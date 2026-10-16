@@ -1,10 +1,4 @@
-import {
-  defineComponent,
-  h,
-  type Child,
-  type ComponentContract,
-  type Props,
-} from "meowjsx";
+import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
 import { copyTextToClipboard } from "../clipboard";
 import { Icon } from "../icons/icon";
 

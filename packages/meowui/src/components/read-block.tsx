@@ -1,10 +1,4 @@
-import {
-  defineComponent,
-  h,
-  type Child,
-  type ComponentContract,
-  type Props,
-} from "meowjsx";
+import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
 import { OutputBlock } from "./output-block";
 import { highlightCode, type HighlightSpan } from "../syntax-highlight";
 

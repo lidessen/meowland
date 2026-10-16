@@ -11,15 +11,19 @@ import { AssistantView, type AssistantDraft, type AssistantMessage } from "meowu
 const messages = signal<readonly AssistantMessage[]>([]);
 const draft = signal<AssistantDraft>({ text: "", attachments: [] });
 
-const view = <AssistantView
-  messages={messages}
-  draft={draft}
-  onDraftChange={(next) => { draft.value = next; }}
-  onSubmit={async (snapshot) => {
-    const accepted = await hostSend(snapshot);
-    return { accepted };
-  }}
-/>;
+const view = (
+  <AssistantView
+    messages={messages}
+    draft={draft}
+    onDraftChange={(next) => {
+      draft.value = next;
+    }}
+    onSubmit={async (snapshot) => {
+      const accepted = await hostSend(snapshot);
+      return { accepted };
+    }}
+  />
+);
 ```
 
 组件由父容器取得受约束高度；标准安装仍需 `createMeowUI` 与 `standardTheme.cssText`，不依赖 Rossovia 的 CSS 或 controller。消息和 composer 使用同一阅读列，回最新只锚定消息区域。活动在宽容器旁显，在窄容器变为同一个原生模态对话框，不重挂消息和草稿。

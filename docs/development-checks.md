@@ -1,0 +1,45 @@
+# 工程检查
+
+状态：正在落地；命令以根 `package.json` 为准。检查与修复分开，检查失败返回非零，不自动改源码、更新 golden 或发布包。
+
+## 安装与版本
+
+使用 Bun 1.4.2，首次运行或 CI 先执行 `bun install --frozen-lockfile`。根开发依赖精确固定 Oxlint 1.88.0、Oxfmt 0.73.0 与 TypeScript 7.0.2，解析结果保存在唯一 `bun.lock`。
+
+首次检查先执行 `bun run build`，再执行 `bun run check`。包间公共 exports 指向 dist，现有类型检查和单测会真实消费这些入口；源码或导出修改后重新 build，不能让旧 dist 代替当前源码。`check` 自身不隐式生成产物。
+
+2026-10-16 从官方 npm registry 的 [Oxlint](https://registry.npmjs.org/oxlint/1.88.0) 与 [Oxfmt](https://registry.npmjs.org/oxfmt/0.73.0) 元数据核对版本。上游声明 Node `^20.19.0 || >=22.12.0`；本仓库脚本显式用 Bun 执行 JS launcher，再调用其平台原生 binding，不依赖 PATH 上的 Node。兼容性以本版本实际运行结果为准。
+
+## 本地命令与范围
+
+| 命令                   | 范围与作用                                                                                                                                                     |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bun run lint`         | Oxlint correctness 规则与默认插件，覆盖源码、单测、浏览器用例、示例、脚本和 TS 配置；警告也导致失败                                                            |
+| `bun run lint:fix`     | 相同规则的普通 `--fix`；不启用 suggestions 或 dangerous fixes，修改后仍需审阅 diff                                                                             |
+| `bun run format:check` | Oxfmt 检查支持的源码、文档及配置，不写文件                                                                                                                     |
+| `bun run format`       | Oxfmt 写入格式；局部任务优先直接传本次修改的精确路径，避免覆盖其它作者 WIP                                                                                     |
+| `bun run typecheck`    | 五包生产入口、JSX core/renderer/Web 环境、无 DOM 的 CSS core、CSS/UI 公共类型用例，以及根工程脚本、浏览器示例和展板 host；不等于全部 unit/prototype 的 TS 检查 |
+| `bun run test`         | JSX/CSS/UI 单测、Book 的 Bun/单测与生命周期、Press 单测与根工程脚本单测；`.spec.ts(x)` 浏览器场景另用 Playwright                                               |
+| `bun run check`        | 顺序执行 format:check → lint → typecheck → test；任一步失败即停止                                                                                              |
+| `bun run build`        | 构建五包 ESM 与声明及必要资源；清理并更新各包 dist，不发布                                                                                                     |
+| `bun run pack`         | 把当前 dist 打成本地 tgz；不自动 build，不代表安装态或浏览器验收通过                                                                                           |
+
+检查排除 `node_modules`、`dist`、`artifacts`、Playwright 报告、测试结果和 Book 生成目录。格式工具另外跳过 Bun 生成的锁文件及原样保留的 `packages/meowui/THIRD_PARTY_NOTICES.md`；不因历史源码存在告警而整体忽略包或测试目录。具体边界在 `.oxlintrc.json` 与 `.oxfmtrc.json`。
+
+两个 JSON 类型/行为用例文件对 `no-unused-vars` 设置 `_` 前缀的参数占位约定，保留回调 props 的类型推断；其它文件保持 Oxlint 默认规则选项，未用导入仍报错。Reactive effect 的信号读取具有订阅语义，不能作为普通无用表达式随意删除。
+
+平台环境类型不能合并处理：JSX core 与 CSS core 不加载 DOM/Bun 类型，Web 与 UI 使用 DOM；Book 的 Bun/Playwright 入口保留自身所需宿主类型。`bun scripts/build.ts --check --package <name>` 仅检查该包的生产 build 配置，不包含根 typecheck 的额外环境和公共类型用例。
+
+## CI 与发行验证
+
+`.github/workflows/checks.yml` 是唯一工程 workflow，仅在 main push、pull request 或手动触发时执行 frozen install → build → lint。它不执行完整本地 check，也不执行格式检查、单测、浏览器、打包、tag 发布、npm 发布或部署；只有只读 repository 权限。
+
+需要本地完整工程检查时执行 `bun run check`。UI/交互改动仍须按受影响场景实际打开页面；公开 exports、资源或打包改动须另做 build → pack → 独立目录安装消费。旧 tgz 的成功属于当时源码，不因为后续格式或工程配置改变而自动升级为本版发行验收。
+
+## 修复与证据
+
+先区分真实缺陷、类型表达与工具环境差异，再选择最小修复。不能用全局关闭有效规则、删除失败断言、放宽 props 或 `skipLibCheck` 隐藏当前问题。必要例外限于准确规则和范围，并说明原因。
+
+检查结果应写清输入版本、实际命令和退出状态。格式、lint、类型、单测、浏览器观察、安装态消费和正式发布分别报告。检查脚本或 CI 本身有改动时，在隔离副本植入格式、lint、类型或断言错误，验证相应命令返回非零；负例不留在产品源码，不为它新增生产分支或常驻状态。
+
+官方行为参考：[Oxlint 配置](https://oxc.rs/docs/guide/usage/linter/config)、[Oxlint CLI](https://oxc.rs/docs/guide/usage/linter/cli)、[Oxfmt 配置](https://oxc.rs/docs/guide/usage/formatter/config)。

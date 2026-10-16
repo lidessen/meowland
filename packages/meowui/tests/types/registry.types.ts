@@ -1,8 +1,4 @@
-import type {
-  RegisteredComponentName,
-  RegisteredComponentPart,
-  ThemeRules,
-} from "meowjsx";
+import type { RegisteredComponentName, RegisteredComponentPart, ThemeRules } from "meowjsx";
 import "meowui";
 
 const component: RegisteredComponentName = "button";

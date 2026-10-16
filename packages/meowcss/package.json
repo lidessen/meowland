@@ -2,7 +2,10 @@
   "name": "meowcss",
   "version": "0.1.0",
   "type": "module",
-  "scripts": { "test": "bun test tests", "typecheck": "tsc -p tsconfig.core.json" },
+  "scripts": {
+    "test": "bun test tests",
+    "typecheck": "tsc -p tsconfig.core.json"
+  },
   "description": "meowcss library",
   "files": [
     "dist",

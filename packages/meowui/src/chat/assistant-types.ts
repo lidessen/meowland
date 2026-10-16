@@ -97,14 +97,11 @@ export interface AssistantViewProps extends Props {
   readOnly?: boolean;
   onDraftChange?: (draft: AssistantDraft) => void;
   /** Only an explicit accepted:true may clear an unchanged submitted snapshot. */
-  onSubmit?: (draft: AssistantDraft) =>
-    | { accepted: boolean }
-    | Promise<{ accepted: boolean }>;
+  onSubmit?: (draft: AssistantDraft) => { accepted: boolean } | Promise<{ accepted: boolean }>;
   /** Host attachment ingestion. Return normalized entries or update controlled draft. No upload is implicit. */
-  onAttach?: (files: readonly File[]) =>
-    | readonly AssistantAttachment[]
-    | void
-    | Promise<readonly AssistantAttachment[] | void>;
+  onAttach?: (
+    files: readonly File[],
+  ) => readonly AssistantAttachment[] | void | Promise<readonly AssistantAttachment[] | void>;
   /** Disable local file selection when the host supports only already-normalized attachments. */
   allowAttachments?: boolean;
   disabled?: MaybeSignal<boolean>;

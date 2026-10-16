@@ -10,35 +10,53 @@ const checking = process.argv.includes("--check");
 
 async function files(directory: string): Promise<string[]> {
   const entries = await readdir(directory, { withFileTypes: true });
-  return (await Promise.all(entries.map(async (entry) => {
-    const file = join(directory, entry.name);
-    return entry.isDirectory() ? files(file) : [file];
-  }))).flat();
+  return (
+    await Promise.all(
+      entries.map(async (entry) => {
+        const file = join(directory, entry.name);
+        return entry.isDirectory() ? files(file) : [file];
+      }),
+    )
+  ).flat();
 }
 
 async function existing(file: string): Promise<boolean> {
-  try { return (await stat(file)).isFile(); } catch { return false; }
+  try {
+    return (await stat(file)).isFile();
+  } catch {
+    return false;
+  }
 }
 
 if (checking && selected < 0) {
   for (const config of [
-    "meowjsx/tsconfig.core.json", "meowjsx/tsconfig.renderer.json",
-    "meowjsx/tsconfig.web.json", "meowcss/tsconfig.core.json",
+    "meowjsx/tsconfig.core.json",
+    "meowjsx/tsconfig.renderer.json",
+    "meowjsx/tsconfig.web.json",
+    "meowcss/tsconfig.core.json",
   ]) {
-    const child = Bun.spawn(["bun", join(root, "node_modules/typescript/bin/tsc"),
-      "-p", join(root, "packages", config)],
-      { cwd: root, stdout: "inherit", stderr: "inherit" });
-    if (await child.exited !== 0) throw new Error(config + " environment check failed");
+    const child = Bun.spawn(
+      ["bun", join(root, "node_modules/typescript/bin/tsc"), "-p", join(root, "packages", config)],
+      { cwd: root, stdout: "inherit", stderr: "inherit" },
+    );
+    if ((await child.exited) !== 0) throw new Error(config + " environment check failed");
   }
 }
 
 for (const name of packages) {
   const directory = join(root, "packages", name);
   if (!checking) await rm(join(directory, "dist"), { recursive: true, force: true });
-  const child = Bun.spawn(["bun", join(root, "node_modules/typescript/bin/tsc"),
-    "-p", join(directory, "tsconfig.build.json"), ...(checking ? ["--noEmit"] : [])],
-    { cwd: root, stdout: "inherit", stderr: "inherit" });
-  if (await child.exited !== 0) throw new Error(name + " TypeScript compilation failed");
+  const child = Bun.spawn(
+    [
+      "bun",
+      join(root, "node_modules/typescript/bin/tsc"),
+      "-p",
+      join(directory, "tsconfig.build.json"),
+      ...(checking ? ["--noEmit"] : []),
+    ],
+    { cwd: root, stdout: "inherit", stderr: "inherit" },
+  );
+  if ((await child.exited) !== 0) throw new Error(name + " TypeScript compilation failed");
   if (checking) continue;
   for (const source of await files(join(directory, "src"))) {
     if ([".ts", ".tsx"].includes(extname(source))) continue;
@@ -57,9 +75,11 @@ for (const name of packages) {
       let replacement = specifier.replace(/\.(tsx?|jsx)$/, ".js");
       if (!extname(replacement)) {
         if (await existing(resolve(dirname(file), replacement + ".js"))) replacement += ".js";
-        else if (await existing(resolve(dirname(file), replacement, "index.js"))) replacement += "/index.js";
+        else if (await existing(resolve(dirname(file), replacement, "index.js")))
+          replacement += "/index.js";
       }
-      if (replacement !== specifier) updated = updated.replace(match[0], match[1] + replacement + match[3]);
+      if (replacement !== specifier)
+        updated = updated.replace(match[0], match[1] + replacement + match[3]);
     }
     if (updated !== original) await writeFile(file, updated);
   }
@@ -73,9 +93,15 @@ for (const name of packages) {
 
 if (checking && selected < 0) {
   for (const name of ["meowcss", "meowui"]) {
-    const child = Bun.spawn(["bun", join(root, "node_modules/typescript/bin/tsc"),
-      "-p", join(root, "packages", name, "tsconfig.types.json")],
-      { cwd: root, stdout: "inherit", stderr: "inherit" });
-    if (await child.exited !== 0) throw new Error(name + " public type contracts failed");
+    const child = Bun.spawn(
+      [
+        "bun",
+        join(root, "node_modules/typescript/bin/tsc"),
+        "-p",
+        join(root, "packages", name, "tsconfig.types.json"),
+      ],
+      { cwd: root, stdout: "inherit", stderr: "inherit" },
+    );
+    if ((await child.exited) !== 0) throw new Error(name + " public type contracts failed");
   }
 }

@@ -74,7 +74,11 @@ function replay(
   story: StoryEntry,
   environment: BrowserContextOptions,
 ): string {
-  const args = ["bun", resolve(import.meta.dir, `../cli${import.meta.url.endsWith(".ts") ? ".ts" : ".js"}`), "capture"];
+  const args = [
+    "bun",
+    resolve(import.meta.dir, `../cli${import.meta.url.endsWith(".ts") ? ".ts" : ".js"}`),
+    "capture",
+  ];
   if (options.configFile) args.push("--config", resolve(options.configFile));
   if (options.temporary) {
     args.push("--component", options.temporary.component, "--export", options.temporary.exportName);

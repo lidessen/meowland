@@ -2,7 +2,10 @@
   "name": "meowpress",
   "version": "0.1.0",
   "type": "module",
-  "scripts": { "test": "bun test tests/unit", "typecheck": "tsc --noEmit -p tsconfig.json" },
+  "scripts": {
+    "test": "bun test tests/unit",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
   "description": "meowpress library",
   "files": [
     "dist",

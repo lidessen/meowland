@@ -1,10 +1,4 @@
-import {
-  defineComponent,
-  h,
-  type Child,
-  type ComponentContract,
-  type Props,
-} from "meowjsx";
+import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
 import { Popover, type PopoverTriggerBindings } from "./popover";
 import { copyTextToClipboard } from "../clipboard";
 export const hoverCardContract = {

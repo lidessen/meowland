@@ -26,7 +26,7 @@ bun run pack
 
 构建输出 ESM JavaScript 与声明文件，保留模块图；五个 tarball 放到未跟踪的 `artifacts/`。这些命令只构建或打本地包，不发布 npm。包的公开入口不指向 TypeScript 源码。
 
-维护者另用 `bun run typecheck` 检查生产入口、JSX core/renderer/Web 环境、无 DOM 的 CSS core 以及 CSS/UI 公共类型用例。它不覆盖全部 unit/prototype 源码；各包 README 另列自己的检查入口。单测使用 `bun run test`，展板检查使用 `bun run --cwd apps/showcase check`，浏览器检查按消费者的 Playwright 配置分别运行。列出命令不表示本轮所有项目均已通过；验证须绑定实际输入版本，旧产物通过不替代当前源码验收。
+维护者首次安装后先 `bun run build`，再执行 `bun run check`，顺序检查格式、lint、类型与单测。检查和自动修复分开；工程脚本、类型环境、测试范围及仅 build/lint 的 CI 见[工程检查](docs/development-checks.md)。`typecheck` 不覆盖全部 unit/prototype 源码；各包 README 另列自己的检查入口。展板检查使用 `bun run --cwd apps/showcase check`，浏览器检查按消费者的 Playwright 配置分别运行。列出命令不表示本轮所有项目均已通过；验证须绑定实际输入版本，旧产物通过不替代当前源码验收。
 
 源码来自 Rossovia 仓库的库目录，在独立目录迁移；不使用原仓库的 workspace 链接、产品后端或真实数据。现有第三方声明随源码保留。
 

@@ -1,10 +1,4 @@
-import {
-  h,
-  defineComponent,
-  type Child,
-  type ComponentContract,
-  type Props,
-} from "meowjsx";
+import { h, defineComponent, type Child, type ComponentContract, type Props } from "meowjsx";
 import { ChatBubble } from "./bubble";
 import { messageRoleContext } from "./message-context";
 

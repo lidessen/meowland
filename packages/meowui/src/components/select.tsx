@@ -1,9 +1,4 @@
-import {
-  defineComponent,
-  type ComponentContract,
-  type Props,
-  type MaybeSignal,
-} from "meowjsx";
+import { defineComponent, type ComponentContract, type Props, type MaybeSignal } from "meowjsx";
 
 export const selectContract = {
   name: "select",

@@ -14,14 +14,20 @@ const mounted = render(
   <Card>
     <h1>Meowland package example</h1>
     <p>This page consumes only the public package entries.</p>
-    <p>Count: <output>{count}</output></p>
+    <p>
+      Count: <output>{count}</output>
+    </p>
     <Button onClick={() => count.update((value) => value + 1)}>Increment</Button>
   </Card>,
   root,
 );
-window.addEventListener("pagehide", () => {
-  mounted.unmount();
-  removeStyles();
-  restoreTheme();
-  uninstall();
-}, { once: true });
+window.addEventListener(
+  "pagehide",
+  () => {
+    mounted.unmount();
+    removeStyles();
+    restoreTheme();
+    uninstall();
+  },
+  { once: true },
+);

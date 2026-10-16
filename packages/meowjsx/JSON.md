@@ -7,11 +7,19 @@ import { createJsonView, defineJsonComponent, jsonSchema, parseJsonView } from "
 import { h, signal, type MaybeSignal } from "meowjsx";
 
 const Label = (props: { text: MaybeSignal<string> }) => h("span", null, props.text);
-const catalog = new Map([["Label", defineJsonComponent(Label, {
-  text: { kind: "value", schema: jsonSchema.string(), bindable: true, required: true },
-})]]);
+const catalog = new Map([
+  [
+    "Label",
+    defineJsonComponent(Label, {
+      text: { kind: "value", schema: jsonSchema.string(), bindable: true, required: true },
+    }),
+  ],
+]);
 const text = signal("Hello");
-const description = parseJsonView({ component: "Label", props: { text: { $binding: "label" } } }, catalog);
+const description = parseJsonView(
+  { component: "Label", props: { text: { $binding: "label" } } },
+  catalog,
+);
 const child = createJsonView(description, { catalog, bindings: new Map([["label", text]]) });
 ```
 

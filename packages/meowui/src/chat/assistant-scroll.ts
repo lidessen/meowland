@@ -1,7 +1,14 @@
-interface ReadingAnchor { id: string; offset: number }
+interface ReadingAnchor {
+  id: string;
+  offset: number;
+}
 
 /** The transcript has exactly one scroll owner. The latest control belongs to this viewport. */
-export function assistantScroll(viewport: HTMLElement, content: HTMLElement, onLatest: (latest: boolean) => void) {
+export function assistantScroll(
+  viewport: HTMLElement,
+  content: HTMLElement,
+  onLatest: (latest: boolean) => void,
+) {
   let following = true;
   let anchor: ReadingAnchor | undefined;
   let top = viewport.scrollTop;
@@ -12,7 +19,9 @@ export function assistantScroll(viewport: HTMLElement, content: HTMLElement, onL
     top = viewport.scrollTop;
     const origin = viewport.getBoundingClientRect().top;
     const row = rows().find((item) => item.getBoundingClientRect().bottom > origin);
-    anchor = row ? { id: row.dataset.assistantMessageId!, offset: row.getBoundingClientRect().top - origin } : undefined;
+    anchor = row
+      ? { id: row.dataset.assistantMessageId!, offset: row.getBoundingClientRect().top - origin }
+      : undefined;
   };
   const restore = () => {
     if (!viewport.clientHeight) return;
@@ -20,9 +29,13 @@ export function assistantScroll(viewport: HTMLElement, content: HTMLElement, onL
     if (following) viewport.scrollTop = Math.max(0, viewport.scrollHeight - viewport.clientHeight);
     else {
       const row = anchor && rows().find((item) => item.dataset.assistantMessageId === anchor!.id);
-      viewport.scrollTop = row && anchor
-        ? viewport.scrollTop + row.getBoundingClientRect().top - viewport.getBoundingClientRect().top - anchor.offset
-        : top;
+      viewport.scrollTop =
+        row && anchor
+          ? viewport.scrollTop +
+            row.getBoundingClientRect().top -
+            viewport.getBoundingClientRect().top -
+            anchor.offset
+          : top;
     }
     capture();
     onLatest(atLatest());
@@ -50,7 +63,15 @@ export function assistantScroll(viewport: HTMLElement, content: HTMLElement, onL
   return {
     beforeUpdate: capture,
     afterUpdate: restore,
-    latest() { following = true; restore(); viewport.focus({ preventScroll: true }); },
-    dispose() { observer.disconnect(); viewport.removeEventListener("scroll", scroll); viewport.removeEventListener("click", inspectDisclosure); },
+    latest() {
+      following = true;
+      restore();
+      viewport.focus({ preventScroll: true });
+    },
+    dispose() {
+      observer.disconnect();
+      viewport.removeEventListener("scroll", scroll);
+      viewport.removeEventListener("click", inspectDisclosure);
+    },
   };
 }

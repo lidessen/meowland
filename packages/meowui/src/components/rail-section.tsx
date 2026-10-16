@@ -1,10 +1,4 @@
-import {
-  defineComponent,
-  h,
-  type Child,
-  type ComponentContract,
-  type Props,
-} from "meowjsx";
+import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
 import { RailItem } from "./rail-item";
 
 export const railSectionContract = {

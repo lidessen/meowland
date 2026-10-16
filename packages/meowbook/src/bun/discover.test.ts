@@ -235,7 +235,7 @@ test("build emits a static gallery, independent canvas and manifest, then remove
       JSON.stringify({
         extends: resolve(root, "../tsconfig.json"),
         compilerOptions: {
-          paths: { "meowbook": [resolve(import.meta.dir, "../index.ts")] },
+          paths: { meowbook: [resolve(import.meta.dir, "../index.ts")] },
         },
         include: ["*.tsx", "*.ts"],
       }),

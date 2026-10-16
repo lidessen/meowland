@@ -1,0 +1,25 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "categories": {
+    "correctness": "error"
+  },
+  "overrides": [
+    {
+      "files": [
+        "packages/meowjsx/tests/types/json.types.ts",
+        "packages/meowjsx/tests/unit/json.test.ts"
+      ],
+      "rules": {
+        "no-unused-vars": ["error", { "argsIgnorePattern": "^_" }]
+      }
+    }
+  ],
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "artifacts/**",
+    "**/playwright-report/**",
+    "**/test-results/**",
+    "**/.meowbook-*/**"
+  ]
+}

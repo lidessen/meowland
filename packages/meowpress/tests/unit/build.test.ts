@@ -99,13 +99,16 @@ test("builds explicit site artwork from the content assets root across page dept
     const content = join(root, "content");
     const output = join(root, "dist");
     await mkdir(join(content, "assets/images"), { recursive: true });
-    const artwork = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><circle cx="8" cy="8" r="6" fill="navy"/></svg>';
+    const artwork =
+      '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><circle cx="8" cy="8" r="6" fill="navy"/></svg>';
     await writeFile(join(content, "assets/images/site.svg"), artwork);
     await buildSite({
       content,
       skillsDirectory: root,
       outputDirectory: output,
-      site: { images: { hero: "images/site.svg", feed: "images/site.svg", about: "images/site.svg" } },
+      site: {
+        images: { hero: "images/site.svg", feed: "images/site.svg", about: "images/site.svg" },
+      },
     });
     const home = await Bun.file(join(output, "index.html")).text();
     const about = await Bun.file(join(output, "about/index.html")).text();

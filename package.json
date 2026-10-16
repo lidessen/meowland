@@ -2,20 +2,30 @@
   "name": "meowland",
   "private": true,
   "packageManager": "bun@1.4.2",
-  "workspaces": ["packages/*", "apps/*"],
+  "workspaces": [
+    "packages/*",
+    "apps/*"
+  ],
   "scripts": {
     "build": "bun scripts/build.ts",
     "pack": "bun scripts/pack.ts",
-    "typecheck": "bun scripts/build.ts --check",
-    "test": "bun test packages/meowjsx/tests packages/meowcss/tests packages/meowui/tests/unit packages/meowbook/src/bun packages/meowbook/tests packages/meowpress/tests/unit",
+    "typecheck": "bun scripts/build.ts --check && bun node_modules/typescript/bin/tsc -p tsconfig.scripts.json && bun node_modules/typescript/bin/tsc -p examples/browser/tsconfig.json && bun node_modules/typescript/bin/tsc -p apps/showcase/tsconfig.json",
+    "lint": "bun node_modules/oxlint/bin/oxlint --deny-warnings .",
+    "lint:fix": "bun node_modules/oxlint/bin/oxlint --deny-warnings --fix .",
+    "format:check": "bun node_modules/oxfmt/bin/oxfmt --check .",
+    "format": "bun node_modules/oxfmt/bin/oxfmt --write .",
+    "check": "bun run format:check && bun run lint && bun run typecheck && bun run test",
+    "test": "bun test packages/meowjsx/tests packages/meowcss/tests packages/meowui/tests/unit packages/meowbook/src/bun packages/meowbook/tests packages/meowpress/tests/unit scripts",
     "dev": "bun run --filter @meowland/showcase dev"
   },
   "devDependencies": {
-    "meowjsx": "workspace:*",
-    "meowcss": "workspace:*",
-    "meowui": "workspace:*",
     "@playwright/test": "1.63.0",
     "@types/bun": "1.4.2",
+    "meowcss": "workspace:*",
+    "meowjsx": "workspace:*",
+    "meowui": "workspace:*",
+    "oxfmt": "0.73.0",
+    "oxlint": "1.88.0",
     "typescript": "7.0.2"
   }
 }

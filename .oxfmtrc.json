@@ -1,0 +1,14 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "sortPackageJson": false,
+  "ignorePatterns": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "artifacts/**",
+    "**/playwright-report/**",
+    "**/test-results/**",
+    "**/.meowbook-*/**",
+    "bun.lock",
+    "packages/meowui/THIRD_PARTY_NOTICES.md"
+  ]
+}

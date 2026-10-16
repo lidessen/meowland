@@ -1,14 +1,7 @@
 import { uiTokens } from "meowui/theme";
 import { h, signal, type Child } from "meowjsx";
 import { defineStory } from "meowbook";
-import {
-  ChatConversation,
-  ChatMessageList,
-  ChatMessage,
-  Button,
-  Stack,
-  Inline,
-} from "meowui";
+import { ChatConversation, ChatMessageList, ChatMessage, Button, Stack, Inline } from "meowui";
 
 export const ConversationReading = defineStory({
   id: "chat-conversation",

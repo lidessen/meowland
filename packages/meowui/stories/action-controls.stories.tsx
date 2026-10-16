@@ -1,15 +1,6 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
-import {
-  Button,
-  ChoiceSelect,
-  Icon,
-  IconButton,
-  Input,
-  Select,
-  Stack,
-  Toolbar,
-} from "meowui";
+import { Button, ChoiceSelect, Icon, IconButton, Input, Select, Stack, Toolbar } from "meowui";
 
 export const IconButtonStory = defineStory({
   id: "icon-button",

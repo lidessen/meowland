@@ -1,10 +1,4 @@
-import {
-  defineComponent,
-  h,
-  mapSignal,
-  type ComponentContract,
-  type Props,
-} from "meowjsx";
+import { defineComponent, h, mapSignal, type ComponentContract, type Props } from "meowjsx";
 import { Icon } from "../icons/icon";
 
 export const imagePreviewContract = {

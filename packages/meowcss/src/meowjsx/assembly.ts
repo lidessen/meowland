@@ -2,7 +2,7 @@ import { defineTheme as assembleTheme, type ThemeDefinition } from "../assembly"
 import type { CSSFragment } from "./fragments";
 import type { ComponentContract } from "meowjsx";
 import { partSelector, type PartSelector, type StylePropsBinding } from "./parts";
-import { isTokenSet, type Options, type Selection, type TokenSet } from "../values";
+import { isTokenSet, type Options, type TokenSet } from "../values";
 
 type Defaults<O extends Options<any>> = {
   [K in keyof O["axes"]]: O["axes"][K][number];

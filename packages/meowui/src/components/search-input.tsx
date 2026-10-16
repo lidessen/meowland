@@ -1,10 +1,4 @@
-import {
-  defineComponent,
-  h,
-  type ComponentContract,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { defineComponent, h, type ComponentContract, type MaybeSignal, type Props } from "meowjsx";
 import { Icon } from "../icons/icon";
 
 export const searchInputContract = {

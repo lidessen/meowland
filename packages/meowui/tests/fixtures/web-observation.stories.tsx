@@ -1,15 +1,5 @@
-import {
-  createComponentObservation,
-  createRuntime,
-  h,
-  signal,
-  type Child,
-} from "meowjsx";
-import {
-  createSkeletonController,
-  createWebRenderer,
-  useWebObservation,
-} from "meowjsx/web";
+import { createComponentObservation, createRuntime, h, signal, type Child } from "meowjsx";
+import { createSkeletonController, createWebRenderer, useWebObservation } from "meowjsx/web";
 import { defineStory } from "meowbook";
 
 export const WebObservation = defineStory({

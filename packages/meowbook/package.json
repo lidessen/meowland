@@ -1,0 +1,54 @@
+{
+  "name": "meowbook",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": { "test": "bun test src/bun tests", "typecheck": "tsc --noEmit -p tsconfig.json" },
+  "description": "meowbook library",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    },
+    "./web": {
+      "types": "./dist/src/web/index.d.ts",
+      "import": "./dist/src/web/index.js"
+    },
+    "./bun": {
+      "types": "./dist/src/bun/index.d.ts",
+      "import": "./dist/src/bun/index.js"
+    },
+    "./playwright": {
+      "types": "./dist/src/playwright.d.ts",
+      "import": "./dist/src/playwright.js"
+    }
+  },
+  "bin": {
+    "meowbook": "./dist/src/cli.js"
+  },
+  "dependencies": {
+    "@types/bun": "1.4.2",
+    "@types/node": "26.6.5",
+    "@babel/parser": "^7.29.9",
+    "playwright": "1.63.0",
+    "pngjs": "^7.0.0",
+    "typescript": "7.0.2",
+    "@playwright/test": "1.63.0"
+  },
+  "peerDependencies": {
+    "meowjsx": "^0.1.0",
+    "meowcss": "^0.1.0",
+    "meowui": "^0.1.0"
+  },
+  "devDependencies": {
+    "@types/pngjs": "^6.0.5",
+    "meowjsx": "workspace:*",
+    "meowcss": "workspace:*",
+    "meowui": "workspace:*"
+  }
+}

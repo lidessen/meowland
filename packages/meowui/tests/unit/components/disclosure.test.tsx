@@ -1,0 +1,29 @@
+import { expect, test } from "bun:test";
+import { createRuntime, h } from "meowjsx";
+import { createWebRenderer } from "meowjsx/web";
+import { Disclosure, installMeowUI } from "meowui";
+
+test("Disclosure retains native semantics and host slots through its stable part contract", () => {
+  const runtime = createRuntime();
+  installMeowUI(runtime);
+  const web = createWebRenderer(runtime);
+  const view = (
+    <Disclosure
+      summary="执行详情"
+      open
+      id="run-details"
+      className="host"
+      summaryClassName="host-summary"
+      contentClassName="host-content"
+    >
+      <p>检查结果</p>
+    </Disclosure>
+  );
+  const html = web.renderToHtml(view);
+  expect(html).toContain("<details");
+  expect(html).toContain(" open");
+  expect(html).toContain('<summary class="host-summary"');
+  expect(html).toContain('class="host-content"');
+  expect(html).toContain('data-meowui-part="disclosure/summary"');
+  expect(html).toContain('id="run-details"');
+});

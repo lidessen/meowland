@@ -1,0 +1,38 @@
+{
+  "name": "meowcss",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": { "test": "bun test tests", "typecheck": "tsc -p tsconfig.core.json" },
+  "description": "meowcss library",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    },
+    "./meowjsx": {
+      "types": "./dist/src/meowjsx/index.d.ts",
+      "import": "./dist/src/meowjsx/index.js"
+    },
+    "./web": {
+      "types": "./dist/src/web/index.d.ts",
+      "import": "./dist/src/web/index.js"
+    }
+  },
+  "peerDependencies": {
+    "meowjsx": "^0.1.0"
+  },
+  "peerDependenciesMeta": {
+    "meowjsx": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "meowjsx": "workspace:*"
+  }
+}

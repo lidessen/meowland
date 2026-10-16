@@ -1,0 +1,2 @@
+[test]
+pathIgnorePatterns = ["**/*.spec.ts", "**/*.spec.tsx", "**/node_modules/**"]

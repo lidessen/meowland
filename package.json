@@ -1,0 +1,21 @@
+{
+  "name": "meowland",
+  "private": true,
+  "packageManager": "bun@1.4.2",
+  "workspaces": ["packages/*", "apps/*"],
+  "scripts": {
+    "build": "bun scripts/build.ts",
+    "pack": "bun scripts/pack.ts",
+    "typecheck": "bun scripts/build.ts --check",
+    "test": "bun test packages/meowjsx/tests packages/meowcss/tests packages/meowui/tests/unit packages/meowbook/src/bun packages/meowbook/tests packages/meowpress/tests/unit",
+    "dev": "bun run --filter @meowland/showcase dev"
+  },
+  "devDependencies": {
+    "meowjsx": "workspace:*",
+    "meowcss": "workspace:*",
+    "meowui": "workspace:*",
+    "@playwright/test": "1.63.0",
+    "@types/bun": "1.4.2",
+    "typescript": "7.0.2"
+  }
+}

@@ -1,0 +1,204 @@
+[
+  {
+    "name": "single region with omitted defaults",
+    "valid": true,
+    "layout": { "areas": [["content"]], "regions": { "content": {} } }
+  },
+  {
+    "name": "communication rectangle and content scroll owner",
+    "valid": true,
+    "layout": {
+      "areas": [
+        ["list", "thread"],
+        ["list", "messages"],
+        ["list", "compose"]
+      ],
+      "columns": ["compact", "fill"],
+      "rows": ["content", "fill", "content"],
+      "gap": "compact",
+      "regions": {
+        "list": { "group": "browse" },
+        "thread": { "direction": "inline", "align": "baseline", "group": "detail" },
+        "messages": { "scrollOwner": "content", "gap": "none", "group": "detail" },
+        "compose": { "direction": "block", "align": "stretch", "group": "detail" }
+      }
+    }
+  },
+  {
+    "name": "empty matrix cells and repeated finite tracks",
+    "valid": true,
+    "layout": {
+      "areas": [
+        ["first", "first", null],
+        ["second", "third", null]
+      ],
+      "columns": ["content", "content", "fill"],
+      "rows": ["fill", "fill"],
+      "gap": "relaxed",
+      "regions": {
+        "first": { "align": "start", "gap": "normal", "scrollOwner": "layout" },
+        "second": { "align": "center", "gap": "relaxed" },
+        "third": { "align": "end" }
+      }
+    }
+  },
+  {
+    "name": "compact navigation and remaining content retain desktop matrix",
+    "valid": true,
+    "layout": {
+      "areas": [["navigation", "content"]],
+      "columns": ["compact", "fill"],
+      "regions": {
+        "navigation": { "compactRow": "content", "scrollOwner": "content" },
+        "content": { "compactRow": "fill", "scrollOwner": "content" }
+      }
+    }
+  },
+  {
+    "name": "raw compact row size",
+    "valid": false,
+    "layout": { "areas": [["a"]], "regions": { "a": { "compactRow": "160px" } } }
+  },
+  {
+    "name": "invalid compact row enum",
+    "valid": false,
+    "layout": { "areas": [["a"]], "regions": { "a": { "compactRow": "compact" } } }
+  },
+  { "name": "missing layout", "valid": false },
+  { "name": "null layout", "valid": false, "layout": null },
+  { "name": "empty grid", "valid": false, "layout": { "areas": [], "regions": {} } },
+  { "name": "empty row", "valid": false, "layout": { "areas": [[]], "regions": {} } },
+  { "name": "null row", "valid": false, "layout": { "areas": [null], "regions": {} } },
+  {
+    "name": "ragged matrix",
+    "valid": false,
+    "layout": { "areas": [["a"], ["a", "b"]], "regions": { "a": {}, "b": {} } }
+  },
+  {
+    "name": "disjoint named area",
+    "valid": false,
+    "layout": { "areas": [["a", "b", "a"]], "regions": { "a": {}, "b": {} } }
+  },
+  {
+    "name": "nonrectangular named area",
+    "valid": false,
+    "layout": {
+      "areas": [
+        ["a", "a"],
+        ["a", "b"]
+      ],
+      "regions": { "a": {}, "b": {} }
+    }
+  },
+  {
+    "name": "hole in named rectangle",
+    "valid": false,
+    "layout": {
+      "areas": [
+        ["a", "a", "a"],
+        ["a", null, "a"]
+      ],
+      "regions": { "a": {} }
+    }
+  },
+  {
+    "name": "all empty cells",
+    "valid": false,
+    "layout": { "areas": [[null]], "regions": {} }
+  },
+  {
+    "name": "invalid area name",
+    "valid": false,
+    "layout": { "areas": [["Content"]], "regions": { "Content": {} } }
+  },
+  {
+    "name": "missing region mapping",
+    "valid": false,
+    "layout": { "areas": [["a", "b"]], "regions": { "a": {} } }
+  },
+  {
+    "name": "unknown region mapping",
+    "valid": false,
+    "layout": { "areas": [["a"]], "regions": { "b": {} } }
+  },
+  {
+    "name": "extra region mapping",
+    "valid": false,
+    "layout": { "areas": [["a"]], "regions": { "a": {}, "b": {} } }
+  },
+  {
+    "name": "null region mapping",
+    "valid": false,
+    "layout": { "areas": [["a"]], "regions": { "a": null } }
+  },
+  {
+    "name": "wrong column count",
+    "valid": false,
+    "layout": { "areas": [["a"]], "columns": ["fill", "compact"], "regions": { "a": {} } }
+  },
+  {
+    "name": "wrong row count",
+    "valid": false,
+    "layout": { "areas": [["a"]], "rows": [], "regions": { "a": {} } }
+  },
+  {
+    "name": "raw CSS column",
+    "valid": false,
+    "layout": { "areas": [["a"]], "columns": ["200px"], "regions": { "a": {} } }
+  },
+  {
+    "name": "compact row",
+    "valid": false,
+    "layout": { "areas": [["a"]], "rows": ["compact"], "regions": { "a": {} } }
+  },
+  {
+    "name": "null columns",
+    "valid": false,
+    "layout": { "areas": [["a"]], "columns": null, "regions": { "a": {} } }
+  },
+  {
+    "name": "invalid direction",
+    "valid": false,
+    "layout": { "areas": [["a"]], "regions": { "a": { "direction": "row" } } }
+  },
+  {
+    "name": "empty alignment",
+    "valid": false,
+    "layout": { "areas": [["a"]], "regions": { "a": { "align": "" } } }
+  },
+  {
+    "name": "null gap",
+    "valid": false,
+    "layout": { "areas": [["a"]], "gap": null, "regions": { "a": {} } }
+  },
+  {
+    "name": "invalid root gap",
+    "valid": false,
+    "layout": { "areas": [["a"]], "gap": "large", "regions": { "a": {} } }
+  },
+  {
+    "name": "invalid region gap",
+    "valid": false,
+    "layout": { "areas": [["a"]], "regions": { "a": { "gap": "large" } } }
+  },
+  {
+    "name": "invalid scroll owner",
+    "valid": false,
+    "layout": { "areas": [["a"]], "regions": { "a": { "scrollOwner": "page" } } }
+  },
+  {
+    "name": "invalid group name",
+    "valid": false,
+    "layout": { "areas": [["a"]], "regions": { "a": { "group": "" } } }
+  },
+  {
+    "name": "recursive region geometry",
+    "valid": false,
+    "layout": { "areas": [["a"]], "regions": { "a": { "areas": [["child"]] } } }
+  },
+  {
+    "name": "unknown layout field",
+    "valid": false,
+    "layout": { "areas": [["a"]], "template": "split", "regions": { "a": {} } }
+  }
+]

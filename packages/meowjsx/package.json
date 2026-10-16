@@ -1,0 +1,47 @@
+{
+  "name": "meowjsx",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "test": "bun test tests/unit",
+    "typecheck": "tsc -p tsconfig.core.json && tsc -p tsconfig.renderer.json && tsc -p tsconfig.web.json"
+  },
+  "description": "meowjsx library",
+  "files": [
+    "dist",
+    "README.md",
+    "JSON.md",
+    "LICENSE",
+    "THIRD_PARTY_NOTICES.md"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    },
+    "./runtime": {
+      "types": "./dist/src/runtime.d.ts",
+      "import": "./dist/src/runtime.js"
+    },
+    "./renderer": {
+      "types": "./dist/src/renderer.d.ts",
+      "import": "./dist/src/renderer.js"
+    },
+    "./jsx-runtime": {
+      "types": "./dist/src/jsx-runtime.d.ts",
+      "import": "./dist/src/jsx-runtime.js"
+    },
+    "./jsx-dev-runtime": {
+      "types": "./dist/src/jsx-dev-runtime.d.ts",
+      "import": "./dist/src/jsx-dev-runtime.js"
+    },
+    "./web": {
+      "types": "./dist/web/index.d.ts",
+      "import": "./dist/web/index.js"
+    },
+    "./json": {
+      "types": "./dist/src/json/index.d.ts",
+      "import": "./dist/src/json/index.js"
+    }
+  }
+}

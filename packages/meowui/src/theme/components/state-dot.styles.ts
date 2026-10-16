@@ -1,0 +1,69 @@
+import { css, partSelector } from "meowcss/meowjsx";
+import { uiTokens } from "../tokens";
+import { stateDotContract } from "../../components/state-dot";
+
+export const stateDotStyles = css`
+  ${partSelector(stateDotContract, "root")} {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: none;
+    border-radius: 50%;
+    corner-shape: round;
+    background: transparent;
+    color: ${uiTokens.subtleForeground};
+  }
+  ${partSelector(stateDotContract, "root")}[data-appearance="dot"]:not([data-state="ongoing"])::after {
+    content: "";
+    position: absolute;
+    inset: 20%;
+    border-radius: 50%;
+    corner-shape: round;
+    background: currentColor;
+  }
+  ${partSelector(stateDotContract, "root")}[data-state="idle"] {
+    color: light-dark(#d4d4d4, #545557);
+  }
+  ${partSelector(stateDotContract, "root")}[data-state="done"] {
+    color: ${uiTokens.success};
+  }
+  ${partSelector(stateDotContract, "root")}[data-state="warning"] {
+    color: ${uiTokens.warning};
+  }
+  ${partSelector(stateDotContract, "root")}[data-state="error"] {
+    color: ${uiTokens.danger};
+  }
+  ${partSelector(stateDotContract, "root")}[data-state="ongoing"] {
+    background: transparent;
+  }
+  ${partSelector(stateDotContract, "root")}[data-appearance="step"] {
+    background: transparent;
+    border: 1.5px solid ${uiTokens.subtleForeground};
+    box-sizing: border-box;
+  }
+  ${partSelector(stateDotContract, "root")}[data-appearance="step"]:is([data-state="done"], [data-state="error"]) {
+    border-color: currentColor;
+    background: currentColor;
+  }
+  ${partSelector(stateDotContract, "root")}[data-appearance="step"][data-state="warning"] {
+    border-color: currentColor;
+  }
+  ${partSelector(stateDotContract, "root")}[data-appearance="step"][data-state="done"] > svg {
+    color: ${uiTokens.onPrimary};
+  }
+  ${partSelector(stateDotContract, "motion")} {
+    display: flex;
+    animation: ui-state-dot-spin 1.5s linear infinite;
+  }
+  @keyframes ui-state-dot-spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ${partSelector(stateDotContract, "motion")} {
+      animation: none;
+    }
+  }
+`;

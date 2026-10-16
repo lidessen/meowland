@@ -19,7 +19,7 @@ exports 的 JS 与 types 都指向正式包内产物；浏览器入口不夹 Bun
 
 ## 版本与发布
 
-版本、依赖范围和 changelog 由官方 Changesets 的 changeset/version 流程管理；发版准备时可集中汇总受影响包与 semver 变化，不要求每个 commit、PR 或纯文档改动都生成 changeset。不编写另一套版本算法，也不将整个 workspace 图机械变成永久固定版本组。版本计划完成后 build/pack 并验收选定产物，再交本地唯一发布脚本，命令与当前限制以[本地发布](../../../docs/releasing.md)为准，不在技能里维护第二套命令或发布账本。
+维护者或 Agent 准备受影响包的源 manifest 独立版本、依赖范围与发布说明，按[本地发布](../../../docs/releasing.md)当前合同执行；不要求每个 commit、PR 或纯文档改动都生成版本记录。build/pack 并验收选定产物后，在 release manifest 显式列出包与目标版本，交本地唯一发布脚本核对源 manifest、tarball、目标和依赖范围。脚本不推断版本联动，技能不另编版本算法、固定版本组、命令表或发布账本。
 
 Actions 只做 build/lint，不发 npm、不部署，也不以 tag 自动发布。只有本次任务已授权真实发布时才进入脚本的执行模式；否则停在其本地 dry-run/只读计划。选定版本与 tarball 不因进入发布阶段重新打包。tag/draft Release、npm 成功及正式 Release 是不同结果；中断恢复沿同一已核身份接续，不覆盖已发版本或盲目重发。
 

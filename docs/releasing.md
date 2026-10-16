@@ -2,7 +2,7 @@
 
 五包采用独立稳定 SemVer，各自使用 `包名@版本` Git tag，例如 `meowjsx@0.1.0`；同一轮可以显式选择多个包。维护者或 Agent 显式准备包 manifest、依赖范围和发行说明，不引入独立版本工具；本地 `scripts/release.ts` 只消费已落盘 metadata 与已验收 tarball，负责 tag、GitHub Release 和 npm 执行，不另建第二条 publish 通路。`apps/showcase` 私有，不发布。GitHub Actions 只做 build/lint，不因 tag 自动发布，不承担 npm、Release 或部署。
 
-实现脚本不等于授权正式发布。本轮只做本地 dry-run 与外部 CLI 边界 mock；没有真实创建 tag、上传资产、登录、npm publish 或正式 Release。当前新仓库尚无 origin，MIT 文件和包 license 字段仍受原工具审批阻断，不能重试或换路代写；正式发布须先由有权限的人解决这些条件。`meowpress` 官方 registry 为撤包存根，当前 owner/内容与发布权未知，不应据此认为名字空闲或已占用。
+实现脚本不等于授权正式发布。本轮只做本地 dry-run 与外部 CLI 边界 mock；没有真实创建 tag、上传资产、登录、npm publish 或正式 Release。当前新仓库尚无 origin；根 `LICENSE` 与五包 `license: "MIT"` 字段已实际写入，许可证携带及其它发布前置仍须按本轮精确产物验收，不以文件落地替代。`meowpress` 官方 registry 为撤包存根，当前 owner/内容与发布权未知，不应据此认为名字空闲或已占用。
 
 ## 准备精确输入
 

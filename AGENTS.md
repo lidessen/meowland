@@ -1,11 +1,19 @@
 # Meowland 开发入口
 
-这是独立 UI 库仓库。库源码属于 `packages/`；`apps/showcase` 只负责展示与验证，不拥有另一套组件实现。Rossovia 的后端、业务状态、执行协议与权限实现不迁入这里。
+这是独立的 UI 能力库。先读[根 README](README.md)、所属包 README 和更深层 AGENTS，再从[技能索引](.agents/README.md)按任务加载方法，不预读所有技能或历史记录。
 
-- 先读根 README、所属包 README 与更深层 AGENTS。实现保持平台边界：MeowJSX 根不依赖 DOM；Web 通过 `meowjsx/web`；MeowCSS 根不依赖 JSX、UI 或 DOM。
-- 包外使用明确的 public exports；构建保留共享模块图，不能为不同入口复制 runtime、Context、token 标识或 registry。
-- 通用结构、完整 Assistant 组合、局部定制入口、具体主题与语义布局归 MeowUI；MeowCSS 只提供通用机制。场景传数据和受控 props，不复制组件或完整界面实现；产品事实与动作适配留宿主。
-- 源码、测试和提交信息用英文，文档用中文。保留第三方 notices，不能用本仓库许可证覆盖第三方字体、图标或依赖许可。
-- 修改前后核对当前文件状态并保留其它作者 WIP；启用 Git 后同时核对工作树与 index。只按明确授权的稳定范围提交；不批量暂存、不自动推送或发布。
-- 测试保护真实行为、类型环境和发行资源。单测、类型通过、浏览器观察、独立 tarball 消费与正式发布分别报告。
-- 本地命令见 README。复制源码、构建成功或生成 tarball 均不代表公开发布，也不代表 Rossovia 正式消费已经切换。
+## 容易破坏的边界
+
+- MeowJSX 根及其类型不依赖 DOM；Web 显式走 `meowjsx/web`。MeowCSS 根不依赖 JSX、UI 或 DOM，组件与 Web 适配由子路径承担。
+- 同一渲染图共享 core 模块，同次主题组装共享 CSS token/fragment 身份；不能把各入口分别内联成多份 runtime、Context 或 Symbol/WeakMap。显式创建多个 Runtime 仍是合法隔离。
+- MeowUI 拥有通用结构、完整 Assistant、具体主题和语义布局。`apps/showcase` 与 stories 只传场景数据和驱动交互，不复制组件实现；后端、业务事实、权限、上传与持久化留宿主。
+- JSON 入口复用同一组件与有限合同，不把任意业务 JSON、函数或对象路径变成执行能力。支持集以包内 JSON 说明和实际导出为准。
+- 包外消费使用 public exports；源码、测试和提交信息用英文，文档用中文。第三方资源继续保留自己的 notices。
+
+## 按风险推进
+
+独立工作可以并行，共享文件先对齐 owner 并保留无关 WIP。复杂任务先明确目标、依赖和可观察结果；改变职责、公共合同或生命周期等机制时，先与独立质疑者达成有界共识，普通实现、局部修复和文案不必重走设计流程。
+
+检查命令及覆盖范围见[开发检查](docs/development-checks.md)。视觉和交互变化实际打开对应场景；静态检查、行为观察、安装态验收与正式发布分别报告。必要检查成立后，只为新改动、失败或未决风险补测，不用重复全矩阵代替判断。
+
+发布合同见[本地发布](docs/releasing.md)。Actions 只做 build/lint，不发布或部署；构建、打包、tag 或 draft Release 都不等于完成发布。提交、推送与真实发布仍按本次任务授权执行。

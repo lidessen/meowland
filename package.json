@@ -9,6 +9,7 @@
   "scripts": {
     "build": "bun scripts/build.ts",
     "pack": "bun scripts/pack.ts",
+    "release": "bun scripts/release.ts",
     "typecheck": "bun scripts/build.ts --check && bun node_modules/typescript/bin/tsc -p tsconfig.scripts.json && bun node_modules/typescript/bin/tsc -p examples/browser/tsconfig.json && bun node_modules/typescript/bin/tsc -p apps/showcase/tsconfig.json",
     "lint": "bun node_modules/oxlint/bin/oxlint --deny-warnings .",
     "lint:fix": "bun node_modules/oxlint/bin/oxlint --deny-warnings --fix .",
@@ -21,11 +22,13 @@
   "devDependencies": {
     "@playwright/test": "1.63.0",
     "@types/bun": "1.4.2",
+    "@types/semver": "7.8.0",
     "meowcss": "workspace:*",
     "meowjsx": "workspace:*",
     "meowui": "workspace:*",
     "oxfmt": "0.73.0",
     "oxlint": "1.88.0",
+    "semver": "7.8.5",
     "typescript": "7.0.2"
   }
 }

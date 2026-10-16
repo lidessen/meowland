@@ -1,18 +1,18 @@
 # Meowland
 
-独立的 Bun / TypeScript UI 工具仓库，本地迁移进行中。原 Rossovia 产品仓库的源码、服务、正式依赖和 Git remote 均未在这里切换。
+独立的 Bun / TypeScript UI 工具仓库。本轮本地迁移与有限验收完成，正式发布及产品切换尚待后续；原 Rossovia 产品仓库的源码、服务、正式依赖和 Git remote 均未在这里切换。
 
 ## 包
 
-| 包                                          | 职责                                                                            |
-| ------------------------------------------- | ------------------------------------------------------------------------------- |
-| [`meowjsx`](packages/meowjsx/README.md)     | 平台无关 JSX / reactive runtime；浏览器能力通过 `meowjsx/web` 显式加载          |
-| [`meowcss`](packages/meowcss/README.md)     | 通用 token / CSS 生成，另有 `/meowjsx` 与 `/web` 适配入口                       |
-| [`meowui`](packages/meowui/README.md)       | 组件、语义布局和具体标准主题；完整 Assistant 与 JSON catalog 正在实现和独立验收 |
-| [`meowbook`](packages/meowbook/README.md)   | 组件展示、检查、浏览器预览与截图工具                                            |
-| [`meowpress`](packages/meowpress/README.md) | Markdown / MDX 静态站点构建工具                                                 |
+| 包                                          | 职责                                                                                                |
+| ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
+| [`meowjsx`](packages/meowjsx/README.md)     | 平台无关 JSX / reactive runtime；浏览器能力通过 `meowjsx/web` 显式加载                              |
+| [`meowcss`](packages/meowcss/README.md)     | 通用 token / CSS 生成，另有 `/meowjsx` 与 `/web` 适配入口                                           |
+| [`meowui`](packages/meowui/README.md)       | 组件、语义布局和具体标准主题；本轮完整 Assistant 与有限 JSON catalog 的本地实现及有限独立验收已完成 |
+| [`meowbook`](packages/meowbook/README.md)   | 组件展示、检查、浏览器预览与截图工具                                                                |
+| [`meowpress`](packages/meowpress/README.md) | Markdown / MDX 静态站点构建工具                                                                     |
 
-[`apps/showcase`](apps/showcase/README.md) 是私有展板，不是第六个发布包。完整 Assistant 组合与 JSON→UI 的实现及独立验收正在进行；已有 chat 原语、复制源码或早期 tarball 通过不代表当前源码已经完成同源验收。
+[`apps/showcase`](apps/showcase/README.md) 是私有展板，不是第六个发布包。本轮完整 Assistant 与有限 JSON→UI 已完成本地实现及有限独立验收，实际同源输入、产物与未覆盖范围见[本地迁移回执](docs/local-migration-receipt.md)；早期混合产物的通过不作为本轮同源证据，也不表示 Rossovia 已切换或正式发布。
 
 ## 本地开发
 

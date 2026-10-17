@@ -23,7 +23,7 @@ test("shared gallery serves the UI library and no product scenes", async ({ page
   const entries = (await (await request.get("/manifest.json")).json()) as StoryEntry[];
   expect(entries.length).toBeGreaterThan(0);
   for (const entry of entries) {
-    expect(entry.file).toContain("packages/meowui/");
+    expect(entry.file).toContain("packages/meowtail/");
     expect(entry.file).not.toContain("apps/meowland/");
   }
 

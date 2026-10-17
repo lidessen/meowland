@@ -1,10 +1,10 @@
 import { signal, type ReadableSignal } from "meowjsx";
 import { createJsonView, parseJsonView } from "meowjsx/json";
 import { render } from "meowjsx/web";
-import { installMeowUI } from "meowui";
-import type { AssistantDraft, AssistantMessage } from "meowui/chat";
-import { createMeowUICatalog } from "meowui/json";
-import { standardTheme } from "meowui/theme";
+import { installMeowUI } from "meowtail";
+import type { AssistantDraft, AssistantMessage } from "meowtail/chat";
+import { createMeowUICatalog } from "meowtail/json";
+import { standardTheme } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 
 const root = document.querySelector("#app");

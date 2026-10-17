@@ -2,7 +2,7 @@
 
 `meowbook` 是 MeowJSX Web 组件开发包。提供静态场景索引、隔离画布、选择性组件替换与普通浏览器测试入口，不依赖 Storybook，也不包含旧 Notes/Tasks 应用。
 
-Gallery 自身由 MeowJSX 渲染，复用 MeowUI 的 Button、Input、Icon 与标准主题，使用独立 runtime，不影响场景执行环境。Meowbook 只维护工具的目录、画布与检查抽屉布局。检查说明默认收起，窄屏通过目录按钮选择场景。
+Gallery 自身由 MeowJSX 渲染，复用 Meowtail 的 Button、Input、Icon 与标准主题，使用独立 runtime，不影响场景执行环境。Meowbook 只维护工具的目录、画布与检查抽屉布局。检查说明默认收起，窄屏通过目录按钮选择场景。
 
 工具以画布为主：默认自适应可用空间，固定设备宽度用于明确比较。交互最新反馈直接显示在底部，完整记录按需展开。搜索显示命中数量；窄屏目录支持遮罩关闭、Escape 和焦点返回。左下「工具外观」支持浅色、深色和跟随系统，独立于场景内部主题，不重挂载场景。
 
@@ -18,7 +18,7 @@ bunx --no-install meowbook capture --config meowbook.config.ts --story composer 
 ```
 
 CLI 需要 Bun。当前迁移只提供本地构建与 tarball，尚未正式发布 npm；先安装本轮产物及其
-`meowjsx`、`meowcss`、`meowui` peers，再使用以上已安装 CLI 命令，不从 registry 猜取同名包。
+`meowjsx`、`meowcss`、`meowtail` peers，再使用以上已安装 CLI 命令，不从 registry 猜取同名包。
 公开入口为 `meowbook`、`meowbook/web`、`meowbook/bun`、`meowbook/playwright`。
 发行包携带编译后的 JS、类型声明与 gallery HTML；构建和摄影不读取库仓库的源码目录。
 静态构建使用 `meowbook/bun` 的 `buildStories(config, outdir)`；CLI 提供 list、check、serve、capture。
@@ -42,8 +42,8 @@ export default defineConfig({
 
 ```ts
 import { createRuntime } from "meowjsx";
-import { createMeowUI } from "meowui";
-import { standardTheme } from "meowui/theme";
+import { createMeowUI } from "meowtail";
+import { standardTheme } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 import type { PreviewEnvironment } from "meowbook";
 export default (({ root, onCleanup }) => {
@@ -127,7 +127,7 @@ bunx --no-install meowbook capture --config meowbook.config.ts --story buttons -
 bunx --no-install meowbook capture --config meowbook.config.ts --all --select button --json
 bunx --no-install meowbook capture --config meowbook.config.ts --all --full-page --out /tmp/meowland-ui-review --json
 bunx --no-install meowbook capture --config meowbook.config.ts \
-  --component packages/meowui/src/components/button.tsx --export Button
+  --component packages/meowtail/src/components/button.tsx --export Button
 ```
 
 `--story`、`--all` 与临时组件入口互斥。临时 props 仍由 `--props-file` 提供，路径相对配置 root。
@@ -332,7 +332,7 @@ bunx --no-install playwright test --config playwright.capture.config.ts
 
 第一项只启动包自身 fixture，验证 renderer 生命周期、canvas、测量和 gallery 行为；第二项验证拍摄观察、透明选择、DPR 裁切、输入保留和失败诊断。它们不启动产品应用，也不证明 Rossovia 已切换消费。
 Meowbook 只保留 fixture 规格。与真实消费者的接合由消费者自己的 Playwright 配置执行：
-MeowUI 目录、搜索与移动端规格在 `packages/meowui/tests/browser`，由其 `playwright.config.ts` 运行；
+Meowtail 目录、搜索与移动端规格在 `packages/meowtail/tests/browser`，由其 `playwright.config.ts` 运行；
 产品页面的规格与数据由各消费者维护，不随本包分发。
 浏览器命令需要已安装的 Playwright Chromium。安装包不自动下载浏览器；在自己的环境显式准备
 `bunx --no-install playwright install chromium`，或摄影时通过 `--channel chrome` 使用已安装的 Chrome。

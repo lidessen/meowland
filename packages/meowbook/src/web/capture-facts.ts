@@ -1,5 +1,5 @@
 import type { ObservedComponent } from "meowjsx";
-import { pageFrameOptions } from "meowui";
+import { pageFrameOptions } from "meowtail";
 import type { CaptureActiveFocus, CaptureScrollView, CaptureSnapshot } from "../capture/types";
 
 export const captureInstanceId = (instance: ObservedComponent<Node>): string =>

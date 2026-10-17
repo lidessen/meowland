@@ -1,5 +1,5 @@
 import { css } from "meowcss";
-import { uiTokens } from "meowui/theme";
+import { uiTokens } from "meowtail/theme";
 
 export const canvasStyles = css`
   html,

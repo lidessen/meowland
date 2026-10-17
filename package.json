@@ -16,7 +16,7 @@
     "format:check": "bun node_modules/oxfmt/bin/oxfmt --check .",
     "format": "bun node_modules/oxfmt/bin/oxfmt --write .",
     "check": "bun run format:check && bun run lint && bun run typecheck && bun run test",
-    "test": "bun test packages/meowjsx/tests packages/meowcss/tests packages/meowui/tests/unit packages/meowbook/src/bun packages/meowbook/tests packages/meowpress/tests/unit scripts",
+    "test": "bun test packages/meowjsx/tests packages/meowcss/tests packages/meowtail/tests/unit packages/meowbook/src/bun packages/meowbook/tests packages/meowpress/tests/unit scripts",
     "dev": "bun run --filter @meowland/showcase dev"
   },
   "devDependencies": {
@@ -25,7 +25,7 @@
     "@types/semver": "7.8.0",
     "meowcss": "workspace:*",
     "meowjsx": "workspace:*",
-    "meowui": "workspace:*",
+    "meowtail": "workspace:*",
     "oxfmt": "0.73.0",
     "oxlint": "1.88.0",
     "semver": "7.8.5",

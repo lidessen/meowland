@@ -1,7 +1,7 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { tokenRef } from "meowcss";
-import { uiTokens } from "meowui/theme";
-import { buttonContract, buttonOptions, disclosureContract } from "meowui";
+import { uiTokens } from "meowtail/theme";
+import { buttonContract, buttonOptions, disclosureContract } from "meowtail";
 export const inspectionHeight = tokenRef("workshop", "inspection", "height");
 
 export const galleryStyles = css`

@@ -9,6 +9,6 @@
     "**/test-results/**",
     "**/.meowbook-*/**",
     "bun.lock",
-    "packages/meowui/THIRD_PARTY_NOTICES.md"
+    "packages/meowtail/THIRD_PARTY_NOTICES.md"
   ]
 }

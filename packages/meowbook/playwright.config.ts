@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// Fixture specs only: Dashboard, MeowUI and catalog specs run from their owners' configs.
+// Fixture specs only: Dashboard, Meowtail and catalog specs run from their owners' configs.
 export default defineConfig({
   testDir: "./tests/browser",
   testIgnore: ["capture.spec.ts", "guides.spec.ts", "focus.spec.ts"],

@@ -10,7 +10,7 @@ import {
   PageFrame,
   mountRegionLayout,
   installMeowUI,
-} from "meowui";
+} from "meowtail";
 
 const LabelContext = createContext("missing-context");
 function CaptureButton({ label }: { label?: string }) {

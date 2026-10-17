@@ -1,11 +1,11 @@
 import { h, createRuntime } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { installMeowUI, Button, SearchInput, Select, Disclosure, Toolbar } from "meowui";
-import { Icon } from "meowui/icons";
-import { standardTheme } from "meowui/theme";
+import { installMeowUI, Button, SearchInput, Select, Disclosure, Toolbar } from "meowtail";
+import { Icon } from "meowtail/icons";
+import { standardTheme } from "meowtail/theme";
 import { applyTheme } from "meowcss/web";
 
-/** Only tool composition lives here; controls, icons and theme are MeowUI. */
+/** Only tool composition lives here; controls, icons and theme are Meowtail. */
 export function mountGallery() {
   const runtime = createRuntime();
   installMeowUI(runtime);

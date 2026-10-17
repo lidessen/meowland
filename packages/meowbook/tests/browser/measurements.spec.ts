@@ -27,7 +27,7 @@ test("category inspection reads arbitrary CSS outside the canvas without remount
   const detail = page.locator("#measurement-detail");
   await expect(detail).toContainText("草稿");
   await expect(canvas.locator("#measurement-detail")).toHaveCount(0);
-  // Deliberately unrelated to MeowUI's sizes; no theme or component classes are installed.
+  // Deliberately unrelated to Meowtail's sizes; no theme or component classes are installed.
   await input.evaluate((element) =>
     Object.assign((element as HTMLElement).style, {
       width: "173px",

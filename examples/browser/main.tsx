@@ -1,7 +1,7 @@
 import { h, signal } from "meowjsx";
 import { render } from "meowjsx/web";
-import { Button, Card, installMeowUI } from "meowui";
-import { standardTheme } from "meowui/theme";
+import { Button, Card, installMeowUI } from "meowtail";
+import { standardTheme } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 
 const root = document.querySelector("#app");

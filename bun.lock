@@ -10,7 +10,7 @@
         "@types/semver": "7.8.0",
         "meowcss": "workspace:*",
         "meowjsx": "workspace:*",
-        "meowui": "workspace:*",
+        "meowtail": "workspace:*",
         "oxfmt": "0.73.0",
         "oxlint": "1.88.0",
         "semver": "7.8.5",
@@ -42,12 +42,12 @@
         "@types/pngjs": "^6.0.5",
         "meowcss": "workspace:*",
         "meowjsx": "workspace:*",
-        "meowui": "workspace:*",
+        "meowtail": "workspace:*",
       },
       "peerDependencies": {
         "meowcss": "^0.1.0",
         "meowjsx": "^0.1.0",
-        "meowui": "^0.1.0",
+        "meowtail": "^0.1.0",
       },
     },
     "packages/meowcss": {
@@ -90,8 +90,8 @@
         "meowjsx": "^0.1.0",
       },
     },
-    "packages/meowui": {
-      "name": "meowui",
+    "packages/meowtail": {
+      "name": "meowtail",
       "version": "0.1.0",
       "dependencies": {
         "@floating-ui/dom": "^1.8.0",
@@ -419,7 +419,7 @@
 
     "meowpress": ["meowpress@workspace:packages/meowpress"],
 
-    "meowui": ["meowui@workspace:packages/meowui"],
+    "meowtail": ["meowtail@workspace:packages/meowtail"],
 
     "micromark": ["micromark@4.0.3", "", { "dependencies": { "@types/debug": "^4.0.0", "debug": "^4.0.0", "decode-named-character-reference": "^1.0.0", "devlop": "^1.0.0", "micromark-core-commonmark": "^2.0.0", "micromark-factory-space": "^2.0.0", "micromark-util-character": "^2.0.0", "micromark-util-chunked": "^2.0.0", "micromark-util-combine-extensions": "^2.0.0", "micromark-util-decode-numeric-character-reference": "^2.0.0", "micromark-util-edit-map": "^1.0.0", "micromark-util-encode": "^2.0.0", "micromark-util-normalize-identifier": "^2.0.0", "micromark-util-resolve-all": "^2.0.0", "micromark-util-sanitize-uri": "^2.0.0", "micromark-util-subtokenize": "^2.0.0", "micromark-util-symbol": "^2.0.0", "micromark-util-types": "^2.0.0" } }, "sha512-oGYfQzHSG5dOMovQcJ3fyTmZlWAWpi0XA0sJwJs+i6OT88o1+Jtw/8z0CmdowSLxGhhFK89rQ/oXph/wN02PNw=="],
 

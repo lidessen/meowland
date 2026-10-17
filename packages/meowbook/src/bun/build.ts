@@ -3,7 +3,7 @@ import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import type { StoryConfig, StoryEntry } from "../types";
 import { discoverStories, sourcePath, type DiscoveredStory, type TemporaryStory } from "./discover";
-import { standardTheme } from "meowui/theme";
+import { standardTheme } from "meowtail/theme";
 import { themeAttributes } from "meowcss";
 import { canvasStyles } from "../web/canvas.styles";
 import { galleryStyles } from "../web/gallery.styles";

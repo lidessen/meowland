@@ -3,7 +3,9 @@ import { readFile, realpath } from "node:fs/promises";
 import { basename, dirname, resolve } from "node:path";
 import { prerelease, satisfies, valid, validRange } from "semver";
 
-const names = ["meowjsx", "meowcss", "meowui", "meowbook", "meowpress"];
+const names = ["meowjsx", "meowcss", "meowtail", "meowbook", "meowpress"];
+// Historical inputs remain readable, but retired packages cannot be selected for release.
+const reviewedNames = [...names, "meowui"];
 const registry = "https://registry.npmjs.org";
 const statusArgs = [
   "git",
@@ -119,11 +121,15 @@ export async function inspect(
     "Select unique package names explicitly",
   );
   assert(
+    selected.every((name) => names.includes(name)),
+    "Unknown or retired selected package",
+  );
+  assert(
     new Set(input.packages.map((item) => item.name)).size === input.packages.length,
     "Duplicate reviewed package",
   );
   assert(
-    input.packages.every((item) => names.includes(item.name)),
+    input.packages.every((item) => reviewedNames.includes(item.name)),
     "Unknown reviewed package",
   );
   const blockers: string[] = [];
@@ -223,7 +229,7 @@ export async function inspect(
         ...packed.optionalDependencies,
         ...packed.dependencies,
       })
-        .filter(([dependency]) => names.includes(dependency))
+        .filter(([dependency]) => reviewedNames.includes(dependency))
         .map(([dependency, range]) => [
           dependency,
           {
@@ -327,6 +333,10 @@ export async function release(
   acknowledgeUnpublished: string[] = [],
 ) {
   assert(mode === "execute" || mode === "prepare-github", "Invalid release mode");
+  assert(
+    plan.packages.length > 0 && plan.packages.every((item) => names.includes(item.name)),
+    "Unknown or retired selected package",
+  );
   assert(!deferFinalize || mode === "execute", "Deferred finalization requires --execute");
   assert(
     acknowledgeUnpublished.length === 0 ||

@@ -1,7 +1,7 @@
 import { createRuntime, h } from "meowjsx";
 import type { PreviewEnvironment } from "../../src";
-import { createMeowUI } from "meowui";
-import { standardTheme } from "meowui/theme";
+import { createMeowUI } from "meowtail";
+import { standardTheme } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 function PreviewContainer({ children }: { children?: import("meowjsx").Child }) {
   return h("div", { "data-default-container": true }, children);

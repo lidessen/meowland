@@ -24,6 +24,11 @@ async function fixture(
   dependencyRange = "^1.0.0",
   version = "1.2.3",
   optionalPeer = true,
+  options: {
+    names?: string[];
+    selected?: string[];
+    peers?: Record<string, Record<string, string>>;
+  } = {},
 ) {
   const root = await mkdtemp(join(tmpdir(), "meowland-release-test-"));
   temporary.push(root);
@@ -31,7 +36,7 @@ async function fixture(
   const license = "MIT License\nPermission is hereby granted (test fixture only).\n";
   await writeFile(join(root, "LICENSE"), license);
   const packages = [];
-  for (const name of ["meowjsx", "meowcss"].slice(0, count)) {
+  for (const name of (options.names ?? ["meowjsx", "meowcss"]).slice(0, count)) {
     const directory = join(root, "packages", name);
     const packRoot = join(root, "staging", name);
     await mkdir(directory, { recursive: true });
@@ -47,6 +52,7 @@ async function fixture(
             peerDependenciesMeta: { meowjsx: { optional: optionalPeer } },
           }
         : {}),
+      ...(options.peers?.[name] ? { peerDependencies: options.peers[name] } : {}),
     };
     await writeFile(join(directory, "package.json"), JSON.stringify(manifest));
     await writeFile(join(packRoot, "package", "package.json"), JSON.stringify(manifest));
@@ -74,7 +80,7 @@ async function fixture(
   const plan = await inspect(
     root,
     manifest,
-    packages.map((item) => item.name),
+    options.selected ?? packages.map((item) => item.name),
     local,
   );
   expect(plan.blockers).toEqual([]);
@@ -238,6 +244,45 @@ test("dry-run reads real reviewed archives without network, credentials, or muta
   expect(localCalls.every((args) => args[0] === "git" || args[0] === "tar")).toBe(true);
   await writeFile(plan.packages[0]!.path, "changed bytes");
   await expect(inspect(root, manifest, ["meowjsx"], local)).rejects.toThrow("tarball changed");
+});
+
+test("meowtail archives use their exact new candidate path and identity", async () => {
+  const { plan, localCalls } = await fixture(1, "^0.1.0", "0.1.0", true, {
+    names: ["meowtail"],
+  });
+  expect(plan.packages.map((item) => item.tag)).toEqual(["meowtail@0.1.0"]);
+  expect(localCalls).toContainEqual(["git", "show", `${commit}:packages/meowtail/package.json`]);
+  expect(localCalls.some((args) => args.some((value) => value.includes("meowui")))).toBe(false);
+});
+
+test("historical unselected meowui input stays readable for Press but cannot be released", async () => {
+  const { root, manifest, plan, local } = await fixture(2, "^0.1.0", "0.1.0", true, {
+    names: ["meowui", "meowpress"],
+    selected: ["meowpress"],
+  });
+  const original = await readFile(manifest);
+  expect(plan.manifestHash).toBe(sha(original));
+  expect(plan.packages.map((item) => item.name)).toEqual(["meowpress"]);
+  await expect(inspect(root, manifest, ["meowui"], local)).rejects.toThrow("retired");
+  const remote = external(plan);
+  await expect(
+    release({ ...plan, packages: [{ ...plan.packages[0]!, name: "meowui" }] }, remote.runner),
+  ).rejects.toThrow("retired");
+  expect(remote.mutations).toEqual([]);
+  expect(await readFile(manifest)).toEqual(original);
+});
+
+test("historical Book dependencies on meowui remain explicit release dependencies", async () => {
+  const { plan } = await fixture(1, "^0.1.0", "0.1.0", true, {
+    names: ["meowbook"],
+    peers: { meowbook: { meowui: "^0.1.0" } },
+  });
+  expect(plan.packages[0]!.dependencies).toEqual({
+    meowui: { range: "^0.1.0", optional: false },
+  });
+  const remote = external(plan);
+  await expect(release(plan, remote.runner)).rejects.toThrow("meowui");
+  expect(remote.mutations).toEqual([]);
 });
 
 test("GitHub preparation never invokes npm and complete execution reuses its exact drafts", async () => {

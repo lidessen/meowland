@@ -47,12 +47,12 @@
   "peerDependencies": {
     "meowjsx": "^0.1.0",
     "meowcss": "^0.1.0",
-    "meowui": "^0.1.0"
+    "meowtail": "^0.1.0"
   },
   "devDependencies": {
     "@types/pngjs": "^6.0.5",
     "meowjsx": "workspace:*",
     "meowcss": "workspace:*",
-    "meowui": "workspace:*"
+    "meowtail": "workspace:*"
   }
 }

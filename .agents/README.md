@@ -8,7 +8,7 @@
 | 做或修组件、完整 Assistant、有限 UI JSON catalog；检查真实布局与交互        | [ui-development](skills/ui-development/SKILL.md)                 | Meowtail 合同、Assistant/JSON 说明；按需 Meowbook 视觉取证                 |
 | 改公共导出、类型、依赖、包资源、CLI，验证 tarball 或准备本地发布            | [package-delivery](skills/package-delivery/SKILL.md)             | 包 manifest/README、开发检查、本地发布合同                                 |
 | 规划跨包工作、锻打职责/公共合同/生命周期等机制，选择足够的验证              | [design-change](skills/design-change/SKILL.md)                   | 本次需求、受影响合同与真实反例                                             |
-| 与人共创或局部改稿浏览器演示，迭代叙事、视觉、素材与互动                    | [presentation-authoring](skills/presentation-authoring/SKILL.md) | 作品 README、[演示样例](../examples/presentation/README.md)、Meowbook 合同 |
+| 与人共创或局部改稿浏览器演示/课件，迭代叙事、视觉、素材与互动               | [presentation-authoring](skills/presentation-authoring/SKILL.md) | 作品 README、[演示样例](../examples/presentation/README.md)、Meowbook 合同 |
 
 普通按钮文案不需要包发布验收，局部实现不必先做架构设计。JSON core 的描述/引用机制归第一项，具体 UI catalog 与 Assistant 用法归第二项；跨两者的任务只补读接合处。Meowbook 工具源码按实际机制归开发任务，场景观看与截图方法归 UI 技能。
 

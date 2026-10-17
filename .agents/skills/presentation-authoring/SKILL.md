@@ -1,6 +1,6 @@
 ---
 name: presentation-authoring
-description: Create and iteratively revise Meowland browser presentations with people, combining narrative, visual design, real assets and interactive JSX in a runnable work. Use for authoring or revising a presentation, rather than general component maintenance or PPTX conversion.
+description: Create and iteratively revise Meowland browser presentations and classroom courseware with people, combining narrative, visual design, source material and interactive JSX in a runnable work. Use for presentation or courseware authoring and revision, rather than general component maintenance or PPTX conversion.
 ---
 
 # 演示创作与持续改稿
@@ -18,6 +18,16 @@ description: Create and iteratively revise Meowland browser presentations with p
 每轮依据预览选择最重要的 1–3 个问题，同轮允许改文稿、视觉、素材和互动；再回全场看叙事、密度与节奏，不永久冻结某一层。若人已选 B 排版，只要求改结论和图，就保留该结构，局部 patch 对应文字和资源，不重新生成全场。
 
 只保留必要的 brief、作品源、素材/来源和当前反馈，允许合并文档，不强制四文件、脚手架或台账。普通 Git 检查点与局部 diff 用于比较/回退；实际提交仍按当次授权。
+
+## 课件场景
+
+课件补充目标学生、已有知识与本次学习目标，目标描述学生能解释、应用或判断什么及其依据。记录学科、年级、册次、教材版本和单元；不能仅凭城市与年级猜目录。先核实用户材料或可追溯的教材、课文与参考课件，说明实际读到的是目录、搜索摘要、局部预览还是全文。区分教材原文、他人讲解和自己的改编，不编造缺失正文、页码或标准答案。若用户只要求找参考或课文，先交来源、版本对应关系和待核点，不自行扩成完整单元成品。
+
+沿用共同迭代：把一个已核实的讲解点和关键提问或练习，与字体、颜色、图像和交互一起试成可预览片段；其余材料可以继续核对、明确占位。按预览反馈调整讲解、思考或作答、练习与反馈的节奏，不等全课文案定稿，也不强制每页套固定教案栏目。
+
+教师用现有 step / `Reveal` 决定提示、答案和解释何时出现，先留出思考或作答机会，默认不让媒体结束或计时自动揭晓。题目、提示、参考答案与学生输入分别处理，翻页/回退不擦除作答，重做由明确动作触发；开放题的示例与评价依据不冒充唯一答案。预览要实际重放“提问未揭示 → 提示/答案 → 解释反馈”和回退状态。
+
+引用与素材来源沿用后文的素材约定，教材另记版次、册次与可核页码/课名。参考课件用于比较组织和讲解方法，不把来源标注当作授权整套搬运；文字引用、图片与音视频按实际授权使用，生成素材不冒充课文、教材插图或教学事实依据。
 
 ## 让反馈与状态可重看
 

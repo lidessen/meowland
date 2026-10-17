@@ -75,6 +75,7 @@ import {
   separatorContract,
   textareaContract,
   statusDotContract,
+  statusContract,
   tagContract,
   processGroupContract,
   processStepContract,
@@ -199,6 +200,7 @@ export const MeowUIComponent = {
   ChatComposer: chatComposerContract.name,
   ChatToolCall: chatToolCallContract.name,
   StatusDot: statusDotContract.name,
+  Status: statusContract.name,
   Tag: tagContract.name,
   ProcessGroup: processGroupContract.name,
   ProcessStep: processStepContract.name,
@@ -311,6 +313,7 @@ export const meowUIComponents = [
   chatComposerContract,
   chatToolCallContract,
   statusDotContract,
+  statusContract,
   tagContract,
   processGroupContract,
   processStepContract,
@@ -428,6 +431,7 @@ declare module "meowjsx" {
     };
     "chat-tool-call": { parts: (typeof chatToolCallContract.parts)[number] };
     "status-dot": { parts: (typeof statusDotContract.parts)[number] };
+    status: { parts: (typeof statusContract.parts)[number] };
     tag: { parts: (typeof tagContract.parts)[number] };
     "process-group": { parts: (typeof processGroupContract.parts)[number] };
     "process-step": { parts: (typeof processStepContract.parts)[number] };

@@ -92,7 +92,7 @@
     },
     "packages/meowtail": {
       "name": "meowtail",
-      "version": "0.1.0",
+      "version": "0.1.1-layout.20261017.0",
       "dependencies": {
         "@floating-ui/dom": "^1.8.0",
         "@shikijs/langs": "4.3.1",

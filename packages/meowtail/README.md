@@ -65,7 +65,13 @@ className 保留宿主应用的视觉扩展点，标准主题由同一 package �
 
 界面改版（系统设计稿（原产品仓库历史参考））新增的通用组件：
 `StatusDot` 以 processing（accent 脉冲）、success、returned（空心绿，执行返回不等于目标完成）、
-warning、danger、unknown（空心灰，不假装知道）、idle 表达状态，点本身不带文字；`Tag` 是挨着内容的静态事实
+warning、danger、unknown（空心灰，不假装知道）、idle 表达状态，点本身不带文字。
+`Status` 接收 `state` 与必填 `label`，把装饰点与可见状态文字作为一个内容单元，标准主题统一点为 7px，
+不提供 `size` 或 `halo`。`label` 保留 `Child` 的组合能力并排除直接空值与布尔值；调用方须保证
+字符串、数组及动态内容实际非空且可见，并使用适合行内呈现的内容。`ListRow.status` 与
+`ResourceCard.status` 仍接收 `Child`，可传入 `Status`；`WorkCard`、`Timeline` 等组件继续拥有内部标记，
+不机械替换命令式改写、信号独立点或无逐点文字的装饰点阵。状态文字的非空语义仍由调用方审查。
+`Tag` 是挨着内容的静态事实
 （中性、强调、橙色计数、等宽路径），可选择与筛选仍用 `Pill`；`ProcessGroup` 与 `ProcessStep` 是折叠的步骤记录；
 `WorkCard` 是对话里指向一件工作的单个控件；`IconRail`、`RailItem` 与 `RailSection` 是 56px 图标栏，悬停或键盘
 聚焦时展开为覆盖在内容上的 256px 抽屉，分组收起时折成一个图标并显示子项的当前位置与橙点。

@@ -61,6 +61,7 @@ import { codeHighlightStyles } from "./shared/code-highlight.styles";
 import { codeHighlightTokens } from "./shared/code-highlight.tokens";
 import { accentTokens, statusTokens, radiusTokens, lineTokens, layerTokens } from "./palette";
 import { statusDotStyles } from "./components/status-dot.styles";
+import { statusStyles } from "./components/status.styles";
 import { tagStyles } from "./components/tag.styles";
 import { processGroupStyles } from "./components/process-group.styles";
 import { workCardStyles } from "./components/work-card.styles";
@@ -96,6 +97,7 @@ export const standardTheme = defineTheme({
   styles: [
     assistantStyles,
     statusDotStyles,
+    statusStyles,
     tagStyles,
     processGroupStyles,
     workCardStyles,

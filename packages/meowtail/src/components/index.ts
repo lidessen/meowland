@@ -176,6 +176,7 @@ export {
   statusDotContract,
   statusDotOptions,
 } from "./status-dot";
+export { Status, type StatusProps, statusContract } from "./status";
 export { Tag, type TagProps, tagContract, tagOptions } from "./tag";
 export { ProcessGroup, type ProcessGroupProps, processGroupContract } from "./process-group";
 export { ProcessStep, type ProcessStepProps, processStepContract } from "./process-step";

@@ -267,8 +267,11 @@ async function jsonCommand(
   throw new Error(`${args[0]} ${args[1]} read failed: ${result.stderr || text(result)}`);
 }
 
-/** Execute only after a separate human authorization; runner injection isolates mutation tests. */
-export async function release(plan: Plan, runner: Runner = run) {
+export type ReleaseMode = "execute" | "prepare-github";
+
+/** Both modes mutate GitHub state and require authorization; only execute uses npm. */
+export async function release(plan: Plan, runner: Runner = run, mode: ReleaseMode = "execute") {
+  assert(mode === "execute" || mode === "prepare-github", "Invalid release mode");
   assert(plan.blockers.length === 0, plan.blockers.join("\n"));
   const { root, input, packages } = plan;
   const command = (args: string[]) => checked(runner, args, root);
@@ -307,13 +310,16 @@ export async function release(plan: Plan, runner: Runner = run) {
     remoteHead === input.commit,
     "Push the reviewed commit to the default branch before release",
   );
-  const username = text(await command(["npm", "whoami", "--registry", registry]));
-  assert(username.length > 0, "npm authentication is required; this script never logs in");
-  const access = await jsonCommand(
-    runner,
-    ["npm", "access", "list", "packages", username, "--json", "--registry", registry],
-    root,
-  );
+  let access: Record<string, string> | null = null;
+  if (mode === "execute") {
+    const username = text(await command(["npm", "whoami", "--registry", registry]));
+    assert(username.length > 0, "npm authentication is required; this script never logs in");
+    access = await jsonCommand(
+      runner,
+      ["npm", "access", "list", "packages", username, "--json", "--registry", registry],
+      root,
+    );
+  }
   const states: {
     item: Package;
     local: boolean;
@@ -351,6 +357,10 @@ export async function release(plan: Plan, runner: Runner = run) {
     const existing = matches[0];
     const missingAssets: string[] = [];
     if (existing) {
+      assert(
+        mode !== "prepare-github" || existing.draft,
+        `GitHub preparation requires a draft Release: ${item.tag}`,
+      );
       assert(peeled && existing.tag_name === item.tag, `Release tag differs: ${item.tag}`);
       assert(
         existing.body === releaseBody(item, input.commit),
@@ -380,63 +390,66 @@ export async function release(plan: Plan, runner: Runner = run) {
         assert(hash(download.stdout) === expected, `Release asset differs: ${asset}`);
       }
     }
-    const metadata = await jsonCommand(
-      runner,
-      ["npm", "view", item.name, "--json", "--registry", registry],
-      root,
-      "npm",
-    );
-    assert(
-      !metadata?.time?.unpublished,
-      `Unpublished package ownership must be resolved: ${item.name}`,
-    );
-    if (metadata)
-      assert(
-        access?.[item.name] === "read-write",
-        `npm write access is not established: ${item.name}`,
-      );
-    const published = await jsonCommand(
-      runner,
-      [
+    let published = null;
+    if (mode === "execute") {
+      const metadata = await jsonCommand(
+        runner,
+        ["npm", "view", item.name, "--json", "--registry", registry],
+        root,
         "npm",
-        "view",
-        `${item.name}@${item.version}`,
-        "dist.integrity",
-        "--json",
-        "--registry",
-        registry,
-      ],
-      root,
-      "npm",
-    );
-    if (published !== null)
-      assert(published === item.integrity, `Published version has different bytes: ${item.tag}`);
-    if (existing && !existing.draft)
-      assert(
-        published === item.integrity,
-        `Public Release is not backed by the reviewed npm package: ${item.tag}`,
       );
-    for (const [dependency, { range, optional }] of Object.entries(item.dependencies)) {
-      const selected = packages.find((candidate) => candidate.name === dependency);
-      if (selected)
+      assert(
+        !metadata?.time?.unpublished,
+        `Unpublished package ownership must be resolved: ${item.name}`,
+      );
+      if (metadata)
         assert(
-          satisfies(selected.version, range),
-          `Selected dependency version does not satisfy ${item.name}: ${dependency}@${range}`,
+          access?.[item.name] === "read-write",
+          `npm write access is not established: ${item.name}`,
         );
-      else if (!optional) {
-        const available = await jsonCommand(
-          runner,
-          ["npm", "view", `${dependency}@${range}`, "version", "--json", "--registry", registry],
-          root,
+      published = await jsonCommand(
+        runner,
+        [
           "npm",
-        );
+          "view",
+          `${item.name}@${item.version}`,
+          "dist.integrity",
+          "--json",
+          "--registry",
+          registry,
+        ],
+        root,
+        "npm",
+      );
+      if (published !== null)
+        assert(published === item.integrity, `Published version has different bytes: ${item.tag}`);
+      if (existing && !existing.draft)
         assert(
-          (Array.isArray(available) ? available : [available]).some(
-            (version) =>
-              typeof version === "string" && valid(version) !== null && satisfies(version, range),
-          ),
-          `Publish a compatible dependency first or include it: ${dependency}@${range}`,
+          published === item.integrity,
+          `Public Release is not backed by the reviewed npm package: ${item.tag}`,
         );
+      for (const [dependency, { range, optional }] of Object.entries(item.dependencies)) {
+        const selected = packages.find((candidate) => candidate.name === dependency);
+        if (selected)
+          assert(
+            satisfies(selected.version, range),
+            `Selected dependency version does not satisfy ${item.name}: ${dependency}@${range}`,
+          );
+        else if (!optional) {
+          const available = await jsonCommand(
+            runner,
+            ["npm", "view", `${dependency}@${range}`, "version", "--json", "--registry", registry],
+            root,
+            "npm",
+          );
+          assert(
+            (Array.isArray(available) ? available : [available]).some(
+              (version) =>
+                typeof version === "string" && valid(version) !== null && satisfies(version, range),
+            ),
+            `Publish a compatible dependency first or include it: ${dependency}@${range}`,
+          );
+        }
       }
     }
     states.push({
@@ -448,7 +461,7 @@ export async function release(plan: Plan, runner: Runner = run) {
       missingAssets,
     });
   }
-  // Every selected package passed preflight before the first tag or registry mutation.
+  // Every selected package passed this mode's preflight before the first mutation.
   assert(
     text(await command(["git", "rev-parse", "HEAD"])) === input.commit &&
       !text(await command(statusArgs)),
@@ -519,6 +532,7 @@ export async function release(plan: Plan, runner: Runner = run) {
         githubRepository,
       ]);
   }
+  if (mode === "prepare-github") return;
   for (const { item, published } of states) {
     assert(
       hash(new Uint8Array(await readFile(item.path))) === item.sha256,
@@ -572,17 +586,20 @@ export async function release(plan: Plan, runner: Runner = run) {
 export async function main(args: string[]) {
   if (args.length === 1 && args[0] === "--help") {
     console.log(
-      "Usage: bun scripts/release.ts --manifest <reviewed.json> --packages <name,name> [--execute]\nDefault: local-only dry-run; --execute changes Git tags, GitHub Releases, and npm.",
+      "Usage: bun scripts/release.ts --manifest <reviewed.json> --packages <name,name> [--prepare-github | --execute]\nDefault: local-only dry-run; --prepare-github prepares tags and draft Releases without npm; --execute completes GitHub and npm publication.",
     );
     return;
   }
   const values = new Map<string, string>();
-  let execute = false;
+  let mode: ReleaseMode | undefined;
   for (let index = 0; index < args.length; index++) {
     const arg = args[index]!;
-    if (arg === "--execute") {
-      assert(!execute, "Duplicate --execute");
-      execute = true;
+    if (arg === "--execute" || arg === "--prepare-github") {
+      assert(
+        mode === undefined,
+        "Choose only one release mode; flags cannot be combined or repeated",
+      );
+      mode = arg === "--execute" ? "execute" : "prepare-github";
       continue;
     }
     assert(
@@ -605,7 +622,7 @@ export async function main(args: string[]) {
   console.log(
     JSON.stringify(
       {
-        mode: execute ? "execute" : "dry-run",
+        mode: mode ?? "dry-run",
         repository: plan.input.repository,
         commit: plan.input.commit,
         packages: plan.packages.map((item) => ({
@@ -622,7 +639,7 @@ export async function main(args: string[]) {
     ),
   );
   assert(plan.blockers.length === 0, plan.blockers.join("\n"));
-  if (execute) await release(plan);
+  if (mode) await release(plan, run, mode);
 }
 if (import.meta.main)
   main(process.argv.slice(2)).catch((error) => {

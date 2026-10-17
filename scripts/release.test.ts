@@ -3,7 +3,7 @@ import { createHash } from "node:crypto";
 import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
-import { inspect, release, run, type Plan, type Result, type Runner } from "./release.ts";
+import { inspect, main, release, run, type Plan, type Result, type Runner } from "./release.ts";
 
 const temporary: string[] = [];
 afterEach(async () => {
@@ -234,6 +234,62 @@ test("dry-run reads real reviewed archives without network, credentials, or muta
   expect(localCalls.every((args) => args[0] === "git" || args[0] === "tar")).toBe(true);
   await writeFile(plan.packages[0]!.path, "changed bytes");
   await expect(inspect(root, manifest, ["meowjsx"], local)).rejects.toThrow("tarball changed");
+});
+
+test("GitHub preparation never invokes npm and complete execution reuses its exact drafts", async () => {
+  const { plan } = await fixture();
+  const remote = external(plan);
+  const githubOnly: Runner = (args, cwd) => {
+    if (args[0] === "npm") throw new Error("GitHub preparation must not invoke npm");
+    return remote.runner(args, cwd);
+  };
+  await release(plan, githubOnly, "prepare-github");
+  expect(remote.remoteTags.size).toBe(2);
+  expect(remote.releases.size).toBe(2);
+  expect([...remote.releases.values()].every((entry) => entry.draft)).toBe(true);
+  expect(remote.published.size).toBe(0);
+  expect(remote.mutations.some((args) => args[2] === "edit")).toBe(false);
+  const preparedMutations = remote.mutations.length;
+  await release(plan, githubOnly, "prepare-github");
+  expect(remote.mutations).toHaveLength(preparedMutations);
+  await release(plan, remote.runner);
+  expect(remote.published.size).toBe(2);
+  expect([...remote.releases.values()].every((entry) => !entry.draft)).toBe(true);
+  expect(remote.mutations.filter((args) => args[2] === "create")).toHaveLength(2);
+  expect(remote.mutations.filter((args) => args[3] === "tag")).toHaveLength(2);
+});
+
+test("GitHub preparation checks all selected identities before mutation and refuses public releases", async () => {
+  const { plan } = await fixture();
+  const conflicted = external(plan);
+  conflicted.remoteTags.set(plan.packages[1]!.tag, "c".repeat(40));
+  await expect(release(plan, conflicted.runner, "prepare-github")).rejects.toThrow(
+    "Existing remote tag differs",
+  );
+  expect(conflicted.mutations).toHaveLength(0);
+  const prepared = external(plan);
+  await release(plan, prepared.runner, "prepare-github");
+  const before = prepared.mutations.length;
+  const asset = `${plan.packages[1]!.tag}/${basename(plan.packages[1]!.path)}`;
+  prepared.assets.set(asset, encode("mismatching second package"));
+  await expect(release(plan, prepared.runner, "prepare-github")).rejects.toThrow("asset differs");
+  expect(prepared.mutations).toHaveLength(before);
+  prepared.assets.set(asset, await readFile(plan.packages[1]!.path));
+  prepared.releases.get(plan.packages[1]!.tag)!.draft = false;
+  await expect(release(plan, prepared.runner, "prepare-github")).rejects.toThrow(
+    "requires a draft Release",
+  );
+  expect(prepared.mutations).toHaveLength(before);
+});
+
+test("release mode flags are mutually exclusive and cannot repeat", async () => {
+  for (const args of [
+    ["--execute", "--prepare-github"],
+    ["--prepare-github", "--execute"],
+    ["--prepare-github", "--prepare-github"],
+    ["--execute", "--execute"],
+  ])
+    await expect(main(args)).rejects.toThrow("Choose only one release mode");
 });
 
 test("all selected packages are verified before any public Release; partial npm success resumes", async () => {

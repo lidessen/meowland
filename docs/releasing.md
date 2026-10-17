@@ -45,9 +45,21 @@ bun scripts/release.ts --manifest /tmp/release-input.json --packages meowjsx
 bun run release --manifest /tmp/release-input.json --packages meowjsx,meowcss
 ```
 
-不加 `--execute` 就是 dry-run：只读取本地 Git、输入、源 manifest 与 tar 目录/正文，校验 SHA256、包名/版本、公开 exports/bin 文件、workspace 依赖已重写、MIT 声明及 LICENSE；打印明确包集合、版本、tag 与 blockers。Git status 使用 no-optional-locks 并关闭 fsmonitor，不刷新 index。不会重建或打包，不调用 gh/npm/fetch，不联网、不读取 npm/GitHub 凭据、不创建临时发布状态。缺许可证、origin、工作树不净或 HEAD 不符会明确失败，非零退出；404、远端权限与认证在此阶段完全没有被验证。
+不加 `--execute` 或 `--prepare-github` 就是 dry-run：只读取本地 Git、输入、源 manifest 与 tar 目录/正文，校验 SHA256、包名/版本、公开 exports/bin 文件、workspace 依赖已重写、MIT 声明及 LICENSE；打印明确包集合、版本、tag 与 blockers。Git status 使用 no-optional-locks 并关闭 fsmonitor，不刷新 index。不会重建或打包，不调用 gh/npm/fetch，不联网、不读取 npm/GitHub 凭据、不创建临时发布状态。缺许可证、origin、工作树不净或 HEAD 不符会明确失败，非零退出；404、远端权限与认证在此阶段完全没有被验证。
 
 异常参数、缺输入或错误包哈希也非零退出。不要用 `npm publish --dry-run` 替代这个纯本地演练：那不是本脚本的无凭据边界。
+
+## 只准备 GitHub draft（须有远端变更授权）
+
+npm 尚未登录时，可以先完成获准的 GitHub 工作：
+
+```sh
+bun scripts/release.ts --manifest /tmp/release-input.json --packages meowjsx,meowcss --prepare-github
+```
+
+这不是 dry-run：它会使用当前 GitHub 身份，核对仓库 push 权限、默认分支 commit、全部选包 tag、Release 正文及已有资产 bytes，再复用正式执行的同一段逻辑创建缺失 tag、推送精确 tag，并创建或补齐 draft 资产。所有本地输入和全部选包身份先通过检查才开始变更；不覆盖冲突 tag 或资产。已有公开 Release 会失败，不降级或修补。
+
+该模式完全不调用 npm，不检查 npm 身份、名称发布权、registry 版本或未选依赖，不发布 npm，也不把 draft 转为正式 Release。因此准备成功只代表 GitHub draft 及资产已就绪，不能宣称包可发布或本轮发布完成。它和 `--execute` 互斥，两者均不能重复。之后保留同一 manifest、commit 和 tarball，用下节 `--execute` 完成原有 npm 前置核查并复用现有 tag/draft；不另存发布状态表，也不重新打包。
 
 ## 正式执行（须另有明确授权）
 
@@ -77,6 +89,6 @@ bun scripts/release.ts --manifest /tmp/release-input.json --packages meowjsx,meo
 
 ## 验证入口与官方依据
 
-专用隔离测试：`bun test scripts/release.test.ts`。测试经真实发布算法，在 CLI 外部边界 mock GitHub/npm，真实读取临时 tarball；覆盖纯本地演练、第二包发布失败后恢复、draft 上传半成功、正式 Release 半成功、身份/资产/权限冲突；另有严格 semver/显式目标不匹配与 notes 传递/改写冲突的定点用例。mock 通过不代表真实 registry/GitHub 发布已验证。
+专用隔离测试：`bun test scripts/release.test.ts`。测试经真实发布算法，在 CLI 外部边界 mock GitHub/npm，真实读取临时 tarball；覆盖纯本地演练、第二包发布失败后恢复、draft 上传半成功、正式 Release 半成功、身份/资产/权限冲突；另有严格 semver/显式目标不匹配与 notes 传递/改写冲突的定点用例。GitHub 准备模式另核禁用全部 npm 调用、重复执行复用 draft、随后正式执行接续、第二包 tag/资产冲突时零新变更及模式互斥。mock 通过不代表真实 registry/GitHub 发布已验证。
 
 2026-10-16 官方只读核查：[gh release create](https://cli.github.com/manual/gh_release_create) 的 draft / verify-tag / `file#label` 合同；[gh release edit](https://cli.github.com/manual/gh_release_edit) 的 `--draft=false`；[GitHub List releases](https://docs.github.com/en/rest/releases/releases#list-releases) 的有权限 draft 可见性；[npm publish](https://docs.npmjs.com/cli/v11/commands/npm-publish/) 的 exact version 不可复用与 SHA512 integrity；[npm view](https://docs.npmjs.com/cli/v11/commands/npm-view/) 的字段查询；[git ls-remote](https://git-scm.com/docs/git-ls-remote) 的 annotated tag peeled 行。[Bun semver](https://bun.com/docs/runtime/semver) 对不可解析范围容错，因此严格发布校验采用 npm 的 [node-semver](https://github.com/npm/node-semver) `valid` / `validRange` / `satisfies`。实际 CLI、服务器权限及 registry 返回仍以执行时事实为准。

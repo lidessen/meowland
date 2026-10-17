@@ -36,8 +36,7 @@ export default meowSite({
 
 ## 验证与构建
 
-当前迁移提供本地构建与 tarball，尚未正式发布 npm。安装本轮 `meowpress`、`meowcss`、
-`meowjsx` 产物后，在消费者目录运行：
+安装 `meowpress` 及其 `meowcss`、`meowjsx` 依赖后，在消费者目录运行：
 
 ```sh
 bunx --no-install meowpress --config ./site.config.ts

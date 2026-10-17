@@ -2,13 +2,13 @@
 
 五包采用独立稳定 SemVer，各自使用 `包名@版本` Git tag，例如 `meowjsx@0.1.0`；同一轮可以显式选择多个包。维护者或 Agent 显式准备包 manifest、依赖范围和发行说明，不引入独立版本工具；本地 `scripts/release.ts` 只消费已落盘 metadata 与已验收 tarball，负责 tag、GitHub Release 和 npm 执行，不另建第二条 publish 通路。`apps/showcase` 私有，不发布。GitHub Actions 只做 build/lint，不因 tag 自动发布，不承担 npm、Release 或部署。
 
-实现脚本不等于授权正式发布，GitHub draft、registry 发包及消费验收须分别记录。根 `LICENSE` 与五包 `license: "MIT"` 字段已实际写入，许可证携带及其它发布前置仍须按本轮精确产物验收，不以文件落地替代。`meowpress` 官方 registry 曾返回撤包存根，当前 owner/内容与发布权须另行核实，不应据此认为名字空闲或已占用；未获该包发布授权时不把它加入命令。
+实现脚本不等于授权正式发布，GitHub draft、registry 发包及消费验收须分别记录。根 `LICENSE` 与五包 `license: "MIT"` 字段已实际写入，许可证携带及其它发布前置仍须按本轮精确产物验收，不以文件落地替代。Press 历史撤包存根与 E409 不作为未来永久阻断；本批已获明确授权并完成 `0.1.0` 发布，事实见[发布回执](records/2026-10-17-tail-book-press-publish.md)。新批次仍须核当前 owner、内容和权限，不由旧查询结果猜名称状态。
 
 ## 准备精确输入
 
 当前发行名为 `meowjsx`、`meowcss`、`meowtail`、`meowbook`、`meowpress`。`meowui` 已退出新的选包集合；工具只容许它作为旧验收输入中的未选历史条目存在，不能选中发布，也不会把旧名、tag 或 tarball 静默映射为新名。因此原 `initial-0.1.0` 输入仍可只选 Press 接续核查，原输入 bytes 不改。新 UI 使用独立的 `meowtail-0.1.0` 输入与 tarball，不混入旧候选身份。
 
-已正式发布的 JSX/CSS `0.1.0` 不重新打包覆盖原发行资产。Book 的本地新 `0.1.0` 包只供安装态验收，不能沿用绑定旧候选的 `meowbook@0.1.0` draft/tag。安全的发布方案是另行确定例如 `0.1.1` 的新 Book 版本并保留旧记录；若要保留 `0.1.0`，须先获明确授权处理旧未公开 draft/tag。未获授权时不删除、移动或覆盖远端记录。新 UI 输入暂不选入这个待定的 Book 发行版本。
+已正式发布的 JSX/CSS `0.1.0` 不重新打包覆盖原发行资产。Book 改名接线后的本地 `0.1.0` 包只供验收，不能沿用旧 `meowbook@0.1.0` draft/tag；本批已另选 `0.1.1` 并保留旧记录。Tail、Book 与 Press 各自沿自己的单包精确输入发布，不把后继包字节混入旧 tag 或资产。未来若处理旧未公开记录，仍须有相应明确授权，不自动删除、移动或覆盖。
 
 流程为：人或 Agent 判断本次包集合、各包独立目标版本与发行说明，明确更新包 manifest、必要依赖范围和说明 → check/build/pack → 独立安装态验收 → 本地 release。不引入 Changesets、bumpp 或 changelogen，不自动推断版本联动、扩大选包集合，也不设每 commit/PR 必须记录的门禁或机器人。
 
@@ -110,6 +110,7 @@ bun run release --manifest artifacts/releases/initial-0.1.0/release-input.json -
 
 - tag 或资产已成功：核 identity/bytes 后复用；draft 缺资产只补缺项。
 - 某个 npm publish 成功、后续失败：下次先查 exact integrity；相同就跳过，不重发。若发布响应未知或 registry 暂不可读，保持失败，等明确查证后再重入，不盲目 resend。
+- npm 原生命令已经显示接受处理与 `+ name@version`，但脚本随后的 exact 查询返回 404：分别记录“已接受”和“尚不可见”，不能把脚本总退出非零当作可以重发。等待官方 exact metadata、归档与原 integrity/bytes 一致后，完成独立 registry 消费，再沿同输入正式化；本批三包均遇到并按此收口。
 - 所有 npm 都成功，但正式 Release 只完成一部分：重入校验全部 npm 与已有公开资产，再完成剩余 draft；不把已公开部分退回 draft。
 - tag 指向不同 commit、registry 同名同版不同 bytes、资产同名不同 bytes、权限/网络失败：停止人工核查，不能 force tag、clobber 或改哈希假装同一次发布。
 

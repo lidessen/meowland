@@ -1,6 +1,6 @@
 # Meowland
 
-独立的 Bun / TypeScript UI 工具仓库。JSX/CSS 首版已正式发布，UI 独立包改名候选仍在本地验收，产品切换尚待后续；原 Rossovia 产品仓库的源码、服务、正式依赖和 Git remote 均未在这里切换。
+独立的 Bun / TypeScript UI 工具仓库。五包已完成 npm 发布、独立 registry 消费验收及正式 GitHub Release，产品切换尚待后续；原 Rossovia 产品仓库的源码、服务、正式依赖和 Git remote 均未在这里切换。
 
 ## 包
 
@@ -12,7 +12,7 @@
 | [`meowbook`](packages/meowbook/README.md)   | 组件展示、检查、浏览器预览与截图工具                                                                |
 | [`meowpress`](packages/meowpress/README.md) | Markdown / MDX 静态站点构建工具                                                                     |
 
-[`apps/showcase`](apps/showcase/README.md) 是私有展板，不是第六个发布包。本轮完整 Assistant 与有限 JSON→UI 已完成本地实现及有限独立验收，实际同源输入、产物与未覆盖范围见[本地迁移回执](docs/local-migration-receipt.md)；早期混合产物的通过不作为本轮同源证据，也不表示 Rossovia 已切换或正式发布。
+[`apps/showcase`](apps/showcase/README.md) 是私有展板，不是第六个发布包。本轮完整 Assistant 与有限 JSON→UI 已完成本地实现及有限独立验收，实际同源输入、产物与未覆盖范围见[本地迁移回执](docs/local-migration-receipt.md)；早期混合产物的通过不作为本轮同源证据，也不表示 Rossovia 产品已切换或发布。
 
 ## 本地开发
 
@@ -32,8 +32,8 @@ bun run pack
 
 ## 发布状态
 
-公开源码仓库为 [lidessen/meowland](https://github.com/lidessen/meowland)。`meowjsx@0.1.0`、`meowcss@0.1.0` 已完成 npm 发布、独立 registry 消费与正式 Release；原 tag 和资产保持不变。独立 UI 包由 `meowui` 改名为 `meowtail`，初始候选仍为 `0.1.0`，尚未发布或取得新名称发布权；404 查询不保证可注册。公开入口为 `meowtail`、`meowtail/chat`、`meowtail/json` 等，`createMeowUI`、`installMeowUI` 和既有 DOM/CSS 标记保持兼容，不合入 JSX/CSS。
+公开源码仓库为 [lidessen/meowland](https://github.com/lidessen/meowland)。当前正式版本为 `meowjsx@0.1.0`、`meowcss@0.1.0`、`meowtail@0.1.0`、`meowbook@0.1.1`、`meowpress@0.1.0`，均已完成 npm 发布、独立 registry 安装验收和正式 GitHub Release。JSX/CSS 原 tag 与资产保持不变；本批精确候选、产物与验收范围见[发布回执](docs/records/2026-10-17-tail-book-press-publish.md)。
 
-`meowbook` 已改用新 UI 包，但旧 `meowbook@0.1.0` draft/tag 仍绑定原候选，不能承载新 bytes。其本地候选仅供验收；正式发布前须确定新的 Book 版本，或另行明确授权处理旧未公开 draft/tag。`meowpress` 本人发布返回 E409，观察窗口内仍未公开，后台处理原因未知；不盲目重发。后续单独授权的精确发布批次沿[本地发布](docs/releasing.md)执行，本轮改名实现不含推送、发包或远端资产变更。
+独立 UI 包由 `meowui` 改名为 `meowtail`，公开入口为 `meowtail`、`meowtail/chat`、`meowtail/json` 等；`createMeowUI`、`installMeowUI` 和既有 DOM/CSS 标记保持兼容，不合入 JSX/CSS。Book 使用新 UI 包并以 `0.1.1` 发布，旧 UI 与 Book `0.1.0` draft/tag 保留，未移动或覆盖。Press 的先前 E409 保留为历史，本批获明确授权后仅重试一次，现已完成发布和消费验收。后续发布继续沿[本地发布](docs/releasing.md)执行，不覆盖同名同版资产。
 
-自有代码采用 MIT，根 `LICENSE` 与五个包的 `license: "MIT"` 字段已实际写入；当前产物仍须按本轮精确输入验收，文件落地不代表已完成打包或正式发布。第三方资源继续适用其原许可证。
+自有代码采用 MIT，正式包携带相应 `LICENSE` 与第三方 notices；第三方资源继续适用其原许可证。构建、安装验收和正式发布的区别仍按本次精确输入分别记录。

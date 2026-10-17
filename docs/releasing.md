@@ -88,6 +88,20 @@ bun run release --manifest artifacts/releases/initial-0.1.0/release-input.json -
 
 ## 中断与恢复
 
+### 已撤包名称的显式确认
+
+默认执行仍会拒绝历史撤包。只有本次明确获准尝试所选包，且接受当前发布权仍未知时，才使用包级确认，例如：
+
+```sh
+bun run release --manifest artifacts/releases/initial-0.1.0/release-input.json --packages meowpress --execute --defer-finalize --acknowledge-unpublished meowpress
+```
+
+`--acknowledge-unpublished` 接收一次逗号分隔的唯一已选包名集合，只可与 `--execute` 使用；不对未选包、其它权限或错误生效。它不声明 owner 或 write access，不把名字判为空闲，而是让已明确历史撤包的选定包沿原生 npm publish 取得 registry 的真实裁定。active package 仍须原有写权限；认证、网络、非法 metadata 和同版本不同 integrity 均会失败。
+
+对明确的结构化撤包时间和历史版本继续检查：24 小时内或目标版本曾被撤回都拒绝；缺失或非法结构化字段不能伪装为政策已满足。npm 对 root lookup 返回严格 `E404 / Unpublished on <ISO时间>` 时，核其撤包时间并只承接为发布权未知。exact version lookup 只有在同包 root 已确认撤包、时间一致且显式确认时才可承接同类结果；不把任意 E404、错误正文或查询失败当作拥有发布权。历史版本信息仍可能不完整，真实 registry 可以拒绝本次尝试。
+
+服务器拒绝、OTP/2FA 未完成或发包后的 integrity 查询失败都会非零退出；确认不能掩盖这些结果，不自动重试、不换身份/版本、不新增 raw npm 路线。成功后仍按 defer → 独立 registry 消费 → 同输入 execute 正式化接续，后续也携带相同包级确认；原候选 tag、验收输入及 tgz 不变。
+
 保留原输入、同候选 commit 与同 tarball，解决报告的具体错误后，用相同命令重入。工具可在正常提交并推送的小修后继续使用，但候选必须仍是工具提交祖先，tag、Release 正文、已上传输入与包 bytes 都不得替换。创建远端变更前再次核工具 HEAD、已跟踪工作区、origin、manifest 与包哈希，防止前置检查后输入变化。状态直接来自原 Git tags、GitHub Release/资产和 npm，不另外存本地进度表。
 
 - tag 或资产已成功：核 identity/bytes 后复用；draft 缺资产只补缺项。

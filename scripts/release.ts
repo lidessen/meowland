@@ -268,6 +268,22 @@ export async function inspect(
   };
 }
 
+class UnpublishedLookupError extends Error {
+  constructor(readonly time: string) {
+    super("npm lookup reports an unpublished package; explicit acknowledgement is required");
+  }
+}
+
+function checkWithdrawalTime(time: unknown, name: string): asserts time is string {
+  assert(typeof time === "string", `Missing withdrawal time: ${name}`);
+  const timestamp = Date.parse(time);
+  assert(
+    Number.isFinite(timestamp) && new Date(timestamp).toISOString() === time,
+    `Invalid withdrawal time: ${name}`,
+  );
+  assert(Date.now() - timestamp >= 24 * 60 * 60 * 1000, `Withdrawal is within 24 hours: ${name}`);
+}
+
 async function jsonCommand(
   runner: Runner,
   args: string[],
@@ -284,7 +300,18 @@ async function jsonCommand(
     } catch {
       /* Not a registry absence. */
     }
-    if (error?.code === "E404" && !/unpublish/i.test(JSON.stringify(error))) return null;
+    if (error?.code === "E404") {
+      const withdrawn =
+        typeof error.summary === "string" &&
+        /^Unpublished on (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)$/.exec(error.summary);
+      if (withdrawn) {
+        const time = withdrawn[1]!;
+        const timestamp = Date.parse(time);
+        if (Number.isFinite(timestamp) && new Date(timestamp).toISOString() === time)
+          throw new UnpublishedLookupError(time);
+      }
+      if (!/unpublish/i.test(JSON.stringify(error))) return null;
+    }
   }
   throw new Error(`${args[0]} ${args[1]} read failed: ${result.stderr || text(result)}`);
 }
@@ -297,9 +324,17 @@ export async function release(
   runner: Runner = run,
   mode: ReleaseMode = "execute",
   deferFinalize = false,
+  acknowledgeUnpublished: string[] = [],
 ) {
   assert(mode === "execute" || mode === "prepare-github", "Invalid release mode");
   assert(!deferFinalize || mode === "execute", "Deferred finalization requires --execute");
+  assert(
+    acknowledgeUnpublished.length === 0 ||
+      (mode === "execute" &&
+        new Set(acknowledgeUnpublished).size === acknowledgeUnpublished.length &&
+        acknowledgeUnpublished.every((name) => plan.packages.some((item) => item.name === name))),
+    "Acknowledge unique selected package names only with --execute",
+  );
   assert(plan.blockers.length === 0, plan.blockers.join("\n"));
   const { root, input, packages } = plan;
   const command = (args: string[]) => checked(runner, args, root);
@@ -420,35 +455,83 @@ export async function release(
     }
     let published = null;
     if (mode === "execute") {
-      const metadata = await jsonCommand(
-        runner,
-        ["npm", "view", item.name, "--json", "--registry", registry],
-        root,
-        "npm",
-      );
-      assert(
-        !metadata?.time?.unpublished,
-        `Unpublished package ownership must be resolved: ${item.name}`,
-      );
-      if (metadata)
-        assert(
-          access?.[item.name] === "read-write",
-          `npm write access is not established: ${item.name}`,
-        );
-      published = await jsonCommand(
-        runner,
-        [
+      const acknowledged = acknowledgeUnpublished.includes(item.name);
+      let metadata;
+      let withdrawalTime: string | undefined;
+      try {
+        metadata = await jsonCommand(
+          runner,
+          ["npm", "view", item.name, "--json", "--registry", registry],
+          root,
           "npm",
-          "view",
-          `${item.name}@${item.version}`,
-          "dist.integrity",
-          "--json",
-          "--registry",
-          registry,
-        ],
-        root,
-        "npm",
-      );
+        );
+      } catch (error) {
+        if (!acknowledged || !(error instanceof UnpublishedLookupError)) throw error;
+        checkWithdrawalTime(error.time, item.name);
+        withdrawalTime = error.time;
+      }
+      if (metadata !== null && metadata !== undefined) {
+        assert(
+          typeof metadata === "object" && !Array.isArray(metadata) && metadata.name === item.name,
+          `Invalid package metadata: ${item.name}`,
+        );
+        assert(
+          metadata.time === undefined ||
+            (metadata.time && typeof metadata.time === "object" && !Array.isArray(metadata.time)),
+          `Invalid package time metadata: ${item.name}`,
+        );
+        const withdrawal = metadata.time?.unpublished;
+        const activeMetadata =
+          metadata.version !== undefined ||
+          metadata.dist !== undefined ||
+          metadata.versions !== undefined ||
+          metadata["dist-tags"] !== undefined;
+        if (withdrawal !== undefined && !activeMetadata) {
+          assert(acknowledged, `Unpublished package ownership must be resolved: ${item.name}`);
+          assert(
+            withdrawal && typeof withdrawal === "object" && !Array.isArray(withdrawal),
+            `Invalid withdrawal metadata: ${item.name}`,
+          );
+          checkWithdrawalTime(withdrawal.time, item.name);
+          assert(
+            Array.isArray(withdrawal.versions) &&
+              withdrawal.versions.every(
+                (version: unknown) => typeof version === "string" && valid(version) === version,
+              ),
+            `Missing or invalid withdrawn versions: ${item.name}`,
+          );
+          assert(
+            !withdrawal.versions.includes(item.version),
+            `A withdrawn version cannot be reused: ${item.tag}`,
+          );
+          withdrawalTime = withdrawal.time;
+        } else
+          assert(
+            access?.[item.name] === "read-write",
+            `npm write access is not established: ${item.name}`,
+          );
+      }
+      try {
+        published = await jsonCommand(
+          runner,
+          [
+            "npm",
+            "view",
+            `${item.name}@${item.version}`,
+            "dist.integrity",
+            "--json",
+            "--registry",
+            registry,
+          ],
+          root,
+          "npm",
+        );
+      } catch (error) {
+        if (!acknowledged || !withdrawalTime || !(error instanceof UnpublishedLookupError))
+          throw error;
+        assert(error.time === withdrawalTime, `Withdrawal lookup changed: ${item.name}`);
+        // Neither lookup proves ownership or absence of historical versions. Publish decides.
+      }
       if (published !== null)
         assert(published === item.integrity, `Published version has different bytes: ${item.tag}`);
       if (existing && !existing.draft)
@@ -615,7 +698,7 @@ export async function release(
 export async function main(args: string[]) {
   if (args.length === 1 && args[0] === "--help") {
     console.log(
-      "Usage: bun scripts/release.ts --manifest <reviewed.json> --packages <name,name> [--prepare-github | --execute [--defer-finalize]]\nDefault: local-only dry-run; --prepare-github prepares tags and draft Releases without npm; --execute publishes reviewed packages; --defer-finalize leaves drafts for registry consumer verification.",
+      "Usage: bun scripts/release.ts --manifest <reviewed.json> --packages <name,name> [--prepare-github | --execute [--defer-finalize] [--acknowledge-unpublished <selected-name,name>]]\nDefault: local-only dry-run; --prepare-github prepares tags and draft Releases without npm; --execute publishes reviewed packages; --defer-finalize leaves drafts for registry consumer verification.",
     );
     return;
   }
@@ -638,7 +721,7 @@ export async function main(args: string[]) {
       continue;
     }
     assert(
-      ["--manifest", "--packages"].includes(arg) && !values.has(arg),
+      ["--manifest", "--packages", "--acknowledge-unpublished"].includes(arg) && !values.has(arg),
       `Unknown or duplicate argument: ${arg}`,
     );
     const value = args[++index];
@@ -646,6 +729,11 @@ export async function main(args: string[]) {
     values.set(arg, value);
   }
   assert(!deferFinalize || mode === "execute", "--defer-finalize requires --execute");
+  const acknowledged = values.get("--acknowledge-unpublished")?.split(",") ?? [];
+  assert(
+    acknowledged.length === 0 || mode === "execute",
+    "--acknowledge-unpublished requires --execute",
+  );
   assert(
     values.has("--manifest") && values.has("--packages"),
     "Explicit --manifest and --packages are required",
@@ -655,6 +743,11 @@ export async function main(args: string[]) {
     values.get("--manifest")!,
     values.get("--packages")!.split(","),
   );
+  assert(
+    new Set(acknowledged).size === acknowledged.length &&
+      acknowledged.every((name) => plan.packages.some((item) => item.name === name)),
+    "Acknowledge unique selected package names only",
+  );
   console.log(
     JSON.stringify(
       {
@@ -663,6 +756,7 @@ export async function main(args: string[]) {
         commit: plan.input.commit,
         toolCommit: plan.toolCommit,
         deferFinalize,
+        acknowledgeUnpublished: acknowledged,
         packages: plan.packages.map((item) => ({
           name: item.name,
           version: item.version,
@@ -677,7 +771,7 @@ export async function main(args: string[]) {
     ),
   );
   assert(plan.blockers.length === 0, plan.blockers.join("\n"));
-  if (mode) await release(plan, run, mode, deferFinalize);
+  if (mode) await release(plan, run, mode, deferFinalize, acknowledged);
 }
 if (import.meta.main)
   main(process.argv.slice(2)).catch((error) => {

@@ -582,3 +582,185 @@ test("release notes come from reviewed input and changed notes cannot overwrite 
   await expect(release(changed, remote.runner)).rejects.toThrow("Release provenance differs");
   expect(remote.mutations).toHaveLength(before);
 });
+
+const oldWithdrawal = "2023-12-21T10:27:53.097Z";
+const withdrawnLookup = (time = oldWithdrawal) =>
+  result(JSON.stringify({ error: { code: "E404", summary: `Unpublished on ${time}` } }), 1);
+
+test("unpublished acknowledgement is scoped to selected execute packages and reuses the original publish path", async () => {
+  const { plan } = await fixture(1);
+  const item = plan.packages[0]!;
+  for (const rootResult of [
+    withdrawnLookup(),
+    result(
+      JSON.stringify({
+        name: item.name,
+        time: { unpublished: { time: oldWithdrawal, versions: ["1.0.0", "1.0.1"] } },
+      }),
+    ),
+  ]) {
+    const remote = external(plan);
+    const runner: Runner = (args, cwd) => {
+      if (args[0] === "npm" && args[1] === "view") {
+        if (args[2] === item.name) return Promise.resolve(rootResult);
+        if (args[2] === item.tag && !remote.published.has(item.tag))
+          return Promise.resolve(withdrawnLookup());
+      }
+      return remote.runner(args, cwd);
+    };
+    await expect(release(plan, runner, "execute", true)).rejects.toThrow(/unpublished|Unpublished/);
+    expect(remote.mutations).toHaveLength(0);
+    await release(plan, runner, "execute", true, [item.name]);
+    expect(remote.published.get(item.tag)).toBe(item.integrity);
+    expect(remote.releases.get(item.tag)!.draft).toBe(true);
+    await release(plan, runner, "execute", false, [item.name]);
+    expect(remote.releases.get(item.tag)!.draft).toBe(false);
+    expect(remote.mutations.filter((args) => args[1] === "publish")).toHaveLength(1);
+  }
+  for (const acknowledged of [["meowcss"], [item.name, item.name]])
+    await expect(
+      release(plan, external(plan).runner, "execute", true, acknowledged),
+    ).rejects.toThrow("unique selected");
+  await expect(
+    release(plan, external(plan).runner, "prepare-github", false, [item.name]),
+  ).rejects.toThrow("only with --execute");
+  for (const args of [
+    ["--acknowledge-unpublished", item.name],
+    ["--prepare-github", "--acknowledge-unpublished", item.name],
+    ["--execute", "--acknowledge-unpublished", item.name, "--acknowledge-unpublished", item.name],
+  ])
+    await expect(main(args)).rejects.toThrow(/requires --execute|duplicate argument/);
+  const group = await fixture();
+  const remote = external(group.plan);
+  await expect(
+    release(
+      group.plan,
+      (args, cwd) =>
+        args[0] === "npm" && args[1] === "view"
+          ? Promise.resolve(withdrawnLookup())
+          : remote.runner(args, cwd),
+      "execute",
+      true,
+      [group.plan.packages[0]!.name],
+    ),
+  ).rejects.toThrow("explicit acknowledgement");
+  expect(remote.mutations).toHaveLength(0);
+});
+
+test("unpublished acknowledgement preserves withdrawal policy, metadata, permission and integrity failures", async () => {
+  const { plan } = await fixture(1);
+  const item = plan.packages[0]!;
+  const recent = new Date(Date.now() - 60 * 60 * 1000).toISOString();
+  const metadata = (unpublished: unknown) =>
+    result(JSON.stringify({ name: item.name, time: { unpublished } }));
+  for (const failure of [
+    { root: withdrawnLookup(recent), expected: "within 24 hours" },
+    {
+      root: metadata({ time: oldWithdrawal, versions: [item.version] }),
+      expected: "cannot be reused",
+    },
+    { root: metadata({ time: recent, versions: [] }), expected: "within 24 hours" },
+    { root: metadata({ time: oldWithdrawal }), expected: "withdrawn versions" },
+    {
+      root: metadata({ time: oldWithdrawal, versions: ["not-a-version"] }),
+      expected: "withdrawn versions",
+    },
+    { root: metadata({ time: "invalid", versions: [] }), expected: "withdrawal time" },
+    { root: result("[]"), expected: "Invalid package metadata" },
+    {
+      root: result(JSON.stringify({ name: item.name, time: "invalid" })),
+      expected: "Invalid package time metadata",
+    },
+    { root: result("{"), expected: "JSON" },
+    { root: result(JSON.stringify({ name: item.name })), expected: "write access" },
+    {
+      root: result(
+        JSON.stringify({
+          name: item.name,
+          versions: [item.version],
+          "dist-tags": { latest: item.version },
+          time: { unpublished: { time: oldWithdrawal, versions: ["1.0.0"] } },
+        }),
+      ),
+      expected: "write access",
+    },
+    { root: result("", 1, "ETIMEDOUT"), expected: "read failed" },
+    { root: result(JSON.stringify({ error: { code: "E403" } }), 1), expected: "read failed" },
+    {
+      root: result(
+        JSON.stringify({ error: { code: "E404", summary: "Unpublished for unknown reasons" } }),
+        1,
+      ),
+      expected: "read failed",
+    },
+    {
+      root: withdrawnLookup(),
+      exact: withdrawnLookup("2023-12-22T10:27:53.097Z"),
+      expected: "lookup changed",
+    },
+    {
+      root: withdrawnLookup(),
+      exact: result(JSON.stringify("sha512-different")),
+      expected: "different bytes",
+    },
+    {
+      root: withdrawnLookup(),
+      exact: result("", 1, "E401 authentication failed"),
+      expected: "read failed",
+    },
+  ]) {
+    const remote = external(plan);
+    await expect(
+      release(
+        plan,
+        (args, cwd) => {
+          if (args[0] === "npm" && args[1] === "view") {
+            if (args[2] === item.name) return Promise.resolve(failure.root);
+            if (args[2] === item.tag && failure.exact) return Promise.resolve(failure.exact);
+          }
+          return remote.runner(args, cwd);
+        },
+        "execute",
+        true,
+        [item.name],
+      ),
+    ).rejects.toThrow(failure.expected);
+    expect(remote.mutations).toHaveLength(0);
+  }
+});
+
+test("unpublished acknowledgement cannot hide a publish denial or a failed post-publish verification", async () => {
+  const { plan } = await fixture(1);
+  const item = plan.packages[0]!;
+  for (const failure of ["publish", "verification"] as const) {
+    const remote = external(plan);
+    let attempts = 0;
+    await expect(
+      release(
+        plan,
+        (args, cwd) => {
+          if (
+            args[0] === "npm" &&
+            args[1] === "view" &&
+            (args[2] === item.name || args[2] === item.tag)
+          )
+            return Promise.resolve(withdrawnLookup());
+          if (args[0] === "npm" && args[1] === "publish") {
+            attempts++;
+            if (failure === "publish")
+              return Promise.resolve(result("", 1, "E403 registry denied publish"));
+          }
+          return remote.runner(args, cwd);
+        },
+        "execute",
+        true,
+        [item.name],
+      ),
+    ).rejects.toThrow(
+      failure === "publish" ? "E403 registry denied publish" : "npm view read failed",
+    );
+    expect(attempts).toBe(1);
+    expect(remote.releases.get(item.tag)!.draft).toBe(true);
+    expect(remote.mutations.some((args) => args[2] === "edit")).toBe(false);
+  }
+});

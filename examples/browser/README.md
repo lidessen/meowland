@@ -3,7 +3,7 @@
 先在仓库根执行构建与打包，将本目录复制到仓库之外的干净目录，再用绝对路径安装本轮三个本地包：
 
 ```sh
-bun add /absolute/path/artifacts/meowjsx-0.1.0.tgz /absolute/path/artifacts/meowcss-0.1.0.tgz /absolute/path/artifacts/meowui-0.1.0.tgz
+bun add /absolute/path/artifacts/meowjsx-0.1.0.tgz /absolute/path/artifacts/meowcss-0.1.0.tgz /absolute/path/artifacts/meowtail-0.1.0.tgz
 bun run build
 ```
 

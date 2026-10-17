@@ -1,6 +1,6 @@
 # Meowland
 
-独立的 Bun / TypeScript UI 工具仓库。本轮本地迁移与有限验收完成，正式发布及产品切换尚待后续；原 Rossovia 产品仓库的源码、服务、正式依赖和 Git remote 均未在这里切换。
+独立的 Bun / TypeScript UI 工具仓库。JSX/CSS 首版已正式发布，UI 独立包改名候选仍在本地验收，产品切换尚待后续；原 Rossovia 产品仓库的源码、服务、正式依赖和 Git remote 均未在这里切换。
 
 ## 包
 
@@ -8,7 +8,7 @@
 | ------------------------------------------- | --------------------------------------------------------------------------------------------------- |
 | [`meowjsx`](packages/meowjsx/README.md)     | 平台无关 JSX / reactive runtime；浏览器能力通过 `meowjsx/web` 显式加载                              |
 | [`meowcss`](packages/meowcss/README.md)     | 通用 token / CSS 生成，另有 `/meowjsx` 与 `/web` 适配入口                                           |
-| [`meowui`](packages/meowui/README.md)       | 组件、语义布局和具体标准主题；本轮完整 Assistant 与有限 JSON catalog 的本地实现及有限独立验收已完成 |
+| [`meowtail`](packages/meowtail/README.md)   | 组件、语义布局和具体标准主题；本轮完整 Assistant 与有限 JSON catalog 的本地实现及有限独立验收已完成 |
 | [`meowbook`](packages/meowbook/README.md)   | 组件展示、检查、浏览器预览与截图工具                                                                |
 | [`meowpress`](packages/meowpress/README.md) | Markdown / MDX 静态站点构建工具                                                                     |
 
@@ -32,6 +32,8 @@ bun run pack
 
 ## 发布状态
 
-公开源码仓库为 [lidessen/meowland](https://github.com/lidessen/meowland)；Git tag、draft Release 与正式 npm 发布分别核验，本地同名 tarball 不表示拥有该名称。首次四包发布与独立 registry 消费验收沿[本地发布](docs/releasing.md)的一条多包命令接续；`meowpress` 的名称归属与发布权仍须另行确认，不加入未获授权的发布集合。实际各包发布结果以当次回执和 registry 为准。
+公开源码仓库为 [lidessen/meowland](https://github.com/lidessen/meowland)。`meowjsx@0.1.0`、`meowcss@0.1.0` 已完成 npm 发布、独立 registry 消费与正式 Release；原 tag 和资产保持不变。独立 UI 包由 `meowui` 改名为 `meowtail`，初始候选仍为 `0.1.0`，尚未发布或取得新名称发布权；404 查询不保证可注册。公开入口为 `meowtail`、`meowtail/chat`、`meowtail/json` 等，`createMeowUI`、`installMeowUI` 和既有 DOM/CSS 标记保持兼容，不合入 JSX/CSS。
+
+`meowbook` 已改用新 UI 包，但旧 `meowbook@0.1.0` draft/tag 仍绑定原候选，不能承载新 bytes。其本地候选仅供验收；正式发布前须确定新的 Book 版本，或另行明确授权处理旧未公开 draft/tag。`meowpress` 本人发布返回 E409，观察窗口内仍未公开，后台处理原因未知；不盲目重发。后续单独授权的精确发布批次沿[本地发布](docs/releasing.md)执行，本轮改名实现不含推送、发包或远端资产变更。
 
 自有代码采用 MIT，根 `LICENSE` 与五个包的 `license: "MIT"` 字段已实际写入；当前产物仍须按本轮精确输入验收，文件落地不代表已完成打包或正式发布。第三方资源继续适用其原许可证。

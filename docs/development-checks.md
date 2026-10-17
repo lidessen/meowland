@@ -24,7 +24,7 @@
 | `bun run build`        | 构建五包 ESM 与声明及必要资源；清理并更新各包 dist，不发布                                                                                                     |
 | `bun run pack`         | 把当前 dist 打成本地 tgz；不自动 build，不代表安装态或浏览器验收通过                                                                                           |
 
-检查排除 `node_modules`、`dist`、`artifacts`、Playwright 报告、测试结果和 Book 生成目录。格式工具另外跳过 Bun 生成的锁文件及原样保留的 `packages/meowui/THIRD_PARTY_NOTICES.md`；不因历史源码存在告警而整体忽略包或测试目录。具体边界在 `.oxlintrc.json` 与 `.oxfmtrc.json`。
+检查排除 `node_modules`、`dist`、`artifacts`、Playwright 报告、测试结果和 Book 生成目录。格式工具另外跳过 Bun 生成的锁文件及原样保留的 `packages/meowtail/THIRD_PARTY_NOTICES.md`；不因历史源码存在告警而整体忽略包或测试目录。具体边界在 `.oxlintrc.json` 与 `.oxfmtrc.json`。
 
 两个 JSON 类型/行为用例文件对 `no-unused-vars` 设置 `_` 前缀的参数占位约定，保留回调 props 的类型推断；其它文件保持 Oxlint 默认规则选项，未用导入仍报错。Reactive effect 的信号读取具有订阅语义，不能作为普通无用表达式随意删除。
 

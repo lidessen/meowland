@@ -6,13 +6,17 @@
 
 ## 准备精确输入
 
+当前发行名为 `meowjsx`、`meowcss`、`meowtail`、`meowbook`、`meowpress`。`meowui` 已退出新的选包集合；工具只容许它作为旧验收输入中的未选历史条目存在，不能选中发布，也不会把旧名、tag 或 tarball 静默映射为新名。因此原 `initial-0.1.0` 输入仍可只选 Press 接续核查，原输入 bytes 不改。新 UI 使用独立的 `meowtail-0.1.0` 输入与 tarball，不混入旧候选身份。
+
+已正式发布的 JSX/CSS `0.1.0` 不重新打包覆盖原发行资产。Book 的本地新 `0.1.0` 包只供安装态验收，不能沿用绑定旧候选的 `meowbook@0.1.0` draft/tag。安全的发布方案是另行确定例如 `0.1.1` 的新 Book 版本并保留旧记录；若要保留 `0.1.0`，须先获明确授权处理旧未公开 draft/tag。未获授权时不删除、移动或覆盖远端记录。新 UI 输入暂不选入这个待定的 Book 发行版本。
+
 流程为：人或 Agent 判断本次包集合、各包独立目标版本与发行说明，明确更新包 manifest、必要依赖范围和说明 → check/build/pack → 独立安装态验收 → 本地 release。不引入 Changesets、bumpp 或 changelogen，不自动推断版本联动、扩大选包集合，也不设每 commit/PR 必须记录的门禁或机器人。
 
 check/build/pack 与安装态验收是人工或 Agent 先完成的前置步骤，**发布脚本不会调用这些命令**，更不会在 `--execute` 中静默重建或替换已验收 tarball。本脚本不写版本、依赖或 changelog，不为减少操作强制五包同版；它只用正式 node-semver 校验目标版本与内部依赖范围，不自研版本或范围解析算法。
 
 完成本轮版本与安装态验收后，提交这组源码，正常推送到该仓库默认分支。输入的 `commit` 是包的候选提交，也是 tag 和 Release 正文始终使用的身份；发布工具可以来自它的后继提交，不能为了更新工具而移动旧 tag、改写原输入或重新打包。工具 HEAD 必须包含候选提交，已跟踪工作区与 index 干净，并且远端默认分支等于实际运行的工具提交。脚本通过 `git show <候选commit>:<path>` 读取候选 LICENSE 与包 manifest，不把工具提交里的后继包源码当本次候选。脚本不负责改版本、重建、重打包、提交代码、创建仓库或配置认证。
 
-将一次验收输入与已验 tarball 保存在稳定的本地目录，例如被忽略的 `artifacts/releases/initial-0.1.0/release-input.json`（这不是发布进度 ledger）：
+将一次验收输入与已验 tarball 保存在稳定的本地目录，例如被忽略的 `artifacts/releases/meowtail-0.1.0/release-input.json`（这不是发布进度 ledger）：
 
 ```json
 {
@@ -20,9 +24,9 @@ check/build/pack 与安装态验收是人工或 Agent 先完成的前置步骤�
   "commit": "完整的40位已验收Git提交SHA",
   "packages": [
     {
-      "name": "meowjsx",
+      "name": "meowtail",
       "version": "0.1.0",
-      "file": "./artifacts/meowjsx-0.1.0.tgz",
+      "file": "./artifacts/meowtail-0.1.0.tgz",
       "sha256": "独立验收所核对的64位tarball哈希",
       "notes": "可选：由维护者确定的本次发行说明"
     }
@@ -40,9 +44,9 @@ check/build/pack 与安装态验收是人工或 Agent 先完成的前置步骤�
 
 ```sh
 bun scripts/release.ts --help
-bun run release --manifest artifacts/releases/initial-0.1.0/release-input.json --packages meowjsx
+bun run release --manifest artifacts/releases/meowtail-0.1.0/release-input.json --packages meowtail
 # 工程配置的等价入口：
-bun run release --manifest artifacts/releases/initial-0.1.0/release-input.json --packages meowjsx,meowcss
+bun run release --manifest artifacts/releases/meowtail-0.1.0/release-input.json --packages meowtail
 ```
 
 不加 `--execute` 或 `--prepare-github` 就是 dry-run：只读取本地 Git、输入、候选提交的 manifest 与 tar 目录/正文，校验 SHA256、包名/版本、公开 exports/bin 文件、workspace 依赖已重写、MIT 声明及 LICENSE；分别打印候选与工具 commit、明确包集合、版本、tag 与 blockers。Git status 使用 no-optional-locks、关闭 fsmonitor 并只核已跟踪文件及 index，不刷新 index。除显式选定的输入与 tarball 外，未跟踪文件不参与发布；不会读取、删除或提交任意 `data/`。不会重建或打包，不调用 gh/npm/fetch，不联网、不读取 npm/GitHub 凭据、不创建临时发布状态。缺许可证、origin、候选不是工具提交祖先或已跟踪内容有未提交修改会明确失败，非零退出；404、远端权限与认证在此阶段完全没有被验证。
@@ -54,7 +58,7 @@ bun run release --manifest artifacts/releases/initial-0.1.0/release-input.json -
 npm 尚未登录时，可以先完成获准的 GitHub 工作：
 
 ```sh
-bun run release --manifest artifacts/releases/initial-0.1.0/release-input.json --packages meowjsx,meowcss --prepare-github
+bun run release --manifest artifacts/releases/meowtail-0.1.0/release-input.json --packages meowtail --prepare-github
 ```
 
 这不是 dry-run：它会使用当前 GitHub 身份，核对仓库 push 权限、默认分支 commit、全部选包 tag、Release 正文及已有资产 bytes，再复用正式执行的同一段逻辑创建缺失 tag、推送精确 tag，并创建或补齐 draft 资产。所有本地输入和全部选包身份先通过检查才开始变更；不覆盖冲突 tag 或资产。已有公开 Release 会失败，不降级或修补。
@@ -66,7 +70,7 @@ bun run release --manifest artifacts/releases/initial-0.1.0/release-input.json -
 维护者在脚本外按各工具正式方式配置 Git/GitHub/npm 身份、2FA 等条件；脚本不登录、不索取或写入 token。确认有本轮正式发布授权后才运行：
 
 ```sh
-bun run release --manifest artifacts/releases/initial-0.1.0/release-input.json --packages meowjsx,meowcss,meowui,meowbook --execute --defer-finalize
+bun run release --manifest artifacts/releases/meowtail-0.1.0/release-input.json --packages meowtail --execute --defer-finalize
 ```
 
 实际顺序：
@@ -79,10 +83,10 @@ bun run release --manifest artifacts/releases/initial-0.1.0/release-input.json -
 首次发包建议如上先停 draft，在仓库外从 registry 实际安装本次选中的精确版本，独立核包文件、公开入口、必要 CLI/资源及受影响行为；不能用本地 tgz 安装替代 registry 消费验收。通过后，保留同一输入与包，在本人终端用同一条命令去掉 `--defer-finalize` 接续：
 
 ```sh
-bun run release --manifest artifacts/releases/initial-0.1.0/release-input.json --packages meowjsx,meowcss,meowui,meowbook --execute
+bun run release --manifest artifacts/releases/meowtail-0.1.0/release-input.json --packages meowtail --execute
 ```
 
-重新核全部 registry integrity，相同版本会跳过 npm publish，只正式化剩余 draft。脚本不自动判定独立消费者验收，也不维护第二份验收 ACK；执行这一步的维护者或 Agent 必须先核当次真实消费证据。这里示例选定四包，不隐式发布 manifest 中其余包。
+重新核全部 registry integrity，相同版本会跳过 npm publish，只正式化剩余 draft。脚本不自动判定独立消费者验收，也不维护第二份验收 ACK；执行这一步的维护者或 Agent 必须先核当次真实消费证据。这里示例只选定新 UI 包，不隐式发布 manifest 中其余包。
 
 这是单维护者本地顺序工作流，不是跨 GitHub/npm 的原子事务。执行时不要并发修改这些输入或启动第二个发布者；单条失败即非零退出，没有隐式重试、自动 rollback、强制覆写或换版本绕过未知状态。
 

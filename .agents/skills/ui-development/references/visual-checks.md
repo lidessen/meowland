@@ -4,7 +4,7 @@
 
 ## 建立可比场景
 
-确认本次源码/安装产物、真实组件、配置与容器；已有服务不等于本版已重建。通用展板配置是 `apps/showcase/meowbook.config.ts`，包自己的 MeowUI 配置也可用。先发现实际 story id，例如从仓库根调用当前源码 CLI：
+确认本次源码/安装产物、真实组件、配置与容器；已有服务不等于本版已重建。通用展板配置是 `apps/showcase/meowbook.config.ts`，包自己的 Meowtail 配置也可用。先发现实际 story id，例如从仓库根调用当前源码 CLI：
 
 ```sh
 bun packages/meowbook/src/cli.ts list --config apps/showcase/meowbook.config.ts --query assistant --json

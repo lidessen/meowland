@@ -11,7 +11,7 @@ description: Develop or debug MeowJSX core/Web rendering, reactive lifecycle and
 
 core 的值、响应式、Context 和目标中立 renderer seam 留在 `meowjsx` 根；DOM/event/HTML/mount 留 `meowjsx/web`。同包子路径不代表根可以回导 Web，公开声明的类型依赖也属于环境边界。
 
-MeowCSS 根保纯 token/options、参数片段与 CSS/主题生成；`meowcss/meowjsx` 承担组件 contract/registry/carrier，`meowcss/web` 承担 DOM 生命周期。具体 UI token 值、parts 实例、主题和语义布局属于 MeowUI。不要提前把 typed fragment 转字符串来绕过类型或组件绑定。
+MeowCSS 根保纯 token/options、参数片段与 CSS/主题生成；`meowcss/meowjsx` 承担组件 contract/registry/carrier，`meowcss/web` 承担 DOM 生命周期。具体 UI token 值、parts 实例、主题和语义布局属于 Meowtail。不要提前把 typed fragment 转字符串来绕过类型或组件绑定。
 
 沿真实 import 图确认根、runtime、JSX runtime、Web 以及 CSS adapters 引用同一份内部实现。相同版本的两个物理副本仍可能分裂 Context 或 token 身份；不要用全局 singleton 补救，也不要禁止合法的多个显式 Runtime。
 

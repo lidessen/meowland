@@ -6,7 +6,7 @@
 
 - MeowJSX 根及其类型不依赖 DOM；Web 显式走 `meowjsx/web`。MeowCSS 根不依赖 JSX、UI 或 DOM，组件与 Web 适配由子路径承担。
 - 同一渲染图共享 core 模块，同次主题组装共享 CSS token/fragment 身份；不能把各入口分别内联成多份 runtime、Context 或 Symbol/WeakMap。显式创建多个 Runtime 仍是合法隔离。
-- MeowUI 拥有通用结构、完整 Assistant、具体主题和语义布局。`apps/showcase` 与 stories 只传场景数据和驱动交互，不复制组件实现；后端、业务事实、权限、上传与持久化留宿主。
+- Meowtail 拥有通用结构、完整 Assistant、具体主题和语义布局。`apps/showcase` 与 stories 只传场景数据和驱动交互，不复制组件实现；后端、业务事实、权限、上传与持久化留宿主。
 - JSON 入口复用同一组件与有限合同，不把任意业务 JSON、函数或对象路径变成执行能力。支持集以包内 JSON 说明和实际导出为准。
 - 包外消费使用 public exports；源码、测试和提交信息用英文，文档用中文。第三方资源继续保留自己的 notices。
 

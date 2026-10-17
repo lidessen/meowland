@@ -1,6 +1,6 @@
 import { afterEach, expect, test } from "bun:test";
 import { createHash } from "node:crypto";
-import { mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { chmod, mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { basename, join } from "node:path";
 import { inspect, main, release, run, type Plan, type Result, type Runner } from "./release.ts";
@@ -27,7 +27,7 @@ async function fixture(
 ) {
   const root = await mkdtemp(join(tmpdir(), "meowland-release-test-"));
   temporary.push(root);
-  // This text is fixture data, not the project's unapproved license file.
+  // This abbreviated text is isolated fixture data, not the project's license file.
   const license = "MIT License\nPermission is hereby granted (test fixture only).\n";
   await writeFile(join(root, "LICENSE"), license);
   const packages = [];
@@ -64,6 +64,9 @@ async function fixture(
     localCalls.push(args);
     if (args[0] === "tar") return run(args, cwd);
     if (args.join(" ") === "git rev-parse HEAD") return result(commit);
+    if (args[1] === "merge-base") return result();
+    if (args[1] === "show")
+      return result(await readFile(join(root, args[2]!.split(":")[1]!), "utf8"));
     if (args.includes("status")) return result();
     if (args[1] === "remote") return result("git@github.com:example/meowland.git");
     throw new Error(`Dry-run invoked a non-local command: ${args.join(" ")}`);
@@ -94,7 +97,7 @@ function external(plan: Plan) {
   const runner: Runner = async (args) => {
     if (args[0] === "git") {
       if (args[1] === "remote") return result("git@github.com:example/meowland.git");
-      if (args[1] === "rev-parse" && args[2] === "HEAD") return result(commit);
+      if (args[1] === "rev-parse" && args[2] === "HEAD") return result(plan.toolCommit);
       if (args.includes("status")) return result();
       if (args[1] === "show-ref")
         return result("", localTags.has(args.at(-1)!.slice("refs/tags/".length)) ? 0 : 1);
@@ -103,7 +106,8 @@ function external(plan: Plan) {
           localTags.get(args.at(-1)!.slice("refs/tags/".length).replace("^{commit}", ""))!,
         );
       if (args[1] === "ls-remote") {
-        if (args[3]?.startsWith("refs/heads/")) return result(`${commit}\trefs/heads/main`);
+        if (args[3]?.startsWith("refs/heads/"))
+          return result(`${plan.toolCommit}\trefs/heads/main`);
         const tag = args[3]!.slice("refs/tags/".length);
         return result(
           remoteTags.has(tag)
@@ -292,6 +296,144 @@ test("release mode flags are mutually exclusive and cannot repeat", async () => 
     await expect(main(args)).rejects.toThrow("Choose only one release mode");
 });
 
+test("native publish inherits real process stdio while metadata stays captured", async () => {
+  const root = await mkdtemp(join(tmpdir(), "meowland-release-stdio-"));
+  temporary.push(root);
+  const executable = join(root, "npm");
+  const evidence = join(root, "stdio.json");
+  await writeFile(
+    executable,
+    `#!${process.execPath}
+import { writeFileSync } from "node:fs";
+if (process.argv[2] === "publish") {
+  writeFileSync(process.argv[3], JSON.stringify({
+    stdin: Boolean(process.stdin.isTTY),
+    stdout: Boolean(process.stdout.isTTY),
+    stderr: Boolean(process.stderr.isTTY),
+  }));
+  process.stdout.write("Isolated fake publish stdout\\n");
+  process.stderr.write("Isolated fake publish stderr\\n");
+  process.exit(7);
+}
+process.stdout.write(JSON.stringify({ metadata: true }));
+`,
+  );
+  await chmod(executable, 0o755);
+  const published = await run([executable, "publish", evidence], root);
+  expect(published).toEqual({ code: 7, stdout: new Uint8Array(), stderr: "" });
+  expect(JSON.parse(await readFile(evidence, "utf8"))).toEqual({
+    stdin: Boolean(process.stdin.isTTY),
+    stdout: Boolean(process.stdout.isTTY),
+    stderr: Boolean(process.stderr.isTTY),
+  });
+  const metadata = await run([executable, "view", "fixture@1.2.3"], root);
+  expect(metadata.code).toBe(0);
+  expect(JSON.parse(new TextDecoder().decode(metadata.stdout))).toEqual({ metadata: true });
+});
+
+test("candidate Git files stay exact under a newer tool commit without consuming untracked data", async () => {
+  const { root, manifest } = await fixture(1);
+  const git = async (...args: string[]) => {
+    const output = await run(["git", ...args], root);
+    expect(output.code).toBe(0);
+    return new TextDecoder().decode(output.stdout).trim();
+  };
+  const identity = [
+    "-c",
+    "user.name=Release Test",
+    "-c",
+    "user.email=release@example.invalid",
+    "-c",
+    "commit.gpgsign=false",
+    "-c",
+    "core.hooksPath=/dev/null",
+  ];
+  await git("init", "--quiet");
+  await git("add", "LICENSE", "packages/meowjsx/package.json");
+  await git(...identity, "commit", "--quiet", "-m", "Candidate fixture");
+  const candidate = await git("rev-parse", "HEAD");
+  const input = JSON.parse(await readFile(manifest, "utf8"));
+  input.commit = candidate;
+  await writeFile(manifest, JSON.stringify(input));
+  const source = join(root, "packages", "meowjsx", "package.json");
+  const metadata = JSON.parse(await readFile(source, "utf8"));
+  metadata.version = "9.9.9";
+  await writeFile(source, JSON.stringify(metadata));
+  await writeFile(join(root, "LICENSE"), "A different license in the tool commit\n");
+  await git("add", "LICENSE", "packages/meowjsx/package.json");
+  await git(...identity, "commit", "--quiet", "-m", "Tool fixture");
+  const toolCommit = await git("rev-parse", "HEAD");
+  await git("remote", "add", "origin", "https://github.com/example/meowland.git");
+  await mkdir(join(root, "data"));
+  await writeFile(join(root, "data", "untracked.txt"), "Not a release input\n");
+  const calls: string[][] = [];
+  const runner: Runner = (args, cwd) => {
+    calls.push(args);
+    return run(args, cwd);
+  };
+  const plan = await inspect(root, manifest, ["meowjsx"], runner);
+  expect(plan.toolCommit).toBe(toolCommit);
+  expect(plan.input.commit).toBe(candidate);
+  expect(toolCommit).not.toBe(candidate);
+  expect(plan.packages[0]!.version).toBe("1.2.3");
+  expect(plan.blockers).toEqual([]);
+  expect(calls).toContainEqual(["git", "show", `${candidate}:LICENSE`]);
+  expect(calls).toContainEqual(["git", "show", `${candidate}:packages/meowjsx/package.json`]);
+  expect(calls.find((args) => args.includes("status"))).toContain("--untracked-files=no");
+  expect(calls.some((args) => args.some((arg) => arg.includes("data/")))).toBe(false);
+  const tree = await git("rev-parse", `${candidate}^{tree}`);
+  input.commit = await git(...identity, "commit-tree", tree, "-m", "Unrelated candidate fixture");
+  await writeFile(manifest, JSON.stringify(input));
+  const unrelated = await inspect(root, manifest, ["meowjsx"], runner);
+  expect(unrelated.blockers).toEqual(["Reviewed commit is not an ancestor of the tool commit"]);
+});
+
+test("tool identity changes and an unpushed tool commit prevent all release mutations", async () => {
+  const { root, manifest, local } = await fixture(1);
+  const plan = await inspect(root, manifest, ["meowjsx"], (args, cwd) =>
+    args.join(" ") === "git rev-parse HEAD"
+      ? Promise.resolve(result("c".repeat(40)))
+      : local(args, cwd),
+  );
+  for (const changed of ["head", "tracked", "remote"] as const) {
+    const remote = external(plan);
+    await expect(
+      release(plan, (args, cwd) => {
+        if (changed === "head" && args.join(" ") === "git rev-parse HEAD")
+          return Promise.resolve(result("d".repeat(40)));
+        if (changed === "tracked" && args.includes("status"))
+          return Promise.resolve(result(" M scripts/release.ts"));
+        if (changed === "remote" && args[1] === "ls-remote" && args[3]?.startsWith("refs/heads/"))
+          return Promise.resolve(result(`${commit}\trefs/heads/main`));
+        return remote.runner(args, cwd);
+      }),
+    ).rejects.toThrow(changed === "remote" ? "inspected tool commit" : "during preflight");
+    expect(remote.mutations).toHaveLength(0);
+  }
+});
+
+test("deferred finalization leaves verified packages in drafts and reentry never republishes", async () => {
+  const { plan } = await fixture();
+  const remote = external(plan);
+  await release(plan, remote.runner, "execute", true);
+  expect(remote.published.size).toBe(2);
+  expect([...remote.releases.values()].every((entry) => entry.draft)).toBe(true);
+  expect(remote.mutations.some((args) => args[2] === "edit")).toBe(false);
+  await release(plan, remote.runner);
+  expect([...remote.releases.values()].every((entry) => !entry.draft)).toBe(true);
+  expect(remote.mutations.filter((args) => args[1] === "publish")).toHaveLength(2);
+  expect(remote.mutations.filter((args) => args[3] === "tag")).toHaveLength(2);
+  for (const args of [
+    ["--defer-finalize"],
+    ["--prepare-github", "--defer-finalize"],
+    ["--execute", "--defer-finalize", "--defer-finalize"],
+  ])
+    await expect(main(args)).rejects.toThrow("defer-finalize");
+  await expect(release(plan, remote.runner, "prepare-github", true)).rejects.toThrow(
+    "requires --execute",
+  );
+});
+
 test("all selected packages are verified before any public Release; partial npm success resumes", async () => {
   const { plan } = await fixture();
   const remote = external(plan);
@@ -320,10 +462,9 @@ test("explicit subset releases only that package and does not require an unselec
 
 test("local blockers and an altered second tarball prevent all external mutations", async () => {
   const { root, manifest, local, plan } = await fixture();
-  for (const problem of ["head", "dirty", "origin", "push-origin"] as const) {
+  for (const problem of ["candidate", "dirty", "origin", "push-origin"] as const) {
     const blocked = await inspect(root, manifest, ["meowjsx"], async (args, cwd) => {
-      if (problem === "head" && args.join(" ") === "git rev-parse HEAD")
-        return result("c".repeat(40));
+      if (problem === "candidate" && args[1] === "merge-base") return result("", 1);
       if (problem === "dirty" && args.includes("status")) return result(" M package.json");
       if (problem === "origin" && args[1] === "remote") return result("", 2, "No such remote");
       if (problem === "push-origin" && args[1] === "remote" && args.includes("--push"))

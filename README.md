@@ -32,6 +32,6 @@ bun run pack
 
 ## 发布状态
 
-目前没有公开发布或创建新的远程仓库。2026-10-16 官方 npm registry 查询中，`meowjsx`、`meowcss`、`meowui`、`meowbook` 返回 404，这不保证将来可注册；`meowpress` 返回历史撤包信息，名称归属与发布权尚待确认。本地同名 tarball 不表示拥有该名称。
+公开源码仓库为 [lidessen/meowland](https://github.com/lidessen/meowland)；Git tag、draft Release 与正式 npm 发布分别核验，本地同名 tarball 不表示拥有该名称。首次四包发布与独立 registry 消费验收沿[本地发布](docs/releasing.md)的一条多包命令接续；`meowpress` 的名称归属与发布权仍须另行确认，不加入未获授权的发布集合。实际各包发布结果以当次回执和 registry 为准。
 
 自有代码采用 MIT，根 `LICENSE` 与五个包的 `license: "MIT"` 字段已实际写入；当前产物仍须按本轮精确输入验收，文件落地不代表已完成打包或正式发布。第三方资源继续适用其原许可证。

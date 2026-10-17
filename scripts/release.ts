@@ -12,7 +12,7 @@ const statusArgs = [
   "core.fsmonitor=false",
   "status",
   "--porcelain",
-  "--untracked-files=all",
+  "--untracked-files=no",
 ];
 const decoder = new TextDecoder();
 export type Result = { code: number; stdout: Uint8Array; stderr: string };
@@ -27,6 +27,7 @@ type Package = InputPackage & {
 };
 export type Plan = {
   root: string;
+  toolCommit: string;
   manifest: string;
   manifestHash: string;
   input: Input;
@@ -44,6 +45,15 @@ function releaseBody(item: Package, commit: string) {
 }
 
 export const run: Runner = async (args, cwd) => {
+  if (basename(args[0] ?? "") === "npm" && args[1] === "publish") {
+    const child = Bun.spawn(args, {
+      cwd,
+      stdin: "inherit",
+      stdout: "inherit",
+      stderr: "inherit",
+    });
+    return { code: await child.exited, stdout: new Uint8Array(), stderr: "" };
+  }
   const child = Bun.spawn(args, { cwd, stdin: "ignore", stdout: "pipe", stderr: "pipe" });
   const [stdout, stderr, code] = await Promise.all([
     new Response(child.stdout).arrayBuffer(),
@@ -54,7 +64,10 @@ export const run: Runner = async (args, cwd) => {
 };
 async function checked(runner: Runner, args: string[], cwd: string) {
   const result = await runner(args, cwd);
-  assert(result.code === 0, `${args[0]} ${args[1]} failed: ${result.stderr || text(result)}`);
+  assert(
+    result.code === 0,
+    `${args[0]} ${args[1]} failed (exit ${result.code}): ${result.stderr || text(result) || "See command output"}`,
+  );
   return result;
 }
 function repositoryOf(remote: string) {
@@ -114,18 +127,21 @@ export async function inspect(
     "Unknown reviewed package",
   );
   const blockers: string[] = [];
-  const head = text(await checked(runner, ["git", "rev-parse", "HEAD"], root));
-  if (head !== input.commit) blockers.push("HEAD differs from the reviewed commit");
+  const toolCommit = text(await checked(runner, ["git", "rev-parse", "HEAD"], root));
+  assert(/^[a-f0-9]{40}$/.test(toolCommit), "A full tool commit is required");
+  const ancestor = await runner(
+    ["git", "merge-base", "--is-ancestor", input.commit, toolCommit],
+    root,
+  );
+  assert(ancestor.code === 0 || ancestor.code === 1, "Cannot inspect reviewed commit ancestry");
+  if (ancestor.code !== 0) blockers.push("Reviewed commit is not an ancestor of the tool commit");
   if (text(await checked(runner, statusArgs, root)))
-    blockers.push("Working tree or index is not clean");
+    blockers.push("Tracked working tree or index is not clean");
   if (!(await originMatches(runner, root, input.repository)))
     blockers.push("origin must identify the exact GitHub repository");
-  let license = "";
-  try {
-    license = await readFile(resolve(root, "LICENSE"), "utf8");
-  } catch {
-    /* Report together with package checks. */
-  }
+  const candidateFile = async (path: string) =>
+    text(await checked(runner, ["git", "show", `${input.commit}:${path}`], root));
+  const license = await candidateFile("LICENSE");
   if (!license.includes("MIT License") || !license.includes("Permission is hereby granted"))
     blockers.push("The reviewed root MIT LICENSE is missing");
   const packages: Package[] = [];
@@ -158,9 +174,7 @@ export async function inspect(
     const packed = JSON.parse(
       text(await checked(runner, ["tar", "-xOf", path, "package/package.json"], root)),
     );
-    const local = JSON.parse(
-      await readFile(resolve(root, "packages", name, "package.json"), "utf8"),
-    );
+    const local = JSON.parse(await candidateFile(`packages/${name}/package.json`));
     assert(
       packed.name === name && packed.version === item.version && !packed.private,
       `Packed identity is invalid: ${name}`,
@@ -243,7 +257,15 @@ export async function inspect(
         );
     }
   }
-  return { root, manifest, manifestHash: hash(manifestBytes), input, packages, blockers };
+  return {
+    root,
+    toolCommit,
+    manifest,
+    manifestHash: hash(manifestBytes),
+    input,
+    packages,
+    blockers,
+  };
 }
 
 async function jsonCommand(
@@ -270,8 +292,14 @@ async function jsonCommand(
 export type ReleaseMode = "execute" | "prepare-github";
 
 /** Both modes mutate GitHub state and require authorization; only execute uses npm. */
-export async function release(plan: Plan, runner: Runner = run, mode: ReleaseMode = "execute") {
+export async function release(
+  plan: Plan,
+  runner: Runner = run,
+  mode: ReleaseMode = "execute",
+  deferFinalize = false,
+) {
   assert(mode === "execute" || mode === "prepare-github", "Invalid release mode");
+  assert(!deferFinalize || mode === "execute", "Deferred finalization requires --execute");
   assert(plan.blockers.length === 0, plan.blockers.join("\n"));
   const { root, input, packages } = plan;
   const command = (args: string[]) => checked(runner, args, root);
@@ -307,8 +335,8 @@ export async function release(plan: Plan, runner: Runner = run, mode: ReleaseMod
     await command(["git", "ls-remote", "origin", `refs/heads/${branch}`]),
   ).split(/\s+/)[0];
   assert(
-    remoteHead === input.commit,
-    "Push the reviewed commit to the default branch before release",
+    remoteHead === plan.toolCommit,
+    "Push the inspected tool commit to the default branch before release",
   );
   let access: Record<string, string> | null = null;
   if (mode === "execute") {
@@ -463,7 +491,7 @@ export async function release(plan: Plan, runner: Runner = run, mode: ReleaseMod
   }
   // Every selected package passed this mode's preflight before the first mutation.
   assert(
-    text(await command(["git", "rev-parse", "HEAD"])) === input.commit &&
+    text(await command(["git", "rev-parse", "HEAD"])) === plan.toolCommit &&
       !text(await command(statusArgs)),
     "Repository changed during preflight",
   );
@@ -568,6 +596,7 @@ export async function release(plan: Plan, runner: Runner = run, mode: ReleaseMod
     );
     assert(integrity === item.integrity, `npm verification failed: ${item.tag}`);
   }
+  if (deferFinalize) return;
   for (const state of states)
     if (!state.release || state.release.draft)
       await command([
@@ -586,14 +615,20 @@ export async function release(plan: Plan, runner: Runner = run, mode: ReleaseMod
 export async function main(args: string[]) {
   if (args.length === 1 && args[0] === "--help") {
     console.log(
-      "Usage: bun scripts/release.ts --manifest <reviewed.json> --packages <name,name> [--prepare-github | --execute]\nDefault: local-only dry-run; --prepare-github prepares tags and draft Releases without npm; --execute completes GitHub and npm publication.",
+      "Usage: bun scripts/release.ts --manifest <reviewed.json> --packages <name,name> [--prepare-github | --execute [--defer-finalize]]\nDefault: local-only dry-run; --prepare-github prepares tags and draft Releases without npm; --execute publishes reviewed packages; --defer-finalize leaves drafts for registry consumer verification.",
     );
     return;
   }
   const values = new Map<string, string>();
   let mode: ReleaseMode | undefined;
+  let deferFinalize = false;
   for (let index = 0; index < args.length; index++) {
     const arg = args[index]!;
+    if (arg === "--defer-finalize") {
+      assert(!deferFinalize, "Duplicate --defer-finalize");
+      deferFinalize = true;
+      continue;
+    }
     if (arg === "--execute" || arg === "--prepare-github") {
       assert(
         mode === undefined,
@@ -610,6 +645,7 @@ export async function main(args: string[]) {
     assert(value && !value.startsWith("--"), `Missing value: ${arg}`);
     values.set(arg, value);
   }
+  assert(!deferFinalize || mode === "execute", "--defer-finalize requires --execute");
   assert(
     values.has("--manifest") && values.has("--packages"),
     "Explicit --manifest and --packages are required",
@@ -625,6 +661,8 @@ export async function main(args: string[]) {
         mode: mode ?? "dry-run",
         repository: plan.input.repository,
         commit: plan.input.commit,
+        toolCommit: plan.toolCommit,
+        deferFinalize,
         packages: plan.packages.map((item) => ({
           name: item.name,
           version: item.version,
@@ -639,7 +677,7 @@ export async function main(args: string[]) {
     ),
   );
   assert(plan.blockers.length === 0, plan.blockers.join("\n"));
-  if (mode) await release(plan, run, mode);
+  if (mode) await release(plan, run, mode, deferFinalize);
 }
 if (import.meta.main)
   main(process.argv.slice(2)).catch((error) => {

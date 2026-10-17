@@ -19,7 +19,7 @@ import {
 } from "meowtail/presentation";
 import { assets, bytesLabel, imageFacts, secondsLabel, transferSeconds } from "./assets";
 
-export const talkVersion = "image-waiting-b2";
+export const talkVersion = "image-waiting-b3";
 export interface TalkOptions {
   initialPosition?: SlidePosition;
   speed?: number;
@@ -356,13 +356,13 @@ export function createImageTalk(options: TalkOptions = {}) {
     },
     {
       id: "summary",
-      title: "Send what the moment needs.",
+      title: "Choose detail. Then send fewer bytes.",
       steps: 1,
       render: () => (
         <Stack gap="relaxed">
           <header>
             <p className="eyebrow">04 / Take it with you</p>
-            <h2 className="talk-heading">Send what the moment needs.</h2>
+            <h2 className="talk-heading">Choose detail. Then send fewer bytes.</h2>
           </header>
           <p className="result-line">
             At <strong>{speed} Mbit/s</strong>, the transfer-only estimate is
@@ -373,7 +373,7 @@ export function createImageTalk(options: TalkOptions = {}) {
           <Reveal at={1}>
             <ul className="source-list">
               <li>Choose dimensions for the display.</li>
-              <li>Compare quality at that size, then measure bytes.</li>
+              <li>Keep the smaller file only when its detail is enough.</li>
               <li>Measure the real experience; use the estimate to ask better questions.</li>
             </ul>
           </Reveal>

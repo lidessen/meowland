@@ -1,6 +1,6 @@
 # 内容与视觉迭代记录
 
-当前作品标识为 `image-waiting-b2`；它是当前夹具的标识，不表示仓库中存在已提交的 b1 版本。以下只记录本次实际可核修改，不补造方案评审或用户选择历史。
+粗稿检查点 `9caeff43c0a5594a54a8144cfe283123c1fc2036` 的作品标识为 `image-waiting-b2`，当前局部修订为 `image-waiting-b3`。`b2` 是当时夹具的标识，不表示存在已提交的 b1 版本。以下只记录本次实际可核修改，不补造方案评审或用户选择历史。
 
 ## 已发生的粗稿与替换
 
@@ -19,4 +19,15 @@
 
 若下一轮反馈是“保留当前左右 B 排版，仅改结论和图”，应只 patch 相关文稿与素材引用，真实执行图片替换、测字节、观察裁切并重录受影响证据，不能把该推荐路径写成已经完成。重排只移动现有 `slides` 条目，稳定 id 不跟页序变；步骤含义变化后重新确认定位。
 
-复验配方：`experiment / step=3 / image-waiting-b2 / speed=71` → Open evidence → Return to experiment → summary。公式与总结都应继续使用71 Mbit/s。源码用普通 Git 检查点回退，素材版本见来源说明与录屏记录。
+复验配方：`experiment / step=3 / image-waiting-b3 / speed=71` → Open evidence → Return to experiment → summary。公式与总结都应继续使用71 Mbit/s。源码用普通 Git 检查点回退，素材版本见来源说明与录屏记录。
+
+## 检查点后的真实局部修订：image-waiting-b3
+
+父任务先提交上述粗稿为 `9caeff4`，随后只在当前左右布局上改图与结论：
+
+- 原创岸线原来在横坐标56%处硬截断。只改素材生成器的一条岸线公式，生成两种实际编码，替换同一资源路径，保留全部页 id、步数与左右布局。PNG从3,597,630变为3,634,345 bytes，JPEG从67,108变为68,426 bytes；同步重测公式、来源与显示值。
+- 总结标题改为“Choose detail. Then send fewer bytes.”；只把第二条结论改为“Keep the smaller file only when its detail is enough.”，其余叙事不重写。
+- 独立审查实际播放抓到流响应缺少可读Content-Length导致画面显示0 bytes。录屏生成器改用读盘时已知的真实大小，并在读完后核对实际读取bytes，最终显示实际值。重新生成12秒录屏，实际检查4秒与10秒帧：中间PNG进度与总数非0，完成PNG3,634,345、JPEG68,426 bytes，与文件一致。
+- [revision.json](revision.json)记录检查点、实际前后文件hash及截图路径。`artifacts/presentation-review/b3-before-*`与`b3-after-*`可比较局部变化；这些证据是本机忽略目录中的原图，不冒充源文件版本。
+
+该修订没有声称用户先前选过B，也不补造早期图片占位。它演示了现在真实执行的一次局部改图与结论修改。

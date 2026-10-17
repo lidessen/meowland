@@ -278,6 +278,35 @@ test("a rejected wrapper play reports failure and permits a real retry", async (
   await expect(figure.getByRole("status")).not.toContainText("Unable to play");
 });
 
+test("native loading retry is visible only after failure and hides throughout recovery", async ({
+  page,
+}) => {
+  await jump(page, "media");
+  const video = page.getByRole("region", { name: "First test deck", exact: true }).locator("video");
+  const figure = video.locator("..");
+  const retry = figure.getByRole("button", {
+    name: "Retry loading",
+    exact: true,
+    includeHidden: true,
+  });
+  await expect(figure).toHaveAttribute("data-media-state", "ready");
+  await expect(retry).toBeHidden();
+  await video.evaluate((element: HTMLVideoElement) => {
+    element.src = `/recovering.wav?resource=${crypto.randomUUID()}`;
+    element.load();
+  });
+  await expect(figure).toHaveAttribute("data-media-state", "failed");
+  await expect(retry).toBeVisible();
+  await retry.click();
+  await expect(figure).toHaveAttribute("data-media-state", "loading");
+  await expect(retry).toBeHidden();
+  await expect(figure).toHaveAttribute("data-media-state", "ready");
+  await expect(retry).toBeHidden();
+  expect(await video.evaluate((element: HTMLVideoElement) => element.readyState)).toBeGreaterThan(
+    0,
+  );
+});
+
 test("an inert background iframe needs explicit host denial before any clocks can run", async ({
   page,
 }) => {
@@ -323,4 +352,30 @@ test("contain mode does not leave the unscaled canvas as empty horizontal scroll
   await expect
     .poll(() => viewport.evaluate((element) => element.scrollWidth - element.clientWidth))
     .toBeLessThanOrEqual(1);
+});
+
+test("reordering the real authored talk preserves stable ids, direct step and experiment state", async ({
+  page,
+}) => {
+  await page.goto("/?sample=reordered");
+  await expect(
+    page.getByRole("heading", { name: "Give the connection a speed.", exact: true }),
+  ).toBeVisible();
+  const slider = page.getByRole("slider", { name: "Network speed (Mbit/s)", exact: true });
+  await expect(slider).toHaveValue("71");
+  await expect(
+    page.getByText("Transfer-only estimate for an uncached response", { exact: false }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("combobox", { name: "Choose slide" }).locator("option").first(),
+  ).toHaveAttribute("value", "experiment");
+  await page.getByRole("combobox", { name: "Choose slide" }).selectOption("summary");
+  await expect(page.getByText("71 Mbit/s", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Revisit your experiment", exact: true }).click();
+  await expect(slider).toHaveValue("71");
+  await expect(page.getByRole("button", { name: "Replay estimate", exact: true })).toBeVisible();
+  await page.getByRole("combobox", { name: "Choose slide" }).selectOption("opening");
+  await expect(
+    page.getByRole("heading", { name: /The same image\.\s*A different wait\./ }),
+  ).toBeVisible();
 });

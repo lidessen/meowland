@@ -46,10 +46,10 @@ bun packages/meowbook/src/cli.ts serve --config examples/presentation/meowbook.c
 
 五个稳定页 id 为 `opening`、`compare`、`experiment`、`evidence`、`summary`。每场作品由 `createImageTalk` 创建一次位置 Signal、网速 Signal、视频时间。翻页卸载页面资源，但参数仍属于这场会话；回退不撤销实验。**Reset experiment** 才把速度恢复 8 Mbit/s；整页刷新开启新会话，不做持久化。
 
-- 图片是同一原创程序插画的 **PNG 与 JPEG 编码版本**，不是摄影、事实证据或生成式模型输出。均为 2200 × 1400；文件实测 3,597,630 与 67,108 bytes。JPEG 的细颗粒和边缘被平滑，不能声称画质相同，也不能从此图推广任意照片的压缩比。
+- 图片是同一原创程序插画的 **PNG 与 JPEG 编码版本**，不是摄影、事实证据或生成式模型输出。均为 2200 × 1400；文件实测 3,634,345 与 68,426 bytes。JPEG 的细颗粒和边缘被平滑，不能声称画质相同，也不能从此图推广任意照片的压缩比。
 - 公式为 `seconds = bytes × 8 ÷ (Mbit/s × 1,000,000)`。这是未缓存响应、固定吞吐下的纯传输估算，忽略往返、服务端、解码与网络变化。热缓存可避免传输，不能称其为所有真实加载的下限。所有单位为十进制。
 - 原创互动条形动画响应活动许可并清理 RAF；减少动态效果时直接显示完成代表态。它随公式演示，不冒充实时测网速。
-- 12 秒静音 VP8 WebM 记录浏览器真实请求/解码这两个本地文件。服务端每 70ms 发一个 32KiB chunk，故意控制等待，**不是公网性能基准**。本次记录 PNG 约 7.99s、JPEG 约 0.30s；条件、浏览器版本与实际结果见 [recording.json](records/recording.json)。有英文 VTT 字幕与常显文字替代。
+- 12 秒静音 VP8 WebM 记录浏览器真实请求/解码这两个本地文件。服务端每 70ms 发一个 32KiB chunk，故意控制等待，**不是公网性能基准**。本次记录 PNG 约 8.08s、JPEG 约 0.30s；条件、浏览器版本与实际结果见 [recording.json](records/recording.json)。有英文 VTT 字幕与常显文字替代。
 - 视频回访恢复上次时间点（包含结束点），保持暂停；继续或重播由用户手动启动。媒体结束不翻页，叙事步骤不决定媒体时钟。
 - 独立音乐入口使用原创 6 秒低音量正弦声、原生控制，手动播放。根音频跨两页保留，退出作品释放，不建音轨平台。
 - 字体故意使用操作系统本地 sans-serif，不下载或再分发字体；不同系统允许选择不同字体。离线验收检查实际排版，不能只看 fonts.ready。
@@ -58,9 +58,9 @@ bun packages/meowbook/src/cli.ts serve --config examples/presentation/meowbook.c
 
 ## 一次局部迭代与复验
 
-当前作品版本 `image-waiting-b2`。先形成开场、左右 B 排版与最难实验页，图片暂可占位；随后换入原创真实两图、测量 bytes、加入真实本地加载录屏。保留 B 排版时只改结论与相关图，不重写整套结构。修订记录见 [records/iteration.md](records/iteration.md)。
+当前作品版本 `image-waiting-b3`。先形成开场、左右 B 排版与最难实验页，图片暂可占位；随后换入原创真实两图、测量 bytes、加入真实本地加载录屏。保留 B 排版时只改结论与相关图，不重写整套结构。修订记录见 [records/iteration.md](records/iteration.md)。
 
-反馈使用稳定 `slideId + step + 作品版本 + 输入`，例如 `experiment / 3 / image-waiting-b2 / speed=71`。重排只改 `slides` 数组，id 不跟页序变；步骤含义变化要重新确认定位。重启预览后按 URL/夹具重放，普通 Git 检查点支持源码回退，不建设通用撤销系统。
+反馈使用稳定 `slideId + step + 作品版本 + 输入`，例如 `experiment / 3 / image-waiting-b3 / speed=71`。重排只改 `slides` 数组，id 不跟页序变；步骤含义变化要重新确认定位。重启预览后按 URL/夹具重放，普通 Git 检查点支持源码回退，不建设通用撤销系统。
 
 ## 交付与验收边界
 

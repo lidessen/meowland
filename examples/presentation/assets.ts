@@ -9,8 +9,8 @@ export const assets = { original, delivery, recording, captions, tone };
 export const imageFacts = {
   width: 2200,
   height: 1400,
-  originalBytes: 3597630,
-  deliveryBytes: 67108,
+  originalBytes: 3634345,
+  deliveryBytes: 68426,
 } as const;
 export const transferSeconds = (bytes: number, mbps: number) => (bytes * 8) / (mbps * 1_000_000);
 export const secondsLabel = (seconds: number) =>

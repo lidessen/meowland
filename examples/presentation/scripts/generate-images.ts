@@ -30,8 +30,8 @@ for (let y = 0; y < height; y++) {
       const reflection = Math.exp(-Math.pow((u - 0.72) / (0.025 + (v - 0.68) * 0.4), 2));
       color = mix(color, [228, 213, 164], reflection * 0.6 * Math.max(0, wave));
     }
-    const shore = 0.81 + Math.sin(u * 7 + 1) * 0.16;
-    if (v > shore && u < 0.56) color = [41, 75, 70];
+    const shore = 0.79 + Math.pow(u / 0.58, 1.6) * 0.35 + Math.sin(u * 8) * 0.025;
+    if (v > shore) color = [41, 75, 70];
     const grain = (random() - 0.5) * 17;
     const offset = (y * width + x) * 4;
     for (let c = 0; c < 3; c++) pixels[offset + c] = Math.max(0, Math.min(255, color[c]! + grain));

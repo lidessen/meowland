@@ -1,0 +1,73 @@
+{
+  "beforeCommit": "9caeff43c0a5594a54a8144cfe283123c1fc2036",
+  "beforeVersion": "image-waiting-b2",
+  "afterVersion": "image-waiting-b3",
+  "scope": "Keep the existing left/right layout and stable slide ids; smooth the original artwork shore, revise the summary, and repair recording byte counters.",
+  "before": [
+    {
+      "path": "scripts/generate-images.ts",
+      "bytes": 2900,
+      "sha256": "5e6f24e16d46c8b7c7e5efd61ad4e46e15f4e59899a15d78a4c1ce29046c9a30"
+    },
+    {
+      "path": "talk.tsx",
+      "bytes": 16524,
+      "sha256": "47de435ffb1b66ec03dd53ae992347acd62d3b356faa71add0bdb566843b7745"
+    },
+    {
+      "path": "assets/coast-original.png",
+      "bytes": 3597630,
+      "sha256": "b234fd126a90dd73437b2cb7cecad3e2aaaf882457b80322f6b7a1963d021f8d"
+    },
+    {
+      "path": "assets/coast-delivery.jpg",
+      "bytes": 67108,
+      "sha256": "8c6cc5bc40de3dac17bb93e33c2e81ce26725deababc9dfc398ef94def3e67c9"
+    },
+    {
+      "path": "assets/local-transfer.webm",
+      "bytes": 495907,
+      "sha256": "68fbc568de844c76048f75d4e365265e39b3ce69d9c97537cb55ce0dc633c408"
+    }
+  ],
+  "beforeScreenshots": [
+    "artifacts/presentation-review/b3-before-opening.png",
+    "artifacts/presentation-review/b3-before-summary.png"
+  ],
+  "after": [
+    {
+      "path": "scripts/generate-images.ts",
+      "bytes": 2918,
+      "sha256": "9b6a23acc391e5717a90d8e67a73f4dfd8a8ad7ac28750b7fd6360b213d8f5b1"
+    },
+    {
+      "path": "talk.tsx",
+      "bytes": 16548,
+      "sha256": "4c17d4d122c442f7f250479b4194e7a2c368fca8826b2aa12b5393d6bb7fe28a"
+    },
+    {
+      "path": "assets/coast-original.png",
+      "bytes": 3634345,
+      "sha256": "07c8f7f9d469ae26e4b26c7de9e12c6a70396f1954c46c824890861b745410f5"
+    },
+    {
+      "path": "assets/coast-delivery.jpg",
+      "bytes": 68426,
+      "sha256": "9922a645ddf1770b2d6eb9f11fe3324bfd196b64570856dd2007ea55d7ccaa3b"
+    },
+    {
+      "path": "assets/local-transfer.webm",
+      "bytes": 498896,
+      "sha256": "0ed55b10cb794a63b2e1ac0f8dd00a67a906da40f7681a8fd805c837a41271f5"
+    }
+  ],
+  "afterScreenshots": [
+    "artifacts/presentation-review/b3-after-opening.png",
+    "artifacts/presentation-review/b3-after-summary.png"
+  ],
+  "recordingFrames": [
+    "artifacts/presentation-review/b3-recording-middle.png",
+    "artifacts/presentation-review/b3-recording-complete.png"
+  ],
+  "verification": "All five slide geometries remained 1280x720 with no content scroll overflow. Browser screenshots use a dark OS preference with this work explicitly light. New recording frames at 4s/10s show nonzero counters matching actual file bytes."
+}

@@ -160,6 +160,9 @@ export const presentationStyles = css`
     gap: 8px;
     font-size: ${uiTokens.fontBody};
   }
+  :where(${partSelector(presentationVideoContract, "actions")}, ${partSelector(presentationAudioContract, "actions")}) > [hidden] {
+    display: none;
+  }
   ${part("soundtrack")} ${partSelector(presentationAudioContract, "root")} {
     flex-direction: row;
     flex-wrap: wrap;

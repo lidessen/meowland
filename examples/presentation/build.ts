@@ -37,7 +37,7 @@ const assets = result.outputs.map((entry) => ({
 }));
 await writeFile(
   join(outdir, "build-manifest.json"),
-  JSON.stringify({ entry: "index.html", sourceVersion: "image-waiting-b2", assets }, null, 2),
+  JSON.stringify({ entry: "index.html", sourceVersion: "image-waiting-b3", assets }, null, 2),
 );
 const imageStats = await Promise.all(
   ["coast-original.png", "coast-delivery.jpg"].map(async (name) => ({

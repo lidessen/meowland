@@ -1,4 +1,12 @@
-import { createRuntime, defineComponent, h, mapSignal, signal, type Child } from "meowjsx";
+import {
+  createRuntime,
+  defineComponent,
+  h,
+  mapSignal,
+  signal,
+  type Child,
+  type VNode,
+} from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { createMeowUI } from "meowtail";
 import { applyTheme, mountStyles } from "meowcss/web";
@@ -12,6 +20,8 @@ import {
   type SlideDefinition,
   type SlidePosition,
 } from "meowtail/presentation";
+import { createImageTalk } from "../../../../../examples/presentation/talk";
+import { talkCss } from "../../../../../examples/presentation/talk.styles";
 
 interface DeckFacts {
   renders: Record<string, number>;
@@ -191,11 +201,27 @@ function createDeck(instance: number) {
 }
 
 const root = document.querySelector<HTMLElement>("#test-root")!;
-const removeStyles = mountStyles(document, standardTheme.cssText);
+const removeStyles = mountStyles(document, standardTheme.cssText + talkCss);
 const removeTheme = applyTheme(root, standardTheme);
 const decks = [createDeck(0), createDeck(1)];
+let content: Child = decks.map((deck) => deck.node);
+if (new URL(location.href).searchParams.get("sample") === "reordered") {
+  const talk = createImageTalk({
+    initialPosition: { slideId: "experiment", step: 3 },
+    speed: 71,
+    active: false,
+  });
+  const view = talk.view as VNode;
+  const slides = view.props.slides as readonly SlideDefinition[];
+  // Reuse the actual authored page functions and state; only change their order.
+  const reordered = [
+    slides.find((slide) => slide.id === "experiment")!,
+    ...slides.filter((slide) => slide.id !== "experiment"),
+  ];
+  content = h(view.type, { ...view.props, slides: reordered });
+}
 const mounted = createWebRenderer(createRuntime({ plugins: [createMeowUI()] })).render(
-  decks.map((deck) => deck.node),
+  content,
   root,
 );
 window.presentationTest = {

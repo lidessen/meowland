@@ -1,4 +1,4 @@
-import { resolve } from "node:path";
+import { basename, resolve } from "node:path";
 
 const result = await Bun.build({
   entrypoints: [resolve(import.meta.dir, "fixture.tsx")],
@@ -6,7 +6,12 @@ const result = await Bun.build({
   minify: false,
 });
 if (!result.success) throw new Error(result.logs.map(String).join("\n"));
-const script = await result.outputs[0]!.text();
+const script = await result.outputs.find((output) => output.kind === "entry-point")!.text();
+const assets = new Map(
+  result.outputs
+    .filter((output) => output.kind === "asset")
+    .map((output) => [`/${basename(output.path)}`, output]),
+);
 
 // A local PCM asset exercises the browser media implementation without network or codecs.
 const samples = 8000 * 3;
@@ -27,15 +32,26 @@ header.setUint16(32, 2, true);
 header.setUint16(34, 16, true);
 label(36, "data");
 header.setUint32(40, samples * 2, true);
+const failedResources = new Set<string>();
 
 Bun.serve({
   hostname: "127.0.0.1",
   port: 13019,
-  fetch(request) {
+  async fetch(request) {
     const path = new URL(request.url).pathname;
     if (path === "/fixture.js")
       return new Response(script, { headers: { "content-type": "text/javascript" } });
-    if (path === "/silence.wav") {
+    const asset = assets.get(path);
+    if (asset) return new Response(asset);
+    if (path === "/recovering.wav" && !failedResources.has(request.url)) {
+      failedResources.add(request.url);
+      return new Response("Missing test media", { status: 404 });
+    }
+    if (path === "/recovering.wav") {
+      // Leave a real HTTP loading interval in which the retry action must remain hidden.
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    }
+    if (path === "/silence.wav" || path === "/recovering.wav") {
       const range = /^bytes=(\d+)-(\d*)$/.exec(request.headers.get("range") ?? "");
       if (range) {
         const start = Number(range[1]);

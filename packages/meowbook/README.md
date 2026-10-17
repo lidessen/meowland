@@ -17,8 +17,8 @@ bunx --no-install meowbook serve --config meowbook.config.ts --port 13004
 bunx --no-install meowbook capture --config meowbook.config.ts --story composer --depth all
 ```
 
-CLI 需要 Bun。当前迁移只提供本地构建与 tarball，尚未正式发布 npm；先安装本轮产物及其
-`meowjsx`、`meowcss`、`meowtail` peers，再使用以上已安装 CLI 命令，不从 registry 猜取同名包。
+CLI 需要 Bun。安装 `meowbook` 及其 `meowjsx`、`meowcss`、`meowtail` peers 后，
+在消费者目录使用以上已安装 CLI 命令。
 公开入口为 `meowbook`、`meowbook/web`、`meowbook/bun`、`meowbook/playwright`。
 发行包携带编译后的 JS、类型声明与 gallery HTML；构建和摄影不读取库仓库的源码目录。
 静态构建使用 `meowbook/bun` 的 `buildStories(config, outdir)`；CLI 提供 list、check、serve、capture。

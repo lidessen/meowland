@@ -16,6 +16,8 @@
 
 浏览器演示创作见 [presentation-authoring skill](.agents/skills/presentation-authoring/SKILL.md) 与[图片等待演示](examples/presentation/README.md)：文稿、视觉、素材和互动围绕同一可运行作品迭代，复用 Meowtail 演示组件和 Meowbook。演示样例是私有消费者，不新增发布包；首期浏览器交付，PPT 导出留待以后。[设计与取舍](docs/designs/2026-10-17-presentation-authoring.md)保留职责、状态和验收边界；同版检查、独立审查与包外消费结果见[首期实施回执](docs/records/2026-10-17-presentation-authoring.md)，截图反馈后的专属外围主题见[控制层优化回执](docs/records/2026-10-17-presentation-chrome.md)。
 
+课件实作见 [8B Unit 6 · Sunshine for all / Welcome](examples/sunshine-welcome/README.md)：依照核实的课时范围创作课堂活动，教师控制提示和参考答案，学生输入由作品 signals 保留；教材来源、课堂改编与启动方式在样例中区分说明，验证与限制见[课件回执](docs/records/2026-10-17-sunshine-welcome.md)。
+
 ## 本地开发
 
 使用 Bun 1.4.2：

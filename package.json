@@ -10,7 +10,7 @@
     "build": "bun scripts/build.ts",
     "pack": "bun scripts/pack.ts",
     "release": "bun scripts/release.ts",
-    "typecheck": "bun scripts/build.ts --check && bun node_modules/typescript/bin/tsc -p tsconfig.scripts.json && bun node_modules/typescript/bin/tsc -p examples/browser/tsconfig.json && bun node_modules/typescript/bin/tsc -p examples/presentation/tsconfig.json && bun node_modules/typescript/bin/tsc -p apps/showcase/tsconfig.json",
+    "typecheck": "bun scripts/build.ts --check && bun node_modules/typescript/bin/tsc -p tsconfig.scripts.json && bun node_modules/typescript/bin/tsc -p examples/browser/tsconfig.json && bun node_modules/typescript/bin/tsc -p examples/presentation/tsconfig.json && bun node_modules/typescript/bin/tsc -p examples/sunshine-welcome/tsconfig.json && bun node_modules/typescript/bin/tsc -p apps/showcase/tsconfig.json",
     "lint": "bun node_modules/oxlint/bin/oxlint --deny-warnings .",
     "lint:fix": "bun node_modules/oxlint/bin/oxlint --deny-warnings --fix .",
     "format:check": "bun node_modules/oxfmt/bin/oxfmt --check .",

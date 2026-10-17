@@ -31,7 +31,7 @@
 
 平台环境类型不能合并处理：JSX core 与 CSS core 不加载 DOM/Bun 类型，Web 与 UI 使用 DOM；Book 的 Bun/Playwright 入口保留自身所需宿主类型。`bun scripts/build.ts --check --package <name>` 仅检查该包的生产 build 配置，不包含根 typecheck 的额外环境和公共类型用例。
 
-图片演示的正式构建、Meowbook 审阅、源文件与媒体交付入口见[样例 README](../examples/presentation/README.md)。正式 Web 产物与组件合同浏览器测试分别验收；字体/图片 ready、静态图与实际播放、断网冷启动也分别记录，不由其中一项代替另一项。
+图片演示的正式构建、Meowbook 审阅、源文件与媒体交付入口见[样例 README](../examples/presentation/README.md)；英语 Welcome 课件的课堂状态与浏览器验收见[课件 README](../examples/sunshine-welcome/README.md)。根 typecheck 包含两项作品工程，作品浏览器用例仍按各自配置独立运行。正式 Web 产物与组件合同浏览器测试分别验收；字体/图片 ready、静态图与实际播放、断网冷启动也分别记录，不由其中一项代替另一项。
 
 ## CI 与发行验证
 

@@ -12,6 +12,7 @@ import {
   Field,
   IconButton,
   Input,
+  Inline,
   NavItem,
   Separator,
   Textarea,
@@ -38,6 +39,8 @@ const invalidEmptyState: JSX.Element = <EmptyState title="空" size="tiny" />;
 void compactEmptyState;
 void invalidEmptyState;
 const card: JSX.Element = <Card as="article">内容</Card>;
+const inlineSlot: JSX.Element = <Inline as="span">Inline slot content</Inline>;
+void inlineSlot;
 const badge: JSX.Element = <Badge tone="accent">演示</Badge>;
 const field: JSX.Element = (
   <Field label="名称" description="可选说明">

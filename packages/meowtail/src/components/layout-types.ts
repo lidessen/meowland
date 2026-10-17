@@ -8,6 +8,7 @@ export const layoutOptions = defineOptions("layout", {
 });
 export type LayoutElement =
   | "div"
+  | "span"
   | "section"
   | "nav"
   | "main"

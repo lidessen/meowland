@@ -1,0 +1,13 @@
+WEBVTT
+
+00:00.000 --> 00:02.000
+A local HTTP server sends the same picture in two formats.
+
+00:02.000 --> 00:05.000
+The smaller JPEG completes first; the original PNG is still transferring.
+
+00:05.000 --> 00:09.500
+These are real local requests with deliberately paced chunks.
+
+00:09.500 --> 00:12.000
+This controlled demonstration is not a public-network benchmark.

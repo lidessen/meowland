@@ -1,3 +1,9 @@
+import {
+  presentationContract,
+  revealContract,
+  presentationVideoContract,
+  presentationAudioContract,
+} from "../presentation";
 import { defaultRuntime, type ComponentContract, type Runtime, type RuntimePlugin } from "meowjsx";
 import { pillContract } from "../components/pill";
 import { pageFrameContract } from "../components/page-frame";
@@ -117,6 +123,10 @@ import { assistantComposerContract } from "../chat/assistant-composer";
 import { assistantQuestionContract } from "../chat/assistant-question";
 
 export const MeowUIComponent = {
+  Presentation: presentationContract.name,
+  PresentationVideo: presentationVideoContract.name,
+  PresentationAudio: presentationAudioContract.name,
+  Reveal: revealContract.name,
   PageFrame: pageFrameContract.name,
   RegionLayout: regionLayoutContract.name,
   Pill: pillContract.name,
@@ -223,6 +233,10 @@ export const MeowUIComponent = {
 } as const;
 
 export const meowUIComponents = [
+  presentationContract,
+  revealContract,
+  presentationVideoContract,
+  presentationAudioContract,
   pageFrameContract,
   regionLayoutContract,
   pillContract,
@@ -335,6 +349,10 @@ export const meowUIComponents = [
 
 declare module "meowjsx" {
   interface ComponentRegistryMap {
+    "presentation-video": { parts: (typeof presentationVideoContract.parts)[number] };
+    "presentation-audio": { parts: (typeof presentationAudioContract.parts)[number] };
+    presentation: { parts: (typeof presentationContract.parts)[number] };
+    "presentation-reveal": { parts: (typeof revealContract.parts)[number] };
     "page-frame": { parts: (typeof pageFrameContract.parts)[number] };
     "region-layout": { parts: (typeof regionLayoutContract.parts)[number] };
     pill: { parts: "root" };

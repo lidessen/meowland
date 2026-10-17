@@ -1,0 +1,15 @@
+{
+  "name": "meowland-presentation-example",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build.ts",
+    "serve": "bun serve.ts"
+  },
+  "dependencies": {
+    "meowjsx": "^0.1.0",
+    "meowcss": "^0.1.0",
+    "meowtail": "0.1.1-presentation.20261017.1",
+    "meowbook": "^0.1.1"
+  }
+}

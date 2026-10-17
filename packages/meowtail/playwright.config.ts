@@ -2,6 +2,8 @@ import { defineConfig, devices } from "@playwright/test";
 
 export default defineConfig({
   testDir: "./tests/browser",
+  // Presentation contracts use their own bare consumer server and configuration.
+  testIgnore: ["**/presentation/**"],
   outputDir: "./test-results",
   fullyParallel: true,
   use: {

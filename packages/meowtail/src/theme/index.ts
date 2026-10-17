@@ -1,3 +1,6 @@
+import { presentationStyles } from "./presentation/presentation.styles";
+import { presentationTokens } from "./presentation/presentation.tokens";
+export { presentationTokens } from "./presentation/presentation.tokens";
 import { defineTheme } from "meowcss/meowjsx";
 import { assistantStyles } from "./chat/assistant.styles";
 import { baseStyles, cornerShapeStyles } from "./base.styles";
@@ -83,6 +86,7 @@ export const standardTheme = defineTheme({
   options: standardOptions,
   defaults: { scheme: "auto" },
   tokens: [
+    presentationTokens,
     uiTokens,
     chatTokens,
     alertTokens,
@@ -95,6 +99,7 @@ export const standardTheme = defineTheme({
     resourceCardTokens,
   ],
   styles: [
+    presentationStyles,
     assistantStyles,
     statusDotStyles,
     statusStyles,

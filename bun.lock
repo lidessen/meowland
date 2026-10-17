@@ -8,6 +8,7 @@
         "@playwright/test": "1.63.0",
         "@types/bun": "1.4.2",
         "@types/semver": "7.8.0",
+        "meowbook": "workspace:*",
         "meowcss": "workspace:*",
         "meowjsx": "workspace:*",
         "meowtail": "workspace:*",
@@ -92,7 +93,7 @@
     },
     "packages/meowtail": {
       "name": "meowtail",
-      "version": "0.1.1-layout.20261017.1",
+      "version": "0.1.1-presentation.20261017.1",
       "dependencies": {
         "@floating-ui/dom": "^1.8.0",
         "@shikijs/langs": "4.3.1",

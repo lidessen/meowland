@@ -2,6 +2,81 @@
 
 `meowtail` 提供跨应用组件、语义布局、标准主题和完整 Assistant 组合。网络、执行、权限与持久化由宿主适配，库不携带 Rossovia 的业务状态或后端。
 
+## 浏览器交互演示
+
+`meowtail/presentation` 提供 `Presentation`、`Reveal`、`PresentationVideo`、`PresentationAudio`
+和 `usePresentationActivity`；根入口重导相同实现，沿用同一 MeowJSX/Context/主题身份。
+使用现有 `createMeowUI()` 与 `meowtail/theme` 的 `standardTheme`，即可取得默认演示结构和视觉。
+本地实现不表示已发布；当前公开版本和安装验收以根 README 与当次回执为准。
+
+```tsx
+import { h, signal } from "meowjsx";
+import {
+  Presentation,
+  Reveal,
+  type SlideDefinition,
+  type SlidePosition,
+} from "meowtail/presentation";
+
+// Create these once per work instance, outside each slide's render callback.
+const speed = signal(20);
+const position = signal<SlidePosition>({ slideId: "experiment", step: 0 });
+const slides: readonly SlideDefinition[] = [
+  {
+    id: "experiment",
+    title: "Transfer estimate",
+    steps: 1,
+    render: () => (
+      <div>
+        <h2>Change the connection speed</h2>
+        <input
+          type="range"
+          min="1"
+          max="100"
+          value={speed}
+          onInput={(event: Event) => {
+            speed.value = Number((event.currentTarget as HTMLInputElement).value);
+          }}
+        />
+        <Reveal at={1}>
+          <p>The estimate changes with the same experiment input.</p>
+        </Reveal>
+      </div>
+    ),
+  },
+];
+const view = (
+  <Presentation title="Image transfer" slides={slides} position={position} active={false} />
+);
+```
+
+实际作品应在工厂或顶层组件内创建这组值，避免模块级单例使多场演示串值。`position` 提供时
+是唯一位置来源，导航与页内跳转都整体写同一 Signal；省略时组件创建本地位置，从第一页第 0 步开始。
+页 id 必须唯一非空，`steps` 是第 0 步之外的推进次数，位置和 `Reveal at` 超出范围会明确报错。
+步骤只更新局部绑定，换页才卸载旧页。跨页保留输入、计算参数与结果由宿主普通 signals 持有，
+旧页的 DOM、媒体、计时器和监听则按各自 owner 清理。回到第 0 步不会清空实验输入。
+
+默认逻辑画布为 1280×720，以 contain 适合可用区域；原尺寸模式提供滚动。工具控件保留自己的
+正常尺寸。`presentationTokens` 从 `meowtail/theme` 导出，可调演示标题、正文、颜色和页面边缘，
+不改变工作界面控件字号。内容超过画布会显示诊断；仍须实际观察真实文字、字体、媒体与目标尺寸。
+
+`active` 是宿主运行许可，缺省 true，与文档可见性、用户暂停和祖先 Reveal 组合。
+审阅、后台 iframe 和确定状态摄影应从首次挂载传 false；前台交互再由宿主开放。
+`usePresentationActivity()` 在同步组件 render 中捕获只读 Signal；自定义动画通过现有
+`context.effect` 响应它并返回清理函数。该许可不等于正在播放或内容已就绪，不能自动暂停任意子组件。
+Reveal 保留几何与局部状态，隐藏内容从键盘和可访问树移除；嵌套层共享祖先许可。
+
+媒体组件要求 `src` 与可读的 `label`，默认原生 controls、metadata 预加载和用户启动。
+`ref`、媒体事件、poster、track children 等原生接缝落到真实 video/audio；`className` 用于外层状态结构，
+其他原生属性落到媒体元素。显式播放按钮检查 `play()` 的异步结果；宿主通过原生 ref 调用 play 时同样负责检查结果。
+失活或卸载会暂停，恢复许可不自动开声。宿主可在 ref cleanup 中读取最后 `currentTime`，在重进的 metadata
+事件后恢复 seek；组件先调用宿主 cleanup，再暂停并释放 src。素材换版的时间失效规则仍由宿主决定。
+可选 `soundtrack` 槽沿用同一音频组件，跨页保留、退出清理，不混音，也不自动协调页内媒体音量。
+
+Meowbook 用于审阅和摄影；正式观众入口由消费者用同一 JSX/主题构建 HTML、脚本与资源。
+本入口没有 PPT/PDF 导出器、内容编辑器或资产服务。设计边界见
+[创作能力设计](../../docs/designs/2026-10-17-presentation-authoring.md)。
+
 本包的 npm 名称是 `meowtail`；既有 `createMeowUI`、`installMeowUI`、`createMeowUICatalog` 等 API 和运行时样式身份保持不变。使用新的包导入路径，不能据包名推导新的函数名、`data-*` 标记或 CSS 变量。
 
 完整组合的使用合同见 [Assistant](ASSISTANT.md)，有限 JSON 入口见 [JSON catalog](JSON.md)。两者的实现与独立验收仍在进行；本页的 API 说明和早期产物验证不等于当前全部源码的同源验收通过。

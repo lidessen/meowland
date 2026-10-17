@@ -1,0 +1,20 @@
+{
+  "generator": "scripts/record-transfer.ts",
+  "condition": "Loopback HTTP with 32768-byte chunks, one every 70ms, no-store; both requests start together after 800ms",
+  "viewport": "960x600",
+  "durationSeconds": 12,
+  "codec": "VP8, silent",
+  "browser": "153.0.8010.12",
+  "results": [
+    {
+      "name": "original",
+      "bytes": 3597630,
+      "elapsedMs": 7985
+    },
+    {
+      "name": "delivery",
+      "bytes": 67108,
+      "elapsedMs": 301
+    }
+  ]
+}

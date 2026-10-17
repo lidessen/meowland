@@ -12,23 +12,26 @@
 
 ## 本地命令与范围
 
-| 命令                   | 范围与作用                                                                                                                                                     |
-| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bun run lint`         | Oxlint correctness 规则与默认插件，覆盖源码、单测、浏览器用例、示例、脚本和 TS 配置；警告也导致失败                                                            |
-| `bun run lint:fix`     | 相同规则的普通 `--fix`；不启用 suggestions 或 dangerous fixes，修改后仍需审阅 diff                                                                             |
-| `bun run format:check` | Oxfmt 检查支持的源码、文档及配置，不写文件                                                                                                                     |
-| `bun run format`       | Oxfmt 写入格式；局部任务优先直接传本次修改的精确路径，避免覆盖其它作者 WIP                                                                                     |
-| `bun run typecheck`    | 五包生产入口、JSX core/renderer/Web 环境、无 DOM 的 CSS core、CSS/UI 公共类型用例，以及根工程脚本、浏览器示例和展板 host；不等于全部 unit/prototype 的 TS 检查 |
-| `bun run test`         | JSX/CSS/UI 单测、Book 的 Bun/单测与生命周期、Press 单测与根工程脚本单测；`.spec.ts(x)` 浏览器场景另用 Playwright                                               |
-| `bun run check`        | 顺序执行 format:check → lint → typecheck → test；任一步失败即停止                                                                                              |
-| `bun run build`        | 构建五包 ESM 与声明及必要资源；清理并更新各包 dist，不发布                                                                                                     |
-| `bun run pack`         | 把当前 dist 打成本地 tgz；不自动 build，不代表安装态或浏览器验收通过                                                                                           |
+| 命令                        | 范围与作用                                                                                                                                                              |
+| --------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bun run lint`              | Oxlint correctness 规则与默认插件，覆盖源码、单测、浏览器用例、示例、脚本和 TS 配置；警告也导致失败                                                                     |
+| `bun run lint:fix`          | 相同规则的普通 `--fix`；不启用 suggestions 或 dangerous fixes，修改后仍需审阅 diff                                                                                      |
+| `bun run format:check`      | Oxfmt 检查支持的源码、文档及配置，不写文件                                                                                                                              |
+| `bun run format`            | Oxfmt 写入格式；局部任务优先直接传本次修改的精确路径，避免覆盖其它作者 WIP                                                                                              |
+| `bun run typecheck`         | 五包生产入口、JSX core/renderer/Web 环境、无 DOM 的 CSS core、CSS/UI 公共类型用例，以及根工程脚本、浏览器/图片演示示例和展板 host；不等于全部 unit/prototype 的 TS 检查 |
+| `bun run test`              | JSX/CSS/UI 单测、Book 的 Bun/单测与生命周期、Press 单测与根工程脚本单测；`.spec.ts(x)` 浏览器场景另用 Playwright                                                        |
+| `bun run test:presentation` | 演示组件的独立浏览器合同，包括跨页信号、Reveal、活动许可、媒体与清理；使用专属本地服务，不混入 Meowbook 组件展板配置                                                    |
+| `bun run check`             | 顺序执行 format:check → lint → typecheck → test；任一步失败即停止                                                                                                       |
+| `bun run build`             | 构建五包 ESM 与声明及必要资源；清理并更新各包 dist，不发布                                                                                                              |
+| `bun run pack`              | 把当前 dist 打成本地 tgz；不自动 build，不代表安装态或浏览器验收通过                                                                                                    |
 
 检查排除 `node_modules`、`dist`、`artifacts`、Playwright 报告、测试结果和 Book 生成目录。格式工具另外跳过 Bun 生成的锁文件及原样保留的 `packages/meowtail/THIRD_PARTY_NOTICES.md`；不因历史源码存在告警而整体忽略包或测试目录。具体边界在 `.oxlintrc.json` 与 `.oxfmtrc.json`。
 
 两个 JSON 类型/行为用例文件对 `no-unused-vars` 设置 `_` 前缀的参数占位约定，保留回调 props 的类型推断；其它文件保持 Oxlint 默认规则选项，未用导入仍报错。Reactive effect 的信号读取具有订阅语义，不能作为普通无用表达式随意删除。
 
 平台环境类型不能合并处理：JSX core 与 CSS core 不加载 DOM/Bun 类型，Web 与 UI 使用 DOM；Book 的 Bun/Playwright 入口保留自身所需宿主类型。`bun scripts/build.ts --check --package <name>` 仅检查该包的生产 build 配置，不包含根 typecheck 的额外环境和公共类型用例。
+
+图片演示的正式构建、Meowbook 审阅、源文件与媒体交付入口见[样例 README](../examples/presentation/README.md)。正式 Web 产物与组件合同浏览器测试分别验收；字体/图片 ready、静态图与实际播放、断网冷启动也分别记录，不由其中一项代替另一项。
 
 ## CI 与发行验证
 

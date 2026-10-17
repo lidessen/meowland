@@ -13,4 +13,9 @@ export const presentationTokens = defineTokens("presentation", {
   lineHeight: "1.4",
   insetBlock: "52px",
   insetInline: "64px",
+  chromeBackdrop: ["#e6ebe4", "#131f1b"],
+  chromeSurface: ["#f4f5ee", "#1e3028"],
+  chromeInk: ["#203d35", "#edf2e8"],
+  chromeMuted: ["#586a5d", "#afc1b2"],
+  chromeLine: ["#cbd4c9", "#40574a"],
 });

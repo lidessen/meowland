@@ -38,3 +38,17 @@ PLAYWRIGHT_CHANNEL=chrome bun node_modules/@playwright/test/cli.js test --config
 - 离线证据是冷浏览器、外部请求阻断与正式目录服务；没有声称双击 `file://`、任意部署子目录或未安装 runtime 的机器可用。
 - 样例使用系统字体；未验证自带 Web 字体。媒体验证包括真实解码、时间推进与暂停事实，不包括物理音响输出测量。
 - 根工程全量检查、安装态、实际视觉与发布分别由父任务记录；测试通过不等于已发布。
+
+## 演示外围主题复审
+
+本轮只改外围主题，作品源文件未改。独立审查发现两处真实接线问题：桌面目录的 flex basis 使工具不必要换行；`partSelector` 的零 specificity 使后面的 Button 基础规则覆盖了 chrome 的 44px 目标、字号和颜色。生产作者分别限制桌面不换行、仅提高 chrome 内真实 button 的选择器 specificity。新增触控目标回归先在旧构建失败（实际高 36px），在父任务重新构建后的版本通过；同时比较舞台内 `Open evidence` 与外部同 variant Button 的 computed 样式，避免外围规则污染作品按钮。
+
+同一最终构建重新运行组件浏览器全部 19 项（原 13 项 + 新 chrome 6 项，11.1 s）及正式作品 5 项（3.6 s），全部通过。新增覆盖真实 light/dark 主题绑定、键盘到达与操作、390px / 844×390 触控操作、原尺寸滚动时的控件可达、44px 目标、控件不遮舞台、原生宿主 Fullscreen API。定向 lint 与包 TypeScript 检查通过。没有把截图相等或颜色像素常量写成审美测试。
+
+最后一次仅在已有短窗断点减少外围 padding/gap；父任务重建后补跑 chrome 全部 6 项（4.1 s）通过，并重新生成全部 `final-*` 原图和 JSON。该变动不改作品、导航或媒体状态，未重复上一轮 13 + 5 项。
+
+实际 computed：导航按钮 44×44px、13px 字号；390px 下工具高 44px、12px 字号、左右 padding 8px，两工具宽 93.02 / 77.36px，在 198.89px 容器同排。正式 390px 页脚从 137px 降到 107px；844×390 夹具页脚从 106px 降到 58px，舞台从约 238×134px 恢复为最终 384×216px。浅色页眉文字对合成背景约 4.78:1，深色约 8.95:1；页脚辅助文字约 5.27:1 / 7.35:1，未使用叠加 opacity。
+
+证据目录为 `artifacts/presentation-review/chrome-20261017/`，`final-*` 是最后一次统一重建后重新生成，`baseline-*` 为前版。已亲自打开并观看正式 opening 宽屏/390px、短窗、深色宽/窄、深色键盘焦点、作品内容置于深色宿主，以及原生 fullscreen 原图：控件完整可达，无舞台覆盖，焦点环可辨。优先交付 `final-formal-opening-wide-light.png`、`final-formal-opening-narrow-light.png`；诊断原值见 `final-computed.json`。
+
+Fullscreen 结果仅表示本机无头 Chrome 允许宿主对真实容器调用原生 API 并保留控件，不表示新增播放器全屏功能或完成物理显示器验收。正式作品始终使用浅色；深色测试实际绑定主题于夹具，验证外围独立配色与作者指定的纸色/标题，不声称强制作者全部内容控件跨主题视觉恒定。未发现本轮剩余行为阻断。

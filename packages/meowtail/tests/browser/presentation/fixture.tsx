@@ -8,9 +8,9 @@ import {
   type VNode,
 } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { createMeowUI } from "meowtail";
+import { Button, createMeowUI } from "meowtail";
 import { applyTheme, mountStyles } from "meowcss/web";
-import { standardTheme } from "meowtail/theme";
+import { standardOptions, standardTheme } from "meowtail/theme";
 import {
   Presentation,
   PresentationAudio,
@@ -201,10 +201,18 @@ function createDeck(instance: number) {
 }
 
 const root = document.querySelector<HTMLElement>("#test-root")!;
+const query = new URL(location.href).searchParams;
+if (query.get("chrome") === "single") root.style.height = "100dvh";
 const removeStyles = mountStyles(document, standardTheme.cssText + talkCss);
-const removeTheme = applyTheme(root, standardTheme);
+const scheme = query.get("scheme");
+const removeTheme = applyTheme(
+  root,
+  standardTheme,
+  scheme === "light" || scheme === "dark" ? standardOptions.select({ scheme }) : undefined,
+);
 const decks = [createDeck(0), createDeck(1)];
-let content: Child = decks.map((deck) => deck.node);
+let content: Child =
+  query.get("chrome") === "single" ? decks[0]!.node : decks.map((deck) => deck.node);
 if (new URL(location.href).searchParams.get("sample") === "reordered") {
   const talk = createImageTalk({
     initialPosition: { slideId: "experiment", step: 3 },
@@ -220,9 +228,17 @@ if (new URL(location.href).searchParams.get("sample") === "reordered") {
   ];
   content = h(view.type, { ...view.props, slides: reordered });
 }
-const mounted = createWebRenderer(createRuntime({ plugins: [createMeowUI()] })).render(
-  content,
-  root,
+const web = createWebRenderer(createRuntime({ plugins: [createMeowUI()] }));
+const mounted = web.render(content, root);
+const referenceRoot = document.createElement("div");
+referenceRoot.hidden = true;
+referenceRoot.inert = true;
+root.append(referenceRoot);
+const reference = web.render(
+  <Button id="fixture-style-reference" variant="outline">
+    Reference content control
+  </Button>,
+  referenceRoot,
 );
 window.presentationTest = {
   jump(instance, position) {
@@ -237,6 +253,8 @@ window.presentationTest = {
   },
   dispose() {
     mounted.unmount();
+    reference.unmount();
+    referenceRoot.remove();
     removeTheme();
     removeStyles();
   },

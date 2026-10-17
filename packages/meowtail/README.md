@@ -60,6 +60,11 @@ const view = (
 正常尺寸。`presentationTokens` 从 `meowtail/theme` 导出，可调演示标题、正文、颜色和页面边缘，
 不改变工作界面控件字号。内容超过画布会显示诊断；仍须实际观察真实文字、字体、媒体与目标尺寸。
 
+外围采用常显的分组控制带：导航与页序、原生目录、暂停/尺寸操作各有自己的位置。
+`presentationTokens` 中的 `chrome*` 值只控制围台、页眉和控制带，独立于舞台纸色/正文字体与
+通用 Button 主题；不需额外 props 或主题安装器。窄屏会重排这些分组，控件保留约 44px 的
+触控高度、可见焦点与原生键盘语义，不依赖悬停显示。
+
 `active` 是宿主运行许可，缺省 true，与文档可见性、用户暂停和祖先 Reveal 组合。
 审阅、后台 iframe 和确定状态摄影应从首次挂载传 false；前台交互再由宿主开放。
 `usePresentationActivity()` 在同步组件 render 中捕获只读 Signal；自定义动画通过现有

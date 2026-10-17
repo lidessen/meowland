@@ -14,7 +14,7 @@
 
 [`apps/showcase`](apps/showcase/README.md) 是私有展板，不是第六个发布包。本轮完整 Assistant 与有限 JSON→UI 已完成本地实现及有限独立验收，实际同源输入、产物与未覆盖范围见[本地迁移回执](docs/local-migration-receipt.md)；早期混合产物的通过不作为本轮同源证据，也不表示 Rossovia 产品已切换或发布。
 
-浏览器演示创作见 [presentation-authoring skill](.agents/skills/presentation-authoring/SKILL.md) 与[图片等待演示](examples/presentation/README.md)：文稿、视觉、素材和互动围绕同一可运行作品迭代，复用 Meowtail 演示组件和 Meowbook。演示样例是私有消费者，不新增发布包；首期浏览器交付，PPT 导出留待以后。[设计与取舍](docs/designs/2026-10-17-presentation-authoring.md)保留职责、状态和验收边界；同版检查、独立审查与包外消费结果见[首期实施回执](docs/records/2026-10-17-presentation-authoring.md)。
+浏览器演示创作见 [presentation-authoring skill](.agents/skills/presentation-authoring/SKILL.md) 与[图片等待演示](examples/presentation/README.md)：文稿、视觉、素材和互动围绕同一可运行作品迭代，复用 Meowtail 演示组件和 Meowbook。演示样例是私有消费者，不新增发布包；首期浏览器交付，PPT 导出留待以后。[设计与取舍](docs/designs/2026-10-17-presentation-authoring.md)保留职责、状态和验收边界；同版检查、独立审查与包外消费结果见[首期实施回执](docs/records/2026-10-17-presentation-authoring.md)，截图反馈后的专属外围主题见[控制层优化回执](docs/records/2026-10-17-presentation-chrome.md)。
 
 ## 本地开发
 

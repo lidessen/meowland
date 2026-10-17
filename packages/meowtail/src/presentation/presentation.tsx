@@ -11,6 +11,7 @@ import {
   type WritableSignal,
 } from "meowjsx";
 import { Button } from "../components/button";
+import { Icon } from "../icons/icon";
 import {
   PresentationActivity,
   PresentationSlide,
@@ -35,6 +36,11 @@ export const presentationContract = {
     "stage",
     "slide",
     "controls",
+    "navigation",
+    "page-number",
+    "step",
+    "slide-picker",
+    "tools",
     "position",
     "soundtrack",
     "diagnostic",
@@ -314,14 +320,61 @@ export const Presentation = defineComponent<
             "controls",
             "nav",
             { "aria-label": "Presentation controls" },
-            <Button variant="outline" onClick={() => move(-1)} disabled={previousDisabled}>
-              Previous
-            </Button>,
-            <Button onClick={() => move(1)} disabled={nextDisabled}>
-              Next
-            </Button>,
-            <label>
-              Slide{" "}
+            context.part(
+              "navigation",
+              "div",
+              { role: "group", "aria-label": "Presentation navigation" },
+              <Button
+                variant="quiet"
+                aria-label="Previous"
+                title="Previous"
+                onClick={() => move(-1)}
+                disabled={previousDisabled}
+              >
+                <Icon name="chevron-left" aria-hidden="true" />
+              </Button>,
+              context.part(
+                "page-number",
+                "div",
+                { "aria-hidden": "true" },
+                <span>
+                  {mapSignal(position, (value) =>
+                    String(positionIndex(slides, value) + 1).padStart(2, "0"),
+                  )}
+                </span>,
+                <span> / {String(slides.length).padStart(2, "0")}</span>,
+                context.part(
+                  "step",
+                  "small",
+                  {
+                    hidden: mapSignal(
+                      position,
+                      (value) => (slides[positionIndex(slides, value)]!.steps ?? 0) === 0,
+                    ),
+                  },
+                  mapSignal(
+                    position,
+                    (value) =>
+                      `Step ${value.step} / ${slides[positionIndex(slides, value)]!.steps ?? 0}`,
+                  ),
+                ),
+              ),
+              <Button
+                variant="quiet"
+                aria-label="Next"
+                title="Next"
+                onClick={() => move(1)}
+                disabled={nextDisabled}
+              >
+                <Icon name="chevron-right" aria-hidden="true" />
+              </Button>,
+            ),
+            context.part(
+              "slide-picker",
+              "label",
+              null,
+              <Icon name="list" aria-hidden="true" />,
+              <span>Contents</span>,
               <select
                 aria-label="Choose slide"
                 value={mapSignal(position, (value) => value.slideId)}
@@ -335,26 +388,31 @@ export const Presentation = defineComponent<
                 {slides.map((slide) => (
                   <option value={slide.id}>{slide.title}</option>
                 ))}
-              </select>
-            </label>,
-            <Button
-              variant="quiet"
-              aria-pressed={mapSignal(paused, String)}
-              onClick={() => {
-                paused.value = !paused.value;
-              }}
-            >
-              {mapSignal(paused, (value) => (value ? "Resume effects" : "Pause effects"))}
-            </Button>,
-            <Button
-              variant="quiet"
-              aria-pressed={mapSignal(actualSize, String)}
-              onClick={() => {
-                actualSize.value = !actualSize.value;
-              }}
-            >
-              {mapSignal(actualSize, (value) => (value ? "Fit to window" : "Actual size"))}
-            </Button>,
+              </select>,
+            ),
+            context.part(
+              "tools",
+              "div",
+              { role: "group", "aria-label": "Presentation options" },
+              <Button
+                variant="quiet"
+                aria-pressed={mapSignal(paused, String)}
+                onClick={() => {
+                  paused.value = !paused.value;
+                }}
+              >
+                {mapSignal(paused, (value) => (value ? "Resume effects" : "Pause effects"))}
+              </Button>,
+              <Button
+                variant="quiet"
+                aria-pressed={mapSignal(actualSize, String)}
+                onClick={() => {
+                  actualSize.value = !actualSize.value;
+                }}
+              >
+                {mapSignal(actualSize, (value) => (value ? "Fit to window" : "Actual size"))}
+              </Button>,
+            ),
           ),
           soundtrack ? context.part("soundtrack", "div", null, soundtrack) : null,
         )}

@@ -1,5 +1,16 @@
 export { Presentation, presentationContract } from "./presentation";
 export { Reveal, revealContract, type RevealProps } from "./reveal";
+export {
+  PresentationLayout,
+  presentationLayoutContract,
+  type PresentationLayoutProps,
+} from "./layout";
+export {
+  PresentationText,
+  presentationTextContract,
+  presentationTextOptions,
+  type PresentationTextProps,
+} from "./presentation-text";
 export { usePresentationActivity } from "./context";
 export {
   PresentationVideo,
@@ -11,3 +22,8 @@ export {
   type PresentationAudioProps,
 } from "./media";
 export type { PresentationProps, SlideDefinition, SlidePosition, SlideSession } from "./types";
+export type {
+  PresentationTransition,
+  PresentationTransitionEffect,
+  PresentationTransitionDirection,
+} from "./transition";

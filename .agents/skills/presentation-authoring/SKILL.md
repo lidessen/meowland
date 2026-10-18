@@ -9,6 +9,18 @@ description: Create and iteratively revise Meowland browser presentations and cl
 
 先读作品已有 README、入口与素材说明。新作品参考[可运行样例](../../../examples/presentation/README.md)，以它的实际入口和命令为准；组件能力从 [Meowtail README](../../../packages/meowtail/README.md)与 public exports 核实，不把[设计提案](../../../docs/designs/2026-10-17-presentation-authoring.md)中的草案当作可用 API。复用真实组件和布局，作品只持有内容、实验状态与宿主接线。
 
+## 从内容区域开始选布局
+
+先读[演示内容布局](../../../packages/meowtail/PRESENTATION-LAYOUTS.md)，按观点、依据和操作的关系划分区域，
+再放入标题、图片和正文。优先 PresentationLayout 的 header/footer 槽与 single/equal/wide-start/wide-end
+命名列比，区域内部继续用 Stack/Grid/AspectRatio；标题、图文、对比、数字、流程、引用与总结是组合配方。
+需要第三列时在 single 内使用 Grid，顺序流程保留 ol/li 语义。
+
+占位和真实图使用同一比例容器，替换后检查 contain/cover、裁切和说明。逻辑画布内的列比不随宿主窄屏重排；
+Presentation 缩放整张画布。长标题和最终步骤装不下时先精简、拆页或改区域，不靠自动缩字或隐藏溢出交付。
+标题确需排印强调时可用 PresentationText editorial/marker，正文保持 plain；它仍是真实可选择文本，
+不把原生 contenteditable 接缝描述成编辑器。静态构图与内容清晰度先成立，再选择必要的 transition 入场。
+
 ## 尽早运行，再一起改变
 
 短 brief 只需受众、看完改变什么、时长、核心主张、依据/不确定性与硬限制；已有材料一并使用。可推定处写可改假设，只问会改变方向的问题。每个场景用一句话说明目的，互动明确观众改哪个变量、看哪个结果。

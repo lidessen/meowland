@@ -7,6 +7,7 @@ import {
   usePresentationActivity,
   type SlideDefinition,
   type SlidePosition,
+  type PresentationTransition,
 } from "meowtail/presentation";
 
 const position = signal<SlidePosition>({ slideId: "first", step: 0 });
@@ -30,10 +31,19 @@ const presentation = (
     slides={slides}
     position={position}
     active={active}
+    transition={{ effect: "slide", direction: "left", speed: "fast" }}
     soundtrack={<PresentationAudio src="./music.wav" label="Music" />}
   />
 );
 void presentation;
+const transition: PresentationTransition = { effect: "zoom", speed: "slow" };
+void transition;
+// @ts-expect-error Presets keep authored transitions bounded and portable.
+const arbitraryDuration: PresentationTransition = { effect: "fade", duration: 1234 };
+void arbitraryDuration;
+// @ts-expect-error The player only decorates a new page, without retaining an outgoing page.
+const retainedPage: PresentationTransition = "push";
+void retainedPage;
 const video = <PresentationVideo src="./evidence.webm" label="Evidence" />;
 void video;
 // @ts-expect-error Media requires an explicit accessible label even when native controls are shown.

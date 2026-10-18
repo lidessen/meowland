@@ -19,6 +19,7 @@ import {
   usePresentationActivity,
   type SlideDefinition,
   type SlidePosition,
+  type PresentationTransitionEffect,
 } from "meowtail/presentation";
 import { createImageTalk } from "../../../../../examples/presentation/talk";
 import { talkCss } from "../../../../../examples/presentation/talk.styles";
@@ -66,6 +67,10 @@ const Clock = timers;
 
 function createDeck(instance: number) {
   const query = new URL(location.href).searchParams;
+  const transition = {
+    effect: (query.get("transition") ?? "none") as PresentationTransitionEffect,
+    speed: "slow" as const,
+  };
   const position = signal<SlidePosition>({
     slideId: query.get("slide") ?? "experiment",
     step: Number(query.get("step") ?? 0),
@@ -115,11 +120,11 @@ function createDeck(instance: number) {
             <button type="button" onClick={() => position.set({ slideId: "discussion", step: 0 })}>
               Visit discussion
             </button>
-            <Reveal at={2}>
+            <Reveal at={2} transition={transition}>
               <button type="button">Revealed action</button>
             </Reveal>
-            <Reveal at={3} data-testid="outer-reveal">
-              <Reveal at={1} data-testid="inner-reveal">
+            <Reveal at={3} transition={transition} data-testid="outer-reveal">
+              <Reveal at={1} transition={transition} data-testid="inner-reveal">
                 <button type="button">Nested action</button>
                 <Clock facts={facts} nested />
               </Reveal>
@@ -193,6 +198,7 @@ function createDeck(instance: number) {
         title={`${instance === 0 ? "First" : "Second"} test deck`}
         position={position}
         active={active}
+        transition={transition}
         slides={slides}
         soundtrack={<PresentationAudio src="/silence.wav" label="Test soundtrack" />}
       />

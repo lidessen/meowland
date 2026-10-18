@@ -13,6 +13,7 @@ import {
   usePresentationActivity,
 } from "./context";
 import { layoutStyle } from "../shared/layout-style";
+import { entranceMotion, type PresentationTransition } from "./transition";
 
 export const revealContract = {
   name: "presentation-reveal",
@@ -21,13 +22,15 @@ export const revealContract = {
 
 export interface RevealProps extends Props {
   at: number;
+  /** Decoration on a mounted hidden-to-shown step, independent of activity. */
+  transition?: PresentationTransition;
   className?: string;
 }
 
 /** Keeps geometry and local state while excluding concealed content from interaction. */
 export const Reveal = defineComponent<RevealProps, "presentation-reveal", "root">(
   revealContract,
-  ({ at, children, ...props }, context) => {
+  ({ at, transition = "none", children, ...props }, context) => {
     const slide = useContext(PresentationSlide);
     if (!slide) throw new Error("Reveal requires a Presentation slide");
     if (!Number.isInteger(at) || at < 0 || at > slide.steps)
@@ -37,11 +40,17 @@ export const Reveal = defineComponent<RevealProps, "presentation-reveal", "root"
     const revealed = mapSignal(slide.step, (value) => value >= at);
     let element: HTMLElement | undefined;
     const concealed = context.signal(!revealed.value);
+    const motion = entranceMotion(context, activity);
+    let wasRevealed = revealed.value;
     context.effect(() => {
       const hide = !revealed.value;
+      const entering = !wasRevealed && !hide;
+      wasRevealed = !hide;
+      if (hide) motion.cancel();
       if (hide && element?.contains(element.ownerDocument.activeElement)) slide.focusFallback();
       if (element) element.style.visibility = hide ? "hidden" : "inherit";
       concealed.value = hide;
+      if (entering && element) motion.play(element, transition, "up");
     });
     return (
       <PresentationActivity.Provider value={activity}>

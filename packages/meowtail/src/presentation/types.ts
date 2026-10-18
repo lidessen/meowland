@@ -1,4 +1,5 @@
 import type { Child, MaybeSignal, Props, ReadableSignal, WritableSignal } from "meowjsx";
+import type { PresentationTransition } from "./transition";
 
 export interface SlidePosition {
   readonly slideId: string;
@@ -25,6 +26,8 @@ export interface PresentationProps extends Props {
   position?: WritableSignal<SlidePosition>;
   /** Host permission, independent of the viewer's own pause control. */
   active?: MaybeSignal<boolean>;
+  /** New-page entrance only. Old pages still stop and unmount immediately. */
+  transition?: PresentationTransition;
   soundtrack?: Child;
   className?: string;
 }

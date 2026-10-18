@@ -29,6 +29,7 @@ import {
   type SlideDefinition,
   type SlidePosition,
 } from "./types";
+import { entranceMotion, pendingEntranceAnimations } from "./transition";
 
 export const presentationContract = {
   name: "presentation",
@@ -91,7 +92,16 @@ export const Presentation = defineComponent<
 >(
   presentationContract,
   (
-    { title, slides, position: suppliedPosition, active = true, soundtrack, className, ...props },
+    {
+      title,
+      slides,
+      position: suppliedPosition,
+      active = true,
+      transition = "none",
+      soundtrack,
+      className,
+      ...props
+    },
     context,
   ) => {
     validateSlides(slides);
@@ -112,9 +122,22 @@ export const Presentation = defineComponent<
     const overflow = context.signal(false);
     let viewport: HTMLElement | undefined;
     let stage: HTMLElement | undefined;
+    let frame: HTMLElement | undefined;
     let heading: HTMLElement | undefined;
     let currentId = position.value.slideId;
     let currentEnabled = context.signal(true);
+    const motion = entranceMotion(context, activity);
+    let entranceFrame: number | undefined;
+    let navigationGeneration = 0;
+    const cancelEntrance = () => {
+      if (entranceFrame !== undefined)
+        stage?.ownerDocument.defaultView?.cancelAnimationFrame(entranceFrame);
+      entranceFrame = undefined;
+      motion.cancel();
+    };
+    context.effect(() => {
+      if (!activity.value) cancelEntrance();
+    });
     const focusFallback = () => heading?.focus();
     // Use the first child as the signal's initial value: setting it before mount
     // would queue a notification and mount the same page again for new subscribers.
@@ -126,19 +149,40 @@ export const Presentation = defineComponent<
         focusFallback={focusFallback}
       />,
     );
+    let pendingOverflow: Promise<unknown> | undefined;
     const fit = () => {
       const originalSize = actualSize.value;
       if (!viewport) return;
       scale.value = originalSize
         ? 1
         : Math.min(viewport.clientWidth / 1280, viewport.clientHeight / 720, 1);
-      if (stage) overflow.value = stage.scrollWidth > 1280 || stage.scrollHeight > 720;
+      if (!stage) return;
+      // Reveal movement can briefly enlarge scroll geometry. Measure the logical
+      // content once our finite decorations settle, never an author's own clock.
+      const animations = pendingEntranceAnimations(stage);
+      if (animations.length) {
+        if (!pendingOverflow) {
+          const pending = Promise.allSettled(animations.map((animation) => animation.finished));
+          pendingOverflow = pending;
+          void pending.then(() => {
+            if (pendingOverflow !== pending) return;
+            pendingOverflow = undefined;
+            fit();
+          });
+        }
+        return;
+      }
+      overflow.value = stage.scrollWidth > 1280 || stage.scrollHeight > 720;
     };
     context.effect(fit);
     context.effect(() => {
       const value = position.value;
       const index = positionIndex(slides, value);
       if (currentId === value.slideId) return;
+      const direction =
+        index > slides.findIndex((slide) => slide.id === currentId) ? "left" : "right";
+      const generation = ++navigationGeneration;
+      cancelEntrance();
       // Flush the old activity gate before the renderer mounts a replacement.
       batch(() => {
         currentEnabled.value = false;
@@ -155,10 +199,20 @@ export const Presentation = defineComponent<
           focusFallback={focusFallback}
         />
       );
+      // Rendering is flushed before the next frame. A superseded navigation must
+      // never decorate a page that has already stopped or been replaced.
+      if (activity.value)
+        entranceFrame = stage?.ownerDocument.defaultView?.requestAnimationFrame(() => {
+          entranceFrame = undefined;
+          if (generation !== navigationGeneration || currentId !== position.value.slideId) return;
+          if (stage?.isConnected) motion.play(stage, transition, direction, frame);
+        });
       queueMicrotask(fit);
     });
     context.onCleanup(() => {
+      pendingOverflow = undefined;
       currentEnabled.set(false);
+      cancelEntrance();
     });
     const move = (delta: -1 | 1) => {
       const current = position.value;
@@ -299,7 +353,15 @@ export const Presentation = defineComponent<
             context.part(
               "stage",
               "div",
-              { style: frameStyle },
+              {
+                style: frameStyle,
+                ref: (element: HTMLElement) => {
+                  frame = element;
+                  return () => {
+                    frame = undefined;
+                  };
+                },
+              },
               context.part(
                 "slide",
                 "article",
@@ -307,11 +369,35 @@ export const Presentation = defineComponent<
                   style: { transform: mapSignal(scale, (value) => `scale(${value})`) },
                   ref: (element: HTMLElement) => {
                     stage = element;
-                    const Resize = element.ownerDocument.defaultView?.ResizeObserver;
+                    const view = element.ownerDocument.defaultView;
+                    const Resize = view?.ResizeObserver;
                     const observer = Resize ? new Resize(fit) : undefined;
                     observer?.observe(element);
+                    let connected = true;
+                    let queued = false;
+                    const contentChanged = () => {
+                      if (queued) return;
+                      queued = true;
+                      queueMicrotask(() => {
+                        queued = false;
+                        if (connected) fit();
+                      });
+                    };
+                    const Mutation = view?.MutationObserver;
+                    const mutations = Mutation ? new Mutation(contentChanged) : undefined;
+                    mutations?.observe(element, {
+                      childList: true,
+                      characterData: true,
+                      subtree: true,
+                    });
+                    element.addEventListener("load", contentChanged, true);
+                    element.addEventListener("loadedmetadata", contentChanged, true);
                     return () => {
+                      connected = false;
                       observer?.disconnect();
+                      mutations?.disconnect();
+                      element.removeEventListener("load", contentChanged, true);
+                      element.removeEventListener("loadedmetadata", contentChanged, true);
                       stage = undefined;
                     };
                   },

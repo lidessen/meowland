@@ -6,6 +6,8 @@
 
 `meowtail/presentation` 提供 `Presentation`、`Reveal`、`PresentationVideo`、`PresentationAudio`
 和 `usePresentationActivity`；根入口重导相同实现，沿用同一 MeowJSX/Context/主题身份。
+内容区域使用 `PresentationLayout` 的可替换 header/footer 和命名列比，常见标题、图文、对比、
+数字、流程与总结组合见[演示内容布局](PRESENTATION-LAYOUTS.md)。
 使用现有 `createMeowUI()` 与 `meowtail/theme` 的 `standardTheme`，即可取得默认演示结构和视觉。
 本地实现不表示已发布；当前公开版本和安装验收以根 README 与当次回执为准。
 
@@ -73,6 +75,13 @@ const view = (
 `context.effect` 响应它并返回清理函数。该许可不等于正在播放或内容已就绪，不能自动暂停任意子组件。
 Reveal 保留几何与局部状态，隐藏内容从键盘和可访问树移除；嵌套层共享祖先许可。
 
+Presentation 与 Reveal 可选 `transition`：none（默认）、fade、slide、zoom，或
+`{ effect, direction?, speed? }`。direction 为 left/right/up/down，表示移动方向；
+slide 前进默认向左、后退默认向右，Reveal 默认向上；fade/zoom 不使用方向。
+speed 为 fast/normal/slow。页面切换只让新页入场，旧页立即卸载；Reveal 只在已挂载内容从隐藏变为显示时入场，
+直达步骤不补播。显现时即可交互，隐藏时立即 inert 并停止协作活动。
+失活、暂停、文档隐藏或 reduced motion 会取消动画并落到终态，恢复后不补播；无 WAAPI 时直接呈现终态。
+
 媒体组件要求 `src` 与可读的 `label`，默认原生 controls、metadata 预加载和用户启动。
 `ref`、媒体事件、poster、track children 等原生接缝落到真实 video/audio；`className` 用于外层状态结构，
 其他原生属性落到媒体元素。显式播放按钮检查 `play()` 的异步结果；宿主通过原生 ref 调用 play 时同样负责检查结果。
@@ -138,6 +147,7 @@ className 保留宿主应用的视觉扩展点，标准主题由同一 package �
 
 `Checkbox`、`Switch` 和 `SegmentedControl` 提供原生表单选择；`Tabs` 负责保留挂载的面板切换。
 `Menu`、`HoverCard`、`Toast`、`RiskConfirmation` 提供菜单、预览和反馈，业务操作与显示寿命由宿主负责。
+Menu 的 Tab / Shift+Tab 关闭整个菜单链并沿原生顺序离开，不执行菜单项；Escape 逐层关闭并返回该层入口。
 `TerminalBlock`、`ReadBlock`、`DiffBlock`、`SearchBlock`、`WebBlock` 与 `JsonBlock/JsonTree`
 展示宿主提供的输出；组件不执行工具或读取文件。`ReadBlock` 可传 `lang`，首次进入视口时加载高亮，未知语言保留纯文本。
 `ImagePreview` 统一图片加载、失败与预览框，`ImageLightbox` 提供单图查看，
@@ -216,7 +226,7 @@ Meowbook 自身的工具与独立夹具测试仍由 `test:meowbook` 负责。
 `Stack` 纵向排列，`Inline` 横向排列且默认允许换行。共同提供 `gap`（none/compact/normal/relaxed）、
 `align` 和 `justify`；`Inline wrap={false}` 可明确保持单行。组件保留方向与排列结构，theme 决定语义间距。
 `Grid` 默认按容器宽度自动排列，`minColumnWidth` 为 compact/normal/wide；也可指定 `columns={1|2|3|4}`。
-固定列数不会偷偷变成响应式列数。`Container width` 为 narrow/content/wide/full，主题控制内容最大宽度。
+固定列数不会偷偷变成响应式列数。`Container width` 为 narrow/content/wide/page/full，主题控制内容最大宽度。
 Stack 默认 stretch 便于表单与内容区域填满宽度；混合标签和按钮时用 `align="start"` 保留自然尺寸，
 或把行动放入 Inline。字段、动作与长文字按内容关系明确选择 stretch、start 或 baseline 对齐。
 
@@ -231,8 +241,14 @@ Stack 默认 stretch 便于表单与内容区域填满宽度；混合标签和�
 `Toolbar` 默认横向并允许换行；`orientation="vertical"` 沿纵向排列。它为自身按钮、原生输入型按钮和有 href 的链接动作集合提供一个 Tab 停靠，方向键、Home / End 在当前集合内移动，横向尊重 RTL。原生 Input、Textarea、Select 和自管键盘的组合控件保留独立 Tab 与编辑键；嵌套 Toolbar 不重复消费。隐藏、disabled、inert 或作者显式 `tabIndex=-1` 的入口不入动作集合，动态成员变化不主动夺焦点。Enter / Space 仍沿控件原生激活，不自动将复杂输入折进 overflow 菜单；卸载恢复本组件管理过的 tabindex，保调用方后续有效属性。
 
 `LayoutItem` 控制直接子项的空间分配：`grow` 默认 false，`shrink` 默认 true，
-`basis` 默认 auto，`alignSelf` 默认 auto。它保留 min-width:0，让长内容能收缩；长标识符
+`basis` 默认 auto，`alignSelf` 默认 auto。它与 Stack/Inline/Grid 的根保留 min-width:0、min-height:0，
+让嵌套子项能够接受父容器分配的有限空间；长标识符
 是否断行、正文是否截断由内容决定。只在需要控制子项空间时使用，不要求每个元素包一层。
+
+纵向工作区先由宿主或 PageFrame 提供有限高度，再用 `LayoutItem grow` 分配正文余量。
+实际滚动内容明确使用 `overflow: auto`；布局组件不会默认裁切内容，也不会自动选择滚动 owner。
+中间继续用 Stack 等布局组件时沿用可收缩的根；插入原生 div 等宿主包装时，仍须自行处理其
+高度和最小尺寸。无高度限制的 Stack 保持自然文流，`shrink={false}` 的动作仍保留自然尺寸。
 
 ```tsx
 // 标签与值属于一组，混合字号沿文字基线对齐。

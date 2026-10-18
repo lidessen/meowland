@@ -16,6 +16,7 @@ export const listGroupStyles = css`
   }
   ${row("root")} {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     min-width: 0;
     font: ${uiTokens.fontBody}/1.5 ${uiTokens.font};
     color: ${uiTokens.foreground};
@@ -25,6 +26,8 @@ export const listGroupStyles = css`
   }
   ${row("line")} {
     display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
     align-items: center;
     gap: 8px 16px;
     padding: 12px 16px;
@@ -37,7 +40,7 @@ export const listGroupStyles = css`
   ${row("copy")} {
     display: grid;
     gap: 1px;
-    flex: 1 1 auto;
+    flex: 1 1 ${uiTokens.gridColumnCompact};
     min-width: 0;
   }
   ${row("heading")} {
@@ -64,16 +67,19 @@ export const listGroupStyles = css`
   ${row("status")} {
     display: inline-flex;
     align-items: center;
-    flex: 0 0 auto;
+    flex: 0 1 auto;
+    min-width: 0;
     gap: 6px;
     color: ${uiTokens.mutedForeground};
     font-size: 12px;
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
   ${row("actions")} {
     display: inline-flex;
+    flex-wrap: wrap;
     align-items: center;
     flex: 0 0 auto;
+    max-width: 100%;
     gap: 6px;
   }
   ${row("panel")} {
@@ -88,13 +94,5 @@ export const listGroupStyles = css`
     border: ${lineTokens.width} solid ${accentTokens.line};
     border-radius: ${radiusTokens.card};
     background: ${accentTokens.soft};
-  }
-  @media (max-width: 560px) {
-    ${row("line")} {
-      flex-wrap: wrap;
-    }
-    ${row("copy")} {
-      flex-basis: 100%;
-    }
   }
 `;

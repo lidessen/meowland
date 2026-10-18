@@ -98,6 +98,7 @@ test("nested actions close their root before invoking the selected leaf", () => 
 
 test("menu keyboard walks enabled rows and typeahead excludes shortcut text", () => {
   let props: Props | undefined;
+  const changes: boolean[] = [];
   const runtime = createRuntime();
   runtime.use({
     render({ vnode }, next) {
@@ -106,7 +107,12 @@ test("menu keyboard walks enabled rows and typeahead excludes shortcut text", ()
     },
   });
   createWebRenderer(runtime).renderToHtml(
-    <Menu id="walk" trigger={(bindings) => <button {...bindings}>操作</button>} items={[]} />,
+    <Menu
+      id="walk"
+      trigger={(bindings) => <button {...bindings}>操作</button>}
+      items={[]}
+      onOpenChange={(next) => changes.push(next)}
+    />,
   );
   const doc: {
     activeElement: object | null;
@@ -127,11 +133,20 @@ test("menu keyboard walks enabled rows and typeahead excludes shortcut text", ()
   }));
   menuRoot = { ownerDocument: doc, getRootNode: () => doc, querySelectorAll: () => rows };
   (props!.ref as (node: object) => void)(menuRoot);
-  const key = (value: string) =>
+  const key = (value: string, shiftKey = false) => {
+    const observed = { prevented: false, stopped: false };
     (props!.onKeyDown as (event: KeyboardEvent) => void)({
       key: value,
-      preventDefault() {},
+      shiftKey,
+      preventDefault() {
+        observed.prevented = true;
+      },
+      stopPropagation() {
+        observed.stopped = true;
+      },
     } as KeyboardEvent);
+    return observed;
+  };
   key("ArrowUp");
   expect(doc.activeElement).toBe(rows[2]);
   key("ArrowDown");
@@ -142,6 +157,8 @@ test("menu keyboard walks enabled rows and typeahead excludes shortcut text", ()
   expect(doc.activeElement).toBe(rows[0]);
   key("b");
   expect(doc.activeElement).toBe(rows[1]);
-  key("Tab");
-  expect(clicked).toBe("Beta");
+  expect(key("Tab")).toEqual({ prevented: false, stopped: true });
+  expect(key("Tab", true)).toEqual({ prevented: false, stopped: true });
+  expect(changes).toEqual([false, false]);
+  expect(clicked).toBe("");
 });

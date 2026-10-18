@@ -226,9 +226,11 @@ export const Menu = defineComponent<MenuLevelProps, "menu", (typeof menuContract
       if (event.key === "Home") next = 0;
       if (event.key === "End") next = rows.length - 1;
       if (event.key === "Tab") {
-        event.preventDefault();
-        if (!event.shiftKey && current >= 0) rows[current]?.click();
-        else request(false);
+        // Dismiss the whole action surface, then let native Tab continue from
+        // its restored trigger. Moving focus must never activate an action.
+        request(false);
+        closeAncestors?.();
+        event.stopPropagation();
         return;
       }
       if (event.key.length === 1 && event.key !== " ") {

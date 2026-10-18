@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test("tabs keyboard navigation skips disabled items, wraps, preserves drafts and panel relationships", async ({
   page,
 }) => {
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=tabs");
+  await page.goto("/canvas.html?story=tabs");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const tabs = page.getByRole("tablist", { name: "项目视图" });
   const overview = tabs.getByRole("tab", { name: "概览", exact: true });

@@ -38,9 +38,10 @@ export const LayoutItem = defineComponent<LayoutItemProps, "layout-item", "root"
         style: layoutStyle(props.style, {
           flexGrow: grow ? 1 : 0,
           flexShrink: shrink ? 1 : 0,
-          flexBasis: basis,
+          flexBasis: typeof basis === "number" ? `${basis}px` : basis,
           alignSelf,
           minWidth: 0,
+          minHeight: 0,
         }),
       },
       children,

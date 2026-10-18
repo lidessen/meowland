@@ -41,7 +41,7 @@ ${partSelector(cardHeaderContract, "root")} {
   min-width: 0;
 }
 :where(${partSelector(cardHeaderContract, "root")}:has(> ${partSelector(cardActionContract, "root")})) {
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr) fit-content(50%);
 }
 :where(${partSelector(cardHeaderContract, "root")} > ${partSelector(cardTitleContract, "root")}, ${partSelector(cardHeaderContract, "root")} > ${partSelector(cardDescriptionContract, "root")}) {
   grid-column: 1;

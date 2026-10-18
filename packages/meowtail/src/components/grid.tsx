@@ -39,6 +39,7 @@ export const Grid = defineComponent<GridProps, "grid", "root">(
               : `repeat(${columns}, minmax(0, 1fr))`,
           alignItems: align,
           minWidth: 0,
+          minHeight: 0,
         }),
       },
       children,

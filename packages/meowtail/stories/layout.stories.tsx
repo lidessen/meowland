@@ -1,4 +1,4 @@
-import { h } from "meowjsx";
+import { h, mapSignal, signal } from "meowjsx";
 import { defineStory } from "meowbook";
 import {
   Badge,
@@ -221,4 +221,83 @@ export const NaturalPageContainerStory = defineStory({
       </Stack>
     </Container>
   ),
+});
+
+export const NestedLayoutScrollStory = defineStory({
+  id: "layout-nested-scroll",
+  title: "嵌套布局 · 固定头尾与局部滚动",
+  group: "导航与布局",
+  groupOrder: 40,
+  component: "LayoutItem",
+  variant: "纵向余量与动态长内容",
+  description: "有限高度交给布局分配，阅读体独立滚动；固定操作、草稿和自然文流保持原身份。",
+  covers: ["nested min-size", "fixed header/footer", "dynamic content", "numeric basis"],
+  render: () => {
+    const count = signal(24);
+    return (
+      <Container width="wide">
+        <Stack
+          gap="compact"
+          style={{ height: "clamp(240px, calc(100dvh - 170px), 540px)" }}
+          data-nested-layout
+        >
+          <LayoutItem shrink={false} data-nested-fixed="header">
+            <Inline gap="compact" justify="between">
+              <strong>检查动态内容与可用空间</strong>
+              <Button size="small" variant="outline" onClick={() => (count.value += 12)}>
+                追加内容
+              </Button>
+            </Inline>
+          </LayoutItem>
+          <LayoutItem grow basis={0} style={{ display: "flex" }} data-nested-body>
+            <Inline wrap={false} align="stretch" gap="compact" style={{ flex: 1 }}>
+              <LayoutItem basis={120} shrink={false} style="color:inherit" data-numeric-basis>
+                <Stack gap="compact">
+                  <strong>当前范围</strong>
+                  <span>布局基础</span>
+                  <Badge>本地检查</Badge>
+                </Stack>
+              </LayoutItem>
+              <LayoutItem grow basis="0%" style={{ display: "flex" }} data-percent-basis>
+                <Stack gap="compact" style={{ flex: 1 }}>
+                  <LayoutItem shrink={false}>
+                    <Field label="检查草稿" htmlFor="nested-layout-draft">
+                      <Input id="nested-layout-draft" placeholder="窗口变化后继续编辑" />
+                    </Field>
+                  </LayoutItem>
+                  <LayoutItem grow basis={0} style={{ display: "flex" }}>
+                    <Grid columns={1} gap="none" style={{ flex: 1 }}>
+                      <Stack
+                        gap="compact"
+                        role="region"
+                        aria-label="嵌套布局阅读区"
+                        tabIndex={0}
+                        style={{ overflow: "auto", overscrollBehavior: "contain" }}
+                        data-nested-scroll
+                      >
+                        {mapSignal(count, (value) =>
+                          Array.from({ length: value }, (_, index) => (
+                            <p style={{ margin: 0, overflowWrap: "anywhere" }}>
+                              记录 {index + 1}：长内容在阅读区域内连续排列，输入和底部操作保持可达。
+                              organization/research-model-with-a-very-long-unbroken-identifier-2026
+                            </p>
+                          )),
+                        )}
+                      </Stack>
+                    </Grid>
+                  </LayoutItem>
+                </Stack>
+              </LayoutItem>
+            </Inline>
+          </LayoutItem>
+          <LayoutItem shrink={false} data-nested-fixed="footer">
+            <Inline gap="compact">
+              <Button>完成检查</Button>
+              <span>固定操作不跟随阅读体滚动。</span>
+            </Inline>
+          </LayoutItem>
+        </Stack>
+      </Container>
+    );
+  },
 });

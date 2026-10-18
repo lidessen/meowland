@@ -25,6 +25,7 @@ export const Stack = defineComponent<StackProps, "stack", "root">(
           alignItems: align,
           justifyContent: justifyStyle(justify),
           minWidth: 0,
+          minHeight: 0,
         }),
       },
       children,

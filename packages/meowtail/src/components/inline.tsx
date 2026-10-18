@@ -28,6 +28,7 @@ export const Inline = defineComponent<InlineProps, "inline", "root">(
           alignItems: align,
           justifyContent: justifyStyle(justify),
           minWidth: 0,
+          minHeight: 0,
         }),
       },
       children,

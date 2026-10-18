@@ -10,6 +10,7 @@ const card = (part: (typeof resourceCardContract.parts)[number]) =>
 export const resourceCardStyles = css`
   ${card("root")} {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     gap: ${resourceCardTokens.gap};
     align-content: start;
     min-width: 0;
@@ -33,6 +34,8 @@ export const resourceCardStyles = css`
   }
   ${card("head")} {
     display: flex;
+    flex-wrap: wrap;
+    min-width: 0;
     align-items: center;
     gap: 12px;
   }
@@ -56,6 +59,7 @@ export const resourceCardStyles = css`
   }
   ${card("copy")} {
     display: grid;
+    flex: 1 1 ${uiTokens.gridColumnCompact};
     gap: 1px;
     min-width: 0;
   }
@@ -73,12 +77,13 @@ export const resourceCardStyles = css`
   ${card("status")} {
     display: inline-flex;
     align-items: center;
-    flex: 0 0 auto;
+    flex: 0 1 auto;
+    min-width: 0;
     gap: 6px;
     margin-left: auto;
     color: ${uiTokens.mutedForeground};
     font-size: ${uiTokens.fontCaption};
-    white-space: nowrap;
+    overflow-wrap: anywhere;
   }
   ${card("description")} {
     margin: 0;

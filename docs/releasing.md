@@ -2,7 +2,7 @@
 
 各包独立 SemVer，由维护者或 Agent 显式确定选包、版本与依赖范围。唯一发布算法 `scripts/release.ts` 消费已验收 tarball；不自动改版本、扩展选包、build、pack、提交或推送。稳定版显式使用 `latest`，测试版必须为 `x.y.z-alpha.N` 并显式使用 `alpha`。`*-slides.*` 等其它预发行格式不会被映射为 alpha。`meowslides` 已准备 `0.1.0-alpha.0` 公开候选，实际发布仍须本次明确授权；根与 showcase 不发布。
 
-普通 push/PR 继续只运行 build/lint；真实发布仅由 `.github/workflows/npm-release.yml` 的手动 `workflow_dispatch` 触发，使用 npm Trusted Publishing OIDC，不使用 `NPM_TOKEN` 或个人 npm 登录态。用户已明确授权此方式替代原本地发包安排。脚本不创建 Git tag、GitHub Release 或部署。历史 tag/Release 与[原发布回执](records/2026-10-17-tail-book-press-publish.md)保持原样。当前流程支持 `meowjsx`、`meowcss`、`meowtail`、`meowbook`、`meowslides` 的显式子集；其它包不自动加入。选包接线不构成发布授权；四包和新增 Slides 可以分别选择，未选中的包不会随批发布。
+普通 push/PR 继续只运行 build/lint；真实发布仅由 `.github/workflows/npm-release.yml` 的手动 `workflow_dispatch` 触发，使用 npm Trusted Publishing OIDC，不使用 `NPM_TOKEN` 或个人 npm 登录态。用户已明确授权此方式替代原本地发包安排。脚本不创建 Git tag、GitHub Release 或部署。历史 tag/Release 与[原发布回执](records/2026-10-17-tail-book-press-publish.md)保持原样。当前流程支持 `meowjsx`、`meowcss`、`meowtail`、`meowbook`、`meowslides`、`meowpress` 的显式子集；选包接线不构成发布授权。四包和新增 Slides/Press 可以分别选择，未选中的包不会随批发布。Press 的 `0.1.1-alpha.0` 候选只扩大原 CSS dependency/JSX peer 的 alpha 兼容范围，保留稳定范围与原依赖类别；发布前仍按实际 tgz 验证 CLI、字体许可和自定义主题身份。
 
 ## 准备与固定输入
 
@@ -78,9 +78,15 @@ OIDC 不以 `npm whoami/access` 作权限预检：公开 metadata/依赖/bytes �
 
 Slides 的本地公开候选与脚本接线不创建 npm 包或 trust。首包名称/占位创建、所需 trust 配置与首次实际发布须在获用户明确授权后执行；不要复用四包授权自动增加第五包。新包引导若涉及公开占位或 staging，必须先说明该动作的公开影响；本地准备可完整完成，不以创建占位作为验收前置。
 
+Press 已有稳定版包，准备新的 `0.1.1-alpha.0` 不需要新包占位；若选它发布，须确认该包的 trusted publisher 是否已配置，并按同一精确仓库/workflow/允许动作补齐所需授权。Press 的发布与持久授权也不由原四包授权自动覆盖。集中确认新增目标和动作即可，不重复逐包请求已经授予的相同授权。
+
 官方另有[新包 staged creation](https://github.blog/changelog/2026-10-02-npm-staged-publishing-now-supports-creating-new-packages/) 路径：使用用户本地登录会话暂存首版，再由维护者以 2FA 审核批准；不要求长期 token 或 token bypass。对不存在的包，暂存会创建公开 `0.0.0-stage` 占位，真实版本须经批准才可安装，详见 [staged publishing](https://docs.npmjs.com/staged-publishing/)。这是有独立公开影响的新包引导流程，不是现有四包的正常 OIDC 自动发布，也没有接入本脚本；首次引导、维护者批准及之后的 trust 绑定应在一次明确授权中说明，不能假定尚不存在的包已经有可用 trust。OIDC 本身兼容禁止传统 token 的发布设置，不要求启用 Bypass 2FA。
 
 不降低账户 2FA，不建议开启 bypass。npm 2026-07-31 公告说明 bypass 的管理权限已限制、直接发包也在弃用；本流程直接采用短期 OIDC。之后如要删除旧 token 或调整 package publishing access，须另获授权，不随配置自动执行。
+
+版本选择仍固定 Node 24/npm 11.21.0，后者覆盖本流程需要的 OIDC dist-tag 支持；不随 npm 的 `latest` 自动升级。用户提供的 [2026-07-08 公告](https://github.blog/changelog/2026-07-08-npm-install-time-security-and-gat-bypass2fa-deprecation/) 说明 npm 12 默认不运行依赖安装脚本，默认不解析 Git 与远程 URL 依赖，并预计约在 2027 年 1 月取消 bypass token 的直接发布。该时间是公告预期，不把长期 bypass token 当作新流程前提。
+
+当前准备 job 使用固定 Bun、frozen lock 和 `--ignore-scripts` 安装；npm 本身的安装与实际 publish 也显式禁用 scripts。发布目标是本地精确 tgz，包间依赖为 registry semver，源码仓库 URL 仅为 repository 元信息，不是 Git 安装依赖。升级 npm 12 时须复验完整锁定的传递依赖和安装/发布命令，不自动加 `--allow-git`、`--allow-remote` 或安装脚本许可；本轮未声称完成 npm 12 实装矩阵。新 trust 的两日首次成功发布期限不构成发布授权：只有候选与授权就绪后才配置/执行，过期则经授权重新配置，不为赶期限擅自发布。
 
 ## 执行与恢复
 

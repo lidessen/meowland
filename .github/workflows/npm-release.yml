@@ -8,7 +8,7 @@ on:
         required: true
         type: string
       packages:
-        description: Explicit comma-separated meowjsx,meowcss,meowtail,meowbook,meowslides subset
+        description: Explicit comma-separated meowjsx,meowcss,meowtail,meowbook,meowslides,meowpress subset
         required: true
         type: string
       channel:

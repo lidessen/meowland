@@ -355,6 +355,16 @@ test("Slides alpha follows its explicitly selected runtime and UI peers", async 
   expect(subset.packages.map(({ name }) => name)).toEqual(["meowjsx"]);
 });
 
+test("Press alpha accepts selected CSS dependency and JSX peer without UI packages", async () => {
+  const { plan } = await fixture(3, "^0.1.0-alpha.0", "0.1.0-alpha.0", false, {
+    names: ["meowpress", "meowcss", "meowjsx"],
+    peers: { meowpress: { meowjsx: "^0.1.0 || ^0.1.0-alpha.0" } },
+    dependencies: { meowpress: { meowcss: "^0.1.0 || ^0.1.0-alpha.0" } },
+    channel: "alpha",
+  });
+  expect(plan.packages.map(({ name }) => name)).toEqual(["meowjsx", "meowcss", "meowpress"]);
+});
+
 test("legacy GitHub flags are rejected and modes cannot be combined", async () => {
   for (const args of [
     ["--prepare-github"],

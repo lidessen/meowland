@@ -1,6 +1,6 @@
 {
   "name": "meowpress",
-  "version": "0.1.0",
+  "version": "0.1.1-alpha.0",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -8,6 +8,11 @@
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "description": "meowpress library",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lidessen/meowland.git",
+    "directory": "packages/meowpress"
+  },
   "files": [
     "dist",
     "README.md",
@@ -30,10 +35,10 @@
     "mdast-util-from-markdown": "^2.0.3",
     "remark-gfm": "^4.0.1",
     "yaml": "^2.9.0",
-    "meowcss": "^0.1.0"
+    "meowcss": "^0.1.0 || ^0.1.1-alpha.0"
   },
   "peerDependencies": {
-    "meowjsx": "^0.1.0"
+    "meowjsx": "^0.1.0 || ^0.1.1-alpha.0"
   },
   "devDependencies": {
     "meowjsx": "workspace:*",

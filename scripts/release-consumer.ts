@@ -4,7 +4,7 @@ import { lstat, mkdir, mkdtemp, readFile, readdir, realpath, writeFile } from "n
 import { tmpdir } from "node:os";
 import { basename, dirname, join, resolve } from "node:path";
 
-const supported = ["meowjsx", "meowcss", "meowtail", "meowbook", "meowslides"];
+const supported = ["meowjsx", "meowcss", "meowtail", "meowbook", "meowslides", "meowpress"];
 type Candidate = { name: string; version: string; file: string; sha256: string };
 type Input = { repository: string; commit: string; packages: Candidate[] };
 export type ConsumerOptions = {
@@ -159,7 +159,7 @@ export function publicImportProbe(selected: readonly string[]) {
   return `import {readFile,access} from "node:fs/promises";
 const names=${JSON.stringify(selected)};
 const imported=[];
-const bunTools=new Set(["meowbook/bun","meowslides/build"]);
+const bunTools=new Set(["meowbook/bun","meowslides/build","meowpress/build"]);
 const hasJsx=await access("node_modules/meowjsx/package.json").then(()=>true,()=>false);
 for(const name of names){
  const pkg=JSON.parse(await readFile("node_modules/"+name+"/package.json","utf8"));
@@ -176,6 +176,7 @@ function probes(selected: string[]) {
   const graph = new Set(selected);
   if (graph.has("meowslides"))
     for (const peer of ["meowjsx", "meowcss", "meowtail"]) graph.add(peer);
+  if (graph.has("meowpress")) for (const peer of ["meowjsx", "meowcss"]) graph.add(peer);
   const has = (name: string) => graph.has(name);
   const code = [`import {strict as assert} from "node:assert";`];
   const core: string[] = [];
@@ -221,6 +222,10 @@ function probes(selected: string[]) {
       `import {compileSlides,buildSlides,serveSlides,devSlides,type BuildSlidesOptions,type BuildSlidesResult} from "meowslides/build";export const tools=[compileSlides,buildSlides,serveSlides,devSlides];export const options:BuildSlidesOptions={entry:"slides.mdx",outdir:"dist"};export const slideMetadata=(result:BuildSlidesResult)=>result.slides;`,
     );
   }
+  if (has("meowpress"))
+    tool.push(
+      `import {buildSite,meowSite,type SiteConfig,type ResolvedSiteConfig} from "meowpress/build";export const pressTools=[buildSite,meowSite];export const pressConfig:SiteConfig={content:"content",skillsDirectory:"skills",outputDirectory:"dist"};export const resolvedPress:ResolvedSiteConfig=meowSite(pressConfig);`,
+    );
   return {
     code: code.join("\n"),
     core: core.join("\n"),
@@ -317,6 +322,89 @@ const session=createSession();const slides:readonly SlideDefinition[]=[{id:"tsx"
     "strict public Slides TSX host types and independent browser bundle build; browser behavior not exercised",
   );
 }
+async function pressConsumption(directory: string, checks: string[]) {
+  const site = join(directory, "press-site");
+  for (const folder of ["content/posts/assets/_draft", "content/thoughts", "skills", "runner"])
+    await mkdir(join(site, folder), { recursive: true });
+  const document = (title: string, body: string) =>
+    `---\ntitle: ${title}\ndate: 2026-10-18\n---\n\n${body}\n`;
+  const files: Record<string, string> = {
+    "content/posts/public.md": document("Public Markdown", "A **fixture statement**."),
+    "content/posts/component.mdx": document("Public MDX", "<Callout>Trusted MDX content</Callout>"),
+    "content/posts/_private.md": document("Private draft", "DO_NOT_PUBLISH_FIXTURE"),
+    "content/thoughts/note.md": document("Thought", "A finite public thought."),
+    "content/posts/assets/public.txt": "consumer-owned public asset",
+    "content/posts/assets/_draft/private.txt": "DO_NOT_PUBLISH_FIXTURE_ASSET",
+    "site.config.ts": `import {join} from "node:path";import {meowSite} from "meowpress/build";export default meowSite({content:join(import.meta.dir,"content"),skillsDirectory:join(import.meta.dir,"skills"),outputDirectory:join(import.meta.dir,"default-dist")});`,
+    "custom.ts": `import {strict as assert} from "node:assert";import {realpath} from "node:fs/promises";import {join,dirname} from "node:path";import {fileURLToPath,pathToFileURL} from "node:url";import {css,defineOptions,defineTokens,defineTheme} from "meowcss";import {meowSite,buildSite} from "meowpress/build";
+const pressCssPath=Bun.resolveSync("meowcss",dirname(fileURLToPath(import.meta.resolve("meowpress/build"))));const consumerCssPath=fileURLToPath(import.meta.resolve("meowcss"));assert.equal(await realpath(pressCssPath),await realpath(consumerCssPath));const pressCss=await import(pathToFileURL(pressCssPath).href);assert.equal(pressCss.defineTheme,defineTheme);
+const tokens=defineTokens("consumer-press",{ink:["black","white"]});const theme=defineTheme({options:defineOptions("consumer-press",{}),defaults:{scheme:"dark"},tokens:[tokens],styles:css\`body{color:\${tokens.ink}}\`});const config=meowSite({content:join(import.meta.dir,"content"),skillsDirectory:join(import.meta.dir,"skills"),outputDirectory:join(import.meta.dir,"custom-dist"),theme});assert.equal(config.theme,theme);await buildSite(config);const html=await Bun.file(join(config.outputDirectory,"posts/public/index.html")).text();assert.ok(html.includes('data-meowui-theme-root="consumer-press"'));assert.ok(html.includes('data-meowui-color-scheme="dark"'));const href=html.match(/href="([^" ]+\\.css)"/)?.[1];assert.ok(href);const stylesheet=await Bun.file(join(config.outputDirectory,"posts/public",href)).text();assert.ok(stylesheet.includes(tokens.ink.name));await Bun.write(join(import.meta.dir,"custom-theme-proof.json"),JSON.stringify({samePublicCssModule:true,sameDefineTheme:true,sameThemeDefinitionIdentity:true,rootAndDarkOptions:true,tokenName:tokens.ink.name}));`,
+  };
+  for (const [file, contents] of Object.entries(files)) await writeFile(join(site, file), contents);
+  // Running from a nested consumer directory catches package assets accidentally resolved from cwd.
+  await command(
+    ["bun", join(directory, "node_modules/.bin/meowpress"), "--config", "../site.config.ts"],
+    join(site, "runner"),
+  );
+  const output = join(site, "default-dist");
+  const markdown = await readFile(join(output, "posts/public/index.html"), "utf8");
+  const mdx = await readFile(join(output, "posts/component/index.html"), "utf8");
+  assert(
+    markdown.includes("<strong>fixture statement</strong>") &&
+      mdx.includes("Trusted MDX content") &&
+      mdx.includes("mdx-callout"),
+    "Installed Press CLI did not render Markdown/MDX",
+  );
+  assert(
+    (await readFile(join(output, "thoughts/note/index.html"), "utf8")).includes(
+      "A finite public thought.",
+    ),
+    "Installed Press CLI lost thought content",
+  );
+  assert(
+    !existsSync(join(output, "posts/private/index.html")) &&
+      !existsSync(join(output, "posts/_private/index.html")) &&
+      !existsSync(join(output, "posts/assets/_draft/private.txt")),
+    "Press published private fixture content/assets",
+  );
+  assert(
+    (await readFile(join(output, "posts/assets/public.txt"), "utf8")) ===
+      files["content/posts/assets/public.txt"],
+    "Press lost its public local asset",
+  );
+  for (const file of ["index.html", "posts/index.html", "llms.txt", "agents.md"])
+    assert(
+      !(await readFile(join(output, file), "utf8")).includes("DO_NOT_PUBLISH_FIXTURE"),
+      "Press index published a draft",
+    );
+  const home = await readFile(join(output, "index.html"), "utf8");
+  const href = home.match(/href="([^" ]+\.css)"/)?.[1];
+  assert(
+    href && home.includes('data-meowui-theme-root="blog"'),
+    "Press default theme/root missing",
+  );
+  const defaultCSS = await readFile(join(output, href), "utf8");
+  assert(
+    defaultCSS.includes("@font-face") &&
+      defaultCSS.includes("data:font/woff2;base64,") &&
+      !defaultCSS.includes("@import") &&
+      !defaultCSS.includes("node_modules"),
+    "Press default Geist font did not build from installed dependencies",
+  );
+  assert(
+    (await readFile(join(output, "licenses/geist-OFL.txt"), "utf8")).includes(
+      "SIL OPEN FONT LICENSE Version 1.1",
+    ),
+    "Press output omitted the Geist OFL license",
+  );
+  await command(["bun", "../custom.ts"], join(site, "runner"));
+  checks.push(
+    "installed Press CLI from nested external cwd: Markdown/MDX/thoughts, draft exclusion and public local assets",
+  );
+  checks.push(
+    "Press default Geist font embedded with OFL; Press/consumer public CSS resolution and defineTheme identity match; custom ThemeDefinition/token/options round-trip preserved",
+  );
+}
 export async function consume(options: ConsumerOptions) {
   const { input, candidates } = await consumerInput(options);
   const directory = await mkdtemp(join(tmpdir(), "meowland-release-consumer-"));
@@ -360,9 +448,13 @@ export async function consume(options: ConsumerOptions) {
   await command(["bun", "public-imports.mjs"], directory);
   checks.push("all selected public exports import under Bun");
   await command(["node", "public-imports.mjs"], directory);
-  checks.push(
-    "all selected runtime exports import under native Node, including Slides theme; Bun tool execution excluded",
-  );
+  checks.push("selected runtime exports import under native Node; Bun-only tool entries excluded");
+  if (options.selected.includes("meowslides"))
+    checks.push("native Node imports the installed Slides theme (ESM specifier regression)");
+  if (options.selected.includes("meowpress"))
+    checks.push(
+      "Press exposes only the Bun build tool; no Press root/runtime import or Node CLI execution",
+    );
   const probe = probes(options.selected);
   await writeFile(join(directory, "identity.ts"), probe.code);
   await command(["bun", "identity.ts"], directory);
@@ -424,6 +516,7 @@ export async function consume(options: ConsumerOptions) {
     checks.push("installed Meowbook CLI list/check with public consumer story");
   }
   if (options.selected.includes("meowslides")) await slidesConsumption(directory, checks);
+  if (options.selected.includes("meowpress")) await pressConsumption(directory, checks);
   for (const item of candidates)
     assert(
       hash(await readFile(item.file)) === item.sha256,
@@ -456,7 +549,7 @@ export async function consume(options: ConsumerOptions) {
 if (import.meta.main) {
   if (process.argv.slice(2).join(" ") === "--help")
     console.log(
-      "Usage: bun scripts/release-consumer.ts --manifest <release.json> --packages <name,name> [--offline] [--out <receipt.json>]\nInstalls exact local tarballs outside the repository; never publishes. Supports meowjsx, meowcss, meowtail, meowbook, meowslides. Node is required for native ESM runtime imports; Slides build tools execute under Bun.",
+      "Usage: bun scripts/release-consumer.ts --manifest <release.json> --packages <name,name> [--offline] [--out <receipt.json>]\nInstalls exact local tarballs outside the repository; never publishes. Supports meowjsx, meowcss, meowtail, meowbook, meowslides, meowpress. Node is required for native ESM runtime imports; Slides and Press build tools execute under Bun.",
     );
   else
     consume(consumerOptions(process.argv.slice(2)))

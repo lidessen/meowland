@@ -13,7 +13,10 @@ test("consumer requires explicit unique supported selection and rejects executio
   expect(
     consumerOptions(["--manifest", "input.json", "--packages", "meowslides"]).selected,
   ).toEqual(["meowslides"]);
-  for (const name of ["meowpress", "unknown"])
+  expect(consumerOptions(["--manifest", "input.json", "--packages", "meowpress"]).selected).toEqual(
+    ["meowpress"],
+  );
+  for (const name of ["unknown", "meowui"])
     expect(() => consumerOptions(["--manifest", "input.json", "--packages", name])).toThrow(
       "supported",
     );
@@ -111,6 +114,38 @@ test("the standard native Node public probe catches a broken Slides theme specif
     const repaired = await run();
     expect(repaired.code).toBe(0);
     expect(JSON.parse(repaired.stdout)).toEqual(["meowslides", "meowslides/theme"]);
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("the native Node public probe excludes the Press-only Bun tool", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "release-consumer-press-node-test-"));
+  try {
+    const packageDirectory = join(directory, "node_modules/meowpress");
+    await mkdir(packageDirectory, { recursive: true });
+    await writeFile(
+      join(packageDirectory, "package.json"),
+      JSON.stringify({ name: "meowpress", type: "module", exports: { "./build": "./build.js" } }),
+    );
+    await writeFile(
+      join(packageDirectory, "build.js"),
+      'throw Error("Press tooling was executed under Node");',
+    );
+    await writeFile(join(directory, "public-imports.mjs"), publicImportProbe(["meowpress"]));
+    const child = Bun.spawn(["node", "public-imports.mjs"], {
+      cwd: directory,
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    const [code, stdout, stderr] = await Promise.all([
+      child.exited,
+      new Response(child.stdout).text(),
+      new Response(child.stderr).text(),
+    ]);
+    expect(code).toBe(0);
+    expect(stderr).toBe("");
+    expect(JSON.parse(stdout)).toEqual([]);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

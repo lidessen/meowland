@@ -75,7 +75,7 @@
     },
     "packages/meowpress": {
       "name": "meowpress",
-      "version": "0.1.0",
+      "version": "0.1.1-alpha.0",
       "bin": {
         "meowpress": "./dist/src/cli.js",
       },
@@ -84,7 +84,7 @@
         "@fontsource-variable/geist": "^5.3.0",
         "@mdx-js/mdx": "^3.1.1",
         "mdast-util-from-markdown": "^2.0.3",
-        "meowcss": "^0.1.0",
+        "meowcss": "^0.1.0 || ^0.1.1-alpha.0",
         "remark-gfm": "^4.0.1",
         "yaml": "^2.9.0",
       },
@@ -93,7 +93,7 @@
         "meowjsx": "workspace:*",
       },
       "peerDependencies": {
-        "meowjsx": "^0.1.0",
+        "meowjsx": "^0.1.0 || ^0.1.1-alpha.0",
       },
     },
     "packages/meowslides": {
@@ -616,8 +616,6 @@
     "yaml": ["yaml@2.9.1", "", { "bin": { "yaml": "bin.mjs" } }, "sha512-3NxN8+78OdzbT7C/WjGsyfPAtJaN3FNDsWxv7Y7mcDsT/oOmgW8BpyQQFFBnvZE3j9Y2Sdz1ULFLezL7Eb2yFw=="],
 
     "zwitch": ["zwitch@2.0.4", "", {}, "sha512-bXE4cR/kVZhKZX/RjPEflHaKVhUVl85noU3v6b8apfQEc1x4A+zBxjZ4lN8LqGd6WZ3dl98pY4o717VFmoPp+A=="],
-
-    "meowpress/meowcss": ["meowcss@0.1.0", "", { "peerDependencies": { "meowjsx": "^0.1.0" }, "optionalPeers": ["meowjsx"] }, "sha512-gYYTVQjD3jjPtfM/3n7f83mQ7w4cOkFnEVzE9C8b5M0IE3FoAq0JKM3IhGUh82/ZYn0sNG7QpB5znosL/HVBvQ=="],
 
     "parse-entities/@types/unist": ["@types/unist@2.0.11", "", {}, "sha512-CmBKiL6NNo/OqgmMn95Fk9Whlp2mtvIv+KNpQKN2F4SjvrEesubTRWGYSg+BnWZOnlCaSTU1sMpsBOzgbYhnsA=="],
   }

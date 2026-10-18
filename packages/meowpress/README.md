@@ -3,6 +3,8 @@
 `meowpress` 提供静态站点的内容读取、页面渲染、主题和构建流程。
 消费者持有站点配置与内容，通过本包构建；本包不持有应用的文章或输出目录。
 
+当前准备 `0.1.1-alpha.0` 本地候选，尚未发布该版本。CSS 普通依赖与 JSX peer 均允许 `^0.1.0 || ^0.1.1-alpha.0`，保留稳定版兼容范围，并接受本轮 JSX/CSS alpha；不依赖 Meowtail 或 MeowSlides。实际包外构建与主题身份验收绑定精确 tgz，不通过 override 绕过 peer 合同。发布仍需独立明确授权。
+
 本包是独立内容发布库，源码位于 `packages/meowpress`，已有公开构建入口、独立测试与类型检查，
 不依赖 Assistant、WorkCell、Deno 或特定 Blog 的内容与运行状态。样式生成来自 `meowcss`，
 HTML 渲染来自 `meowjsx/web`，无需安装 MeowUI。

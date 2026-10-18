@@ -16,15 +16,13 @@
 当前从仓库根执行：
 
 ```sh
-bun examples/image-loading/build.ts
-bun examples/image-loading/serve.ts
 PLAYWRIGHT_CHANNEL=chrome bun node_modules/@playwright/test/cli.js test --config packages/meowslides/tests/browser/presentation/playwright.config.ts
 PLAYWRIGHT_CHANNEL=chrome bun node_modules/@playwright/test/cli.js test --config packages/meowslides/playwright.config.ts
 PLAYWRIGHT_CHANNEL=chrome bun node_modules/@playwright/test/cli.js test --config packages/meowslides/tests/browser/authoring/playwright.config.ts
 bun node_modules/typescript/bin/tsc --noEmit -p packages/meowslides/tests/browser/tsconfig.json
 ```
 
-lab 服务占 13009；独立合同服务 13019、组件 gallery 13027、真实 MDX 作者服务 13039、临时改稿服务 13040。测试自行启动后三项与独立合同服务，lab 由执行者先启动；本轮自行启动的全部服务均已关闭。
+lab 服务占 13009；独立合同服务 13019、组件 gallery 13027、真实 MDX 作者服务 13039、临时改稿服务 13040。当前独立合同配置自行构建并启动 lab，同时管理 13019；其余配置自行启动各自服务。所有服务只监听回环地址，不复用已有进程，测试完成后退出。历史本轮验收时 lab 曾由执行者先启动；2026-10-18 发布就绪审查修复了这一手动前置，避免干净环境中两个外框用例连接失败。
 
 ## 实际发现的两个组合缺陷
 

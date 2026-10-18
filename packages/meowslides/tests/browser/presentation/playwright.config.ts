@@ -13,10 +13,19 @@ export default defineConfig({
     trace: "retain-on-failure",
     screenshot: "only-on-failure",
   },
-  webServer: {
-    command: "bun packages/meowslides/tests/browser/presentation/server.ts",
-    cwd: new URL("../../../../..", import.meta.url).pathname,
-    url: "http://127.0.0.1:13019/",
-    reuseExistingServer: false,
-  },
+  webServer: [
+    {
+      command: "bun packages/meowslides/tests/browser/presentation/server.ts",
+      cwd: new URL("../../../../..", import.meta.url).pathname,
+      url: "http://127.0.0.1:13019/",
+      reuseExistingServer: false,
+    },
+    {
+      command:
+        "bun examples/image-loading/build.ts && PORT=13009 bun examples/image-loading/serve.ts",
+      cwd: new URL("../../../../..", import.meta.url).pathname,
+      url: "http://127.0.0.1:13009/",
+      reuseExistingServer: false,
+    },
+  ],
 });

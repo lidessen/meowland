@@ -36,6 +36,9 @@ export const presentationLayoutStyles = css`
   ${part("root")}[data-columns="equal"] > ${part("body")} {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  ${part("root")}[data-columns="3"] > ${part("body")} {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
   ${part("root")}[data-columns="wide-start"] > ${part("body")} {
     grid-template-columns: minmax(0, 2fr) minmax(0, 1fr);
   }

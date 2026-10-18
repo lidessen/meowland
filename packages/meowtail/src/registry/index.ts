@@ -6,6 +6,8 @@ import {
 } from "../presentation";
 import { presentationLayoutContract } from "../presentation/layout";
 import { presentationTextContract } from "../presentation/presentation-text";
+import { presentationListContract } from "../presentation/list";
+import { presentationImageContract } from "../presentation/image";
 import { defaultRuntime, type ComponentContract, type Runtime, type RuntimePlugin } from "meowjsx";
 import { pillContract } from "../components/pill";
 import { pageFrameContract } from "../components/page-frame";
@@ -128,6 +130,8 @@ export const MeowUIComponent = {
   Presentation: presentationContract.name,
   PresentationLayout: presentationLayoutContract.name,
   PresentationText: presentationTextContract.name,
+  PresentationList: presentationListContract.name,
+  PresentationImage: presentationImageContract.name,
   PresentationVideo: presentationVideoContract.name,
   PresentationAudio: presentationAudioContract.name,
   Reveal: revealContract.name,
@@ -240,6 +244,8 @@ export const meowUIComponents = [
   presentationContract,
   presentationLayoutContract,
   presentationTextContract,
+  presentationListContract,
+  presentationImageContract,
   revealContract,
   presentationVideoContract,
   presentationAudioContract,
@@ -360,6 +366,8 @@ declare module "meowjsx" {
     presentation: { parts: (typeof presentationContract.parts)[number] };
     "presentation-layout": { parts: (typeof presentationLayoutContract.parts)[number] };
     "presentation-text": { parts: (typeof presentationTextContract.parts)[number] };
+    "presentation-list": { parts: (typeof presentationListContract.parts)[number] };
+    "presentation-image": { parts: (typeof presentationImageContract.parts)[number] };
     "presentation-reveal": { parts: (typeof revealContract.parts)[number] };
     "page-frame": { parts: (typeof pageFrameContract.parts)[number] };
     "region-layout": { parts: (typeof regionLayoutContract.parts)[number] };

@@ -13,6 +13,12 @@ const valid = (
   </PresentationLayout>
 );
 void valid;
-// @ts-expect-error Presentation columns are finite named proportions.
+const numbered = [1, 2, 3].map((columns) => <PresentationLayout columns={columns as 1 | 2 | 3} />);
+void numbered;
+// @ts-expect-error Presentation columns are finite counts or named proportions.
 const invalid = <PresentationLayout columns="33% 67%" />;
 void invalid;
+
+// @ts-expect-error Four columns are outside the bounded presentation presets.
+const tooMany = <PresentationLayout columns={4} />;
+void tooMany;

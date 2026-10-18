@@ -6,8 +6,14 @@
 
 `meowtail/presentation` 提供 `Presentation`、`Reveal`、`PresentationVideo`、`PresentationAudio`
 和 `usePresentationActivity`；根入口重导相同实现，沿用同一 MeowJSX/Context/主题身份。
-内容区域使用 `PresentationLayout` 的可替换 header/footer 和命名列比，常见标题、图文、对比、
+内容区域使用 `PresentationLayout` 的可替换 header/footer、`1 | 2 | 3` 等宽列或既有命名列比，常见标题、图文、对比、
 数字、流程与总结组合见[演示内容布局](PRESENTATION-LAYOUTS.md)。
+`PresentationList items={...}` 生成原生 ul/li，`as="ol"` 可继续传 start/reversed；
+它使用演示正文 token（标准主题默认 28px），不另设 size/density，也不自动压缩无限长内容。
+正文图片用 `PresentationImage src alt`，默认 16:9、contain、center，caption 保持自然高度并复用 ImagePreview 的加载/失败反馈。
+数值 ratio 是优选框比例，`ratio="fill"` 须由有限父级分配空间；图注也占内容预算。
+cover 需明确选择，position 为与背景相同的九点；比例不同时，完整显示与填满区域需取舍，文字图优先 contain。
+Meowbook 的 `presentation-foundations` 可实际查看两列、三列、列表、照片 cover 与文字图 contain。
 整场与逐页可传 `background`：`"theme"` 或 `{ fill?, image?, overlay?, foreground? }`，
 也可传同类型 Signal。`image` 接收 src、cover/contain 的 fit（默认 cover）和九点 position（默认 center）；
 fill/overlay 支持 CSS 颜色或渐变。页省略时继承整场，整场省略时沿主题；显式 theme 回主题，

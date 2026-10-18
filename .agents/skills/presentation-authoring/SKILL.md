@@ -12,11 +12,15 @@ description: Create and iteratively revise Meowland browser presentations and cl
 ## 从内容区域开始选布局
 
 先读[演示内容布局](../../../packages/meowtail/PRESENTATION-LAYOUTS.md)，按观点、依据和操作的关系划分区域，
-再放入标题、图片和正文。优先 PresentationLayout 的 header/footer 槽与 single/equal/wide-start/wide-end
-命名列比，区域内部继续用 Stack/Grid/AspectRatio；标题、图文、对比、数字、流程、引用与总结是组合配方。
-需要第三列时在 single 内使用 Grid，顺序流程保留 ol/li 语义。
+再放入标题、图片和正文。优先 PresentationLayout 的 header/footer 槽与 `1 | 2 | 3` 等宽列，
+或 single/equal/wide-start/wide-end 命名列比；区域内部继续用 Stack/Grid，标题、图文、对比、数字、流程、引用与总结是组合配方。
+短要点用 PresentationList 的 items，顺序有意义时 as="ol" 并保留 start/reversed 等原生语义。
+列表沿用演示正文 token（标准主题默认 28px），不靠 size/density 或自动缩字塞满三列；长内容先精简、拆页或改区域。
 
-占位和真实图使用同一比例容器，替换后检查 contain/cover、裁切和说明。逻辑画布内的列比不随宿主窄屏重排；
+正文图优先 PresentationImage，默认 16:9、contain、center；caption 自然占高并复用 ImagePreview 的失败反馈。
+fill 需要 PresentationLayout body 或 LayoutItem grow 等有限父级，图片使用扣除图注后的余量；不确定父级高度时用数值 ratio。
+文字图优先完整显示，照片确需填满才显式 cover 并核对九点 position 与主体裁切；比例不同时不能同时保证完整边缘与填满区域。
+占位和真实图使用同一比例容器，替换后检查实际裁切、长图注与说明。逻辑画布内的列比不随宿主窄屏重排；
 Presentation 缩放整张画布。长标题和最终步骤装不下时先精简、拆页或改区域，不靠自动缩字或隐藏溢出交付。
 标题确需排印强调时可用 PresentationText editorial/marker，正文保持 plain；它仍是真实可选择文本，
 不把原生 contenteditable 接缝描述成编辑器。静态构图与内容清晰度先成立，再选择必要的 transition 入场。

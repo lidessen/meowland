@@ -3,6 +3,7 @@
 先根据观众要读什么划分区域，再放入内容。`PresentationLayout` 是通用页面骨架，
 标题、图文、对比、数字、流程和总结继续组合现有组件。可运行的六页构图在 Meowbook 的
 `presentation-layouts`，不改变现有图片演示或英语课件。
+`presentation-foundations` 另用三页真实演示展示数值列数、原生列表、照片裁切与文字图完整显示。
 
 ## 区域与比例
 
@@ -10,21 +11,23 @@
 `header`、`footer` 接收普通 Child，保持自然高度；`children` 进入占剩余高度的 body。
 省略任一槽不会留下空行或额外间距。骨架不另加边缘，沿用 Presentation 画布的 inset。
 
-| 关系               | `columns`        | 适合的内容                          |
-| ------------------ | ---------------- | ----------------------------------- |
-| 单一阅读轴         | `single`（默认） | 标题、引用、总结，或内部继续放 Grid |
-| 同等重要           | `equal`          | 两个方案、前后对比、两组依据        |
-| 主要内容在逻辑起点 | `wide-start`     | 数字或主图占 2 份，旁注占 1 份      |
-| 主要内容在逻辑终点 | `wide-end`       | 说明占 1 份，图或实验占 2 份        |
+| 关系               | `columns`              | 适合的内容                          |
+| ------------------ | ---------------------- | ----------------------------------- |
+| 单一阅读轴         | `single`（默认）或 `1` | 标题、引用、总结，或内部继续放 Grid |
+| 同等重要           | `equal` 或 `2`         | 两个方案、前后对比、两组依据        |
+| 三个同等区域       | `3`                    | 三组短要点、少量步骤或三方比较      |
+| 主要内容在逻辑起点 | `wide-start`           | 数字或主图占 2 份，旁注占 1 份      |
+| 主要内容在逻辑终点 | `wide-end`             | 说明占 1 份，图或实验占 2 份        |
 
-双列构图通常提供两个直接子项。更多区域可在 `single` 中组合 `Grid columns={3}`。
-超过两项会按普通网格新增行，仍需核对有限画布的内容量。
+数值 `1 | 2 | 3` 表示等宽逻辑列数，既有字符串用法保持不变。
+通常提供与列数相同的直接子项；超过列数会按普通网格新增行，仍需核对有限画布的内容量。
+更复杂的区域继续在 `single` 中组合 Grid，不把每种构图变成新模板。
 `gap` 使用 none/compact/normal/relaxed，默认 normal；主题的 `presentationTokens.spaceGroup`、
 `spaceSection`、`spacePanel` 决定组内、区域和较宽间距，与工具栏控件间距独立。
 
 ```tsx
-import { Stack, LayoutItem } from "meowtail";
-import { PresentationLayout } from "meowtail/presentation";
+import { Stack } from "meowtail";
+import { PresentationImage, PresentationLayout } from "meowtail/presentation";
 
 <PresentationLayout
   columns="wide-end"
@@ -34,35 +37,82 @@ import { PresentationLayout } from "meowtail/presentation";
   <Stack justify="center">
     <p>短主张和适用条件。</p>
   </Stack>
-  <Stack style={{ height: "100%" }}>
-    <LayoutItem grow basis="0%">
-      <img
-        src={image}
-        alt="说明图片表达的内容"
-        aria-describedby="slide-image-caption"
-        style={{ display: "block", width: "100%", height: "100%", objectFit: "contain" }}
-      />
-    </LayoutItem>
-    <LayoutItem shrink={false}>
-      <small id="slide-image-caption">说明图中应观察的关系。</small>
-    </LayoutItem>
-  </Stack>
+  <PresentationImage
+    src={image}
+    alt="说明图片表达的内容"
+    ratio="fill"
+    caption="说明图中应观察的关系。"
+  />
 </PresentationLayout>;
 ```
 
-占位阶段就用 AspectRatio 确定容器；替换真实图片后再核对长宽比、contain/cover 和必要的裁切。
+这里 body 提供有限高度，图片使用余量，图注保持自然高度。替换真实图片后仍需核对长宽比与完整边缘。
 骨架不下载素材、不默认裁切，不把图中文字当可访问的正文。
-固定高度区域若同时包含媒体和说明，先用 Stack + LayoutItem grow 把余量交给媒体，
-说明保持自然高度，再由 img 的 objectFit="contain" 保留图像比例；图片可用 aria-describedby 关联说明。
-不要让按列宽计算的 AspectRatio 再加一段说明后侵入 footer。AspectRatio 更适合先确定自然高度的占位区域，
-并须与整页剩余高度一起检查。
+
+## 正文列表
+
+`PresentationList` 接收 `items: readonly Child[]`，每项自动形成一个原生 li，默认使用 ul。
+顺序有意义时指定 `as="ol"`，`start`、`reversed` 等原生属性仍落在列表元素；不要再手工写重复数字。
+
+```tsx
+<PresentationLayout columns={3} header={<h2>三个区域使用相同的阅读尺度</h2>}>
+  <PresentationList items={["记录观察。", "保留来源。"]} />
+  <PresentationList as="ol" items={["用相同条件比较。", "指出差异。"]} />
+  <PresentationList
+    as="ol"
+    start={3}
+    reversed
+    items={["收敛问题。", "解释结论。", "提出下一步。"]}
+  />
+</PresentationLayout>
+```
+
+列表沿用 `presentationTokens.fontBody`（标准主题默认 28px）和演示行高、组间距，
+不另设 size/density。它不会按内容多少自动缩字；三列更不能无限塞长内容。
+先保留少量能解释的要点，过长时精简、拆页或调整区域，仍观察溢出诊断与实际阅读效果。
+
+## 正文图片与图注
+
+`PresentationImage` 需要 `src` 和有意义的 `alt`，复用 ImagePreview 的加载、失败反馈与事件。
+可选 `caption` 为普通 Child，在原生 figure 内生成自然高度的 figcaption；它不是浮在图片上的装饰文字。
+不把关键图中文字仅留在像素里，仍提供替代文字或真实正文说明。
+
+`ratio` 默认 `16 / 9`，也可传正的有限数值作为框的优选比例；`ratio="fill"` 使用有限父级分配的剩余高度。
+fill 不是自行寻找屏幕高度：直接放进 PresentationLayout body，或放进已有有限 Stack 的
+`LayoutItem grow basis={0}` 区域，再保留其他文字的自然高度。父级高度不确定时使用数值比例。
+
+```tsx
+<PresentationImage
+  src={photo}
+  alt="描述主体与可观察环境"
+  ratio="fill"
+  fit="cover"
+  position="top right"
+  caption="允许裁切的照片仍需核对主体是否完整。"
+/>;
+<PresentationImage
+  src={diagram}
+  alt="用真实文字说明图中关系"
+  ratio={4 / 3}
+  caption="文字图默认完整显示。"
+/>;
+```
+
+`fit` 默认 contain，保留完整图像；cover 必须明确选择，允许裁切。
+比例不同时，保留全部内容和填满区域不能同时成立：文字图、图表和证据图优先 contain，
+留白是比例差异的正常结果；照片仅在边缘可舍弃时选 cover，并实际看主体与裁切。
+`position` 默认 center，可选 top/bottom/left/right、top left/top right/bottom left/bottom right。
+
+caption、页标题、footer 都领取自然高度，媒体只使用余量。长图注会减少画面空间，不能靠 fill
+保证任意内容都装下；数值比例也要与整页容量一起检查。不要让图片先占满正文，再把图注挤入 footer。
+复杂媒体组合仍可用 Stack + LayoutItem；AspectRatio 适合自然比例占位，不代替有限高度预算。
 
 ## 选用构图
 
 | 目的         | 最小组合                                                                   |
 | ------------ | -------------------------------------------------------------------------- |
 | 标题与主张   | single + Stack justify="center"；主标题、副标题与上下文                    |
-| 图文分栏     | wide-start/wide-end + Stack + figure/AspectRatio；根据证据的重要性选主次   |
+| 图文分栏     | wide-start/wide-end + PresentationImage；根据证据的重要性选主次            |
 | 并列对比     | equal；使用同样的标题层级与比较轴，避免两边内容量悬殊                      |
 | 重点数字     | wide-start；数字、单位与条件组成一个区域，解释与来源另放，示意数值明确标记 |
 | 流程或时间线 | single + Grid/Stack 内的原生 ol/li；保留顺序语义，必要时组合 Reveal        |

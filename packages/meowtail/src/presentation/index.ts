@@ -1,5 +1,12 @@
 export { Presentation, presentationContract } from "./presentation";
 export { Reveal, revealContract, type RevealProps } from "./reveal";
+export { PresentationList, presentationListContract, type PresentationListProps } from "./list";
+export {
+  PresentationImage,
+  presentationImageContract,
+  type PresentationImageProps,
+  type PresentationImagePosition,
+} from "./image";
 export {
   PresentationLayout,
   presentationLayoutContract,

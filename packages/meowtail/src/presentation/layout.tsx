@@ -4,7 +4,7 @@ export interface PresentationLayoutProps extends Props {
   header?: Child;
   footer?: Child;
   /** Logical column proportions within the fixed presentation canvas. */
-  columns?: "single" | "equal" | "wide-start" | "wide-end";
+  columns?: 1 | 2 | 3 | "single" | "equal" | "wide-start" | "wide-end";
   gap?: "none" | "compact" | "normal" | "relaxed";
   className?: string;
 }
@@ -28,7 +28,12 @@ export const PresentationLayout = defineComponent<
     context.part(
       "root",
       "div",
-      { ...props, className, "data-columns": columns, "data-gap": gap },
+      {
+        ...props,
+        className,
+        "data-columns": columns === 1 ? "single" : columns === 2 ? "equal" : columns,
+        "data-gap": gap,
+      },
       header ? context.part("header", "header", null, header) : null,
       context.part("body", "div", null, children),
       footer ? context.part("footer", "footer", null, footer) : null,

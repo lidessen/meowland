@@ -1,6 +1,8 @@
 import { presentationStyles } from "./presentation/presentation.styles";
 import { presentationLayoutStyles } from "./presentation/layout.styles";
 import { presentationTextStyles } from "./presentation/presentation-text.styles";
+import { presentationListStyles } from "./presentation/list.styles";
+import { presentationImageStyles } from "./presentation/image.styles";
 import { presentationTokens } from "./presentation/presentation.tokens";
 export { presentationTokens } from "./presentation/presentation.tokens";
 import { defineTheme } from "meowcss/meowjsx";
@@ -104,6 +106,7 @@ export const standardTheme = defineTheme({
     presentationStyles,
     presentationLayoutStyles,
     presentationTextStyles,
+    presentationListStyles,
     assistantStyles,
     statusDotStyles,
     statusStyles,
@@ -172,6 +175,7 @@ export const standardTheme = defineTheme({
     chatConversationStyles,
     chatAttachmentsStyles,
     imagePreviewStyles,
+    presentationImageStyles,
     iconsStyles,
     searchInputStyles,
     pathPickerStyles,

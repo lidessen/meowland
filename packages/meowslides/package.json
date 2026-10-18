@@ -48,9 +48,9 @@
     "@types/node": "26.6.5"
   },
   "peerDependencies": {
-    "meowjsx": "^0.1.0",
-    "meowcss": "^0.1.0",
-    "meowtail": "^0.2.0-slides.20261018.1"
+    "meowjsx": "^0.1.0 || ^0.1.1-alpha.0",
+    "meowcss": "^0.1.0 || ^0.1.1-alpha.0",
+    "meowtail": "^0.2.0-alpha.0"
   },
   "devDependencies": {
     "meowjsx": "workspace:*",

@@ -1,8 +1,11 @@
 import { createHash } from "node:crypto";
-import { readFile, realpath } from "node:fs/promises";
-import { basename, dirname, resolve } from "node:path";
-import { prerelease, satisfies, valid, validRange } from "semver";
+import { mkdtemp, readFile, realpath, rm, writeFile } from "node:fs/promises";
+import { basename, dirname, join, resolve } from "node:path";
+import { gt, prerelease, satisfies, valid, validRange } from "semver";
 
+import { tmpdir } from "node:os";
+
+export type Channel = "stable" | "alpha";
 const names = ["meowjsx", "meowcss", "meowtail", "meowslides", "meowbook", "meowpress"];
 // Historical inputs remain readable, but retired packages cannot be selected for release.
 const reviewedNames = [...names, "meowui"];
@@ -25,10 +28,12 @@ type Package = InputPackage & {
   path: string;
   tag: string;
   integrity: string;
-  dependencies: Record<string, { range: string; optional: boolean }>;
+  dependencies: { name: string; range: string; optional: boolean; kind: string }[];
 };
 export type Plan = {
   root: string;
+  channel: Channel;
+  distTag: "latest" | "alpha";
   toolCommit: string;
   manifest: string;
   manifestHash: string;
@@ -42,33 +47,68 @@ const text = (result: Result) => decoder.decode(result.stdout).trim();
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error(message);
 }
-function releaseBody(item: Package, commit: string) {
-  return `${item.notes ? `${item.notes}\n\n` : ""}Package ${item.tag}\nCommit ${commit}\nSHA256 ${item.sha256}`;
+/** npm runs without project/global/user auth or npm_config_* environment overrides. */
+export function npmEnvironment(source: NodeJS.ProcessEnv) {
+  return Object.fromEntries(Object.entries(source).filter(([key]) => !/^npm_config_/i.test(key)));
 }
-
 export const run: Runner = async (args, cwd) => {
-  if (basename(args[0] ?? "") === "npm" && args[1] === "publish") {
-    const child = Bun.spawn(args, {
-      cwd,
-      stdin: "inherit",
-      stdout: "inherit",
-      stderr: "inherit",
+  if (args[0] === "registry") {
+    assert(
+      args[1] === "get" && args.length === 3 && reviewedNames.includes(args[2]!),
+      "Invalid registry read",
+    );
+    const response = await fetch(`${registry}/${encodeURIComponent(args[2]!)}`, {
+      headers: { accept: "application/json" },
+      signal: AbortSignal.timeout(15000),
+      redirect: "error",
+      cache: "no-store",
     });
-    return { code: await child.exited, stdout: new Uint8Array(), stderr: "" };
+    return {
+      code: response.status === 200 ? 0 : response.status,
+      stdout: new Uint8Array(await response.arrayBuffer()),
+      stderr: "",
+    };
   }
-  const child = Bun.spawn(args, { cwd, stdin: "ignore", stdout: "pipe", stderr: "pipe" });
-  const [stdout, stderr, code] = await Promise.all([
-    new Response(child.stdout).arrayBuffer(),
-    new Response(child.stderr).text(),
-    child.exited,
-  ]);
-  return { code, stdout: new Uint8Array(stdout), stderr };
+  let isolated: string | undefined;
+  let env: NodeJS.ProcessEnv | undefined;
+  if (basename(args[0] ?? "") === "npm") {
+    assert(Boolean(process.env.NPM_TOKEN), "Set NPM_TOKEN in the local publishing environment");
+    isolated = await mkdtemp(join(tmpdir(), "meowland-npm-"));
+    await writeFile(join(isolated, "global.npmrc"), "");
+    cwd = isolated;
+    env = npmEnvironment(process.env);
+    args = [
+      ...args,
+      "--registry",
+      registry,
+      "--userconfig",
+      resolve(import.meta.dir, "npmrc"),
+      "--globalconfig",
+      join(isolated, "global.npmrc"),
+      "--ignore-scripts",
+      "--workspaces=false",
+    ];
+  }
+  try {
+    const child = Bun.spawn(args, { cwd, env, stdin: "ignore", stdout: "pipe", stderr: "pipe" });
+    const [stdout, stderr, code] = await Promise.all([
+      new Response(child.stdout).arrayBuffer(),
+      new Response(child.stderr).text(),
+      child.exited,
+    ]);
+    // npm diagnostics can contain account/config data; never forward them to logs.
+    return { code, stdout: new Uint8Array(stdout), stderr: isolated ? "" : stderr };
+  } finally {
+    if (isolated) await rm(isolated, { recursive: true, force: true });
+  }
 };
 async function checked(runner: Runner, args: string[], cwd: string) {
   const result = await runner(args, cwd);
   assert(
     result.code === 0,
-    `${args[0]} ${args[1]} failed (exit ${result.code}): ${result.stderr || text(result) || "See command output"}`,
+    args[0] === "npm"
+      ? `npm ${args[1]} failed (exit ${result.code}); verify token permissions, registry availability and 2FA outside this script`
+      : `${args[0]} ${args[1]} failed (exit ${result.code}): ${result.stderr || text(result)}`,
   );
   return result;
 }
@@ -103,10 +143,12 @@ export async function inspect(
   manifest: string,
   selected: string[],
   runner: Runner = run,
+  channel: Channel = "stable",
 ): Promise<Plan> {
   root = await realpath(root);
   manifest = resolve(manifest);
-  assert(!manifest.includes("#"), "Manifest path cannot contain an asset label separator");
+  assert(channel === "stable" || channel === "alpha", "Unknown release channel");
+  const distTag = channel === "alpha" ? "alpha" : "latest";
   assert(
     /^[a-zA-Z0-9][a-zA-Z0-9._-]*\.json$/.test(basename(manifest)),
     "Use a plain JSON filename for the reviewed input",
@@ -155,8 +197,11 @@ export async function inspect(
     const item = input.packages.find((candidate) => candidate.name === name);
     assert(item, `Package is not in the reviewed input: ${name}`);
     assert(
-      valid(item.version) === item.version && prerelease(item.version) === null,
-      `Use a stable independent semver: ${name}`,
+      valid(item.version) === item.version &&
+        (channel === "stable"
+          ? prerelease(item.version) === null
+          : /^\d+\.\d+\.\d+-alpha\.\d+$/.test(item.version)),
+      `Use an independent ${channel === "alpha" ? "x.y.z-alpha.N" : "stable"} semver: ${name}`,
     );
     assert(
       item.notes === undefined || typeof item.notes === "string",
@@ -164,7 +209,6 @@ export async function inspect(
     );
     assert(/^[a-f0-9]{64}$/.test(item.sha256), `Invalid SHA256: ${name}`);
     const path = await realpath(resolve(dirname(manifest), item.file));
-    assert(!path.includes("#"), `Tarball path cannot contain an asset label separator: ${name}`);
     assert(
       basename(path) === `${name}-${item.version}.tgz`,
       `Unexpected tarball filename: ${name}`,
@@ -189,8 +233,7 @@ export async function inspect(
       !packed.publishConfig ||
         Object.entries(packed.publishConfig).every(
           ([key, value]) =>
-            value ===
-            ({ registry, access: "public", tag: "latest" } as Record<string, string>)[key],
+            value === ({ registry, access: "public", tag: distTag } as Record<string, string>)[key],
         ),
       `Conflicting publishConfig: ${name}`,
     );
@@ -223,23 +266,19 @@ export async function inspect(
       ]).includes("workspace:"),
       `Unresolved workspace dependency: ${name}`,
     );
-    const dependencies = Object.fromEntries(
-      Object.entries({
-        ...packed.peerDependencies,
-        ...packed.optionalDependencies,
-        ...packed.dependencies,
-      })
-        .filter(([dependency]) => reviewedNames.includes(dependency))
-        .map(([dependency, range]) => [
-          dependency,
-          {
+    const dependencies = ["dependencies", "optionalDependencies", "peerDependencies"].flatMap(
+      (kind) =>
+        Object.entries(packed[kind] ?? {})
+          .filter(([dependency]) => reviewedNames.includes(dependency))
+          .map(([dependency, range]) => ({
+            name: dependency,
             range: String(range),
+            kind,
             optional:
-              !packed.dependencies?.[dependency] &&
-              (Boolean(packed.optionalDependencies?.[dependency]) ||
+              kind === "optionalDependencies" ||
+              (kind === "peerDependencies" &&
                 packed.peerDependenciesMeta?.[dependency]?.optional === true),
-          },
-        ]),
+          })),
     );
     packages.push({
       ...item,
@@ -250,7 +289,7 @@ export async function inspect(
     });
   }
   for (const item of packages) {
-    for (const [dependency, { range }] of Object.entries(item.dependencies)) {
+    for (const { name: dependency, range } of item.dependencies) {
       assert(
         validRange(range) !== null,
         `Invalid dependency range: ${item.name} -> ${dependency}@${range}`,
@@ -265,485 +304,246 @@ export async function inspect(
   }
   return {
     root,
+    channel,
+    distTag,
     toolCommit,
     manifest,
     manifestHash: hash(manifestBytes),
     input,
-    packages,
+    packages: publishOrder(packages),
     blockers,
   };
 }
 
-class UnpublishedLookupError extends Error {
-  constructor(readonly time: string) {
-    super("npm lookup reports an unpublished package; explicit acknowledgement is required");
-  }
+/** Dependencies precede consumers regardless of the operator's selection order. */
+function publishOrder(packages: Package[]) {
+  const ordered: Package[] = [];
+  const visiting = new Set<string>();
+  const visited = new Set<string>();
+  const visit = (item: Package) => {
+    assert(!visiting.has(item.name), `Selected dependency cycle: ${item.name}`);
+    if (visited.has(item.name)) return;
+    visiting.add(item.name);
+    for (const dependency of item.dependencies) {
+      const target = packages.find((candidate) => candidate.name === dependency.name);
+      if (target) visit(target);
+    }
+    visiting.delete(item.name);
+    visited.add(item.name);
+    ordered.push(item);
+  };
+  packages.forEach(visit);
+  return ordered;
 }
 
-function checkWithdrawalTime(time: unknown, name: string): asserts time is string {
-  assert(typeof time === "string", `Missing withdrawal time: ${name}`);
-  const timestamp = Date.parse(time);
-  assert(
-    Number.isFinite(timestamp) && new Date(timestamp).toISOString() === time,
-    `Invalid withdrawal time: ${name}`,
+async function npmJSON(runner: Runner, root: string, args: string[]) {
+  const response = await runner(["npm", ...args, "--json"], root);
+  let value;
+  try {
+    value = JSON.parse(text(response));
+  } catch {
+    throw new Error(`npm ${args[0]} returned invalid JSON (exit ${response.code})`);
+  }
+  if (response.code === 0) return value;
+  throw new Error(
+    `npm ${args[0]} read failed (exit ${response.code}); check registry/auth outside this script`,
   );
-  assert(Date.now() - timestamp >= 24 * 60 * 60 * 1000, `Withdrawal is within 24 hours: ${name}`);
+}
+async function unchanged(plan: Plan, runner: Runner) {
+  assert(
+    text(await checked(runner, ["git", "rev-parse", "HEAD"], plan.root)) === plan.toolCommit,
+    "Tool HEAD changed during preflight",
+  );
+  assert(
+    !text(await checked(runner, statusArgs, plan.root)),
+    "Tracked files changed during preflight",
+  );
+  assert(
+    await originMatches(runner, plan.root, plan.input.repository),
+    "origin changed during preflight",
+  );
+  assert(
+    hash(await readFile(plan.manifest)) === plan.manifestHash,
+    "Input changed during preflight",
+  );
+  for (const item of plan.packages)
+    assert(
+      hash(await readFile(item.path)) === item.sha256,
+      `Tarball changed during preflight: ${item.name}`,
+    );
+}
+function tagsOf(metadata: unknown): Record<string, string> {
+  if (metadata === null) return {};
+  assert(typeof metadata === "object" && !Array.isArray(metadata), "Invalid package metadata");
+  const record = metadata as Record<string, unknown>;
+  assert(
+    !(record.time as { unpublished?: unknown } | undefined)?.unpublished,
+    "Unpublished package requires manual investigation",
+  );
+  const tags = record["dist-tags"];
+  assert(
+    tags &&
+      typeof tags === "object" &&
+      !Array.isArray(tags) &&
+      Object.values(tags).every((version) => typeof version === "string" && valid(version)),
+    "Invalid package dist-tags",
+  );
+  return tags as Record<string, string>;
 }
 
-async function jsonCommand(
-  runner: Runner,
-  args: string[],
-  root: string,
-  absent: "github" | "npm" | null = null,
-) {
-  const result = await runner(args, root);
-  if (result.code === 0) return JSON.parse(text(result));
-  if (absent === "github" && /\(HTTP 404\)/.test(result.stderr)) return null;
-  if (absent === "npm") {
-    let error;
-    try {
-      error = JSON.parse(text(result)).error;
-    } catch {
-      /* Not a registry absence. */
-    }
-    if (error?.code === "E404") {
-      const withdrawn =
-        typeof error.summary === "string" &&
-        /^Unpublished on (\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z)$/.exec(error.summary);
-      if (withdrawn) {
-        const time = withdrawn[1]!;
-        const timestamp = Date.parse(time);
-        if (Number.isFinite(timestamp) && new Date(timestamp).toISOString() === time)
-          throw new UnpublishedLookupError(time);
-      }
-      if (!/unpublish/i.test(JSON.stringify(error))) return null;
-    }
+/** Public packuments do not depend on latest and never receive publishing credentials. */
+async function metadata(runner: Runner, root: string, name: string) {
+  const response = await runner(["registry", "get", name], root);
+  let value;
+  try {
+    value = JSON.parse(text(response));
+  } catch {
+    throw new Error(`Registry returned invalid JSON: ${name}`);
   }
-  throw new Error(`${args[0]} ${args[1]} read failed: ${result.stderr || text(result)}`);
+  if (response.code === 404 && value?.error === "Not found") return null;
+  assert(response.code === 0, `Registry read failed: ${name} (status ${response.code})`);
+  assert(value?.name === name, `Unexpected registry identity: ${name}`);
+  tagsOf(value);
+  assert(
+    value.versions && typeof value.versions === "object" && !Array.isArray(value.versions),
+    `Invalid registry versions: ${name}`,
+  );
+  return value;
+}
+function integrityOf(value: Awaited<ReturnType<typeof metadata>>, item: Package): string | null {
+  if (value === null || !Object.hasOwn(value.versions, item.version)) return null;
+  const integrity = value.versions[item.version]?.dist?.integrity;
+  assert(typeof integrity === "string", `Missing registry integrity: ${item.tag}`);
+  return integrity;
 }
 
-export type ReleaseMode = "execute" | "prepare-github";
-
-/** Both modes mutate GitHub state and require authorization; only execute uses npm. */
+/** check is read-only; execute is the sole registry mutation path. No GitHub or push operations. */
 export async function release(
   plan: Plan,
   runner: Runner = run,
-  mode: ReleaseMode = "execute",
-  deferFinalize = false,
-  acknowledgeUnpublished: string[] = [],
+  mode: "check" | "execute" = "execute",
 ) {
-  assert(mode === "execute" || mode === "prepare-github", "Invalid release mode");
-  assert(
-    plan.packages.length > 0 && plan.packages.every((item) => names.includes(item.name)),
-    "Unknown or retired selected package",
-  );
-  assert(!deferFinalize || mode === "execute", "Deferred finalization requires --execute");
-  assert(
-    acknowledgeUnpublished.length === 0 ||
-      (mode === "execute" &&
-        new Set(acknowledgeUnpublished).size === acknowledgeUnpublished.length &&
-        acknowledgeUnpublished.every((name) => plan.packages.some((item) => item.name === name))),
-    "Acknowledge unique selected package names only with --execute",
-  );
   assert(plan.blockers.length === 0, plan.blockers.join("\n"));
-  const { root, input, packages } = plan;
-  const command = (args: string[]) => checked(runner, args, root);
-  const api = (path: string) =>
-    jsonCommand(runner, ["gh", "api", "--hostname", "github.com", path], root, "github");
-  const githubRepository = `github.com/${input.repository}`;
-  const repo = await api(`repos/${input.repository}`);
+  await unchanged(plan, runner);
+  const identity = await npmJSON(runner, plan.root, ["whoami"]);
   assert(
-    repo?.full_name === input.repository && repo.permissions?.push === true,
-    "GitHub repository identity or push permission differs",
+    typeof identity === "string" && /^[a-z0-9][a-z0-9._-]*$/i.test(identity),
+    "Invalid npm identity",
   );
-  const releasePages = await jsonCommand(
-    runner,
-    [
-      "gh",
-      "api",
-      "--hostname",
-      "github.com",
-      "--paginate",
-      "--slurp",
-      `repos/${input.repository}/releases?per_page=100`,
-    ],
-    root,
-  );
+  const access = await npmJSON(runner, plan.root, ["access", "list", "packages", identity]);
   assert(
-    Array.isArray(releasePages) && releasePages.every(Array.isArray),
-    "Invalid GitHub release list",
+    access && typeof access === "object" && !Array.isArray(access),
+    "Invalid npm access response",
   );
-  const releases = releasePages.flat();
-  const branch = repo.default_branch;
-  assert(typeof branch === "string" && branch.length > 0, "Missing remote default branch");
-  const remoteHead = text(
-    await command(["git", "ls-remote", "origin", `refs/heads/${branch}`]),
-  ).split(/\s+/)[0];
-  assert(
-    remoteHead === plan.toolCommit,
-    "Push the inspected tool commit to the default branch before release",
-  );
-  let access: Record<string, string> | null = null;
-  if (mode === "execute") {
-    const username = text(await command(["npm", "whoami", "--registry", registry]));
-    assert(username.length > 0, "npm authentication is required; this script never logs in");
-    access = await jsonCommand(
-      runner,
-      ["npm", "access", "list", "packages", username, "--json", "--registry", registry],
-      root,
-    );
-  }
-  const states: {
-    item: Package;
-    local: boolean;
-    remote: boolean;
-    release: any;
-    published: boolean;
-    missingAssets: string[];
-  }[] = [];
-  for (const item of packages) {
-    const local = await runner(
-      ["git", "show-ref", "--verify", "--quiet", `refs/tags/${item.tag}`],
-      root,
-    );
-    assert(local.code === 0 || local.code === 1, `Cannot inspect local tag: ${item.tag}`);
-    if (local.code === 0)
+  const states: { item: Package; exists: boolean; tags: Record<string, string> }[] = [];
+  for (const item of plan.packages) {
+    const packageMetadata = await metadata(runner, plan.root, item.name);
+    const tags = tagsOf(packageMetadata);
+    if (packageMetadata !== null) {
+      assert(packageMetadata.name === item.name, `Unexpected registry identity: ${item.name}`);
       assert(
-        text(await command(["git", "rev-parse", "--verify", `refs/tags/${item.tag}^{commit}`])) ===
-          input.commit,
-        `Existing local tag differs: ${item.tag}`,
+        access[item.name] === "read-write",
+        `Account lacks visible write access: ${item.name}`,
       );
-    const tags = text(
-      await command([
-        "git",
-        "ls-remote",
-        "origin",
-        `refs/tags/${item.tag}`,
-        `refs/tags/${item.tag}^{}`,
-      ]),
-    );
-    const tagRows = tags ? tags.split("\n").map((line) => line.split(/\s+/)) : [];
-    const peeled = tagRows.find((row) => row[1]?.endsWith("^{}")) ?? tagRows[0];
-    if (peeled) assert(peeled[0] === input.commit, `Existing remote tag differs: ${item.tag}`);
-    const matches = releases.filter((entry: any) => entry.tag_name === item.tag);
-    assert(matches.length < 2, `Ambiguous GitHub releases: ${item.tag}`);
-    const existing = matches[0];
-    const missingAssets: string[] = [];
-    if (existing) {
-      assert(
-        mode !== "prepare-github" || existing.draft,
-        `GitHub preparation requires a draft Release: ${item.tag}`,
-      );
-      assert(peeled && existing.tag_name === item.tag, `Release tag differs: ${item.tag}`);
-      assert(
-        existing.body === releaseBody(item, input.commit),
-        `Release provenance differs: ${item.tag}`,
-      );
-      for (const [asset, expected, source] of [
-        [basename(item.path), item.sha256, item.path],
-        [basename(plan.manifest), plan.manifestHash, plan.manifest],
-      ] as const) {
-        if (!existing.assets?.some((entry: any) => entry.name === asset)) {
-          assert(existing.draft, `Public Release asset is missing: ${asset}`);
-          missingAssets.push(source);
-          continue;
-        }
-        const download = await command([
-          "gh",
-          "release",
-          "download",
-          item.tag,
-          "--repo",
-          githubRepository,
-          "--pattern",
-          asset,
-          "--output",
-          "-",
-        ]);
-        assert(hash(download.stdout) === expected, `Release asset differs: ${asset}`);
-      }
     }
-    let published = null;
-    if (mode === "execute") {
-      const acknowledged = acknowledgeUnpublished.includes(item.name);
-      let metadata;
-      let withdrawalTime: string | undefined;
-      try {
-        metadata = await jsonCommand(
-          runner,
-          ["npm", "view", item.name, "--json", "--registry", registry],
-          root,
-          "npm",
-        );
-      } catch (error) {
-        if (!acknowledged || !(error instanceof UnpublishedLookupError)) throw error;
-        checkWithdrawalTime(error.time, item.name);
-        withdrawalTime = error.time;
-      }
-      if (metadata !== null && metadata !== undefined) {
-        assert(
-          typeof metadata === "object" && !Array.isArray(metadata) && metadata.name === item.name,
-          `Invalid package metadata: ${item.name}`,
-        );
-        assert(
-          metadata.time === undefined ||
-            (metadata.time && typeof metadata.time === "object" && !Array.isArray(metadata.time)),
-          `Invalid package time metadata: ${item.name}`,
-        );
-        const withdrawal = metadata.time?.unpublished;
-        const activeMetadata =
-          metadata.version !== undefined ||
-          metadata.dist !== undefined ||
-          metadata.versions !== undefined ||
-          metadata["dist-tags"] !== undefined;
-        if (withdrawal !== undefined && !activeMetadata) {
-          assert(acknowledged, `Unpublished package ownership must be resolved: ${item.name}`);
-          assert(
-            withdrawal && typeof withdrawal === "object" && !Array.isArray(withdrawal),
-            `Invalid withdrawal metadata: ${item.name}`,
-          );
-          checkWithdrawalTime(withdrawal.time, item.name);
-          assert(
-            Array.isArray(withdrawal.versions) &&
-              withdrawal.versions.every(
-                (version: unknown) => typeof version === "string" && valid(version) === version,
-              ),
-            `Missing or invalid withdrawn versions: ${item.name}`,
-          );
-          assert(
-            !withdrawal.versions.includes(item.version),
-            `A withdrawn version cannot be reused: ${item.tag}`,
-          );
-          withdrawalTime = withdrawal.time;
-        } else
-          assert(
-            access?.[item.name] === "read-write",
-            `npm write access is not established: ${item.name}`,
-          );
-      }
-      try {
-        published = await jsonCommand(
-          runner,
-          [
-            "npm",
-            "view",
-            `${item.name}@${item.version}`,
-            "dist.integrity",
-            "--json",
-            "--registry",
-            registry,
-          ],
-          root,
-          "npm",
-        );
-      } catch (error) {
-        if (!acknowledged || !withdrawalTime || !(error instanceof UnpublishedLookupError))
-          throw error;
-        assert(error.time === withdrawalTime, `Withdrawal lookup changed: ${item.name}`);
-        // Neither lookup proves ownership or absence of historical versions. Publish decides.
-      }
-      if (published !== null)
-        assert(published === item.integrity, `Published version has different bytes: ${item.tag}`);
-      if (existing && !existing.draft)
-        assert(
-          published === item.integrity,
-          `Public Release is not backed by the reviewed npm package: ${item.tag}`,
-        );
-      for (const [dependency, { range, optional }] of Object.entries(item.dependencies)) {
-        const selected = packages.find((candidate) => candidate.name === dependency);
-        if (selected)
-          assert(
-            satisfies(selected.version, range),
-            `Selected dependency version does not satisfy ${item.name}: ${dependency}@${range}`,
-          );
-        else if (!optional) {
-          const available = await jsonCommand(
-            runner,
-            ["npm", "view", `${dependency}@${range}`, "version", "--json", "--registry", registry],
-            root,
-            "npm",
-          );
-          assert(
-            (Array.isArray(available) ? available : [available]).some(
-              (version) =>
-                typeof version === "string" && valid(version) !== null && satisfies(version, range),
-            ),
-            `Publish a compatible dependency first or include it: ${dependency}@${range}`,
-          );
-        }
-      }
-    }
-    states.push({
-      item,
-      local: local.code === 0,
-      remote: Boolean(peeled),
-      release: existing,
-      published: published !== null,
-      missingAssets,
-    });
-  }
-  // Every selected package passed this mode's preflight before the first mutation.
-  assert(
-    text(await command(["git", "rev-parse", "HEAD"])) === plan.toolCommit &&
-      !text(await command(statusArgs)),
-    "Repository changed during preflight",
-  );
-  assert(
-    hash(new Uint8Array(await readFile(plan.manifest))) === plan.manifestHash,
-    "Reviewed manifest changed during preflight",
-  );
-  assert(await originMatches(runner, root, input.repository), "origin changed during preflight");
-  for (const item of packages)
+    const current = tags[plan.distTag];
     assert(
-      hash(new Uint8Array(await readFile(item.path))) === item.sha256,
-      `Tarball changed during preflight: ${item.name}`,
+      !current || !gt(current, item.version),
+      `Refusing to move ${item.name} ${plan.distTag} backwards`,
     );
+    const integrity = integrityOf(packageMetadata, item);
+    assert(
+      integrity === null || integrity === item.integrity,
+      `Registry has different bytes: ${item.tag}`,
+    );
+    for (const dependency of item.dependencies) {
+      if (
+        dependency.optional ||
+        plan.packages.some((candidate) => candidate.name === dependency.name)
+      )
+        continue;
+      const dependencyMetadata = await metadata(runner, plan.root, dependency.name);
+      const versions = Object.keys(dependencyMetadata?.versions ?? {});
+      assert(
+        versions.some(
+          (version) =>
+            typeof version === "string" && valid(version) && satisfies(version, dependency.range),
+        ),
+        `No compatible dependency: ${item.name} ${dependency.kind} ${dependency.name}@${dependency.range}`,
+      );
+    }
+    states.push({ item, exists: integrity !== null, tags });
+  }
+  // All selected packages, bytes and dependencies have passed before the first mutation.
+  await unchanged(plan, runner);
+  if (mode === "check") return;
   for (const state of states) {
     const { item } = state;
+    await unchanged(plan, runner);
+    // Fail if another publisher changed any tag since preflight, rather than overwrite it.
+    const before = tagsOf(await metadata(runner, plan.root, item.name));
     assert(
-      hash(new Uint8Array(await readFile(item.path))) === item.sha256,
-      `Tarball changed before publish: ${item.name}`,
+      before[plan.distTag] === state.tags[plan.distTag] && before.latest === state.tags.latest,
+      `Registry tags changed during preflight: ${item.name}`,
     );
-    if (!state.remote) {
-      if (!state.local)
-        await command([
-          "git",
-          "-c",
-          "core.hooksPath=/dev/null",
-          "tag",
-          "--no-sign",
-          item.tag,
-          input.commit,
-        ]);
-      await command([
-        "git",
-        "-c",
-        "core.hooksPath=/dev/null",
-        "push",
-        "origin",
-        `refs/tags/${item.tag}:refs/tags/${item.tag}`,
-      ]);
-    }
-    if (!state.release)
-      await command([
-        "gh",
-        "release",
-        "create",
-        item.tag,
-        item.path,
-        plan.manifest,
-        "--repo",
-        githubRepository,
-        "--verify-tag",
-        "--draft",
-        "--title",
-        item.tag,
-        "--notes",
-        releaseBody(item, input.commit),
-        "--latest=false",
-      ]);
-    else if (state.missingAssets.length)
-      await command([
-        "gh",
-        "release",
-        "upload",
-        item.tag,
-        ...state.missingAssets,
-        "--repo",
-        githubRepository,
-      ]);
-  }
-  if (mode === "prepare-github") return;
-  for (const { item, published } of states) {
+    if (!state.exists)
+      await checked(
+        runner,
+        [
+          "npm",
+          "publish",
+          item.path,
+          "--access",
+          "public",
+          "--tag",
+          plan.distTag,
+          "--ignore-scripts",
+        ],
+        plan.root,
+      );
+    else if (before[plan.distTag] !== item.version)
+      await checked(runner, ["npm", "dist-tag", "add", item.tag, plan.distTag], plan.root);
+    const published = await metadata(runner, plan.root, item.name);
     assert(
-      hash(new Uint8Array(await readFile(item.path))) === item.sha256,
-      `Tarball changed before publish: ${item.name}`,
+      integrityOf(published, item) === item.integrity,
+      `Registry verification failed: ${item.tag}`,
     );
-    if (!published)
-      await command([
-        "npm",
-        "publish",
-        item.path,
-        "--registry",
-        registry,
-        "--access",
-        "public",
-        "--tag",
-        "latest",
-        "--ignore-scripts",
-      ]);
+    const after = tagsOf(published);
+    assert(after[plan.distTag] === item.version, `Dist-tag verification failed: ${item.tag}`);
+    if (plan.channel === "alpha")
+      assert(
+        after.latest === state.tags.latest,
+        `latest changed during alpha release: ${item.name}; investigate without automatic rollback`,
+      );
   }
-  for (const { item } of states) {
-    const integrity = await jsonCommand(
-      runner,
-      [
-        "npm",
-        "view",
-        `${item.name}@${item.version}`,
-        "dist.integrity",
-        "--json",
-        "--registry",
-        registry,
-      ],
-      root,
-    );
-    assert(integrity === item.integrity, `npm verification failed: ${item.tag}`);
-  }
-  if (deferFinalize) return;
-  for (const state of states)
-    if (!state.release || state.release.draft)
-      await command([
-        "gh",
-        "release",
-        "edit",
-        state.item.tag,
-        "--repo",
-        githubRepository,
-        "--draft=false",
-        "--latest=false",
-        "--verify-tag",
-      ]);
 }
 
 export async function main(args: string[]) {
   if (args.length === 1 && args[0] === "--help") {
     console.log(
-      "Usage: bun scripts/release.ts --manifest <reviewed.json> --packages <name,name> [--prepare-github | --execute [--defer-finalize] [--acknowledge-unpublished <selected-name,name>]]\nDefault: local-only dry-run; --prepare-github prepares tags and draft Releases without npm; --execute publishes reviewed packages; --defer-finalize leaves drafts for registry consumer verification.",
+      "Usage: bun run release --manifest <reviewed.json> --packages <name,name> [--channel stable|alpha] [--check | --execute]\nDefault: local-only dry-run. --check reads registry/auth; --execute publishes exact reviewed bytes. alpha never targets latest. Requires local NPM_TOKEN for either registry mode.",
     );
     return;
   }
   const values = new Map<string, string>();
-  let mode: ReleaseMode | undefined;
-  let deferFinalize = false;
+  let mode: "check" | "execute" | undefined;
   for (let index = 0; index < args.length; index++) {
     const arg = args[index]!;
-    if (arg === "--defer-finalize") {
-      assert(!deferFinalize, "Duplicate --defer-finalize");
-      deferFinalize = true;
-      continue;
-    }
-    if (arg === "--execute" || arg === "--prepare-github") {
+    if (arg === "--check" || arg === "--execute") {
+      assert(!mode, "Choose one release mode without repetition");
+      mode = arg === "--check" ? "check" : "execute";
+    } else {
       assert(
-        mode === undefined,
-        "Choose only one release mode; flags cannot be combined or repeated",
+        ["--manifest", "--packages", "--channel"].includes(arg) && !values.has(arg),
+        `Unknown or duplicate argument: ${arg}`,
       );
-      mode = arg === "--execute" ? "execute" : "prepare-github";
-      continue;
+      const value = args[++index];
+      assert(value && !value.startsWith("--"), `Missing value: ${arg}`);
+      values.set(arg, value);
     }
-    assert(
-      ["--manifest", "--packages", "--acknowledge-unpublished"].includes(arg) && !values.has(arg),
-      `Unknown or duplicate argument: ${arg}`,
-    );
-    const value = args[++index];
-    assert(value && !value.startsWith("--"), `Missing value: ${arg}`);
-    values.set(arg, value);
   }
-  assert(!deferFinalize || mode === "execute", "--defer-finalize requires --execute");
-  const acknowledged = values.get("--acknowledge-unpublished")?.split(",") ?? [];
-  assert(
-    acknowledged.length === 0 || mode === "execute",
-    "--acknowledge-unpublished requires --execute",
-  );
+  const channel = values.get("--channel") ?? "stable";
+  assert(channel === "stable" || channel === "alpha", "Unknown release channel");
   assert(
     values.has("--manifest") && values.has("--packages"),
     "Explicit --manifest and --packages are required",
@@ -752,36 +552,35 @@ export async function main(args: string[]) {
     resolve(import.meta.dir, ".."),
     values.get("--manifest")!,
     values.get("--packages")!.split(","),
-  );
-  assert(
-    new Set(acknowledged).size === acknowledged.length &&
-      acknowledged.every((name) => plan.packages.some((item) => item.name === name)),
-    "Acknowledge unique selected package names only",
+    run,
+    channel,
   );
   console.log(
     JSON.stringify(
       {
         mode: mode ?? "dry-run",
+        channel,
+        distTag: plan.distTag,
         repository: plan.input.repository,
         commit: plan.input.commit,
         toolCommit: plan.toolCommit,
-        deferFinalize,
-        acknowledgeUnpublished: acknowledged,
-        packages: plan.packages.map((item) => ({
-          name: item.name,
-          version: item.version,
-          tag: item.tag,
-          sha256: item.sha256,
+        packages: plan.packages.map(({ name, version, sha256, integrity }) => ({
+          name,
+          version,
+          sha256,
+          integrity,
         })),
         blockers: plan.blockers,
-        remoteState: "Not checked in dry-run; absence never proves registration rights",
+        remoteState: mode
+          ? "Checking registry; account visibility does not prove token publish/2FA permission"
+          : "Not checked; dry-run uses no registry or credentials",
       },
       null,
       2,
     ),
   );
   assert(plan.blockers.length === 0, plan.blockers.join("\n"));
-  if (mode) await release(plan, run, mode, deferFinalize, acknowledged);
+  if (mode) await release(plan, run, mode);
 }
 if (import.meta.main)
   main(process.argv.slice(2)).catch((error) => {

@@ -12,10 +12,6 @@ html,body{margin:0;min-width:320px;font-family:ui-sans-serif,system-ui,-apple-sy
 .panda-lesson .panda-caption{font-size:14px;line-height:1.4;color:#617063;margin:0}
 .panda-lesson .panda-hero{width:100%;height:360px;object-fit:cover;border-radius:48% 48% 24px 24px}
 .panda-lesson .panda-hero [data-meowui-part="image-preview/image"]{object-fit:cover}
-.panda-lesson .panda-photo-card{margin:0;min-width:0}
-.panda-lesson .panda-photo{height:100%;border-radius:20px;background:#e5ebdd}
-.panda-lesson .panda-observation-questions{font-size:22px;line-height:1.35;margin:0;padding-left:26px}
-.panda-lesson .panda-observation-questions li+li{margin-top:12px}
 .panda-lesson a{color:inherit;text-underline-offset:3px}
 .panda-lesson .panda-image-note{font-size:13px;line-height:1.35;color:#617063;margin:10px 0 0}
 .panda-lesson .panda-reading{min-width:0;padding:16px 20px;border-left:4px solid #9dad8b;background:#eef0e3;border-radius:0 18px 18px 0}

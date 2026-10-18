@@ -1,9 +1,13 @@
 # 八上 Unit 5 · Wild animals — Reading: Protecting pandas
 
-八页可运行浏览器课件，作品标识 `protecting-pandas-a4`（外围页头可见 a4）。依据用户提供的 Reading 1 PPT 与已研究教学材料，
+八页可运行浏览器课件，作品标识 `protecting-pandas-a5`（外围页头可见 a5）。依据用户提供的 Reading 1 PPT 与已研究教学材料，
 从成长信息、问题/后果、保护措施走到有依据的个人行动表达。阅读材料标题为 `Xiwang in safe hands`；
 不据文件名推定教材版次或教材页码。摘录、图片和教学改编的来源与边界见 [SOURCES.md](SOURCES.md)。
 原 PPT、用户材料和另一作品 Sunshine Welcome 均不覆盖。
+
+a5 复用共享 `PresentationImage`、`PresentationList` 与数值两/三栏。观察照片默认完整显示；
+短片页把视频、森林照片、原有问题分成三个独立区域，森林显式 `cover` 并注明裁切，避免图注和问题挤成横条。
+问题、任务状态与材料来源沿用 a4，不以照片裁切推导森林变化。通用用法见[演示布局指南](../../packages/meowtail/PRESENTATION-LAYOUTS.md)。
 
 ## 打开与编辑
 

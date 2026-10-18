@@ -1,5 +1,16 @@
 # Protecting pandas 独立浏览器验收
 
+## a5 共享布局与图片适配
+
+当前入口 `protecting-pandas-a5` / `chunk-03jpht82.js`，build-manifest SHA256
+`6f7b79c2f06367d9d92b62afe3083bae995efa08020830c6a778ef573a71e518`。
+冻结后完整浏览器 **13/13 通过（18.4 秒）**；保留原八页、任务、支持状态与媒体键盘合同，新增实际图片/frame 同高及 cover 断言。
+
+两轮实际看图分别发现并修复了主题声明顺序覆盖新适配，以及两栏内图片、图注、长问题争高的问题。
+短片页改用共享三栏/原生列表，森林画框由 a4 的 568×157 改为约 373×316 逻辑像素，明确裁切；观察双照片仍为默认 contain。
+最终 live 原图在 `artifacts/presentation-foundations-a5/live/`，根实际查看宽屏播放、窄/短窗口及宽屏观察图，独立审查另看两页三尺寸、失败和键盘状态。
+窄/短窗口是逻辑画布概览，不代表手机上正文无需放大即可阅读。既有 a4 记录仅保留为历史，完整共享能力检查见[本轮记录](../../../docs/records/2026-10-18-presentation-foundations.md)。
+
 ## a4 图片与真实短片最终验收
 
 最终交付 `protecting-pandas-a4` / `chunk-90dfy6sp.js`，build-manifest SHA256 为

@@ -219,7 +219,7 @@ test("unavailable photographs and video retain descriptions and native retry rec
   expect(errors).toEqual([]);
 });
 
-test("a4 observation scenes preserve media, descriptions and controls in wide, narrow and short windows", async ({
+test("a5 observation scenes preserve media, descriptions and controls in wide, narrow and short windows", async ({
   page,
 }, testInfo) => {
   await page.emulateMedia({ reducedMotion: "reduce" });
@@ -232,7 +232,7 @@ test("a4 observation scenes preserve media, descriptions and controls in wide, n
     for (const id of ["observe", "watch"]) {
       await page.goto(`/?slide=${id}`);
       await ready(page);
-      await expect(page.getByRole("heading", { name: /Protecting pandas · a4/ })).toBeVisible();
+      await expect(page.getByRole("heading", { name: /Protecting pandas · a5/ })).toBeVisible();
       await decodedImages(page);
       if (id === "observe") await page.getByRole("button", { name: "Next", exact: true }).click();
       else await loadedVideo(page);
@@ -258,6 +258,21 @@ test("a4 observation scenes preserve media, descriptions and controls in wide, n
       expect(overflow.crossing, `${id}: body content must not cross footer`).toEqual([]);
       await expect(page.locator('[data-meowui-part="presentation/diagnostic"]')).toBeHidden();
       if (id === "watch") {
+        const photograph = canvas(page).locator('[data-meowui-part="presentation-image/root"]');
+        await expect(photograph.locator("img")).toHaveCSS("object-fit", "cover");
+        const geometry = await photograph.evaluate((figure) => {
+          const frame = figure.querySelector('[data-meowui-part="presentation-image/frame"]')!;
+          const image = figure.querySelector("img")!;
+          const caption = figure.querySelector("figcaption")!;
+          return {
+            frameHeight: frame.getBoundingClientRect().height,
+            imageHeight: image.getBoundingClientRect().height,
+            frameBottom: frame.getBoundingClientRect().bottom,
+            captionTop: caption.getBoundingClientRect().top,
+          };
+        });
+        expect(geometry.imageHeight).toBeCloseTo(geometry.frameHeight, 1);
+        expect(geometry.captionTop).toBeGreaterThanOrEqual(geometry.frameBottom);
         await expect(video(page)).toBeVisible();
         await expect(description(page)).toBeVisible();
         for (const name of ["Play / continue", "Pause", "Back to start"]) {
@@ -268,7 +283,7 @@ test("a4 observation scenes preserve media, descriptions and controls in wide, n
         }
       }
       await page.screenshot({
-        path: testInfo.outputPath(`a4-${id}-${size.width}x${size.height}.png`),
+        path: testInfo.outputPath(`a5-${id}-${size.width}x${size.height}.png`),
         animations: "disabled",
       });
     }

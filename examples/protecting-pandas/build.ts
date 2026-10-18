@@ -33,7 +33,7 @@ await writeFile(
   JSON.stringify(
     {
       entry: "index.html",
-      sourceVersion: "protecting-pandas-a4",
+      sourceVersion: "protecting-pandas-a5",
       assets: result.outputs.map((entry) => ({
         path: entry.path.slice(outdir.length + 1),
         bytes: entry.size,

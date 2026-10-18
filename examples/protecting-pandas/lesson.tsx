@@ -1,8 +1,10 @@
 import { h, mapSignal, signal, type Child, type MaybeSignal, type WritableSignal } from "meowjsx";
-import { AspectRatio, ImagePreview, Inline, LayoutItem, Stack } from "meowtail";
+import { ImagePreview, Inline, Stack } from "meowtail";
 import {
   Presentation,
+  PresentationImage,
   PresentationLayout,
+  PresentationList,
   PresentationText,
   PresentationVideo,
   Reveal,
@@ -12,7 +14,7 @@ import {
 import { growthStages, problemCards, protectionCards, readingExcerpts } from "./content";
 import { pandaMedia } from "./media";
 
-export const lessonVersion = "protecting-pandas-a4";
+export const lessonVersion = "protecting-pandas-a5";
 type TaskId = "growth" | "problems" | "protect" | "meaning" | "act";
 type SupportKind = "hint" | "reference" | "evidence";
 let nextInstance = 0;
@@ -88,20 +90,15 @@ export function createPandaLesson(options: LessonOptions = {}) {
       <p className="panda-question">{question}</p>
     </header>
   );
-  const photo = (src: string, alt: string, caption: Child, ratio = 16 / 9) => (
-    <figure className="panda-photo-card">
-      <AspectRatio ratio={ratio}>
-        <ImagePreview
-          src={src}
-          alt={alt}
-          loading="eager"
-          className="panda-photo"
-          loadingLabel="Loading observation photo…"
-          failedLabel="Photo unavailable. Use the description below."
-        />
-      </AspectRatio>
-      <figcaption className="panda-image-note">{caption}</figcaption>
-    </figure>
+  const photo = (src: string, alt: string, caption: Child) => (
+    <PresentationImage
+      src={src}
+      alt={alt}
+      ratio="fill"
+      caption={caption}
+      loadingLabel="Loading observation photo…"
+      failedLabel="Photo unavailable. Use the description below."
+    />
   );
   const reading = (id: TaskId, group: string) => (
     <section className="panda-reading" aria-label="Reading excerpts">
@@ -255,7 +252,7 @@ export function createPandaLesson(options: LessonOptions = {}) {
       steps: 1,
       render: () => (
         <PresentationLayout
-          columns="equal"
+          columns={2}
           gap="compact"
           header={header(
             "LOOK",
@@ -332,7 +329,7 @@ export function createPandaLesson(options: LessonOptions = {}) {
       title: "Watch, question, find evidence",
       render: () => (
         <PresentationLayout
-          columns="equal"
+          columns={3}
           gap="compact"
           header={header(
             "WATCH",
@@ -370,30 +367,23 @@ export function createPandaLesson(options: LessonOptions = {}) {
               Bao · Smithsonian National Zoo, 2016 · Brian Gratwicke · CC BY 2.0 · silent 18 s.
             </p>
           </Stack>
-          <Stack gap="normal">
-            <LayoutItem grow basis={0}>
-              <ImagePreview
-                src={pandaMedia.forest}
-                alt="Forest in Wolong National Nature Reserve"
-                loading="eager"
-                className="panda-photo"
-                loadingLabel="Loading protected forest photograph…"
-                failedLabel="Photo unavailable. Read the forest description below."
-              />
-            </LayoutItem>
-            <p className="panda-image-note">
-              Forest in Wolong National Nature Reserve · Toni Wöhrl · CC BY-SA 4.0. A still
-              photograph cannot show a forest shrinking.
-            </p>
-            <ol className="panda-observation-questions">
-              <li>What can you see? “The panda is…”</li>
-              <li>What might it need? Separate observation from your idea.</li>
-              <li>
-                On the next pages, read P2–P3 for a problem and consequence. Then use A1–A2 to
-                explain a possible response.
-              </li>
-            </ol>
-          </Stack>
+          <PresentationImage
+            src={pandaMedia.forest}
+            alt="Forest in Wolong National Nature Reserve"
+            ratio="fill"
+            fit="cover"
+            loadingLabel="Loading protected forest photograph…"
+            failedLabel="Photo unavailable. Read the forest description below."
+            caption="Forest in Wolong National Nature Reserve · Toni Wöhrl · CC BY-SA 4.0. Cropped context photo; a still photograph cannot show a forest shrinking."
+          />
+          <PresentationList
+            as="ol"
+            items={[
+              "What can you see? “The panda is…”",
+              "What might it need? Separate observation from your idea.",
+              "On the next pages, read P2–P3 for a problem and consequence. Then use A1–A2 to explain a possible response.",
+            ]}
+          />
         </PresentationLayout>
       ),
     },
@@ -563,7 +553,7 @@ export function createPandaLesson(options: LessonOptions = {}) {
     view: (
       <Presentation
         slideClassName="panda-lesson"
-        title="8A Unit 5 · Wild animals / Protecting pandas · a4"
+        title="8A Unit 5 · Wild animals / Protecting pandas · a5"
         slides={slides}
         position={position}
         active={options.active}

@@ -1,5 +1,7 @@
 # Protecting pandas 浏览器课件与课堂控件复验
 
+本记录保留 a1 阶段的交付事实；用户随后明确要求将共享问题移入组件层，后续 a3 的机制、安装态和完整逐图复验另见[组件层修复记录](2026-10-18-presentation-component-fixes.md)。下文的局部标题 class 与手写隐藏处理已由后续公共合同替代，旧验证结果不代表 a3。
+
 用户在看效果时明确要求新增实际熊猫课件，并指出画布内不应以下拉框隐藏教学选项、按钮不应直接套普通应用表单样式。
 本轮从 `89c68cc` 新增 `examples/protecting-pandas`，未覆盖 Sunshine Welcome、原 PPT 或用户材料。
 未知 `data/` 和 Rossovia 均未读取或修改；本轮不推送、发布或部署。

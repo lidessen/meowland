@@ -1,7 +1,43 @@
 # Protecting pandas 独立浏览器验收
 
 2026-10-18。测试作者仅维护本目录，没有修改正文、样式、素材或旧 Sunshine 作品。
-最终输入为 `/Users/lidessen/workspaces/meowland/artifacts/protecting-pandas-candidate`，版本标识
+
+## 共享组件修复后的最终检查
+
+`/Users/lidessen/workspaces/meowland/artifacts/protecting-pandas-candidate-a3` 的
+`protecting-pandas-a3`（`chunk-zrg09fpk.js`）最终同版完整浏览器 **8/8 通过，14.8 秒**；
+manifest SHA-256 为 `d881cd0d2275c91d3c2b420e5894fcaf644b1dfb325feb2fd5ab51d0e3739f4e`。
+本目录类型、lint、格式检查通过。严格正文预算、画布边界和播放器样式隔离断言均保留。
+新增第八项在 1100×760 的五题中检查默认、各提示单开、全开、全关：支持按钮位置和阅读框
+位置/高度保持稳定，隐藏面板退出可访问树。作品改用共享 `Reveal when` 与 `slideClassName`，
+没有把作品手写的可见性、inert 或 aria-hidden 实现当作组件修复。
+
+同版 `artifacts/sunshine-component-candidate` 的旧 Sunshine 三项必要行为回归 **3/3 通过，4.9 秒**：
+教师逐步揭示、跨页保留与显式重做、提示受控与 reduced motion。只读取旧作品，未改其正文或样式。
+这不是 Sunshine 全量浏览器验收。
+
+最终 live 13014 已更新为同一产物。1100×760 的 **37 张原图已逐张实际打开审阅**，
+没有发现新增裁切、正文与支持/页脚重叠或提示栏跳动。完整逐图索引与测量位于
+`artifacts/protecting-pandas-review/live-normal/a3/REVIEW.md` 和 `index.json`；每图都核对了
+`chunk-zrg09fpk.js`。五题全部七态正文为 259/259，支持按钮 y 为 455.455 CSS px，
+四题原文框位置/高度不变；页面异常及可见溢出诊断均为零。行动回访图等待入场动画结束后重拍并实际打开。
+
+第 13/15/16 图保留内容边界：选 Having babies 时 Reference 是 forests 通用示例，
+并非按当前选项生成。没有在组件修复任务中更改原文，也未将该内容关联边界作为共享组件故障。
+旧 a1 图保留为历史证据，不能当作 a3 最终画面。独立 Chrome 页面没有操作用户已有标签页，
+本结果也不证明其原 Safari 页面已刷新。
+
+```sh
+PANDA_DIST=/Users/lidessen/workspaces/meowland/artifacts/protecting-pandas-candidate-a3 \
+  bunx --no-install playwright test --config examples/protecting-pandas/tests/playwright.config.ts
+SUNSHINE_DIST=/Users/lidessen/workspaces/meowland/artifacts/sunshine-component-candidate \
+  bunx --no-install playwright test --config examples/sunshine-welcome/tests/playwright.config.ts \
+  --grep 'teacher steps reveal|page visits preserve|warm-up hints'
+```
+
+## a1 历史候选与截图
+
+历史输入为 `/Users/lidessen/workspaces/meowland/artifacts/protecting-pandas-candidate`，版本标识
 `protecting-pandas-a1`；浏览器脚本为 `chunk-0cehad9c.js`，manifest 的 SHA-256 为
 `a5ecd3b6cda6b3b5bf1cac05f50c83694a7a6eb62c6634d9bcf2baffb3ca5965`。
 
@@ -17,7 +53,7 @@
 - 新消费者最初缺少私有 ESM package.json，Playwright 无法加载 import.meta 配置；由宿主作者补齐，
   没有修改旧作品或降低测试合同。
 
-## 最终检查
+## a1 检查记录
 
 ```sh
 PANDA_DIST=/Users/lidessen/workspaces/meowland/artifacts/protecting-pandas-candidate \
@@ -27,7 +63,7 @@ bun node_modules/oxlint/bin/oxlint --deny-warnings examples/protecting-pandas/te
 bun node_modules/oxfmt/bin/oxfmt --check examples/protecting-pandas/tests
 ```
 
-最终完整浏览器 **7/7 通过，10.9 秒**；测试类型、lint、格式检查通过。使用本机 Chrome、独立
+a1 完整浏览器 **7/7 通过，10.9 秒**；当时测试类型、lint、格式检查通过。使用本机 Chrome、独立
 loopback 13034 和正式 Web 候选产物；没有把 Meowbook 开发预览当作正式交付。
 
 覆盖五题 Hint / Reference / Evidence 独立开关、撤回与恢复、aria-controls/expanded 与隐藏后退出可访问树；

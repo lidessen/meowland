@@ -2,7 +2,7 @@
 
 各包独立 SemVer，由维护者或 Agent 显式确定选包、版本与依赖范围。唯一发布算法 `scripts/release.ts` 消费已验收 tarball；不自动改版本、扩展选包、build、pack、提交或推送。稳定版显式使用 `latest`，测试版必须为 `x.y.z-alpha.N` 并显式使用 `alpha`。`*-slides.*` 等其它预发行格式不会被映射为 alpha。`meowslides` 已准备 `0.1.0-alpha.0` 公开候选，实际发布仍须本次明确授权；根与 showcase 不发布。
 
-普通 push/PR 继续只运行 build/lint；真实发布仅由 `.github/workflows/npm-release.yml` 的手动 `workflow_dispatch` 触发，使用 npm Trusted Publishing OIDC，不使用 `NPM_TOKEN` 或个人 npm 登录态。用户已明确授权此方式替代原本地发包安排。脚本不创建 Git tag、GitHub Release 或部署。历史 tag/Release 与[原发布回执](records/2026-10-17-tail-book-press-publish.md)保持原样。当前流程支持 `meowjsx`、`meowcss`、`meowtail`、`meowbook`、`meowslides`、`meowpress` 的显式子集；选包接线不构成发布授权。四包和新增 Slides/Press 可以分别选择，未选中的包不会随批发布。Press 的 `0.1.1-alpha.0` 候选只扩大原 CSS dependency/JSX peer 的 alpha 兼容范围，保留稳定范围与原依赖类别；发布前仍按实际 tgz 验证 CLI、字体许可和自定义主题身份。
+普通 push/PR 继续只运行 build/lint；真实发布仅由 `.github/workflows/npm-release.yml` 的手动 `workflow_dispatch` 触发，使用 npm Trusted Publishing OIDC，不使用 `NPM_TOKEN` 或个人 npm 登录态。用户已明确授权此方式替代原本地发包安排。脚本不创建 Git tag、GitHub Release 或部署。历史 tag/Release 与[原发布回执](records/2026-10-17-tail-book-press-publish.md)保持原样。当前流程支持 `meowjsx`、`meowcss`、`meowtail`、`meowbook`、`meowslides`、`meowpress` 的显式子集；选包接线不构成发布授权。四包和新增 Slides/Press 可以分别选择，未选中的包不会随批发布。Press 的 `0.1.1-alpha.0` 候选以必需 CSS/JSX peer 表达共享模块的宿主 owner，并保留稳定版与显式 alpha 的兼容范围；普通 CSS dependency 曾在真实混合安装图产生另一份稳定 CSS，故实际 tgz 验收仍须核模块身份、CLI、字体许可和自定义主题，不以放宽范围替代身份验证。
 
 ## 准备与固定输入
 

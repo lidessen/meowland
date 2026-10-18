@@ -8,6 +8,13 @@
 和 `usePresentationActivity`；根入口重导相同实现，沿用同一 MeowJSX/Context/主题身份。
 内容区域使用 `PresentationLayout` 的可替换 header/footer 和命名列比，常见标题、图文、对比、
 数字、流程与总结组合见[演示内容布局](PRESENTATION-LAYOUTS.md)。
+整场与逐页可传 `background`：`"theme"` 或 `{ fill?, image?, overlay?, foreground? }`，
+也可传同类型 Signal。`image` 接收 src、cover/contain 的 fit（默认 cover）和九点 position（默认 center）；
+fill/overlay 支持 CSS 颜色或渐变。页省略时继承整场，整场省略时沿主题；显式 theme 回主题，
+对象完整覆盖而不与整场合并，fill 省略时使用主题纸色。foreground 的 light/dark 指文字颜色，省略沿主题。
+装饰背景铺满画布并自行裁切，不改变内容边缘、缩放或步骤生命周期；背景 Signal 更新不重挂当前内容。
+同页背景更新不触发切页入场动画，只替换装饰层。
+图片失败后保留底色、遮罩和文字明暗，作者须确保无图时仍可读；需要说明与替代文字的图片继续放正文。
 使用现有 `createMeowUI()` 与 `meowtail/theme` 的 `standardTheme`，即可取得默认演示结构和视觉。
 本地实现不表示已发布；当前公开版本和安装验收以根 README 与当次回执为准。
 

@@ -1,10 +1,19 @@
 import { defineTokens } from "meowcss";
 
+const darkInk = "#182932";
+const lightInk = "#f4f4ed";
+const darkMuted = "#596974";
+const lightMuted = "#bdcbd2";
+
 /** Presentation content has its own reading scale, independent of toolbar controls. */
 export const presentationTokens = defineTokens("presentation", {
   paper: ["#fbfaf6", "#1d252c"],
-  ink: ["#182932", "#f4f4ed"],
-  muted: ["#596974", "#bdcbd2"],
+  ink: [darkInk, lightInk],
+  muted: [darkMuted, lightMuted],
+  onLightInk: darkInk,
+  onLightMuted: darkMuted,
+  onDarkInk: lightInk,
+  onDarkMuted: lightMuted,
   accent: ["#136c68", "#7bd2c6"],
   fontBody: "28px",
   fontTitle: "60px",

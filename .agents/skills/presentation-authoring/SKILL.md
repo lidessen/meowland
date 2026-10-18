@@ -20,6 +20,7 @@ description: Create and iteratively revise Meowland browser presentations and cl
 Presentation 缩放整张画布。长标题和最终步骤装不下时先精简、拆页或改区域，不靠自动缩字或隐藏溢出交付。
 标题确需排印强调时可用 PresentationText editorial/marker，正文保持 plain；它仍是真实可选择文本，
 不把原生 contenteditable 接缝描述成编辑器。静态构图与内容清晰度先成立，再选择必要的 transition 入场。
+背景先用整场 background 设默认，再逐页完整覆盖；foreground 指文字明暗，搭配底色与遮罩实际检查图片失败后仍可读，关键图片留正文与 alt。
 
 ## 尽早运行，再一起改变
 

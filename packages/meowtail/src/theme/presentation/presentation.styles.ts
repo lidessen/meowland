@@ -85,6 +85,32 @@ export const presentationStyles = css`
     font-size: ${tokens.fontBody};
     line-height: ${tokens.lineHeight};
     overflow: visible;
+    isolation: isolate;
+  }
+  ${part("slide")}[data-background-foreground="light"] {
+    ${tokens.ink.name}: ${tokens.onDarkInk};
+    ${tokens.muted.name}: ${tokens.onDarkMuted};
+  }
+  ${part("slide")}[data-background-foreground="dark"] {
+    ${tokens.ink.name}: ${tokens.onLightInk};
+    ${tokens.muted.name}: ${tokens.onLightMuted};
+  }
+  ${part("background")} {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    overflow: clip;
+    pointer-events: none;
+    background: ${tokens.paper};
+  }
+  ${part("background-image")}, ${part("background-overlay")} {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+  ${part("background-image")}[hidden] {
+    display: none;
   }
   ${part("slide")} :where(h1, h2, h3, p, figure) {
     margin: 0;

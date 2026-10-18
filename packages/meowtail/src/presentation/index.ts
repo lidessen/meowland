@@ -21,7 +21,14 @@ export {
   type PresentationVideoProps,
   type PresentationAudioProps,
 } from "./media";
-export type { PresentationProps, SlideDefinition, SlidePosition, SlideSession } from "./types";
+export type {
+  PresentationProps,
+  SlideDefinition,
+  SlidePosition,
+  SlideSession,
+  SlideBackground,
+  SlideBackgroundImage,
+} from "./types";
 export type {
   PresentationTransition,
   PresentationTransitionEffect,

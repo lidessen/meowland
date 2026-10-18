@@ -73,6 +73,45 @@ import { PresentationLayout } from "meowtail/presentation";
 它仍是真实文本，可选择、换行、复制；原生 contenteditable 只是接缝，不构成编辑器。
 打印和 forced-colors 保留普通文字。
 
+## 背景与阅读区域
+
+Presentation.background 设整场默认，SlideDefinition.background 可逐页完整覆盖。
+两者接收 `SlideBackground` 或其 Signal；页值为 undefined 时继承整场，整场 undefined 沿主题。
+显式 `"theme"` 回到主题背景与文字，不继承整场的图像、遮罩或颜色。
+对象中的字段不与整场对象合并；fill 省略使用主题纸色。
+
+```tsx
+const slides: readonly SlideDefinition[] = [
+  {
+    id: "opening",
+    title: "开场",
+    background: {
+      fill: "#173d36",
+      image: { src: coast, fit: "cover", position: "top right" },
+      overlay: "linear-gradient(90deg, rgba(12, 34, 31, .9), rgba(12, 34, 31, .15))",
+      foreground: "light",
+    },
+    render: () => (
+      <PresentationLayout>
+        <h1>让阅读区域保持清楚</h1>
+      </PresentationLayout>
+    ),
+  },
+];
+```
+
+fill 和 overlay 使用 CSS 颜色或渐变。image.fit 默认 cover，可选 contain；position 默认 center，
+也可选 top/bottom/left/right、top left/top right/bottom left/bottom right。
+cover 允许裁切，contain 保持完整比例并露出底色；检查实际图片与文字的位置，不依赖背景细节传达关键事实。
+foreground 的 light/dark 指文字颜色，省略使用主题文字；它不会检测图片或自动判断对比度。
+
+背景覆盖 1280×720 整张画布，独立裁切自己的装饰；正文仍使用原有 inset 与溢出诊断。
+图片错误后仍保留 fill、overlay 与 foreground，因此要实际检查无图可读性，不把成功下载当作可读的前提。
+背景不进入可访问树；有内容含义的图片保留正文、alt 与说明，不挪进装饰层。
+背景 Signal 可在同一页更新，不重挂草稿、媒体或内容实例；视频仍使用正文媒体组件，不作为背景输入。
+同页背景更新只替换装饰层，不触发切页入场动画。
+运行场景 `presentation-backgrounds` 可观察整场渐变、逐页图、contain、主题恢复、深色、失败与动态更新。
+
 ## 画布与重排的边界
 
 Presentation 的逻辑画布为 1280×720。窄窗口或短窗口使用 contain 整体缩放，

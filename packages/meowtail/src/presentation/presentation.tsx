@@ -28,6 +28,7 @@ import {
   type PresentationProps,
   type SlideDefinition,
   type SlidePosition,
+  type SlideBackground,
 } from "./types";
 import { entranceMotion, pendingEntranceAnimations } from "./transition";
 
@@ -40,6 +41,9 @@ export const presentationContract = {
     "viewport",
     "stage",
     "slide",
+    "background",
+    "background-image",
+    "background-overlay",
     "controls",
     "navigation",
     "page-number",
@@ -98,6 +102,7 @@ export const Presentation = defineComponent<
       position: suppliedPosition,
       active = true,
       transition = "none",
+      background,
       soundtrack,
       className,
       ...props
@@ -108,6 +113,14 @@ export const Presentation = defineComponent<
     const position =
       suppliedPosition ?? context.signal<SlidePosition>({ slideId: slides[0]!.id, step: 0 });
     positionIndex(slides, position.value);
+    const resolveBackground = (): SlideBackground =>
+      unwrap(slides[positionIndex(slides, position.value)]!.background) ??
+      unwrap(background) ??
+      "theme";
+    const resolvedBackground = context.signal(resolveBackground());
+    context.effect(() => {
+      resolvedBackground.value = resolveBackground();
+    });
     const paused = context.signal(false);
     const optionsOpen = context.signal(false);
     const optionsId = `meowui-presentation-options-${++nextPresentationId}`;
@@ -377,6 +390,9 @@ export const Presentation = defineComponent<
                 "article",
                 {
                   style: { transform: mapSignal(scale, (value) => `scale(${value})`) },
+                  "data-background-foreground": mapSignal(resolvedBackground, (value) =>
+                    value === "theme" ? "theme" : (value.foreground ?? "theme"),
+                  ),
                   ref: (element: HTMLElement) => {
                     stage = element;
                     const view = element.ownerDocument.defaultView;
@@ -412,6 +428,41 @@ export const Presentation = defineComponent<
                     };
                   },
                 },
+                mapSignal(resolvedBackground, (value) => {
+                  if (value === "theme") return null;
+                  return context.part(
+                    "background",
+                    "div",
+                    {
+                      "aria-hidden": "true",
+                      inert: true,
+                      style: value.fill ? { background: value.fill } : undefined,
+                    },
+                    value.image
+                      ? context.part("background-image", "img", {
+                          src: value.image.src,
+                          alt: "",
+                          draggable: false,
+                          decoding: "async",
+                          style: {
+                            objectFit: value.image.fit ?? "cover",
+                            objectPosition: value.image.position ?? "center",
+                          },
+                          onError: (event: Event) => {
+                            (event.currentTarget as HTMLImageElement).hidden = true;
+                          },
+                          ref: (image: HTMLImageElement) => () => {
+                            image.removeAttribute("src");
+                          },
+                        })
+                      : null,
+                    value.overlay
+                      ? context.part("background-overlay", "div", {
+                          style: { background: value.overlay },
+                        })
+                      : null,
+                  );
+                }),
                 page,
               ),
             ),

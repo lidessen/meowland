@@ -97,7 +97,8 @@ Press 已有稳定版包，准备新的 `0.1.1-alpha.0` 不需要新包占位；
 - 未存在的精确版本：只运行 `npm publish <绝对tgz路径> --access public --tag alpha|latest --ignore-scripts`，同一 runner 固定 registry/config，由 npm 自动交换 OIDC 短期凭据。
 - 精确版本已存在且 SHA512 相同：跳过 publish；所选 tag 未指向该版本时只修复所选 tag。不同 bytes 直接停止，不覆盖、换哈希或自动换版本。
 - 所选 tag 已指向更新版本：拒绝倒退。alpha 全程只写 `alpha`；发包和 tag 修复后均核 `latest` 与预检完全一致，包括原本不存在的情况。发现并发变化即失败，不自动反向改 `latest`。
-- 每包变更后核 exact integrity 与所选 tag。某条失败即停止，不隐式重试或回滚；保留同一输入与 tgz，排除具体原因后重入。优先重新运行该 Actions run 的失败 publish job，继续下载原 artifact；新 dispatch 若重建得到不同 bytes，会被 exact integrity 检查拒绝，不能改哈希伪装成同批。registry 的实际版本/integrity/tags 是恢复依据，不维护第二份进度 ledger。
+- 每包变更后核 exact integrity 与所选 tag。npm [发布前扫描](https://github.blog/changelog/2026-07-28-npm-publish-time-malware-scanning-and-dual-use-metadata/) 会延迟可安装性，publish 返回成功或 HTTP 202 不代表已经公开可用。脚本只发送一次 mutation，然后最多读 41 次公开 registry，读取间隔 30 秒（约二十分钟暂停预算，另计请求耗时）；只允许等待版本或预期 tag 可见，不重复上传。不同 integrity、alpha 的 latest 改变、所选 tag 跳到原值/目标值之外、网络或无效 JSON 均立即停止。超时报告尚未验证可用，可能仍在扫描、人工审核或被阻止，不承诺最终公开，也不自动补 tag、重发或回滚。
+- 失败时保留同一输入与 tgz，先只读调查再重入。优先重新运行该 Actions run 的失败 publish job，继续下载原 artifact；新 dispatch 若重建得到不同 bytes，会被 exact integrity 检查拒绝，不能改哈希伪装成同批。registry 的实际版本/integrity/tags 是恢复依据，不维护第二份进度 ledger。
 
 publish 响应未知或版本暂不可见时，不因脚本退出非零就盲目重新发送。先确认官方 registry 状态；重入会检查相同 bytes 并跳过已成功版本。全部脚本成功后还需从 registry 安装精确版本做独立消费验收，才能报告真实发布与消费结果；构建、打包、dry-run 或只读检查都不等于已发布。
 

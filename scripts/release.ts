@@ -523,12 +523,51 @@ function integrityOf(value: Awaited<ReturnType<typeof metadata>>, item: Package)
   return integrity;
 }
 
+type VisibilityWait = { reads?: number; pause?: (milliseconds: number) => Promise<void> };
+/** npm can accept a publish before scanning makes the version installable. Never republish here. */
+export async function waitForPublication(
+  plan: Plan,
+  item: Package,
+  before: Record<string, string>,
+  runner: Runner,
+  { reads = 41, pause = (milliseconds) => Bun.sleep(milliseconds) }: VisibilityWait = {},
+) {
+  assert(Number.isInteger(reads) && reads > 0, "Invalid registry visibility read limit");
+  for (let index = 0; index < reads; index++) {
+    const published = await metadata(runner, plan.root, item.name);
+    const integrity = integrityOf(published, item);
+    const after = tagsOf(published);
+    assert(
+      integrity === null || integrity === item.integrity,
+      `Registry verification failed: ${item.tag}; different bytes appeared`,
+    );
+    if (plan.channel === "alpha")
+      assert(
+        after.latest === before.latest,
+        `latest changed during alpha release: ${item.name}; investigate without automatic rollback`,
+      );
+    assert(
+      after[plan.distTag] === before[plan.distTag] || after[plan.distTag] === item.version,
+      `Registry tags changed while awaiting publication: ${item.name}`,
+    );
+    if (integrity === item.integrity && after[plan.distTag] === item.version) return after;
+    if (index + 1 < reads) {
+      console.log(JSON.stringify({ awaitingPublication: item.tag, read: index + 1, reads }));
+      await pause(30000);
+    }
+  }
+  throw new Error(
+    `Publication not yet verified available after ${reads} registry reads: ${item.tag}; inspect npm scanning/review status without republishing`,
+  );
+}
+
 /** check is read-only; execute is the sole registry mutation path. No GitHub or push operations. */
 export async function release(
   plan: Plan,
   runner: Runner = run,
   mode: "check" | "execute" = "execute",
   onVerified: (record: Record<string, unknown>) => void = () => {},
+  visibility: VisibilityWait = {},
 ) {
   assert(plan.blockers.length === 0, plan.blockers.join("\n"));
   await unchanged(plan, runner);
@@ -593,18 +632,7 @@ export async function release(
       );
     else if (before[plan.distTag] !== item.version)
       await checked(runner, ["npm", "dist-tag", "add", item.tag, plan.distTag], plan.root);
-    const published = await metadata(runner, plan.root, item.name);
-    assert(
-      integrityOf(published, item) === item.integrity,
-      `Registry verification failed: ${item.tag}`,
-    );
-    const after = tagsOf(published);
-    assert(after[plan.distTag] === item.version, `Dist-tag verification failed: ${item.tag}`);
-    if (plan.channel === "alpha")
-      assert(
-        after.latest === state.tags.latest,
-        `latest changed during alpha release: ${item.name}; investigate without automatic rollback`,
-      );
+    const after = await waitForPublication(plan, item, state.tags, runner, visibility);
     onVerified({
       name: item.name,
       version: item.version,

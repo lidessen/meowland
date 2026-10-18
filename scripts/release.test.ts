@@ -331,6 +331,87 @@ test("latest interference after alpha mutation fails without rollback", async ()
   expect(remote.mutations).toHaveLength(1);
 });
 
+test("accepted publication waits for matching bytes and tag without uploading twice", async () => {
+  const { plan, local } = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
+  const remote = external(plan, local);
+  let accepted = false;
+  let reads = 0;
+  const pauses: number[] = [];
+  const runner: Runner = async (args, cwd) => {
+    if (accepted && args[0] === "registry") {
+      reads++;
+      if (reads <= 2)
+        return result(
+          JSON.stringify({ name: "meowjsx", versions: {}, "dist-tags": { latest: "1.0.0" } }),
+        );
+      if (reads === 3)
+        return result(
+          JSON.stringify({
+            name: "meowjsx",
+            versions: {
+              [plan.packages[0]!.version]: { dist: { integrity: plan.packages[0]!.integrity } },
+            },
+            "dist-tags": { latest: "1.0.0" },
+          }),
+        );
+    }
+    const response = await remote.runner(args, cwd);
+    if (args[0] === "npm" && args[1] === "publish") accepted = true;
+    return response;
+  };
+  await release(plan, runner, "execute", () => {}, {
+    reads: 4,
+    pause: async (ms) => {
+      pauses.push(ms);
+    },
+  });
+  expect(reads).toBe(4);
+  expect(pauses).toEqual([30000, 30000, 30000]);
+  expect(remote.mutations).toHaveLength(1);
+  expect(remote.mutations[0]![1]).toBe("publish");
+});
+
+test("visibility timeout and concurrent changes stop after one mutation", async () => {
+  for (const problem of ["timeout", "bytes", "latest", "tag", "http", "json"]) {
+    const { plan, local } = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
+    const remote = external(plan, local);
+    let accepted = false;
+    let pauses = 0;
+    const runner: Runner = async (args, cwd) => {
+      if (accepted && args[0] === "registry") {
+        if (problem === "http") return result("", 403);
+        if (problem === "json") return result("{");
+        return result(
+          JSON.stringify({
+            name: "meowjsx",
+            versions:
+              problem === "bytes"
+                ? { [plan.packages[0]!.version]: { dist: { integrity: "sha512-other" } } }
+                : {},
+            "dist-tags": {
+              latest: problem === "latest" ? "2.0.0" : "1.0.0",
+              ...(problem === "tag" ? { alpha: "9.0.0-alpha.0" } : {}),
+            },
+          }),
+        );
+      }
+      const response = await remote.runner(args, cwd);
+      if (args[0] === "npm" && args[1] === "publish") accepted = true;
+      return response;
+    };
+    const action = release(plan, runner, "execute", () => {}, {
+      reads: 2,
+      pause: async () => {
+        pauses++;
+      },
+    });
+    if (problem === "timeout") await expect(action).rejects.toThrow("not yet verified available");
+    else await expect(action).rejects.toThrow();
+    expect(pauses).toBe(problem === "timeout" ? 1 : 0);
+    expect(remote.mutations).toHaveLength(1);
+  }
+});
+
 test("selection stays explicit and an unselected optional peer does not expand it", async () => {
   const { root, manifest, local } = await fixture();
   const plan = await inspect(root, manifest, ["meowcss"], local);

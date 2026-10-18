@@ -79,6 +79,11 @@ jobs:
       - uses: oven-sh/setup-bun@v2
         with:
           bun-version: 1.4.2
+      - name: Inspect the publishing executables
+        run: |
+          command -v npm
+          npm --version
+          node --version
       - run: bun install --frozen-lockfile --ignore-scripts
       - uses: actions/download-artifact@v4
         with:

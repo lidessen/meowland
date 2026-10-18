@@ -8,6 +8,7 @@ import {
   inspect,
   main,
   npmEnvironment,
+  npmOutputFacts,
   release,
   run,
   type Channel,
@@ -472,9 +473,16 @@ test("real subprocess excludes saved/token auth while preserving OIDC", async ()
   await writeFile(
     executable,
     `#!${process.execPath}
-import { readFile } from 'node:fs/promises';
+import { readFile, writeFile } from 'node:fs/promises';
 const args = process.argv.slice(2);
 const flag = (name) => args[args.indexOf(name) + 1];
+if (args.includes('--version')) {
+  await writeFile(${JSON.stringify(join(directory, "version-config.json"))}, JSON.stringify({
+    globalEmpty: await readFile(flag('--globalconfig'), 'utf8') === '',
+    userEmpty: await readFile(flag('--userconfig'), 'utf8') === '',
+  }));
+  console.log('11.21.0'); process.exit(0);
+}
 console.log(JSON.stringify({
   isolated: process.cwd() !== ${JSON.stringify(directory)},
   configOverrides: Object.keys(process.env).some((key) => /^npm_config_/i.test(key)),
@@ -493,6 +501,10 @@ console.log(JSON.stringify({
   try {
     const output = await run([executable, "publish", "fixture.tgz"], directory);
     expect(output.code).toBe(0);
+    expect(JSON.parse(await readFile(join(directory, "version-config.json"), "utf8"))).toEqual({
+      globalEmpty: true,
+      userEmpty: true,
+    });
     expect(JSON.parse(new TextDecoder().decode(output.stdout))).toEqual({
       isolated: true,
       configOverrides: false,
@@ -515,6 +527,30 @@ console.log(JSON.stringify({
       else process.env[key] = value;
     }
   }
+});
+
+test("npm diagnostics retain only public facts and discard authentication output", () => {
+  const facts = npmOutputFacts(
+    "+ meowjsx@0.1.1-alpha.0\n+ unrelated@1.2.3\nsecret-fixture-stdout\n",
+    [
+      "npm http fetch PUT 201 https://registry.npmjs.org/meowjsx 123ms",
+      "npm http fetch PUT 403 https://registry.npmjs.org/unrelated 123ms",
+      "npm http fetch PUT 200 https://registry.npmjs.org/meowjsx/-/secret-fixture-url 123ms",
+      "npm http fetch POST 200 https://registry.npmjs.org/-/npm/v1/oidc/token/exchange/package/meowjsx 123ms",
+      "npm notice Publishing (dry-run)",
+      "npm error code ENEEDAUTH",
+      "npm error Login: https://example.invalid/auth?token=secret-fixture-token",
+    ].join("\n"),
+  );
+  expect(facts).toEqual({
+    success: ["+ meowjsx@0.1.1-alpha.0"],
+    dryRun: true,
+    help: false,
+    errorCodes: ["ENEEDAUTH"],
+    publishResponses: [{ package: "meowjsx", status: 201 }],
+  });
+  expect(JSON.stringify(facts)).not.toContain("secret-fixture");
+  expect(JSON.stringify(facts)).not.toContain("token/exchange");
 });
 
 test("public GET transport supports a first alpha with no latest and retries the same bytes", async () => {

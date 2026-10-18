@@ -62,6 +62,8 @@ bun run release --manifest <release-input.json> --packages meowjsx,meowcss,meowt
 
 OIDC 不以 `npm whoami/access` 作权限预检：公开 metadata/依赖/bytes 可以只读核查，trust、direct publish 与 dist-tag 权限只能由其对应操作裁定。认证、网络、非法 JSON 与历史撤包失败均停止；不把任意错误当作未发布，不自动转其它认证方式。
 
+发布子进程记录实际 npm 路径、realpath、版本、退出与信号状态，以及输出字节数；仅从内存中的输出抽取白名单包的成功标记、发布 PUT 状态码和有限错误信息，不输出原始 npm 日志、认证 URL 或凭据。命令明确关闭 dry-run。命令退出零或 PUT 返回成功都不能替代后续 registry integrity/tag 核验；核验失败先保留原制品并调查，不自动重发。
+
 ## 用户一次性配置的 npm trust
 
 这是持久发布授权，必须在用户动作时明确确认后由用户或获准操作配置；本仓库落地与 dry-run 不会写 npm 安全设置。四个已存在的包各自在 npm Settings → Trusted publishing 添加 GitHub Actions：

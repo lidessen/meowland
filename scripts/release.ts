@@ -69,6 +69,29 @@ export function npmEnvironment(source: NodeJS.ProcessEnv) {
     ),
   );
 }
+/** Extract fixed public facts only; npm output may contain authentication URLs. */
+export function npmOutputFacts(stdout: string, stderr: string) {
+  const output = `${stdout}\n${stderr}`;
+  return {
+    success: stdout
+      .split(/\r?\n/)
+      .filter(
+        (line) =>
+          /^\+ [a-z][a-z0-9-]*@[0-9]+\.[0-9]+\.[0-9]+(?:-[a-zA-Z0-9.-]+)?$/.test(line) &&
+          publishNames.some((name) => line.startsWith(`+ ${name}@`)),
+      ),
+    dryRun: /\(dry-run\)/.test(output),
+    help: /Usage:|npm <command>/.test(output),
+    errorCodes: [...stderr.matchAll(/^npm error code ([A-Z0-9_]+)$/gm)].map((match) => match[1]),
+    publishResponses: [
+      ...stderr.matchAll(
+        /^npm http fetch PUT ([0-9]{3}) https:\/\/registry\.npmjs\.org\/([a-z][a-z0-9-]*)(?:\s|$)/gm,
+      ),
+    ]
+      .filter((match) => publishNames.includes(match[2]!))
+      .map((match) => ({ package: match[2], status: Number(match[1]) })),
+  };
+}
 export function assertOIDC(source?: string, env: NodeJS.ProcessEnv = process.env) {
   assert(
     env.GITHUB_ACTIONS === "true" && env.RUNNER_ENVIRONMENT === "github-hosted",
@@ -110,37 +133,77 @@ export const run: Runner = async (args, cwd) => {
   }
   let isolated: string | undefined;
   let env: NodeJS.ProcessEnv | undefined;
+  let npmIdentity: { executable: string; realpath: string; version: string | null } | undefined;
   const npm = basename(args[0] ?? "") === "npm";
-  if (npm) {
-    assert(
-      args[1] === "publish" || (args[1] === "dist-tag" && args[2] === "add"),
-      "Unsupported OIDC operation",
-    );
-    assertOIDC();
-    isolated = await mkdtemp(join(tmpdir(), "meowland-npm-"));
-    await writeFile(join(isolated, "user.npmrc"), "");
-    await writeFile(join(isolated, "global.npmrc"), "");
-    cwd = isolated;
-    env = npmEnvironment(process.env);
-    args = [
-      ...args,
-      "--registry",
-      registry,
-      "--userconfig",
-      join(isolated, "user.npmrc"),
-      "--globalconfig",
-      join(isolated, "global.npmrc"),
-      "--ignore-scripts",
-      "--workspaces=false",
-    ];
-  }
   try {
+    if (npm) {
+      assert(
+        args[1] === "publish" || (args[1] === "dist-tag" && args[2] === "add"),
+        "Unsupported OIDC operation",
+      );
+      assertOIDC();
+      isolated = await mkdtemp(join(tmpdir(), "meowland-npm-"));
+      await writeFile(join(isolated, "user.npmrc"), "");
+      await writeFile(join(isolated, "global.npmrc"), "");
+      cwd = isolated;
+      env = npmEnvironment(process.env);
+      const executable = Bun.which(args[0]!, { cwd });
+      assert(executable, "npm executable is missing");
+      const config = [
+        "--registry",
+        registry,
+        "--userconfig",
+        join(isolated, "user.npmrc"),
+        "--globalconfig",
+        join(isolated, "global.npmrc"),
+      ];
+      const version = Bun.spawn([executable, "--version", ...config], {
+        cwd,
+        env,
+        stdin: "ignore",
+        stdout: "pipe",
+        stderr: "pipe",
+      });
+      const [versionOutput, , versionCode] = await Promise.all([
+        new Response(version.stdout).text(),
+        new Response(version.stderr).text(),
+        version.exited,
+      ]);
+      npmIdentity = {
+        executable,
+        realpath: await realpath(executable),
+        version: versionCode === 0 && valid(versionOutput.trim()) ? versionOutput.trim() : null,
+      };
+      args = [
+        executable,
+        ...args.slice(1),
+        ...config,
+        "--ignore-scripts",
+        "--workspaces=false",
+        "--dry-run=false",
+        "--loglevel=http",
+      ];
+    }
     const child = Bun.spawn(args, { cwd, env, stdin: "ignore", stdout: "pipe", stderr: "pipe" });
     const [stdout, stderr, code] = await Promise.all([
       new Response(child.stdout).arrayBuffer(),
       new Response(child.stderr).text(),
       child.exited,
     ]);
+    if (npm)
+      console.log(
+        JSON.stringify({
+          npm: {
+            ...npmIdentity,
+            command: args[1],
+            code,
+            signal: child.signalCode,
+            stdoutBytes: stdout.byteLength,
+            stderrBytes: new TextEncoder().encode(stderr).byteLength,
+            ...npmOutputFacts(decoder.decode(stdout), stderr),
+          },
+        }),
+      );
     return { code, stdout: new Uint8Array(stdout), stderr: npm ? "" : stderr };
   } finally {
     if (isolated) await rm(isolated, { recursive: true, force: true });

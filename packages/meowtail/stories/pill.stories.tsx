@@ -4,10 +4,10 @@ import { Badge, Button, Inline, Pill, Stack } from "meowtail";
 
 export const PillStory = defineStory({
   id: "pill-tags",
-  title: "胶囊 · 筛选与状态标签",
+  title: "Pill · Filters and status tags",
   component: "Pill",
-  group: "基础控件",
-  description: "24px 胶囊按钮与 20px 只读标签，选择状态由调用者持有。",
+  group: "Basic controls",
+  description: "24px pill buttons and 20px read-only tags; the caller owns the selection state.",
   render() {
     const active = signal(true);
     const pressed = signal("true");
@@ -22,13 +22,13 @@ export const PillStory = defineStory({
               pressed.value = String(active.value);
             }}
           >
-            仅显示运行中
+            Show running only
           </Pill>
-          <Pill>退出码 1</Pill>
+          <Pill>Exit code 1</Pill>
           <Pill onClick={() => {}} disabled>
-            不可用筛选
+            Unavailable filter
           </Pill>
-          <Button size="small">刷新</Button>
+          <Button size="small">Refresh</Button>
         </Inline>
         <Inline>
           {(

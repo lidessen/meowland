@@ -17,12 +17,13 @@ import {
 
 export const DialogLayoutStory = defineStory({
   id: "dialog-layout",
-  title: "弹窗布局 · 固定标题与正文滚动",
-  group: "浮层与反馈",
+  title: "Dialog layout · Fixed header and body scrolling",
+  group: "Overlays and feedback",
   groupOrder: 30,
   component: "DialogPanel",
-  variant: "自然高度与宿主约束",
-  description: "短表单自然取高，长正文与宿主受限窗口共用页壳；表单仍使用原生提交和取消。",
+  variant: "Natural height and host constraints",
+  description:
+    "Short forms keep their natural height; long bodies and host-constrained windows share the same page shell. Forms still use native submit and cancel.",
   covers: ["fixed header", "layout scroll owner", "intrinsic height", "host height", "native form"],
   render() {
     return (
@@ -30,10 +31,10 @@ export const DialogLayoutStory = defineStory({
         {(["short", "long", "limited", "workspace"] as const).map((kind) => {
           let dialog: HTMLDialogElement | undefined;
           const name = {
-            short: "短表单",
-            long: "长正文",
-            limited: "受限高度",
-            workspace: "完整工作区",
+            short: "Short form",
+            long: "Long body",
+            limited: "Limited height",
+            workspace: "Full workspace",
           }[kind];
           return (
             <div>
@@ -43,7 +44,7 @@ export const DialogLayoutStory = defineStory({
                   dialog?.showModal();
                 }}
               >
-                打开{name}
+                Open {name}
               </Button>
               <Dialog
                 labelledBy={`${kind}-title`}
@@ -63,11 +64,11 @@ export const DialogLayoutStory = defineStory({
                   method="dialog"
                   header={
                     <DialogHeader
-                      title={`${name} · 当前对象与关闭动作`}
+                      title={`${name} · Current item and close action`}
                       titleId={`${kind}-title`}
                       actions={
                         <IconButton
-                          label={`关闭${name}`}
+                          label={`Close ${name}`}
                           onClick={() => {
                             dialog?.close("cancel");
                           }}
@@ -79,18 +80,24 @@ export const DialogLayoutStory = defineStory({
                   }
                 >
                   <Stack gap="compact">
-                    <Field label={`${name}草稿`} htmlFor={`${kind}-draft`}>
-                      <Input id={`${kind}-draft`} name="draft" value="保留当前输入" required />
+                    <Field label={`${name} draft`} htmlFor={`${kind}-draft`}>
+                      <Input
+                        id={`${kind}-draft`}
+                        name="draft"
+                        value="Keep the current input"
+                        required
+                      />
                     </Field>
                     {kind !== "short" ? (
                       Array.from({ length: 24 }, (_, i) => (
                         <p>
-                          正文 {i + 1}
-                          ：读取内容、修改草稿与关闭窗口保持独立，标题和关闭入口始终属于同一顶部区域。
+                          Body {i + 1}: Reading content, editing the draft, and closing the window
+                          stay independent; the title and close entry always belong to the same top
+                          region.
                         </p>
                       ))
                     ) : (
-                      <p>短表单只使用内容所需的高度。</p>
+                      <p>A short form uses only the height its content needs.</p>
                     )}
                   </Stack>
                   <Button
@@ -98,7 +105,7 @@ export const DialogLayoutStory = defineStory({
                     value="save"
                     size={kind === "limited" ? "small" : "default"}
                   >
-                    保存{name}
+                    Save {name}
                   </Button>
                 </DialogPanel>
               </Dialog>
@@ -112,12 +119,13 @@ export const DialogLayoutStory = defineStory({
 
 export const CatalogFrameStory = defineStory({
   id: "page-frame-catalog",
-  title: "页壳 · 换行标题与目录筛选",
-  group: "导航与布局",
+  title: "Page shell · Wrapping title and catalog filtering",
+  group: "Navigation and layout",
   groupOrder: 40,
   component: "PageFrame",
-  variant: "自然页头与剩余正文",
-  description: "标题、说明、刷新与分类共享自然高度；正文独立领取余量，不以百分比裁切页头控件。",
+  variant: "Natural header and remaining body",
+  description:
+    "The title, description, refresh action, and categories share their natural height; the body claims the remaining space on its own, and header controls are not clipped by percentages.",
   render() {
     const selected = signal("all");
     return (
@@ -127,21 +135,21 @@ export const CatalogFrameStory = defineStory({
           header={
             <Stack gap="compact">
               <PageHeader
-                title="扩展目录"
-                description="查看已授权的能力与页面，分类不会改变内容的身份。"
-                actions={<Button variant="outline">刷新目录</Button>}
+                title="Extension catalog"
+                description="Browse authorized capabilities and pages; categories do not change the identity of the content."
+                actions={<Button variant="outline">Refresh catalog</Button>}
               />
               <SegmentedControl
                 id="catalog-kind"
-                label="目录分类"
+                label="Catalog categories"
                 value={selected}
                 onValueChange={(value) => {
                   selected.value = value;
                 }}
                 options={[
-                  { value: "all", label: "全部" },
-                  { value: "local", label: "本地" },
-                  { value: "enabled", label: "已启用" },
+                  { value: "all", label: "All" },
+                  { value: "local", label: "Local" },
+                  { value: "enabled", label: "Enabled" },
                 ]}
               />
             </Stack>
@@ -149,7 +157,7 @@ export const CatalogFrameStory = defineStory({
         >
           <Stack>
             {Array.from({ length: 20 }, (_, index) => (
-              <p>目录内容 {index + 1}：主区域保留自己的滚动范围。</p>
+              <p>Catalog content {index + 1}: The main region keeps its own scroll range.</p>
             ))}
           </Stack>
         </PageFrame>

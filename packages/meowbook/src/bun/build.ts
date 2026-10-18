@@ -168,7 +168,7 @@ export async function buildStories(
     );
     await writeFile(
       join(prepared.directory, "canvas.html"),
-      `<!doctype html><html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Meowbook canvas</title><link rel="stylesheet" href="./canvas.css"></head><body><div id="story-state" data-status="loading">Loading</div><main id="story-root"></main><script type="module" src="./canvas-entry.ts"></script></body></html>`,
+      `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Meowbook canvas</title><link rel="stylesheet" href="./canvas.css"></head><body><div id="story-state" data-status="loading">Loading</div><main id="story-root"></main><script type="module" src="./canvas-entry.ts"></script></body></html>`,
     );
     const galleryFile = join(sourceDirectory, "web/index.html");
     const gallery = (await readFile(galleryFile, "utf8")).replace(

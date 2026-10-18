@@ -27,7 +27,7 @@ test("card actions stay beside wide copy and follow narrow copy without changing
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const wide = page.locator('[data-card-responsive="wide"]');
   const sidebar = page.locator('[data-card-responsive="sidebar"]');
-  const draft = page.getByRole("textbox", { name: "保留的草稿", exact: true });
+  const draft = page.getByRole("textbox", { name: "Kept draft", exact: true });
   await draft.fill("The same draft survives container reflow");
   const original = await draft.elementHandle();
   const broad = await boxes(wide);

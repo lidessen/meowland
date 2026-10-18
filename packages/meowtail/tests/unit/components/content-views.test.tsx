@@ -23,7 +23,7 @@ test("web source links allow only retrieval URLs and preserve citation identity"
   expect(html).not.toContain('href="javascript:');
   expect(html).toContain("&lt;source&gt;");
   expect(html).toContain('value="2"');
-  expect(html).toContain("来源列表已截断");
+  expect(html).toContain("Source list truncated");
 });
 test("JSON creates only the expanded branch and invalid input remains visible", () => {
   const html = createWebRenderer(createRuntime()).renderToHtml(
@@ -35,7 +35,7 @@ test("JSON creates only the expanded branch and invalid input remains visible", 
   const invalid = createWebRenderer(createRuntime()).renderToHtml(
     <JsonBlock text={'{"broken": <script>'} defaultOpen />,
   );
-  expect(invalid).toContain("JSON 格式无效");
+  expect(invalid).toContain("Invalid JSON");
   expect(invalid).toContain("&lt;script&gt;");
 });
 test("lightbox uses a closed native dialog with accessible image and trigger", () => {
@@ -45,5 +45,5 @@ test("lightbox uses a closed native dialog with accessible image and trigger", (
   expect(html).toContain("<dialog");
   expect(html).not.toContain(" open");
   expect(html).toContain('alt="sample"');
-  expect(html).toContain("关闭图片预览");
+  expect(html).toContain("Close image preview");
 });

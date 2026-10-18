@@ -11,8 +11,8 @@ test("a task is a named record with no inferred execution or reply outcome", () 
   expect(output).toContain('<section aria-label="Inspect an attachment"');
   expect(output).toContain('data-execution-state="unknown"');
   expect(output).not.toContain("<button");
-  expect(output).not.toContain("未回复");
-  expect(output).not.toContain("失败");
+  expect(output).not.toContain("No reply");
+  expect(output).not.toContain("Failed");
 });
 
 test("execution success and a missing public reply remain independent", () => {

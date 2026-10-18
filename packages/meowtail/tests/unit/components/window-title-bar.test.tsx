@@ -11,8 +11,8 @@ test("the title bar is a header with leading, title and trailing slots", () => {
   const html = renderToHtml(
     <WindowTitleBar
       title="Meowland"
-      leading={<button type="button">返回</button>}
-      trailing={<button type="button">搜索</button>}
+      leading={<button type="button">Back</button>}
+      trailing={<button type="button">Search</button>}
     />,
   );
   expect(html).toContain("<header");
@@ -20,8 +20,8 @@ test("the title bar is a header with leading, title and trailing slots", () => {
   for (const part of ["leading", "title", "trailing"])
     expect(html).toContain(`data-meowui-part="window-title-bar/${part}"`);
   expect(html).toContain("Meowland");
-  expect(html.indexOf("返回")).toBeLessThan(html.indexOf("Meowland"));
-  expect(html.indexOf("Meowland")).toBeLessThan(html.indexOf("搜索"));
+  expect(html.indexOf("Back")).toBeLessThan(html.indexOf("Meowland"));
+  expect(html.indexOf("Meowland")).toBeLessThan(html.indexOf("Search"));
 });
 
 test("the theme makes the bar a drag area that keeps clear of the shell's room", () => {

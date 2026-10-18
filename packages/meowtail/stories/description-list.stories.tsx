@@ -12,23 +12,25 @@ import {
 } from "meowtail";
 
 const copy = {
-  purpose: "同一组标签与值共用自然列；局部空间不足时上下排列，值内仍可组合阅读和操作。",
-  version: "版本",
+  purpose:
+    "Labels and values in one group share a natural column; when local space is tight they stack vertically, and values can still combine reading and actions.",
+  version: "Version",
   versionValue: "2026.10.15",
-  identity: "完整的工作目录引用标识",
+  identity: "Full working directory reference identity",
   identityValue: "workspace:development-documentation-service-with-a-long-unbroken-identity",
-  action: "核对引用",
-  draft: "备注草稿",
-  narrow: "相同视口中的窄区域",
+  action: "Check reference",
+  draft: "Note draft",
+  narrow: "Narrow region in the same viewport",
 };
 
 export const DescriptionListStory = defineStory({
   id: "description-list-composition",
-  title: "信息布局 · 自然标签列与局部组合",
-  group: "导航与布局",
+  title: "Information layout · Natural label column and local composition",
+  group: "Navigation and layout",
   groupOrder: 40,
   component: "DescriptionList",
-  description: "只展示公共信息布局；标签、长标识与动作是固定示例，不读取业务资料。",
+  description:
+    "Shows only the public information layout; labels, long identity and actions are fixed examples and read no business data.",
   covers: [
     "native description list",
     "shared label column",
@@ -41,7 +43,7 @@ export const DescriptionListStory = defineStory({
     <Container width="content">
       <Stack gap="relaxed">
         <span>{copy.purpose}</span>
-        <DescriptionList aria-label="工作信息" data-description-wide>
+        <DescriptionList aria-label="Work information" data-description-wide>
           <DescriptionItem term={copy.version}>{copy.versionValue}</DescriptionItem>
           <DescriptionItem term={copy.identity}>
             <Inline wrap={false} gap="compact" align="start">
@@ -56,13 +58,13 @@ export const DescriptionListStory = defineStory({
             </Inline>
           </DescriptionItem>
           <DescriptionItem term={<label htmlFor="description-draft">{copy.draft}</label>}>
-            <Input id="description-draft" placeholder="输入后调整局部宽度" />
+            <Input id="description-draft" placeholder="Type to adjust the local width" />
           </DescriptionItem>
         </DescriptionList>
         <div style={{ width: "100%", maxWidth: "20rem" }} data-description-narrow>
           <Stack gap="compact">
             <strong>{copy.narrow}</strong>
-            <DescriptionList aria-label="窄区域信息">
+            <DescriptionList aria-label="Narrow region information">
               <DescriptionItem term={copy.version}>{copy.versionValue}</DescriptionItem>
               <DescriptionItem term={copy.identity}>
                 <code>{copy.identityValue}</code>

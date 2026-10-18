@@ -96,10 +96,10 @@ export const ChatMessage = defineComponent<
                       "span",
                       null,
                       status === "streaming"
-                        ? "生成中"
+                        ? "Generating"
                         : status === "pending"
-                          ? "等待中"
-                          : "未完成",
+                          ? "Waiting"
+                          : "Incomplete",
                     )
                   : null,
               ),

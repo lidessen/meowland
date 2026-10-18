@@ -34,12 +34,12 @@ import { uiTokens } from "meowtail/theme";
 
 export const DesignLanguageStory = defineStory({
   id: "design-language",
-  title: "设计语言 · 全景画板",
-  group: "组合示例",
+  title: "Design language · Panorama board",
+  group: "Composition examples",
   groupOrder: 70,
-  variant: "设计总览",
+  variant: "Design overview",
   description:
-    "在同一张画板上查看色彩、字体、尺度与组件组合。切换设计与外观，对照整体语言；输入和交互状态保持不变。",
+    "See color, typography, scale and component composition on one board. Switch design and appearance to compare the whole language; input and interaction states stay unchanged.",
   covers: [
     "theme switching",
     "retained input",
@@ -54,36 +54,36 @@ export const DesignLanguageStory = defineStory({
       <header className="language-heading">
         <div>
           <span className="language-eyebrow">MEOWUI / DESIGN LANGUAGE</span>
-          <h1>设计语言</h1>
-          <p>从基础元素到完整界面，在一张画板里看见它们的关系。</p>
+          <h1>Design language</h1>
+          <p>From foundations to complete interfaces, see how they relate on one board.</p>
         </div>
         <span className="language-edition">
-          基础 · 组件 · 组合
+          Foundations · Components · Composition
           <br />
-          同一套组件，两种表达
+          One set of components, two expressions
         </span>
       </header>
       <section className="language-band" aria-labelledby="language-foundations">
         <h2 id="language-foundations">
-          <span>01</span> 基础语言 <small>Foundations</small>
+          <span>01</span> Foundation language <small>Foundations</small>
         </h2>
         <div className="language-grid language-foundations">
-          <section className="language-sheet" aria-label="色彩">
+          <section className="language-sheet" aria-label="Color">
             <h3>
-              色彩 <small>Color</small>
+              Color <small>Color</small>
             </h3>
             <div className="language-palette">
               {(
                 [
-                  [uiTokens.background, "画布"],
-                  [uiTokens.surface, "表面"],
-                  [uiTokens.surfaceMuted, "衬底"],
-                  [uiTokens.foreground, "正文"],
-                  [uiTokens.mutedForeground, "次要"],
-                  [uiTokens.border, "边界"],
-                  [uiTokens.primary, "强调"],
-                  [uiTokens.primarySoft, "选中"],
-                  [uiTokens.focus, "焦点"],
+                  [uiTokens.background, "Canvas"],
+                  [uiTokens.surface, "Surface"],
+                  [uiTokens.surfaceMuted, "Muted surface"],
+                  [uiTokens.foreground, "Body text"],
+                  [uiTokens.mutedForeground, "Secondary"],
+                  [uiTokens.border, "Border"],
+                  [uiTokens.primary, "Accent"],
+                  [uiTokens.primarySoft, "Selected"],
+                  [uiTokens.focus, "Focus"],
                 ] as const
               ).map(([token, label]) => (
                 <div className="language-swatch">
@@ -102,33 +102,37 @@ export const DesignLanguageStory = defineStory({
               ))}
             </div>
           </section>
-          <section className="language-sheet" aria-label="字体">
+          <section className="language-sheet" aria-label="Typography">
             <h3>
-              字体 <small>Typography</small>
+              Typography <small>Typography</small>
             </h3>
             <div className="language-type-specimen">
-              Aa <span>字</span>
+              Aa <span>A</span>
             </div>
             <div className="language-type-row">
               <code>title</code>
-              <strong style={{ fontSize: `${uiTokens.fontTitle}` }}>让工作自然继续</strong>
+              <strong style={{ fontSize: `${uiTokens.fontTitle}` }}>
+                Let work continue naturally
+              </strong>
             </div>
             <div className="language-type-row">
               <code>body</code>
-              <span style={{ fontSize: `${uiTokens.fontBody}` }}>清楚表达，也留出思考的空间。</span>
+              <span style={{ fontSize: `${uiTokens.fontBody}` }}>
+                Say it clearly, and leave room to think.
+              </span>
             </div>
             <div className="language-type-row">
               <code>caption</code>
-              <span style={{ fontSize: `${uiTokens.fontCaption}` }}>更新于今天 · 09:41</span>
+              <span style={{ fontSize: `${uiTokens.fontCaption}` }}>Updated today · 09:41</span>
             </div>
             <div className="language-type-row">
               <code>mono</code>
               <span style={{ fontFamily: `${uiTokens.mono}` }}>Aa 0123456789</span>
             </div>
           </section>
-          <section className="language-sheet" aria-label="尺度与形状">
+          <section className="language-sheet" aria-label="Scale and shape">
             <h3>
-              尺度与形状 <small>Space & shape</small>
+              Scale and shape <small>Space & shape</small>
             </h3>
             <div className="language-spacing">
               {(
@@ -158,121 +162,125 @@ export const DesignLanguageStory = defineStory({
                 </div>
               ))}
             </div>
-            <p className="language-note">间距、字形与圆角随主题一起变化。</p>
+            <p className="language-note">Spacing, type and radius change with the theme.</p>
           </section>
         </div>
       </section>
       <section className="language-band" aria-labelledby="language-components">
         <h2 id="language-components">
-          <span>02</span> 组件与状态 <small>Components</small>
+          <span>02</span> Components and states <small>Components</small>
         </h2>
         <div className="language-grid">
-          <section className="language-sheet" aria-label="操作">
+          <section className="language-sheet" aria-label="Actions">
             <h3>
-              操作 <small>Actions</small>
+              Actions <small>Actions</small>
             </h3>
             <div className="language-samples">
               <div className="workshop-row">
-                <Button>保存修改</Button>
-                <Button variant="outline">查看差异</Button>
-                <Button variant="quiet">取消</Button>
+                <Button>Save changes</Button>
+                <Button variant="outline">View diff</Button>
+                <Button variant="quiet">Cancel</Button>
               </div>
               <div className="workshop-row">
-                <Button variant="danger">删除</Button>
-                <Button disabled>不可用</Button>
+                <Button variant="danger">Delete</Button>
+                <Button disabled>Unavailable</Button>
                 <Button variant="outline" disabled>
-                  不可用
+                  Unavailable
                 </Button>
               </div>
               <div className="workshop-row">
                 <Button size="small" variant="outline">
-                  小尺寸
+                  Small
                 </Button>
-                <Button variant="outline">默认</Button>
+                <Button variant="outline">Default</Button>
                 <Button size="large" variant="outline">
-                  大尺寸
+                  Large
                 </Button>
               </div>
-              <Toolbar label="画板工具">
-                <IconButton label="搜索">
+              <Toolbar label="Board tools">
+                <IconButton label="Search">
                   <Icon name="search" />
                 </IconButton>
-                <IconButton label="查看文件">
+                <IconButton label="View file">
                   <Icon name="file" />
                 </IconButton>
                 <Separator orientation="vertical" style={{ height: "20px" }} />
-                <AddButton variant="quiet" aria-label="添加工作">
-                  添加
+                <AddButton variant="quiet" aria-label="Add work">
+                  Add
                 </AddButton>
               </Toolbar>
             </div>
           </section>
-          <section className="language-sheet" aria-label="输入">
+          <section className="language-sheet" aria-label="Inputs">
             <h3>
-              输入 <small>Inputs</small>
+              Inputs <small>Inputs</small>
             </h3>
             <div className="language-samples">
-              <Field label="项目名称" htmlFor="theme-project">
+              <Field label="Project name" htmlFor="theme-project">
                 <Input id="theme-project" value="Meowland" />
               </Field>
               <div className="language-input-pair">
-                <Field label="可见范围" htmlFor="language-visibility">
+                <Field label="Visibility" htmlFor="language-visibility">
                   <Select id="language-visibility">
-                    <option>仅自己</option>
-                    <option>项目成员</option>
+                    <option>Only me</option>
+                    <option>Project members</option>
                   </Select>
                 </Field>
-                <Field label="只读示例" htmlFor="language-disabled">
-                  <Input id="language-disabled" value="由组织管理" disabled />
+                <Field label="Read-only example" htmlFor="language-disabled">
+                  <Input id="language-disabled" value="Managed by the organization" disabled />
                 </Field>
               </div>
-              <Field label="项目地址" htmlFor="language-invalid" error="请使用字母、数字或短横线。">
+              <Field
+                label="Project address"
+                htmlFor="language-invalid"
+                error="Use letters, numbers or hyphens."
+              >
                 <Input id="language-invalid" value="my project" />
               </Field>
             </div>
           </section>
-          <section className="language-sheet" aria-label="导航与反馈">
+          <section className="language-sheet" aria-label="Navigation and feedback">
             <h3>
-              导航与反馈 <small>Navigation & feedback</small>
+              Navigation and feedback <small>Navigation & feedback</small>
             </h3>
             <div className="workshop-navigation">
               <NavItem
-                label="设计组件语言"
+                label="Design component language"
                 icon={<Icon name="folder" />}
                 active
                 badge={<Badge>3</Badge>}
               />
-              <NavItem label="审阅今天的修改" icon={<Icon name="file" />} />
+              <NavItem label="Review today's changes" icon={<Icon name="file" />} />
             </div>
             <Separator />
             <div className="workshop-row">
-              <Badge>草稿</Badge>
-              <Badge tone="accent">进行中</Badge>
-              <Badge tone="success">已同步</Badge>
-              <Badge tone="warning">等待审阅</Badge>
-              <Badge tone="danger">失败</Badge>
+              <Badge>Draft</Badge>
+              <Badge tone="accent">In progress</Badge>
+              <Badge tone="success">Synced</Badge>
+              <Badge tone="warning">Waiting for review</Badge>
+              <Badge tone="danger">Failed</Badge>
             </div>
-            <Alert tone="info" title="保留当前工作">
-              切换主题后，输入和展开状态保持不变。
+            <Alert tone="info" title="Keep the current work">
+              Input and expanded states stay unchanged after switching themes.
             </Alert>
           </section>
         </div>
       </section>
       <section className="language-band" aria-labelledby="language-composition">
         <h2 id="language-composition">
-          <span>03</span> 组合与阅读 <small>Composition</small>
+          <span>03</span> Composition and reading <small>Composition</small>
         </h2>
         <div className="language-compositions">
           <div className="language-conversation">
             <div className="workshop-stack">
               <ChatHeader
-                title="整理组件的设计语言"
-                description="meowtail · 本地演示"
-                status={<ChatStatus label="就绪" tone="online" />}
+                title="Organize the component design language"
+                description="meowtail · Local demo"
+                status={<ChatStatus label="Ready" tone="online" />}
               />
               <ChatMessageList>
-                <ChatMessage role="user" author="你">
-                  组件结构保持稳定，让不同的设计通过主题表达。
+                <ChatMessage role="user" author="You">
+                  Component structure stays stable; different designs are expressed through themes.
                 </ChatMessage>
                 <ChatMessage
                   role="assistant"
@@ -280,56 +288,63 @@ export const DesignLanguageStory = defineStory({
                   actions={
                     <ChatMessageActions>
                       <Button variant="quiet" size="small">
-                        查看修改
+                        View changes
                       </Button>
                     </ChatMessageActions>
                   }
                 >
-                  <p>先校准阅读与操作的比例，再用同一组组件检查两种语言。</p>
-                  <ChatProcess label="已检查 3 类组件">
+                  <p>
+                    First calibrate the proportion of reading and actions, then check both languages
+                    with the same components.
+                  </p>
+                  <ChatProcess label="Checked 3 kinds of components">
                     <ChatToolCall
-                      label="校准组件边界"
+                      label="Calibrate component boundaries"
                       state="complete"
-                      detail="结构、状态和可访问性由组件提供；尺寸、材质和动态交由主题。"
+                      detail="Structure, state and accessibility come from components; size, material and motion come from themes."
                     />
                   </ChatProcess>
                 </ChatMessage>
               </ChatMessageList>
               <ChatComposer
-                placeholder="继续描述想改进的地方…"
-                hint="本地示例，不会发送到服务"
+                placeholder="Keep describing what you want to improve…"
+                hint="Local example; nothing is sent to a service"
                 hintId="language-hint"
               >
-                <AddButton variant="quiet" aria-label="添加附件">
-                  附件
+                <AddButton variant="quiet" aria-label="Add attachment">
+                  Attachment
                 </AddButton>
               </ChatComposer>
             </div>
             <p className="workshop-feedback" role="status" data-feedback>
-              发送后显示本地回执，不调用模型。
+              A local receipt appears after sending; no model is called.
             </p>
           </div>
           <aside className="language-context">
             <Card as="section">
               <div className="language-samples">
                 <span className="language-eyebrow">PROJECT / 001</span>
-                <h3>让细节形成整体</h3>
-                <p>相同的文字、控件和状态，放进真实的阅读与操作关系中。</p>
+                <h3>Let details form a whole</h3>
+                <p>
+                  The same words, controls and states placed in real reading and action
+                  relationships.
+                </p>
                 <Separator />
                 <div className="workshop-row">
-                  <Badge tone="success">已同步</Badge>
-                  <span className="language-note">刚刚更新</span>
+                  <Badge tone="success">Synced</Badge>
+                  <span className="language-note">Updated just now</span>
                 </div>
-                <Button variant="outline">查看项目</Button>
+                <Button variant="outline">View project</Button>
               </div>
             </Card>
-            <div className="language-icon-strip" aria-label="图标样本">
+            <div className="language-icon-strip" aria-label="Icon samples">
               {(["folder", "file", "search", "plus", "eye", "arrow-right"] as const).map((name) => (
                 <Icon name={name} size={20} />
               ))}
             </div>
             <p className="language-note">
-              所有样本使用正式主题。可直接输入、展开过程，并用键盘查看焦点状态。
+              All samples use the real theme. You can type, expand process and check focus states
+              with the keyboard.
             </p>
           </aside>
         </div>
@@ -342,11 +357,11 @@ export const DesignLanguageStory = defineStory({
       const input = root.querySelector<HTMLTextAreaElement>("textarea")!;
       const feedback = root.querySelector<HTMLElement>("[data-feedback]")!;
       if (!input.value.trim()) {
-        feedback.textContent = "先写下一句话，再发送。";
+        feedback.textContent = "Write a sentence before sending.";
         input.focus();
         return;
       }
-      feedback.textContent = `组件提交回调：${input.value}。输入保留。`;
+      feedback.textContent = `Component submit callback: ${input.value}. Input retained.`;
       report(feedback.textContent);
     };
     root.addEventListener("submit", submit);
@@ -358,12 +373,13 @@ export const DesignLanguageStory = defineStory({
 
 export const ContentCarriersStory = defineStory({
   id: "content-carriers",
-  title: "内容 · 附件、来源与执行状态",
-  group: "组合示例",
+  title: "Content · Attachments, sources and execution states",
+  group: "Composition examples",
   groupOrder: 70,
   component: "ChatAttachments",
-  variant: "附件与来源",
-  description: "图片以缩略图辨认，文件显示名称和大小；详细过程与来源按需展开。",
+  variant: "Attachments and sources",
+  description:
+    "Images are recognized by thumbnail and files show name and size; detailed process and sources expand on demand.",
   covers: [
     "ChatAttachments",
     "ChatSources",
@@ -377,7 +393,7 @@ export const ContentCarriersStory = defineStory({
         items={[
           {
             id: "image",
-            name: "布局草图.svg",
+            name: "layout-sketch.svg",
             mediaType: "image/svg+xml",
             url:
               "data:image/svg+xml," +
@@ -387,7 +403,7 @@ export const ContentCarriersStory = defineStory({
           },
           {
             id: "file",
-            name: "组件设计语言与交互状态说明.md",
+            name: "component-design-language-and-interaction-states.md",
             mediaType: "text/markdown",
             sizeBytes: 2468,
             url: "data:text/plain,MeowUI%20design%20sample",
@@ -404,38 +420,43 @@ export const ContentCarriersStory = defineStory({
         <DialogPanel
           header={
             <DialogHeader
-              title="组件设计语言与交互状态说明.md"
+              title="component-design-language-and-interaction-states.md"
               titleId="attachment-title"
-              description="内置 Markdown 示例 · 未读取本地文件"
+              description="Built-in Markdown example · No local file was read"
               descriptionId="attachment-description"
             />
           }
         >
           <article className="workshop-document">
-            <h3>让内容保持在前景</h3>
-            <p>组件负责语义与操作，主题组织尺寸、颜色和反馈。</p>
-            <p>切换表达时，正在进行的工作留在原处。</p>
+            <h3>Keep content in the foreground</h3>
+            <p>Components own semantics and actions; themes organize size, color and feedback.</p>
+            <p>When switching expression, work in progress stays in place.</p>
           </article>
           <DialogActions>
-            <Button data-close-preview>返回附件</Button>
+            <Button data-close-preview>Back to attachments</Button>
           </DialogActions>
         </DialogPanel>
       </Dialog>
       <ChatToolCall
-        label="检查组件状态"
+        label="Check component states"
         state="running"
-        detail="这里是固定状态样例，不执行后台任务。"
+        detail="This is a fixed-state example; no background task runs."
       />
-      <ChatToolCall label="等待确认修改范围" state="waiting" collapsible>
-        <p>组件契约保持稳定，主题可以独立演进。</p>
+      <ChatToolCall label="Waiting to confirm the change scope" state="waiting" collapsible>
+        <p>The component contract stays stable, and themes can evolve independently.</p>
       </ChatToolCall>
-      <ChatToolCall label="示例连接中断" state="error" detail="保留输入，可在连接恢复后重试。" />
+      <ChatToolCall
+        label="Example connection lost"
+        state="error"
+        detail="Input is kept; retry once the connection returns."
+      />
       <ChatSources
         items={[
           {
             title: "Apple Human Interface Guidelines",
             url: "https://developer.apple.com/design/human-interface-guidelines/typography",
-            description: "桌面字体角色参考；Web 参数是本项目适配。",
+            description:
+              "Desktop type role reference; the Web parameters are this project's adaptation.",
           },
         ]}
       />
@@ -455,12 +476,13 @@ export const ContentCarriersStory = defineStory({
 
 export const ConversationStatesStory = defineStory({
   id: "conversation-states",
-  title: "对话 · 角色与反馈状态",
-  group: "组合示例",
+  title: "Conversation · Roles and feedback states",
+  group: "Composition examples",
   groupOrder: 70,
   component: "ChatMessage",
-  variant: "角色与反馈",
-  description: "固定状态样例：在线、等待、错误及生成中。没有后台任务或模型调用。",
+  variant: "Roles and feedback",
+  description:
+    "Fixed-state examples: online, waiting, error and generating. There is no background task or model call.",
   covers: [
     "ChatMessage roles",
     "complete / pending / streaming / error",
@@ -470,31 +492,31 @@ export const ConversationStatesStory = defineStory({
   render: () => (
     <div className="workshop-composition">
       <div className="workshop-row">
-        <ChatStatus label="就绪" tone="online" />
-        <ChatStatus label="处理中" tone="busy" />
-        <ChatStatus label="等待确认" tone="waiting" />
-        <ChatStatus label="连接中断" tone="error" />
-        <ChatStatus label="未开始" tone="idle" />
+        <ChatStatus label="Ready" tone="online" />
+        <ChatStatus label="In progress" tone="busy" />
+        <ChatStatus label="Waiting for confirmation" tone="waiting" />
+        <ChatStatus label="Connection lost" tone="error" />
+        <ChatStatus label="Not started" tone="idle" />
       </div>
       <ChatFrame>
         <ChatMessageList>
-          <ChatMessage role="system" author="系统" timestamp="09:41">
-            已连接当前项目。
+          <ChatMessage role="system" author="System" timestamp="09:41">
+            Connected to the current project.
           </ChatMessage>
-          <ChatMessage role="user" author="你" status="pending">
-            帮我检查组件在窄屏上的表现。（等待发送）
+          <ChatMessage role="user" author="You" status="pending">
+            Check how the components behave on a narrow screen. (Waiting to send)
           </ChatMessage>
           <ChatMessage role="assistant" author="Assistant" status="streaming">
-            正在检查按钮、输入和弹窗的布局…
+            Checking the layout of buttons, inputs and dialogs…
           </ChatMessage>
-          <ChatMessage role="tool" author="浏览器检查">
-            已打开 390px 画布，保留原始内容。
+          <ChatMessage role="tool" author="Browser check">
+            Opened the 390px canvas and kept the original content.
           </ChatMessage>
           <ChatMessage role="assistant" author="Assistant" status="error">
-            连接中断，检查未完成。输入仍然保留。
+            The connection was lost and the check did not finish. Input is still kept.
           </ChatMessage>
           <ChatMessage role="assistant" author="Assistant" continuation>
-            恢复连接后可以继续检查。
+            Checking can continue once the connection returns.
           </ChatMessage>
         </ChatMessageList>
       </ChatFrame>

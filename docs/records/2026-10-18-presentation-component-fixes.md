@@ -1,53 +1,53 @@
-# Presentation 共享组件修复与课件复验
+# Presentation shared component fixes and courseware re-verification
 
-用户指出不能靠调整单份 PPT 修复共享问题，因此以 Protecting pandas 复现并验收，在 Meowtail 公共组件层统一处理。仓库正式包名仍为 `meowtail`，未重命名。保留用户材料、未知 `data/`、Rossovia 和 Sunshine 的课堂内容；本轮仅本地提交，不推送、发布或部署。
+The user pointed out that shared issues cannot be fixed by adjusting a single PPT, so Protecting pandas was used to reproduce and accept them, and they were handled uniformly in Meowtail's public component layer. The repository's official package name is still `meowtail`, with no rename. User material, the unknown `data/`, Rossovia and Sunshine's classroom content were kept; this round only made local commits, with no push, publish or deployment.
 
-## 两轮实质闭环
+## Two rounds of substantive end-to-end work
 
-第一轮在实际课件中复现标题样式影响播放器 chrome、支持面板隐藏时布局跳动，以及 body 内容穿过 footer 但 article 的 scrollHeight 仍为 720 的遗漏。独立审查将它们与普通内容设计分开：选择、草稿、重做状态属于宿主；删除重复文字、语义列宽和紧凑间距属于正常编排；隐藏/焦点/活动许可、内容类作用位置和区域溢出诊断属于共享组件合同。
+The first round reproduced in actual courseware a heading style affecting the player chrome, layout jumping when the support panel was hidden, and an omission where body content passed through the footer but the article's scrollHeight was still 720. Independent review separated these from ordinary content design: selection, draft and redo state belong to the host; removing duplicate text, semantic column widths and compact spacing belong to normal composition; hide/focus/activity permission, where content classes apply, and region overflow diagnostics belong to the shared component contract.
 
-第二轮在通用 Meowbook 压力场景、两份实际课件和独立安装目录复验。独立安装态继续找到了缩放时新旧几何混用和紧行高文字范围的误报，修复同样回到组件层。验证分别记录自动化断言、实际截图观察和安装态消费，不能互相替代。
+The second round re-verified in generic Meowbook stress scenes, the two actual courseware pieces and an independent install directory. Installed-state work further found mixed new/old geometry during scaling and false reports of tight-line-height text ranges, and those fixes also returned to the component layer. Verification separately records automated assertions, actual screenshot observation and installed-state consumption, and these cannot replace one another.
 
-## 公共合同与消费者
+## Public contract and consumers
 
-- `Reveal` 支持互斥的 `at` 或受控 `when`。两种模式共享同一保留几何、隐藏 AX/焦点、活动暂停与动画取消路径；同一节点和输入草稿保留，恢复活动不补播媒体或入场动画。未引入第二套显示状态组件。
-- `Presentation.slideClassName` 将作品类放到当前 slide article，原 `className` 仍作用播放器根。它明确内容样式的挂载点，不承诺任意 CSS 的沙箱隔离。
-- 溢出诊断检查画布及最近的 `PresentationLayout` header/body/footer 分配区域，支持文字行、动态内容及隐藏/显示变化。显式滚动或裁切的 owner 负责内部内容，其自身越界仍诊断；背景装饰及 top layer 不误算正文容量。诊断只警告，不自动裁切、缩字或扩张画布。
+- `Reveal` supports mutually exclusive `at` or controlled `when`. Both modes share the same path for preserved geometry, hidden AX/focus, activity pause and animation cancel; the same node and input draft are kept, and restoring activity does not replay media or entrance animation. No second display-state component was introduced.
+- `Presentation.slideClassName` puts the work class on the current slide article, while the original `className` still applies to the player root. It defines the mount point for content styles and does not promise sandbox isolation for arbitrary CSS.
+- Overflow diagnostics check the canvas and the nearest `PresentationLayout` header/body/footer allocated regions, supporting text lines, dynamic content and show/hide changes. Owners that explicitly scroll or clip are responsible for inner content, while their own out-of-bounds is still diagnosed; background decoration and the top layer are not miscounted as body capacity. Diagnostics only warn and do not automatically clip, shrink text or expand the canvas.
 
-Panda a3 将作品自己的显隐接线替换为 `Reveal when`，由共享组件统一负责 visibility/inert/aria-hidden、焦点与活动许可；使用 `slideClassName` 并删除逐标题 class 补丁。选择、支持开关和草稿依然由作品工厂持有，课堂文字与素材来源保持不变。Sunshine 仅切换内容类挂载点，构建/服务增加候选输出目录，避免覆盖仍运行的旧预览。通用 stories 复用真实组件，覆盖长 token、嵌套 min-size、输入、活动与媒体。
+Panda a3 replaced the work's own show/hide wiring with `Reveal when`, so the shared component uniformly handles visibility/inert/aria-hidden, focus and activity permission; it uses `slideClassName` and removed per-heading class patches. Selection, support toggles and drafts are still held by the work factory, and classroom text and asset sources are unchanged. Sunshine only switched the content class mount point, and its build/serve gained a candidate output directory to avoid overwriting the still-running old preview. Generic stories reuse the real components, covering long tokens, nested min-size, input, activity and media.
 
-## 验证边界
+## Verification boundaries
 
-最终统一 build 后，根 typecheck、Meowtail 全包 tsc 与根单测通过：325 项、67 文件、2019 断言。
-相关组件浏览器 15/15（诊断 6、受控 Reveal 4、既有布局 2、背景 3），既有 Presentation 合同全套 32/32。
-Panda 全套 8/8（14.8 秒），Sunshine 定向 3/3（4.9 秒）；后者覆盖教师逐步揭示、跨页状态/显式重做、提示与 reduced motion，不冒充 Sunshine 全套验收。
-全仓格式检查显式排除 `data/**`，lint 同样排除且 deny-warnings；skill 校验通过。八份相关文档的 26 个相对文件链接存在性检查通过，本轮此检查不覆盖锚点。
+After the final unified build, root typecheck, full Meowtail package tsc and root unit tests passed: 325 items, 67 files, 2019 assertions.
+The related component browser runs passed 15/15 (diagnostics 6, controlled Reveal 4, existing layout 2, backgrounds 3), and the full existing Presentation contract passed 32/32.
+The full Panda suite passed 8/8 (14.8 seconds), and Sunshine targeted 3/3 (4.9 seconds); the latter covers teacher step-by-step reveal, cross-slide state/explicit redo, hints and reduced motion, and is not passed off as Sunshine's full acceptance.
+The repo-wide format check explicitly excluded `data/**`, and lint excluded it the same way with deny-warnings; the skill validation passed. Existence checks of 26 relative file links across eight related documents passed; this round's check does not cover anchors.
 
-独立质疑者读实际 diff，并以真实浏览器验证 16 个共享合同点及 8 个缩放点；最终字体修订另补 8/8，包括 direct text、inline span、真实多行越 footer、横向长 token、撤去清除和窄短缩放。
-普通窗口 1100×760 的 live a3 37/37 原图已由独立审查者逐张打开：封面初/终两态，五题默认、选中、Hint 单开、Reference 单开、Evidence 单开、全开、回访七态。没有新增重叠、裁切或支持栏跳动；pageerror 与可见诊断均为零。逐图索引为 `artifacts/protecting-pandas-review/live-normal/a3/REVIEW.md` 与 `index.json`。
-另一独立审查者在 1440×1000、1280×500 的同版 live 各拍同样 37 态，共 74/74 原图逐张实际打开。选中、长草稿、高亮、单开/全开与回访均完整；每题七态支持栏位置不变，body 259/scrollHeight 259，正文与 footer 保留 16 逻辑 px。原图、74 行逐图索引 `VISUAL-INDEX.md` 与 `facts.json` 归档 `artifacts/protecting-pandas-review/live-visual/a3/`。根另实际查看宽屏问题全支持、普通窗口成长默认、短窗行动全支持。共 111 张 live 图逐张审阅，不包括下列另拍的 18 张自动化图。
-同版全展开自动化另拍六页 × 1440×900、390×844、1280×330，共 18 图，归档 `artifacts/protecting-pandas-review/a3/automated-scenes/`；根实际查看窄窗成长页和极短窗长草稿行动页，不宣称这 18 图全部人工看过。
-历史 a1 的截图与私有 a2 候选保留为过程证据，不计入 a3 的完整逐图结果。
+The independent challenger read the actual diff and verified 16 shared contract points and 8 scaling points in a real browser; the final font revision added another 8/8, covering direct text, inline span, real multi-line overflow past the footer, horizontal long tokens, removal of clearing, and narrow/short scaling.
+The independent reviewer opened all 37/37 original images of live a3 at the normal window 1100×760, one by one: two cover states (initial/final), and seven states for each of the five questions — default, selected, Hint only, Reference only, Evidence only, all open, and revisit. There was no new overlap, clipping or support panel jumping; pageerror and visible diagnostics were both zero. The per-image index is `artifacts/protecting-pandas-review/live-normal/a3/REVIEW.md` and `index.json`.
+Another independent reviewer took the same 37 states on the same live version at 1440×1000 and 1280×500, and actually opened all 74/74 original images one by one. Selection, long drafts, highlighting, single-open/all-open and revisit were all complete; the support panel position stayed the same across the seven states of each question, body 259/scrollHeight 259, and the body and footer kept 16 logical px. The original images, the 74-row per-image index `VISUAL-INDEX.md` and `facts.json` are archived in `artifacts/protecting-pandas-review/live-visual/a3/`. The root also actually viewed wide-screen all-support for the questions, normal-window growth default and short-window all-support for the action page. A total of 111 live images were reviewed one by one, excluding the 18 automated images shot separately below.
+The same-version full-expansion automation separately shot six slides × 1440×900, 390×844 and 1280×330, 18 images in total, archived in `artifacts/protecting-pandas-review/a3/automated-scenes/`; the root actually viewed the narrow-window growth slide and the extremely short-window long-draft action slide, and does not claim that all 18 images were viewed manually.
+The historical a1 screenshots and the private a2 candidate are kept as process evidence and are not counted into a3's complete per-image results.
 
-安装态使用三个全新 tgz，在仓库外 `/tmp/meowland-component-consumer-BkHwcQ` 离线真实安装，无源码别名、逃逸链接或父级依赖。当前 dist、打包副本和安装文件逐文件 SHA 一致；严格公共类型正例/五项负例、无 DOM core、root/subpath 身份及实际浏览器消费通过。
-原始 `48px / 1.1` 标题反例与纯 inline 换行已原样复验；真实多行、nowrap、inline-block 越界仍诊断。四视口九张截图实际查看，pageerror 为零。
-回执为 `artifacts/presentation-components-final-consumer-p66ucuuu/receipt.json`；Meowtail tgz SHA256
-`55d755f1b404aca8cdb79f22ab308c871b4404bb5361a960b5e9beafb8dee433`。这是本地安装态验收，未发布 registry。
+Installed state used three brand-new tgz files, installed offline for real in `/tmp/meowland-component-consumer-BkHwcQ` outside the repository, with no source alias, escaping link or parent dependency. Current dist, the packed copy and installed files matched SHA file by file; strict public type positive cases/negative cases (five), DOM-free core, root/subpath identity and actual browser consumption passed.
+The original `48px / 1.1` heading counterexample and pure inline wrapping were re-verified as-is; real multi-line, nowrap and inline-block out-of-bounds are still diagnosed. Nine screenshots across four viewports were actually viewed, and pageerror was zero.
+The receipt is `artifacts/presentation-components-final-consumer-p66ucuuu/receipt.json`; the Meowtail tgz SHA256
+`55d755f1b404aca8cdb79f22ab308c871b4404bb5361a960b5e9beafb8dee433`. This is local installed-state acceptance, not a registry publish.
 
-最终 Web 脚本 `chunk-zrg09fpk.js`，build-manifest SHA256 为
-`d881cd0d2275c91d3c2b420e5894fcaf644b1dfb325feb2fd5ab51d0e3739f4e`。
-候选七个文件与 live 逐字节核对后原子更新 index，HTTP 200；保留旧哈希资源与 `13014` 进程，不重启用户现场。
-作品外围标题含 `a3`，旧标签页需要刷新；刷新会清空本场草稿。旧 Sunshine `13012` 保留，回归使用独立候选目录与测试服务。
+The final Web script is `chunk-zrg09fpk.js`, and the build-manifest SHA256 is
+`d881cd0d2275c91d3c2b420e5894fcaf644b1dfb325feb2fd5ab51d0e3739f4e`.
+After checking the seven candidate files byte for byte against live, the index was updated atomically, returning HTTP 200; old hash assets and the `13014` process were kept, and the user's live site was not restarted.
+The work's peripheral title contains `a3`, so old tabs need a refresh; refreshing clears this session's draft. The old Sunshine `13012` was kept, and regressions use a separate candidate directory and test service.
 
-代表图使用实际 live 的“问题与后果”全支持宽屏原图，根与独立审查者均实际查看后，替换已有 Library 文件到 version 1：
-`libfile_95916a411e8c8191a2ee5da6a478b07c`。
-本地副本与完整上传回执为 `artifacts/protecting-pandas-review/a3/`，保留 a1 历史，不重复建立另一个同名 Library 文件。
+The representative image uses the actual live wide-screen original of "Questions and consequences" with all support open; after both the root and the independent reviewer actually viewed it, the existing Library file was replaced at version 1:
+`libfile_95916a411e8c8191a2ee5da6a478b07c`.
+The local copy and complete upload receipt are in `artifacts/protecting-pandas-review/a3/`, keeping the a1 history and not creating another Library file with the same name.
 
-本轮根测试、组件和 Presentation 浏览器分别完整运行；没有运行全部无关组件浏览器矩阵。类型、静态检查、行为断言、视觉观察和安装态分开记录；build、pack 与本地提交都不等于正式发行。
+This round's root tests, component browser and Presentation browser were each run completely; the full unrelated component browser matrix was not run. Types, static checks, behavior assertions, visual observation and installed state are recorded separately; build, pack and local commits do not equal an official release.
 
-保留一项内容边界：问题页 Reference 是 forests 的通用示例，保护页也是通用关联提示，不随当前选择动态生成。本轮按用户要求保留课堂原文字，不将此解释关联问题伪装成共享组件故障。
+One content boundary is kept: the Reference on the questions page is a generic forests example, and the protection page also shows a generic related hint, not generated dynamically from the current selection. This round kept the classroom original text as the user requested and does not disguise this interpretation-related issue as a shared component failure.
 
-实现与相关规范本地提交 `bf5208d`；验证用源码哈希与独立安装回执一致，提交前后无生产源码变化。
-根自有正式图测试服务 `13009`、组件审查 `13058` 与各测试/安装态临时服务均已退出；用户预览 `13014` 和旧作品 `13012` 保留。
+Implementation and related specifications were committed locally as `bf5208d`; the source hash used for verification matches the independent install receipt, and there was no production source change before or after the commit.
+The root's own official-image test service `13009`, component review `13058` and the temporary test/installed-state services all exited; the user previews `13014` and the old work `13012` were kept.
 
-未做 Firefox、人工屏幕阅读器、实体手机、真实课堂投影或学习成效观察。窄短窗口采用整体画布缩放；控件可达不代表手机正文适合阅读。诊断是有限演示画布的可视警告，不是通用 CSS 验证器。没有改变课件来源事实、无关整体配色或后端持久化职责。
+Firefox, manual screen readers, physical phones, real classroom projection and learning-outcome observation were not done. Narrow/short windows use whole-canvas scaling; control reachability does not mean phone body text is suitable for reading. Diagnostics are visual warnings for a finite presentation canvas, not a generic CSS validator. Courseware source facts, unrelated overall colors and backend persistence responsibilities were not changed.

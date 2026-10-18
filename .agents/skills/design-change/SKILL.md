@@ -3,24 +3,24 @@ name: design-change
 description: Plan cross-package work or challenge changes to responsibilities, public contracts and lifecycle mechanisms. Use real counterexamples and proportionate tests; skip routine implementation or wording fixes.
 ---
 
-# 规划与机制锻打
+# Planning and mechanism stress-testing
 
-用于目标仍需分解、职责/公共合同/状态或生命周期要改变的工作。已有合同下的局部修复和文字调整直接处理，不要求先写方案、填表或启动完整团队。
+Use this for work whose goal still needs decomposition, or where responsibilities/public contracts/state or lifecycle must change. Local fixes and copy changes under an existing contract are handled directly; they do not require a written plan, a form or a full team first.
 
-## 先找到会改变选择的问题
+## First find the questions that change the choice
 
-从真实请求、消费者、现有合同与失败窗口开始，区分用户已定方向、源码事实、候选和未知。简短说明预期可观察行为、当前为何不足及下一项会改变决定的未知；不要从“新增一层/包/状态”倒推需求。
+Start from the real request, consumers, existing contracts and failure windows; distinguish user-set direction, source facts, candidates and unknowns. Briefly state the expected observable behavior, why the current state is insufficient, and the next unknown that would change the decision; do not work backward from "add a layer/package/state".
 
-优先比较修正已有接线、更小替代与保留现状。引入或删除机制时说清必要责任由谁继续承担、哪些调用方一起切换、失败与恢复由哪个 owner 接住；不能只删除名字、把复杂度交给用户或保留新旧两路兜底。
+Prefer comparing a fix to existing wiring, smaller alternatives and keeping the status quo. When introducing or removing a mechanism, state who continues to carry the necessary responsibility, which callers switch together, and which owner catches failure and recovery; do not merely delete a name, hand complexity to users, or keep old and new fallbacks side by side.
 
-机制实施前让独立于作者/实施者的质疑者，用真实反例和更小替代核对确切边界。沿当前任务或原设计位置记简短理由与结论，不建永久审批表。既有共识范围内不反复重审；新反证或机制偏移才重开受影响决定。独立性或环境缺失时准确报告，继续可独立推进的部分，不由作者冒充独立通过。
+Before implementing a mechanism, have a challenger independent of the author/implementer check the exact boundary with real counterexamples and smaller alternatives. Record a brief rationale and conclusion alongside the current task or original design location; do not build a permanent approval table. Do not repeatedly re-review within existing consensus; only new counterevidence or mechanism drift reopens the affected decisions. When independence or environment is missing, report accurately, continue the parts that can proceed independently, and do not let the author pose as independent approval.
 
-## 让计划和测试降低返工
+## Make plans and tests reduce rework
 
-复杂任务按真实依赖切工作包，文件 writer 明确，独立工作并行；已有任务计划能承接就不另建台账。每片有可观察结果和必要消费者闭包，不把摘要、Git SHA 或未相关的治理欠账当新阻塞。
+Split complex tasks into work packages by real dependencies, name the file writer explicitly, and run independent work in parallel; if an existing task plan can carry the work, do not create another ledger. Each slice has an observable result and the necessary consumer closure; do not treat a summary, a Git SHA or an unrelated governance debt as a new blocker.
 
-测试先回答“什么输入会错、消费者损失什么、哪一条断言能发现”。优先复用真实入口与现有夹具；mock 隔离范围外依赖，不替换本次要证明的机制。不要匹配源码词句、复制算法算期望或机械追覆盖率；文案、样式与简单透传不自动新增测试。
+Tests first answer "which input goes wrong, what the consumer loses, and which assertion detects it". Prefer reusing real entry points and existing fixtures; mock out-of-scope dependencies without replacing the mechanism this work needs to prove. Do not match source wording, copy an algorithm to compute expectations, or mechanically chase coverage; copy, styles and simple pass-through do not automatically get new tests.
 
-缺陷回归应能在原错误存在时失败；类型环境、真实 DOM、安装资源分别用能发现该错误的最小检查。必要风险已有证据后停止补测，只有新变化、失败或未决风险才重跑；检查清单与实际命令从[开发检查](../../../docs/development-checks.md)取得。
+A defect regression should fail when the original error is present; type environments, real DOM and installed resources each use the minimal check that can detect that error. Stop adding tests once necessary risk has evidence; re-run only for new changes, failures or unresolved risks; get the checklist and actual commands from [development checks](../../../docs/development-checks.md).
 
-交付支配设计的选择、反例如何改变了它、必要责任与剩余验证。推演、实现、自动化检查、视觉/交互观察和用户接受分别报告；只要求方案时不自动开始实现或发布。
+Deliver the choice that drove the design, how counterexamples changed it, the necessary responsibilities and remaining verification. Report reasoning, implementation, automated checks, visual/interaction observation and user acceptance separately; when only a plan is requested, do not automatically start implementation or release.

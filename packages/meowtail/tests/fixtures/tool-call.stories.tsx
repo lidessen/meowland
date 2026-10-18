@@ -13,10 +13,9 @@ export const ToolCallContract = defineStory({
     );
     const status = signal("Queued; no execution reported");
     const output = signal<string | undefined>(
-      Array.from(
-        { length: 24 },
-        (_, i) => `line ${i + 1}: ${"long result 长结果 ".repeat(8)}`,
-      ).join("\n"),
+      Array.from({ length: 24 }, (_, i) => `line ${i + 1}: ${"long result text ".repeat(8)}`).join(
+        "\n",
+      ),
     );
     const canRetry = signal(true);
     const retryDisabled = signal(false);
@@ -62,12 +61,12 @@ export const ToolCallContract = defineStory({
         </Button>
         <div style={{ width: "320px", maxWidth: "100%" }}>
           <ChatToolCall
-            label={"check_" + "VeryLongToolName没有空格工具名称".repeat(6)}
+            label={"check_" + "VeryLongToolNameWithoutSpaces".repeat(6)}
             summary={summary}
             state={state}
             statusLabel={status}
             input={
-              "<script>window.untrustedExecuted = true</script>\n" + "很长的中文输入".repeat(35)
+              "<script>window.untrustedExecuted = true</script>\n" + "VeryLongInputText".repeat(35)
             }
             output={output}
             outputSummary="The output is execution data; it does not imply a public reply."
@@ -97,7 +96,7 @@ export const ToolCallContract = defineStory({
           label="Read long source material"
           summary={"/very-long-source-name".repeat(50)}
           state="cancelled"
-          statusLabel="已取消"
+          statusLabel="Canceled"
           collapsible
         />
         <p role="status" data-tool-intents>

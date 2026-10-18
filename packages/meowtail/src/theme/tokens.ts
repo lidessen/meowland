@@ -8,6 +8,9 @@ export const standardOptions = defineOptions("meowui", {});
 /** Re-evaluate color aliases at a local scheme instead of inheriting resolved parent colors. */
 const schemeAlias = (value: string) => standardOptions.by.scheme([value, value]);
 
+/** Secondary ink that remains readable on input and page surfaces in both schemes. */
+const mutedForeground = ["#61666b", "#adb2b8"] as const;
+
 export const uiTokens = defineTokens("ui", {
   font: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif',
   mono: '"SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, "PingFang SC", "Microsoft YaHei"',
@@ -54,11 +57,15 @@ export const uiTokens = defineTokens("ui", {
   foreground: ["#0f1115", "#f9fafb"],
   toastSurface: ["#353638", "#43454a"],
   toastForeground: "#ffffff",
-  mutedForeground: ["#61666b", "#adb2b8"],
-  subtleForeground: "#81858c",
-  captionForeground: ["#adb2b8", "#81858c"],
+  mutedForeground,
+  // Metadata ink stays above the normal-text floor in both schemes; it is still
+  // lighter than the primary muted text so hierarchy survives.
+  subtleForeground: ["#656a71", "#9aa0a7"],
+  captionForeground: ["#656a71", "#9aa0a7"],
   shimmer: ["rgb(0 0 0 / 30%)", "rgb(255 255 255 / 45%)"],
-  placeholder: ["#e1e5ee", "#81858c"],
+  // Placeholder is text the reader must scan before typing; reuse the readable
+  // secondary ink instead of a near-white tint that only works as decoration.
+  placeholder: mutedForeground,
   border: ["rgb(0 0 0 / 16%)", "rgb(255 255 255 / 20%)"],
   borderSubtle: ["rgb(0 0 0 / 12%)", "rgb(255 255 255 / 16%)"],
   borderSoft: schemeAlias(`${lineTokens.divider}`),
@@ -69,10 +76,10 @@ export const uiTokens = defineTokens("ui", {
   primaryHover: ["#43454a", "#ebeef2"],
   onPrimary: ["#ffffff", "#0f1115"],
   primarySoft: ["#ebeef2", "#43454a"],
-  info: ["#4176e6", "#7aaaff"],
-  warning: "#dd8629",
-  success: "#22c55e",
-  danger: ["#ec1313", "#f25a5a"],
+  info: ["#2f5fce", "#7aaaff"],
+  warning: ["#a85c00", "#f0a04b"],
+  success: ["#15803d", "#4ade80"],
+  danger: ["#d51d1d", "#f25a5a"],
   // Filled destructive actions are a Meowland extension: state red alone does
   // not provide readable small labels, especially with white ink in dark mode.
   dangerAction: ["#b91c1c", "#f25a5a"],

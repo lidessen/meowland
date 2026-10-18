@@ -20,24 +20,24 @@ test("composed cards retain heading hierarchy, host semantics and actions withou
   const view = (
     <Card as="article" aria-labelledby="project-title" className="host">
       <CardHeader>
-        <CardTitle id="project-title">项目记录</CardTitle>
-        <CardDescription>待确认的修改</CardDescription>
+        <CardTitle id="project-title">Project record</CardTitle>
+        <CardDescription>Changes to confirm</CardDescription>
         <CardAction>
-          <Button aria-label="更多记录">更多</Button>
+          <Button aria-label="More records">More</Button>
         </CardAction>
       </CardHeader>
       <CardContent>
         <Card as="section" variant="embedded" aria-labelledby="task-title">
           <CardHeader>
             <CardTitle as="h3" id="task-title">
-              内嵌任务
+              Embedded task
             </CardTitle>
           </CardHeader>
-          <CardContent>任务详情</CardContent>
+          <CardContent>Task details</CardContent>
         </Card>
       </CardContent>
       <CardFooter>
-        <Button type="submit">保存</Button>
+        <Button type="submit">Save</Button>
       </CardFooter>
     </Card>
   );
@@ -58,11 +58,11 @@ test("Card children keep their structure without requiring composition slots", (
   const web = createWebRenderer(runtime);
   const plain = web.renderToHtml(
     <Card>
-      <p>原有内容</p>
+      <p>Existing content</p>
     </Card>,
   );
   expect(plain).toContain('data-option-card-variant="auto"');
-  expect(plain).toContain("<p>原有内容</p>");
+  expect(plain).toContain("<p>Existing content</p>");
   expect(plain).not.toContain('data-meowui-part="card-content/root"');
 });
 
@@ -74,7 +74,7 @@ test("Card depth follows ancestor context across wrappers and leaves siblings an
     <div>
       <Card>
         <CardContent>
-          <Card variant="surface">独立表面</Card>
+          <Card variant="surface">Standalone surface</Card>
         </CardContent>
       </Card>
     </div>
@@ -83,11 +83,11 @@ test("Card depth follows ancestor context across wrappers and leaves siblings an
     <Card>
       <CardContent>
         <Wrapped />
-        <Card>同级内嵌</Card>
+        <Card>Sibling embedded</Card>
       </CardContent>
     </Card>,
-    <Card>另一张顶层卡</Card>,
-    <Card variant="embedded">显式内嵌</Card>,
+    <Card>Another top-level card</Card>,
+    <Card variant="embedded">Explicitly embedded</Card>,
   ]);
   expect([...html.matchAll(/data-card-depth="(\d+)"/g)].map((match) => match[1])).toEqual([
     "0",
@@ -100,5 +100,5 @@ test("Card depth follows ancestor context across wrappers and leaves siblings an
   expect(html.match(/data-option-card-variant="auto"/g)).toHaveLength(4);
   expect(html).toContain('data-option-card-variant="embedded"');
   expect(html).toMatch(/data-card-depth="2"[^>]*data-option-card-variant="surface"/);
-  expect(web.renderToHtml(<Card>独立渲染</Card>)).toContain('data-card-depth="0"');
+  expect(web.renderToHtml(<Card>Standalone render</Card>)).toContain('data-card-depth="0"');
 });

@@ -5,17 +5,17 @@ test("tabs keyboard navigation skips disabled items, wraps, preserves drafts and
 }) => {
   await page.goto("/canvas.html?story=tabs");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  const tabs = page.getByRole("tablist", { name: "项目视图" });
-  const overview = tabs.getByRole("tab", { name: "概览", exact: true });
-  const notes = tabs.getByRole("tab", { name: "工作笔记", exact: true });
-  const files = tabs.getByRole("tab", { name: "文件", exact: true });
+  const tabs = page.getByRole("tablist", { name: "Project views" });
+  const overview = tabs.getByRole("tab", { name: "Overview", exact: true });
+  const notes = tabs.getByRole("tab", { name: "Work notes", exact: true });
+  const files = tabs.getByRole("tab", { name: "Files", exact: true });
   await overview.focus();
   await page.keyboard.press("ArrowRight");
   await expect(notes).toBeFocused();
   await expect(notes).toHaveAttribute("aria-selected", "true");
-  await expect(tabs.getByRole("tab", { name: "权限管理" })).toBeDisabled();
-  const draft = page.getByRole("textbox", { name: "工作草稿" });
-  await draft.fill("保留这段草稿");
+  await expect(tabs.getByRole("tab", { name: "Permissions" })).toBeDisabled();
+  const draft = page.getByRole("textbox", { name: "Work draft" });
+  await draft.fill("Keep this draft");
   await notes.focus();
   await page.keyboard.press("End");
   await expect(files).toBeFocused();
@@ -27,7 +27,7 @@ test("tabs keyboard navigation skips disabled items, wraps, preserves drafts and
   await page.keyboard.press("Home");
   await expect(overview).toBeFocused();
   await page.keyboard.press("ArrowRight");
-  await expect(draft).toHaveValue("保留这段草稿");
+  await expect(draft).toHaveValue("Keep this draft");
   const panelId = await notes.getAttribute("aria-controls");
   await expect(page.locator(`#${panelId}`)).toHaveAttribute(
     "aria-labelledby",
@@ -36,6 +36,9 @@ test("tabs keyboard navigation skips disabled items, wraps, preserves drafts and
   await expect(page.locator(`#${panelId}`)).toBeVisible();
   await page.keyboard.press("Tab");
   await expect(page.locator(`#${panelId}`)).toBeFocused();
-  await page.getByRole("tablist", { name: "受控视图" }).getByRole("tab", { name: "详情" }).click();
-  await expect(page.getByRole("tabpanel", { name: "详情" })).toBeVisible();
+  await page
+    .getByRole("tablist", { name: "Controlled views" })
+    .getByRole("tab", { name: "Details" })
+    .click();
+  await expect(page.getByRole("tabpanel", { name: "Details" })).toBeVisible();
 });

@@ -65,8 +65,8 @@ export const ContentBoundariesStory = defineStory({
           <CardTitle>{title}</CardTitle>
           <CardDescription>CardHeader also works without a Card ancestor.</CardDescription>
           <CardAction>
-            <Button size="small">查看详情</Button>
-            <Button size="small">编辑记录</Button>
+            <Button size="small">View details</Button>
+            <Button size="small">Edit record</Button>
           </CardAction>
         </CardHeader>
         <ResourceCard

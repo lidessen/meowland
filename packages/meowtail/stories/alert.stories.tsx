@@ -1,27 +1,41 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Alert, Stack, Container } from "meowtail";
+import { Alert, Button, Stack, Container } from "meowtail";
 export const Alerts = defineStory({
   id: "alert",
-  title: "提示 · 结果与下一步",
+  title: "Alert · Outcome and next step",
   component: "Alert",
-  variant: "信息与紧急反馈",
-  group: "浮层与反馈",
+  variant: "Informational and urgent feedback",
+  group: "Overlays and feedback",
   groupOrder: 30,
-  description: "颜色表达语义，播报紧急度由 role 独立指定。这些均为本地演示消息。",
-  covers: ["Alert", "status", "error"],
+  description:
+    "Color conveys semantics; the announced urgency is set independently with role. These are all local demo messages.",
+  covers: ["Alert", "bar", "status", "error"],
   render: () => (
     <Container width="content">
       <Stack>
-        <Alert title="仅保存在本机">当前草稿尚未发布，可继续修改。</Alert>
-        <Alert title="草稿已保存" tone="success">
-          下次打开时可以继续编辑。
+        <Alert title="Saved on this device only">
+          The current draft has not been published yet; you can keep editing.
         </Alert>
-        <Alert title="连接暂时中断" tone="warning">
-          已保留当前输入，恢复连接后可以继续发送。
+        <Alert
+          layout="bar"
+          tone="warning"
+          actions={
+            <Button variant="quiet" size="small">
+              View receipt
+            </Button>
+          }
+        >
+          Last submission unverified; draft kept.
         </Alert>
-        <Alert title="文件无法读取" tone="danger" role="alert">
-          文件可能已移动，请重新选择文件后再试。
+        <Alert title="Draft saved" tone="success">
+          You can continue editing the next time you open it.
+        </Alert>
+        <Alert title="Connection temporarily interrupted" tone="warning">
+          Your input has been kept; you can send it after the connection recovers.
+        </Alert>
+        <Alert title="File could not be read" tone="danger" role="alert">
+          The file may have moved. Select the file again and try again.
         </Alert>
       </Stack>
     </Container>

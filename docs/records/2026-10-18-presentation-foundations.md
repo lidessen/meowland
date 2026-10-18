@@ -1,77 +1,77 @@
-# 演示布局基础：列、列表与图片
+# Presentation layout foundations: columns, lists and images
 
-## 目标与边界
+## Goal and boundaries
 
-在已有 Meowtail 演示体系内补齐常用两/三栏、原生正文列表与可靠的图片/图注组合。
-本轮优先响应用户指定 a4 图片留白；逐空练习仅完成缺口研究，未实现，也未将 Reveal 描述成逐空组件。
-保留课程问题、任务状态、媒体来源与配色；不修改 Rossovia、版本、依赖、锁文件或发布工具。
-未知 `data/` 未读取或修改。没有推送、发布或部署。
+Within the existing Meowtail presentation system, fill in common two/three-column layouts, native body lists and a reliable image/caption composition.
+This round prioritized the a4 image whitespace the user specified; the fill-in-the-blank exercise only completed gap research and was not implemented, and Reveal was not described as a fill-in-the-blank component.
+Lesson questions, task state, media sources and colors were kept; Rossovia, versions, dependencies, lock files and release tooling were not modified.
+The unknown `data/` was not read or modified. There was no push, publish or deployment.
 
-## 第一轮：核实与反例
+## Round one: verification and counterexamples
 
-- 现有 `PresentationLayout` 已有 single/equal/wide-start/wide-end，equal 即两栏；通用 Grid 能三栏，但演示布局缺直接三栏。
-- ListGroup 面向应用行列表，Timeline 面向事件流；两者均不能冒充投屏正文 ul/ol。
-- 指定截图 Library `libfile_7ebd8cfd772c8191be98d1e6e14a6080` 已核实身份并打开原图。森林源为 5184×3456、3:2，原图没有内嵌边框。
-- a4 实际槽位约 568×156.84；contain 图像只占宽 41.42%，左右各留约 166px。相同槽位强制 cover 会裁去约 59% 高度，不是可靠的通用默认。
+- The existing `PresentationLayout` already had single/equal/wide-start/wide-end, where equal means two columns; the generic Grid can do three columns, but the presentation layout lacked direct three columns.
+- ListGroup is for app row lists and Timeline is for event streams; neither can stand in for projected body ul/ol.
+- The specified screenshot Library `libfile_7ebd8cfd772c8191be98d1e6e14a6080` was verified for identity and its original image was opened. The forest source is 5184×3456, 3:2, and the original image has no embedded border.
+- The actual a4 slot is about 568×156.84; a contained image occupies only 41.42% of the width, leaving about 166px on each side. Forcing cover in the same slot would crop about 59% of the height, which is not a reliable generic default.
 
-布局/列表和图片分别由独立 owner 实施；独立质疑者先核对有限高度、原生语义、裁切/完整显示及简单 API，再写实现。
+Layout/list and images were implemented by separate independent owners; the independent challenger first verified finite height, native semantics, clipping/full display and a simple API before implementation was written.
 
-## 实现
+## Implementation
 
-- `PresentationLayout columns={1 | 2 | 3}`：1/2 复用既有 single/equal 分配，3 使用同一 body grid；旧字符串兼容。逻辑列不因物理窄窗口自动重排。
-- `PresentationList items={...} as="ul" | "ol"`：真实 ul/ol/li 与浏览器标记，支持原生 start/reversed；复用演示正文 tokens，嵌套继承字号、长词可换行。静态 null/undefined/boolean 省略，数字 0 保留。
-- `PresentationImage`：一个真实 ImagePreview 的 figure/frame/caption 薄适配。默认 ratio=16/9、contain、center；显式 cover 与九点 position；ratio="fill" 消费有限父级余高，图注自然占高。
-- 加载/失败与事件复用原组件，不复制状态机；不改变全局 ImagePreview 默认，不添加 Lightbox、自动裁切或自动缩字。
-- 根与 presentation 子路径共享组件/contract 身份，主题及 registry 同时接线。Meowbook 真实三页 gallery 和作者指南均已更新。
+- `PresentationLayout columns={1 | 2 | 3}`: 1/2 reuse the existing single/equal allocation, and 3 uses the same body grid; old strings remain compatible. Logical columns do not reflow automatically because of a physically narrow window.
+- `PresentationList items={...} as="ul" | "ol"`: real ul/ol/li and browser markers, supporting native start/reversed; it reuses presentation body tokens, inherits font size when nested, and wraps long words. Static null/undefined/boolean are omitted, while the number 0 is kept.
+- `PresentationImage`: a thin figure/frame/caption adapter over a real ImagePreview. Default ratio=16/9, contain, center; explicit cover and nine-point position; ratio="fill" consumes the finite parent's remaining height, and the caption takes natural height.
+- Loading/failure and events reuse the original component without copying the state machine; the global ImagePreview defaults are unchanged, and no Lightbox, automatic clipping or automatic text shrinking was added.
+- The root and presentation subpaths share component/contract identity, and theme and registry are wired at the same time. The real three-slide Meowbook gallery and the authoring guide were both updated.
 
-## 第二轮：组合发现与收敛
+## Round two: composition findings and convergence
 
-实际浏览器和截图共同发现两个不能用“无溢出”掩盖的问题：
+The actual browser and screenshots together found two problems that could not be hidden behind "no overflow":
 
-1. 新图片主题早于基础 ImagePreview 样式，零特异性 part 规则被后者覆盖，实际 img 仍 180px/contain，遮住图注。将适配样式排在基础样式之后，补 actual img 与 frame 同边界、computed fit/position 回归；未增加选择器提权。
-2. 仅改 cover 的两栏版本把森林裁成 568×122 的薄条，图注又占 84px。独立复看否决该构图。最终 Panda watch 用共享三栏将视频、森林和原有三条问题分开，森林约 373×316；用默认正文 PresentationList 替换私有 22px 列表 CSS。
+1. The new image theme came before the base ImagePreview styles, so the base's zero-specificity part rules overrode it, and the actual img was still 180px/contain and covered the caption. The adapter styles were ordered after the base styles, and regressions were added for the actual img sharing the frame boundary and for computed fit/position; selector specificity was not escalated.
+2. A two-column version that only changed cover cropped the forest into a 568×122 thin strip, and the caption took another 84px. Independent re-review rejected that composition. Finally Panda watch used the shared three columns to separate the video, the forest and the original three questions, with the forest about 373×316; the private 22px list CSS was replaced with the default body PresentationList.
 
-数值比例在 grid 默认 stretch 下也可能被拉高，已用自身对齐与不 grow 保持首选比例；只有 fill 领余量。
-最后把新图片的状态文字限定为演示 caption token，避免应用 12px 失败提示在投屏中太细。
-原双照片观察页保持 contain；森林为明确标注裁切的环境图，不能作为森林变化的事实证据。
+Numeric ratios could also be stretched under the grid's default stretch, so self-alignment and no-grow were used to keep the preferred ratio; only fill takes the remaining space.
+Finally the new image's status text was scoped to the presentation caption token, so the app's 12px failure hint would not be too thin when projected.
+The original two-photo observation slide keeps contain; the forest is an environment image with explicitly labeled cropping and cannot serve as factual evidence of forest change.
 
-## 冻结版本验证
+## Frozen-version verification
 
-同一最终源码/dist：
+Same final source/dist:
 
-- 根 build、root typecheck、完整 Meowtail tsc（含公共正负类型）、Panda tests tsc 通过。
-- 全套单测 331/331，69 文件、2063 断言。
-- 新布局/列表/图片真实 Chrome 浏览器 7/7；覆盖数值/旧别名、长词/超容量诊断、原生倒序/嵌套、数值比例、三种源图四角、显式裁切、加载→失败、自然图注。
-- 既有 Presentation 浏览器 33/33；Panda 完整 13/13；Sunshine 定向 3/3。后者仅教师揭示、跨页状态和提示，不宣称全套 Sunshine 或全仓浏览器矩阵。
-- Meowbook check：Panda 5 stories、Meowtail 115 stories。新增 gallery 只组合公共组件，无第二套组件实现。
-- 正式 gallery 从 Meowbook 目录进入，三页×宽/窄/短共九图均由独立 owner 实际打开，无诊断或运行错误。短窗外围文档高 344 超过 330，但播放器目录在 y283–327 完整可达，逻辑画布未裁切；不将其宣称为完全无页面滚动。
-- 仓库 fmt、lint、diff 检查通过，fmt/lint 明确排除 `data/**`。
-- 新三包 tgz 在空的仓库外 `/tmp/meowland-component-consumer-a558Ij` 离线真实安装：root/subpath 组件与 contract 身份、严格类型七项负例、无 DOM core、四视口图片/列表/列布局浏览器通过；无源码 alias、父 node_modules 或逃逸 symlink。
-- 当前 dist、打包 staging、安装文件逐文件 SHA 一致。Meowtail tgz SHA256：`c701aede4a8bf110d5259ab53295a9aab3f37c65cadd122e8f37ca127ff12a27`。此新 batch 仅用于本轮验收，不替换另一仓库迁移约定的旧 tgz。
+- Root build, root typecheck, full Meowtail tsc (including public positive/negative types) and Panda tests tsc passed.
+- Full unit tests 331/331, 69 files, 2063 assertions.
+- New layout/list/image real Chrome browser 7/7; covering numeric/old aliases, long words/over-capacity diagnostics, native reversed/nesting, numeric ratios, four corners of three source image types, explicit clipping, load→failure and natural captions.
+- Existing Presentation browser 33/33; full Panda 13/13; Sunshine targeted 3/3. The latter only covers teacher reveal, cross-slide state and hints, and does not claim the full Sunshine or repo-wide browser matrix.
+- Meowbook check: Panda 5 stories, Meowtail 115 stories. The new gallery only composes public components, with no second component implementation.
+- The official gallery was entered from the Meowbook contents, and all nine images (three slides × wide/narrow/short) were actually opened by an independent owner, with no diagnostics or runtime errors. The short-window peripheral document height 344 exceeds 330, but the player outline is fully reachable at y283–327 and the logical canvas is not clipped; this is not claimed as completely without page scrolling.
+- Repository fmt, lint and diff checks passed, and fmt/lint explicitly excluded `data/**`.
+- The three new tgz files were installed offline for real in the empty out-of-repository `/tmp/meowland-component-consumer-a558Ij`: root/subpath component and contract identity, seven strict type negative cases, DOM-free core and four-viewport image/list/column layout browser checks passed; no source alias, parent node_modules or escaping symlink.
+- Current dist, packed staging and installed files matched SHA file by file. Meowtail tgz SHA256: `c701aede4a8bf110d5259ab53295a9aab3f37c65cadd122e8f37ca127ff12a27`. This new batch is only for this round's acceptance and does not replace the old tgz agreed for the other-repository migration.
 
-安装回执：`artifacts/presentation-foundations-consumer-vuyqp0di/receipt.json`；
-组件 owner 回执：`artifacts/panda-a4-independent-visual/IMAGE-REVIEW.md`；
-独立组合观察：`artifacts/interaction-media-review/`（最终 watch 使用 `watch-final-three-*`，旧两栏图不作为交付）。
+Install receipt: `artifacts/presentation-foundations-consumer-vuyqp0di/receipt.json`;
+component owner receipt: `artifacts/panda-a4-independent-visual/IMAGE-REVIEW.md`;
+independent composition observation: `artifacts/interaction-media-review/` (the final watch uses `watch-final-three-*`; the old two-column images are not delivered).
 
-## 实际交付与截图
+## Actual delivery and screenshots
 
-当前本地预览 `http://127.0.0.1:13014/`，a5 `chunk-03jpht82.js`；未停止既有服务，保留旧哈希资源供缓存页使用。
-候选 12 文件逐字节核对后原子更新入口；manifest SHA256：
-`6f7b79c2f06367d9d92b62afe3083bae995efa08020830c6a778ef573a71e518`。
-最终 live 冷启动拍摄 11 图、无运行错误；根实际打开宽屏播放、窄/短 watch、宽屏双照片，另有独立 owner 实际打开两页三尺寸和失败/键盘图。
+The current local preview is `http://127.0.0.1:13014/`, a5 `chunk-03jpht82.js`; the existing service was not stopped, and old hash assets are kept for cached pages.
+After checking the 12 candidate files byte for byte, the entry was updated atomically; manifest SHA256:
+`6f7b79c2f06367d9d92b62afe3083bae995efa08020830c6a778ef573a71e518`.
+The final live cold start shot 11 images with no runtime errors; the root actually opened wide-screen playback, narrow/short watch and wide-screen two-photo, and an independent owner actually opened two slides at three sizes plus failure/keyboard images.
 
-Library 完整 ID（均已成功上传并记录本地版本属性）：
+Full Library IDs (all uploaded successfully with local version attributes recorded):
 
-| 用途                      | Library ID                                 |
-| ------------------------- | ------------------------------------------ |
-| 改前 a4 用户指定图        | `libfile_7ebd8cfd772c8191be98d1e6e14a6080` |
-| 改后 a5 宽屏播放 1440×900 | `libfile_4e2fecad674481919b6b86da6e0bb8f9` |
-| a5 窄窗口 390×844         | `libfile_af13ceca8f1c8191a0b1bd1377b7ce5b` |
-| a5 短窗口 1280×330        | `libfile_a885800e1aec819198b62b4f2d424346` |
+| Purpose                                           | Library ID                                 |
+| ------------------------------------------------- | ------------------------------------------ |
+| a4 user-specified image before the change         | `libfile_7ebd8cfd772c8191be98d1e6e14a6080` |
+| a5 wide-screen playback 1440×900 after the change | `libfile_4e2fecad674481919b6b86da6e0bb8f9` |
+| a5 narrow window 390×844                          | `libfile_af13ceca8f1c8191a0b1bd1377b7ce5b` |
+| a5 short window 1280×330                          | `libfile_a885800e1aec819198b62b4f2d424346` |
 
-截图与测量在 `artifacts/presentation-foundations-a5/live/`，上传回执在相邻目录。
-正式 gallery 证据在 `artifacts/presentation-foundations-gallery-final/`。
-仅 Chrome/Chromium 实际验收，未测试 Safari、真实屏幕阅读器或触屏设备；窄/短是固定逻辑画布概览，不能宣称正文无需放大可读。
-fill 仍需有限父级，cover 仍会裁内容；超过容量应改编排、精简或拆页，不能靠图片适配无限容纳文字。
+Screenshots and measurements are in `artifacts/presentation-foundations-a5/live/`, and the upload receipt is in the adjacent directory.
+Official gallery evidence is in `artifacts/presentation-foundations-gallery-final/`.
+Only Chrome/Chromium had actual acceptance; Safari, real screen readers and touch devices were not tested; narrow/short are fixed logical canvas overviews, and it cannot be claimed that body text is readable without zooming.
+fill still needs a finite parent, and cover still crops content; when over capacity, authors should change the composition, simplify or split slides, not rely on image adaptation to hold unlimited text.
 
-共享实现、公共合同、测试与作者指南提交为 `aa11989`；Panda 消费与本记录单独提交。
+The shared implementation, public contract, tests and authoring guide were committed as `aa11989`; the Panda consumption and this record were committed separately.

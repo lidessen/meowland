@@ -4,11 +4,12 @@ import { Button, Stack } from "meowtail";
 import { Toast } from "../src/components/toast";
 export const ToastStory = defineStory({
   id: "toast-feedback",
-  title: "通知 · 宿主控制显示",
+  title: "Toast · Host-controlled visibility",
   component: "Toast",
-  group: "浮层与反馈",
+  group: "Overlays and feedback",
   groupOrder: 30,
-  description: "通知由宿主显示和关闭，不创建全局队列或自动定时器。",
+  description:
+    "The host shows and dismisses toasts; no global queue or automatic timer is created.",
   render() {
     const toast = signal<Child>(null);
     return (
@@ -17,7 +18,7 @@ export const ToastStory = defineStory({
           onClick={() => {
             toast.value = (
               <Toast
-                message="已保存本地示例。"
+                message="Saved the local sample."
                 actions={
                   <Button
                     variant="quiet"
@@ -25,14 +26,14 @@ export const ToastStory = defineStory({
                       toast.value = null;
                     }}
                   >
-                    撤销
+                    Undo
                   </Button>
                 }
               />
             );
           }}
         >
-          显示通知
+          Show toast
         </Button>
         <Button
           variant="quiet"
@@ -40,7 +41,7 @@ export const ToastStory = defineStory({
             toast.value = null;
           }}
         >
-          关闭通知
+          Dismiss toast
         </Button>
         {toast}
       </Stack>

@@ -1,11 +1,11 @@
-# 独立浏览器消费示例
+# Standalone browser consumption example
 
-先在仓库根执行构建与打包，将本目录复制到仓库之外的干净目录，再用绝对路径安装本轮三个本地包：
+First build and pack at the repository root, copy this directory to a clean directory outside the repository, then install this round's three local packages by absolute path:
 
 ```sh
 bun add /absolute/path/artifacts/meowjsx-0.1.0.tgz /absolute/path/artifacts/meowcss-0.1.0.tgz /absolute/path/artifacts/meowtail-0.1.0.tgz
 bun run build
 ```
 
-用本地静态 HTTP 服务打开 `index.html`，点击 Increment 应更新计数。示例不使用源码别名、相邻 workspace 链接或 Rossovia 后端。
-该页验证公共包的基础组件接合；完整 Assistant、JSON→UI、Book 与 Press 的验收分别记录，不以此页代替。
+Open `index.html` with a local static HTTP server; clicking Increment should update the count. The example uses no source aliases, adjacent workspace links or Rossovia backend.
+This page verifies basic component assembly of the public packages; acceptance for the complete Assistant, JSON-to-UI, Book and Press is recorded separately and is not replaced by this page.

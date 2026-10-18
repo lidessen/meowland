@@ -58,13 +58,13 @@ export const WebBlock = defineComponent<
             "meta",
             "div",
             {},
-            `HTTP ${props.statusCode}${truncated ? " · 内容已截断" : ""}`,
+            `HTTP ${props.statusCode}${truncated ? " · Content truncated" : ""}`,
           ),
         ]
       : [
           props.answer ? context.part("answer", "div", {}, props.answer) : null,
           !props.answer && props.sources.length === 0
-            ? context.part("meta", "div", {}, "没有结果")
+            ? context.part("meta", "div", {}, "No results")
             : null,
           context.part(
             "sources",
@@ -78,7 +78,7 @@ export const WebBlock = defineComponent<
               ]),
             ),
           ),
-          truncated ? context.part("meta", "div", {}, "来源列表已截断") : null,
+          truncated ? context.part("meta", "div", {}, "Source list truncated") : null,
         ],
   );
 });

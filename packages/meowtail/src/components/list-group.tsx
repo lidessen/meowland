@@ -36,7 +36,7 @@ export const listRowContract = {
 
 export interface ListRowProps extends Props {
   title: Child;
-  /** Tags beside the title, such as "CLI" or "默认". */
+  /** Tags beside the title, such as "CLI" or "Default". */
   tags?: Child;
   description?: Child;
   /** A state in words with its dot; the row's only status. */

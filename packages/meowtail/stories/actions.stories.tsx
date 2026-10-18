@@ -4,13 +4,13 @@ import { AddButton, Button, Icon, IconButton } from "meowtail";
 
 export const ActionMatrixStory = defineStory({
   id: "actions-matrix",
-  title: "操作 · 尺寸、层级与不可用",
-  group: "基础控件",
+  title: "Actions · Sizes, levels and unavailable states",
+  group: "Basic controls",
   groupOrder: 10,
   component: "Button",
-  variant: "尺寸与层级",
+  variant: "Sizes and levels",
   description:
-    "同一操作对照三种尺寸和六种层级：主要（黑白）、次要、安静、强调软底（关于当前活动）、停止（打断运行中的工作）与确认危险操作。按钮可用键盘触发；禁用控件跳过 Tab，不产生回执。",
+    "The same action across three sizes and six levels: primary (black and white), secondary, quiet, accent soft fill (about current activity), stop (interrupting running work) and confirming a dangerous action. Buttons can be triggered from the keyboard; disabled controls skip Tab and produce no receipt.",
   covers: [
     "Button all variant × size",
     "disabled",
@@ -19,21 +19,25 @@ export const ActionMatrixStory = defineStory({
     "keyboard activation",
   ],
   render() {
-    const feedback = signal("选择操作；这里的回执只发生在本地。");
+    const feedback = signal("Choose an action; the receipt here only happens locally.");
     const actions = [
-      ["primary", "保存修改"],
-      ["outline", "查看差异"],
-      ["quiet", "稍后处理"],
-      ["danger", "丢弃草稿"],
-      ["accent", "查看进展"],
-      ["stop", "停止处理"],
+      ["primary", "Save changes"],
+      ["outline", "View diff"],
+      ["quiet", "Handle later"],
+      ["danger", "Discard draft"],
+      ["accent", "View progress"],
+      ["stop", "Stop processing"],
     ] as const;
     return (
       <div className="workshop-stack workshop-constrained">
         {(["small", "default", "large"] as const).map((size) => (
           <section className="workshop-stack">
             <h2 className="workshop-section-title">
-              {{ small: "紧凑工具栏", default: "常规操作", large: "重点操作" }[size]}
+              {
+                { small: "Compact toolbar", default: "Regular actions", large: "Priority actions" }[
+                  size
+                ]
+              }
             </h2>
             <div className="workshop-foundation-action-grid">
               {actions.map(([variant, label]) => (
@@ -41,7 +45,7 @@ export const ActionMatrixStory = defineStory({
                   size={size}
                   variant={variant}
                   onClick={() => {
-                    feedback.value = `已选择：${label}（${size}）`;
+                    feedback.value = `Selected: ${label} (${size})`;
                   }}
                 >
                   {label}
@@ -49,9 +53,9 @@ export const ActionMatrixStory = defineStory({
               ))}
               <IconButton
                 size={size}
-                label={`${size} 搜索`}
+                label={`${size} search`}
                 onClick={() => {
-                  feedback.value = `已选择搜索（${size}）`;
+                  feedback.value = `Selected search (${size})`;
                 }}
               >
                 <Icon name="search" />
@@ -63,31 +67,31 @@ export const ActionMatrixStory = defineStory({
                   {label}
                 </Button>
               ))}
-              <IconButton size={size} label={`${size} 搜索不可用`} disabled>
+              <IconButton size={size} label={`${size} search unavailable`} disabled>
                 <Icon name="search" />
               </IconButton>
             </div>
           </section>
         ))}
         <section className="workshop-stack">
-          <h2 className="workshop-section-title">添加入口</h2>
+          <h2 className="workshop-section-title">Add entries</h2>
           <div className="workshop-row">
             <AddButton
               onClick={() => {
-                feedback.value = "已选择添加";
+                feedback.value = "Selected add";
               }}
             />
             <AddButton
               variant="outline"
               size="small"
               onClick={() => {
-                feedback.value = "已选择添加附件";
+                feedback.value = "Selected add attachment";
               }}
             >
-              添加附件
+              Add attachment
             </AddButton>
             <AddButton variant="quiet" size="large" disabled>
-              等待工作完成后添加
+              Add after the work completes
             </AddButton>
           </div>
         </section>

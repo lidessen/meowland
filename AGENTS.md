@@ -1,20 +1,48 @@
-# Meowland 开发入口
+# Meowland development entry point
 
-这是独立的 UI 能力库。先读[根 README](README.md)、所属包 README 和更深层 AGENTS，再从[技能索引](.agents/README.md)按任务加载方法，不预读所有技能或历史记录。
+This is a standalone UI capability library. Start with the [root README](README.md), the owning package's README and any deeper AGENTS file; then load methods per task from the [skill index](.agents/README.md). Do not pre-read all skills or historical records.
 
-## 容易破坏的边界
+## Boundaries that break easily
 
-- MeowJSX 根及其类型不依赖 DOM；Web 显式走 `meowjsx/web`。MeowCSS 根不依赖 JSX、UI 或 DOM，组件与 Web 适配由子路径承担。
-- 同一渲染图共享 core 模块，同次主题组装共享 CSS token/fragment 身份；不能把各入口分别内联成多份 runtime、Context 或 Symbol/WeakMap。显式创建多个 Runtime 仍是合法隔离。
-- Meowtail 拥有通用结构、完整 Assistant、具体主题和语义布局。`apps/showcase` 与 stories 只传场景数据和驱动交互，不复制组件实现；后端、业务事实、权限、上传与持久化留宿主。
-- Meowslides 拥有演示播放、演示内容布局、渐显、媒体和创作工具；单向依赖 Meowtail 的通用能力。MDX 是可信本地代码，不把上传或生成的任意文本默认执行。
-- JSON 入口复用同一组件与有限合同，不把任意业务 JSON、函数或对象路径变成执行能力。支持集以包内 JSON 说明和实际导出为准。
-- 包外消费使用 public exports；源码、测试和提交信息用英文，文档用中文。第三方资源继续保留自己的 notices。
+- The MeowJSX root and its types do not depend on the DOM; Web goes explicitly through `meowjsx/web`. The MeowCSS root does not depend on JSX, UI or the DOM; components and Web adaptation are carried by subpaths.
+- One render graph shares core modules; one theme assembly shares CSS token/fragment identity. Entry points must not be inlined into multiple runtimes, Contexts or Symbol/WeakMap copies. Explicitly creating multiple Runtimes is still valid isolation.
+- Meowtail owns generic structure, the complete Assistant, concrete themes and semantic layout. `apps/showcase` and stories only pass scenario data and drive interactions; they do not copy component implementations. Backend, business facts, permissions, uploads and persistence stay with the host.
+- Meowslides owns presentation playback, presentation content layouts, reveals, media and authoring tools; it depends one-way on Meowtail's generic capabilities. MDX is trusted local code; arbitrary uploaded or generated text is not executed by default.
+- The JSON entry point reuses the same components and finite contracts; it does not turn arbitrary business JSON, functions or object paths into execution capabilities. The supported set is defined by the JSON documentation inside the package and the actual exports.
+- Out-of-package consumption uses public exports. Third-party assets keep their own notices.
 
-## 按风险推进
+## English only
 
-独立工作可以并行，共享文件先对齐 owner 并保留无关 WIP。复杂任务先明确目标、依赖和可观察结果；改变职责、公共合同或生命周期等机制时，先与独立质疑者达成有界共识，普通实现、局部修复和文案不必重走设计流程。
+All human-readable repository content is English: READMEs and docs, AGENTS and skill guides, source
+comments and JSDoc, user-visible strings (labels, placeholders, empty/error/status text), story and demo
+copy, test titles and fixtures, console output and commit messages. Do not add Chinese prose, comments,
+labels, fixtures or mixed-language sections.
 
-检查命令及覆盖范围见[开发检查](docs/development-checks.md)。视觉和交互变化实际打开对应场景；静态检查、行为观察、安装态验收与正式发布分别报告。必要检查成立后，只为新改动、失败或未决风险补测，不用重复全矩阵代替判断。
+- The only non-English text allowed is third-party license/attribution kept verbatim, plus deliberate
+  Unicode test payloads that must be non-ASCII to prove the behavior. Such a payload needs a short
+  English comment explaining why it is intentional. Current approved files are
+  [presentation-text.test.tsx](packages/meowslides/tests/unit/presentation/presentation-text.test.tsx)
+  and [compiler.test.ts](packages/meowslides/tests/build/compiler.test.ts); any new exception is a
+  review decision and must be reported, not added silently.
+- Language changes preserve behavior and contracts: never rename APIs, identifiers, package names,
+  exports, story `id`s or `data-*` names/values, and keep numbers, dates, versions, commands, links and
+  the strength of claims unchanged.
+- Reviewed migration exception (2026-10-18): the 15 `data-card-action`, `data-message-choice`,
+  `data-message-action` and `data-action` display-copy payloads in the Tail card, chat-message, chat
+  and foundation stories may be translated to English. Their attribute names stay unchanged and
+  their values are only copied into visible feedback, never used as machine identifiers. This
+  exception does not authorize changes to other `data-*` values.
+- Markdown translation keeps heading anchors valid; update same-file anchors with the heading and
+  reconcile cross-file anchors in the same change. Historical records may change language only, not
+  chronology, scope or evidence.
+- Before handoff, run the sweep and report its result when a change touches language-visible content:
+  `rg -n '[\p{Han}]' --hidden -g '!.git' -g '!node_modules'`. It must print only the approved files
+  above; anything else fails the change.
 
-发布合同见[本地发布](docs/releasing.md)。普通 push/PR 的 Actions 只做 build/lint；npm 发布仅走用户已授权的手动 workflow_dispatch + Trusted Publishing OIDC，不部署；构建、打包、tag 或 draft Release 都不等于完成发布。提交、推送与真实发布仍按本次任务授权执行。
+## Work by risk
+
+Independent work may run in parallel; align the owner of shared files first and preserve unrelated WIP. For complex tasks, clarify the goal, dependencies and observable results first. When changing mechanisms such as responsibilities, public contracts or lifecycle, reach bounded consensus with an independent challenger first; routine implementation, local fixes and copy changes do not need to repeat the design process.
+
+Check commands and coverage are in [development checks](docs/development-checks.md). For visual and interaction changes, actually open the relevant scenario; report static checks, behavior observation, installed-state acceptance and official release separately. Once the necessary checks hold, add tests only for new changes, failures or unresolved risks; do not repeat the full matrix in place of judgment.
+
+The release contract is in [local releasing](docs/releasing.md). Actions on regular push/PR only build/lint; npm publishing only goes through the user-authorized manual workflow_dispatch + Trusted Publishing OIDC and does not deploy; building, packing, tagging or a draft Release does not equal a completed release. Commits, pushes and real releases still follow the authorization for this task.

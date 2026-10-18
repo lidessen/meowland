@@ -18,9 +18,9 @@ export interface WorkCardProps extends Props {
   title: Child;
   /** What the dot says; the words in `status` stay the source of truth. */
   state?: MaybeSignal<StatusDotState>;
-  /** Current status in words, for example "正在推进：校对记录格式". */
+  /** Current status in words, for example "In progress: reviewing the record format". */
   status?: Child;
-  /** A quiet extra fact after the status, for example "已关联 1 项成果". */
+  /** A quiet extra fact after the status, for example "1 outcome linked". */
   detail?: Child;
   icon?: Child;
   /** Label of the open affordance; the whole card is the control. */
@@ -42,7 +42,7 @@ export const WorkCard = defineComponent<
       status,
       detail,
       icon,
-      action = "详情",
+      action = "Details",
       className,
       children,
       ...props

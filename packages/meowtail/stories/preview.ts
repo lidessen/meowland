@@ -34,16 +34,16 @@ const preview: PreviewEnvironment = ({ root, onCleanup }) => {
   }
   const toolbar = document.createElement("nav");
   toolbar.className = "workshop-theme-controls";
-  toolbar.setAttribute("aria-label", "主题预览");
+  toolbar.setAttribute("aria-label", "Theme preview");
   const controls: { unmount(): void }[] = [];
   for (const [label, key, choices] of [
     [
-      "外观",
+      "Appearance",
       "meowuiColorScheme",
       [
-        ["light", "浅色"],
-        ["dark", "深色"],
-        ["auto", "跟随系统"],
+        ["light", "Light"],
+        ["dark", "Dark"],
+        ["auto", "Follow system"],
       ],
     ],
   ] as const) {

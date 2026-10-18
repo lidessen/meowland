@@ -17,29 +17,29 @@ const chat: JSX.Element = (
   <ChatFrame>
     <ChatHeader
       title="Assistant"
-      description="可选说明"
-      status={<ChatStatus label="在线" tone="online" />}
-      actions={<button type="button">运行</button>}
+      description="Optional description"
+      status={<ChatStatus label="Online" tone="online" />}
+      actions={<button type="button">Run</button>}
     />
     <ChatMessageList>
       <ChatMessage
         role="assistant"
         author="Assistant"
-        timestamp="刚刚"
+        timestamp="Just now"
         actions={
           <ChatMessageActions>
-            <button type="button">复制</button>
+            <button type="button">Copy</button>
           </ChatMessageActions>
         }
       >
-        <p>一条消息</p>
-        <ChatToolCall label="search" state="complete" detail="已完成" />
+        <p>One message</p>
+        <ChatToolCall label="search" state="complete" detail="Completed" />
       </ChatMessage>
     </ChatMessageList>
     <ChatComposer
-      placeholder="输入"
+      placeholder="Input"
       onSubmit={(event) => event.preventDefault()}
-      hint="Enter 发送"
+      hint="Enter to send"
     />
   </ChatFrame>
 );
@@ -51,17 +51,17 @@ const missingTitle = <ChatHeader />;
 const missingStatusLabel = <ChatStatus />;
 
 // @ts-expect-error ChatMessage needs a role and an author.
-const missingMessageIdentity = <ChatMessage>内容</ChatMessage>;
+const missingMessageIdentity = <ChatMessage>Content</ChatMessage>;
 
 const children: Child = chat;
-const sources = <ChatSources items={[{ title: "文档", url: "https://example.com" }]} />;
-const tool = <ChatToolCall label="读取" state="running" collapsible />;
-const unconfirmedTool = <ChatToolCall label="结果未确认" state="unknown" />;
+const sources = <ChatSources items={[{ title: "Document", url: "https://example.com" }]} />;
+const tool = <ChatToolCall label="Read" state="running" collapsible />;
+const unconfirmedTool = <ChatToolCall label="Unconfirmed result" state="unknown" />;
 const sourceRules = { "chat-sources": { summary: { className: "summary" } } } satisfies ThemeRules;
 // @ts-expect-error A source must have a URL.
-const invalidSource = <ChatSources items={[{ title: "缺地址" }]} />;
+const invalidSource = <ChatSources items={[{ title: "Missing address" }]} />;
 // @ts-expect-error Tool state is a finite lifecycle.
-const invalidTool = <ChatToolCall label="读取" state="magic" />;
+const invalidTool = <ChatToolCall label="Read" state="magic" />;
 void sources;
 void tool;
 void unconfirmedTool;

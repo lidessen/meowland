@@ -1,109 +1,109 @@
-# 本地 npm 发布
+# Local npm releases
 
-各包独立 SemVer，由维护者或 Agent 显式确定选包、版本与依赖范围。唯一发布算法 `scripts/release.ts` 消费已验收 tarball；不自动改版本、扩展选包、build、pack、提交或推送。稳定版显式使用 `latest`，测试版必须为 `x.y.z-alpha.N` 并显式使用 `alpha`。`*-slides.*` 等其它预发行格式不会被映射为 alpha。`meowslides` 已准备 `0.1.0-alpha.0` 公开候选，实际发布仍须本次明确授权；根与 showcase 不发布。
+Each package uses independent SemVer, and the maintainer or an Agent explicitly determines the selected packages, versions, and dependency ranges. The single release algorithm `scripts/release.ts` consumes already-accepted tarballs; it does not automatically change versions, expand the package selection, build, pack, commit, or push. Stable releases explicitly use `latest`; prereleases must be `x.y.z-alpha.N` and explicitly use `alpha`. Other prerelease formats such as `*-slides.*` are never mapped to alpha. `meowslides` has a prepared public candidate `0.1.0-alpha.0`, but an actual release still requires explicit authorization for that run; the root and showcase are not published.
 
-普通 push/PR 继续只运行 build/lint；真实发布仅由 `.github/workflows/npm-release.yml` 的手动 `workflow_dispatch` 触发，使用 npm Trusted Publishing OIDC，不使用 `NPM_TOKEN` 或个人 npm 登录态。用户已明确授权此方式替代原本地发包安排。脚本不创建 Git tag、GitHub Release 或部署。历史 tag/Release 与[原发布回执](records/2026-10-17-tail-book-press-publish.md)保持原样。当前流程支持 `meowjsx`、`meowcss`、`meowtail`、`meowbook`、`meowslides`、`meowpress` 的显式子集；选包接线不构成发布授权。四包和新增 Slides/Press 可以分别选择，未选中的包不会随批发布。Press 的 `0.1.1-alpha.0` 候选以必需 CSS/JSX peer 表达共享模块的宿主 owner，并保留稳定版与显式 alpha 的兼容范围；普通 CSS dependency 曾在真实混合安装图产生另一份稳定 CSS，故实际 tgz 验收仍须核模块身份、CLI、字体许可和自定义主题，不以放宽范围替代身份验证。
+Regular pushes/PRs continue to run only build/lint; a real release is triggered only by the manual `workflow_dispatch` of `.github/workflows/npm-release.yml`, using npm Trusted Publishing OIDC and no `NPM_TOKEN` or personal npm login state. The user has explicitly authorized this method as the replacement for the former local packing arrangement. The script does not create Git tags, GitHub Releases, or deployments. Historical tags/Releases and the [original publication receipt](records/2026-10-17-tail-book-press-publish.md) remain as they are. The current flow supports explicit subsets of `meowjsx`, `meowcss`, `meowtail`, `meowbook`, `meowslides`, and `meowpress`; wiring the package selection does not constitute release authorization. The four packages and the new Slides/Press can be selected separately; unselected packages are not released in the batch. Press's `0.1.1-alpha.0` candidate expresses the host owner of shared modules via required CSS/JSX peers and retains compatible ranges for both stable and explicit alpha; an ordinary CSS dependency once produced a second copy of stable CSS in a real mixed install graph, so actual tarball acceptance must still check module identity, CLI, font license, and custom themes, and loosening ranges is not a substitute for identity verification.
 
-## 准备与固定输入
+## Preparation and pinned inputs
 
-1. 明确受影响包及各自独立版本，更新源 manifest 与必要依赖/peer 范围。脚本使用 node-semver 正常预发行语义分别校验依赖与 peer；稳定范围通常不接受 alpha，应显式加入相应 alpha 基准范围。不会强制所有包同版或推断联动。
-2. 按[开发检查](development-checks.md)完成必要检查，build/pack，并在仓库外空目录安装实际 tgz，验证公开入口、资源、CLI 和受影响行为。pack 不代表 build 已完成；本地 tgz 消费不等于 registry 消费。
-3. 提交候选源码，固定候选完整 SHA 与已验收 tgz 的 SHA256。工具提交可为候选后继；候选须是工具 HEAD 的祖先。已跟踪工作区/index 须干净，origin 须与输入仓库一致。未跟踪内容（包括未知 `data/`）不参与检查，不读取或清理。
-4. 在被忽略的 `artifacts/releases/<本批名称>/` 保存输入 JSON 与精确 tarball，之后不重打包、不改哈希假装同一批。
+1. Identify the affected packages and their independent versions, and update the source manifest plus necessary dependency/peer ranges. The script uses node-semver's normal prerelease semantics to validate dependencies and peers separately; a stable range usually does not accept alpha, so explicitly add the corresponding alpha baseline range. It never forces all packages to the same version or infers coupling.
+2. Complete the necessary checks per [development checks](development-checks.md), build/pack, and install the actual tarballs in an empty directory outside the repository to verify public entry points, resources, CLI, and affected behavior. Packing does not mean the build is done; local tarball consumption is not the same as registry consumption.
+3. Commit the candidate source and pin the candidate's full SHA and the SHA256 of the accepted tarballs. Tool commits may follow the candidate; the candidate must be an ancestor of the tool HEAD. The tracked working tree/index must be clean, and origin must match the input repository. Untracked content (including unknown `data/`) does not participate in checks and is not read or cleaned.
+4. Store the input JSON and exact tarballs in the ignored `artifacts/releases/<batch-name>/`, then do not repack or alter hashes to pretend it is the same batch.
 
-存在其它任务 WIP 时，保持其原目录和内容，使用已提交候选的独立干净 checkout 构建与验收，不 stash/reset、复制未验收源码或修改输入 hash 将其混入。新 ESM 修复后的候选必须使用新提交和精确哈希，旧 `857c0fb` 四包输入不得继续发布。具体批次与消费者回执见当次记录。
+When other tasks have WIP, keep their original directories and content, and use an independent clean checkout of the committed candidate to build and accept; do not stash/reset, copy unaccepted source, or modify input hashes to mix it in. After the new ESM fix, the candidate must use a new commit and exact hash; the old `857c0fb` four-package input must not be released further. See the record for that run for the specific batch and consumer receipt.
 
-输入示例（哈希与 SHA 需替换为实际值）：
+Input example (replace hashes and SHAs with actual values):
 
 ```json
 {
   "repository": "lidessen/meowland",
-  "commit": "完整的40位候选Git提交SHA",
+  "commit": "Full 40-character candidate Git commit SHA",
   "packages": [
     {
       "name": "meowtail",
       "version": "0.2.0-alpha.0",
       "file": "./meowtail-0.2.0-alpha.0.tgz",
-      "sha256": "已验收tarball的64位SHA256",
-      "notes": "可选：本批说明，保存在本地输入中"
+      "sha256": "64-character SHA256 of the accepted tarball",
+      "notes": "Optional: batch note, stored in the local input"
     }
   ]
 }
 ```
 
-`file` 相对 JSON 所在目录。`--packages` 必须再次显式选择唯一包名；只发布所选集合，不自动带上输入中的其它包。包名/版本必须同时匹配候选提交 manifest 与 tgz，公开 exports/bin 目标须齐全，不含未解析 workspace 依赖，并携带根 MIT LICENSE。内部依赖先于消费者发布，所选集合出现依赖环即失败。不会用工具后继提交中的新 manifest 替代候选 manifest。
+`file` is relative to the directory containing the JSON. `--packages` must explicitly select unique package names again; only the selected set is published, and other packages in the input are not included automatically. Package names/versions must match both the candidate commit's manifest and the tarball, public exports/bin targets must be complete, no unresolved workspace dependencies may be present, and the root MIT LICENSE must be included. Internal dependencies are published before their consumers, and a dependency cycle in the selected set fails the run. The candidate manifest is never replaced by a new manifest from a later tool commit.
 
-## 手动触发与本地演练
+## Manual dispatch and local dry run
 
-本地先按已验收的完整源码 SHA 演练；省略 `--execute` 不联网、不触发 workflow：
-
-```sh
-bun run release:dispatch --commit <完整HEAD-SHA> --packages meowjsx,meowcss,meowtail,meowbook --channel alpha
-```
-
-获准推送的源码与 workflow 已到远端 `main`、npm trust 已由用户配置后，同一命令加 `--execute` 才请求运行：
+First rehearse locally against the accepted full source SHA; omitting `--execute` does not access the network or trigger the workflow:
 
 ```sh
-bun run release:dispatch --commit <完整HEAD-SHA> --packages meowjsx,meowcss,meowtail,meowbook --channel alpha --execute
+bun run release:dispatch --commit <full-HEAD-SHA> --packages meowjsx,meowcss,meowtail,meowbook --channel alpha
 ```
 
-这是一条触发命令，成功仅说明已请求运行，不表示 npm 已发布。GitHub CLI 使用既有 GitHub 登录权限；脚本不登录、不扩大权限、不推送。源 SHA 必须等于本地 HEAD 和远端 main；workflow 的 SHA、checkout HEAD 与输入 SHA 也须完全一致。普通 push 不会发包。稳定版沿同一入口使用 `--channel stable` 与已显式准备的稳定版本；工具不把 alpha 自动升级成稳定版。
+After the approved-pushed source and workflow are on remote `main` and the user has configured npm trust, the same command with `--execute` requests a run:
 
-workflow 的 prepare job 在 GitHub-hosted runner 用固定 Bun 构建和检查源码，显式 pack 选包，生成包含 commit/版本/SHA256 的输入，在仓库外实际安装 tgz 验证公开入口、类型、共享身份和必要 CLI，再上传 manifest/tgz/消费回执。publish job 下载同一 artifact，不重新打包，经同一 release 算法检查后发布。两 job 都固定源码 SHA；只有 publish job 获 `id-token: write`，仓库权限为 `contents: read`。同仓库发布串行排队，不取消进行中的发布。
+```sh
+bun run release:dispatch --commit <full-HEAD-SHA> --packages meowjsx,meowcss,meowtail,meowbook --channel alpha --execute
+```
 
-纯本地检查已打包产物仍可运行：
+This is a trigger command; success only means the run was requested, not that npm has published. GitHub CLI uses existing GitHub login permission; the script does not log in, expand permissions, or push. The source SHA must equal local HEAD and remote main; the workflow SHA, checkout HEAD, and input SHA must also match exactly. A regular push does not publish packages. Stable releases use the same entry with `--channel stable` and an explicitly prepared stable version; the tool does not automatically upgrade alpha to stable.
+
+The workflow's prepare job builds and checks the source with a pinned Bun on a GitHub-hosted runner, explicitly packs the selected packages, generates input containing commit/version/SHA256, actually installs the tarballs outside the repository to verify public entry points, types, shared identity, and necessary CLI, then uploads the manifest/tarballs/consumer receipt. The publish job downloads the same artifact, does not repack, and publishes after checks by the same release algorithm. Both jobs pin the source SHA; only the publish job gets `id-token: write`, and repository permission is `contents: read`. Releases in the same repository queue serially, and an in-progress release is not canceled.
+
+A purely local check of already-packed artifacts can still be run:
 
 ```sh
 bun run release --manifest <release-input.json> --packages meowjsx,meowcss,meowtail,meowbook --channel alpha
-# 加 --check 只查公开registry元数据，不证明OIDC trust配置正确
+# With --check, only public registry metadata is queried; does not prove the OIDC trust config is correct
 ```
 
-`release --execute` 只允许精确的 `lidessen/meowland`、`main`、`npm-release.yml` 手动 workflow 与 GitHub-hosted OIDC 上下文。它不在本机登录、不读取凭据文件，也不回退到 token；npm 在临时空目录用空 user/global config 运行，去除传统 npm 认证变量和 `npm_config_*` 覆盖，保留 Actions OIDC 上下文。官方 registry、禁用 scripts/workspaces 均由命令明确指定。
+`release --execute` only allows the exact `lidessen/meowland`, `main`, `npm-release.yml` manual workflow and a GitHub-hosted OIDC context. It does not log in locally, read credential files, or fall back to a token; npm runs in a temporary empty directory with empty user/global config, strips traditional npm auth variables and `npm_config_*` overrides, and preserves the Actions OIDC context. The official registry and disabled scripts/workspaces are all specified explicitly by the command.
 
-OIDC 不以 `npm whoami/access` 作权限预检：公开 metadata/依赖/bytes 可以只读核查，trust、direct publish 与 dist-tag 权限只能由其对应操作裁定。认证、网络、非法 JSON 与历史撤包失败均停止；不把任意错误当作未发布，不自动转其它认证方式。
+OIDC does not use `npm whoami/access` as a permission precheck: public metadata/dependencies/bytes can be checked read-only, but trust, direct publish, and dist-tag permissions can only be decided by their corresponding operations. Authentication, network, invalid JSON, and historical unpublished-package failures all stop; no arbitrary error is treated as unpublished, and there is no automatic fallback to another authentication method.
 
-发布子进程记录实际 npm 路径、realpath、版本、退出与信号状态，以及输出字节数；仅从内存中的输出抽取白名单包的成功标记、发布 PUT 状态码和有限错误信息，不输出原始 npm 日志、认证 URL 或凭据。命令明确关闭 dry-run。命令退出零或 PUT 返回成功都不能替代后续 registry integrity/tag 核验；核验失败先保留原制品并调查，不自动重发。
+The publishing subprocess records the actual npm executable and realpath, version, exit/signal status and output byte counts. It extracts only allowlisted package success markers, publish PUT status codes and limited error facts from output held in memory; raw npm logs, authentication URLs and credentials are never printed. The command explicitly disables dry-run. Neither an exit code of zero nor a successful PUT response replaces registry integrity/tag verification; retain the original artifacts and investigate a verification failure without automatically republishing.
 
-## 用户一次性配置的 npm trust
+## One-time npm trust configuration by the user
 
-这是持久发布授权，必须在用户动作时明确确认后由用户或获准操作配置；本仓库落地与 dry-run 不会写 npm 安全设置。四个已存在的包各自在 npm Settings → Trusted publishing 添加 GitHub Actions：
+This is a persistent release authorization; it must be configured by the user or an approved operator after explicit confirmation at the time of the user action. This repository's implementation and dry runs never write npm security settings. Each of the four existing packages adds GitHub Actions under npm Settings → Trusted publishing:
 
-| 字段                 | 精确值                                                                                |
-| -------------------- | ------------------------------------------------------------------------------------- |
-| Organization or user | `lidessen`                                                                            |
-| Repository           | `meowland`                                                                            |
-| Workflow filename    | `npm-release.yml`（只填文件名）                                                       |
-| Environment          | 留空；本 workflow 未声明 environment                                                  |
-| Allowed actions      | 明确允许 `npm publish`；为同 bytes 重试时修复 alpha/latest tag，另允许 `npm dist-tag` |
+| Field                | Exact value                                                                                                      |
+| -------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Organization or user | `lidessen`                                                                                                       |
+| Repository           | `meowland`                                                                                                       |
+| Workflow filename    | `npm-release.yml` (filename only)                                                                                |
+| Environment          | Leave empty; this workflow does not declare an environment                                                       |
+| Allowed actions      | Explicitly allow `npm publish`; to fix alpha/latest tags when retrying the same bytes, also allow `npm dist-tag` |
 
-需配置的包为 `meowjsx`、`meowcss`、`meowtail`、`meowbook`。当前新 trust 默认允许 staging，不能把默认值误当 direct publish 已启用。workflow 固定 Node 24/npm 11.21.0，覆盖 dist-tag OIDC 所需版本；使用 GitHub-hosted runner。首次成功发布须在新 trust 创建后两天内完成，否则需由用户重新配置。保存 trust 不等于服务端已验证匹配，首次实际发布才确立有效性。不需要长期 npm token，也不要求每次运行输入 npm 验证码。
+The packages to configure are `meowjsx`, `meowcss`, `meowtail`, and `meowbook`. A new trust currently allows staging by default; do not mistake the default for direct publish being enabled. The workflow pins Node 24/npm 11.21.0, which covers the version needed for dist-tag OIDC, and uses a GitHub-hosted runner. The first successful publish must complete within two days after the new trust is created; otherwise the user must reconfigure it. Saving trust does not mean the server has verified a match; only the first actual publish establishes validity. No long-lived npm token is needed, and no npm one-time password is required for each run.
 
-Slides 的本地公开候选与脚本接线不创建 npm 包或 trust。首包名称/占位创建、所需 trust 配置与首次实际发布须在获用户明确授权后执行；不要复用四包授权自动增加第五包。新包引导若涉及公开占位或 staging，必须先说明该动作的公开影响；本地准备可完整完成，不以创建占位作为验收前置。
+Slides' local public candidate and script wiring do not create an npm package or trust. First-package name/placeholder creation, the required trust configuration, and the first actual publish must be executed after explicit user authorization; do not automatically add a fifth package under the four-package authorization. If new-package bootstrap involves a public placeholder or staging, the public impact of that action must be explained first; local preparation can be completed in full, and creating a placeholder is not a prerequisite for acceptance.
 
-Press 已有稳定版包，准备新的 `0.1.1-alpha.0` 不需要新包占位；若选它发布，须确认该包的 trusted publisher 是否已配置，并按同一精确仓库/workflow/允许动作补齐所需授权。Press 的发布与持久授权也不由原四包授权自动覆盖。集中确认新增目标和动作即可，不重复逐包请求已经授予的相同授权。
+Press already has a stable package, so preparing a new `0.1.1-alpha.0` does not need a new-package placeholder; if it is selected for release, confirm whether that package's trusted publisher is configured and fill in the required authorization with the same exact repository/workflow/allowed actions. Press's release and persistent authorization are also not automatically covered by the original four-package authorization. Confirm the new targets and actions in one place; do not re-request the same authorization per package for what has already been granted.
 
-官方另有[新包 staged creation](https://github.blog/changelog/2026-10-02-npm-staged-publishing-now-supports-creating-new-packages/) 路径：使用用户本地登录会话暂存首版，再由维护者以 2FA 审核批准；不要求长期 token 或 token bypass。对不存在的包，暂存会创建公开 `0.0.0-stage` 占位，真实版本须经批准才可安装，详见 [staged publishing](https://docs.npmjs.com/staged-publishing/)。这是有独立公开影响的新包引导流程，不是现有四包的正常 OIDC 自动发布，也没有接入本脚本；首次引导、维护者批准及之后的 trust 绑定应在一次明确授权中说明，不能假定尚不存在的包已经有可用 trust。OIDC 本身兼容禁止传统 token 的发布设置，不要求启用 Bypass 2FA。
+Official docs also offer a [new-package staged creation](https://github.blog/changelog/2026-10-02-npm-staged-publishing-now-supports-creating-new-packages/) path: stage the first version with the user's local login session, then have the maintainer review and approve with 2FA; no long-lived token or token bypass is required. For a nonexistent package, staging creates a public `0.0.0-stage` placeholder, and the real version can only be installed after approval; see [staged publishing](https://docs.npmjs.com/staged-publishing/). This is a new-package bootstrap flow with its own public impact, not the normal OIDC automatic publish of the existing four packages, and it is not wired into this script; the first bootstrap, maintainer approval, and subsequent trust binding should be described in one explicit authorization, and it cannot be assumed that a package that does not yet exist already has usable trust. OIDC itself is compatible with publishing settings that forbid traditional tokens and does not require enabling Bypass 2FA.
 
-不降低账户 2FA，不建议开启 bypass。npm 2026-07-31 公告说明 bypass 的管理权限已限制、直接发包也在弃用；本流程直接采用短期 OIDC。之后如要删除旧 token 或调整 package publishing access，须另获授权，不随配置自动执行。
+Do not weaken account 2FA, and do not recommend enabling bypass. The npm 2026-07-31 announcement states that bypass management permissions have been restricted and direct publish is also being deprecated; this flow adopts short-lived OIDC directly. If old tokens are to be deleted or package publishing access adjusted later, separate authorization is required; this does not happen automatically with configuration.
 
-版本选择仍固定 Node 24/npm 11.21.0，后者覆盖本流程需要的 OIDC dist-tag 支持；不随 npm 的 `latest` 自动升级。用户提供的 [2026-07-08 公告](https://github.blog/changelog/2026-07-08-npm-install-time-security-and-gat-bypass2fa-deprecation/) 说明 npm 12 默认不运行依赖安装脚本，默认不解析 Git 与远程 URL 依赖，并预计约在 2027 年 1 月取消 bypass token 的直接发布。该时间是公告预期，不把长期 bypass token 当作新流程前提。
+The version selection stays pinned to Node 24/npm 11.21.0; the latter covers the OIDC dist-tag support this flow needs and is not automatically upgraded with npm's `latest`. The [2026-07-08 announcement](https://github.blog/changelog/2026-07-08-npm-install-time-security-and-gat-bypass2fa-deprecation/) provided by the user states that npm 12 does not run dependency install scripts by default, does not resolve Git and remote URL dependencies by default, and is expected to remove direct publish with bypass tokens around January 2027. That time is the announcement's expectation; long-lived bypass tokens are not treated as a prerequisite for the new flow.
 
-当前准备 job 使用固定 Bun、frozen lock 和 `--ignore-scripts` 安装；npm 本身的安装与实际 publish 也显式禁用 scripts。发布目标是本地精确 tgz，包间依赖为 registry semver，源码仓库 URL 仅为 repository 元信息，不是 Git 安装依赖。升级 npm 12 时须复验完整锁定的传递依赖和安装/发布命令，不自动加 `--allow-git`、`--allow-remote` 或安装脚本许可；本轮未声称完成 npm 12 实装矩阵。新 trust 的两日首次成功发布期限不构成发布授权：只有候选与授权就绪后才配置/执行，过期则经授权重新配置，不为赶期限擅自发布。
+The current prepare job installs with a pinned Bun, frozen lock, and `--ignore-scripts`; npm's own install and actual publish also explicitly disable scripts. Release targets are exact local tarballs, inter-package dependencies are registry semver, and the source repository URL is only repository metadata, not a Git install dependency. When upgrading to npm 12, revalidate the fully locked transitive dependencies and the install/publish commands, and do not automatically add `--allow-git`, `--allow-remote`, or install-script permission; this round does not claim the npm 12 runtime matrix is complete. The two-day first-successful-publish deadline for a new trust does not constitute release authorization: configure/execute only after the candidate and authorization are ready; if it expires, reconfigure with authorization, and never publish on your own to beat the deadline.
 
-## 执行与恢复
+## Execution and recovery
 
-所有选包的本地、workflow 上下文、registry、完整 bytes 和依赖检查完成后，才开始任何变更。每次变更前再核工具 HEAD、已跟踪状态、origin、输入及全部 tgz 哈希，且复核当前 tags 未被其它发布者改变。不要同时启动第二个发布者或修改输入。
+Start any change only after all selected packages pass local, workflow-context, registry, full-bytes, and dependency checks. Before each change, recheck the tool HEAD, tracked state, origin, input, and all tarball hashes, and confirm the current tags have not been changed by another publisher. Do not start a second publisher concurrently or modify the input.
 
-- 未存在的精确版本：只运行 `npm publish <绝对tgz路径> --access public --tag alpha|latest --ignore-scripts`，同一 runner 固定 registry/config，由 npm 自动交换 OIDC 短期凭据。
-- 精确版本已存在且 SHA512 相同：跳过 publish；所选 tag 未指向该版本时只修复所选 tag。不同 bytes 直接停止，不覆盖、换哈希或自动换版本。
-- 所选 tag 已指向更新版本：拒绝倒退。alpha 全程只写 `alpha`；发包和 tag 修复后均核 `latest` 与预检完全一致，包括原本不存在的情况。发现并发变化即失败，不自动反向改 `latest`。
-- 每包变更后核 exact integrity 与所选 tag。npm [发布前扫描](https://github.blog/changelog/2026-07-28-npm-publish-time-malware-scanning-and-dual-use-metadata/) 会延迟可安装性，publish 返回成功或 HTTP 202 不代表已经公开可用。脚本只发送一次 mutation，然后最多读 41 次公开 registry，读取间隔 30 秒（约二十分钟暂停预算，另计请求耗时）；只允许等待版本或预期 tag 可见，不重复上传。不同 integrity、alpha 的 latest 改变、所选 tag 跳到原值/目标值之外、网络或无效 JSON 均立即停止。超时报告尚未验证可用，可能仍在扫描、人工审核或被阻止，不承诺最终公开，也不自动补 tag、重发或回滚。
-- 失败时保留同一输入与 tgz，先只读调查再重入。优先重新运行该 Actions run 的失败 publish job，继续下载原 artifact；新 dispatch 若重建得到不同 bytes，会被 exact integrity 检查拒绝，不能改哈希伪装成同批。registry 的实际版本/integrity/tags 是恢复依据，不维护第二份进度 ledger。
+- Exact version that does not exist: run only `npm publish <absolute-tgz-path> --access public --tag alpha|latest --ignore-scripts`; the same runner pins registry/config, and npm exchanges short-lived OIDC credentials automatically.
+- Exact version already exists with the same SHA512: skip publish; if the selected tag does not point at that version, fix only the selected tag. Different bytes stop immediately; do not overwrite, change hashes, or automatically switch versions.
+- The selected tag already points at a newer version: refuse to move it backwards. Alpha always writes only `alpha`; after publishing and tag fixes, confirm `latest` matches the precheck exactly, including the case where it did not exist before. A detected concurrent change fails the run; `latest` is never automatically changed back.
+- After each package change, check exact integrity and the selected tag. npm [publish-time scanning](https://github.blog/changelog/2026-07-28-npm-publish-time-malware-scanning-and-dual-use-metadata/) delays installation availability: a successful publish or HTTP 202 does not mean the version is publicly available. Send the mutation only once, then read the public registry at most 41 times with 30 seconds between reads (about twenty minutes of pauses, plus request time). Wait only for the expected version/tag, without uploading again. Different integrity, a changed latest during alpha publication, a selected tag outside its original/target values, network errors or invalid JSON stop immediately. A timeout reports availability as not yet verified; scanning, manual review or blocking may still be involved. Do not promise eventual publication or automatically repair tags, republish or roll back.
+- On failure, retain the same input and tarballs, investigate read-only, then resume. Prefer re-running the failed publish job of that Actions run to continue downloading the original artifact; if a new dispatch rebuilds different bytes, the exact integrity check rejects it, and hashes cannot be altered to pass it off as the same batch. The registry's actual version/integrity/tags are the recovery source of truth; no second progress ledger is maintained.
 
-publish 响应未知或版本暂不可见时，不因脚本退出非零就盲目重新发送。先确认官方 registry 状态；重入会检查相同 bytes 并跳过已成功版本。全部脚本成功后还需从 registry 安装精确版本做独立消费验收，才能报告真实发布与消费结果；构建、打包、dry-run 或只读检查都不等于已发布。
+When the publish response is unknown or the version is temporarily invisible, do not blindly resend just because the script exited non-zero. Confirm the official registry state first; re-entry checks the same bytes and skips already-succeeded versions. After all scripts succeed, an independent consumption acceptance must install the exact version from the registry before real publication and consumption results are reported; building, packing, a dry run, or read-only checks are not the same as published.
 
-## 验证与依据
+## Verification and references
 
-定向测试 `bun test scripts/release.test.ts` 使用真实临时 tarball 与隔离 Git 仓库，mock registry 边界，覆盖渠道、依赖/peer、拓扑、全选预检、部分失败恢复、同 bytes/tag 修复、latest 保护、输入变化和OIDC 上下文及传统认证隔离；dispatch 测试核纯本地预演、远端 SHA 不符零触发、固定 main 参数和手动 workflow 权限。mock 通过不等于真实 trust、Billing 或发包通过。
+The targeted test `bun test scripts/release.test.ts` uses real temporary tarballs and isolated Git repositories, mocks the registry boundary, and covers channels, dependencies/peers, topology, select-all precheck, partial-failure recovery, same-bytes/tag fixes, latest protection, input changes, and OIDC context plus traditional-authentication isolation; dispatch tests check the purely local rehearsal, zero triggers on a remote SHA mismatch, pinned main parameters, and manual workflow permission. Mock passes do not mean real trust, Billing, or publishing passed.
 
-官方依据：[npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/)、[bypass 限制公告](https://github.blog/changelog/2026-07-31-restricting-npm-bypass-2fa-granular-access-tokens/)、[workflow_dispatch](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#onworkflow_dispatch)、[npm publish](https://docs.npmjs.com/cli/v11/commands/npm-publish/)、[dist-tag](https://docs.npmjs.com/cli/v11/commands/npm-dist-tag/)、[npmrc 配置优先级](https://docs.npmjs.com/cli/v11/configuring-npm/npmrc/)、[变量占位符](https://docs.npmjs.com/using-private-packages-in-a-ci-cd-workflow/)、[node-semver](https://github.com/npm/node-semver)。
+Official references: [npm Trusted Publishing](https://docs.npmjs.com/trusted-publishers/), [bypass restriction announcement](https://github.blog/changelog/2026-07-31-restricting-npm-bypass-2fa-granular-access-tokens/), [workflow_dispatch](https://docs.github.com/en/actions/reference/workflows-and-actions/workflow-syntax#onworkflow_dispatch), [npm publish](https://docs.npmjs.com/cli/v11/commands/npm-publish/), [dist-tag](https://docs.npmjs.com/cli/v11/commands/npm-dist-tag/), [npmrc config precedence](https://docs.npmjs.com/cli/v11/configuring-npm/npmrc/), [variable placeholders](https://docs.npmjs.com/using-private-packages-in-a-ci-cd-workflow/), [node-semver](https://github.com/npm/node-semver).

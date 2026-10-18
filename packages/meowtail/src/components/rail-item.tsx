@@ -15,9 +15,9 @@ export interface RailItemProps extends Props {
    * attribute on the item, so a host can set or clear it at runtime without re-rendering.
    */
   dot?: "warning" | "accent";
-  /** Text or count at the end, visible while the rail is expanded: a count, "处理中". */
+  /** Text or count at the end, visible while the rail is expanded: a count, "In progress". */
   meta?: Child;
-  /** "accent" marks activity happening now, such as "处理中"; otherwise the meta is a quiet fact. */
+  /** "accent" marks activity happening now, such as "In progress"; otherwise the meta is a quiet fact. */
   metaTone?: "accent";
   /** A route renders an anchor; an action renders a button. */
   href?: string;

@@ -28,13 +28,13 @@ import {
 
 const payload = [
   "Inspect packages/meowtail/src/chat/agent-workflow-with-a-very-long-unbroken-file-name.tsx",
-  "中文输入：检查嵌套任务、长路径、消息与工具输出是否能在窄容器中完整阅读。",
+  "Input sample: check whether nested tasks, long paths, messages and tool output can all be read in a narrow container.",
   '<img src="x" onerror="alert(1)"> is tool data, not an executable element.',
 ].join("\n");
 const resultLines = Array.from(
   { length: 24 },
   (_, index) =>
-    `Result ${index + 1}: 长中文与 English output remain readable. No external tool ran.`,
+    `Result ${index + 1}: Long lines and English output remain readable. No external tool ran.`,
 ).join("\n");
 const attachment = {
   id: "notes",
@@ -46,19 +46,23 @@ const attachment = {
 /** A host fixture owns state and local scheduling; every visible surface is a public component. */
 export function agentWorkflowDemo(narrow = false): Child {
   const state = signal<ChatExecutionState>("running");
-  const status = signal("正在检查第 2 个文件");
+  const status = signal("Checking file 2");
   const output = signal<string | undefined>(resultLines);
   const progress = signal<ChatTaskProgress | undefined>({
     value: 2,
     max: 5,
-    label: "已检查 2 / 5 个文件 · 宿主报告",
+    label: "Checked 2 / 5 files · Host report",
   });
-  const reply = signal("公开答复尚未收到；执行已完成，不表示回复失败。");
-  const answer = signal("等待你选择检查范围；没有执行失败。");
+  const reply = signal(
+    "Public reply not received yet; execution is complete, which does not mean the reply failed.",
+  );
+  const answer = signal("Waiting for you to choose the check scope; no execution failed.");
   const waiting = signal<ChatExecutionState>("waiting");
   const retryState = signal<ChatExecutionState>("error");
-  const retryStatus = signal("本地模拟读取失败 · 可重试");
-  const feedback = signal("所有操作仅改变本地示例状态，不执行工具或网络请求。");
+  const retryStatus = signal("Local simulated read failed · Can retry");
+  const feedback = signal(
+    "All actions only change local example state; no tool or network request runs.",
+  );
   let alive = true;
   const timers = new Set<ReturnType<typeof setTimeout>>();
   const later = (action: () => void) => {
@@ -80,138 +84,149 @@ export function agentWorkflowDemo(narrow = false): Child {
         }}
       >
         <Stack gap="compact">
-          <strong>并发执行 · 公开进度</strong>
-          <span>一个任务在推进，一个需要你的答复，一个执行已完成但尚未回报。</span>
+          <strong>Concurrent execution · Public progress</strong>
+          <span>
+            One task is progressing, one needs your answer, and one finished executing but has not
+            reported back.
+          </span>
           <Inline>
             <Button
               variant="outline"
               size="small"
               onClick={() => {
                 state.value = "running";
-                status.value = "正在检查第 3 个文件";
-                output.value = `${output.value ?? ""}\nNew result: 新内容已到达，展开状态由原生 details 保留。`;
-                progress.value = { value: 3, max: 5, label: "已检查 3 / 5 个文件 · 宿主报告" };
+                status.value = "Checking file 3";
+                output.value = `${output.value ?? ""}\nNew result: New content arrived; the expanded state is kept by native details.`;
+                progress.value = { value: 3, max: 5, label: "Checked 3 / 5 files · Host report" };
               }}
             >
-              推进检查
+              Advance the check
             </Button>
             <Button
               variant="quiet"
               size="small"
               onClick={() => {
                 state.value = "unknown";
-                status.value = "连接中断 · 保留最后一次已知结果";
+                status.value = "Connection lost · Keep the last known result";
                 progress.value = undefined;
-                feedback.value = "连接中断不等于执行失败；旧输出保留，当前进度未知。";
+                feedback.value =
+                  "A lost connection is not an execution failure; old output is kept and the current progress is unknown.";
               }}
             >
-              模拟连接中断
+              Simulate connection loss
             </Button>
           </Inline>
         </Stack>
         <Grid columns="auto" minColumnWidth="wide" align="stretch">
           <ChatTask
-            title="检查组件布局"
+            title="Check component layout"
             state={state}
             statusLabel={status}
-            description="公开摘要：检查阅读轴、长内容与动作可达性。"
+            description="Public summary: check the reading axis, long content and action reachability."
             progress={progress}
-            footer={<span>执行事实来自宿主；尚未声明所有检查通过。</span>}
+            footer={
+              <span>Execution facts come from the host; not all checks are declared passing.</span>
+            }
           >
             <ChatToolCall
-              label="读取文件"
+              label="Read file"
               summary="chat/agent-workflow-with-a-very-long-unbroken-file-name.tsx"
               state={state}
               statusLabel={status}
               input={payload}
               output={output}
-              outputSummary="已返回 24 条记录；可展开全部输出并复制原始文本。"
+              outputSummary="Returned 24 records; expand all output and copy the raw text."
               maxLines={4}
               collapsible
               open
               onCancel={() => {
                 state.value = "cancelled";
-                status.value = "已取消后续检查；保留已有输出";
+                status.value = "Canceled further checks; existing output is kept";
                 progress.value = undefined;
               }}
             />
             <ChatToolCall
-              label="生成检查报告"
-              summary="等待文件检查完成"
+              label="Generate check report"
+              summary="Waiting for the file check to finish"
               state="queued"
-              statusLabel="排队中 · 尚未开始"
+              statusLabel="Queued · Not started yet"
               input="Summarize only confirmed findings."
               collapsible
             />
           </ChatTask>
           <ChatTask
-            title="确认检查范围"
+            title="Confirm check scope"
             state={waiting}
             statusLabel={answer}
-            executionText="执行暂停，等待用户答复。"
-            footer={<span>选择只更新示例；授权政策由宿主决定。</span>}
+            executionText="Execution paused, waiting for the user's answer."
+            footer={
+              <span>
+                The choice only updates the example; the host decides authorization policy.
+              </span>
+            }
           >
             <ChatQuestion
-              question="本轮检查哪些区域？"
+              question="Which areas should this round check?"
               questionId={narrow ? "agent-scope-narrow" : "agent-scope-wide"}
-              description="这是一项普通范围选择；未回复时保持等待。"
+              description="This is an ordinary scope choice; it stays waiting until answered."
               actions={
                 <Inline gap="compact">
                   <Button
                     size="small"
                     onClick={() => {
                       waiting.value = "queued";
-                      answer.value = "已收到范围：工具与任务 · 等待调度";
+                      answer.value = "Scope received: Tools and tasks · Waiting for scheduling";
                     }}
                   >
-                    工具与任务
+                    Tools and tasks
                   </Button>
                   <Button
                     size="small"
                     variant="outline"
                     onClick={() => {
                       waiting.value = "cancelled";
-                      answer.value = "用户取消了这项范围确认";
+                      answer.value = "The user canceled this scope confirmation";
                     }}
                   >
-                    取消确认
+                    Cancel confirmation
                   </Button>
                 </Inline>
               }
             />
           </ChatTask>
           <ChatTask
-            title="委派：独立键盘审查"
+            title="Delegated: Independent keyboard review"
             state="success"
-            statusLabel="执行成功 · 等待公开答复"
-            executionText="委派执行已返回，检查了 5 个交互入口。"
+            statusLabel="Succeeded · Waiting for public reply"
+            executionText="The delegated execution returned and checked 5 interaction entry points."
             replyText={reply}
             footer={
               <Button
                 variant="outline"
                 size="small"
                 onClick={() => {
-                  reply.value = "已收到公开答复：键盘检查完成，附审查记录。";
+                  reply.value =
+                    "Public reply received: the keyboard check is complete, with the review record attached.";
                 }}
               >
-                接收公开答复
+                Receive public reply
               </Button>
             }
           >
-            <ChatProcess label="子任务记录 · 1 项">
+            <ChatProcess label="Subtask record · 1 item">
               <ChatTask
-                title="核对焦点顺序"
+                title="Check focus order"
                 state="success"
-                statusLabel="执行成功"
-                executionText="Tab、Shift+Tab 与展开控件已检查。"
+                statusLabel="Succeeded"
+                executionText="Tab, Shift+Tab and expandable controls were checked."
               />
             </ChatProcess>
           </ChatTask>
         </Grid>
-        <ChatProcess label="其他活动 · 可重试的错误与明确取消">
+        <ChatProcess label="Other activity · Retryable errors and explicit cancellation">
           <Stack gap="compact">
             <ChatToolCall
-              label="读取本地索引"
+              label="Read local index"
               state={retryState}
               statusLabel={retryStatus}
               input="index.json"
@@ -219,38 +234,43 @@ export function agentWorkflowDemo(narrow = false): Child {
               collapsible
               onRetry={() => {
                 retryState.value = "running";
-                retryStatus.value = "正在重试本地模拟";
+                retryStatus.value = "Retrying the local simulation";
                 later(() => {
                   retryState.value = "success";
-                  retryStatus.value = "本地模拟重试成功";
+                  retryStatus.value = "Local simulation retry succeeded";
                 });
               }}
             />
             <ChatToolCall
-              label="额外网络检索"
+              label="Extra network search"
               state="cancelled"
-              statusLabel="已取消 · 未发送任何网络请求"
-              outputSummary="取消是一项独立事实，不显示为执行错误。"
+              statusLabel="Canceled · No network request was sent"
+              outputSummary="Cancellation is a separate fact and is not shown as an execution error."
               collapsible
             />
           </Stack>
         </ChatProcess>
-        <ChatProcess label="计划、产物与可选元数据">
+        <ChatProcess label="Plan, artifacts and optional metadata">
           <Stack>
-            <ol aria-label="公开计划">
-              <li>检查布局与长内容：进行中</li>
-              <li>收集独立键盘审查：执行已完成，等待公开答复</li>
-              <li>整理产物：排队中</li>
+            <ol aria-label="Public plan">
+              <li>Check layout and long content: In progress</li>
+              <li>
+                Collect independent keyboard review: Execution complete, waiting for public reply
+              </li>
+              <li>Organize artifacts: Queued</li>
             </ol>
-            <DescriptionList aria-label="宿主提供的元数据">
-              <DescriptionItem term="上次更新时间">10:42 · 固定示例时间</DescriptionItem>
-              <DescriptionItem term="用量">输入 1,240 / 输出 320 tokens · 示例数据</DescriptionItem>
+            <DescriptionList aria-label="Host-provided metadata">
+              <DescriptionItem term="Last updated">10:42 · Fixed example time</DescriptionItem>
+              <DescriptionItem term="Usage">
+                Input 1,240 / output 320 tokens · Example data
+              </DescriptionItem>
             </DescriptionList>
             <ResourceLink
-              title="组件审查记录"
-              detail="本地示例产物 · 点击只显示提示"
+              title="Component review record"
+              detail="Local example artifact · Click only shows a notice"
               onClick={() => {
-                feedback.value = "宿主收到打开审查记录的意图；示例没有加载文件。";
+                feedback.value =
+                  "The host received the intent to open the review record; the example loaded no file.";
               }}
             />
             <ChatAttachments items={[attachment]} />
@@ -285,18 +305,18 @@ export function agentAssistantDemo(): Child {
         {
           id: "summary",
           kind: "text",
-          text: "正在检查共享组件。**公开进度摘要**：文件检查进行中，独立审查执行已完成，仍在等待它的公开答复。\n\n`<script>alert(1)</script>` 是说明文字。原始 HTML 也不执行：<img src=x onerror=alert(1)>。",
+          text: "Checking shared components. **Public progress summary**: The file check is in progress, the independent review finished executing, and its public reply is still pending.\n\n`<script>alert(1)</script>` is description text. Raw HTML is not executed either: <img src=x onerror=alert(1)>.",
         },
         {
           id: "inspect-tool",
           kind: "tool",
-          label: "读取组件文件",
+          label: "Read component files",
           summary: "packages/meowtail/src/chat/long-component-file-name.tsx",
           state: "running",
-          statusLabel: "正在接收输出",
+          statusLabel: "Receiving output",
           input: payload,
           output: resultLines,
-          outputSummary: "已返回 24 条记录，完整结果可展开。",
+          outputSummary: "Returned 24 records; the full result can be expanded.",
           maxLines: 3,
           defaultOpen: true,
           canCancel: true,
@@ -304,38 +324,41 @@ export function agentAssistantDemo(): Child {
         {
           id: "delegate-task",
           kind: "task",
-          title: "独立键盘审查",
+          title: "Independent keyboard review",
           state: "success",
-          statusLabel: "执行成功 · 公开答复未收到",
-          executionText: "执行已返回，5 / 5 项完成。",
-          replyText: "等待公开答复，不表示执行失败。",
-          progress: { value: 5, max: 5, label: "执行检查 5 / 5 项" },
+          statusLabel: "Succeeded · Public reply not received",
+          executionText: "Execution returned; 5 / 5 items complete.",
+          replyText: "Waiting for the public reply does not mean execution failed.",
+          progress: { value: 5, max: 5, label: "Execution check 5 / 5 items" },
         },
         {
           id: "retry-tool",
           kind: "tool",
-          label: "读取索引",
+          label: "Read index",
           state: "error",
-          statusLabel: "本地模拟读取失败",
+          statusLabel: "Local simulated read failed",
           input: "index.json",
           output: "Previous confirmed data is retained.",
           canRetry: true,
         },
         { id: "files", kind: "attachments", items: [attachment] },
-        { id: "references", kind: "text", text: "宿主提供的产物与来源" },
+        { id: "references", kind: "text", text: "Artifacts and sources provided by the host" },
       ],
     },
   ]);
-  const draft = signal<AssistantDraft>({ text: "请继续检查窄容器中的组合。", attachments: [] });
+  const draft = signal<AssistantDraft>({
+    text: "Continue checking composition in a narrow container.",
+    attachments: [],
+  });
   const questions = signal<readonly AssistantQuestion[]>([
     {
       id: "scope",
-      title: "下一步检查哪些区域？",
+      title: "Which areas should be checked next?",
       state: "open",
-      description: "等待你的答复。没有回复不表示执行失败。",
+      description: "Waiting for your answer. No reply does not mean execution failed.",
       options: [
-        { value: "tools", label: "工具与任务" },
-        { value: "composer", label: "输入与附件" },
+        { value: "tools", label: "Tools and tasks" },
+        { value: "composer", label: "Input and attachments" },
       ],
     },
   ]);
@@ -368,17 +391,17 @@ export function agentAssistantDemo(): Child {
             const part = messages.value[0]?.parts.find((item) => item.id === "inspect-tool");
             if (part?.kind !== "tool") return;
             patchTool("inspect-tool", {
-              output: `${part.output ?? ""}\nNew output: 中文更新 <img src=x onerror=alert(1)> stays inert.`,
-              outputSummary: "已追加一条本地结果；不改变展开与焦点。",
+              output: `${part.output ?? ""}\nNew output: A text update <img src=x onerror=alert(1)> stays inert.`,
+              outputSummary: "Appended one local result; expansion and focus are unchanged.",
             });
           }}
         >
-          追加工具输出
+          Append tool output
         </Button>
       </Inline>
       <AssistantView
-        title="Agent 工作流"
-        description="共享默认组合 · 本地数据，不连接 Agent runtime"
+        title="Agent workflow"
+        description="Shared default composition · Local data, not connected to an Agent runtime"
         messages={messages}
         draft={draft}
         onDraftChange={(next) => {
@@ -396,36 +419,44 @@ export function agentAssistantDemo(): Child {
           ];
           return { accepted: true };
         }}
-        activity={{ title: "检查共享组件", statusText: "文件检查进行中", tone: "processing" }}
+        activity={{
+          title: "Check shared components",
+          statusText: "File check in progress",
+          tone: "processing",
+        }}
         work={[
           {
             id: "running",
-            title: "文件检查",
-            statusText: "正在接收输出",
+            title: "File check",
+            statusText: "Receiving output",
             tone: "processing",
-            executionText: "运行中",
+            executionText: "Running",
           },
           {
             id: "queued",
-            title: "整理报告",
-            statusText: "排队中 · 尚未开始",
+            title: "Organize the report",
+            statusText: "Queued · Not started yet",
             tone: "idle",
-            executionText: "等待调度",
+            executionText: "Waiting for scheduling",
           },
           {
             id: "returned",
-            title: "独立键盘审查",
-            statusText: "执行成功 · 等待公开答复",
+            title: "Independent keyboard review",
+            statusText: "Succeeded · Waiting for public reply",
             tone: "success",
-            executionText: "执行已完成",
-            replyText: "公开答复尚未收到",
+            executionText: "Execution complete",
+            replyText: "Public reply not received yet",
           },
         ]}
         questions={questions}
         onAnswer={(id, answer) => {
           questions.value = questions.value.map((question) =>
             question.id === id
-              ? { ...question, state: "answered", feedback: `宿主收到范围选择：${answer}` }
+              ? {
+                  ...question,
+                  state: "answered",
+                  feedback: `The host received the scope choice: ${answer}`,
+                }
               : question,
           );
         }}
@@ -433,14 +464,14 @@ export function agentAssistantDemo(): Child {
           if (action === "cancel") {
             patchTool(partId, {
               state: "cancelled",
-              statusLabel: "用户已取消后续检查",
+              statusLabel: "The user canceled further checks",
               canCancel: false,
             });
             return;
           }
           patchTool(partId, {
             state: "running",
-            statusLabel: "正在重试本地模拟",
+            statusLabel: "Retrying the local simulation",
             retryDisabled: true,
           });
           const timer = setTimeout(() => {
@@ -448,7 +479,7 @@ export function agentAssistantDemo(): Child {
             if (alive)
               patchTool(partId, {
                 state: "success",
-                statusLabel: "本地模拟重试成功",
+                statusLabel: "Local simulation retry succeeded",
                 canRetry: false,
                 output: "Index read completed in this local fixture.",
               });
@@ -459,8 +490,8 @@ export function agentAssistantDemo(): Child {
           part.id === "references" ? (
             <Stack gap="compact">
               <ResourceLink
-                title="组件审查产物"
-                detail="示例入口 · 只使用本地锚点"
+                title="Component review artifact"
+                detail="Example entry point · Uses a local anchor only"
                 href="#agent-reference"
               />
               <ChatSources
@@ -468,11 +499,13 @@ export function agentAssistantDemo(): Child {
                   {
                     title: "Meowtail source",
                     url: "https://github.com/lidessen/meowland",
-                    description: "显式提供的示例来源，不由 UI 检索。",
+                    description: "An explicitly provided example source; not retrieved by the UI.",
                   },
                 ]}
               />
-              <span id="agent-reference">产物、引用与附件均由宿主提供。</span>
+              <span id="agent-reference">
+                Artifacts, references and attachments are all provided by the host.
+              </span>
             </Stack>
           ) : undefined
         }
@@ -483,10 +516,11 @@ export function agentAssistantDemo(): Child {
 
 export const AgentWorkflow = defineStory({
   id: "agent-workflow",
-  title: "Agent · 并发、等待与执行回报",
+  title: "Agent · Concurrency, waiting and execution reporting",
   group: "Assistant",
   component: "ChatTask",
-  description: "共享工具与任务展示。执行完成、公开答复、用户等待和连接中断是不同事实。",
+  description:
+    "Shared tool and task display. Execution completion, public reply, user waiting and a lost connection are different facts.",
   covers: [
     "ChatTask",
     "ChatToolCall",
@@ -502,21 +536,22 @@ export const AgentWorkflow = defineStory({
 
 export const AgentWorkflowNarrow = defineStory({
   id: "agent-workflow-narrow",
-  title: "Agent · 320px 局部容器",
+  title: "Agent · 320px local container",
   group: "Assistant",
   component: "ChatTask",
-  description: "相同组合放入宽屏中的 320px 宿主，不借助 story 专属 CSS 修补内容。",
+  description:
+    "The same composition inside a 320px host on a wide screen, without story-only CSS patching the content.",
   covers: ["narrow container", "long input/output", "nested tasks", "default layout"],
   render: () => agentWorkflowDemo(true),
 });
 
 export const AgentWorkflowAssistant = defineStory({
   id: "agent-workflow-assistant",
-  title: "Agent · 完整 Assistant 组合",
+  title: "Agent · Complete Assistant composition",
   group: "Assistant",
   component: "AssistantView",
   description:
-    "同一 Assistant 默认渲染工具与任务，保留消息、草稿、附件、活动、问题和安全 Markdown。",
+    "The same Assistant renders tools and tasks by default and keeps messages, draft, attachments, activity, questions and safe Markdown.",
   covers: [
     "AssistantView",
     "tool/task parts",

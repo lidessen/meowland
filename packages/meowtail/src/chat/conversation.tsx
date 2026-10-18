@@ -20,7 +20,12 @@ export const ChatConversationLatest = defineComponent<
   "chat-conversation",
   (typeof chatConversationContract.parts)[number]
 >(chatConversationContract, ({ children, ...props }, context) =>
-  context.part("latest", "button", { type: "button", ...props }, children ?? "回到最新消息"),
+  context.part(
+    "latest",
+    "button",
+    { type: "button", ...props },
+    children ?? "Back to latest message",
+  ),
 );
 
 /** Optional scroll owner for append-only transcripts. Give the root a constrained height.
@@ -33,7 +38,13 @@ export const ChatConversation = defineComponent<
 >(
   chatConversationContract,
   (
-    { children, ariaLabel = "对话阅读区", latestLabel = "回到最新消息", className, ...props },
+    {
+      children,
+      ariaLabel = "Conversation reading area",
+      latestLabel = "Back to latest message",
+      className,
+      ...props
+    },
     context,
   ) => {
     const hidden = context.signal(true);

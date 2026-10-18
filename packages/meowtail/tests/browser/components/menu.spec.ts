@@ -67,32 +67,32 @@ test("nested menus enter and return by keyboard, close the chain on selection, a
 }) => {
   await page.goto("/canvas.html?story=menu-nested");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  const trigger = page.getByRole("button", { name: "格式操作", exact: true });
+  const trigger = page.getByRole("button", { name: "Format actions", exact: true });
   await trigger.focus();
   await page.keyboard.press("ArrowDown");
-  await expect(page.getByRole("menuitem", { name: "导出格式", exact: true })).toBeFocused();
+  await expect(page.getByRole("menuitem", { name: "Export format", exact: true })).toBeFocused();
   await page.keyboard.press("ArrowRight");
   await expect(page.getByRole("menuitem", { name: "Markdown", exact: true })).toBeFocused();
   await page.keyboard.press("ArrowDown");
-  await expect(page.getByRole("menuitem", { name: "更多格式", exact: true })).toBeFocused();
+  await expect(page.getByRole("menuitem", { name: "More formats", exact: true })).toBeFocused();
   await page.keyboard.press("ArrowRight");
-  await expect(page.getByRole("menuitem", { name: "纯文本", exact: true })).toBeFocused();
+  await expect(page.getByRole("menuitem", { name: "Plain text", exact: true })).toBeFocused();
   await page.keyboard.press("ArrowLeft");
-  await expect(page.getByRole("menuitem", { name: "更多格式", exact: true })).toBeFocused();
+  await expect(page.getByRole("menuitem", { name: "More formats", exact: true })).toBeFocused();
   await page.keyboard.press("Escape");
-  await expect(page.getByRole("menuitem", { name: "导出格式", exact: true })).toBeFocused();
+  await expect(page.getByRole("menuitem", { name: "Export format", exact: true })).toBeFocused();
   await page.keyboard.press("ArrowRight");
   await page.keyboard.press("Enter");
   await expect(trigger).toBeFocused();
   await expect(page.getByRole("menu")).toHaveCount(0);
-  await expect(page.getByRole("status").filter({ hasText: "已选择 Markdown。" })).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Selected Markdown." })).toBeVisible();
   await trigger.click();
-  await page.getByRole("menuitem", { name: "导出格式", exact: true }).click();
-  await page.getByRole("menuitem", { name: "更多格式", exact: true }).click();
-  await page.getByRole("menuitem", { name: "纯文本", exact: true }).click();
-  await expect(page.getByRole("status").filter({ hasText: "已选择纯文本。" })).toBeVisible();
+  await page.getByRole("menuitem", { name: "Export format", exact: true }).click();
+  await page.getByRole("menuitem", { name: "More formats", exact: true }).click();
+  await page.getByRole("menuitem", { name: "Plain text", exact: true }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Selected Plain text." })).toBeVisible();
   await trigger.click();
-  await page.getByRole("menuitem", { name: "导出格式", exact: true }).hover();
+  await page.getByRole("menuitem", { name: "Export format", exact: true }).hover();
   await expect(page.getByRole("menuitem", { name: "Markdown", exact: true })).toBeVisible();
   // The menu legitimately covers the feedback directly below its trigger.
   // Dismiss using the empty viewport edge, not an obscured underlying control.
@@ -106,37 +106,41 @@ test("Menu skips disabled actions, supports typeahead and returns focus after Es
 }) => {
   await page.goto("/canvas.html?story=menu-actions");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  const trigger = page.getByRole("button", { name: "操作", exact: true });
+  const trigger = page.getByRole("button", { name: "Actions", exact: true });
   await trigger.focus();
   await page.keyboard.press("ArrowDown");
-  await expect(page.getByRole("menuitem", { name: "打开" })).toBeFocused();
-  await expect(page.getByRole("menuitem", { name: "导出（不可用）" })).toBeDisabled();
+  await expect(page.getByRole("menuitem", { name: "Open" })).toBeFocused();
+  await expect(page.getByRole("menuitem", { name: "Export (unavailable)" })).toBeDisabled();
   await page.keyboard.press("ArrowDown");
-  await expect(page.getByRole("menuitem", { name: "复制" })).toBeFocused();
+  await expect(page.getByRole("menuitem", { name: "Copy" })).toBeFocused();
   await page.keyboard.press("ArrowDown");
-  await expect(page.getByRole("menuitem", { name: "移除" })).toBeFocused();
+  await expect(page.getByRole("menuitem", { name: "Remove" })).toBeFocused();
   await page.keyboard.press("Home");
-  await expect(page.getByRole("menuitem", { name: "打开" })).toBeFocused();
+  await expect(page.getByRole("menuitem", { name: "Open" })).toBeFocused();
   await page.keyboard.press("End");
-  await expect(page.getByRole("menuitem", { name: "移除" })).toBeFocused();
+  await expect(page.getByRole("menuitem", { name: "Remove" })).toBeFocused();
   await page
-    .getByRole("menuitem", { name: "移除" })
-    .dispatchEvent("keydown", { key: "复", bubbles: true });
-  await expect(page.getByRole("menuitem", { name: "复制" })).toBeFocused();
+    .getByRole("menuitem", { name: "Remove" })
+    .dispatchEvent("keydown", { key: "c", bubbles: true });
+  await expect(page.getByRole("menuitem", { name: "Copy" })).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(trigger).toBeFocused();
   await expect(page.getByRole("menu")).toBeHidden();
   await trigger.click();
-  await page.getByRole("menuitem", { name: "复制" }).click();
+  await page.getByRole("menuitem", { name: "Copy" }).click();
   await expect(trigger).toBeFocused();
-  await expect(page.getByRole("status").filter({ hasText: "已选择复制。" })).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Selected Copy." })).toBeVisible();
 });
 
 test("Toast remains until its owner closes it", async ({ page }) => {
   await page.goto("/canvas.html?story=toast-feedback");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  await page.getByRole("button", { name: "显示通知" }).click();
-  await expect(page.getByRole("status").filter({ hasText: "已保存本地示例。" })).toBeVisible();
-  await page.getByRole("button", { name: "关闭通知" }).click();
-  await expect(page.getByRole("status").filter({ hasText: "已保存本地示例。" })).toHaveCount(0);
+  await page.getByRole("button", { name: "Show toast" }).click();
+  await expect(
+    page.getByRole("status").filter({ hasText: "Saved the local sample." }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Dismiss toast" }).click();
+  await expect(page.getByRole("status").filter({ hasText: "Saved the local sample." })).toHaveCount(
+    0,
+  );
 });

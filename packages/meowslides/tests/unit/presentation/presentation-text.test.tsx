@@ -7,6 +7,7 @@ import { createMeowSlides } from "../../../src/registry";
 
 test("presentation text preserves one semantic, native text source", () => {
   const runtime = createRuntime({ plugins: [createMeowUI(), createMeowSlides()] });
+  // Mixed-script payload is intentional: verifies text splitting across scripts.
   const text = signal("A clear idea / 清楚的想法");
   const html = createWebRenderer(runtime).renderToHtml(
     <PresentationText
@@ -32,6 +33,7 @@ test("presentation text defaults to an inline source without owning its text or 
   const html = createWebRenderer(
     createRuntime({ plugins: [createMeowUI(), createMeowSlides()] }),
   ).renderToHtml(
+    // Mixed-script payload is intentional: verifies text splitting across scripts.
     <PresentationText lang="zh-CN">
       一个想法 <em>one idea</em>
     </PresentationText>,

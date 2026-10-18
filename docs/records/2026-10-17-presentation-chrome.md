@@ -1,43 +1,43 @@
-# 演示外围控制层优化回执
+# Presentation chrome optimization receipt
 
-日期：2026-10-17。前轮浏览器首期完成于 `65425df`；用户观看截图后要求演示专属主题，重点是外围控件不要照搬应用工具栏。按上下文将“主图”理解为“一套主题”，没有生成背景图，也没有更改包名。
+Date: 2026-10-17. The previous round's first browser phase was completed at `65425df`; after viewing screenshots, the user asked for a presentation-specific theme, mainly so that peripheral controls do not copy the app toolbar. In context, "the main image" was interpreted as "a theme"; no background image was generated and the package name was not changed.
 
-## 设计取舍与归属
+## Design tradeoffs and ownership
 
-独立视觉设计者实际查看 b3 原图，比较两个方向：
+An independent visual designer actually viewed the b3 original images and compared two directions:
 
-- **暗色放映室**：中性深墨外围、纸面舞台和深色控制浮台，对比强，但给现有米白作品增加第二个强视觉色块。
-- **画册页脚（采用）**：低对比暖灰围台、小号页眉、居中的自然宽度控制带，翻页与页序优先，目录和工具退居次级，视觉延续纸面作品。
+- **Dark screening room**: a neutral deep-ink surround, paper stage and dark control float, with strong contrast, but it adds a second strong visual color block to the existing cream work.
+- **Art-book footer (adopted)**: a low-contrast warm gray surround, a small masthead and a centered natural-width control band; paging and page order come first, the outline and tools recede to secondary, and the visuals continue the paper work.
 
-这次只调整 Meowtail 自有 presentation 结构与主题。保留作品内容、纸色、字体、页 id、步骤、素材与叙事，保留同一个位置 Signal、活动许可、媒体生命周期和 fit 算法。通用 Button、Icon 和原生 select 继续承担底层行为与语义；专属规则限于演示 chrome，不影响舞台内或其它组件里的按钮。
+This time only Meowtail's own presentation structure and theme were adjusted. Work content, paper color, fonts, slide ids, steps, assets and narrative were kept, as were the same position Signal, activity permission, media lifecycle and fit algorithm. Generic Button, Icon and native select still carry the underlying behavior and semantics; the scoped rules are limited to presentation chrome and do not affect buttons on the stage or in other components.
 
-现有功能是 Previous/Next（先步后页）、目录、页/步骤状态、暂停副作用、原尺寸/适应窗口，没有全屏按钮。本轮不因功能列表新增全屏、菜单状态机或自动隐藏。控制层常显，宽屏聚合、窄屏换行，触摸与键盘仍可找到关键控制；舞台与控件分配独立空间，不用叠层遮挡作品。
+The existing features are Previous/Next (step first, then slide), outline, page/step status, paused side effects, and original size/fit window; there is no fullscreen button. This round did not add fullscreen, a menu state machine or auto-hide because of a feature list. The control layer stays visible, aggregates on wide screens and wraps on narrow screens, and touch and keyboard can still find the key controls; the stage and controls get separate space, with no overlay covering the work.
 
-视觉设计、生产实现、独立审查分别由不同 owner 承担；主作者接合同版构建、交付与本地提交。
+Visual design, production implementation and independent review were handled by different owners; the main author took on the contract build, delivery and local commit.
 
-## 实际走查改变了什么
+## What the actual walkthrough changed
 
-第一轮真实截图发现：短标题的目录会使宽屏控制带无必要换行，短窗中额外占去一行舞台高度。仅将桌面控制带改为不换行，让目录承担内容收缩；窄屏仍按分组网格重排。
+The first round of real screenshots found that an outline with a short title made the wide-screen control band wrap unnecessarily and, in short windows, take an extra line of stage height. Only the desktop control band was changed to no-wrap so that the outline absorbs content shrinking; narrow screens still reflow by grouped grid.
 
-真实 computed styles 又发现：专属 CSS 虽写了 44px 操作高度，实际仍是通用 Button 的 36px，窄屏字号与 padding 也没有生效。原因是 typed part selector 使用低优先级 `:where`，后加载的 Button 基础规则覆盖了它。修复仅在控制带的 typed part 选择器中加入真实 `button` 类型限定，不改通用主题顺序，不使用 `!important` 或新增视觉 class。新增回归在旧 dist 上以 36 < 44 明确失败；同时核对舞台内按钮与控制带外参考 Button 的样式一致，防止专属规则泄漏。
+Real computed styles further found that although the scoped CSS declared a 44px action height, it was actually still the generic Button's 36px, and narrow-screen font size and padding had not taken effect either. The cause was that the typed part selector used the low-priority `:where`, which the later-loaded Button base rules overrode. The fix only added a real `button` type qualifier to the control band's typed part selector; it did not change the generic theme order, use `!important` or add a visual class. The new regression clearly failed on the old dist with 36 < 44; the stage buttons were also checked to match the reference Button outside the control band, preventing the scoped rules from leaking.
 
-## 最终检查与交付
+## Final checks and delivery
 
-工程已执行五包 build、正式作品 build、根类型检查、lint、格式检查、318 项单测。局部 CSS 修正后重新构建受影响 Meowtail 与正式作品，根类型检查、主题 CSS 解析/演示合同 6 项、29 断言通过。不改工程检查脚本，没有再次植入无关负例。
+Engineering ran the five-package build, the official work build, root typecheck, lint, format check and 318 unit tests. After the local CSS fix, the affected Meowtail and the official work were rebuilt, and root typecheck plus 6 theme CSS parse/presentation contract items with 29 assertions passed. The engineering check scripts were not changed and no unrelated negative case was injected again.
 
-独立浏览器检查 19 项（原 13 项 + 新 chrome 6 项）与正式作品 5 项全部通过。最后仅在已有短窗断点减少外围 padding/gap，再构建并补跑受影响 chrome 6 项通过，重新生成全部效果图与 computed 诊断；没有重复未受影响的 13 + 5 项。完整命令、旧版失败证据和执行范围见[独立审查记录](../../packages/meowtail/tests/browser/presentation/REVIEW.md)。
+The 19 independent browser checks (the original 13 + 6 new chrome items) and the 5 official work items all passed. Finally, peripheral padding/gap was reduced only at the existing short-window breakpoint; after rebuilding and rerunning the affected 6 chrome items, they passed, and all renderings and computed diagnostics were regenerated; the unaffected 13 + 5 items were not repeated. Complete commands, old-version failure evidence and execution scope are in the [independent review record](../../packages/meowtail/tests/browser/presentation/REVIEW.md).
 
-主作者与独立视觉/行为审查分别实际打开最终原图：正式作品 1440×960、390×844，真实浅/深主题、键盘焦点、844×390 短窗和原生宿主全屏容器。外围控件不覆盖舞台，目录/按钮可见可达。导航按钮实测 44×44；窄屏工具按钮高 44、字号 12，两工具同排，控制带从 137px 降到 107px。短窗控制带从 106px 降到 58px，舞台从首轮 238×134 恢复到最终 384×216。辅助文字合成对比：浅色页眉 4.78:1、页脚 5.27:1，深色 8.95:1 / 7.35:1。
+The main author and the independent visual/behavior review separately actually opened the final original images: the official work at 1440×960 and 390×844, real light/dark themes, keyboard focus, a 844×390 short window and a native host fullscreen container. Peripheral controls do not cover the stage, and the outline/buttons are visible and reachable. The navigation buttons measured 44×44; narrow-screen tool buttons are 44 high with font size 12, two tools on the same row, and the control band dropped from 137px to 107px. The short-window control band dropped from 106px to 58px, and the stage recovered from 238×134 in the first round to 384×216 finally. Composite contrast of auxiliary text: light masthead 4.78:1 and footer 5.27:1; dark 8.95:1 / 7.35:1.
 
-本机证据在忽略目录 `artifacts/presentation-review/chrome-20261017/`，前后图为 `baseline-*` / `final-*`；最终诊断为 `final-computed.json`，观众构建输出身份为 `viewer-output-hashes.json`。代表性正式作品宽/窄图另交 Library，未上传测试夹具或私人资料。最终观众 JS 为 `chunk-g86j615g.js`，SHA-256：
+Local evidence is in the ignored directory `artifacts/presentation-review/chrome-20261017/`, with before/after images as `baseline-*` / `final-*`; the final diagnostics are `final-computed.json`, and the viewer build output identity is `viewer-output-hashes.json`. Representative wide/narrow images of the official work were handed over to Library separately; no test fixtures or private material were uploaded. The final viewer JS is `chunk-g86j615g.js`, SHA-256:
 
 ```text
 25006debf69f53a6c3ba5f397bb726151026088df72dd3305afef87a79e6da88
 ```
 
-新 chrome 沿现有 `Presentation` 入口与主题图交付，没有依赖/exports/运行资源变更。本轮没有重复发包或覆盖前轮已冻结的 b3 tarball；前轮安装态结果仅代表当时产物，不能冒充本次新样式的安装验证。
+The new chrome ships along the existing `Presentation` entry point and theme graph, with no dependency/exports/runtime resource changes. This round did not republish or overwrite the previous round's frozen b3 tarball; the previous round's installed-state results only represent the artifacts of that time and cannot stand in for installed verification of the new styles.
 
-在仓库根重新构建并预览：
+To rebuild and preview from the repository root:
 
 ```sh
 bun run build
@@ -45,6 +45,6 @@ bun examples/presentation/build.ts
 bun examples/presentation/serve.ts
 ```
 
-本地入口仍为 `http://127.0.0.1:13009/`。当前作品内容版本仍为 `image-waiting-b3`；新的外围版本由本轮 Git 提交与构建文件身份区分，不能只按内容版本判断 chrome。没有 HMR、推送、发布或部署，`data/` 未读取或改动。
+The local entry point is still `http://127.0.0.1:13009/`. The current work content version is still `image-waiting-b3`; the new peripheral version is distinguished by this round's Git commit and build file identity, and chrome cannot be judged by content version alone. There was no HMR, push, publish or deployment, and `data/` was not read or changed.
 
-没有新增播放器全屏功能；验证的是本机无头 Chrome 通过宿主按钮对真实容器进入/退出原生 Fullscreen API，不代表物理屏幕验收。窄屏只证明固定比例舞台和外围操作可用，未将作品改为手机排版。没有重跑所有既有展板、其它浏览器/OS 或屏幕阅读器矩阵，也不把本轮截图等同于用户最终视觉接受。
+No player fullscreen feature was added; what was verified is that local headless Chrome entered and exited the native Fullscreen API on a real container through a host button, which is not physical-screen acceptance. Narrow screens only prove that the fixed-ratio stage and peripheral operations are usable; the work was not changed to mobile typography. The full existing showcase, other browser/OS or screen reader matrices were not rerun, and this round's screenshots are not equated with the user's final visual acceptance.

@@ -40,7 +40,7 @@ export const OutputBlock = defineComponent<
 >(
   outputBlockContract,
   (
-    { title, rows, copyText, maxLines, wrap = false, emptyText = "没有内容", onCopy, ...props },
+    { title, rows, copyText, maxLines, wrap = false, emptyText = "No content", onCopy, ...props },
     context,
   ) => {
     const derived = <T,>(read: () => T) => {
@@ -61,9 +61,9 @@ export const OutputBlock = defineComponent<
       busy.value = true;
       try {
         await (onCopy ?? copyTextToClipboard)(unwrap(copyText));
-        if (!disposed) feedback.value = "已复制";
+        if (!disposed) feedback.value = "Copied";
       } catch {
-        if (!disposed) feedback.value = "复制失败，请手动选择文本。";
+        if (!disposed) feedback.value = "Copy failed; select the text manually.";
       } finally {
         if (!disposed) busy.value = false;
       }
@@ -82,10 +82,10 @@ export const OutputBlock = defineComponent<
             "actions",
             "button",
             { type: "button", disabled: busy, onClick: copy },
-            "复制",
+            "Copy",
           ),
         ]),
-        context.part("body", "div", { tabIndex: 0, "aria-label": "输出内容" }, [
+        context.part("body", "div", { tabIndex: 0, "aria-label": "Output content" }, [
           derived(() => {
             const values = unwrap(rows);
             return values.length === 0
@@ -94,8 +94,10 @@ export const OutputBlock = defineComponent<
           }),
           context.part("fold", "details", { hidden: derived(() => window.value.hidden === 0) }, [
             context.part("toggle", "summary", {}, [
-              <span data-fold-closed>{derived(() => `展开中间 ${window.value.hidden} 行`)}</span>,
-              <span data-fold-open>收起中间行</span>,
+              <span data-fold-closed>
+                {derived(() => `Show the ${window.value.hidden} hidden middle lines`)}
+              </span>,
+              <span data-fold-open>Hide the middle lines</span>,
             ]),
             derived(() => {
               const values = unwrap(rows);

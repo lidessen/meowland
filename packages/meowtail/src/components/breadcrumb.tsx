@@ -17,7 +17,7 @@ export const Breadcrumb = defineComponent<
   BreadcrumbProps,
   "breadcrumb",
   "root" | "list" | "item" | "link" | "current" | "separator"
->(breadcrumbContract, ({ items, label = "当前位置", className, ...props }, context) =>
+>(breadcrumbContract, ({ items, label = "Current location", className, ...props }, context) =>
   context.part(
     "root",
     "nav",

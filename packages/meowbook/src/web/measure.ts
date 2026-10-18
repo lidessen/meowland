@@ -251,7 +251,8 @@ export function createMeasurements(
       report({
         name: label(selected),
         size: number(rect.width) + " × " + number(rect.height),
-        typography: style.fontSize + " / " + style.lineHeight + " · 字重 " + style.fontWeight,
+        typography:
+          style.fontSize + " / " + style.lineHeight + " · Font weight " + style.fontWeight,
         spacing:
           "P " + box(style, "padding") + " · M " + box(style, "margin") + " · gap " + style.gap,
       });

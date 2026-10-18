@@ -14,13 +14,13 @@ import {
 
 export const DrawerStory = defineStory({
   id: "drawer",
-  title: "抽屉 · 窄屏导航",
-  group: "导航与布局",
+  title: "Drawer · Narrow-screen navigation",
+  group: "Navigation and layout",
   groupOrder: 34,
   component: "Drawer",
-  variant: "固定标题与独立阅读",
+  variant: "Fixed header and independent reading",
   description:
-    "标题和关闭共用固定区域；正文独立滚动。选择目的地、Escape 或遮罩关闭后返回触发按钮。",
+    "The title and close button share a fixed region; the body scrolls independently. After choosing a destination, pressing Escape, or closing via the scrim, focus returns to the trigger button.",
   covers: ["Drawer header", "body scroll", "Escape", "scrim click", "focus return"],
   render() {
     const open = signal(false);
@@ -33,10 +33,10 @@ export const DrawerStory = defineStory({
           }}
         >
           <Icon name="menu" />
-          打开导航抽屉
+          Open navigation drawer
         </Button>
         <Drawer
-          label="主导航"
+          label="Main navigation"
           open={open}
           onOpenChange={(next) => {
             open.value = next;
@@ -46,7 +46,7 @@ export const DrawerStory = defineStory({
               title="Meowland"
               actions={
                 <IconButton
-                  label="关闭导航"
+                  label="Close navigation"
                   onClick={() => {
                     open.value = false;
                   }}
@@ -59,7 +59,7 @@ export const DrawerStory = defineStory({
         >
           <Stack gap="compact">
             <NavItem
-              label="对话"
+              label="Chat"
               icon={<Icon name="message-square" />}
               active
               onClick={() => {
@@ -67,28 +67,28 @@ export const DrawerStory = defineStory({
               }}
             />
             <NavItem
-              label="记忆与知识"
+              label="Memory and knowledge"
               icon={<Icon name="file-text" />}
               onClick={() => {
                 open.value = false;
               }}
             />
             <NavItem
-              label="服务"
+              label="Services"
               icon={<Icon name="network" />}
               onClick={() => {
                 open.value = false;
               }}
             />
             <NavItem
-              label="通信"
+              label="Messaging"
               icon={<Icon name="message-square" />}
               onClick={() => {
                 open.value = false;
               }}
             />
             <NavItem
-              label="提醒"
+              label="Reminders"
               icon={<Icon name="list-checks" />}
               badge={
                 <Tag kind="count" tone="warning">
@@ -101,7 +101,7 @@ export const DrawerStory = defineStory({
             />
             {Array.from({ length: 8 }, (_, i) => (
               <NavItem
-                label={`已授权的示例扩展 ${i + 1}`}
+                label={`Authorized sample extension ${i + 1}`}
                 icon={<Icon name="file-text" />}
                 onClick={() => {
                   open.value = false;
@@ -109,10 +109,10 @@ export const DrawerStory = defineStory({
               />
             ))}
             <span>
-              <StatusDot state="success" /> Runtime 已连接
+              <StatusDot state="success" /> Runtime connected
             </span>
             <NavItem
-              label="设置"
+              label="Settings"
               icon={<Icon name="settings" />}
               onClick={() => {
                 open.value = false;

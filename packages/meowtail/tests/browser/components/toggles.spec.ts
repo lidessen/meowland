@@ -4,13 +4,16 @@ test("native checkbox and switch preserve labels, keyboard, form values and rese
   page,
 }) => {
   await page.goto("/canvas.html?story=toggles");
-  const remember = page.getByRole("checkbox", { name: "保存本次选择", exact: true });
-  const confirm = page.getByRole("checkbox", { name: "确认后才能提交", exact: true });
-  const tools = page.getByRole("switch", { name: "显示工具过程", exact: true });
-  const notifications = page.getByRole("switch", { name: "通知（受控）", exact: true });
-  const fixed = page.getByRole("switch", { name: "固定开启（拒绝修改）", exact: true });
+  const remember = page.getByRole("checkbox", { name: "Save this choice", exact: true });
+  const confirm = page.getByRole("checkbox", { name: "Required before submitting", exact: true });
+  const tools = page.getByRole("switch", { name: "Show tool process", exact: true });
+  const notifications = page.getByRole("switch", {
+    name: "Notifications (controlled)",
+    exact: true,
+  });
+  const fixed = page.getByRole("switch", { name: "Always on (rejects changes)", exact: true });
   await expect(remember).toBeChecked();
-  await page.getByText("保存本次选择", { exact: true }).click();
+  await page.getByText("Save this choice", { exact: true }).click();
   await expect(remember).not.toBeChecked();
   await tools.focus();
   await page.keyboard.press("Space");
@@ -28,19 +31,21 @@ test("native checkbox and switch preserve labels, keyboard, form values and rese
     ...new FormData((input as HTMLInputElement).form!).keys(),
   ]);
   expect(values).toEqual(["confirm"]);
-  await page.getByRole("button", { name: "重置", exact: true }).click();
+  await page.getByRole("button", { name: "Reset", exact: true }).click();
   await expect(remember).toBeChecked();
   await expect(tools).toBeChecked();
   await expect(confirm).not.toBeChecked();
   await expect(notifications).not.toBeChecked();
   await expect(fixed).toBeChecked();
-  await expect(page.getByRole("checkbox", { name: "当前不可选择", exact: true })).toBeDisabled();
-  await expect(page.getByRole("switch", { name: "暂不可用", exact: true })).toBeDisabled();
+  await expect(
+    page.getByRole("checkbox", { name: "Currently unavailable", exact: true }),
+  ).toBeDisabled();
+  await expect(page.getByRole("switch", { name: "Unavailable", exact: true })).toBeDisabled();
 });
 
 test("controlled reset follows a reassigned native form owner", async ({ page }) => {
   await page.goto("/canvas.html?story=toggles");
-  const fixed = page.getByRole("switch", { name: "固定开启（拒绝修改）", exact: true });
+  const fixed = page.getByRole("switch", { name: "Always on (rejects changes)", exact: true });
   await fixed.evaluate((element) => {
     const form = document.createElement("form");
     form.id = "alternate-toggle-form";

@@ -2,6 +2,7 @@ import { chatTaskContract } from "../chat/task";
 import { defaultRuntime, type ComponentContract, type Runtime, type RuntimePlugin } from "meowjsx";
 import { pillContract } from "../components/pill";
 import { pageFrameContract } from "../components/page-frame";
+import { appBarContract } from "../components/app-bar";
 import { regionLayoutContract } from "../components/region-layout";
 import { imagePreviewContract } from "../components/image-preview";
 import { createStylePropsPlugin } from "meowcss/meowjsx";
@@ -62,6 +63,8 @@ import {
   fieldContract,
   iconButtonContract,
   toolbarContract,
+  actionRailContract,
+  metaRowContract,
   inputContract,
   checkboxContract,
   switchContract,
@@ -104,6 +107,7 @@ import {
   chatQuestionContract,
   chatSourcesContract,
   chatComposerContract,
+  composerPanelContract,
   chatFrameContract,
   chatHeaderContract,
   chatMessageActionsContract,
@@ -119,6 +123,7 @@ import { assistantQuestionContract } from "../chat/assistant-question";
 
 export const MeowUIComponent = {
   PageFrame: pageFrameContract.name,
+  AppBar: appBarContract.name,
   RegionLayout: regionLayoutContract.name,
   Pill: pillContract.name,
   ImagePreview: imagePreviewContract.name,
@@ -166,6 +171,8 @@ export const MeowUIComponent = {
   Button: buttonContract.name,
   IconButton: iconButtonContract.name,
   Toolbar: toolbarContract.name,
+  ActionRail: actionRailContract.name,
+  MetaRow: metaRowContract.name,
   EmptyState: emptyStateContract.name,
   Card: cardContract.name,
   Badge: badgeContract.name,
@@ -199,6 +206,7 @@ export const MeowUIComponent = {
   ChatMessage: chatMessageContract.name,
   ChatMessageActions: chatMessageActionsContract.name,
   ChatComposer: chatComposerContract.name,
+  ComposerPanel: composerPanelContract.name,
   ChatToolCall: chatToolCallContract.name,
   ChatTask: chatTaskContract.name,
   StatusDot: statusDotContract.name,
@@ -226,6 +234,7 @@ export const MeowUIComponent = {
 
 export const meowUIComponents = [
   pageFrameContract,
+  appBarContract,
   regionLayoutContract,
   pillContract,
   imagePreviewContract,
@@ -280,6 +289,8 @@ export const meowUIComponents = [
   buttonContract,
   iconButtonContract,
   toolbarContract,
+  actionRailContract,
+  metaRowContract,
   emptyStateContract,
   cardContract,
   badgeContract,
@@ -313,6 +324,7 @@ export const meowUIComponents = [
   chatMessageContract,
   chatMessageActionsContract,
   chatComposerContract,
+  composerPanelContract,
   chatToolCallContract,
   chatTaskContract,
   statusDotContract,
@@ -339,6 +351,7 @@ export const meowUIComponents = [
 declare module "meowjsx" {
   interface ComponentRegistryMap {
     "page-frame": { parts: (typeof pageFrameContract.parts)[number] };
+    "app-bar": { parts: (typeof appBarContract.parts)[number] };
     "region-layout": { parts: (typeof regionLayoutContract.parts)[number] };
     pill: { parts: "root" };
     "image-preview": { parts: (typeof imagePreviewContract.parts)[number] };
@@ -387,6 +400,8 @@ declare module "meowjsx" {
     button: { parts: (typeof buttonContract.parts)[number] };
     "icon-button": { parts: (typeof iconButtonContract.parts)[number] };
     toolbar: { parts: (typeof toolbarContract.parts)[number] };
+    "action-rail": { parts: (typeof actionRailContract.parts)[number] };
+    "meta-row": { parts: (typeof metaRowContract.parts)[number] };
     "empty-state": { parts: (typeof emptyStateContract.parts)[number] };
     card: { parts: "root" };
     badge: { parts: "root" };
@@ -432,6 +447,7 @@ declare module "meowjsx" {
     "chat-composer": {
       parts: (typeof chatComposerContract.parts)[number];
     };
+    "composer-panel": { parts: (typeof composerPanelContract.parts)[number] };
     "chat-tool-call": { parts: (typeof chatToolCallContract.parts)[number] };
     "chat-task": { parts: (typeof chatTaskContract.parts)[number] };
     "status-dot": { parts: (typeof statusDotContract.parts)[number] };

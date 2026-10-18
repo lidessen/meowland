@@ -19,7 +19,7 @@ export const ImageLightbox = defineComponent<
   (typeof imageLightboxContract.parts)[number]
 >(
   imageLightboxContract,
-  ({ src, alt, caption, trigger = "预览图片", onClose, ...props }, context) => {
+  ({ src, alt, caption, trigger = "Preview image", onClose, ...props }, context) => {
     let dialog: HTMLDialogElement | undefined;
     let opener: HTMLButtonElement | undefined;
     return context.part("root", "div", props, [
@@ -42,7 +42,7 @@ export const ImageLightbox = defineComponent<
         "dialog",
         "dialog",
         {
-          "aria-label": alt || "图片预览",
+          "aria-label": alt || "Image preview",
           ref: (node: HTMLDialogElement) => {
             dialog = node;
             return () => {
@@ -65,7 +65,7 @@ export const ImageLightbox = defineComponent<
             {
               type: "button",
               autoFocus: true,
-              "aria-label": "关闭图片预览",
+              "aria-label": "Close image preview",
               onClick: () => dialog?.close(),
             },
             "×",

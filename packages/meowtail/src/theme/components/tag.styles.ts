@@ -1,7 +1,7 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { tagContract, tagOptions } from "../../components/tag";
 import { uiTokens } from "../tokens";
-import { accentTokens, layerTokens, radiusTokens, statusTokens } from "../palette";
+import { accentTokens, layerTokens, radiusTokens } from "../palette";
 
 const root = partSelector(tagContract, "root");
 
@@ -26,8 +26,8 @@ export const tagStyles = css`
       font-weight: 600;
     }
     ${tagOptions.when({ tone: "warning" })} {
-      background: ${statusTokens.warning};
-      color: #fff;
+      background: ${uiTokens.warning};
+      color: ${uiTokens.onPrimary};
       font-weight: 600;
     }
     ${tagOptions.when({ kind: "count" })} {

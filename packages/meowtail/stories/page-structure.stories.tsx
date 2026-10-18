@@ -14,36 +14,41 @@ import {
 
 export const PageStructureStory = defineStory({
   id: "page-structure",
-  title: "页面组件 · 页头、卡片与分组行",
-  group: "导航与布局",
+  title: "Page components · Page header, cards and grouped rows",
+  group: "Navigation and layout",
   groupOrder: 33,
   component: "PageHeader",
-  variant: "独立组件状态",
-  description: "分别展示公共组件的 props 与插槽，不组装应用页面。",
+  variant: "Individual component states",
+  description:
+    "Shows each public component's props and slots separately; does not assemble an application page.",
   render: () => (
     <Stack>
       <PageHeader
-        title="示例页头"
-        description="组件描述插槽"
-        actions={<Button size="small">操作</Button>}
+        title="Example page header"
+        description="Component description slot"
+        actions={<Button size="small">Action</Button>}
       />
       <ResourceCard
-        title="示例资源"
-        subtitle="资源类别"
-        description="由调用方提供说明。"
+        title="Example resource"
+        subtitle="Resource category"
+        description="The caller provides the description."
         icon={<Icon name="folder" />}
       />
-      <ResourceCard title="停用资源" tone="muted" description="停用状态的组件示例。" />
+      <ResourceCard
+        title="Disabled resource"
+        tone="muted"
+        description="Component example in the disabled state."
+      />
       <ListRow
         tone="accent"
-        title="摘要行"
-        tags={<Tag tone="accent">选中</Tag>}
-        description="独立条目"
+        title="Summary row"
+        tags={<Tag tone="accent">Selected</Tag>}
+        description="Standalone item"
       />
       <ListGroup>
-        <ListRow title="第一个条目" description="由调用方提供内容" />
-        <ListRow title="展开条目" expanded>
-          <p>展开内容插槽</p>
+        <ListRow title="First item" description="The caller provides the content" />
+        <ListRow title="Expanded item" expanded>
+          <p>Expanded content slot</p>
         </ListRow>
       </ListGroup>
     </Stack>
@@ -51,25 +56,29 @@ export const PageStructureStory = defineStory({
 });
 
 const longContentCopy = {
-  pageTitle: "服务配置与已注册工作区中的可用能力",
-  purpose: "页头、状态与标识在窄窗中保持可读，操作仍靠近其对象。",
-  action: "查看配置",
+  pageTitle: "Service configuration and available capabilities in registered workspaces",
+  purpose:
+    "The page header, status and identity stay readable in a narrow window, and actions stay close to their object.",
+  action: "View configuration",
   title: "Development workspace · Review and documentation service",
-  description: "名称用于辨认能力，说明帮助理解用途，标识用于准确核对实例。",
-  category: "工作区能力",
-  status: "已启用",
-  emptyTitle: "停用资源",
-  emptyDescription: "状态由宿主提供，组件只呈现信息与可用动作。",
+  description:
+    "The name identifies the capability, the description explains its purpose, and the identity lets you check the exact instance.",
+  category: "Workspace capabilities",
+  status: "Enabled",
+  emptyTitle: "Disabled resource",
+  emptyDescription:
+    "The host provides the state; the component only presents the information and available actions.",
 };
 
 export const PageStructureLongContentStory = defineStory({
   id: "page-structure-long-content",
-  title: "页面组件 · 长名称、标识与禁用动作",
-  group: "导航与布局",
+  title: "Page components · Long names, identity and disabled actions",
+  group: "Navigation and layout",
   groupOrder: 33,
   component: "ResourceCard",
-  variant: "窄窗与可读元信息",
-  description: "真实公共组件的内容压力场景，不模拟业务请求。",
+  variant: "Narrow window and readable metadata",
+  description:
+    "Content pressure scenarios for the real public components; no business request is simulated.",
   covers: ["long title", "identity", "disabled action", "status label", "page title"],
   render: () => (
     <Stack>

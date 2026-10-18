@@ -29,7 +29,7 @@ export async function bootCanvas(options: CanvasOptions): Promise<() => void> {
   state.id = "story-state";
   state.setAttribute("role", "status");
   state.dataset.status = "loading";
-  state.textContent = "正在加载场景…";
+  state.textContent = "Loading the scenario…";
   const id = new URL(location.href).searchParams.get("story") ?? options.manifest[0]?.id ?? "";
   const captureMode = options.capture === true;
   if (captureMode) document.documentElement.dataset.meowbookCapture = "true";
@@ -49,13 +49,13 @@ export async function bootCanvas(options: CanvasOptions): Promise<() => void> {
     const message = error instanceof Error ? error.message : String(error);
     state.dataset.status = "error";
     const title = document.createElement("strong");
-    title.textContent = "场景遇到了问题";
+    title.textContent = "The scenario ran into a problem";
     const detail = document.createElement("div");
     detail.textContent = message;
     const retry = document.createElement("button");
     retry.type = "button";
-    retry.textContent = "重新加载场景";
-    retry.title = "重新加载会重置此示例的输入";
+    retry.textContent = "Reload scenario";
+    retry.title = "Reloading resets input in this example";
     retry.onclick = () => location.reload();
     state.replaceChildren(title, detail, retry);
     send({ type: "error", message });
@@ -138,7 +138,8 @@ export async function bootCanvas(options: CanvasOptions): Promise<() => void> {
   window.addEventListener("pagehide", onHide);
   listeners.add(() => window.removeEventListener("pagehide", onHide));
   try {
-    if (!options.manifest.some((entry) => entry.id === id)) throw new Error(`未找到场景：${id}`);
+    if (!options.manifest.some((entry) => entry.id === id))
+      throw new Error(`Scenario not found: ${id}`);
     const prepare = await options.loadEnvironment();
     if (disposed) return dispose;
     let defaultContainer: StoryContainer | undefined;
@@ -153,13 +154,14 @@ export async function bootCanvas(options: CanvasOptions): Promise<() => void> {
     if (disposed) return dispose;
     const story = await options.loadStory(id);
     if (disposed) return dispose;
-    if (story.id !== id) throw new Error(`场景索引与运行定义不一致：${id}`);
+    if (story.id !== id)
+      throw new Error(`Scenario index and runtime definition do not match: ${id}`);
     document.title = `${story.title ?? id} · Meowbook`;
     root.dataset.story = id;
     const replacements = story.replacements ?? [];
     const seen = new Set();
     for (const entry of replacements) {
-      if (seen.has(entry.component)) throw new Error("重复的组件替换目标");
+      if (seen.has(entry.component)) throw new Error("Duplicate component replacement target");
       seen.add(entry.component);
     }
     const hits = replacements.map(() => 0);
@@ -176,7 +178,7 @@ export async function bootCanvas(options: CanvasOptions): Promise<() => void> {
         replacement: entry.replacement.contract?.name || entry.replacement.name || "anonymous",
         hits: hits[index]!,
       }));
-      summary.textContent = `组件替换记录 · ${hits.reduce((sum, count) => sum + count, 0)} 次命中`;
+      summary.textContent = `Component replacement log · ${hits.reduce((sum, count) => sum + count, 0)} hits`;
       diagnostics.textContent = JSON.stringify(
         replacements.map((entry, index) => ({
           index,
@@ -229,7 +231,9 @@ export async function bootCanvas(options: CanvasOptions): Promise<() => void> {
     await document.fonts.ready;
     if (disposed || failed) return dispose;
     state.dataset.status = "ready";
-    state.textContent = replacements.length ? "局部预览 · 包含组件替换" : "";
+    state.textContent = replacements.length
+      ? "Partial preview · Component replacements included"
+      : "";
     send({ type: "ready" });
     inspect();
     const observer = new ResizeObserver(inspect);

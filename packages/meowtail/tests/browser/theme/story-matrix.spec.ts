@@ -9,20 +9,16 @@ for (const scheme of ["light", "dark"]) {
       test.setTimeout(60000);
       await page.setViewportSize({ width, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
-      const entries = (await (
-        await request.get("http://127.0.0.1:13007/manifest.json")
-      ).json()) as StoryEntry[];
+      const entries = (await (await request.get("/manifest.json")).json()) as StoryEntry[];
       const errors: string[] = [];
       page.on("pageerror", (error) => errors.push(error.message));
       for (const entry of entries) {
         await test.step(entry.id, async () => {
-          await page.goto(
-            `http://127.0.0.1:13007/canvas.html?story=${encodeURIComponent(entry.id)}`,
-          );
+          await page.goto(`/canvas.html?story=${encodeURIComponent(entry.id)}`);
           await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
           await page
-            .getByRole("navigation", { name: "主题预览", exact: true })
-            .getByRole("combobox", { name: "外观", exact: true })
+            .getByRole("navigation", { name: "Theme preview", exact: true })
+            .getByRole("combobox", { name: "Appearance", exact: true })
             .selectOption(scheme);
           expect(
             await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1),
@@ -73,19 +69,19 @@ for (const scheme of ["light", "dark"]) {
 }
 
 test("icon catalog filters, names and selection remain coherent", async ({ page }) => {
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=icons");
+  await page.goto("/canvas.html?story=icons");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  await page.getByRole("searchbox", { name: "查找图标", exact: true }).fill("folder");
+  await page.getByRole("searchbox", { name: "Find an icon", exact: true }).fill("folder");
   await expect(page.locator("button[data-icon]:visible")).toHaveCount(2);
   await page.getByRole("button", { name: "folder", exact: true }).click();
   await expect(page.getByRole("button", { name: "folder", exact: true })).toHaveAttribute(
     "aria-pressed",
     "true",
   );
-  await expect(page.locator("[data-icon-feedback]")).toContainText("已选择 folder");
-  await page.getByRole("searchbox", { name: "查找图标", exact: true }).fill("not-a-real-icon");
+  await expect(page.locator("[data-icon-feedback]")).toContainText("Selected folder");
+  await page.getByRole("searchbox", { name: "Find an icon", exact: true }).fill("not-a-real-icon");
   await expect(page.locator("button[data-icon]:visible")).toHaveCount(0);
   await expect(page.locator("[data-icon-empty]")).toBeVisible();
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=icon-sizes");
-  await expect(page.getByRole("img", { name: "项目文件夹" })).toBeVisible();
+  await page.goto("/canvas.html?story=icon-sizes");
+  await expect(page.getByRole("img", { name: "Project folder" })).toBeVisible();
 });

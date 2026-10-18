@@ -29,14 +29,14 @@ export const JsonBlock = defineComponent<
         try {
           JSON.parse(text);
         } catch {
-          error = "JSON 格式无效，显示原文。";
+          error = "Invalid JSON; showing the original text.";
         }
       } else {
         try {
           content = JSON.stringify(payload, null, 2) ?? String(payload);
         } catch {
           content = String(payload);
-          error = "无法序列化为 JSON，显示值的文本表示。";
+          error = "Cannot serialize to JSON; showing the value's text representation.";
         }
       }
       body.value = [

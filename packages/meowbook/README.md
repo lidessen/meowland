@@ -1,14 +1,14 @@
 # Meowbook
 
-`meowbook` 是 MeowJSX Web 组件开发包。提供静态场景索引、隔离画布、选择性组件替换与普通浏览器测试入口，不依赖 Storybook，也不包含旧 Notes/Tasks 应用。
+`meowbook` is the MeowJSX Web component development package. It provides a static story index, an isolated canvas, selective component replacement and an ordinary browser test entry point; it does not depend on Storybook and does not include the old Notes/Tasks application.
 
-Gallery 自身由 MeowJSX 渲染，复用 Meowtail 的 Button、Input、Icon 与标准主题，使用独立 runtime，不影响场景执行环境。Meowbook 只维护工具的目录、画布与检查抽屉布局。检查说明默认收起，窄屏通过目录按钮选择场景。
+The Gallery is itself rendered by MeowJSX and reuses Meowtail's Button, Input, Icon and standard theme through its own runtime, so it does not affect the story execution environment. Meowbook only maintains the tool's catalog, canvas and inspection drawer layout. Inspection notes are collapsed by default, and a narrow screen chooses stories through the catalog button.
 
-工具以画布为主：默认自适应可用空间，固定设备宽度用于明确比较。交互最新反馈直接显示在底部，完整记录按需展开。搜索显示命中数量；窄屏目录支持遮罩关闭、Escape 和焦点返回。左下「工具外观」支持浅色、深色和跟随系统，独立于场景内部主题，不重挂载场景。
+The tool centers on the canvas: it fits the available space by default, and fixed device widths are for explicit comparison. The latest interaction feedback appears directly at the bottom, and the full log expands on demand. Search shows the match count; on a narrow screen the catalog supports closing with the backdrop, Escape and focus return. The "Tool appearance" control in the lower left supports light, dark and follow system, independent of the theme inside the story, and does not remount the story.
 
-## 使用
+## Usage
 
-Meowbook 由消费者自己的配置组装场景。安装包后，在消费者目录运行：
+Meowbook assembles stories from the consumer's own config. After installing the package, run in the consumer directory:
 
 ```sh
 bunx --no-install meowbook list --config meowbook.config.ts --json
@@ -17,15 +17,14 @@ bunx --no-install meowbook serve --config meowbook.config.ts --port 13004
 bunx --no-install meowbook capture --config meowbook.config.ts --story composer --depth all
 ```
 
-CLI 需要 Bun。安装 `meowbook` 及其 `meowjsx`、`meowcss`、`meowtail` peers 后，
-在消费者目录使用以上已安装 CLI 命令。
-公开入口为 `meowbook`、`meowbook/web`、`meowbook/bun`、`meowbook/playwright`。
-发行包携带编译后的 JS、类型声明与 gallery HTML；构建和摄影不读取库仓库的源码目录。
-静态构建使用 `meowbook/bun` 的 `buildStories(config, outdir)`；CLI 提供 list、check、serve、capture。
-`meowbook/bun` 是 Bun 工具入口，`meowbook/playwright` 用于 Node/Bun 摄影脚本；
-这两个入口的声明显式加载本包声明的宿主类型依赖，无需消费者额外安装 ambient 类型包。
-它们不能当作纯浏览器入口。浏览器预览代码使用根入口与 `meowbook/web`。
-`--json` 的 stdout 仅输出结构化结果；错误到 stderr 并返回非零状态。服务只监听 loopback，前台运行，Ctrl-C 清理本次临时构建。源码修改后重启服务；首版没有 HMR。
+The CLI requires Bun. After installing `meowbook` and its `meowjsx`, `meowcss` and `meowtail` peers, use the installed CLI commands above in the consumer directory.
+The public entry points are `meowbook`, `meowbook/web`, `meowbook/bun` and `meowbook/playwright`.
+The published package ships compiled JS, declaration files and the gallery HTML; building and capture do not read the library repository's source directories.
+Static builds use `buildStories(config, outdir)` from `meowbook/bun`; the CLI provides list, check, serve and capture.
+`meowbook/bun` is the Bun tool entry point, and `meowbook/playwright` is for Node/Bun capture scripts;
+the declarations of these two entry points explicitly load the host type dependencies declared by this package, so consumers do not need to install an ambient type package themselves.
+They cannot be used as pure browser entry points. Browser preview code uses the root entry point and `meowbook/web`.
+`--json` writes only structured results to stdout; errors go to stderr and return a non-zero status. The server only listens on loopback and runs in the foreground, and Ctrl-C cleans up the temporary build for this run. Restart the server after source changes; the first version has no HMR.
 
 ```ts
 import { defineConfig } from "meowbook";
@@ -37,8 +36,8 @@ export default defineConfig({
 });
 ```
 
-`preview.ts` 默认导出环境函数，挂载消费者的 TS 样式、绑定主题根，并返回执行用的 runtime。
-样式生命周期归环境管理；同一文档切换场景时先清理，gallery 与 canvas 分别拥有各自的 document：
+`preview.ts` default-exports an environment function that mounts the consumer's TS styles, binds the theme root and returns the runtime used for execution.
+The style lifecycle is owned by the environment; switching stories in the same document cleans up first, and the gallery and canvas each own their own document:
 
 ```ts
 import { createRuntime } from "meowjsx";
@@ -53,72 +52,72 @@ export default (({ root, onCleanup }) => {
 }) satisfies PreviewEnvironment;
 ```
 
-## 场景与注释
+## Stories and annotations
 
 ```tsx
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
 export const Primary = defineStory({
   id: "button/primary",
-  title: "主要按钮",
-  group: "基础组件",
+  title: "Primary button",
+  group: "Basic components",
   groupOrder: 10,
   component: "Button",
-  variant: "操作层级",
-  render: () => <Button>保存</Button>,
+  variant: "Action levels",
+  render: () => <Button>Save</Button>,
   setup({ root, signal, onCleanup, report }) {
-    /* 可登记交互和清理 */
+    /* Register interactions and cleanups here. */
   },
   async ready({ root }) {
-    /* 等待该场景真实的异步就绪条件 */
+    /* Wait for this story's real async readiness condition. */
   },
 });
 ```
 
-目录按 `group` 分类，`groupOrder` 为可选有限数字，越小越靠前；同组不同值取最小值，未指定的组保持发现顺序并排在后面。同组的 `component` 合并为一个目录入口，`variant` 用作组件页的短场景标签。未填写时保持每个 story 独立展示；`title` 和 `covers` 仍参与搜索，搜索场景关键词会进入匹配场景。
+The catalog groups by `group`; `groupOrder` is an optional finite number, and smaller values come first. Different values in the same group take the minimum; groups without a value keep discovery order and come after. The same `component` in a group merges into one catalog entry, and `variant` is used as the short story label on the component page. When omitted, each story is displayed separately; `title` and `covers` still participate in search, and searching for story keywords enters the matching story.
 
-`id/title/group/component/variant` 必须是静态字符串字面量，`groupOrder` 必须是静态有限数字；具名导出直接调用从包导入的 `defineStory`，不支持计算 id、对象展开或自定义 wrapper。`list` 仅解析源文件，不执行 story 模块；配置文件是受信任的可执行代码。
+`id/title/group/component/variant` must be static string literals, and `groupOrder` must be a static finite number; named exports call `defineStory` imported from the package directly, and computed ids, object spreads or custom wrappers are not supported. `list` only parses source files and does not execute story modules; the config file is trusted executable code.
 
-简单 props 可写在导出组件的 JSDoc 中，一行一个 JSON：
+Simple props can be written in the JSDoc of the exported component, one JSON object per line:
 
 ```tsx
-/** @story {"id":"button/disabled","props":{"label":"保存","disabled":true}} */
+/** @story {"id":"button/disabled","props":{"label":"Save","disabled":true}} */
 export function Button(props: { label: string; disabled?: boolean }) {
   /* ... */
 }
 ```
 
-注释生成真正的 typed JSX，再由消费者 TypeScript 配置检查。类型错误附上原组件路径与注释位置。支持 JSON 值，不在注释内执行函数/import；开放索引签名仍遵循原组件类型。
+The annotation generates real typed JSX, which the consumer's TypeScript config then checks. Type errors include the original component path and annotation location. JSON values are supported, and functions/imports inside the annotation are not executed; an open index signature still follows the original component type.
 
-临时预览复用同一检查与构建链，不写永久 story，使用上述已安装 CLI 与消费者配置。本文中的 `meowbook.config.ts` 和 story id 是消费者示例；在库仓库内查看通用场景时，从根目录使用 `--config apps/showcase/meowbook.config.ts`。本地 tarball 安装不代表已经公开发布。
+Temporary previews reuse the same check and build chain without writing a permanent story, using the installed CLI and consumer config described above. The `meowbook.config.ts` and story ids in this document are consumer examples; when viewing shared stories inside the library repository from the root, use `--config apps/showcase/meowbook.config.ts`. A local tarball install does not mean the package has been published publicly.
 
-路径在配置 root 内解析。省略 props 文件时为 `{}`；必填属性照常报错。
+Paths resolve inside the config root. Omitting the props file means `{}`; required properties still error as usual.
 
-## 选择性子组件替换
+## Selective child component replacement
 
 ```tsx
 import { defineStory, replaceComponent } from "meowbook";
 import { Placeholder } from "meowbook/web";
 export const LayoutOnly = defineStory({
   id: "panel/layout",
-  title: "布局预览",
-  replacements: [replaceComponent(Chart, () => <Placeholder label="图表" height={240} />)],
+  title: "Layout preview",
+  replacements: [replaceComponent(Chart, () => <Placeholder label="Chart" height={240} />)],
   render: () => <Panel />,
 });
 ```
 
-按函数身份在执行 runtime 的组件调用前替换，原组件不执行。预创建 VNode、Signal、Promise 和多实例均覆盖。替代组件正常经历生命周期、主题和清理；需要 shadow 的替代 contract 仍须由环境注册。规则是 `pre` 插件，遵循 runtime 的首个命中，不递归替换。
+Replacement happens by function identity before the execution runtime calls the component, and the original component does not execute. Pre-created VNodes, Signals, Promises and multiple instances are all covered. Replacement components go through the normal lifecycle, theme and cleanup; a replacement contract that needs shadow must still be registered by the environment. The rule is a `pre` plugin, follows the runtime's first match and does not replace recursively.
 
-局部预览明确显示替换标记；`#story-replacements` 提供命中次数（含零命中）。直接调用函数、模块 import 副作用和私有 renderer 不受替换控制。完整与局部场景使用不同 id，不能用占位场景证明完整行为。
+A partial preview explicitly shows the replacement marker; `#story-replacements` provides hit counts (including zero hits). Direct function calls, module import side effects and private renderers are not controlled by replacement. A complete story and a partial story use different ids, and a placeholder story cannot prove complete behavior.
 
-## 组件拍摄
+## Component capture
 
-大目录先用 `list --query <文字> --json` 缩小发现范围，例如 `--query composer` 或 `--query 过程`。
-查询不区分大小写，按 id、标题、分组、组件名及 variant 做字面包含匹配；保留完整来源信息，零匹配返回空数组。
-它仅用于目录发现，不改变 capture 的选择合同。
+For large catalogs, first narrow discovery with `list --query <text> --json`, for example `--query composer` or `--query process`.
+The query is case-insensitive and matches literal substrings of id, title, group, component name and variant; full source information is retained, and zero matches return an empty array.
+It is only for catalog discovery and does not change the capture selection contract.
 
-`capture` 复用发现、类型检查和画布，构建一次，每个场景使用独立 Chromium context。
-默认输出场景整体图及下一层组件局部图，局部图裁自同一张视口原图，不重新挂载组件：
+`capture` reuses discovery, typechecking and the canvas, builds once, and uses a separate Chromium context for each story.
+By default it outputs the whole-story image and local component images for the next layer; local images are cropped from the same viewport original without remounting components:
 
 ```sh
 bunx --no-install meowbook capture --config meowbook.config.ts --story composer
@@ -130,42 +129,36 @@ bunx --no-install meowbook capture --config meowbook.config.ts \
   --component packages/meowtail/src/components/button.tsx --export Button
 ```
 
-`--story`、`--all` 与临时组件入口互斥。临时 props 仍由 `--props-file` 提供，路径相对配置 root。
-默认深度 `1`，首层非透明组件为 `0`；Fragment、内置 Context Provider 自动透明。
-其他透明组件在声明旁赋值，core 不解释拍摄 metadata：
+`--story`, `--all` and the temporary component entry point are mutually exclusive. Temporary props are still provided by `--props-file`, with paths relative to the config root.
+The default depth is `1`, and the first non-transparent component layer is `0`; fragments and built-in Context Providers are transparent automatically.
+Other transparent components are marked next to their declaration; core does not interpret capture metadata:
 
 ```ts
 import type { ComponentMetadata } from "meowbook";
 Layout.metadata = { capture: { transparent: true } } satisfies ComponentMetadata;
 ```
 
-`--select` 精确匹配实际组件或被替换组件的显示名，保留全部同名实例；显式选中透明组件时也可拍摄它。
-组件名优先来自 contract，其次为保留的函数名；匿名组件只能使用当次实例名。
-完整树保留透明、隐藏、离屏、祖先裁剪和范围外节点，实例 ID 仅在本次挂载内有效。
-复杂 transform、clip-path、mask 等范围标为近似；私有 renderer、直接函数调用和原生弹层无法补出内部实例树。
+`--select` exactly matches the display name of the actual component or the replaced component and keeps all instances with the same name; explicitly selecting a transparent component also captures it.
+The component name comes first from the contract, then from the retained function name; anonymous components can only use the name of the current instance.
+The complete tree keeps transparent, hidden, off-screen, ancestor-clipped and out-of-range nodes, and instance IDs are only valid within this mount.
 
-默认环境为 `1100x900`、DPR `1`、浅色、reduced motion；`--device` 先展开 Playwright 设备预设，
-再应用显式参数。视口每边 `64–4096` CSS 像素，DPR `0.25–4`，最多 `3200` 万像素；
-`--timeout` 为每场景 `1–120000` 毫秒，默认 `30000`，不包含构建。颜色偏好来自浏览器媒体查询；
-没有响应该偏好的场景不能视为暗色主题已验证。移动设备预设仍是模拟。
+Complex transforms, clip-path, mask and similar ranges are marked as approximate; private renderers, direct function calls and native popups cannot reconstruct the internal instance tree.
 
-默认产物位于配置 root 的 `dist/meowbook/captures/<run>/`，`--out` 可指定父目录。
-每次运行有独立的 `index.html`、`manifest.json`、整体和局部 PNG、ARIA snapshot。
-报告可直接离线打开，顶部缩略图总览显示场景、状态及环境，再进入场景详情按组件树查看原图或已保存的整体图区域；manifest 保存完整实例树、环境、来源、
-替换记录和重跑命令，不复制 props 内容。批量失败后继续其他场景并非零退出；取消保留已完成产物和未执行项。
-批量 select 中单场景未匹配不是失败，但全批零匹配是失败。截图成功不等于 UI 验收通过。
+The default environment is `1100x900`, DPR `1`, light and reduced motion; `--device` first expands a Playwright device preset, then applies explicit parameters. The viewport is `64–4096` CSS pixels per side, DPR `0.25–4`, at most 32 million pixels; `--timeout` is `1–120000` milliseconds per story, default `30000`, excluding the build. Color preference comes from the browser media query; a story that does not respond to that preference cannot be considered a verified dark theme. Mobile device presets are still simulated.
 
-同一次观察 snapshot 另保存只读 `activeFocus` 与 `scrollViews`，离线报告在“DOM focus and scroll facts”面板与原图、ARIA 一起呈现。focus 沿开放 shadow 读取 DOM active element，通过同次 observation membership 关联最深且唯一的实例；`activeFocus.part` 是最近包含焦点节点的 part，不保证该 part 节点就是 active element。scroll facts 保存实际 client / scroll 尺寸与 offsets，显式 `declaredOwner` 来自 PageFrame / Region 已有属性，声明与实际 overflow 是不同事实，不自动判定双滚动为缺陷。
+Default artifacts are written to the config root's `dist/meowbook/captures/<run>/`, and `--out` can specify the parent directory.
+Each run has its own `index.html`, `manifest.json`, whole and local PNGs, and ARIA snapshot.
+The report opens directly offline: the thumbnail overview at the top shows stories, status and environment, then the story detail shows the original image or the saved whole-image region along the component tree; the manifest stores the complete instance tree, environment, sources, replacement log and rerun command, without copying props content. During a batch, a failure continues with the other stories and is not a zero exit; canceling keeps completed artifacts and unexecuted items.
+During batch select, a single story that does not match is not a failure, but zero matches in the whole batch is a failure. A successful screenshot does not mean UI acceptance passed.
 
-无实例映射、归属不唯一、不可观察 iframe 或潜在非开放 shadow 内部保留 `unknown` 与准确 reason；普通 host 的 DOM 信息不能可靠发现所有 closed shadow，原生 Select 的 DOM 焦点可观察不表示系统 popup / native AX 已观察。`none` 仅指已观察范围内没有活动控件。实例身份限本次 renderer，不建立第二树、长期订阅或 readiness 状态；读取不移焦、不滚动、不改原 PNG，也不采输入值、密码、正文或完整 Props。原图和 ARIA 仍可能包含用户内容，事实字段不使原有摄影产物自动脱敏。
+The same observation snapshot separately saves read-only `activeFocus` and `scrollViews`; the offline report presents them together with the original image and ARIA in the "DOM focus and scroll facts" panel. focus reads the DOM active element along open shadows and associates the deepest and unique instance through the same observation membership; `activeFocus.part` is the nearest part containing the focus node, and that part node is not guaranteed to be the active element. scroll facts save actual client / scroll sizes and offsets; the explicit `declaredOwner` comes from existing PageFrame / Region attributes, and declared and actual overflow are different facts, so double scrolling is not automatically judged a defect.
 
-长页面可用 `--full-page` 额外保存 `full-page.png`，manifest 的场景 `fullPage` 提供相对路径，
-`environment.fullPageSize` 记录像素尺寸。视口整体图及组件树局部裁图仍基于原视口，避免滚动或
-扩大视口改变响应式效果。全页图同样受 3200 万像素限制，超限明确失败，不静默裁短。
-它展示当前已渲染的文档，不会展开内部滚动容器或主动触发懒加载；这些状态仍需交互取证。
+When an instance has no mapping, ownership is not unique, an iframe cannot be observed or a potentially non-open shadow needs internals, keep `unknown` with an accurate reason; ordinary host DOM information cannot reliably discover all closed shadows, and observing DOM focus in a native Select does not mean the system popup / native AX has been observed. `none` only means no active control was observed within the observed range. Instance identity is limited to this renderer and establishes no second tree, long-lived subscription or readiness state; reading does not move focus, scroll, change the original PNG, or sample input values, passwords, body text or complete props. The original image and ARIA may still contain user content, and the fact fields do not automatically desensitize existing capture artifacts.
 
-交互照片使用同一拍摄函数。先用 `serve --capture` 启动保留组件名并开启观察的画布，再由普通 Playwright
-执行 hover、输入或聚焦：
+Long pages can additionally save `full-page.png` with `--full-page`, and the scene's `fullPage` in the manifest provides the relative path; `environment.fullPageSize` records the pixel size. The viewport whole image and component-tree local crops are still based on the original viewport, to avoid scrolling or enlarging the viewport changing responsive effects. The full-page image is also subject to the 32-million-pixel limit, and exceeding it fails explicitly instead of silently truncating.
+It shows the currently rendered document and does not expand internal scroll containers or trigger lazy loading; those states still require interaction evidence.
+
+Interactive captures use the same capture function. First start a canvas with `serve --capture` that keeps component names and enables observation, then use ordinary Playwright to perform hover, input or focus:
 
 ```ts
 import { resolve } from "node:path";
@@ -186,16 +179,14 @@ if (scene?.status === "success" && scene.frame) {
 }
 ```
 
-`capturePage` 保留调用方的 Page、输入、焦点和环境，不导航或重挂载；失败产物标为诊断图。
-API 的场景图片路径相对 `result.directory`；从 `manifest.scenes` 读取实际成功场景的 `frame`、
-`fullPage` 或 `guides`，不要猜文件名。CLI 的 `--json` 回执另提供绝对路径 `artifacts`。
-未开启 capture 接口的普通画布会报告摄影能力缺失。交互照片通过调用方脚本或测试记录的步骤复现，不生成等价的 story 重跑命令。
-摄影合同由本页与导出的类型共同说明。
+`capturePage` keeps the caller's Page, input, focus and environment and does not navigate or remount; failed artifacts are marked as diagnostic images.
+API scene image paths are relative to `result.directory`; read `frame`, `fullPage` or `guides` from `manifest.scenes` for actually successful scenes instead of guessing file names. The CLI's `--json` receipt additionally provides absolute-path `artifacts`.
+An ordinary canvas without the capture interface enabled reports that capture capability is missing. Interactive capture is reproduced by the caller's script or the steps recorded by the test and does not generate an equivalent story rerun command.
+The capture contract is described by this page together with the exported types.
 
-### 真实页面批量摄影
+### Batch capture of real pages
 
-已运行的页面使用 `--url`，不加载 story 配置或构建展板。单页必须明确给出就绪原生 CSS
-选择器（不支持 Playwright 的 `:visible` 等扩展）：
+For pages already running, use `--url` without loading a story config or building the showcase. A single page must explicitly provide a native CSS ready selector (Playwright extensions such as `:visible` are not supported):
 
 ```sh
 bunx --no-install meowbook capture --url http://127.0.0.1:13001/ \
@@ -204,31 +195,21 @@ bunx --no-install meowbook capture --url http://127.0.0.1:13001/ \
   --pages /absolute/path/capture-pages.ts --all --json
 ```
 
-`--pages` 是受信任的本地可执行 TypeScript / JavaScript 文件，CLI 将路径相对当前目录解析，默认导出
-`CapturePagePlan` 工厂。工厂接收 `{ baseURL, request }`，可通过同一浏览器 context 的 API
-request 动态发现当前扩展，返回最多 500 个 `LiveCaptureEntry`：唯一 `id`、`title`、`ready`、
-可选 `root` 和 `async prepare(page)`。`prepare` 显式导航、选择页面或准备状态，不接受 CLI
-JavaScript 字符串。类型从 `meowbook/bun` 导入。
+`--pages` is a trusted local executable TypeScript / JavaScript file; the CLI resolves the path relative to the current directory, and the default export is a `CapturePagePlan` factory. The factory receives `{ baseURL, request }` and can dynamically discover the current extension through API requests in the same browser context, returning at most 500 `LiveCaptureEntry` items: a unique `id`, `title`, `ready`, an optional `root` and `async prepare(page)`. `prepare` explicitly navigates, selects a page or prepares state, and does not accept CLI JavaScript strings. Types are imported from `meowbook/bun`.
 
-计划通过 `--all` 批量执行，或以 `--scene <id>` 选择一个入口；零匹配明确失败。整批共享
-context 会话，每个入口创建新 Page，prepare 与摄影受每场景 timeout 限制。失败继续其余
-入口，取消保留已完成照片、失败诊断和未执行项，交付一份总览报告并非零退出。
-默认使用 Chromium，`--channel chrome` 使用本机已安装的 Chrome。
-也可用 `--cdp http://127.0.0.1:<port>/` 连接已运行的专用 Chrome DevTools 端点；与
-`--channel` 互斥，端点仅允许无凭据、查询参数或 fragment 的 loopback HTTP(S) 地址。
-摄影创建自己的 context，结束只释放该 context 和连接，不复用或关闭浏览器已有 tab。
+The plan runs as a batch through `--all`, or selects one entry with `--scene <id>`; zero matches fails explicitly. The batch shares a context session, each entry creates a new Page, and prepare and capture are limited by the per-scene timeout. Failures continue with the remaining entries; canceling keeps completed photos, failure diagnostics and unexecuted items, delivers one overview report and exits non-zero.
+Chromium is used by default; `--channel chrome` uses the locally installed Chrome.
+You can also connect to a running dedicated Chrome DevTools endpoint with `--cdp http://127.0.0.1:<port>/`; this is mutually exclusive with `--channel`, and the endpoint only allows loopback HTTP(S) addresses without credentials, query parameters or fragments.
+Capture creates its own context and at the end releases only that context and connection; it does not reuse or close existing browser tabs.
 
-来源、当前页面及可见 iframe 区域保留在报告；普通页面没有组件实例树，因此不支持
-`--select` / 自动 `--guides`，可用显式 CSS `--guide`。缺少骨架摄影接口时 `--focus` 明确失败。
-摄影不改变 CSP、iframe sandbox 或认证机制。远端 URL 要求 HTTPS，HTTP 仅允许 loopback，
-拒绝 URL 内嵌用户名与密码；查询参数和 fragment 不进入 manifest 或重跑命令，含此类
-导航条件的复现由受信任计划负责。照片及 ARIA 可能包含页面内容，产物由调用者保管。
+Sources, the current page and visible iframe regions are kept in the report; ordinary pages have no component instance tree, so `--select` / automatic `--guides` are not supported, but an explicit CSS `--guide` is available. When the skeleton capture interface is missing, `--focus` fails explicitly.
+Capture does not change CSP, iframe sandbox or authentication mechanisms. Remote URLs require HTTPS, HTTP is allowed only on loopback, and embedded usernames and passwords in URLs are rejected; query parameters and fragments do not enter the manifest or rerun commands, and reproduction of navigation conditions containing them is the trusted plan's responsibility. Photos and ARIA may contain page content, and the caller keeps the artifacts.
 
-## 浏览器与 Agent
+## Browser and Agent
 
-### 聚焦素材
+### Focus assets
 
-`--focus` 可重复传入 CSS 选择器，全部匹配保持原像素；其他区域的可观察 HTML 文字变为浅色条，图片、SVG 与原生控件变为等尺寸占位，保留换行、行宽与对齐。页面背景和几何保持原样，并保留干净原图。
+`--focus` can be passed repeatedly with CSS selectors; all matches keep their original pixels, while observable HTML text in other areas becomes light-colored bars, and images, SVG and native controls become same-size placeholders that preserve line breaks, line width and alignment. The page background and geometry stay as they are, and a clean original is also kept.
 
 ```sh
 bunx --no-install meowbook capture --config meowbook.config.ts --story field-group \
@@ -238,65 +219,56 @@ bunx --no-install meowbook capture --config meowbook.config.ts --story page-stru
   --guide '[data-meowui-part="resource-card/root"]' --guide-lines bottom --json
 ```
 
-`--focus-padding` 默认为 12 CSS px，可设 0–128；扩展受祖先裁剪限制。多个目标保留独立区域，不把中间内容一起照亮。
-表单应选包含标签和说明的字段容器，padding 不会自动寻找语义关联元素。
-无效、零可见匹配或超限选择明确报错；最多 12 个选择器、每个 512 字符、48 个可见目标。
+`--focus-padding` defaults to 12 CSS px and can be set from 0–128; expansion is limited by ancestor clipping. Multiple targets keep separate regions and do not light up the content between them.
+For forms, choose a field container that includes the label and description; padding does not automatically find semantically related elements.
+Invalid, zero-visible-match or over-limit selections fail explicitly; at most 12 selectors, 512 characters per selector and 48 visible targets.
 
-输出 `focus.png` 和 `focus.json`；`--full-page` 补充 `focus-full-page.png`。
-同时请求参照线时输出 `focus-guides.png` 及可选 `focus-guides-full-page.png`，先聚焦后画线。
-参照线与清晰区各自选择，参照线不会扩大清晰区。JSON 回执列出绝对路径，离线报告并排展示原图与聚焦图，窄屏上下排列。
+Outputs `focus.png` and `focus.json`; `--full-page` adds `focus-full-page.png`.
+When guides are also requested, it outputs `focus-guides.png` and an optional `focus-guides-full-page.png`, focusing first and then drawing guides.
+Guides and the clear region are selected separately, and guides do not expand the clear region. The JSON receipt lists absolute paths; the offline report shows the original and focus images side by side, stacked on narrow screens.
 
-Playwright `capturePage` 使用 `focus: { selectors: string[], padding?: number }`。
-Meowbook 的所有画布显式创建一个 `ComponentObservation`，供加载骨架与摄影投影共享；摄影接口仍仅在 capture 模式开放。投影从 `read()` 读取当前实例，不另建组件 Map；内容根排除展板容器，卸载视图后释放观察中心。观察事实属于当前 renderer，不构成产品就绪或系统 AX 合同。
-Meowbook 调用 `meowjsx/web` 的共享骨架控制器临时拍摄，随后清理；不改文本、布局、焦点、输入值或滚动状态。已有 SkeletonBoundary 加载态保持其原有所有权。
-原生控件特殊装饰、复杂背景、伪元素和外部 iframe 不保证完全骨架化；本功能不是敏感内容脱敏工具。
-旋转、裁剪等目标以元数据标明矩形近似，遮挡不会被移除。聚焦图是加工素材，颜色、对比度及整体层级必须回到原图判断。
+Playwright `capturePage` uses `focus: { selectors: string[], padding?: number }`.
+All Meowbook canvases explicitly create one `ComponentObservation` shared by the loading skeleton and the capture projection; the capture interface is still only open in capture mode. The projection reads the current instance from `read()` and does not build a second component Map; the content root excludes the showcase container, and unmounting the view releases the observation center. Observation facts belong to the current renderer and do not constitute a product readiness or system AX contract.
+Meowbook calls the shared skeleton controller in `meowjsx/web` for temporary capture and then cleans up; it does not change text, layout, focus, input values or scroll state. An existing SkeletonBoundary loading state keeps its original ownership.
+Special decorations on native controls, complex backgrounds, pseudo-elements and external iframes are not guaranteed to be fully skeletonized; this feature is not a desensitization tool for sensitive content.
+Rotation, clipping and similar targets are marked with rectangle approximations in metadata, and occlusion is not removed. A focus image is a processed asset; color, contrast and overall hierarchy must be judged from the original image.
 
-### 对齐参照线与测量素材
+### Alignment guides and measurement assets
 
-无需写临时浏览器脚本，`capture` 可以同时生成原图、带编号的参照线图和几何 JSON：
+Without writing a temporary browser script, `capture` can generate the original image, a numbered guide image and geometry JSON at the same time:
 
 ```sh
-# 按现有组件选择与深度绘制边界、中心线；同名组件分组比较
+# Draw boundaries and center lines from the existing component selection and depth; compare same-named components as groups
 bunx --no-install meowbook capture --config meowbook.config.ts --story composer --guides --json
 
-# CSS 选择器精确指定要比较的元素；每个选择器是一组，保留全部匹配
+# Specify the exact elements to compare with CSS selectors; each selector is a group, keeping all matches
 bunx --no-install meowbook capture \
   --config meowbook.config.ts --story page-structure \
   --guide '[data-meowui-part="resource-card/root"]' \
   --guide-lines bottom --full-page \
   --out /tmp/meowbook-guides --json
 
-# 比较阅读区与输入框的边缘、中心及宽度
+# Compare the edges, center and width of the reading area and the input box
 bunx --no-install meowbook capture \
   --config meowbook.config.ts --story conversation-layout \
   --guide 'article[data-chat-role="assistant"], [data-meowui-part="chat-composer/root"]' \
   --guide-lines left,right,center-x --json
 ```
 
-`--guides` 与 `--guide` 互斥。前者复用 `--select` 和 `--depth` 的组件选择，
-后者使用浏览器原生 CSS 选择器，不是 Playwright selector 或脚本；不改变局部组件照片的选择。
-`--guide-lines` 可从 `left,right,top,bottom,center-x,center-y` 中按需选取，逗号分隔，
-默认全部；只选一条时，标签同时显示相对本组首项的差值。卡片操作比较常用 `bottom`，
-阅读列比较常用 `left,right,center-x`。需要将不同角色作为一组比较时，用一个 CSS 逗号选择器。
-最多 12 个选择器，每个最多 512 字符，总计最多 48 个目标；超限明确失败，按比较对象缩小范围。
-选择器无效或没有可拍的匹配也明确失败，不交付看似成功的空批注图。
+`--guides` and `--guide` are mutually exclusive. The former reuses the component selection of `--select` and `--depth`, while the latter uses native browser CSS selectors, not Playwright selectors or scripts; it does not change the selection of local component photos.
+`--guide-lines` can pick from `left,right,top,bottom,center-x,center-y` as needed, comma-separated, all by default; when only one line is selected, the label also shows the difference relative to the first item in the group. Card action comparisons commonly use `bottom`, and reading-column comparisons commonly use `left,right,center-x`. To compare different roles as one group, use one CSS comma selector.
+At most 12 selectors, at most 512 characters each and 48 targets in total; exceeding the limit fails explicitly, so narrow the range by comparison target.
+Invalid selectors or no capturable match also fail explicitly, and no apparently successful empty annotation image is delivered.
 
-回执 `artifacts[]` 直接给出原图、批注图和测量文件的绝对路径。
-场景 manifest 的 `guides` 关联 `guides.png`、可选的 `guides-full-page.png` 和 `measurements.json`，
-离线报告可展开 Alignment guides 查看。原图与组件局部图保持无批注；参照线只在附加照片中出现，
-辅助线使用原生 top layer 的手动 popover，覆盖原生 modal dialog 与已有 popover，
-不受页面祖先的 transform 或 overflow 裁剪影响；不关闭业务弹层，不获取焦点。
-拍完清理临时覆盖层，保留交互状态。
+The receipt's `artifacts[]` directly provides the absolute paths of the original image, annotation image and measurement file.
+The scene manifest's `guides` links `guides.png`, an optional `guides-full-page.png` and `measurements.json`, which the offline report can expand under Alignment guides. The original image and component local images remain unannotated; guides only appear in the additional photos, auxiliary lines use a manual popover in the native top layer, cover native modal dialogs and existing popovers, and are not affected by page-ancestor transform or overflow clipping; they do not close business overlays or take focus.
+After capture, the temporary overlay is cleaned up and interaction state is retained.
 
-JSON 的目标编号与图上对应，记录视口及文档坐标、宽高，以及相对本组首个目标的
-左/右/上/下边缘、中心和宽高差值。不同选择器各自成组；跨组比较直接读取目标坐标。
-所有尺寸均为 CSS 像素，图片仍按指定 DPR 输出。测量的是轴对齐边界框，不是文字基线；
-旋转、多根组件、裁剪与遮挡需要结合原图判断，不以边界相同证明视觉对齐。
-默认只画当前视口可见目标；`--full-page` 的 CSS 目标可包含文档离屏内容，
-不会展开内部滚动容器、触发懒加载或穿透 iframe / shadow root。
+JSON target numbers correspond to the image, recording viewport and document coordinates, width and height, as well as left/right/top/bottom edge, center and width/height differences relative to the first target in the group. Different selectors form separate groups; cross-group comparison directly reads target coordinates.
+All sizes are CSS pixels, and images are still output at the specified DPR. What is measured is the axis-aligned bounding box, not text baselines; rotation, multi-root components, clipping and occlusion need to be judged with the original image, and identical boundaries do not prove visual alignment.
+By default only targets visible in the current viewport are drawn; with `--full-page`, CSS targets can include document off-screen content and will not expand internal scroll containers, trigger lazy loading or penetrate iframe / shadow root.
 
-交互后直接复用同一 API：
+After interaction, reuse the same API directly:
 
 ```ts
 const result = await capturePage(page, {
@@ -306,33 +278,31 @@ const result = await capturePage(page, {
 });
 ```
 
-先看原图建立任务与设计判断，再用少量目标核对疑点。差值是测量事实，不是自动缺陷判定；
-例如正文和输入框中心一致但宽度不同，应讨论阅读列关系，不能直接写成未居中。
-参照线不能代替对颜色、字体、层级、密度与整体审美的视觉判断。
+First look at the original image to establish the task and design judgment, then check doubts with a small number of targets. Differences are measurement facts, not automatic defect judgments; for example, when body text and the input box have the same center but different widths, discuss the relationship of the reading column instead of writing it directly as not centered.
+Guides cannot replace visual judgment of color, typography, hierarchy, density and overall aesthetics.
 
-- `/manifest.json` 提供 id、路径、导出名和行号；`/canvas.html?story=<id>` 是独立画布。
-- 等待 `#story-state[data-status="ready"]` 的属性或 attached 状态；该标记就绪后隐藏，默认 visible 等待会超时。失败变为 `error` 并保留错误信息，不能被检查结果覆盖。`capturePage` 自己等待 ready，调用方在操作前仍需等待目标控件。
-- 桌面 1100px、移动端 390px、平板 768px、自适应切换不重新挂载；切换 story 和重置使用新文档。
-- Meowbook 外壳也适配手机：目录抽屉、触控不自动聚焦搜索、窄屏贴边画布、短屏可滚动的检查面板；工具外壳与 story 视口分别验证。390px/短屏/横屏浏览器模拟不等于真机软键盘验收。
-- `onCleanup` 逆序执行，取消后新登记的清理立即执行；`signal` 用于中止自定义异步工作。
-- `ready` 由场景作者声明，不能依靠自动延时推断稳定。Bun 服务和 iframe 是开发隔离，不是安全沙箱；场景代码应可信，数据/API mock 由使用方绑定。
+- `/manifest.json` provides id, path, export name and line number; `/canvas.html?story=<id>` is an isolated canvas.
+- Wait for the `#story-state[data-status="ready"]` attribute or attached state; this marker hides once ready, so the default visible wait will time out. A failure becomes `error` and keeps the error message, which cannot be overwritten by inspection results. `capturePage` waits for ready itself, and the caller still needs to wait for the target control before acting.
+- Desktop 1100px, mobile 390px, tablet 768px and fluid switching do not remount; switching stories and resetting use a new document.
+- The Meowbook shell also adapts to phones: catalog drawer, no automatic search focus on touch, edge-to-edge canvas on narrow screens, scrollable inspection panel on short screens; verify the tool shell and the story viewport separately. 390px/short-screen/landscape browser simulation does not equal real-device soft-keyboard acceptance.
+- `onCleanup` runs in reverse order, and cleanups registered after cancel run immediately; `signal` is used to abort custom async work.
+- `ready` is declared by the story author and cannot rely on automatic delays to infer stability. The Bun server and iframe are development isolation, not a security sandbox; story code should be trusted, and data/API mocks are bound by the consumer.
 
-普通 Playwright Test 可访问上述 URL，无需专用组件测试适配器。本包 `playwright.config.ts` 固定 Chromium 与视口，失败保留 screenshot/trace；测试步骤附原场景位置，正常运行输出 390/1100px 截图。当前是响应式宽度测试（高度 900、DPR 1、桌面输入），不代表真机测试。未建立跨平台像素基线；无溢出或名称提示也不代表设计验收。
+Ordinary Playwright Test can access the URLs above without a dedicated component test adapter. This package's `playwright.config.ts` fixes Chromium and the viewport, keeps screenshots/traces on failure; test steps attach the original story location, and a normal run outputs 390/1100px screenshots. This is currently responsive-width testing (height 900, DPR 1, desktop input) and does not represent real-device testing. No cross-platform pixel baseline is established; no overflow or name notes does not mean design acceptance.
 
-Playwright CLI 可另行使用 `bunx --package @playwright/cli playwright-cli` 操作同一普通 URL；它不成为 Meowbook 内部依赖或文本协议。
+The Playwright CLI can separately use `bunx --package @playwright/cli playwright-cli` to operate the same ordinary URL; it does not become an internal Meowbook dependency or text protocol.
 
-## 分层验证
+## Layered verification
 
-仓库依赖就绪后，从根目录运行 `bun run --cwd packages/meowbook test` 验证机械合同。浏览器验证进入 `packages/meowbook` 后使用实际 Playwright 配置：
+After repository dependencies are ready, run `bun run --cwd packages/meowbook test` from the root to verify mechanical contracts. For browser verification, enter `packages/meowbook` and use the actual Playwright config:
 
 ```sh
 bunx --no-install playwright test --config playwright.config.ts
 bunx --no-install playwright test --config playwright.capture.config.ts
 ```
 
-第一项只启动包自身 fixture，验证 renderer 生命周期、canvas、测量和 gallery 行为；第二项验证拍摄观察、透明选择、DPR 裁切、输入保留和失败诊断。它们不启动产品应用，也不证明 Rossovia 已切换消费。
-Meowbook 只保留 fixture 规格。与真实消费者的接合由消费者自己的 Playwright 配置执行：
-Meowtail 目录、搜索与移动端规格在 `packages/meowtail/tests/browser`，由其 `playwright.config.ts` 运行；
-产品页面的规格与数据由各消费者维护，不随本包分发。
-浏览器命令需要已安装的 Playwright Chromium。安装包不自动下载浏览器；在自己的环境显式准备
-`bunx --no-install playwright install chromium`，或摄影时通过 `--channel chrome` 使用已安装的 Chrome。
+The first command only starts the package's own fixtures and verifies renderer lifecycle, canvas, measurement and gallery behavior; the second verifies capture observation, transparent selection, DPR cropping, input retention and failure diagnostics. They do not start the product app and do not prove Rossovia has switched consumption.
+Meowbook only keeps fixture specs. Integration with real consumers is executed by the consumer's own Playwright config:
+the Meowtail catalog, search and mobile specs are in `packages/meowtail/tests/browser` and run through its `playwright.config.ts`;
+product page specs and data are maintained by each consumer and are not distributed with this package.
+Browser commands require an installed Playwright Chromium. Installing the package does not download a browser automatically; prepare it explicitly in your own environment with `bunx --no-install playwright install chromium`, or use an installed Chrome through `--channel chrome` during capture.

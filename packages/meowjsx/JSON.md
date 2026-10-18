@@ -1,6 +1,6 @@
-# JSON 描述入口
+# JSON description entry
 
-`meowjsx/json` 把有限 JSON 描述构造成普通 MeowJSX VNode，使用原 runtime、Context、Signal、组件和 renderer 生命周期；core 根入口不反向导入 JSON 或 DOM。
+`meowjsx/json` builds ordinary MeowJSX VNodes from finite JSON descriptions, using the existing runtime, Context, Signal, components and renderer lifecycle; the core root entry does not import JSON or the DOM back.
 
 ```ts
 import { createJsonView, defineJsonComponent, jsonSchema, parseJsonView } from "meowjsx/json";
@@ -23,12 +23,12 @@ const description = parseJsonView(
 const child = createJsonView(description, { catalog, bindings: new Map([["label", text]]) });
 ```
 
-节点支持字符串、有限数字、布尔、null、节点数组，以及 `{component, props?, children?}`。component 必须是宿主 catalog 的准确名称；不提供任意 HTML 标签、raw HTML、ref、代码、动态 import、表达式或对象路径。描述中的绑定为独占形状 `{$binding:"准确名称"}`，action 为 `{$action:"准确名称"}`。名称只作 Map 精确查询，不解析点号或路径，也不授予外部权限。
+Nodes support strings, finite numbers, booleans, null, node arrays, and `{component, props?, children?}`. `component` must be an exact name in the host catalog; arbitrary HTML tags, raw HTML, refs, code, dynamic imports, expressions or object paths are not provided. A binding in a description has the exclusive shape `{$binding:"exact name"}`, and an action has `{$action:"exact name"}`. Names are looked up only as exact Map keys; dots and paths are not parsed, and no external permissions are granted.
 
-`parseJsonView` 仅校验、复制和冻结数据，不执行组件、action、事件投影、Signal getter 或 runtime hook。`createJsonView` 再按给定 catalog 校验，绑定宿主的只读 Signal 和真实函数，构造 VNode；挂载和解绑仍由原 renderer 管理。action 的参数由 metadata 中的有限 schema 校验；可由宿主在 metadata 提供可信 `mapArgs` 把原生事件投影成明确参数，JSON 不能提供执行代码。callback 的原返回值保留。
+`parseJsonView` only validates, copies and freezes data; it does not execute components, actions, event projections, Signal getters or runtime hooks. `createJsonView` then validates against the given catalog, binds the host's read-only Signals and real functions, and constructs VNodes; mounting and unmounting are still managed by the original renderer. Action arguments are validated by the finite schema in metadata; the host may provide a trusted `mapArgs` in metadata to project native events into explicit arguments, while JSON cannot provide executable code. The callback's original return value is preserved.
 
-`jsonSchema` 支持 string/number/boolean/enum/array/object/optional/data/union，描述与校验共用这些定义。object 字段严格，union 必须命中一个完整分支；`data()` 仅承诺纯 JsonValue，不会凭泛型声称已经校验复杂业务类型。数据内部的 constructor、$binding 或 $action 普通字段仍是数据，不递归解释为控制。某个 prop 的最外层若恰是独占引用标记，则保留给引用；需要这个字面对象时由 host binding 提供，而不是额外引入转义 DSL。
+`jsonSchema` supports string/number/boolean/enum/array/object/optional/data/union, and description and validation share these definitions. Object fields are strict, and a union must match one complete branch; `data()` only promises a pure JsonValue and does not claim through generics that a complex business type has been validated. Ordinary fields named constructor, $binding or $action inside data are still data and are not recursively interpreted as controls. If a prop's outermost value happens to be an exclusive reference marker, it is kept as a reference; when that literal object is needed, the host binding provides it rather than an additional escape DSL.
 
-`defineJsonComponent` 将有限 metadata 与原组件 Props 静态关联，排除开放 Props 的任意索引字段；它不自动反射 TS 类型，也不宣称已有全组件 schema。具体组件库必须明确支持集。`describeJsonCatalog` 与 `describeJsonSchema` 从同一 metadata 输出有限描述，不另维护 schema。函数、File、类实例、accessor、循环引用、稀疏数组和非有限数字不是 JSON 数据；宿主仍负责网络、权限、持久化及真正数据来源。
+`defineJsonComponent` statically associates finite metadata with the original component's Props and excludes arbitrary index fields of open Props; it does not reflect TS types automatically and does not claim that a whole-component schema exists. A concrete component library must state its supported set explicitly. `describeJsonCatalog` and `describeJsonSchema` output the finite description from the same metadata and do not maintain a separate schema. Functions, File, class instances, accessors, circular references, sparse arrays and non-finite numbers are not JSON data; the host is still responsible for network, permissions, persistence and the real data source.
 
-value metadata 可提供按同 schema 校验、复制冻结的字面 `default`，仅在描述缺少该属性时填入；false、0、空串不会被当作缺失。它不执行 action、绑定或回调，也不能改变该属性显式值仍须符合 schema 的要求。
+Value metadata may provide a literal `default` that is validated against the same schema and copied and frozen, filled in only when the description omits that property; false, 0 and the empty string are not treated as missing. It does not execute actions, bindings or callbacks, and does not change the requirement that an explicit value for that property still matches the schema.

@@ -1,61 +1,61 @@
-# Protecting pandas 独立浏览器验收
+# Protecting pandas independent browser acceptance
 
-## a5 共享布局与图片适配
+## a5 shared layout and image adaptation
 
-当前入口 `protecting-pandas-a5` / `chunk-03jpht82.js`，build-manifest SHA256
-`6f7b79c2f06367d9d92b62afe3083bae995efa08020830c6a778ef573a71e518`。
-冻结后完整浏览器 **13/13 通过（18.4 秒）**；保留原八页、任务、支持状态与媒体键盘合同，新增实际图片/frame 同高及 cover 断言。
+Current entry `protecting-pandas-a5` / `chunk-03jpht82.js`, build-manifest SHA256
+`6f7b79c2f06367d9d92b62afe3083bae995efa08020830c6a778ef573a71e518`.
+After freezing, the full browser suite **13/13 passed (18.4 s)**; the original eight pages, tasks, support states and media keyboard contract are retained, with new actual-image/frame equal-height and cover assertions added.
 
-两轮实际看图分别发现并修复了主题声明顺序覆盖新适配，以及两栏内图片、图注、长问题争高的问题。
-短片页改用共享三栏/原生列表，森林画框由 a4 的 568×157 改为约 373×316 逻辑像素，明确裁切；观察双照片仍为默认 contain。
-最终 live 原图在 `artifacts/presentation-foundations-a5/live/`，根实际查看宽屏播放、窄/短窗口及宽屏观察图，独立审查另看两页三尺寸、失败和键盘状态。
-窄/短窗口是逻辑画布概览，不代表手机上正文无需放大即可阅读。既有 a4 记录仅保留为历史，完整共享能力检查见[本轮记录](../../../docs/records/2026-10-18-presentation-foundations.md)。
+Two rounds of actually viewing the images found and fixed the theme declaration order overriding the new adaptation, and the problem of images, captions and long questions competing for height inside two columns.
+The short-film page switched to the shared three columns/native list; the forest frame changed from a4's 568×157 to about 373×316 logical pixels with explicit cropping; the observation two-photo layout remains default contain.
+Final live originals are in `artifacts/presentation-foundations-a5/live/`; the root actually viewed the wide playback, narrow/short windows and wide observation image, and the independent reviewer additionally viewed two pages at three sizes, failure and keyboard states.
+Narrow/short windows are a logical-canvas overview and do not mean the body text needs no zoom on a phone. The existing a4 records are kept only as history; see [this round's record](../../../docs/records/2026-10-18-presentation-foundations.md) for the complete shared-capability checks.
 
-## a4 图片与真实短片最终验收
+## a4 images and real short-video final acceptance
 
-最终交付 `protecting-pandas-a4` / `chunk-90dfy6sp.js`，build-manifest SHA256 为
-`ae98dc35b5f563792d93943013fd79dd219bb61b699e4da78d4570828af6ab83`。
-完整浏览器 **13/13 通过（18.3 秒）**，包括原八项与新增五项媒体合同。原八项已扩到八页目录/冷启动/三尺寸预算，新片段仍使用同源作品，不放宽正文或 footer 断言。
+Final delivery `protecting-pandas-a4` / `chunk-90dfy6sp.js`, build-manifest SHA256
+`ae98dc35b5f563792d93943013fd79dd219bb61b699e4da78d4570828af6ab83`.
+Full browser **13/13 passed (18.3 s)**, including the original eight items and five new media contract items. The original eight were extended to an eight-page outline/cold start/three-size budget, and new clips still use the same-source work, without relaxing body or footer assertions.
 
-新增覆盖真实图片解码/alt、18 秒视频真实 metadata/videoWidth、本地来源、字幕 cues、初始暂停、键盘 Play/Pause/Back、时间实际推进/停住/归零、ended 不翻页、切页旧 src 释放/回访静默，以及保留行动草稿/支持状态。图片失败保留描述，视频失败反馈分块、文字替代保留，Retry 真恢复。
+New coverage: real image decoding/alt, real metadata/videoWidth for the 18-second video, local sources, caption cues, initial pause, keyboard Play/Pause/Back, actual time advancing/stopping/resetting, ended not changing pages, old src released when changing pages/silent on revisit, and action drafts/support states preserved. Image failure keeps the description; video failure keeps chunked feedback, text alternative, and Retry genuinely recovers.
 
-冷启动只将“已成功 metadata 且离页后旧节点已暂停/释放 src”的同一媒体 `net::ERR_ABORTED` 识别为预期取消；404、其他请求/解码失败和页面错误仍失败。trace 证明首轮取消对应 HTTP 206 媒体正常中断，并非缺资源。
+Cold start only treats the same media's `net::ERR_ABORTED` as an expected cancel when "metadata already succeeded and the old node was paused/released src after leaving the page"; 404s, other request/decode failures and page errors still fail. The trace proves the first-round cancel corresponds to a normal HTTP 206 media interruption, not a missing resource.
 
-首轮 watch 正常 444/457、失败 444/475 的预算缺陷由共享 media min-size/状态布局修复；森林图使用现有 LayoutItem 分配余高，不删除问题/缩字或裁正文。原失败图保留，最终严格预算通过。
+First-round watch normal 444/457 and failure 444/475 budget defects were fixed by the shared media min-size/state layout; the forest image uses the existing LayoutItem to allocate extra height, without deleting questions/shrinking text or cutting body text. The original failure images are kept, and the final strict budget passes.
 
-根从最终 live 13014 拍 11 张新入口/观察/短片/播放/失败原图并记录脚本与预算，实际打开其中六张：三张宽屏主视觉/观察/播放，以及窄窗短片、极短窗短片、宽屏失败。结果见 `artifacts/protecting-pandas-media-a4/live/`；这不冒充十一张全部人工审阅。
-独立作者此前逐看六张媒体三尺寸图，另独立视觉者逐看正常/播放/失败宽图与八张窄短代表图，证据保留其各自候选哈希；最终仅将两条纯文本 Fragment 改为同样文本字符串以通过 lint，根最终 live 复看承接该差异。
+The root took 11 originals of new entry/observation/video/playback/failure from the final live 13014 and recorded scripts and budgets, actually opening six of them: three wide key visual/observation/playback, plus narrow-window short film, extra-short-window short film and wide failure. Results are in `artifacts/protecting-pandas-media-a4/live/`; this does not impersonate manual review of all eleven.
+An independent author previously viewed six media images at three sizes one by one, and a separate visual reviewer viewed normal/playback/failure wide images and eight narrow/short representative images, with evidence keeping their respective candidate hashes; finally only two plain-text Fragments were changed to equal text strings to pass lint, and the root's final live re-view carries that difference.
 
-共享演示合同全套 33/33，随后新增音轨三个按钮可达断言定向 1/1；Sunshine 定向 3/3（2.4 秒）。静态/类型/单测及来源与许可另见[本轮回执](../../../docs/records/2026-10-18-protecting-pandas-media.md)。未做真实投影或完整 Safari/Firefox 媒体矩阵；窄短窗为固定画布缩放概览。
+The shared presentation contract suite is 33/33, followed by a targeted 1/1 for three audio-track button reachability assertions; Sunshine targeted 3/3 (2.4 s). Static/type/unit tests and sources/licenses are in [this round's receipt](../../../docs/records/2026-10-18-protecting-pandas-media.md). No real projection or full Safari/Firefox media matrix was done; narrow/short windows are a fixed-canvas scaling overview.
 
-下文保留 a3 及更早历史结果，不能代替 a4。
+The text below keeps a3 and earlier historical results and cannot replace a4.
 
-2026-10-18。测试作者仅维护本目录，没有修改正文、样式、素材或旧 Sunshine 作品。
+2026-10-18. The test author maintains only this directory and has not modified body text, styles, assets or the old Sunshine work.
 
-## 共享组件修复后的最终检查
+## Final check after shared component fixes
 
-`/Users/lidessen/workspaces/meowland/artifacts/protecting-pandas-candidate-a3` 的
-`protecting-pandas-a3`（`chunk-zrg09fpk.js`）最终同版完整浏览器 **8/8 通过，14.8 秒**；
-manifest SHA-256 为 `d881cd0d2275c91d3c2b420e5894fcaf644b1dfb325feb2fd5ab51d0e3739f4e`。
-本目录类型、lint、格式检查通过。严格正文预算、画布边界和播放器样式隔离断言均保留。
-新增第八项在 1100×760 的五题中检查默认、各提示单开、全开、全关：支持按钮位置和阅读框
-位置/高度保持稳定，隐藏面板退出可访问树。作品改用共享 `Reveal when` 与 `slideClassName`，
-没有把作品手写的可见性、inert 或 aria-hidden 实现当作组件修复。
+`/Users/lidessen/workspaces/meowland/artifacts/protecting-pandas-candidate-a3` contains
+`protecting-pandas-a3` (`chunk-zrg09fpk.js`), and the final same-version full browser suite **8/8 passed, 14.8 s**;
+manifest SHA-256 is `d881cd0d2275c91d3c2b420e5894fcaf644b1dfb325feb2fd5ab51d0e3739f4e`.
+This directory's typecheck, lint and format checks pass. Strict body budgets, canvas boundaries and player style isolation assertions are all retained.
+The new eighth item checks the default, each hint alone, all open and all closed across five questions at 1100×760: support button positions and reading frame
+positions/heights stay stable, and hidden panels leave the accessibility tree. The work switched to shared `Reveal when` and `slideClassName`,
+and the work's hand-written visibility, inert or aria-hidden implementations are not treated as the component fix.
 
-同版 `artifacts/sunshine-component-candidate` 的旧 Sunshine 三项必要行为回归 **3/3 通过，4.9 秒**：
-教师逐步揭示、跨页保留与显式重做、提示受控与 reduced motion。只读取旧作品，未改其正文或样式。
-这不是 Sunshine 全量浏览器验收。
+The same-version `artifacts/sunshine-component-candidate`'s old Sunshine three necessary behavior regressions **3/3 passed, 4.9 s**:
+teacher step-by-step reveal, cross-page persistence and explicit redo, controlled hints and reduced motion. Only the old work was read, and its body text and styles were not changed.
+This is not a full Sunshine browser acceptance.
 
-最终 live 13014 已更新为同一产物。1100×760 的 **37 张原图已逐张实际打开审阅**，
-没有发现新增裁切、正文与支持/页脚重叠或提示栏跳动。完整逐图索引与测量位于
-`artifacts/protecting-pandas-review/live-normal/a3/REVIEW.md` 和 `index.json`；每图都核对了
-`chunk-zrg09fpk.js`。五题全部七态正文为 259/259，支持按钮 y 为 455.455 CSS px，
-四题原文框位置/高度不变；页面异常及可见溢出诊断均为零。行动回访图等待入场动画结束后重拍并实际打开。
+The final live 13014 was updated to the same artifact. All **37 originals at 1100×760 were actually opened and reviewed one by one**,
+finding no new cropping, body/support/footer overlap or hint-bar jumping. The complete per-image index and measurements are in
+`artifacts/protecting-pandas-review/live-normal/a3/REVIEW.md` and `index.json`; every image was checked against
+`chunk-zrg09fpk.js`. The body text of all five questions in all seven states is 259/259, support buttons' y is 455.455 CSS px, and
+four questions' original-text frame positions/heights are unchanged; page exceptions and visible overflow diagnostics are both zero. The action-revisit image was re-taken after the entrance animation finished and actually opened.
 
-第 13/15/16 图保留内容边界：选 Having babies 时 Reference 是 forests 通用示例，
-并非按当前选项生成。没有在组件修复任务中更改原文，也未将该内容关联边界作为共享组件故障。
-旧 a1 图保留为历史证据，不能当作 a3 最终画面。独立 Chrome 页面没有操作用户已有标签页，
-本结果也不证明其原 Safari 页面已刷新。
+Images 13/15/16 keep the content boundary: with Having babies selected, Reference is the generic forests example,
+not generated from the current option. The original text was not changed in the component-fix task, and this content-association boundary was not treated as a shared component fault.
+The old a1 images are kept as historical evidence and cannot be used as a3's final screen. The independent Chrome page did not operate the user's existing tabs,
+and this result does not prove that their original Safari page has been refreshed.
 
 ```sh
 PANDA_DIST=/Users/lidessen/workspaces/meowland/artifacts/protecting-pandas-candidate-a3 \
@@ -65,25 +65,25 @@ SUNSHINE_DIST=/Users/lidessen/workspaces/meowland/artifacts/sunshine-component-c
   --grep 'teacher steps reveal|page visits preserve|warm-up hints'
 ```
 
-## a1 历史候选与截图
+## a1 historical candidate and screenshots
 
-历史输入为 `/Users/lidessen/workspaces/meowland/artifacts/protecting-pandas-candidate`，版本标识
-`protecting-pandas-a1`；浏览器脚本为 `chunk-0cehad9c.js`，manifest 的 SHA-256 为
-`a5ecd3b6cda6b3b5bf1cac05f50c83694a7a6eb62c6634d9bcf2baffb3ca5965`。
+The historical input was `/Users/lidessen/workspaces/meowland/artifacts/protecting-pandas-candidate`, version identity
+`protecting-pandas-a1`; the browser script is `chunk-0cehad9c.js`, and the manifest SHA-256 is
+`a5ecd3b6cda6b3b5bf1cac05f50c83694a7a6eb62c6634d9bcf2baffb3ca5965`.
 
-## 发现与闭环
+## Findings and closure
 
-- 首版正文标题的宽泛 h1 规则放大了播放器标题。最终标题改用作品专有 class；浏览器通过 CSSOM
-  暂时移除作品规则，对比播放器标题和目录的计算样式，确认它们不依赖或受到作品样式覆盖。
-- 首版正文与教师提示区域相叠。第一候选仍有保护页正文可用高 259、实际滚动高 324，含义页 259/313；
-  实际后代进入 footer。作者收敛重复说明和布局后，最终六页三尺寸全展开均通过严格的正文预算检查。
-  未放宽为仅检查整张画布，也未删除重叠断言。最终行动页长草稿在输入内部滚动，不扩张正文。
-- 测试初次把受 CSS 大写影响的 innerText 与默认读取 textContent 的断言相比较，属于测试表示不一致；
-  改为前后读取原始 textContent，再检查证据标记，未将其报告为课件缺陷。
-- 新消费者最初缺少私有 ESM package.json，Playwright 无法加载 import.meta 配置；由宿主作者补齐，
-  没有修改旧作品或降低测试合同。
+- The first version's broad h1 rule on body text enlarged the player title. The final title uses a work-specific class; the browser temporarily removes the work's rules through CSSOM
+  and compares the computed styles of the player title and outline, confirming they neither depend on nor are overridden by the work's styles.
+- In the first version, body text overlapped the teacher hint area. The first candidate still had protection-page body usable height 259 vs actual scroll height 324, and meaning page 259/313;
+  actual descendants entered the footer. After the author converged duplicate explanations and layout, the final six pages at three sizes fully expanded all passed the strict body budget check.
+  This was not relaxed to checking only the whole canvas, nor were overlap assertions deleted. On the final action page, long drafts scroll inside the input and do not expand the body.
+- The test initially compared CSS-uppercase-affected innerText with an assertion that reads textContent by default, which was a test-representation inconsistency;
+  it was changed to read raw textContent before and after, then check the evidence markers, and was not reported as a courseware defect.
+- The new consumer initially lacked a private ESM package.json, so Playwright could not load the import.meta configuration; the host author added it,
+  without modifying the old work or lowering the test contract.
 
-## a1 检查记录
+## a1 check record
 
 ```sh
 PANDA_DIST=/Users/lidessen/workspaces/meowland/artifacts/protecting-pandas-candidate \
@@ -93,26 +93,26 @@ bun node_modules/oxlint/bin/oxlint --deny-warnings examples/protecting-pandas/te
 bun node_modules/oxfmt/bin/oxfmt --check examples/protecting-pandas/tests
 ```
 
-a1 完整浏览器 **7/7 通过，10.9 秒**；当时测试类型、lint、格式检查通过。使用本机 Chrome、独立
-loopback 13034 和正式 Web 候选产物；没有把 Meowbook 开发预览当作正式交付。
+a1 full browser **7/7 passed, 10.9 s**; test types, lint and format checks passed at that time. Local Chrome, an independent
+loopback 13034 and the official Web candidate artifact were used; the Meowbook development preview was not treated as official delivery.
 
-覆盖五题 Hint / Reference / Evidence 独立开关、撤回与恢复、aria-controls/expanded 与隐藏后退出可访问树；
-原始摘录文本不变，证据高亮可撤回。跨页保留选择、教师支持状态与草稿，明确重做只清当前题。
-课堂选项全部直接可见，以原生按钮、选中语义和键盘操作，不以播放器目录的原生 select 当作缺陷。
-方向键、空格等输入操作不推进页面，行动起点不自动写草稿或揭示参考，开放表达不按唯一答案判分。
+Covered five questions' independent Hint / Reference / Evidence toggles, retract and restore, aria-controls/expanded and leaving the accessibility tree after hiding;
+original excerpt text unchanged, evidence highlight retractable. Choices, teacher support states and drafts persist across pages, and explicit redo clears only the current question.
+All classroom options are directly visible, using native buttons, selected semantics and keyboard operation; the player outline's native select is not treated as a defect.
+Input operations such as arrow keys and Space do not advance pages, the action start does not auto-write drafts or reveal references, and open expression is not graded against a single answer.
 
-全新浏览器阻断非交付 origin，请求失败、HTTP 错误、外部请求和页面异常均为零；六页图片实际解码。
-直达任务与 reduced motion 保持教师支持初始隐藏。六页在 1440×900、390×844、1280×330 下全展开，
-含封面最终步骤和长行动草稿；实际文字/控件在画布内、正文不侵入 footer，目录与设置入口可聚焦到达。
+A fresh browser blocks non-delivery origins; request failures, HTTP errors, external requests and page exceptions are all zero; six pages' images actually decode.
+Direct tasks and reduced motion keep teacher supports initially hidden. Six pages fully expanded at 1440×900, 390×844 and 1280×330,
+including the cover final step and long action drafts; actual text/controls stay inside the canvas, body text does not intrude into the footer, and outline and settings entries are focusable.
 
-## 原图与验证边界
+## Original images and verification boundaries
 
-18 张最终原图另存于 `artifacts/protecting-pandas-review/`，文件名为
-`final-{welcome|growth|problems|protect|meaning|act}-{1440x900|390x844|1280x330}-expanded.png`。
-已实际打开六张宽图，以及成长/保护/行动窄图、成长/含义/行动短图，确认主要阅读关系与教师支持分区。
-初次候选失败图及非断言测量保留为 `candidate1-*`，不得用其冒充最终画面。
+The 18 final originals are stored separately in `artifacts/protecting-pandas-review/`, named
+`final-{welcome|growth|problems|protect|meaning|act}-{1440x900|390x844|1280x330}-expanded.png`.
+Six wide images were actually opened, plus growth/protection/action narrow images and growth/meaning/action short images, confirming the main reading relationships and teacher-support regions.
+First-candidate failure images and non-assertion measurements are kept as `candidate1-*` and must not be passed off as final screens.
 
-本验收不证明教材版本、原文事实或图片授权，来源由 `../SOURCES.md` 与素材 notices 负责。
-未做人工屏幕阅读器、实体手机、真实投影教室或学习成效观察。窄短窗仍为固定演示画布整体缩放，
-控件可达不等于正文适合手机阅读；冷启动限本地 HTTP，不声称 file://、任意子路径部署或持久化。
-测试服务随 Playwright 结束关闭；一次额外布局探针的自有 13034 服务已单独关闭，未操作 13014 或 13012。
+This acceptance does not prove textbook edition, original-text facts or image authorization; sources are handled by `../SOURCES.md` and the asset notices.
+No manual screen-reader, physical phone, real projection classroom or learning-outcome observation was done. Narrow/short windows remain the fixed presentation canvas scaled as a whole,
+and control reachability does not mean the body text suits phone reading; cold start is limited to local HTTP and claims no file://, arbitrary subpath deployment or persistence.
+The test service closes when Playwright ends; an extra layout probe's own 13034 service was closed separately, and 13014 or 13012 were not operated.

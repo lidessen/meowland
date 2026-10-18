@@ -17,44 +17,45 @@ import {
 
 export const FieldGroups = defineStory({
   id: "field-group",
-  title: "表单分组 · 标题与整组禁用",
+  title: "Field group · Legend and whole-group disabled",
   component: "FieldGroup",
-  variant: "字段关系",
-  group: "表单输入",
+  variant: "Field relationships",
+  group: "Form inputs",
   groupOrder: 20,
-  description: "使用原生 fieldset/legend 表达同组字段；整组不可用时，输入与选择一起遵守表单语义。",
+  description:
+    "Uses native fieldset/legend for fields in one group; when the group is unavailable, inputs and selects follow form semantics together.",
   covers: ["FieldGroup", "Field", "fieldset", "disabled"],
   render: () => (
     <Container width="narrow">
       <form>
         <Stack gap="relaxed">
           <FieldGroup
-            legend="项目通知"
-            description="选择接收工作完成提醒的方式。"
+            legend="Project notifications"
+            description="Choose how to receive alerts when work completes."
             descriptionId="notification-help"
           >
-            <Field label="接收地址" htmlFor="notification-email">
+            <Field label="Delivery address" htmlFor="notification-email">
               <Input id="notification-email" type="email" placeholder="you@example.com" />
             </Field>
-            <Field label="提醒频率" htmlFor="notification-frequency">
+            <Field label="Alert frequency" htmlFor="notification-frequency">
               <Select id="notification-frequency">
-                <option>仅在需要关注时</option>
-                <option>每次工作完成</option>
+                <option>Only when attention is needed</option>
+                <option>Every time work completes</option>
               </Select>
             </Field>
           </FieldGroup>
           <Separator />
           <FieldGroup
-            legend="组织托管设置"
-            description="这组设置由组织管理，当前不可修改。"
+            legend="Organization-managed settings"
+            description="The organization manages this group; it cannot be changed now."
             disabled
           >
-            <Field label="组织名称" htmlFor="managed-name">
+            <Field label="Organization name" htmlFor="managed-name">
               <Input id="managed-name" value="Meowland" />
             </Field>
-            <Field label="可见范围" htmlFor="managed-visibility">
+            <Field label="Visibility" htmlFor="managed-visibility">
               <Select id="managed-visibility">
-                <option>仅项目成员</option>
+                <option>Project members only</option>
               </Select>
             </Field>
           </FieldGroup>
@@ -65,12 +66,13 @@ export const FieldGroups = defineStory({
 });
 export const MediaRatio = defineStory({
   id: "aspect-ratio",
-  title: "媒体比例 · 横图与方图",
+  title: "Media ratio · Landscape and square",
   component: "AspectRatio",
-  variant: "按容器适应",
-  group: "导航与布局",
+  variant: "Fit to container",
+  group: "Navigation and layout",
   groupOrder: 40,
-  description: "比例控制媒体占位，图片自行选择裁切方式；宽度随父容器变化。",
+  description:
+    "The ratio controls the media placeholder and images choose their own cropping; the width follows the parent container.",
   render: () => (
     <Container>
       <Stack gap="relaxed">
@@ -87,7 +89,7 @@ export const MediaRatio = defineStory({
                 color: `${uiTokens.mutedForeground}`,
               }}
             >
-              {ratio === 1 ? "1 : 1 · 项目封面" : "16 : 9 · 演示预览"}
+              {ratio === 1 ? "1 : 1 · Project cover" : "16 : 9 · Demo preview"}
             </div>
           </AspectRatio>
         ))}
@@ -97,22 +99,22 @@ export const MediaRatio = defineStory({
 });
 export const Separators = defineStory({
   id: "separator",
-  title: "分隔 · 内容与工具组",
+  title: "Separator · Content and tool groups",
   component: "Separator",
-  variant: "横向与纵向",
-  group: "导航与布局",
+  variant: "Horizontal and vertical",
+  group: "Navigation and layout",
   groupOrder: 40,
-  description: "分隔线表达内容边界，默认不新增可聚焦操作。",
+  description: "A separator expresses a content boundary and adds no focusable action by default.",
   render: () => (
     <Container width="narrow">
       <Stack gap="relaxed">
-        <strong>工作记录</strong>
-        <p>变更内容与后续操作各自成组。</p>
+        <strong>Work record</strong>
+        <p>Changes and follow-up actions are grouped separately.</p>
         <Separator />
         <Inline>
-          <Button variant="quiet">查看变更</Button>
+          <Button variant="quiet">View changes</Button>
           <Separator orientation="vertical" style={{ height: "20px" }} />
-          <Button variant="quiet">复制链接</Button>
+          <Button variant="quiet">Copy link</Button>
         </Inline>
       </Stack>
     </Container>
@@ -120,27 +122,27 @@ export const Separators = defineStory({
 });
 export const Tooltips = defineStory({
   id: "tooltip",
-  title: "辅助提示 · 悬停与键盘焦点",
+  title: "Tooltip · Hover and keyboard focus",
   component: "Tooltip",
-  variant: "说明与关闭",
-  group: "浮层与反馈",
+  variant: "Description and dismissal",
+  group: "Overlays and feedback",
   groupOrder: 30,
   description:
-    "鼠标稍作停留时补充说明，键盘聚焦立即显示；Escape 关闭且焦点保留。必要信息始终留在页面。",
+    "Hovering briefly adds a description and keyboard focus shows it immediately; Escape closes it and keeps focus. Necessary information always stays on the page.",
   render: () => (
     <Container width="narrow">
       <Stack gap="relaxed" align="start">
-        <p>独立预览会保留当前工作页面。</p>
+        <p>The standalone preview keeps the current work page.</p>
         <Tooltip
           id="preview-help"
-          content="在独立窗口查看当前组件，便于比较不同尺寸。"
+          content="View the current component in a standalone window to compare different sizes."
           trigger={(props) => (
             <Button {...props} variant="outline">
-              独立预览
+              Standalone preview
             </Button>
           )}
         />
-        <Input aria-label="下一项" placeholder="Tab 移动到这里会关闭提示" />
+        <Input aria-label="Next item" placeholder="Tabbing here closes the tooltip" />
       </Stack>
     </Container>
   ),

@@ -14,8 +14,8 @@ import {
 
 export const PopoverEscapeStory = defineStory({
   id: "popover-escape",
-  title: "浮层 · 子控件与模态关闭",
-  group: "浮层与反馈",
+  title: "Popover · Child controls and modal closing",
+  group: "Overlays and feedback",
   component: "Popover",
   covers: ["Popover", "child DOM Escape", "Dialog", "unmount"],
   render() {
@@ -27,7 +27,7 @@ export const PopoverEscapeStory = defineStory({
     let closeFromCallback = false;
     return (
       <Stack gap="normal">
-        <Button onClick={() => dialog?.showModal()}>打开浮层对话框</Button>
+        <Button onClick={() => dialog?.showModal()}>Open popover dialog</Button>
         <Dialog
           id="escape-dialog"
           labelledBy="escape-title"
@@ -38,28 +38,31 @@ export const PopoverEscapeStory = defineStory({
           <DialogPanel
             header={
               <DialogHeader
-                title="局部编辑与返回"
+                title="Local editing and returning"
                 titleId="escape-title"
                 actions={
                   <Button variant="quiet" onClick={() => dialog?.close()}>
-                    关闭对话框
+                    Close dialog
                   </Button>
                 }
               />
             }
           >
             <Stack gap="normal">
-              <p>输入控件先处理自己的 Escape；未处理时再关闭当前浮层。</p>
+              <p>
+                Input controls handle their own Escape first; if it is unhandled, the current
+                popover closes.
+              </p>
               <Popover
                 id="escape-parent"
                 onKeyDown={(event) => {
                   if (event.key === "Escape") parentKeys.value++;
                 }}
-                trigger={(bindings) => <Button {...bindings}>打开父浮层</Button>}
+                trigger={(bindings) => <Button {...bindings}>Open parent popover</Button>}
               >
                 <Stack gap="normal">
-                  <Field label="局部草稿">
-                    <Input aria-label="局部草稿" />
+                  <Field label="Local draft">
+                    <Input aria-label="Local draft" />
                   </Field>
                   {mapSignal(mounted, (shown) =>
                     shown ? (
@@ -75,30 +78,30 @@ export const PopoverEscapeStory = defineStory({
                             if (closeFromCallback) childOpen.value = false;
                           }
                         }}
-                        trigger={(bindings) => <Button {...bindings}>打开子浮层</Button>}
+                        trigger={(bindings) => <Button {...bindings}>Open child popover</Button>}
                       >
                         <Stack gap="normal">
-                          <Input aria-label="子浮层草稿" />
+                          <Input aria-label="Child popover draft" />
                           <Button
                             onClick={() => {
                               closeFromCallback = true;
                             }}
                           >
-                            回调关闭子浮层
+                            Close child popover via callback
                           </Button>
                           <Button
                             onClick={() => {
                               childOpen.value = false;
                             }}
                           >
-                            关闭子浮层
+                            Close child popover
                           </Button>
                           <Button
                             onClick={() => {
                               mounted.value = false;
                             }}
                           >
-                            移除子浮层
+                            Remove child popover
                           </Button>
                         </Stack>
                       </Popover>
@@ -109,14 +112,14 @@ export const PopoverEscapeStory = defineStory({
                           mounted.value = true;
                         }}
                       >
-                        恢复子浮层
+                        Restore child popover
                       </Button>
                     ),
                   )}
                 </Stack>
               </Popover>
               <output id="escape-callbacks">
-                父层 {parentKeys} · 子层 {childKeys}
+                Parent {parentKeys} · Child {childKeys}
               </output>
             </Stack>
           </DialogPanel>
@@ -128,25 +131,26 @@ export const PopoverEscapeStory = defineStory({
 
 export const PopoverStory = defineStory({
   id: "popover",
-  title: "浮层 · 就地编辑与返回",
-  group: "浮层与反馈",
+  title: "Popover · In-place editing and returning",
+  group: "Overlays and feedback",
   groupOrder: 30,
   component: "Popover",
-  variant: "就地编辑与嵌套",
-  description: "在当前操作旁展开内容；可嵌套、受控开闭，Escape 返回上层。",
+  variant: "In-place editing and nesting",
+  description:
+    "Expands content next to the current action; it can nest, open and close under control, and Escape returns to the previous layer.",
   covers: ["Popover", "controlled", "nested", "edge positioning", "focus return"],
   render() {
     const controlled = signal(false);
     const retained = signal(false);
     const redirected = signal(false);
     let external: HTMLElement | undefined;
-    const paneTitle = signal("选择设置");
+    const paneTitle = signal("Choose settings");
     let inPane = false;
     return (
       <div className="workshop-stack workshop-constrained">
         <header className="workshop-composition-header">
-          <h2>留在手边的设置</h2>
-          <p>修改显示方式，然后回到正在阅读的内容。</p>
+          <h2>Settings kept at hand</h2>
+          <p>Change how things are displayed, then return to what you were reading.</p>
         </header>
         <div className="workshop-actions">
           <Popover
@@ -155,17 +159,17 @@ export const PopoverStory = defineStory({
             labelledBy="display-title"
             trigger={(bindings) => (
               <Button variant="outline" {...bindings}>
-                显示设置
+                Display settings
               </Button>
             )}
           >
             <div className="workshop-section">
               <header className="workshop-composition-header">
-                <h2 id="display-title">显示设置</h2>
-                <p>只影响当前预览。</p>
+                <h2 id="display-title">Display settings</h2>
+                <p>Affects only the current preview.</p>
               </header>
-              <Field label="显示名称" htmlFor="popover-name">
-                <Input id="popover-name" value="工作视图" />
+              <Field label="Display name" htmlFor="popover-name">
+                <Input id="popover-name" value="Work view" />
               </Field>
               <Popover
                 id="nested-popover"
@@ -174,16 +178,18 @@ export const PopoverStory = defineStory({
                 align="end"
                 trigger={(bindings) => (
                   <Button variant="quiet" {...bindings}>
-                    更多设置
+                    More settings
                   </Button>
                 )}
               >
                 <div className="workshop-section">
                   <h3 id="nested-title" className="workshop-section-title">
-                    阅读宽度
+                    Reading width
                   </h3>
-                  <p className="workshop-note">保留正文空间，让辅助操作退到一旁。</p>
-                  <Input aria-label="宽度备注" placeholder="写下偏好…" />
+                  <p className="workshop-note">
+                    Keep space for the body and let supporting actions step aside.
+                  </p>
+                  <Input aria-label="Width note" placeholder="Write down your preference…" />
                 </div>
               </Popover>
             </div>
@@ -198,21 +204,21 @@ export const PopoverStory = defineStory({
             labelledBy="controlled-title"
             trigger={(bindings) => (
               <Button variant="quiet" {...bindings}>
-                打开受控面板
+                Open controlled panel
               </Button>
             )}
           >
             <div className="workshop-section">
               <h3 id="controlled-title" className="workshop-section-title">
-                由宿主管理开闭
+                Open and close managed by the host
               </h3>
-              <p className="workshop-note">关闭后回到触发位置。</p>
+              <p className="workshop-note">Focus returns to the trigger after closing.</p>
               <Button
                 onClick={() => {
                   controlled.value = false;
                 }}
               >
-                关闭受控面板
+                Close controlled panel
               </Button>
             </div>
           </Popover>
@@ -222,7 +228,7 @@ export const PopoverStory = defineStory({
               external = element;
             }}
           >
-            外部操作
+            External action
           </Button>
           <Popover
             id="retained-popover"
@@ -234,12 +240,12 @@ export const PopoverStory = defineStory({
             labelledBy="retained-title"
             trigger={(bindings) => (
               <Button variant="quiet" {...bindings}>
-                保持受控面板
+                Keep controlled panel
               </Button>
             )}
           >
-            <h3 id="retained-title">宿主保留当前面板</h3>
-            <Input aria-label="保留面板草稿" value="等待宿主处理" />
+            <h3 id="retained-title">Host keeps the current panel</h3>
+            <Input aria-label="Retained panel draft" value="Waiting for the host" />
           </Popover>
           <Popover
             id="redirected-popover"
@@ -252,12 +258,12 @@ export const PopoverStory = defineStory({
             labelledBy="redirected-title"
             trigger={(bindings) => (
               <Button variant="quiet" {...bindings}>
-                关闭后继续外部操作
+                Continue external action after closing
               </Button>
             )}
           >
-            <h3 id="redirected-title">宿主指定后续焦点</h3>
-            <p>关闭后继续访问外部动作。</p>
+            <h3 id="redirected-title">Host chooses the next focus</h3>
+            <p>Continue to the external action after closing.</p>
           </Popover>
           <Popover
             id="pane-popover"
@@ -267,16 +273,16 @@ export const PopoverStory = defineStory({
               if (event.key === "Escape" && inPane) {
                 event.preventDefault();
                 inPane = false;
-                paneTitle.value = "选择设置";
+                paneTitle.value = "Choose settings";
               }
             }}
             onOpenChange={() => {
               inPane = false;
-              paneTitle.value = "选择设置";
+              paneTitle.value = "Choose settings";
             }}
             trigger={(bindings) => (
               <Button variant="quiet" {...bindings}>
-                分层设置
+                Layered settings
               </Button>
             )}
           >
@@ -285,10 +291,10 @@ export const PopoverStory = defineStory({
               <Button
                 onClick={() => {
                   inPane = true;
-                  paneTitle.value = "设置详情";
+                  paneTitle.value = "Settings details";
                 }}
               >
-                进入详情
+                Open details
               </Button>
             </div>
           </Popover>
@@ -300,15 +306,16 @@ export const PopoverStory = defineStory({
 
 export const ChoiceSelectStory = defineStory({
   id: "choice-select",
-  title: "选择 · 自定义弹层与键盘",
-  group: "表单输入",
+  title: "Select · Custom popup and keyboard",
+  group: "Form inputs",
   groupOrder: 20,
   component: "ChoiceSelect",
-  variant: "键盘与表单",
-  description: "Popover 承载单选；方向键、字符定位和原生表单校验保持连续。",
+  variant: "Keyboard and forms",
+  description:
+    "A popover carries single selection; arrow keys, character navigation, and native form validation stay continuous.",
   covers: ["ChoiceSelect", "Popover", "keyboard", "required", "form reset"],
   render() {
-    const feedback = signal("配置仅在本地演示，不会发布内容。");
+    const feedback = signal("Configuration is only demoed locally; no content is published.");
     const controlled = signal("draft");
     return (
       <form
@@ -316,54 +323,68 @@ export const ChoiceSelectStory = defineStory({
         onSubmit={(event: SubmitEvent) => {
           event.preventDefault();
           const data = new FormData(event.currentTarget as HTMLFormElement);
-          feedback.value = `已提交：${data.get("delivery")} · ${data.get("environment")}`;
+          feedback.value = `Submitted: ${data.get("delivery")} · ${data.get("environment")}`;
         }}
       >
         <header className="workshop-composition-header">
-          <h2>准备交付</h2>
-          <p>选项就在当前位置展开，长名称可以完整阅读。</p>
+          <h2>Prepare delivery</h2>
+          <p>Options expand in place, and long names remain fully readable.</p>
         </header>
         <Field
-          label="交付目标"
+          label="Delivery target"
           htmlFor="custom-delivery"
-          description="方向键移动，Enter 确认，Escape 返回。"
+          description="Arrow keys move, Enter confirms, Escape returns."
         >
           <ChoiceSelect
             id="custom-delivery"
             name="delivery"
             defaultValue="review"
             options={[
-              { value: "draft", label: "保留为本地草稿", group: "当前项目" },
-              { value: "review", label: "交给项目负责人审阅完整修改与验证记录", group: "当前项目" },
-              { value: "remote", label: "远端项目 · 尚未连接", group: "其他位置", disabled: true },
-              { value: "archived", label: "归入项目存档", group: "其他位置" },
+              { value: "draft", label: "Keep as a local draft", group: "Current project" },
+              {
+                value: "review",
+                label:
+                  "Hand to the project owner to review all changes and the verification record",
+                group: "Current project",
+              },
+              {
+                value: "remote",
+                label: "Remote project · not connected",
+                group: "Other locations",
+                disabled: true,
+              },
+              {
+                value: "archived",
+                label: "File into the project archive",
+                group: "Other locations",
+              },
             ]}
           />
         </Field>
         <Field
-          label="发布环境"
+          label="Release environment"
           htmlFor="custom-environment"
-          description="必选，提交时使用原生表单校验。"
+          description="Required; native form validation applies on submit."
         >
           <ChoiceSelect
             id="custom-environment"
             name="environment"
             required
-            placeholder="选择环境…"
+            placeholder="Select an environment…"
             options={[
-              { value: "local", label: "仅本地预览" },
-              { value: "staging", label: "测试环境" },
+              { value: "local", label: "Local preview only" },
+              { value: "staging", label: "Staging environment" },
             ]}
           />
         </Field>
-        <Field label="可搜索模型" htmlFor="searchable-model">
+        <Field label="Searchable model" htmlFor="searchable-model">
           <ChoiceSelect
             id="searchable-model"
             searchable
-            searchPlaceholder="搜索模型名称或 ID"
+            searchPlaceholder="Search by model name or ID"
             defaultValue=""
             options={[
-              { value: "", label: "跟随运行器默认" },
+              { value: "", label: "Follow the runner default" },
               { value: "gpt-6-astra", label: "GPT-6-Astra · gpt-6-astra" },
               { value: "gpt-6-sol", label: "GPT-6-Sol · gpt-6-sol" },
               { value: "gpt-6-luna", label: "GPT-6-Luna · gpt-6-luna" },
@@ -371,9 +392,9 @@ export const ChoiceSelectStory = defineStory({
           />
         </Field>
         <Field
-          label="受控选择"
+          label="Controlled select"
           htmlFor="custom-controlled"
-          description="表单重置保留调用方当前选项。"
+          description="A form reset keeps the caller's current selection."
         >
           <ChoiceSelect
             id="custom-controlled"
@@ -383,15 +404,15 @@ export const ChoiceSelectStory = defineStory({
               controlled.value = next;
             }}
             options={[
-              { value: "draft", label: "保留草稿" },
-              { value: "review", label: "提交审阅" },
+              { value: "draft", label: "Keep draft" },
+              { value: "review", label: "Submit for review" },
             ]}
           />
         </Field>
         <div className="workshop-actions">
-          <Button type="submit">提交配置</Button>
+          <Button type="submit">Submit configuration</Button>
           <Button variant="quiet" type="reset">
-            恢复默认
+            Restore defaults
           </Button>
         </div>
         <p role="status" className="workshop-feedback">

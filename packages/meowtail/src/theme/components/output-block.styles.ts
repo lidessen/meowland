@@ -232,4 +232,13 @@ export const outputBlockStyles = css`
   ${partSelector(terminal, "span")}[data-ansi-color="90"] {
     color: ${uiTokens.subtleForeground};
   }
+
+  @media (pointer: coarse) {
+    ${partSelector(block, "actions")}[data-meowui-part],
+    ${partSelector(block, "toggle")}[data-meowui-part] {
+      min-width: 44px;
+      min-height: 44px;
+      padding: 0 6px;
+    }
+  }
 `;

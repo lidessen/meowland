@@ -4,11 +4,11 @@ test.describe("touch button sizes", () => {
   test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
 
   test(`DeepSeek controls preserve three distinct sizes on touch screens`, async ({ page }) => {
-    await page.goto("http://127.0.0.1:13007/canvas.html?story=design-language");
+    await page.goto("/canvas.html?story=design-language");
     await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
     expect(await page.evaluate(() => matchMedia("(pointer: coarse)").matches)).toBe(true);
     const heights = [];
-    for (const name of ["小尺寸", "默认", "大尺寸"]) {
+    for (const name of ["Small", "Default", "Large"]) {
       const bounds = await page.getByRole("button", { name, exact: true }).boundingBox();
       expect(bounds).not.toBeNull();
       heights.push(bounds!.height);
@@ -25,9 +25,9 @@ for (const scheme of ["light", "dark"]) {
   test(`DeepSeek ${scheme} disabled quiet actions preserve their unfilled hierarchy`, async ({
     page,
   }) => {
-    await page.goto("http://127.0.0.1:13007/canvas.html?story=actions-matrix");
+    await page.goto("/canvas.html?story=actions-matrix");
     await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-    await page.getByRole("combobox", { name: "外观", exact: true }).selectOption(scheme);
+    await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption(scheme);
     await page.mouse.move(0, 0);
     for (const selector of [
       '[data-meowui-part="button/root"][data-option-button-variant="quiet"]',
@@ -84,9 +84,9 @@ for (const scheme of ["light", "dark"]) {
   test(`DeepSeek ${scheme} composer distinguishes pointer interest from keyboard focus`, async ({
     page,
   }) => {
-    await page.goto("http://127.0.0.1:13007/canvas.html?story=design-language");
+    await page.goto("/canvas.html?story=design-language");
     await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-    await page.getByRole("combobox", { name: "外观", exact: true }).selectOption(scheme);
+    await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption(scheme);
 
     const selected = page.locator('[data-meowui-part="nav-item/root"][aria-current="page"]');
     const selectedSurface = await selected.evaluate(
@@ -96,7 +96,7 @@ for (const scheme of ["light", "dark"]) {
     await expect(selected).toHaveAttribute("aria-current", "page");
     await expect(selected).toHaveCSS("background-color", selectedSurface);
 
-    const input = page.getByRole("textbox", { name: "消息", exact: true });
+    const input = page.getByRole("textbox", { name: "Message", exact: true });
     const surface = page.locator('[data-meowui-part="chat-composer/root"]');
     await input.scrollIntoViewIfNeeded();
     await page.mouse.move(0, 0);
@@ -117,7 +117,7 @@ for (const scheme of ["light", "dark"]) {
     await input.focus();
     await page.keyboard.press("Shift+Tab");
     await page.keyboard.press("Tab");
-    await page.keyboard.type("保留这次编辑");
+    await page.keyboard.type("Keep this edit");
     await expect(input).toBeFocused();
     await expect(surface).toHaveCSS("outline-style", "solid");
     expect(
@@ -133,7 +133,7 @@ for (const scheme of ["light", "dark"]) {
     ).toBe(true);
     await page.mouse.move(0, 0);
     await expect(input).toBeFocused();
-    await expect(input).toHaveValue("保留这次编辑");
+    await expect(input).toHaveValue("Keep this edit");
     await page.keyboard.press("Tab");
     await expect(input).not.toBeFocused();
     await expect(surface).toHaveCSS("outline-style", "none");
@@ -142,13 +142,13 @@ for (const scheme of ["light", "dark"]) {
   test(`Studio ${scheme} buttons expose keyboard focus and disabled controls remain inert`, async ({
     page,
   }) => {
-    await page.goto("http://127.0.0.1:13007/canvas.html?story=buttons");
+    await page.goto("/canvas.html?story=buttons");
     await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-    const appearance = page.getByRole("combobox", { name: "外观", exact: true });
+    const appearance = page.getByRole("combobox", { name: "Appearance", exact: true });
     await appearance.selectOption(scheme);
     await appearance.focus();
     await page.keyboard.press("Tab");
-    const save = page.getByRole("button", { name: "保存修改", exact: true });
+    const save = page.getByRole("button", { name: "Save changes", exact: true });
     await expect(save).toBeFocused();
     expect(
       await save.evaluate((element) => {
@@ -161,10 +161,12 @@ for (const scheme of ["light", "dark"]) {
       }),
     ).toBe(true);
     await page.keyboard.press("Enter");
-    await expect(page.locator("[data-feedback]")).toHaveText("已保存本地示例");
-    await page.getByRole("button", { name: "继续编辑", exact: true }).focus();
+    await expect(page.locator("[data-feedback]")).toHaveText("Saved the local sample.");
+    await page.getByRole("button", { name: "Continue editing", exact: true }).focus();
     await page.keyboard.press("Tab");
-    await expect(page.getByRole("button", { name: "丢弃本地草稿", exact: true })).toBeFocused();
+    await expect(
+      page.getByRole("button", { name: "Discard local draft", exact: true }),
+    ).toBeFocused();
 
     const disabled = page.locator("button:disabled");
     await expect(disabled).toHaveCount(4);
@@ -204,6 +206,6 @@ for (const scheme of ["light", "dark"]) {
       await expect(button).not.toBeFocused();
     }
     await expect(page.locator("html")).toHaveAttribute("data-disabled-activations", "0");
-    await expect(page.locator("[data-feedback]")).toHaveText("已保存本地示例");
+    await expect(page.locator("[data-feedback]")).toHaveText("Saved the local sample.");
   });
 }

@@ -5,13 +5,13 @@ import { SchemePair } from "./scheme-pair";
 
 export const WorkCardStory = defineStory({
   id: "work-card",
-  title: "工作卡片 · 对话里的任务入口",
-  group: "对话组件",
+  title: "Work card · Task entry in a conversation",
+  group: "Conversation components",
   groupOrder: 31,
   component: "WorkCard",
-  variant: "状态与详情入口",
+  variant: "States and detail entry",
   description:
-    "工作卡片是对话中一件工作的入口：标题保留发布时的表达，状态行说明现在的进展，整张卡片打开详情。目标完成才用实心点，执行返回只是空心。",
+    "A work card is the entry point for one piece of work in a conversation: the title keeps the wording from when it was published, the status line explains current progress, and the whole card opens details. Only a completed goal uses a solid dot; a returned run stays hollow.",
   covers: [
     "WorkCard processing/returned/success/warning/unknown",
     "long title",
@@ -20,46 +20,46 @@ export const WorkCardStory = defineStory({
     "light and dark",
   ],
   render() {
-    const opened = signal("尚未打开");
+    const opened = signal("Not opened yet");
     const open = (name: string) => () => {
-      opened.value = `已打开：${name}`;
+      opened.value = `Opened: ${name}`;
     };
     return (
       <SchemePair width={480}>
         {() => (
           <div style={{ display: "grid", gap: "12px" }}>
             <WorkCard
-              title="整理 workflow 原型试验记录"
+              title="Organize notes from the workflow prototype trial"
               state="processing"
-              status="正在推进：校对记录格式"
-              detail="已关联 1 项成果"
-              onClick={open("整理记录")}
+              status="In progress: reviewing the record format"
+              detail="1 outcome linked"
+              onClick={open("prototype notes")}
             />
             <WorkCard
-              title="补齐发布说明"
+              title="Complete the release notes"
               state="returned"
-              status="后台已返回 · 待公开答复"
-              onClick={open("发布说明")}
+              status="Backend returned · awaiting a public reply"
+              onClick={open("release notes")}
             />
             <WorkCard
-              title="核对 Kimi provider 试用结果"
+              title="Verify the Kimi provider trial results"
               state="warning"
-              status="待你回答"
+              status="Waiting for your answer"
               icon={<Icon name="list-checks" />}
               onClick={open("Kimi")}
             />
             <WorkCard
-              title="迁移旧的 Notes 数据并保留全部历史记录与附件，同时清理已经替换的接口和配置项"
+              title="Migrate the old Notes data while keeping all history and attachments, and remove the interfaces and configuration items that have already been replaced"
               state="success"
-              status="目标已完成"
-              onClick={open("迁移")}
+              status="Goal completed"
+              onClick={open("migration")}
             />
             <WorkCard
-              title="尚未开始的目标"
+              title="A goal that has not started"
               state="unknown"
-              status="目标已登记"
-              action="查看工作"
-              onClick={open("登记")}
+              status="Goal registered"
+              action="View work"
+              onClick={open("registration")}
             />
             <p style={{ margin: 0, fontSize: "12.5px", color: "var(--ui-subtle-foreground)" }}>
               {opened}

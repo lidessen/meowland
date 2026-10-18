@@ -4,29 +4,29 @@ import { Button, ChatHeader, ChatStatus, Stack } from "meowtail";
 
 export const ChatHeaderStory = defineStory({
   id: "chat-header",
-  title: "会话标题 · 状态与操作",
+  title: "Chat header · Status and actions",
   component: "ChatHeader",
-  group: "对话组件",
+  group: "Conversation components",
   groupOrder: 50,
-  variant: "窄屏与长标题",
+  variant: "Narrow screen and long title",
   render: () => (
     <Stack>
       <ChatHeader title="Assistant" />
       <ChatHeader
-        eyebrow="当前项目"
-        title="重新检查组件的文字、图标、暗色表面与窄屏交互"
-        description="保留工作上下文，状态与操作在窄屏中自然换行。"
-        status={<ChatStatus tone="busy" label="正在处理" />}
+        eyebrow="Current project"
+        title="Review the component's text, icons, dark surfaces, and narrow-screen interactions"
+        description="Keeps the work context; status and actions wrap naturally on narrow screens."
+        status={<ChatStatus tone="busy" label="Processing" />}
         actions={
           <Button variant="outline" size="small">
-            停止
+            Stop
           </Button>
         }
       />
       <ChatHeader
-        title="等待你的决定"
-        status={<ChatStatus tone="waiting" label="等待确认" />}
-        actions={<Button size="small">查看请求</Button>}
+        title="Waiting for your decision"
+        status={<ChatStatus tone="waiting" label="Waiting for confirmation" />}
+        actions={<Button size="small">View request</Button>}
       />
     </Stack>
   ),

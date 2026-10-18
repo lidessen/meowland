@@ -75,4 +75,11 @@ export const codeBlockStyles = css`
     outline: 2px solid ${uiTokens.focus};
     outline-offset: -2px;
   }
+
+  @media (pointer: coarse) {
+    ${partSelector(codeBlockContract, "actions")}[data-meowui-part] > * {
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
 `;

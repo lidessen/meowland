@@ -24,12 +24,13 @@ import { applyTheme } from "meowcss/web";
 
 export const RegionLayoutStory = defineStory({
   id: "region-layout",
-  title: "区域布局 · 列表、阅读与输入",
-  group: "导航与布局",
+  title: "Region layout · List, reading and input",
+  group: "Navigation and layout",
   groupOrder: 40,
   component: "RegionLayout",
-  variant: "命名区域与内容分离",
-  description: "父容器分配空间；窄窗联合显示阅读与输入，返回保留草稿和列表焦点。",
+  variant: "Named areas and separate content",
+  description:
+    "The parent container allocates space; a narrow window combines reading and input, and going back keeps the draft and list focus.",
   covers: [
     "named areas",
     "content scroll owner",
@@ -40,7 +41,12 @@ export const RegionLayoutStory = defineStory({
   render: () => (
     <div style={{ height: "min(680px, calc(100dvh - 90px))", minHeight: 0 }}>
       <PageFrame
-        header={<PageHeader title="通信" description="命名区域与内容使用同一共享布局。" />}
+        header={
+          <PageHeader
+            title="Messages"
+            description="Named areas and content use the same shared layout."
+          />
+        }
       >
         <div
           ref={(host: HTMLElement) => {
@@ -62,8 +68,12 @@ export const RegionLayoutStory = defineStory({
                 },
               },
               {
-                backLabel: "返回列表",
-                regionLabels: { list: "会话列表", thread: "当前会话", compose: "消息输入" },
+                backLabel: "Back to list",
+                regionLabels: {
+                  list: "Conversation list",
+                  thread: "Current conversation",
+                  compose: "Message input",
+                },
               },
             );
             const draft = signal("");
@@ -73,7 +83,7 @@ export const RegionLayoutStory = defineStory({
                 <Stack gap="compact">
                   {Array.from({ length: 35 }, (_, i) => (
                     <NavItem
-                      label={`会话 ${i + 1}`}
+                      label={`Conversation ${i + 1}`}
                       active={mapSignal(selected, (value) => value === i)}
                       onClick={() => {
                         selected.value = i;
@@ -85,20 +95,26 @@ export const RegionLayoutStory = defineStory({
                 surface.regions.list!,
               ),
               render(
-                <strong>持续核对工作 · 长会话名称会自然换行，不撑开整体布局</strong>,
+                <strong>
+                  Continuous review work · Long conversation names wrap naturally and do not widen
+                  the layout
+                </strong>,
                 surface.regions.thread!,
               ),
               render(
-                <ChatConversation ariaLabel="消息阅读区">
+                <ChatConversation ariaLabel="Message reading area">
                   {Array.from({ length: 40 }, (_, i) => (
-                    <p>消息 {i + 1}：内容保持可读，阅读历史和草稿不因窗口变化丢失。</p>
+                    <p>
+                      Message {i + 1}: Content stays readable; history and drafts are not lost when
+                      the window changes.
+                    </p>
                   ))}
                 </ChatConversation>,
                 surface.regions.messages!,
               ),
               render(
                 <Input
-                  aria-label="消息草稿"
+                  aria-label="Message draft"
                   value={draft}
                   onInput={(event: Event) => {
                     draft.value = (event.target as HTMLInputElement).value;
@@ -120,12 +136,13 @@ export const RegionLayoutStory = defineStory({
 
 export const IsolatedRegionStory = defineStory({
   id: "region-layout-isolated-controls",
-  title: "区域布局 · 局部内容中的菜单与选择",
-  group: "导航与布局",
+  title: "Region layout · Menus and choices in local content",
+  group: "Navigation and layout",
   groupOrder: 40,
   component: "RegionLayout",
-  variant: "隔离内容中的原生浮层",
-  description: "内容只进入叶区域；共享菜单、选择与焦点仍使用真实组件。",
+  variant: "Native popovers inside isolated content",
+  description:
+    "Content only enters leaf regions; the shared menu, choices and focus still use real components.",
   covers: ["shadow leaf", "Menu keyboard", "nested menu", "ChoiceSelect", "focus return"],
   render: () => (
     <div
@@ -142,36 +159,36 @@ export const IsolatedRegionStory = defineStory({
         style.textContent = standardTheme.cssText;
         shadow.append(style);
         const removeTheme = applyTheme(content, standardTheme);
-        const selected = signal("未选择");
+        const selected = signal("Not selected");
         const mounted = render(
           <Stack align="start">
             <Menu
               id="isolated-menu"
-              trigger={(bindings) => <Button {...bindings}>区域动作</Button>}
+              trigger={(bindings) => <Button {...bindings}>Region actions</Button>}
               items={[
                 {
                   id: "read",
-                  label: "读取",
+                  label: "Read",
                   onSelect: () => {
-                    selected.value = "读取";
+                    selected.value = "Read";
                   },
                 },
                 {
                   id: "copy",
-                  label: "复制",
+                  label: "Copy",
                   onSelect: () => {
-                    selected.value = "复制";
+                    selected.value = "Copy";
                   },
                 },
                 {
                   id: "more",
-                  label: "更多",
+                  label: "More",
                   children: [
                     {
                       id: "detail",
-                      label: "查看详情",
+                      label: "View details",
                       onSelect: () => {
-                        selected.value = "详情";
+                        selected.value = "Details";
                       },
                     },
                   ],
@@ -181,8 +198,8 @@ export const IsolatedRegionStory = defineStory({
             <ChoiceSelect
               id="isolated-choice"
               options={[
-                { value: "one", label: "第一个" },
-                { value: "two", label: "第二个" },
+                { value: "one", label: "First option" },
+                { value: "two", label: "Second option" },
               ]}
             />
             <span role="status">{selected}</span>
@@ -201,12 +218,13 @@ export const IsolatedRegionStory = defineStory({
 
 export const WorkspaceRegionStory = defineStory({
   id: "region-layout-workspace",
-  title: "区域布局 · 连续阅读与草稿工作区",
-  group: "导航与布局",
+  title: "Region layout · Continuous reading and draft workspace",
+  group: "Navigation and layout",
   groupOrder: 40,
   component: "PageFrame",
-  variant: "全宽工具栏与自然高度输入",
-  description: "页壳分配剩余空间，长草稿在输入内滚动，工具栏就地展开与原生浮层保持可达。",
+  variant: "Full-width toolbar and natural-height input",
+  description:
+    "The page shell allocates the remaining space, a long draft scrolls inside the input, and the inline toolbar expansion and native popovers stay reachable.",
   covers: ["workspace frame", "content row", "long draft", "short window", "popover"],
   render: () => (
     <ChatFrame style={{ height: "calc(100dvh - 90px)", minHeight: 0 }}>
@@ -216,7 +234,7 @@ export const WorkspaceRegionStory = defineStory({
           <Inline gap="compact" style={{ position: "relative", zIndex: 2 }}>
             <strong>Assistant</strong>
             <details style={{ position: "relative" }}>
-              <summary>当前工作</summary>
+              <summary>Current work</summary>
               <div
                 data-workspace-inline-panel
                 style={{
@@ -229,16 +247,18 @@ export const WorkspaceRegionStory = defineStory({
                   border: `1px solid ${uiTokens.border}`,
                 }}
               >
-                <p>查看当前工作与依据，关闭后继续阅读。</p>
-                <Button size="small">查看详情</Button>
+                <p>Review the current work and its evidence, then close this and keep reading.</p>
+                <Button size="small">View details</Button>
               </div>
             </details>
             <Button variant="outline" size="small">
-              停止
+              Stop
             </Button>
           </Inline>
         }
-        header={<span role="status">共享布局示例 · 固定内容，无真实模型请求</span>}
+        header={
+          <span role="status">Shared layout example · Fixed content, no real model requests</span>
+        }
       >
         <div
           ref={(host: HTMLElement) => {
@@ -254,9 +274,12 @@ export const WorkspaceRegionStory = defineStory({
             const draft = signal("");
             const mounts = [
               render(
-                <ChatConversation ariaLabel="工作区消息">
+                <ChatConversation ariaLabel="Workspace messages">
                   {Array.from({ length: 30 }, (_, i) => (
-                    <p>消息 {i + 1}：同一阅读区保留位置，窗口变化后仍能继续核对长内容。</p>
+                    <p>
+                      Message {i + 1}: The same reading area keeps its position, so long content can
+                      still be checked after the window changes.
+                    </p>
                   ))}
                 </ChatConversation>,
                 surface.regions.messages!,
@@ -264,8 +287,8 @@ export const WorkspaceRegionStory = defineStory({
               render(
                 <ChatComposer
                   layout="stacked"
-                  inputLabel="工作区草稿"
-                  placeholder="有什么需要一起推进？"
+                  inputLabel="Workspace draft"
+                  placeholder="What should we push forward together?"
                   value={draft}
                   onInput={(event: Event) => {
                     draft.value = (event.target as HTMLTextAreaElement).value;
@@ -274,20 +297,20 @@ export const WorkspaceRegionStory = defineStory({
                   trailing={
                     <ChoiceSelect
                       id="workspace-model"
-                      label="示例模型"
+                      label="Example model"
                       value="one"
                       placement="top"
                       align="end"
                       matchTriggerWidth={false}
                       options={[
-                        { value: "one", label: "本地示例模型" },
-                        { value: "two", label: "另一示例模型" },
+                        { value: "one", label: "Local example model" },
+                        { value: "two", label: "Another example model" },
                       ]}
                     />
                   }
-                  submitLabel="发送"
+                  submitLabel="Send"
                 >
-                  <IconButton label="添加材料">
+                  <IconButton label="Add material">
                     <Icon name="plus" />
                   </IconButton>
                 </ChatComposer>,
@@ -307,12 +330,13 @@ export const WorkspaceRegionStory = defineStory({
 
 export const NavigationRegionStory = defineStory({
   id: "region-layout-compact-navigation",
-  title: "区域布局 · 窄窗导航与正文共存",
-  group: "导航与布局",
+  title: "Region layout · Narrow-window navigation beside content",
+  group: "Navigation and layout",
   groupOrder: 40,
   component: "RegionLayout",
-  variant: "导航自然高、正文占剩余空间",
-  description: "桌面双栏，窄窗保留同组导航与正文；改变区域几何不重建输入或分类。",
+  variant: "Natural-height navigation and content filling the rest",
+  description:
+    "Two columns on desktop; a narrow window keeps navigation and content in the same group. Changing region geometry does not rebuild the input or the category.",
   covers: ["compact row", "same group", "content height", "draft identity"],
   render: () => (
     <div style={{ height: "calc(100dvh - 90px)", minHeight: 0 }}>
@@ -330,7 +354,12 @@ export const NavigationRegionStory = defineStory({
                   content: { compactRow: "fill" },
                 },
               },
-              { regionLabels: { navigation: "分类导航", content: "分类正文" } },
+              {
+                regionLabels: {
+                  navigation: "Category navigation",
+                  content: "Category body",
+                },
+              },
             );
             const selected = signal(0);
             const draft = signal("");
@@ -339,7 +368,7 @@ export const NavigationRegionStory = defineStory({
                 <Grid minColumnWidth="compact" gap="compact">
                   {Array.from({ length: 5 }, (_, i) => (
                     <NavItem
-                      label={`分类 ${i + 1}`}
+                      label={`Category ${i + 1}`}
                       active={mapSignal(selected, (value) => value === i)}
                       onClick={() => {
                         selected.value = i;
@@ -351,18 +380,21 @@ export const NavigationRegionStory = defineStory({
               ),
               render(
                 <Stack gap="compact">
-                  <strong>{mapSignal(selected, (value) => `当前分类 ${value + 1}`)}</strong>
+                  <strong>{mapSignal(selected, (value) => `Current category ${value + 1}`)}</strong>
                   <Input
-                    aria-label="分类草稿"
+                    aria-label="Category draft"
                     value={draft}
                     onInput={(event: Event) => {
                       draft.value = (event.target as HTMLInputElement).value;
                     }}
                   />
                   {Array.from({ length: 20 }, (_, i) => (
-                    <p>内容 {i + 1}：窗口改变只调整区域位置，当前分类与草稿保持原身份。</p>
+                    <p>
+                      Content {i + 1}: Changing the window only moves regions; the current category
+                      and draft keep their identity.
+                    </p>
                   ))}
-                  <Button>末尾动作</Button>
+                  <Button>End action</Button>
                 </Stack>,
                 surface.regions.content!,
               ),

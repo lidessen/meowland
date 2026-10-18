@@ -6,11 +6,11 @@ test("nested layout gives the scroll owner the remaining height and retains fixe
   await page.setViewportSize({ width: 1100, height: 800 });
   await page.goto("/canvas.html?story=layout-nested-scroll");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  const draft = page.getByRole("textbox", { name: "检查草稿", exact: true });
+  const draft = page.getByRole("textbox", { name: "Review draft", exact: true });
   const original = await draft.elementHandle();
   await draft.fill("Draft survives nested layout resizing");
   const layout = page.locator("[data-nested-layout]");
-  const scroll = page.getByRole("region", { name: "嵌套布局阅读区", exact: true });
+  const scroll = page.getByRole("region", { name: "Nested layout reading area", exact: true });
   const footer = page.locator('[data-nested-fixed="footer"]');
   await expect(page.locator("[data-numeric-basis]")).toHaveCSS("flex-basis", "120px");
   await expect(page.locator("[data-percent-basis]")).toHaveCSS("flex-basis", "0%");
@@ -50,7 +50,7 @@ test("nested layout gives the scroll owner the remaining height and retains fixe
   }
   const fixedHeight = await footer.evaluate((node) => node.getBoundingClientRect().height);
   const previousScrollHeight = await scroll.evaluate((node) => node.scrollHeight);
-  await page.getByRole("button", { name: "追加内容", exact: true }).click();
+  await page.getByRole("button", { name: "Append content", exact: true }).click();
   await expect
     .poll(() => scroll.evaluate((node) => node.scrollHeight))
     .toBeGreaterThan(previousScrollHeight);
@@ -58,7 +58,7 @@ test("nested layout gives the scroll owner the remaining height and retains fixe
   await scroll.focus();
   await page.keyboard.press("End");
   await expect.poll(() => scroll.evaluate((node) => node.scrollTop)).toBeGreaterThan(0);
-  await expect(page.getByRole("button", { name: "完成检查", exact: true })).toBeInViewport();
+  await expect(page.getByRole("button", { name: "Finish check", exact: true })).toBeInViewport();
   expect(await layout.evaluate((node) => node.scrollHeight <= node.clientHeight + 1)).toBe(true);
 });
 
@@ -69,7 +69,7 @@ test("unbounded stacks retain natural content height", async ({ page }) => {
   const container = page.locator("[data-container-page]");
   expect(await container.evaluate((node) => node.clientHeight > innerHeight)).toBe(true);
   expect(await container.evaluate((node) => node.scrollHeight <= node.clientHeight + 1)).toBe(true);
-  const last = page.getByRole("button", { name: "检查末尾操作", exact: true });
+  const last = page.getByRole("button", { name: "Check trailing actions", exact: true });
   await last.focus();
   await expect(last).toBeInViewport();
   expect(await page.evaluate(() => scrollY)).toBeGreaterThan(0);

@@ -1,8 +1,8 @@
-# 素材来源
+# Asset sources
 
-本例复用 Meowland 原创素材，适用仓库 MIT 许可证，没有第三方图片、字体或音乐。
+This example reuses original Meowland assets under the repository's MIT license; there are no third-party images, fonts or music.
 
-- `coast-delivery.jpg`：原创程序海岸插画的 JPEG 编码，2200 × 1400，68,426 bytes。原稿与生成脚本保留在 [image-loading](../../image-loading/assets/NOTICES.md)。这是插画，不是摄影或科学证据。
-- `quiet-tone.wav`：原创六秒 220 Hz 正弦音，44.1 kHz，含淡入淡出。它用于可选的手动媒体演示，不是环境录音。
+- `coast-delivery.jpg`: a JPEG encoding of the original procedural coast illustration, 2200 × 1400, 68,426 bytes. The original artwork and generation script are kept in [image-loading](../../image-loading/assets/NOTICES.md). This is an illustration, not photography or scientific evidence.
+- `quiet-tone.wav`: an original six-second 220 Hz sine tone at 44.1 kHz with fade in and out. It is used for an optional manual media demonstration, not as an ambient recording.
 
-本例没有修改素材。图片保留描述；音频默认不播放，由共享演示媒体组件响应页面活动许可并释放资源。
+This example does not modify the assets. The image keeps its description; the audio does not play by default, and the shared presentation media components respond to page activity permission and release resources.

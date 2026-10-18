@@ -126,10 +126,10 @@ test("theme variants use original props while components retain semantic state",
     expect(html).toContain('data-option-chat-status-tone="' + tone + '"');
   }
   for (const [state, label] of [
-    ["running", "运行中"],
-    ["complete", "已完成"],
-    ["waiting", "等待中"],
-    ["error", "出错"],
+    ["running", "Running"],
+    ["complete", "Completed"],
+    ["waiting", "Waiting"],
+    ["error", "Error"],
   ] as const) {
     const html = web.renderToHtml(<ChatToolCall label="Tool" state={state} />);
     expect(html).toContain('data-tool-state="' + state + '"');

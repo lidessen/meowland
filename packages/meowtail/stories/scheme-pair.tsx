@@ -15,7 +15,7 @@ export function SchemePair({
     <section
       data-meowui-scope=""
       data-meowui-color-scheme={scheme}
-      aria-label={scheme === "light" ? "浅色" : "深色"}
+      aria-label={scheme === "light" ? "Light" : "Dark"}
       style={{
         flex: `1 1 ${width}px`,
         minWidth: "0",

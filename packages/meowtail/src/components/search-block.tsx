@@ -65,7 +65,7 @@ export const SearchBlock = defineComponent<
             ...(hidden ? file.matches.slice(0, head) : file.matches).map(renderMatch),
             hidden ? (
               <details>
-                <summary>中间 {hidden} 条匹配</summary>
+                <summary>{hidden} matches in the middle</summary>
                 {file.matches.slice(head, file.matches.length - tail).map(renderMatch)}
               </details>
             ) : null,
@@ -77,12 +77,12 @@ export const SearchBlock = defineComponent<
     "div",
     rest,
     <OutputBlock
-      title={`搜索 · 显示 ${shown} / ${total}${truncated ? " · 结果已截断" : ""}`}
+      title={`Search · showing ${shown} / ${total}${truncated ? " · results truncated" : ""}`}
       rows={rows}
       copyText={searchBlockText(props)}
       maxLines={maxLines}
       onCopy={onCopy}
-      emptyText="没有结果"
+      emptyText="No results"
     />,
   );
 });

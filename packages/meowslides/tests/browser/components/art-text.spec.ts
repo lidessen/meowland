@@ -16,7 +16,7 @@ for (const viewport of [
     await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
     const title = page.locator(textRoot);
     await expect(title).toHaveRole("heading");
-    await expect(title).toHaveText("把复杂讲清楚。Make the idea clear.");
+    await expect(title).toHaveText("Explain the complex clearly. Make the idea clear.");
     await expect(title.locator(textContent)).toHaveCount(1);
     const choose = page.getByRole("combobox", { name: "Choose slide" });
     await choose.selectOption("long-title");
@@ -56,8 +56,8 @@ for (const viewport of [
 test("native editable title retains local keys and never duplicates text", async ({ page }) => {
   await page.goto("/canvas.html?story=presentation-art-text");
   await page.getByRole("combobox", { name: "Choose slide" }).selectOption("editable");
-  const editor = page.getByRole("textbox", { name: "可修改的演示标题" });
-  await editor.fill("Fresh title / 新标题");
+  const editor = page.getByRole("textbox", { name: "Editable presentation title" });
+  await editor.fill("Fresh title / Revised live");
   await editor.press("Home");
   await editor.press("ArrowRight");
   await editor.press("End");
@@ -65,7 +65,7 @@ test("native editable title retains local keys and never duplicates text", async
   await expect(editor).toBeFocused();
   await expect(page.getByRole("combobox", { name: "Choose slide" })).toHaveValue("editable");
   await expect(page.locator(textRoot)).toHaveCount(1);
-  await expect(editor).toContainText("Fresh title / 新标题");
+  await expect(editor).toContainText("Fresh title / Revised live");
 });
 
 test("marker treatment falls back to ordinary text in print and forced colors", async ({
@@ -85,6 +85,8 @@ test("marker treatment falls back to ordinary text in print and forced colors", 
     expect(await title.evaluate((node) => getComputedStyle(node).color)).not.toBe(
       "rgba(0, 0, 0, 0)",
     );
-    await expect(page.locator(textRoot)).toHaveText("把复杂讲清楚。Make the idea clear.");
+    await expect(page.locator(textRoot)).toHaveText(
+      "Explain the complex clearly. Make the idea clear.",
+    );
   }
 });

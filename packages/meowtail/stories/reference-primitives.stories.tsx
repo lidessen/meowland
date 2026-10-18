@@ -7,15 +7,16 @@ import { StateDot } from "../src/components/state-dot";
 import { HoverCard } from "../src/components/hover-card";
 export const ReferencePrimitivesStory = defineStory({
   id: "reference-primitives",
-  title: "细节 · 路径、状态与预览",
+  title: "Details · Paths, status and preview",
   component: "PathLabel",
-  group: "基础控件",
+  group: "Basic controls",
   groupOrder: 10,
-  description: "路径只展示文本；预览内容由宿主提供，悬停或键盘聚焦可读。",
+  description:
+    "A path only shows text; the host provides preview content, readable on hover or via keyboard focus.",
   render: () => (
     <Stack align="start">
       <Inline>
-        保存 <ShortcutKeys keys={["⌘", "S"]} />
+        Save <ShortcutKeys keys={["⌘", "S"]} />
         <ShortcutKeys keys={["Ctrl", "+", "S"]} variant="tooltip" />
       </Inline>
       <div style={{ width: "260px", maxWidth: "100%" }}>
@@ -31,23 +32,26 @@ export const ReferencePrimitivesStory = defineStory({
       </Inline>
       <Inline>
         <StateDot state="done" appearance="step" />
-        完成
+        Done
         <StateDot state="idle" appearance="step" />
-        等待
+        Waiting
       </Inline>
       <HoverCard
         id="reference-preview"
         trigger={(bindings) => (
           <Button variant="outline" {...bindings}>
-            组件说明
+            Component notes
           </Button>
         )}
         content={
           <Stack>
             <strong>PathLabel</strong>
-            <p>保留文件名后缀；完整路径可通过原生提示查看。这是内置说明，没有读取文件。</p>
+            <p>
+              The file name keeps its extension; the full path is available through the native
+              tooltip. This is built-in copy and does not read any file.
+            </p>
             <a href="https://example.com" target="_blank" rel="noreferrer">
-              外部链接样例
+              External link example
             </a>
           </Stack>
         }
@@ -63,7 +67,7 @@ export const ReferencePrimitivesStory = defineStory({
           }}
           trigger={(bindings) => (
             <Button variant="outline" {...bindings}>
-              宽预览与复制
+              Wide preview and copy
             </Button>
           )}
           content={<p>packages/meowtail/src/components/hover-card.tsx</p>}

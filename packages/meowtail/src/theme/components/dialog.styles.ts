@@ -94,4 +94,11 @@ export const dialogStyles = css`
     margin: ${uiTokens.spaceGroup} 0 0;
     color: ${uiTokens.mutedForeground};
   }
+
+  @media (pointer: coarse) {
+    ${partSelector(dialogActionsContract, "root")}[data-meowui-part] > * {
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
 `;

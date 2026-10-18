@@ -10,13 +10,13 @@ test("gallery batch waits for each isolated canvas", async ({ page, request }) =
     "ready",
   );
   await page.locator("#inspection-panel > summary").click();
-  await page.getByRole("button", { name: "检查全部样例", exact: true }).click();
+  await page.getByRole("button", { name: "Check all samples", exact: true }).click();
   await expect(page.locator("#batch-status")).toContainText(
-    `${entries.length}/${entries.length} 已检查`,
+    `${entries.length}/${entries.length} checked`,
     { timeout: entries.length * 5_000 },
   );
   await expect(page.locator("#batch-results")).toHaveText("");
-  await expect(page.locator("#batch-status")).toContainText("0 项有提示");
+  await expect(page.locator("#batch-status")).toContainText("0 items with notes");
 });
 
 test("shared gallery serves the UI library and no product scenes", async ({ page, request }) => {

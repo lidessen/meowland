@@ -43,116 +43,122 @@ export const ChatAttachments = defineComponent<
   ChatAttachmentsProps,
   typeof chatAttachmentsContract.name,
   (typeof chatAttachmentsContract.parts)[number]
->(chatAttachmentsContract, ({ items, label = "消息附件", className, ...props }, context) =>
-  context.part(
-    "root",
-    "div",
-    {
-      ...props,
-      className,
-      role: "group",
-      "aria-label": label,
-    },
-    items.map((item) => {
-      const remove = item.onRemove
-        ? context.part(
-            "remove",
-            "button",
-            {
-              type: "button",
-              onClick: item.onRemove,
-              "aria-label": `移除 ${item.name}`,
-            },
-            <Icon name="x" />,
-          )
-        : null;
-      return item.mediaType.startsWith("image/")
-        ? context.part(
-            "entry",
-            "div",
-            { key: item.id, "data-kind": "image" },
-            context.part(
-              "image",
-              item.onPreview ? "button" : "a",
-              item.onPreview
-                ? {
-                    type: "button",
-                    onClick: item.onPreview,
-                    "aria-label": `预览 ${item.name}`,
-                  }
-                : {
-                    href: item.url,
-                    target: "_blank",
-                    rel: "noreferrer",
-                    "aria-label": `打开图片 ${item.name}`,
-                  },
-              context.part(
-                "preview",
-                "span",
-                null,
-                <ImagePreview src={item.url} alt={item.name} />,
-              ),
-            ),
-            remove,
-          )
-        : context.part(
-            "entry",
-            "div",
-            { key: item.id, "data-kind": "file" },
-            context.part(
-              "file",
-              "a",
+>(
+  chatAttachmentsContract,
+  ({ items, label = "Message attachments", className, ...props }, context) =>
+    context.part(
+      "root",
+      "div",
+      {
+        ...props,
+        className,
+        role: "group",
+        "aria-label": label,
+      },
+      items.map((item) => {
+        const remove = item.onRemove
+          ? context.part(
+              "remove",
+              "button",
               {
-                key: item.id,
-                href: item.url,
-                download: item.name,
-                onClick: item.onDownload
-                  ? (event: MouseEvent) => {
-                      event.preventDefault();
-                      item.onDownload!();
-                    }
-                  : undefined,
+                type: "button",
+                onClick: item.onRemove,
+                "aria-label": `Remove ${item.name}`,
               },
+              <Icon name="x" />,
+            )
+          : null;
+        return item.mediaType.startsWith("image/")
+          ? context.part(
+              "entry",
+              "div",
+              { key: item.id, "data-kind": "image" },
               context.part(
-                "icon",
-                "span",
-                { "aria-hidden": "true" },
-                <FileTypeIcon path={item.name} />,
+                "image",
+                item.onPreview ? "button" : "a",
+                item.onPreview
+                  ? {
+                      type: "button",
+                      onClick: item.onPreview,
+                      "aria-label": `Preview ${item.name}`,
+                    }
+                  : {
+                      href: item.url,
+                      target: "_blank",
+                      rel: "noreferrer",
+                      "aria-label": `Open image ${item.name}`,
+                    },
+                context.part(
+                  "preview",
+                  "span",
+                  null,
+                  <ImagePreview src={item.url} alt={item.name} />,
+                ),
               ),
+              remove,
+            )
+          : context.part(
+              "entry",
+              "div",
+              { key: item.id, "data-kind": "file" },
               context.part(
-                "details",
-                "span",
-                null,
-                context.part("name", "strong", null, item.name),
-                item.sizeBytes !== undefined &&
-                  Number.isFinite(item.sizeBytes) &&
-                  item.sizeBytes >= 0
-                  ? context.part(
-                      "size",
-                      "small",
-                      null,
-                      [
-                        fileExtension(item.name).toUpperCase().slice(0, 8),
-                        formatBytes(item.sizeBytes),
-                      ]
-                        .filter(Boolean)
-                        .join(" "),
-                    )
-                  : null,
+                "file",
+                "a",
+                {
+                  key: item.id,
+                  href: item.url,
+                  download: item.name,
+                  onClick: item.onDownload
+                    ? (event: MouseEvent) => {
+                        event.preventDefault();
+                        item.onDownload!();
+                      }
+                    : undefined,
+                },
+                context.part(
+                  "icon",
+                  "span",
+                  { "aria-hidden": "true" },
+                  <FileTypeIcon path={item.name} />,
+                ),
+                context.part(
+                  "details",
+                  "span",
+                  null,
+                  context.part("name", "strong", null, item.name),
+                  item.sizeBytes !== undefined &&
+                    Number.isFinite(item.sizeBytes) &&
+                    item.sizeBytes >= 0
+                    ? context.part(
+                        "size",
+                        "small",
+                        null,
+                        [
+                          fileExtension(item.name).toUpperCase().slice(0, 8),
+                          formatBytes(item.sizeBytes),
+                        ]
+                          .filter(Boolean)
+                          .join(" "),
+                      )
+                    : null,
+                ),
               ),
-            ),
-            item.onPreview
-              ? context.part(
-                  "previewButton",
-                  "button",
-                  { type: "button", onClick: item.onPreview, "aria-label": `预览 ${item.name}` },
-                  "预览",
-                )
-              : null,
-            remove,
-          );
-    }),
-  ),
+              item.onPreview
+                ? context.part(
+                    "previewButton",
+                    "button",
+                    {
+                      type: "button",
+                      onClick: item.onPreview,
+                      "aria-label": `Preview ${item.name}`,
+                    },
+                    "Preview",
+                  )
+                : null,
+              remove,
+            );
+      }),
+    ),
 );
 
 function formatBytes(value: number): string {

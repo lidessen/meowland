@@ -34,7 +34,7 @@ await cp(join(root, "../../package.json"), join(source, "workspace-reference/pac
 await cp(join(root, "../../bun.lock"), join(source, "workspace-reference/bun.lock"));
 await writeFile(
   join(source, "workspace-reference/README.md"),
-  "这两份文件记录同版本 Meowland workspace 的锁定依赖。作品源快照须放回该 checkout 的 examples/sunshine-welcome 继续编辑；不是可独立 npm install 的工程，新 presentation API 尚未发布。详见上级 README。\n",
+  "These two files record the locked dependencies of the same-version Meowland workspace. The work source snapshot must be put back into that checkout's examples/sunshine-welcome to continue editing; it is not a project that can be installed independently with npm, and the new presentation APIs are not published yet. See the parent README for details.\n",
 );
 const assets = result.outputs.map((entry) => ({
   path: entry.path.slice(outdir.length + 1),

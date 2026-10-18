@@ -31,7 +31,7 @@
     },
     "packages/meowbook": {
       "name": "meowbook",
-      "version": "0.1.2-alpha.0",
+      "version": "0.1.2-alpha.1",
       "bin": {
         "meowbook": "./dist/src/cli.js",
       },
@@ -75,7 +75,7 @@
     },
     "packages/meowpress": {
       "name": "meowpress",
-      "version": "0.1.1-alpha.0",
+      "version": "0.1.1-alpha.1",
       "bin": {
         "meowpress": "./dist/src/cli.js",
       },
@@ -122,10 +122,11 @@
     },
     "packages/meowtail": {
       "name": "meowtail",
-      "version": "0.2.0-alpha.0",
+      "version": "0.2.0-alpha.1",
       "dependencies": {
         "@floating-ui/dom": "^1.8.0",
         "@shikijs/langs": "4.3.1",
+        "lucide": "1.59.0",
         "marked": "18.0.12",
         "shiki": "4.3.1",
       },
@@ -402,6 +403,8 @@
     "is-plain-obj": ["is-plain-obj@4.1.0", "", {}, "sha512-+Pgi+vMuUNkJyExiMBt5IlFoMyKnr5zhJ4Uspz58WOhBF5QoIZkFyNHIbBAtHwzVAgk5RtndVNsDRN61/mmDqg=="],
 
     "longest-streak": ["longest-streak@3.1.0", "", {}, "sha512-9Ri+o0JYgehTaVBBDoMqIl8GXtbWg711O3srftcHhZ0dqnETqLaoIK0x17fUw9rFSlK/0NlsKe0Ahhyl5pXE2g=="],
+
+    "lucide": ["lucide@1.59.0", "", {}, "sha512-0KTOAFYlTuLHdJOqnRCuPhscU29xtx/QnlHyrOfK0FynDhuPm50O3BH/e4wRnOS67ph0z7uovveCVcXUPLTPBw=="],
 
     "markdown-extensions": ["markdown-extensions@2.0.0", "", {}, "sha512-o5vL7aDWatOTX8LzaS1WMoaoxIiLRQJuIKKe2wAw6IeULDHaqbiqiggmx+pKvZDb1Sj+pE46Sn1T7lCqfFtg1Q=="],
 

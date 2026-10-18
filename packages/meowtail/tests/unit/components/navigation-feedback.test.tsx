@@ -9,17 +9,19 @@ test("feedback and breadcrumb keep their semantic contracts without theme", () =
     web.renderToHtml(
       <Breadcrumb
         items={[
-          { label: "项目", href: "/projects" },
-          { label: "当前", href: "/current" },
+          { label: "Project", href: "/projects" },
+          { label: "Current", href: "/current" },
         ]}
       />,
     ),
-  ).toContain('<span aria-current="page">当前</span>');
-  expect(web.renderToHtml(<Alert tone="danger">稍后处理</Alert>)).toContain('role="status"');
-  expect(web.renderToHtml(<Alert role="alert">需要立即关注</Alert>)).toContain('role="alert"');
+  ).toContain('<span aria-current="page">Current</span>');
+  expect(web.renderToHtml(<Alert tone="danger">Handle later</Alert>)).toContain('role="status"');
+  expect(web.renderToHtml(<Alert role="alert">Needs immediate attention</Alert>)).toContain(
+    'role="alert"',
+  );
   expect(web.renderToHtml(<Skeleton />)).toContain('aria-hidden="true"');
-  const spinner = web.renderToHtml(<Spinner label="正在读取" />);
+  const spinner = web.renderToHtml(<Spinner label="Reading" />);
   expect(spinner).toContain('role="status"');
-  expect(spinner).toContain("正在读取");
+  expect(spinner).toContain("Reading");
   expect(spinner).not.toContain("progressbar");
 });

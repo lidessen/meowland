@@ -36,7 +36,7 @@ test("long content and action groups stay within a narrow container in a wide wi
   };
 
   for (const scheme of ["light", "dark"]) {
-    await page.getByRole("combobox", { name: "外观", exact: true }).selectOption(scheme);
+    await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption(scheme);
     await assertContained();
   }
   await page.getByRole("button", { name: "Toggle details", exact: true }).click();

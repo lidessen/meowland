@@ -37,10 +37,10 @@ test("description groups share columns and reflow by local width without replaci
     ),
   ).toBe(true);
 
-  const input = page.getByRole("textbox", { name: "备注草稿", exact: true });
+  const input = page.getByRole("textbox", { name: "Note draft", exact: true });
   const original = await input.elementHandle();
   await input.fill("Keep the same draft while the region becomes narrow");
-  const action = page.getByRole("button", { name: "核对引用", exact: true });
+  const action = page.getByRole("button", { name: "Check reference", exact: true });
   await action.focus();
   await page.keyboard.press("Tab");
   await expect(input).toBeFocused();

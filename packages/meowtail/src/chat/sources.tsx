@@ -19,7 +19,7 @@ export const ChatSources = defineComponent<
   ChatSourcesProps,
   "chat-sources",
   (typeof chatSourcesContract.parts)[number]
->(chatSourcesContract, ({ items, label = "来源", ...props }, context) => {
+>(chatSourcesContract, ({ items, label = "Sources", ...props }, context) => {
   const links = items.filter(({ url }) => {
     try {
       return ["http:", "https:"].includes(new URL(url).protocol);

@@ -3,24 +3,24 @@ name: ui-development
 description: Build, refine or review Meowtail components, complete Assistant views and the finite UI JSON catalog, using real Meowbook scenes for relevant visual and interaction evidence.
 ---
 
-# UI 开发与实际走查
+# UI development and real-scene walkthroughs
 
-读 [Meowtail README](../../../packages/meowtail/README.md)、[组件开发约定](../../../packages/meowtail/AGENTS.md)和相近组件。先明确用户在这里读取、比较或操作什么，再判断结构、视觉与反馈；已有设计语言下的局部打磨不必重做全产品设计。
+Read the [Meowtail README](../../../packages/meowtail/README.md), the [component development conventions](../../../packages/meowtail/AGENTS.md) and nearby components. First clarify what users read, compare or operate here, then judge structure, visuals and feedback; local polish under an existing design language does not need a full product redesign.
 
-## 默认体验与实现 owner
+## Default experience and implementation owner
 
-通用结构、交互、标准主题和完整组合在 `packages/meowtail/src/` 实现。story/showcase 只提供内容、状态和范围外宿主动作，不能用专属 CSS、复制 composer 或一整套假页面掩盖默认能力缺失。
+Generic structure, interaction, standard themes and complete compositions are implemented in `packages/meowtail/src/`. Stories/showcase only provide content, state and out-of-scope host actions; they must not hide missing default capability with dedicated CSS, a copied composer or a whole fake page.
 
-沿真实主题 tokens/parts 判断阅读轴、比例、累计留白、控件关系和状态。使用 token 不自动证明协调；先修影响任务的一处关系，改后回到同一场景观察。配色或尺寸不以硬编码像素断言评定美感，交互合同仍用有意义的测试保护。
+Judge the reading axis, proportions, cumulative whitespace, control relationships and states against real theme tokens/parts. Using tokens does not automatically prove harmony; first fix one relationship that affects the task, then return to the same scene after the change. Do not judge aesthetics with hardcoded pixel assertions for color or size, while interaction contracts are still protected by meaningful tests.
 
-完整组合读 [Assistant 合同](../../../packages/meowtail/ASSISTANT.md)：默认布局与常见交互应可直接用，slots 只替换局部。区分局部 UI 状态与宿主事实，受控/本地草稿只留一个 owner；发送接受只消费本次快照，不清后来编辑，也不把 returned 当目标完成。来源、执行、问题资格、上传和持久化仍由宿主提供。
+For complete compositions read the [Assistant contract](../../../packages/meowtail/ASSISTANT.md): default layout and common interactions should be usable directly, with slots replacing only local parts. Distinguish local UI state from host facts; controlled/local drafts have only one owner; accepting a submission consumes only this snapshot, does not clear later edits, and does not treat "returned" as goal completion. Sources, execution, question eligibility, uploads and persistence are still provided by the host.
 
-具体 JSON 用法读 [UI catalog](../../../packages/meowtail/JSON.md)。JSON 与 JSX 使用同一组件/主题，不造第二套 UI。只扩实际支持的有限字段，保 schema、catalog 与组件类型的接合；File、函数 slots 等能力按当前合同处理，不通过任意属性或 renderer 逃生口绕过限制。若要改变通用描述/引用机制，再读 [JSX/CSS 开发](../jsx-css-development/SKILL.md)，不用为每个 UI 字段重审 core。
+For concrete JSON usage read the [UI catalog](../../../packages/meowtail/JSON.md). JSON and JSX use the same components/themes; do not build a second UI. Extend only the finite fields that are actually supported, and keep schema, catalog and component types joined; handle File, function slots and similar capabilities per the current contract, and do not bypass limits through arbitrary props or renderer escape hatches. To change the generic description/reference mechanism, read [JSX/CSS development](../jsx-css-development/SKILL.md) instead of re-reviewing core for every UI field.
 
-## 选择足够的观察与回归
+## Choose sufficient observation and regression
 
-先在真实组件场景中查看，再到受影响组合核对；代表内容应包含会改变布局或动作的长文、错误、等待、禁用等状态，不把占位图当完整能力。按改动覆盖键盘/焦点、滚动、输入草稿与清理，不机械重跑全部场景。
+Look first in a real component scene, then check the affected composition; representative content should cover long text, errors, waiting and disabled states that change layout or action, and placeholder images do not stand in for complete capability. Cover keyboard/focus, scrolling, input drafts and cleanup according to the change; do not mechanically re-run every scene.
 
-实际画面、摄影与交互取证按需读 [visual-checks.md](references/visual-checks.md)。只做视觉审查时，默认不扩大成源码审计或全测试；用户要求修复时追到组件、主题或宿主 owner，修改后复验原动作。自动检查入口见[开发检查](../../../docs/development-checks.md)，其通过不替代看图和操作。
+Read [visual-checks.md](references/visual-checks.md) as needed for actual screens, photography and interaction evidence. When only doing a visual review, do not expand it into a source audit or full test run by default; when the user asks for a fix, trace it to the component, theme or host owner and re-verify the original action after the change. Automatic check entries are in [development checks](../../../docs/development-checks.md), and passing them does not replace looking at images and operating the UI.
 
-返回最重要的可见关系、改动及真实证据：对应场景/状态、实际主题和尺寸、看过的原图与操作、检查结果及未覆盖范围。纯建议、实际修复、有限浏览器行为与用户接受分别说明。
+Return the most important visible relationships, changes and real evidence: the corresponding scenes/states, actual theme and size, the original images viewed and operations performed, check results and uncovered scope. State recommendations, actual fixes, limited browser behavior and user acceptance separately.

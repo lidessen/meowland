@@ -1,6 +1,6 @@
 {
   "name": "meowtail",
-  "version": "0.2.0-alpha.0",
+  "version": "0.2.0-alpha.1",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -34,6 +34,10 @@
       "types": "./dist/src/icons/index.d.ts",
       "import": "./dist/src/icons/index.js"
     },
+    "./icons/lucide": {
+      "types": "./dist/src/icons/lucide.d.ts",
+      "import": "./dist/src/icons/lucide.js"
+    },
     "./registry": {
       "types": "./dist/src/registry.d.ts",
       "import": "./dist/src/registry.js"
@@ -50,6 +54,7 @@
   "dependencies": {
     "@floating-ui/dom": "^1.8.0",
     "@shikijs/langs": "4.3.1",
+    "lucide": "1.59.0",
     "shiki": "4.3.1",
     "marked": "18.0.12"
   },

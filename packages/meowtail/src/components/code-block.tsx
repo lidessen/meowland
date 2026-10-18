@@ -37,16 +37,16 @@ export const CodeBlock = defineComponent<
     try {
       if (onCopy) await onCopy(code);
       else await copyTextToClipboard(code);
-      if (!disposed) feedback.value = "已复制";
+      if (!disposed) feedback.value = "Copied";
     } catch {
-      if (!disposed) feedback.value = "复制失败，请选择代码后手动复制。";
+      if (!disposed) feedback.value = "Copy failed; select the code and copy it manually.";
     } finally {
       if (!disposed) copying.value = false;
     }
   };
   return context.part("root", "figure", props, [
     context.part("header", "figcaption", {}, [
-      context.part("language", "span", {}, language?.trim() || "代码"),
+      context.part("language", "span", {}, language?.trim() || "Code"),
       context.part("actions", "div", {}, [
         <Button
           variant="quiet"
@@ -56,17 +56,17 @@ export const CodeBlock = defineComponent<
             wrap.value = wrap.value === "true" ? "false" : "true";
           }}
         >
-          自动换行
+          Soft wrap
         </Button>,
         <Button variant="quiet" size="small" disabled={copying} onClick={copy}>
-          复制代码
+          Copy code
         </Button>,
       ]),
     ]),
     context.part(
       "content",
       "pre",
-      { tabIndex: 0, "aria-label": "代码内容", "data-wrap": wrap },
+      { tabIndex: 0, "aria-label": "Code content", "data-wrap": wrap },
       context.part(
         "code",
         "code",

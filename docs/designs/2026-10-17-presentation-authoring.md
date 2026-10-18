@@ -1,57 +1,57 @@
-# PPT / 交互演示创作能力设计
+# PPT / interactive presentation authoring capability design
 
-日期：2026-10-17。状态：本设计经三个独立角色、父线程高级模型审查与统一场景压力核查后收敛；用户随后授权实施，首期浏览器版本已完成本地实现与验收，未发布。实际 API、交付与验证边界见[实施回执](../records/2026-10-17-presentation-authoring.md)、[Meowtail README](../../packages/meowtail/README.md)和[作品 README](../../examples/presentation/README.md)。以下保留设计阶段的现场依据、候选草案与取舍，不把历史“待实现”文字当作当前状态。
+Date: 2026-10-17. Status: this design converged after review by three independent roles, a senior-model review on the parent thread, and unified-scenario stress checks; the user then authorized implementation, and the first browser version has completed local implementation and acceptance without being published. See the [implementation receipt](../records/2026-10-17-presentation-authoring.md), the [Meowtail README](../../packages/meowtail/README.md), and the [work README](../../examples/presentation/README.md) for the actual API, delivery, and verification boundaries. The on-the-ground basis, candidate drafts, and tradeoffs from the design phase are retained below; historical "to be implemented" text is not treated as current state.
 
-2026-10-18 教学材料研究已消化到现有创作 skill 与布局使用指南；[教学创作补充](2026-10-18-classroom-authoring.md)说明任务、证据、可撤回支架及候选需求边界，不扩展本页历史草案为现行 API。
+The 2026-10-18 teaching-material research has been digested into the existing authoring skill and layout usage guide; the [teaching authoring supplement](2026-10-18-classroom-authoring.md) explains tasks, evidence, retractable scaffolding, and candidate-need boundaries, without extending this page's historical draft into the current API.
 
-## 目标与建议
+## Goals and recommendation
 
-为 Meowland 增加一项创作 skill，让 agent 与人围绕主旨、受众、叙事、视觉、素材和实际展示，共同迭代可运行作品。用户已明确：**先做浏览器交互演示，以后再支持导出 PPT**。首期覆盖图片、视频、音乐、交互动画；PDF 不在本期范围，不实现 PPT 转换层，也不为未来导出限制当前浏览器交互。
+Add an authoring skill to Meowland so agents and people can jointly iterate runnable works around the thesis, audience, narrative, visuals, assets, and actual presentation. The user has made it explicit: **build the browser interactive presentation first, support PPT export later**. The first phase covers images, video, music, and interactive animation; PDF is out of scope for this phase, no PPT conversion layer is implemented, and current browser interactions are not limited for the sake of future export.
 
-最小方案是 **创作 skill + Meowtail 的少量演示组件 + 现有 Meowbook 预览与取证**。需要补充播放器的页/步骤、画布和媒体生命周期，暂不需要独立基础设施包、编辑器平台、资产服务、工作流引擎或另一套 JSON DSL。
+The minimal approach is **an authoring skill + a few presentation components in Meowtail + the existing Meowbook preview and evidence capture**. The player's slide/step, canvas, and media lifecycle need to be added; a standalone infrastructure package, editor platform, asset service, workflow engine, or another JSON DSL is not needed for now.
 
-设计阶段限于只读核查与文档，不新增生产功能、不发包、不提交推送；后续用户另行授权了实现和本地提交，仍未授权推送或发布。现场起点为 `main@1cf4011`，与本地 `origin/main` 指向相同提交，唯一未跟踪项为 `data/`，未读取或改动它。五包独立发布的事实沿用[根 README](../../README.md)与[当次发布回执](../records/2026-10-17-tail-book-press-publish.md)；当前工作区 Meowtail manifest 是 `0.1.1-layout.20261017.1`，不能把源码状态当作另一次正式发布。
+The design phase was limited to read-only verification and documentation: no production features were added, no packages were published, and nothing was committed or pushed; later the user separately authorized implementation and local commits, while push and release remain unauthorized. The on-the-ground starting point was `main@1cf4011`, pointing at the same commit as local `origin/main`, with `data/` the only untracked item, which was not read or changed. Facts about the five packages' independent releases follow the [root README](../../README.md) and the [publication receipt for that run](../records/2026-10-17-tail-book-press-publish.md); the current workspace Meowtail manifest is `0.1.1-layout.20261017.1`, and the source state must not be treated as another official release.
 
-## 现场依据与职责
+## On-the-ground basis and responsibilities
 
-已读根 README、技能索引、设计变更/UI 技能、相关包 README、Meowtail AGENTS 和对应源码。现有 `.agents/skills` 是四项开发维护方法，没有演示创作 skill。Meowtail AGENTS 引用的历史 Rossovia 设计页本次读取返回 404；以现场合同和代码为准，没有将该历史页当作已核实依据。无需依赖旧 memory 才能解释当前选择。
+The root README, skill index, design-change/UI skills, relevant package READMEs, Meowtail AGENTS, and corresponding source were read. The existing `.agents/skills` holds four development-maintenance methods and no presentation authoring skill. The historical Rossovia design page referenced by Meowtail AGENTS returned 404 when read this time; on-the-ground contracts and code were taken as authoritative, and that historical page was not treated as verified evidence. No reliance on old memory is needed to explain the current choices.
 
-| 已有能力与证据                                                                                                                                                    | 可直接复用                                                       | 本设计不能假定已有的能力                                                 |
-| ----------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------ |
-| [MeowJSX reactive](../../packages/meowjsx/src/reactive.ts)、[生命周期](../../packages/meowjsx/src/lifecycle.ts)、[Context 合同](../../packages/meowjsx/README.md) | Signal、batch、effect、只读共享值、清理和渲染树环境              | 演示时钟、页面导航、媒体活动策略                                         |
-| [Meowtail 布局合同](../../packages/meowtail/README.md)、[AspectRatio](../../packages/meowtail/src/components/aspect-ratio.tsx)                                    | Stack / Inline / Grid / LayoutItem / Container、比例容器         | AspectRatio 只有比例，不含固定演示画布的 fit/scale 或内容溢出诊断        |
-| [ImagePreview](../../packages/meowtail/src/components/image-preview.tsx)                                                                                          | 图片加载、失败、alt 与已有主题                                   | 视频、音频、播放器和素材生成服务                                         |
-| [MeowCSS](../../packages/meowcss/README.md)                                                                                                                       | token、typed parts、主题组装、显式样式安装/清理                  | 演示内容的具体字号和视觉设计                                             |
-| [Meowbook Story 合同](../../packages/meowbook/src/types.ts)、[画布](../../packages/meowbook/src/web/canvas.ts)                                                    | TSX 场景、setup、ready、AbortSignal、onCleanup、report、字体等待 | HMR；源码改变后当前方式是重启服务                                        |
-| [Meowbook 构建](../../packages/meowbook/src/bun/build.ts)、[摄影](../../packages/meowbook/src/capture/page.ts)                                                    | 静态审阅站、普通浏览器交互、原图/ARIA/组件观察                   | 观众播放器导出、PDF/PPTX 转换、任意动画自动冻结                          |
-| [Meowpress SiteConfig](../../packages/meowpress/src/build.ts)、[MDX 渲染](../../packages/meowpress/src/content.ts)                                                | 已有文章站点及资源处理经验                                       | 当前只公开站点构建，MDX 经 renderToHtml；没有演示应用的 hydration/运行时 |
+| Existing capability and evidence                                                                                                                                       | Directly reusable                                                                           | Capabilities this design must not assume exist                                                                            |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| [MeowJSX reactive](../../packages/meowjsx/src/reactive.ts), [lifecycle](../../packages/meowjsx/src/lifecycle.ts), [Context contract](../../packages/meowjsx/README.md) | Signal, batch, effect, read-only shared values, cleanup, and render-tree environment        | Presentation clock, page navigation, media activity policy                                                                |
+| [Meowtail layout contract](../../packages/meowtail/README.md), [AspectRatio](../../packages/meowtail/src/components/aspect-ratio.tsx)                                  | Stack / Inline / Grid / LayoutItem / Container, ratio containers                            | AspectRatio only has ratios; it has no fit/scale for a fixed presentation canvas or content-overflow diagnostics          |
+| [ImagePreview](../../packages/meowtail/src/components/image-preview.tsx)                                                                                               | Image loading, failure, alt, and existing theme                                             | Video, audio, player, and asset generation services                                                                       |
+| [MeowCSS](../../packages/meowcss/README.md)                                                                                                                            | token, typed parts, theme assembly, explicit style install/cleanup                          | Concrete font sizes and visual design for presentation content                                                            |
+| [Meowbook Story contract](../../packages/meowbook/src/types.ts), [canvas](../../packages/meowbook/src/web/canvas.ts)                                                   | TSX scenarios, setup, ready, AbortSignal, onCleanup, report, font waiting                   | HMR; the current way after source changes is restarting the server                                                        |
+| [Meowbook build](../../packages/meowbook/src/bun/build.ts), [capture](../../packages/meowbook/src/capture/page.ts)                                                     | Static review site, ordinary browser interaction, original-image/ARIA/component observation | Audience player export, PDF/PPTX conversion, automatic freezing of arbitrary animation                                    |
+| [Meowpress SiteConfig](../../packages/meowpress/src/build.ts), [MDX rendering](../../packages/meowpress/src/content.ts)                                                | Existing article site and asset-handling experience                                         | Currently only site builds are public, MDX goes through renderToHtml; there is no hydration/runtime for presentation apps |
 
-职责保持现有分层：
+Responsibilities keep the existing layering:
 
-- **创作 skill**：承担叙事与证据、方案比较、素材来源、局部改稿、预览重放和交付清单的复杂度；把这些判断留在创作过程，不增加 runtime 系统。未来候选位置为 `.agents/skills/presentation-authoring/`，本轮不创建 skill 实现。
-- **Meowtail**：共享演示结构、默认播放器、渐进显示、媒体薄包装及具体主题。真实组件在 `src/`，story/showcase 只给内容、状态与宿主动作。公开面收敛后再决定是否增加 `meowtail/presentation` 子路径，不先创建新包或安装器。
-- **Meowbook**：创作审阅与验证。一个作品可整体作为 story；关键页/步骤夹具仍消费相同组件和内容源，不复制播放器。工具替换/Placeholder 可用于标明的研究预览，但正式作品不依赖 Meowbook 来处理缺素材。
-- **作品宿主**：文件、事实、素材来源、生成服务、权限、上传、持久化和部署；互动组件的业务结果也在宿主。首期作品用可信本地 TSX，不把任意业务 JSON 或远端内容当代码运行。
-- **MeowJSX / MeowCSS**：本方案不需扩展 core。Web 行为保持显式入口；新组件与子路径沿同一 core、Context、registry、token/fragment 身份，不各自 bundle 一份。显式不同 runtime、不同预览文档继续可以隔离。
+- **Authoring skill**: carries the complexity of narrative and evidence, option comparison, asset sourcing, local revisions, preview replay, and delivery checklists; these judgments stay in the authoring process and do not add runtime systems. The future candidate location is `.agents/skills/presentation-authoring/`; this round does not create a skill implementation.
+- **Meowtail**: shared presentation structure, default player, progressive reveal, thin media wrappers, and concrete themes. Real components live in `src/`; stories/showcase only provide content, state, and host actions. Whether to add a `meowtail/presentation` subpath is decided after the public surface converges; no new package or installer is created first.
+- **Meowbook**: authoring review and verification. A work can be a story as a whole; key slide/step fixtures still consume the same components and content source and do not copy the player. Tool substitution/Placeholder can be used for a clearly marked research preview, but official works do not depend on Meowbook to handle missing assets.
+- **Work host**: files, facts, asset sources, generation services, permissions, uploads, persistence, and deployment; interactive components' business results also live in the host. First-phase works use trusted local TSX and do not run arbitrary business JSON or remote content as code.
+- **MeowJSX / MeowCSS**: this approach does not need to extend core. Web behavior keeps its explicit entry; new components and subpaths follow the same core, Context, registry, and token/fragment identity rather than bundling their own copy. Explicitly different runtimes and different preview documents can still be isolated.
 
-PageFrame 可以作为创作工具外壳，RegionLayout 可以安排工具区域；二者不变成演示文档 schema。播放器内部仍用已有语义布局，不新增递归布局语言。
+PageFrame can serve as the authoring tool shell, and RegionLayout can arrange tool areas; neither becomes a presentation document schema. The player internals still use the existing semantic layouts, without a new recursive layout language.
 
-## 最小统一概念模型：四种语义，沿用现有机制
+## Minimal unified concept model: four semantics, existing mechanisms
 
-内容仍按作品 Deck → 页 Slide → 离散步骤 Step 组织，页引用普通素材与互动 JSX。更关键的是区分四种语义，而不是建设四个系统：
+Content is still organized as work Deck → slide Slide → discrete step Step, with slides referencing ordinary assets and interactive JSX. More important is distinguishing four semantics rather than building four systems:
 
-| 语义     | 表达与 owner                                                       | 不应绑在一起的事实                                                  |
-| -------- | ------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| 场景     | 有一句表达目的的普通 JSX，作者持有文稿、视觉、素材与证据           | 场景内容不等于播放器 DOM 或导出中间模型                             |
-| 位置     | Presentation 使用唯一的 `{ slideId, step }` Signal                 | step 是可直接呈现的状态，不是重放命令日志或媒体时间                 |
-| 实验状态 | 每场作品实例一次创建的普通 signals；作者定义哪些值保留、何时 reset | 翻页/回退不自动擦草稿、选择、计算结果                               |
-| 运行许可 | 宿主许可、文档可见、用户暂停与祖先 Reveal 共同派生                 | 只管协作组件的副作用；不是媒体时钟、正在播放、ready 或 DOM 存活事实 |
+| Semantics          | Expression and owner                                                                                                      | Facts that should not be tied together                                                                                   |
+| ------------------ | ------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| Scenario           | Plain JSX with one sentence stating its purpose; the author owns the script, visuals, assets, and evidence                | Scenario content is not the player DOM or an export intermediate model                                                   |
+| Position           | Presentation uses a single `{ slideId, step }` Signal                                                                     | step is a state that can be presented directly, not a replay command log or media time                                   |
+| Experiment state   | Ordinary signals created once per work-instance session; the author defines which values are retained and when they reset | Page changes/back do not automatically erase drafts, choices, or computed results                                        |
+| Runtime permission | Derived jointly from host permission, document visibility, user pause, and ancestor Reveal                                | Governs only side effects of participating components; it is not media clock, actually playing, ready, or DOM-alive fact |
 
-Slide 的稳定 id 与可读标题表达叙事单元。给定相同实验输入和资源初值，直接打开第 3 步应呈现与顺序到达相同的内容和结论；不必先执行前三次点击或中间动画。后退改变叙事位置，不撤销独立互动。素材是本地文件/URL 与普通 TS 引用，互动继续用 signals 和已有生命周期。
+A slide's stable id and readable title express the narrative unit. Given the same experiment inputs and initial asset values, opening step 3 directly should present the same content and conclusions as arriving sequentially; earlier clicks or intermediate animations do not have to run first. Going back changes narrative position without undoing independent interactions. Assets are local files/URLs and ordinary TS references, and interactions continue to use signals and the existing lifecycle.
 
-运行时每个 Presentation 实例只有一个当前位置 `{ slideId, step }`。创作 brief、反馈和素材进度不进入播放器状态。不要同时维护大纲模型、编辑器模型、播放器 JSON 和导出模型四份内容真相。
+At runtime, each Presentation instance has only one current position `{ slideId, step }`. Authoring briefs, feedback, and asset progress do not enter player state. Do not maintain four sources of content truth at once: an outline model, an editor model, player JSON, and an export model.
 
-候选 API 如下，**全部是待实现草案，当前不可从包导入**：
+The candidate API follows; **all of it is an unimplemented draft and cannot currently be imported from the package**:
 
 ```ts
 import type { Child, MaybeSignal, ReadableSignal, WritableSignal } from "meowjsx";
@@ -82,242 +82,242 @@ interface PresentationProps {
 }
 ```
 
-`steps` 表示额外推进次数，缺省为 0，合法步骤是 `0..steps`，要求有限非负整数。页 id 唯一且非空；空作品、重复 id、非法步骤和未知定位给出明确诊断，不悄悄跳到另一页。
+`steps` is the number of extra advances, defaulting to 0; valid steps are `0..steps` and must be finite non-negative integers. Slide ids are unique and non-empty; empty works, duplicate ids, invalid steps, and unknown positions produce explicit diagnostics and never silently jump to another slide.
 
-有 `position` 时，它是唯一位置来源，播放器导航与页内跳转按钮都写同一个 Signal，不在内部镜像；没有时，Presentation 一次创建自己的本地位置，从第一页第 0 步开始。作品需要 Q&A 跳回实验或直接指定步骤时，传入普通 Signal 即可，无需另加 controller、导航命令总线或完整历史。原生浏览器 Back 不冒充演示的 prev。
+When `position` is provided, it is the only position source, and both player navigation and in-slide jump buttons write the same Signal, with no internal mirroring; when it is absent, Presentation creates its own local position once, starting at the first slide's step 0. When a work needs Q&A to jump back to an experiment or specify a step directly, passing an ordinary Signal is enough—no extra controller, navigation command bus, or full history is needed. The native browser Back button does not stand in for the presentation's prev.
 
-位置通过整体 set/update 通知，不能原地修改 `.value.step`；外部写入同样接受合法性校验。传入的 position/active Signal 身份在该实例期间稳定，开启全新会话才重挂，不先设计动态替换状态源的协议。
+Position is notified through whole-value set/update; `.value.step` must not be mutated in place, and external writes are likewise validated. The identities of the passed position/active Signals stay stable for the instance's lifetime, and only a brand-new session remounts; no protocol for dynamically replacing state sources is designed first.
 
-`active` 是宿主是否准许该实例执行时间相关副作用，缺省为 true。审阅、后台检查和确定状态夹具从首次挂载显式传 false；前台互动验收由宿主明确开放。根活动门还组合文档可见性和本地用户暂停，Reveal 再组合祖先许可。这个单向门只约束遵守合同的媒体/动画；不能承诺自动暂停任意 children。用它替代首版 `initialPaused`，不再引入公共 mode 枚举。静态代表态由组件初值/夹具直接给出，不靠先播放到终点取得。
+`active` is whether the host permits this instance to perform time-related side effects, defaulting to true. Review, background checks, and deterministic-state fixtures explicitly pass false from the first mount; foreground interaction acceptance is explicitly opened by the host. The root activity gate also combines document visibility and local user pause, and Reveal combines ancestor permission in turn. This one-way gate only constrains media/animation that obey the contract and cannot promise to auto-pause arbitrary children. It replaces the first version's `initialPaused` and does not introduce a public mode enum. The static representative state is given directly by component initial values/fixtures rather than obtained by first playing to the end.
 
-`notes` 是可选内容，并非私密通道。写进观众 bundle 的讲稿即使隐藏也可被读取；敏感备注应留在未打包的作者文件，不先做演讲者窗口或同步服务。
+`notes` is optional content, not a private channel. A script written into the audience bundle can be read even when hidden; sensitive notes should stay in unpackaged author files, and no presenter window or sync service is built first.
 
-`render(session)` 每次进入页执行一次，步骤改变只更新 Signal 与局部绑定，不能整页重新执行和替换。换页才卸载旧页、构造新页。由此避免每点一步清空输入、重置图表或重开视频。接线时应在活动 Provider 内由私有的当前页组件调用 render，不能先在 Presentation 函数中执行再包装结果；现有 Context 跟随 renderer 遍历，而非 VNode 创建位置。无需为此增加公开 Slide 组件。
+`render(session)` runs once each time a slide is entered; a step change only updates the Signal and local bindings and must not re-execute and replace the whole slide. Only a slide change unmounts the old slide and constructs the new one. This avoids clearing input, resetting charts, or restarting video on every step click. In the wiring, a private current-slide component inside the activity Provider should call render; do not execute it in the Presentation function first and wrap the result, because the existing Context follows the renderer traversal rather than the VNode creation site. No public Slide component is needed for this.
 
-首期组件面以如下责任为限，名字待实施时校准：
+The first-phase component surface is limited to the following responsibilities, with names to be calibrated during implementation:
 
-| 候选组件/API                              | 必要责任                                                                | 不承担的责任                                       |
-| ----------------------------------------- | ----------------------------------------------------------------------- | -------------------------------------------------- |
-| `Presentation`                            | 页/步骤导航、位置接线、首版单页渲染策略、画布、控件、暂停与宿主活动许可 | 拖拽编辑、后端、权限、通用路由、导出引擎           |
-| `Reveal at={n}`                           | 根据步骤渐进显示，保留布局位置，处理交互/AX 隐藏与祖先活动许可          | 任意子树自动停机、全局时间轴                       |
-| `PresentationVideo` / `PresentationAudio` | 原生媒体元素与 controls、加载/失败反馈、活动门与清理                    | 转码、流媒体服务、自绘媒体平台、混音               |
-| `usePresentationActivity()`               | 同步 render 中捕获最近的只读活动 Signal，供媒体和自定义动画响应         | 新 effect 调度器、资源注册表或“所有异步都就绪”协议 |
-| 现有图片和布局组件                        | ImagePreview、Stack、Grid、AspectRatio 等                               | 复制一套演示专用基础组件                           |
+| Candidate component/API                   | Required responsibility                                                                                                                 | Responsibility not taken                                                              |
+| ----------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------- |
+| `Presentation`                            | Slide/step navigation, position wiring, first-version single-slide render policy, canvas, controls, pause, and host activity permission | Drag editing, backend, permissions, generic routing, export engine                    |
+| `Reveal at={n}`                           | Progressive display based on step, preserving layout position, handling interaction/AX hiding and ancestor activity permission          | Automatic stopping of arbitrary subtrees, global timeline                             |
+| `PresentationVideo` / `PresentationAudio` | Native media elements and controls, load/failure feedback, activity gate, and cleanup                                                   | Transcoding, streaming services, custom media platform, mixing                        |
+| `usePresentationActivity()`               | Capture the nearest read-only activity Signal in synchronous render for media and custom animation to respond to                        | New effect scheduler, resource registry, or "all asynchronous work is ready" protocol |
+| Existing image and layout components      | ImagePreview, Stack, Grid, AspectRatio, etc.                                                                                            | A duplicated set of presentation-specific base components                             |
 
-例如一页可用普通 TSX 组合 `Stack`、`ImagePreview`、`Reveal` 和作者的图表组件；不必再套一个公开 `Slide` 组件或模板 DSL。需要文字/媒体占位的共享默认呈现时，最小组件应归 Meowtail；素材说明和路径仍是作品数据，不借此扩出公共资产 registry。
+For example, a slide can compose `Stack`, `ImagePreview`, `Reveal`, and the author's chart component with plain TSX; there is no need to wrap it in a public `Slide` component or template DSL. When a shared default presentation for text/media placeholders is needed, the minimal component belongs in Meowtail; asset descriptions and paths remain work data, and this does not become an excuse to grow a public asset registry.
 
-### 画布与主题
+### Canvas and theme
 
-建议先支持常见 16:9 逻辑画布与 contain 展示，逻辑尺寸作为排版参照而非自由绝对坐标编辑器。具体默认尺寸在第一批真实页中校准；布局继续由 Stack/Grid 等组织。舞台适配与缩放由 Presentation 负责，导航和音量等操作区不跟随内容缩成不可操作的小控件。
+Recommend first supporting a common 16:9 logical canvas with contain display, with logical size as a typography reference rather than a free absolute-coordinate editor. The exact default size is calibrated in the first batch of real slides; layout is still organized by Stack/Grid and similar. Stage fitting and scaling are Presentation's responsibility, and control areas such as navigation and volume do not shrink with the content into unusable small controls.
 
-演示内容需要自己的标题、正文、说明、页面边缘和阅读距离关系；复用 MeowCSS 的机制，在 Meowtail 定义少量演示语义 token 与默认主题，作品仅覆盖局部值。工具按钮沿现有 UI 尺度，不能拿 14px 工作界面正文套整张投影页，也不通过全局缩放整套 UI 制造演示风格。
+Presentation content needs its own heading, body, caption, page-edge, and viewing-distance relationships; reuse MeowCSS's mechanisms, define a few presentation semantic tokens and a default theme in Meowtail, and let works override only local values. Tool buttons follow the existing UI scale; do not apply 14px work-interface body text to a whole projected slide, and do not create a presentation style by globally scaling the entire UI.
 
-首期只需一套能成立的默认视觉方向，创作时可改变字体、色彩与关系，不先建主题市场、模板目录和几十种页面 preset。窄窗口需查看真实可读性及可操作性；可提供适合区域/原尺寸查看与滚动，不能以“16:9 能塞进去”宣称手机演讲和无障碍已验收。溢出应可诊断，不能把裁切当成功。
+The first phase needs only one viable default visual direction; authoring can change fonts, colors, and relationships, without first building a theme marketplace, template catalog, and dozens of page presets. Narrow windows need real readability and operability checks; fit-area/original-size viewing and scrolling can be provided, but "it fits at 16:9" must not be used to claim phone presentations and accessibility are accepted. Overflow should be diagnosable; clipping is not success.
 
-## 创作、预览与反馈闭环
+## Authoring, preview, and feedback loop
 
-未来 skill 的核心指令应是“尽早给出可看的内容与视觉组合，然后根据看到和操作到的结果迭代”。agent 负责把粗想法快速变成可运行作品，人围绕真实展示反馈；agent 继续同时修改内容、风格、素材和互动。这是一项创作能力，不是依次执行文案、设计、生成的流水线，也不要求用户逐页批准后才能继续。
+The future skill's core instruction should be "show viewable content and visual combinations early, then iterate based on what is seen and operated". The agent turns rough ideas into runnable works quickly, and the person gives feedback around the actual presentation; the agent keeps changing content, style, assets, and interactions together. This is an authoring capability, not a pipeline that runs copy, design, and generation in sequence, and it does not require page-by-page user approval to continue.
 
-1. **拿到短 brief**：受众、看完改变什么、时长、核心主张、依据与不确定性，加已有材料和硬限制。每个场景先有一句目的，互动明确“观众改哪个变量、看哪个结果”；它们可写在现有文档/源码中，不强制新增字段或文件。可合理推定的内容写成可修改假设，只问会改变工作方向的问题。
-2. **同时试内容和视觉**：粗结构、主张与第一组字体/色彩/排版一起做，已有可运行部分即可先预览；首轮争取覆盖开场和最难互动，但不等两者同时完成才让人看。图片可以占位，其余先保留可改粗纲/粗页，随迭代尽早串成全场。需要比较时做少量真实 A/B 方案，让人看差异后选择，不先建模板系统。
-3. **用真实预览选下一处风险**：先看观众能否理解，再看密度、阅读轴、节奏、素材和互动是否有价值。每轮集中解决 1–3 个影响最大的点，同轮允许改文稿、布局、生成图片、换媒体或改动画。不把某一层永久冻结。
-4. **回到全场看关系**：用页总览核对叙事重复与节奏，用关键步骤截图看密度/排版，实际播放检查转场、媒体与操作。总览可先用既有截图报告，不新增缩略图编辑器。用户反馈和可观察缺陷共同决定下一轮。
-5. **按交付目标结束**：叙事和节奏成立，目标尺寸下可读，媒体/键盘/清理走通；浏览器版本可实际运行，真实素材或允许保留的占位有明确说明。截图成功和“看起来完成”均不单独作为结束条件。
+1. **Get a short brief**: audience, what changes after watching, duration, core claim, evidence and uncertainty, plus existing materials and hard constraints. Each scenario starts with one sentence of purpose, and interactions explicitly state "which variable the audience changes and which result they see"; these can be written in existing docs/source without forcing new fields or files. What can be reasonably inferred goes in as a revisable assumption, and only questions that change the direction of work are asked.
+2. **Try content and visuals together**: rough structure, claim, and the first set of fonts/colors/typography happen together, and any runnable part is previewed immediately; the first round aims to cover the opening and the hardest interaction but does not wait for both to finish before showing someone. Images can be placeholders, the rest keeps a changeable rough outline/rough slides, and the whole deck is connected as early as possible through iteration. When comparison is needed, make a few real A/B options and let the person choose after seeing differences, without first building a template system.
+3. **Use real previews to choose the next risk**: first check whether the audience can understand, then whether density, reading axis, pacing, assets, and interactions are valuable. Each round focuses on the 1–3 highest-impact points, and the same round may change copy, layout, generated images, media, or animation. No layer is permanently frozen.
+4. **Return to the whole deck for relationships**: use the slide overview to check narrative repetition and pacing, key-step screenshots to check density/typography, and actual playback to check transitions, media, and operation. The overview can start from the existing screenshot report without adding a thumbnail editor. User feedback and observable defects jointly decide the next round.
+5. **Finish against the delivery goal**: narrative and pacing hold, content is readable at the target size, and media/keyboard/cleanup work; the browser version actually runs, and real assets or permitted placeholders are clearly stated. A successful screenshot and "it looks done" are not by themselves completion criteria.
 
-只维护四类信息：简短 brief、可执行作品源、素材与来源、当前反馈/待验证项。它们不必各占一个文件：brief 与 review 可共用一份短 Markdown，素材说明也可在相邻文件或 TS 注释中。作品可以从一个 TSX 和少量资源起步，需要时再拆分，不强制项目脚手架、审计台账或每轮填写整张表。
+Maintain only four kinds of information: a short brief, the runnable work source, assets and sources, and current feedback/open items. They need not each occupy a file: the brief and review can share one short Markdown file, and asset descriptions can live in an adjacent file or TS comments. A work can start with one TSX and a few assets and be split later if needed, without forcing a project scaffold, audit ledger, or filling a whole table every round.
 
-反馈用“稳定页 id、当轮版本、相关 step/fixture、哪里不成立、希望改变什么”定位，尺寸与环境仅在相关时补。人说“第 3 页”时，agent 根据当轮预览解析到稳定 id，而不是永久存页序号；重排不改 id，步骤改义、拆页或删页后主动重新定位旧反馈。可以引用已拍截图和一句内容语义，不建版本数据库或强制审计台账。
+Locate feedback with "stable slide id, version for that round, related step/fixture, what does not hold, and what should change", adding size and environment only when relevant. When a person says "slide 3", the agent resolves it to the stable id from that round's preview rather than permanently storing a slide number; reordering does not change ids, and after steps change meaning, slides are split, or slides are deleted, old feedback is actively re-located. Screenshots already taken and one sentence of content semantics can be referenced; no version database or mandatory audit ledger is built.
 
-用户选定 B 排版后若只要求改结论和图，agent 保留该版结构，局部修改文字与资源引用；不重新生成整场。普通 Git 检查点、明确的局部 diff 和素材版本说明足以支持比较/回退，实际提交仍沿当次授权；回退源文件不是播放器 prev，更不需要编辑器撤销平台。文件由 skill 编辑，浏览器用于预览与操作，预览内存不是唯一作品源。
+If the user selects layout B and then only asks to change the conclusion and a figure, the agent keeps that layout's structure and locally modifies text and asset references instead of regenerating the whole presentation. Ordinary Git checkpoints, explicit local diffs, and asset version notes are enough to support comparison/rollback, and actual commits still follow that run's authorization; rolling back source files is not the player's prev and needs no editor undo platform. Files are edited by the skill, the browser is used for preview and operation, and preview memory is not the only work source.
 
-### 现有预览接线
+### Existing preview wiring
 
-作品整体由 `defineStory` 挂载真实 Presentation。关键状态由普通位置 Signal 和实验 fixture 定位，仍复用同一页源。现有 `preview.ts` 管主题与 runtime；`setup/ready/onCleanup/AbortSignal/report` 管本次审阅，不另设 preview bridge。
+The work as a whole mounts a real Presentation via `defineStory`. Key states are located by an ordinary position Signal and an experiment fixture, still reusing the same slide source. The existing `preview.ts` manages theme and runtime; `setup/ready/onCleanup/AbortSignal/report` manage this review, with no separate preview bridge.
 
-沿当前 Meowbook 使用 `list/check/serve/capture`，源码修改后重启服务并 reload 确认新构建。现有 gallery 只保留 story/width，canvas 重载会重置输入，没有演示位置和实验参数恢复协议。agent 改前记录相关的少量输入与位置，改后重放；重复场景再写普通 typed fixture，不把临时输入偷偷写成作品默认值，不先做 HMR 或通用状态持久化。
+Continue using `list/check/serve/capture` with the current Meowbook, restarting the server after source changes and reloading to confirm the new build. The existing gallery keeps only story/width, and a canvas reload resets inputs; there is no protocol for restoring presentation position and experiment parameters. The agent records the relevant few inputs and positions before a change and replays them after; repeated scenarios get an ordinary typed fixture, temporary inputs are not silently made into work defaults, and HMR or generic state persistence is not built first.
 
-编辑审阅、后台检查与正式演示共享作品源，却各自创建会话和实验 signals，不能放模块级单例使它们串值。Meowbook 的后台检查实际会加载 inert、aria-hidden 的 iframe 并执行 story；`document.visibility` 不能代替宿主许可。所有审阅/后台默认传 `active=false`，前台要操作时由宿主明确开放，随后仍须遵守原生媒体用户启动规则。预览可以加载呈现所需的字体、图片和 poster，但组件构造/静态 render 不启动模拟计时、声音或业务请求；自定义副作用也要遵守活动许可。无需新建完整 mode 枚举或演讲者窗口同步。
+Editing review, background checks, and the official presentation share the work source but each creates its own session and experiment signals; module-level singletons must not be used that would leak values between them. Meowbook's background check actually loads an inert, aria-hidden iframe and executes the story; `document.visibility` cannot stand in for host permission. All review/background cases pass `active=false` by default, and the host explicitly opens activity when foreground operation is needed, after which native media user-initiation rules still apply. Preview may load fonts, images, and posters needed for presentation, but component construction/static render must not start simulated timing, sound, or business requests; custom side effects must also respect the activity permission. There is no need for a complete mode enum or presenter-window sync.
 
-## 贯穿创作与验收的同一作品
+## One work spanning authoring and acceptance
 
-首样例采用 3–5 分钟的“同一张图片为什么有时等很久”，以下是待实施的场景安排，不是已完成的媒体实验：
+The first sample uses a 3–5 minute "why the same image sometimes takes much longer"; the scenario arrangement below is to be implemented and is not a completed media experiment:
 
-| 场景 id      | 表达目的                                 | 内容、互动与依据                                                                                       |
-| ------------ | ---------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `opening`    | 让观众注意到相似图片也可能有不同等待时间 | 同源的两个真实图片文件；首轮可有明确标记的占位，随后取实际文件大小和画面                               |
-| `compare`    | 先比较实际字节与可见画质，再谈体验       | 同尺寸 A/B 图、准确单位与来源/处理版本；只用真实测量支持事实                                           |
-| `experiment` | 让观众看到网速选择如何改变简化估算       | 带 Mbit/s 单位的网速滑杆，估算秒数来自文件字节数；明确忽略延迟、缓存、并发、解码等因素，公式是简化模型 |
-| `evidence`   | 区分估算、录屏观察与一般结论             | 一段约 12 秒真实加载录屏及条件说明/文字替代；讲者可停留讲解 90 秒，媒体结束不翻页                      |
-| `takeaway`   | 沿用观众选择得到结论，再邀请验证         | 总结读取同一实验 signals；Q&A 从这里回实验或证据，再返回结论                                           |
+| Scenario id  | Stated purpose                                                                  | Content, interaction, and evidence                                                                                                                                                                                   |
+| ------------ | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `opening`    | Make the audience notice that similar images can also have different wait times | Two real image files from the same source; the first round may use clearly marked placeholders, then use actual file sizes and visuals                                                                               |
+| `compare`    | Compare actual bytes and visible quality first, then discuss experience         | Same-size A/B images, accurate units and source/processing version; only real measurements support facts                                                                                                             |
+| `experiment` | Let the audience see how the network-speed choice changes a simplified estimate | A network-speed slider with Mbit/s units, where estimated seconds come from file byte size; latency, caching, concurrency, decoding, and other factors are explicitly ignored, and the formula is a simplified model |
+| `evidence`   | Distinguish estimates, screen-recording observations, and general conclusions   | A roughly 12-second real loading screen recording plus condition notes/text alternative; the speaker can stay and explain for 90 seconds, and the media ending does not turn the slide                               |
+| `takeaway`   | Reach the conclusion from the audience's choice, then invite verification       | The summary reads the same experiment signals; Q&A goes from here back to the experiment or evidence and then returns to the conclusion                                                                              |
 
-已有可运行部分即可先看；首轮争取让粗结构、初步视觉、开场与最难互动得到真实反馈，不等它们全部完成，更不等录屏、整稿和全素材齐备。下一轮例如人选定 B 排版并提出“保留布局，只改结论和图”，agent 只改对应场景与素材，再用原 slider fixture 复看。这条路径同时检查叙事、视觉、依据、互动、占位替换和局部改稿。
+Preview any runnable part as soon as it exists; the first round aims to get real feedback on the rough structure, initial visuals, opening, and hardest interaction without waiting for all of them to finish, let alone for the screen recording, full script, and all assets. In the next round, for example, the person selects layout B and asks to "keep the layout, change only the conclusion and the figure"; the agent changes only the corresponding scenario and assets, then reviews again with the original slider fixture. This path checks narrative, visuals, evidence, interaction, placeholder replacement, and local revision at the same time.
 
-为证伪资源交付，这个验收样例明确选桌面浏览器、16:9、本地素材与离线 HTTP 启动；不是把断网能力默认为所有未来作品的合同。所有作品都要验证正式入口冷启动，需要外网服务的作品则准确说明依赖，不能宣称离线。
+To falsify asset delivery, this acceptance sample explicitly chooses a desktop browser, 16:9, local assets, and offline HTTP startup; this does not make offline capability a default contract for all future works. Every work must verify cold start of the official entry, and works that need external network services must state their dependencies accurately rather than claiming to be offline.
 
-音乐保留为单独可选媒体场景，验证同一薄音频与根生命周期即可，不为覆盖功能硬塞进本作品叙事。
+Music stays a separate optional media scenario; verifying the same thin audio and root lifecycle is enough, and it is not forced into this work's narrative just to cover features.
 
-## 从占位走向真实素材
+## From placeholders to real assets
 
-先定义素材要解释什么、出现位置、容器比例、fit/crop、文字避让及失败替代；占位应包含用途提示，例如“以产品使用场景说明阻力”，不只是灰框。真实素材由普通 import/TS 变量引用，用稳定页 id 和页内用途定位；多处引用确有共同替换需要时再共用一个普通对象，不要求公共 assetKey API。
+First define what the asset explains, where it appears, the container ratio, fit/crop, text avoidance, and failure fallback; a placeholder should include a usage hint, for example "shows friction with a product-use scenario", not just a gray box. Real assets are referenced by ordinary imports/TS variables and located by stable slide id and in-slide purpose; when multiple references genuinely need a common replacement, share an ordinary object—no public assetKey API is required.
 
-| 素材      | 首轮可用占位                            | 替换后的必要复看                                        |
-| --------- | --------------------------------------- | ------------------------------------------------------- |
-| 图片      | 比例、意图、拟用摄影/插画/图表类型      | 裁切、焦点、色彩与文字关系、真实 alt；装饰图可空 alt    |
-| 视频      | poster、标题、预计片长/讲解点、字幕意图 | 实际编码可播、首帧/尺寸、字幕与文字替代、播放失败与暂停 |
-| 音乐/音频 | 名称、用途、预计时长、可见播放占位      | 音量、静音/停止入口、讲述是否被盖住、页内或跨页生命周期 |
-| 互动动画  | 静态状态图和“观众改变什么、能理解什么”  | 输入/反馈、键盘、离散步骤与动画关系、暂停、静态代表态   |
+| Asset                 | Placeholder usable in the first round                                          | Required re-review after replacement                                                                            |
+| --------------------- | ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| Image                 | Ratio, intent, planned photography/illustration/chart type                     | Cropping, focus, color and text relationships, real alt; decorative images may have empty alt                   |
+| Video                 | poster, title, expected length/explanation points, subtitle intent             | Actual encoding plays, first frame/size, subtitles and text alternatives, playback failure and pause            |
+| Music/audio           | Name, purpose, expected duration, visible playback placeholder                 | Volume, mute/stop entry, whether narration is covered, in-slide or cross-slide lifecycle                        |
+| Interactive animation | Static state diagram and "what the audience changes, what they can understand" | Input/feedback, keyboard, relationship between discrete steps and animation, pause, static representative state |
 
-替换不改变容器与语义用途时，先保持布局再复看；若内容语义或裁切改变，不强行维持旧文案。替换版本需要重新检查真实行为，占位图不能充当已完成媒体的证据。
+When replacement does not change the container and semantic purpose, keep the layout first and then review; if content semantics or cropping change, do not force the old copy to stay. Replaced versions need real behavior re-checked, and placeholder images cannot serve as evidence that media is complete.
 
-普通素材文件与轻量来源说明记录原始来源、用途、授权、原图/处理或生成版本及必要 notices。生成图可用于表达，不能充当真实测量、截图或事实证据；样例的文件字节、画质比较和加载录屏必须对应真实文件/条件。保留能回退的旧引用或普通版本检查点即可，不新增资产 registry。网络生成、鉴权、上传和持久化仍由宿主或工具负责。
+Ordinary asset files plus lightweight source notes record the original source, purpose, authorization, original/processed or generated version, and necessary notices. Generated images can be used for expression but cannot stand in for real measurements, screenshots, or factual evidence; the sample's file bytes, quality comparison, and loading screen recording must correspond to real files/conditions. Keeping rollback-capable old references or ordinary version checkpoints is enough; no asset registry is added. Network generation, authentication, uploads, and persistence remain the host's or tooling's responsibility.
 
-## 页、步骤、动画与媒体生命周期
+## Slide, step, animation, and media lifecycle
 
-### 导航和挂载
+### Navigation and mounting
 
-导航是线性的 `(slide, step)`：next 先加步骤，末步再进入下一页第 0 步；prev 先减步骤，第 0 步再进入上一页末步。目录定位默认第 0 步，也可直接指定合法步骤。首尾保持边界并给出可见状态，不默认循环。回本页第 0 步只重置叙事位置，实验 reset 由作者单独定义，不能擦掉独立输入或重放历史命令。
+Navigation is linear over `(slide, step)`: next increases the step first, and at the last step enters the next slide's step 0; prev decreases the step first, and at step 0 enters the previous slide's last step. Outline navigation targets step 0 by default but can also specify a valid step directly. Boundaries are preserved at the first and last slide with visible state, and looping is not the default. Returning to this slide's step 0 only resets narrative position; experiment reset is defined separately by the author and must not erase independent input or replay historical commands.
 
-首版只挂载当前页是资源策略，不是“离页即丢数据”的作者语义。实验输入、草稿、选择、需要跨页的结果由单次作品实例创建的普通 signals 保留，页 render 只引用或传入；局部 DOM、焦点、动画、effect 等随页释放，重进从同一实验状态重建。切页先撤销旧页活动许可，不能让挂载切换窗口出现两页同时运行；失败也要清理已创建资源。不要在每次入页才创建这些会话值，也不要放模块级单例让多场作品串值。
+The first version mounting only the current slide is a resource policy, not an authoring semantics of "leaving a slide discards data". Experiment inputs, drafts, choices, and cross-slide results are retained by ordinary signals created once per work instance, and the slide render only references or passes them; local DOM, focus, animation, effects, and similar are released with the slide and rebuilt from the same experiment state on re-entry. Changing slides revokes the old slide's activity permission first, so no mount-switch window runs both slides at once; failures must also clean up created resources. Do not create these session values on every slide entry, and do not use module-level singletons that leak values across multiple works.
 
-现有 [signal](../../packages/meowjsx/src/reactive.ts) 持有普通值，[生命周期](../../packages/meowjsx/src/lifecycle.ts) 清理 effect/订阅；保留宿主引用即可分开数据和渲染资源。[keyed](../../packages/meowjsx/src/keyed.ts) 只保留仍在集合内的行，删掉再加入同样重建，也不能跨预览重载保值。暂不新增 keepAlive、通用 store、页状态缓存或自动 DOM 快照。若将来出现无法外置状态的真实重组件，再单独评估保活。
+The existing [signal](../../packages/meowjsx/src/reactive.ts) holds ordinary values, and the [lifecycle](../../packages/meowjsx/src/lifecycle.ts) cleans up effects/subscriptions; keeping host references is enough to separate data from render resources. [keyed](../../packages/meowjsx/src/keyed.ts) keeps only rows still in the collection, so deleting and re-adding rebuilds them and cannot preserve values across preview reloads either. Do not add keepAlive, a generic store, slide-state caching, or automatic DOM snapshots for now. If a real heavy component whose state cannot be externalized appears later, evaluate keep-alive separately then.
 
-Q&A 跳页使用同一位置 Signal。线性 prev 不等于“返回跳转来源”；首期通过目录或页内按钮显式回到目标，需回到原步骤时作品临时保存一个普通位置值后再写回。它仅恢复位置，不做公共导航历史栈、不复活 DOM、不自动恢复媒体声音。
+Q&A slide jumps use the same position Signal. Linear prev is not "return to the jump source"; in the first phase, the work returns explicitly to the target through the outline or an in-slide button, and when the original step is needed it temporarily saves an ordinary position value and writes it back later. That only restores position; it does not build a public navigation history stack, revive the DOM, or automatically restore media sound.
 
-### 渐进显示与活动许可
+### Progressive reveal and activity permission
 
-Reveal 的 at 必须是本页合法范围内的非负整数，越界明确诊断，避免内容永久不可达。默认保留布局位置，未显示时从视觉、键盘交互与可访问树移除；使用适当的 visibility、inert 和 ARIA 接线，不能只改 opacity。回退将隐藏当前焦点所在块时，先把焦点移到稳定导航控件或当前页标题，再隐藏内容。
+Reveal's at must be a non-negative integer within the slide's valid range, and out-of-range values are diagnosed explicitly so content does not become permanently unreachable. Layout position is preserved by default; when not shown, content is removed from visuals, keyboard interaction, and the accessibility tree using appropriate visibility, inert, and ARIA wiring—not just opacity. When going back hides the block containing the current focus, move focus to a stable navigation control or the current slide title before hiding the content.
 
-活动许可由现有 Context 中的只读 Signal 传递：根许可依据宿主 active、文档可见和用户暂停；Reveal 许可为 `ancestorActivity && step >= at`。嵌套 Reveal 必须组合祖先：外层 at=5、内层 at=2 时，第 2 步不能让内层动画偷偷运行。预览中的已挂载与观众正在观看不同，不能只用 document.visibility 推断宿主许可。
+Activity permission is passed through a read-only Signal in the existing Context: the root permission is based on host active, document visibility, and user pause; Reveal permission is `ancestorActivity && step >= at`. Nested Reveal must compose ancestors: with an outer at=5 and an inner at=2, step 2 must not let the inner animation run secretly. Being mounted in a preview differs from an audience actually watching, so document.visibility alone cannot infer host permission.
 
-这只是允许执行时间相关副作用的有限演示活动门，不是通用可见性探测、ready 状态或第二套 runtime。标准媒体和自定义动画在同步 render 捕获最近许可，通过现有 `context.effect` 响应。它表示“可以运行”，不表示“正在播放”；媒体自身暂停不能反向关闭整页活动许可。任意 children 的计时器不会被框架自动发现和暂停，作者自己创建的资源仍由自己负责。
+This is only a bounded presentation activity gate that permits time-related side effects, not generic visibility detection, a ready state, or a second runtime. Standard media and custom animation capture the nearest permission in synchronous render and respond through the existing `context.effect`. It means "allowed to run", not "playing"; a media element's own pause must not turn off the whole slide's activity permission in reverse. Timers in arbitrary children are not automatically discovered and paused by the framework, and resources the author creates remain the author's responsibility.
 
-简单 Reveal 先用无动画/短淡入，自定义动画是离散状态之间的局部过程，不让动画时钟自动推进页步骤。前进可播放短过渡，回退先回到确定的前一步状态；重新前进是否重播由组件的明确规则决定。需要动画完整时序的内容提供局部播放/重播/暂停，不扩出全局时间轴、寻轨器或动画图编辑器。
+Simple Reveal starts with no animation/a short fade-in; custom animation is a local process between discrete states, and the animation clock does not automatically advance slide steps. Advancing may play a short transition, and going back first returns to a deterministic previous-step state; whether advancing again replays is decided by the component's explicit rules. Content that needs the full animation timeline provides local play/replay/pause and does not expand into a global timeline, scrubber, or animation graph editor.
 
-### 媒体和清理
+### Media and cleanup
 
-视频/音频优先采用原生 controls，默认用户启动、`preload="metadata"`，视频提供 poster 与 `playsInline`。拒播、解码失败和资源不可用显示可恢复反馈，检查 `play()` 的异步结果，不把调用返回当成功播放；该异步与拒播语义见 [HTML 媒体规范](https://html.spec.whatwg.org/multipage/media.html#dom-media-play)。字幕/文字替代、可见名称、音量与停止入口要随内容提供。
+Video/audio preferentially use native controls, default to user initiation and `preload="metadata"`, and video provides poster and `playsInline`. Rejected playback, decoding failure, and unavailable assets show recoverable feedback, and the asynchronous result of `play()` is checked; the call's return value is not treated as successful playback. See the [HTML media spec](https://html.spec.whatwg.org/multipage/media.html#dom-media-play) for that asynchronous and rejection semantics. Subtitles/text alternatives, visible names, volume, and stop entry are provided with the content.
 
-页内媒体在 Reveal 隐藏、离页、文档隐藏或演示暂停时停止活动；文档恢复可见不自动恢复声音。迟到的 play promise、加载回调或资源替换回调必须重查本组件是否仍挂载且获准运行，避免翻页后再次开声。初始未显现的资源不自动播放；不预加载所有页的视频或 iframe。
+In-slide media stops activity when its Reveal is hidden, when leaving the slide, when the document is hidden, or when the presentation pauses; the document becoming visible again does not automatically restore sound. Late play promises, load callbacks, or asset-replacement callbacks must recheck whether this component is still mounted and permitted to run, to avoid sound starting again after a slide change. Initially unshown assets do not play automatically, and videos or iframes on all slides are not preloaded.
 
-媒体时钟、播放意图和实际 playing 分开。同素材未结束时，重进恢复最后位置并暂停，metadata 可用后再 seek，由观众点击继续；已结束则保留完成状态，用户再次点击原生 Play 也算明确重播，无需强制增加 Replay 按钮。页面重进或 active 恢复都不自行归零或开声。宿主可用一个普通时间 Signal 接媒体 ref/timeupdate/pause/seeked，离页在清 src/释放节点前同步读取一次最后 currentTime，不只依赖可能迟到的事件；无需时间缓存平台。素材版本改变时不能沿用旧时间。媒体 ended 不推进叙事，12 秒视频结束后讲者仍可停留 90 秒。
+Media clock, playback intent, and actual playing are separate. When the same asset has not ended, re-entry restores the last position and pauses, seeking once metadata is available, and the audience clicks to continue; when it has ended, the completed state is kept, and the user clicking native Play again counts as an explicit replay, with no mandatory Replay button. Re-entering the slide or active recovery does not reset to zero or start sound on its own. The host can use one ordinary time Signal wired to media ref/timeupdate/pause/seeked, reading the last currentTime synchronously before leaving the slide clears src/releases nodes, rather than relying only on possibly-late events; no time-caching platform is needed. When the asset version changes, the old time must not be reused. Media ended does not advance the narrative; after a 12-second video ends, the speaker can still stay for 90 seconds.
 
-薄包装必须把原生 ref 和媒体事件接到真实 video/audio，不能全部透传到外层 div；若有外层状态结构，明确提供对应原生接缝。宿主保存时间，组件释放节点与资源，不能保存 playing=true 后在重进时偷偷开声。
+A thin wrapper must connect the native ref and media events to the real video/audio and must not pass everything through to an outer div; if there is an outer state structure, provide the corresponding native seam explicitly. The host saves time, and the component releases nodes and resources; it must not save playing=true and then secretly start sound on re-entry.
 
-音乐使用同一薄音频组件。根上可选单曲 `soundtrack` 槽只是首实现的组合便利，不是产品概念或配乐系统：继承根活动许可，跨页保留、退出释放，保留原生可访问控件。默认不自动播放、不自动压低音量或暂停页内视频，重叠由用户控制；不做曲库、混音或多轨时间线。
+Music uses the same thin audio component. The optional single-track `soundtrack` slot on the root is only a composition convenience in the first implementation, not a product concept or scoring system: it inherits root activity permission, persists across slides, is released on exit, and keeps native accessible controls. By default it does not autoplay, automatically lower volume, or pause in-slide video, and overlap is user-controlled; no music library, mixing, or multi-track timeline is built.
 
-卸载时 pause 媒体，取消本组件创建的 RAF、WAAPI、定时器、监听和可中止请求；解除本组件订阅，处理动画取消造成的 finished promise 拒绝（见 [Web Animations 取消合同](https://www.w3.org/TR/web-animations-1/#canceling-an-animation)）。组件创建的 object URL 由组件撤销，宿主提供的 URL 仍由宿主拥有。资源创建后登记清理，异步晚到也检查已取消状态；复用现有生命周期，不建立全局资源扫描器。
+On unmount, pause media and cancel RAF, WAAPI, timers, listeners, and abortable requests created by this component; remove this component's subscriptions and handle finished-promise rejections caused by animation cancellation (see the [Web Animations cancellation contract](https://www.w3.org/TR/web-animations-1/#canceling-an-animation)). Object URLs created by the component are revoked by the component, and URLs provided by the host remain the host's. Register cleanup when resources are created, and check the canceled state even for late asynchronous work; reuse the existing lifecycle and do not build a global resource scanner.
 
-### 可访问性和控制
+### Accessibility and controls
 
-前进/后退、当前位置、暂停和媒体控制均可键盘访问。根级快捷键只在演示拥有焦点且事件未被消费时生效，不抢 input、textarea、select、contenteditable、原生媒体控件和互动组件的按键；Enter/Space 等优先保留原控件语义。不能把整张舞台的任意点击都变成翻页。
+Forward/back, current position, pause, and media controls are all keyboard-accessible. Root-level shortcuts take effect only when the presentation has focus and the event has not been consumed, and do not capture keys from input, textarea, select, contenteditable, native media controls, or interactive components; Enter/Space and similar keep the original control semantics first. Arbitrary clicks on the whole stage must not all become slide turns.
 
-换页提供可读的页标题/位置反馈，媒体状态变化不抢焦点。reduced motion 下去掉非必要移动，保持因果和信息完整；持续动画有暂停方式。正常运动和 reduced motion 分别实际观察，图像替代文本/视频字幕/音频说明各按其内容提供。
+Slide changes provide readable slide-title/position feedback, and media state changes do not steal focus. Under reduced motion, non-essential movement is removed while causality and complete information are kept; continuous animation has a pause mechanism. Normal motion and reduced motion are observed separately, and image alternative text/video subtitles/audio descriptions are provided according to each item's content.
 
-## 浏览器交付与未来导出的不同表达
+## Different expressions for browser delivery and future export
 
-首期只交付浏览器版本。下表为浏览器与未来格式的表达差异，用于避免过度承诺，不是本期转换器需求，也不是当前已实现的 Meowland 导出能力。
+The first phase delivers the browser version only. The table below shows expression differences between the browser and future formats to avoid overpromising; it is not a converter requirement for this phase, nor a currently implemented Meowland export capability.
 
-| 交付                  | 保留的表达                              | 必须说明的损失/额外成本                                                                      |
-| --------------------- | --------------------------------------- | -------------------------------------------------------------------------------------------- |
-| 原生 HTML + JS + 资源 | 页/步骤、信号交互、视频、音乐、局部动画 | 需要浏览器运行时与可用资源；托管/离线交付、编码与浏览器环境仍须验证                          |
-| PDF                   | 指定静态状态与排版                      | 交互/音频/动画不保留；决定末步一页或每步一页、视频 poster 与互动代表态                       |
-| 图片式 PPTX           | 每页/步骤的视觉快照                     | 文字/图形主体不可原生编辑；不因此保留媒体和 Web 交互                                         |
-| 可编辑 PPTX           | 明确支持集内的原生文本、形状、图片等    | 需要独立映射和 PowerPoint 实际打开验收；字体、换行、复杂 CSS、SVG/canvas/JS/媒体不能默认等价 |
+| Delivery                  | Expression retained                                              | Losses/additional costs that must be stated                                                                                                                        |
+| ------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Native HTML + JS + assets | Slides/steps, signal interactions, video, music, local animation | Requires a browser runtime and available assets; hosting/offline delivery, encoding, and browser environments still need verification                              |
+| PDF                       | Specified static states and typography                           | Interactions/audio/animation are not retained; decide last-step one-page or one-page-per-step, video posters, and representative interactive states                |
+| Image-based PPTX          | Visual snapshots per slide/step                                  | Text/graphic subjects are not natively editable; media and Web interactions are not retained because of this                                                       |
+| Editable PPTX             | Native text, shapes, images, etc. within an explicit support set | Requires independent mapping and acceptance by actually opening in PowerPoint; fonts, line breaking, complex CSS, SVG/canvas/JS/media cannot be assumed equivalent |
 
-未来实施 PPT 导出时，再明确图片式或可编辑的支持集、目标 PowerPoint 环境和降级验收。现在仅保留普通页 id、步骤定位与同一内容源这些对浏览器本身有用的结构；不增加 exporter 接口、格式中间层、双模型或“可导出组件”限制。互动优先满足浏览器目标，不能假定将来自动无损转换。PDF 也不作为默认下一阶段承诺。
+When PPT export is implemented later, clarify the image-based or editable support set, target PowerPoint environment, and degraded acceptance then. For now, keep only structures that are useful to the browser itself—ordinary slide ids, step positioning, and the same content source; do not add an exporter interface, format intermediate layer, dual model, or "exportable component" restrictions. Interactions prioritize the browser goal, and future automatic lossless conversion cannot be assumed. PDF is also not a default next-phase commitment.
 
-Meowbook 的 `buildStories` 已可产生静态审阅站；正式观众交付另用作品消费者的薄 HTML/TSX 入口和现有 Bun 构建。两个入口复用作品 JSX、组件、主题与素材引用，但各自创建位置和实验会话，不共享观众内存，也不复制组件实现。正式入口不依赖 Meowbook gallery、story query 或开发服务器；不把 Meowpress 改成通用应用 bundler。
+Meowbook's `buildStories` can already produce a static review site; official audience delivery separately uses the work consumer's thin HTML/TSX entry and the existing Bun build. Both entries reuse the work's JSX, components, theme, and asset references but create their own position and experiment sessions, do not share audience memory, and do not copy component implementations. The official entry does not depend on the Meowbook gallery, story queries, or the dev server; Meowpress is not turned into a generic application bundler.
 
-现有 [buildStories](../../packages/meowbook/src/bun/build.ts) 调 Bun.build 并写 manifest，[服务](../../packages/meowbook/src/bun/server.ts)只提供临时输出目录，没有任意 assets 目录自动复制合同。显式 import/HTML/CSS 能进入构建图的资源可沿构建处理，运行时字符串 URL 则不能据此推定已打包。先在作品局部薄构建入口显式携带 JS/CSS/字体、图片、视频、poster、字幕及 notices，核对相对 URL，确有复用才抽 helper，不新增发布平台或资产服务。
+The existing [buildStories](../../packages/meowbook/src/bun/build.ts) calls Bun.build and writes a manifest, while the [server](../../packages/meowbook/src/bun/server.ts) only serves a temporary output directory and has no contract for automatically copying arbitrary assets directories. Resources that can enter the build graph through explicit import/HTML/CSS follow the build, but a runtime string URL cannot be assumed packaged on that basis. First explicitly carry JS/CSS/fonts, images, video, posters, subtitles, and notices in the work's local thin build entry, check relative URLs, and extract a helper only when there is real reuse, without adding a publishing platform or asset service.
 
-浏览器交付应包括可运行 Web 产物、可编辑 TSX/主题与资源源文件、依赖/锁文件、来源说明和准确启动方式。断网不等于上次会话持久化；冷启动仍从作者初值开始。若采用本地 HTTP，所需 runtime 应预先可用，不能依赖断网时下载安装。没有验证就不声称双击 HTML 可用；正式入口路径、部署子目录及资源解析也要与预览分别验证。
+Browser delivery should include the runnable Web artifact, editable TSX/theme and asset source files, dependency/lock files, source notes, and accurate startup instructions. Being offline is not the same as the previous session persisting; cold start still begins from the author's initial values. If local HTTP is used, the required runtime should be available in advance and must not depend on downloading and installing while offline. Without verification, do not claim that double-clicking the HTML works; the official entry path, deployment subdirectory, and asset resolution must also be verified separately from preview.
 
-`renderToHtml` 输出本身不等于交互 HTML：现有实现会排除事件/ref，静态渲染不执行 shadow，不支持异步内容。需要浏览器脚本和 MeowJSX Web 挂载才能保留互动。`document.fonts.ready` 只表示当前字体加载过程稳定，不证明指定字体成功或其余页字体齐全；按作品选定字体检查真实加载/回退与换行，详见 [CSS Font Loading 合同](https://www.w3.org/TR/css-font-loading-3/#font-face-set-ready)。媒体也须实际播放、seek、继续，poster 成功不证明视频编码可播。
+`renderToHtml` output itself is not interactive HTML: the existing implementation excludes events/refs, static rendering does not execute shadows, and asynchronous content is unsupported. Browser scripts and MeowJSX Web mounting are needed to retain interactions. `document.fonts.ready` only means the current font loading process is stable; it does not prove the specified fonts succeeded or that fonts on other slides are complete. Check real loading/fallback and line breaking for the fonts the work selects; see the [CSS Font Loading contract](https://www.w3.org/TR/css-font-loading-3/#font-face-set-ready) for details. Media must also actually play, seek, and continue; a successful poster does not prove the video encoding plays.
 
-skill 在结束时核对叙事依据、选定视觉与局部修改、来源/notices、未替换占位、目标入口、资源和启动说明；notes 和作者资料的打包边界同样要检查。此处是交付核对，不自动发布、推送或部署。
+At the end, the skill checks narrative evidence, chosen visuals and local modifications, sources/notices, unreplaced placeholders, target entry, assets, and startup instructions; the packaging boundary for notes and author materials is checked as well. This is delivery verification; it does not automatically publish, push, or deploy.
 
-外部一手资料仅辅助比较，不引入新依赖：
+External primary sources only aid comparison and introduce no new dependencies:
 
-- [Slidev 的创作取向](https://sli.dev/guide/why)说明文本、主题、组件和浏览器预览可以共同迭代；它有 HMR，不表示当前 Meowbook 已有相同能力。本设计沿现有 TSX，无需再移植其语法。
-- [Slidev 步骤动画](https://sli.dev/guide/animations)与 [reveal.js fragments](https://revealjs.com/fragments/)为离散步骤提供参照；本方案将步骤与局部连续动画分开。
-- [reveal.js 媒体](https://revealjs.com/media/)提供可见性与播放生命周期参考，具体合同仍按本方案和浏览器行为验证。
-- [Slidev 当前导出合同](https://sli.dev/guide/exporting)同时包含图片 PPTX 和 `pptx-editable`。后者按浏览器测量重建原生形状，复杂元素可局部转图，不可靠时可整页回退，字体与换行也有差异。因此“可编辑映射可做”与“任意动态无损导出”是不同承诺，不能沿用“Slidev 只能输出图片 PPTX”的旧结论。
+- [Slidev's authoring approach](https://sli.dev/guide/why) shows that text, themes, components, and browser preview can iterate together; it has HMR, which does not mean the current Meowbook already has the same capability. This design follows existing TSX and does not need to port its syntax.
+- [Slidev step animations](https://sli.dev/guide/animations) and [reveal.js fragments](https://revealjs.com/fragments/) provide references for discrete steps; this approach separates steps from local continuous animation.
+- [reveal.js media](https://revealjs.com/media/) provides references for visibility and playback lifecycle; the concrete contract is still verified per this approach and browser behavior.
+- [Slidev's current export contract](https://sli.dev/guide/exporting) includes both image PPTX and `pptx-editable`. The latter rebuilds native shapes from browser measurements, can convert complex elements locally to images, can fall back to a whole-page image when unreliable, and has differences in fonts and line breaking. Therefore "editable mapping is feasible" and "arbitrary dynamic content can be exported losslessly" are different commitments, and the old conclusion that "Slidev can only output image PPTX" does not hold.
 
-### Slidev 源码中值得吸收的机制
+### Mechanisms worth absorbing from Slidev source
 
-2026-10-17 小范围核查官方 main 两处源码，只比较与当前问题直接相关的机制：
+On 2026-10-17, two pieces of official main source were checked on a small scale, comparing only mechanisms directly relevant to the current problem:
 
-| 源码事实                                                                                                                                                                         | 本方案吸收的部分                                                   | 不照搬的部分                                                                                               |
-| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------- |
-| [useNav.ts](https://raw.githubusercontent.com/slidevjs/slidev/main/packages/client/composables/useNav.ts) 的 next/prev 先处理 clicks，后退跨页进入前页末步；页方向和步骤方向分开 | 导航有明确离散规则，动画不决定翻页；方向确有用途时可从位置变化派生 | Vue Router query、frontmatter、全局 shared composable、print/presenter/export 分支；首期不公开多套导航状态 |
-| [useClicks.ts](https://raw.githubusercontent.com/slidevjs/slidev/main/packages/client/composables/useClicks.ts) 区分 isCurrent 与 isActive，注册 Map 随卸载释放                  | “刚进入步骤”与“当前仍有效”不同；状态可推导，登记的资源有卸载 owner | 相对步骤语法、范围解析、自动元素登记计数和注册 Map；本方案显式 steps + at 更小                             |
+| Source fact                                                                                                                                                                                                                                                    | Part absorbed by this approach                                                                                                                          | Part not copied                                                                                                                                      |
+| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [useNav.ts](https://raw.githubusercontent.com/slidevjs/slidev/main/packages/client/composables/useNav.ts) handles clicks first in next/prev, and going back across pages enters the previous slide's last step; page direction and step direction are separate | Navigation has explicit discrete rules and animation does not decide slide turns; direction can be derived from position changes when it has a real use | Vue Router query, frontmatter, global shared composable, print/presenter/export branches; the first phase does not expose multiple navigation states |
+| [useClicks.ts](https://raw.githubusercontent.com/slidevjs/slidev/main/packages/client/composables/useClicks.ts) distinguishes isCurrent from isActive, and the registration Map is released on unmount                                                         | "Just entered a step" differs from "still currently valid"; state is derivable, and registered resources have an unmount owner                          | Relative step syntax, range parsing, automatic element registration counting, and registration Map; this approach's explicit steps + at is smaller   |
 
-Slidev 的步骤 isActive 不是媒体活动许可，不包含本方案的祖先 Reveal、演示暂停和文档可见性。浏览器热反馈的价值可以借鉴，Markdown DSL、路由状态和围绕传统文稿组织的整体架构不因此成为 Meowland 的设计前提。这里的核心是 agent 和人反复运行、观看、修改作品。
+Slidev's step isActive is not media activity permission and does not include this approach's ancestor Reveal, presentation pause, and document visibility. The value of browser hot feedback can be borrowed, but the Markdown DSL, routing state, and the overall architecture organized around traditional documents do not thereby become design premises for Meowland. The core here is the agent and the person repeatedly running, watching, and modifying the work.
 
-补核 [Slide Hooks](https://sli.dev/features/slide-hook)：Slidev 保留非活动页实例，以 enter/leave/active 区别挂载与演示活动；[Global Context](https://sli.dev/guide/global-context)又区分 slide、presenter、overview、previewNext。吸收的是“挂载、可见、演示许可和视图用途不同”的语义，不因此照搬全页保活或整套上下文系统。Meowland 首版通过普通会话 signals 保留输入、通过有限宿主许可约束副作用，重组件保活和独立演讲者窗口后置。
+Also checked [Slide Hooks](https://sli.dev/features/slide-hook): Slidev keeps inactive slide instances and distinguishes mounting from presentation activity with enter/leave/active; [Global Context](https://sli.dev/guide/global-context) further distinguishes slide, presenter, overview, and previewNext. What is absorbed is the semantics that "mounting, visibility, presentation permission, and view purpose differ", not whole-page keep-alive or the entire context system. Meowland's first version keeps input through ordinary session signals and constrains side effects through bounded host permission, with heavy-component keep-alive and an independent presenter window deferred.
 
-## 确定状态、观察与验收
+## Deterministic states, observation, and acceptance
 
-首期需要可重复观察的状态，暂不需要公共 export/capture 模式。夹具用位置 Signal 与 `active=false` 明确页/步骤和首次挂载停机，再给出实验信号初值、已解码图片、视频 poster、音频停播及动画终态或作者指定代表态；用现有 Story ready 声明该状态确实就绪，再调用 `capturePage`。这要求自定义组件响应许可，不是用一个暂停字段包办所有动画。
+The first phase needs states that can be observed repeatably and does not yet need a public export/capture mode. Fixtures use a position Signal and `active=false` to pin the slide/step and stop side effects from the first mount, then provide initial experiment signal values, decoded images, video posters, stopped audio, and animation end states or author-specified representative states; the existing Story ready declares that the state is actually ready, and then `capturePage` is called. This requires custom components to respond to permission rather than one pause field handling all animations.
 
-这些是代表场景的验证接线，不要求每个浏览器互动都可序列化、任意中间态都能定格或具备通用静态导出。无法用照片说明的效果以实际操作验证，不为未来 PPT 转换削弱表达。
+These are verification wiring for representative scenarios; not every browser interaction has to be serializable, every intermediate state freezable, or a generic static export available. Effects that cannot be explained by a photo are verified by actual operation, and expression is not weakened for future PPT conversion.
 
-Meowbook `ready` 和字体等待不是任意媒体已稳定的证明；摄影源码使用 `animations: "allow"`，默认 reduced motion 也不会自动冻结所有自定义动画。固定 sleep、无网络请求或截图成功均不能代替作品自己的就绪条件。正常播放与中间帧问题通过实际操作或明确采样观察，不从静态照片反推。
+Meowbook `ready` and font waiting do not prove arbitrary media is stable; the capture source uses `animations: "allow"`, and the default reduced motion does not automatically freeze all custom animations either. A fixed sleep, no network requests, or a successful screenshot cannot replace the work's own readiness conditions. Normal playback and intermediate-frame issues are observed through actual operation or explicit sampling, not inferred backward from static photos.
 
-五个压力案例沿同一作品验收，替代脱离消费者的功能清单：
+Five stress cases are accepted along the same work, replacing a feature list detached from consumers:
 
-| 案例                     | 连续动作与必要结果                                                                                                                                                                                                                  |
-| ------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 1：实验与现场跳页        | 将网速滑杆置于行程 70% 并记录实际 Mbit/s → Q&A 跳证据页 → 返回实验。值仍在 70%，估算与总结同步；方向键调整滑杆不翻页。两场作品不串值，作者明确实验 reset 才清选择                                                                   |
-| 2：12 秒媒体与 90 秒讲解 | 播放、暂停、隐藏 Reveal、翻页、后台、迟到 play、重进、继续/重播逐一走通。媒体结束不推进叙事；同素材位置按约定恢复但不自动开声；字幕/文字替代可达，监听/RAF/媒体退出后释放                                                           |
-| 3：局部改稿与重排        | 人保留 B 排版，仅改结论和图，agent 局部 patch 并保留来源版本。随后前移该页：反馈仍指稳定 id，版本/step/fixture 可复查；步骤改义明确重定位。重启看到新构建，按配方恢复相关输入复验；普通 Git 检查点支持源内容回退，不能重写全套      |
-| 4：正式产物冷启动        | 开发服务器关闭、全新浏览器缓存、外网不可用，从实际交付目录按启动说明走完作品。检查字体与媒体/字幕、投影比例、长内容和 reduced motion；回退隐藏有焦点内容时焦点有去处，资源/解码失败有替代内容。外部资源或未支持入口不能冒充离线通过 |
-| 5：直接定位与回退        | 以相同实验 fixture 直接打开第 3 步，与顺序到达比较内容、结果和可操作性；不要求重放前三次点击。回退不撤销独立实验，非法定位可诊断；嵌套外层未显现时内层不运行，后台 Meowbook iframe 不复制模拟/播放副作用                            |
+| Case                                         | Continuous actions and required results                                                                                                                                                                                                                                                                                                                                                                                                                                                      |
+| -------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1: Experiment and live slide jumps           | Put the network-speed slider at 70% of its travel and record the actual Mbit/s → Q&A jumps to the evidence slide → return to the experiment. The value is still 70%, and the estimate and summary stay in sync; arrow keys adjust the slider without turning the slide. Two work sessions do not leak values, and choices clear only on the author's explicit experiment reset                                                                                                               |
+| 2: 12-second media and 90-second explanation | Play, pause, hide Reveal, change slides, background, late play, re-enter, and continue/replay all work one by one. Media ending does not advance the narrative; the same asset's position is restored as agreed but does not auto-start sound; subtitles/text alternatives are reachable, and listeners/RAF/media are released after exit                                                                                                                                                    |
+| 3: Local revision and reordering             | The person keeps layout B and changes only the conclusion and figure; the agent applies a local patch and keeps the source version. Then the slide is moved earlier: feedback still points at the stable id, and version/step/fixture can be checked; changed step meaning is explicitly re-located. A restart shows the new build, and relevant inputs are restored by the recipe for re-verification; ordinary Git checkpoints support source rollback, and the whole set is not rewritten |
+| 4: Official artifact cold start              | With the dev server off, a fresh browser cache, and no external network, run through the work from the actual delivery directory per the startup instructions. Check fonts and media/subtitles, projection ratio, long content, and reduced motion; when going back hides focused content, focus has a destination, and asset/decoding failures have alternative content. External resources or unsupported entries cannot pass as offline                                                   |
+| 5: Direct positioning and back               | Open step 3 directly with the same experiment fixture and compare content, results, and operability with sequential arrival; replaying the first three clicks is not required. Going back does not undo independent experiments, and invalid positions are diagnosable; when a nested outer Reveal is not shown, the inner one does not run, and the background Meowbook iframe does not copy simulated/playback side effects                                                                |
 
-正常动画、中间态和减少动画分别实际观察；额外音乐场景只验证同一薄音频/单曲根生命周期，不强塞主题叙事。必要机械断言覆盖这些场景中的失败窗口，不因列出五例而自动跑重复全矩阵。
+Normal animation, intermediate states, and reduced motion are observed separately; the extra music scenario only verifies the same thin audio/single-track root lifecycle and is not forced into the theme narrative. Necessary mechanical assertions cover the failure windows in these scenarios, and listing five cases does not automatically mean running the repeated full matrix.
 
-机械合同用最小行为/类型测试保护，视觉与互动变化在真实场景打开观察；不写硬编码像素审美测试。若有公开导出/打包变化，再按[工程检查](../development-checks.md)与[发布合同](../releasing.md)做 build、pack、外部 public exports 安装消费。浏览器观察、安装态与正式发布分别报告。
+Mechanical contracts are protected by minimal behavior/type tests, and visual and interaction changes are observed by opening real scenarios; no hard-coded pixel aesthetic tests are written. If public exports/packaging change, follow [development checks](../development-checks.md) and the [release contract](../releasing.md) to build, pack, and install-and-consume external public exports. Browser observations, installed state, and official release are reported separately.
 
-## 分阶段实施与可观察结果
+## Phased implementation and observable results
 
-这是后续实施顺序，不是要求作者瀑布式创作；每片都用同一个粗作品检验，内容和视觉持续可改。当前授权止于本设计。
+This is the later implementation order, not a requirement that authors work in a waterfall; each slice is verified with the same rough work, and content and visuals stay changeable. Current authorization ends with this design.
 
-| 阶段                 | 最小交付与 owner                                                                            | 验收结果与依赖                                                                                                         |
-| -------------------- | ------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------- |
-| 0：收窄公共面        | 用图片等待样例校准四种语义、位置/宿主接线与目标尺寸                                         | 有清楚的叙事目的、实验变量与依据；不等待文案定稿，不做 PPT/PDF 映射验证                                                |
-| 1：可见的创作闭环    | 创作 skill 草案、Meowtail Presentation/主题/Reveal、普通作品会话 signals、Meowbook 同源作品 | 粗结构+视觉+开场/最难互动可预览；先证实滑杆跨页保留、结论同步、直接步定位与回退；步骤不重挂整页，作品实例不串值        |
-| 2：首期表达完整      | 薄原生视频/音频、有限活动 Context、真实录屏和交互动画；音频另有可选场景                     | 12 秒视频与 90 秒讲解互不驱动；恢复位置/声音分开，后台预览无副作用；键盘、隐藏焦点、清理和 reduced motion 实际走通     |
-| 3：首期交付闭合      | skill 完成保留 B 排版的局部改稿、真实素材替换/来源说明；薄 Web 构建与源文件交付             | 五个压力案例均有实际证据；关闭开发服务器后冷启动断网走通，源码/资产/锁文件/启动说明齐全。阶段 1 单独不宣称完整首期完成 |
-| 未来：PPT 导出       | 另行明确图片式/有限可编辑映射、降级说明与独立验收                                           | 用真实目标应用检查页面、编辑能力及损失；首期不预建 exporter，也不限制浏览器组件支持集                                  |
-| 后续：重复问题出现时 | 独立演讲者窗口同步、重组件保活、复杂音轨、导航历史或更多互动组件                            | 每项有真实消费者再设计；不顺手启动全局时间轴、编辑器、撤销平台或 HMR 项目                                              |
+| Phase                                | Minimal delivery and owner                                                                                                                    | Acceptance results and dependencies                                                                                                                                                                                                                                  |
+| ------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 0: Narrow the public surface         | Calibrate the four semantics, position/host wiring, and target size with the image-wait sample                                                | Clear narrative purpose, experiment variable, and evidence; does not wait for final copy and does not do PPT/PDF mapping validation                                                                                                                                  |
+| 1: Visible authoring loop            | Authoring skill draft, Meowtail Presentation/theme/Reveal, plain-work session signals, same-source Meowbook work                              | Rough structure + visuals + opening/hardest interaction are previewable; first prove the slider persists across slides, conclusions stay in sync, direct step positioning and back work; steps do not remount the whole slide, and work instances do not leak values |
+| 2: First-phase expression complete   | Thin native video/audio, bounded activity Context, real screen recording and interactive animation; audio has an additional optional scenario | The 12-second video and 90-second explanation do not drive each other; position/sound restoration are separate, and background preview has no side effects; keyboard, hidden focus, cleanup, and reduced motion actually work                                        |
+| 3: First-phase delivery closed       | The skill completes a local revision keeping layout B, real asset replacement/source notes; thin Web build and source-file delivery           | All five stress cases have actual evidence; cold start works offline after the dev server is closed, and source/assets/lockfiles/startup instructions are complete. Phase 1 alone does not claim the complete first phase is done                                    |
+| Future: PPT export                   | Separately clarify image-based/limited editable mapping, degradation notes, and independent acceptance                                        | Check pages, editing capability, and losses in the real target application; the first phase does not pre-build an exporter or restrict the browser component support set                                                                                             |
+| Later: when repeated problems appear | Independent presenter-window sync, heavy-component keep-alive, complex audio tracks, navigation history, or more interactive components       | Design each only with a real consumer; do not casually start a global timeline, editor, undo platform, or HMR project                                                                                                                                                |
 
-未来新增生产代码前按 `.agents` 的设计共识和检查范围推进；先做代表性消费者闭包，再决定 export 子路径。发布、推送、部署均另按当次授权执行。
+Before adding production code in the future, proceed per `.agents` design consensus and check scope; build a representative consumer closure first, then decide export subpaths. Publishing, pushing, and deployment are executed separately per that run's authorization.
 
-## 独立审查与首版修订轨迹
+## Independent review and first-version revision trail
 
-三个独立角色分别负责代码复用/包边界、迭代创作流程、播放器/媒体/导出，主作者汇总。父线程随后转交 `gpt-6-astra / xhigh` 的独立架构审查结论，本地再核查同一真实场景与对应代码。以下保留首版的重要修正及未采用替代，不另建永久审批表：
+Three independent roles covered code reuse/package boundaries, the iterative authoring process, and player/media/export respectively, with the main author consolidating. The parent thread then handed over independent architecture review conclusions from `gpt-6-astra / xhigh`, and the same real scenario and corresponding code were checked locally. Important first-version corrections and rejected alternatives are retained below, without building another permanent approval table:
 
-| 首版取向 / 反例                                                 | 本次取舍及理由                                                                                                            |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| 单当前页挂载且“互动局部值默认重置”会丢 Q&A 返回后的观众输入     | 保留单页渲染资源策略，撤回数据默认重置；实验状态在作品实例普通 signals 中保留。暂不选全页保活、keepAlive 或 generic store |
-| 初始位置+回调不足以支持页内跳转；命令 API 又增加第二入口        | 改成可写位置 Signal，所有导航读写同一来源；无外部 Signal 时内部一次创建。不要 controller、镜像或完整历史栈                |
-| initialPaused 只管首次，document.visibility 不能辨别后台 iframe | 改成宿主 active 接线，初次及后续许可都明确；组合既有 Context，不承诺控制任意动画，不建 mode 系统                          |
-| 步骤若当命令日志，直达第 3 步与回退会破坏实验                   | step 是可直接呈现的状态，实验选择不随叙事回退；媒体时间/playing 与二者分开                                                |
-| 技术组件清单没有证伪跨页、局部改稿与离线交付                    | 用图片等待的一套作品和五个压力案例贯穿；稳定 id+当轮版本/step/fixture，普通来源说明与 Git 检查点足够                      |
-| 只说“薄 HTML 入口”容易把构建成功误当交付完成                    | 正式 Web 资源闭合、源码/资产/锁文件/启动说明与冷启动实际验收；Meowbook 仍是审阅工具，Meowpress 不变应用打包器             |
-| 全场粗稿或四个文件可能变成流程门槛                              | 首轮粗结构/视觉/开场与最难互动一起试；只维护必要事实，允许合并文档；skill 负责证据、方案比较与局部改稿复杂度              |
-| 音乐作为强制 deck 概念或媒体平台会扩大核心                      | 同一薄音频可挂根单曲槽，仅为组合便利；样例音乐另测，不为覆盖能力扭曲叙事                                                  |
-| 首轮主要参考 Slidev clicks，未充分区分挂载和活动                | 补核 slide hooks/render context，吸收语义分离而非照搬全页保活、Markdown DSL 或路由架构                                    |
+| First-version direction / counterexample                                                                                     | This round's decision and rationale                                                                                                                                                                                                  |
+| ---------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Single-current-slide mounting plus "interaction local values reset by default" loses audience input after returning from Q&A | Keep the single-slide render resource policy and withdraw the default data reset; experiment state stays in the work instance's ordinary signals. Do not choose whole-page keep-alive, keepAlive, or a generic store for now         |
+| Initial position + callbacks are insufficient for in-slide jumps; a command API adds a second entry                          | Change to a writable position Signal so all navigation reads and writes the same source; create it internally once when there is no external Signal. No controller, mirroring, or full history stack                                 |
+| initialPaused only covers the first mount, and document.visibility cannot distinguish a background iframe                    | Change to host active wiring so both initial and later permission are explicit; compose existing Context, do not promise control over arbitrary animation, and do not build a mode system                                            |
+| Treating steps as a command log breaks the experiment when opening step 3 directly and going back                            | step is a directly presentable state, and experiment choices do not follow narrative back; media time/playing are separate from both                                                                                                 |
+| A technical component list did not falsify cross-slide, local revision, and offline delivery                                 | Run the image-wait work and five stress cases through end to end; stable id + that round's version/step/fixture, ordinary source notes, and Git checkpoints are enough                                                               |
+| Only saying "thin HTML entry" easily mistakes a successful build for completed delivery                                      | Close official Web resources and actually accept source/assets/lockfiles/startup instructions and cold start; Meowbook remains a review tool, and Meowpress does not become an application bundler                                   |
+| A whole-deck rough draft or four files could become a process threshold                                                      | Try the rough structure/visuals/opening and the hardest interaction together in the first round; maintain only necessary facts and allow merged documents; the skill owns evidence, option comparison, and local-revision complexity |
+| Treating music as a mandatory deck concept or media platform expands the core                                                | The same thin audio can attach to a root single-track slot only as a composition convenience; sample music is tested separately and the narrative is not distorted to cover capabilities                                             |
+| The first round mainly referenced Slidev clicks and did not sufficiently distinguish mounting from activity                  | Also check slide hooks/render context and absorb the semantic separation rather than copying whole-page keep-alive, the Markdown DSL, or the routing architecture                                                                    |
 
-仍保持的小核心是：可信场景 JSX、一个位置来源、普通实验 signals、有限活动许可，以及导航/Reveal/原生媒体/宿主接线。skill 承担创作复杂度，Meowtail 拥有共享结构，Meowbook 复用审阅，薄 Web 构建负责交付。没有证据要求新基础设施平台、额外 DSL 或多套内容模型。
+The small core retained is: trusted scenario JSX, one position source, ordinary experiment signals, bounded activity permission, and navigation/Reveal/native media/host wiring. The skill carries authoring complexity, Meowtail owns shared structure, Meowbook reuses review, and the thin Web build handles delivery. No evidence requires a new infrastructure platform, additional DSL, or multiple content models.
 
-审查、源码核查与压力推演是设计证据，不代表生产实现、五例浏览器观察、离线交付、导出或用户接受已经通过。本轮只改本设计文档，没有实现、提交、推送或发布，也没有读取/改动既有未跟踪 data。
+Review, source verification, and stress reasoning are design evidence and do not mean production implementation, the five browser observations, offline delivery, export, or user acceptance have passed. This round changed only this design document, with no implementation, commit, push, or release, and the existing untracked data was neither read nor changed.
 
-## 已定范围与剩余偏好
+## Settled scope and remaining preferences
 
-已确定：第一期浏览器交互演示；未来支持 PPT 导出；本期不做 PPT/PDF 转换，不照搬 Slidev 架构或新增 Markdown DSL。
+Settled: the first phase is browser interactive presentations; PPT export is supported in the future; this phase does not do PPT/PDF conversion, does not copy the Slidev architecture, and does not add a Markdown DSL.
 
-1. **后续作品的主要展示环境是什么？** 本验收样例已选桌面浏览器、16:9 与离线 HTTP 启动；具体作品若主要手机阅读、必须双击文件或依赖在线服务，在短 brief 中另记约束，不默认拥有未验证入口能力。
-2. **音乐的常用方式是什么？** 暂以手动播放为创作默认；若经常需要整场连续背景音乐，可用根单曲槽，同一组件与根活动许可即可，不增加产品概念。
+1. **What is the main display environment for later works?** This acceptance sample already chooses a desktop browser, 16:9, and offline HTTP startup; if a specific work is mainly read on phones, must work by double-clicking a file, or depends on online services, record that constraint separately in the short brief and do not assume unverified entry capabilities.
+2. **What is the common way to use music?** Manual playback is the temporary authoring default; if continuous background music for a whole presentation is often needed, the root single-track slot can be used with the same component and root activity permission, without adding a product concept.
 
-这两项是后续样例与验收的偏好，不妨碍本轮设计完成，也不要求先答完才允许继续细化。默认假设可修改，不重复询问已经确定的交付格式。
+These two are preferences for later samples and acceptance; they do not block completion of this round's design and do not have to be fully answered before further refinement is allowed. Default assumptions are revisable, and settled delivery formats are not asked about again.

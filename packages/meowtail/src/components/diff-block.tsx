@@ -45,7 +45,7 @@ export const DiffBlock = defineComponent<
     "div",
     props,
     <OutputBlock
-      title={`变更 · +${added} −${removed}`}
+      title={`Changes · +${added} −${removed}`}
       maxLines={maxLines}
       onCopy={onCopy}
       copyText={diffBlockText(files)}

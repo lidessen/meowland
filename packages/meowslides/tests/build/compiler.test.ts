@@ -20,6 +20,7 @@ describe("local MDX authoring compiler", () => {
   });
 
   test("reads only static finite metadata, derives Unicode ids and rejects collisions", async () => {
+    // Unicode payload is intentional: verifies Unicode slide id derivation.
     const result = await compileSlides(
       '<Slide id="habitat" columns={2} steps={3} notes="Pause" />\n\n# 栖息地\n\n<div>One</div>\n\n<div>Two</div>',
       "/tmp/slides.mdx",

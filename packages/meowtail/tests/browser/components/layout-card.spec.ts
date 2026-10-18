@@ -8,7 +8,7 @@ test("page containers inherit semantic insets while retaining natural flow and t
   await page.goto("/canvas.html?story=layout-container-page");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const container = page.locator("[data-container-page]");
-  const input = page.getByRole("textbox", { name: "页面草稿", exact: true });
+  const input = page.getByRole("textbox", { name: "Page draft", exact: true });
   const original = await input.elementHandle();
   await input.fill("Draft remains in the same natural page");
   const insets = () =>
@@ -49,7 +49,7 @@ test("page containers inherit semantic insets while retaining natural flow and t
   await expect(input).toBeFocused();
   expect(await original!.evaluate((node) => node.isConnected)).toBe(true);
   await page.setViewportSize({ width: 390, height: 330 });
-  const last = page.getByRole("button", { name: "检查末尾操作", exact: true });
+  const last = page.getByRole("button", { name: "Check trailing actions", exact: true });
   await last.focus();
   await expect(last).toBeInViewport();
   expect(await page.evaluate(() => scrollY)).toBeGreaterThan(0);
@@ -64,14 +64,14 @@ test("layout composition keeps text shrinkable, actions intact and axis gaps the
   page,
 }) => {
   await page.setViewportSize({ width: 1030, height: 954 });
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=layout-composition");
+  await page.goto("/canvas.html?story=layout-composition");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const summary = page.locator("[data-layout-summary]");
   await expect(summary).toHaveCSS("align-items", "baseline");
   const actions = page.locator("[data-layout-actions]");
   const grid = page.locator("[data-layout-grid-gaps]");
   for (const scheme of ["light", "dark"]) {
-    await page.getByRole("combobox", { name: "外观", exact: true }).selectOption(scheme);
+    await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption(scheme);
     const spacing = await actions.evaluate(
       (node, properties) =>
         properties.map((property) => getComputedStyle(node).getPropertyValue(property).trim()),
@@ -82,7 +82,7 @@ test("layout composition keeps text shrinkable, actions intact and axis gaps the
     await expect(grid).toHaveCSS("row-gap", spacing[0]!);
     await expect(grid).toHaveCSS("column-gap", spacing[2]!);
   }
-  const edit = page.getByRole("button", { name: "编辑连接", exact: true });
+  const edit = page.getByRole("button", { name: "Edit connection", exact: true });
   const wideWidth = await edit.evaluate((node) => node.getBoundingClientRect().width);
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(edit).toBeVisible();
@@ -116,7 +116,7 @@ test("layout composition keeps text shrinkable, actions intact and axis gaps the
 
 test(`Studio: card nesting shares surfaces and preserves independent cards`, async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=card-composition");
+  await page.goto("/canvas.html?story=card-composition");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const cards = page.locator("[data-card-depth]");
   expect(await cards.count()).toBeGreaterThan(3);
@@ -132,7 +132,7 @@ test(`Studio: card nesting shares surfaces and preserves independent cards`, asy
     ),
   ).toBe(true);
   for (const scheme of ["light", "dark"]) {
-    await page.getByRole("combobox", { name: "外观", exact: true }).selectOption(scheme);
+    await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption(scheme);
     const embedded = page
       .locator(
         '[data-meowui-part="card/root"]:is([data-option-card-variant="embedded"], [data-option-card-variant="auto"]:not([data-card-depth="0"]))',
@@ -149,13 +149,13 @@ test(`Studio: card nesting shares surfaces and preserves independent cards`, asy
       ),
     ).toBe(true);
   }
-  await page.getByRole("button", { name: "保存检查结论", exact: true }).click();
-  await expect(page.locator("[data-card-feedback]")).toContainText("已保存");
+  await page.getByRole("button", { name: "Save check conclusion", exact: true }).click();
+  await expect(page.locator("[data-card-feedback]")).toContainText("Saved");
 });
 
 test("auto grid responds to its container while layout gaps follow the theme", async ({ page }) => {
   await page.setViewportSize({ width: 1100, height: 844 });
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=layout-grid");
+  await page.goto("/canvas.html?story=layout-grid");
   const grid = page.locator('#story-root [data-meowui-part="grid/root"]');
   const items = grid.locator(":scope > *");
   const wide = await items.evaluateAll((nodes) =>
@@ -172,12 +172,12 @@ test("auto grid responds to its container while layout gaps follow the theme", a
     })
     .toBe(true);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=layout-stack");
+  await page.goto("/canvas.html?story=layout-stack");
   const stack = page
     .locator('#story-root [data-meowui-part="stack/root"][data-option-layout-gap="relaxed"]')
     .first();
   for (const scheme of ["light", "dark"]) {
-    await page.getByRole("combobox", { name: "外观", exact: true }).selectOption(scheme);
+    await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption(scheme);
     const panelGap = await stack.evaluate(
       (node, property) => getComputedStyle(node).getPropertyValue(property).trim(),
       uiTokens.spacePanel.name,

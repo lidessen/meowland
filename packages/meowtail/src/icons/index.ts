@@ -14,3 +14,4 @@ export {
   type FileTypeIconProps,
 } from "./file-type-icon";
 export { Icon, iconNames, type IconName, type IconProps } from "./icon";
+export { IconSource, type IconNode, type IconSourceProps } from "./icon-source";

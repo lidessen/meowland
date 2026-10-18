@@ -1,19 +1,19 @@
 # Meowtail
 
-`meowtail` 提供跨应用组件、语义布局、标准主题和完整 Assistant 组合。网络、执行、权限与持久化由宿主适配，库不携带 Rossovia 的业务状态或后端。
+`meowtail` provides cross-application components, semantic layout, the standard theme, and the complete Assistant composition. Networking, execution, permissions, and persistence are adapted by the host; the library carries no Rossovia business state or backend.
 
-## 演示包
+## Presentation package
 
-演示播放器、Reveal、媒体生命周期、演示内容布局和主题已迁入独立 [MeowSlides](../meowslides/README.md)。Meowtail 不反向依赖演示包，旧 `meowtail/presentation` 与根演示导出已移除；通用 UI 和布局仍由本包提供。
+The presentation player, Reveal, media lifecycle, presentation content layouts, and themes have moved into the separate [MeowSlides](../meowslides/README.md). Meowtail does not depend on the presentation package in reverse, and the old `meowtail/presentation` and root presentation exports are removed; shared UI and layout are still provided by this package.
 
-本包的 npm 名称是 `meowtail`；既有 `createMeowUI`、`installMeowUI`、`createMeowUICatalog` 等 API 和运行时样式身份保持不变。使用新的包导入路径，不能据包名推导新的函数名、`data-*` 标记或 CSS 变量。
+This package's npm name is `meowtail`; existing APIs such as `createMeowUI`, `installMeowUI`, and `createMeowUICatalog`, along with runtime style identity, stay unchanged. Use the new package import path; do not derive new function names, `data-*` markers, or CSS variables from the package name.
 
-完整组合的使用合同见 [Assistant](ASSISTANT.md)，有限 JSON 入口见 [JSON catalog](JSON.md)。两者的实现与独立验收仍在进行；本页的 API 说明和早期产物验证不等于当前全部源码的同源验收通过。
+See [Assistant](ASSISTANT.md) for the usage contract of the complete composition and [JSON catalog](JSON.md) for the finite JSON entry point. Implementation and independent acceptance of both are still in progress; the API descriptions and early artifact verification on this page do not equal a same-source acceptance pass for all current source code.
 
-## 最小浏览器接入
+## Minimal browser integration
 
-在包含 `<main id="app"></main>` 的浏览器入口中，先完成同一 runtime 的组件注册、完整 CSS 加载和主题根绑定，再渲染内容。
-仅导入组件、仅安装 registry 或只用 `Theme` 都不能代替这三项；缺少任意一项，页面仍可能显示原生控件，却没有标准主题的尺寸与状态。
+In a browser entry point containing `<main id="app"></main>`, first complete component registration on the same runtime, full CSS loading, and theme root binding, then render content.
+Importing components only, installing the registry only, or using `Theme` only cannot replace these three steps; if any one is missing, the page may still show native controls without the standard theme's sizes and states.
 
 ```tsx
 import { createRuntime, h } from "meowjsx";
@@ -30,10 +30,10 @@ const removeStyles = mountStyles(root.ownerDocument, standardTheme.cssText);
 const removeTheme = applyTheme(root, standardTheme, standardOptions.select({ scheme: "light" }));
 const mounted = createWebRenderer(runtime).render(
   <Stack align="start">
-    <strong>连接设置</strong>
+    <strong>Connection settings</strong>
     <Inline gap="compact">
-      <Button>保存</Button>
-      <Button variant="quiet">取消</Button>
+      <Button>Save</Button>
+      <Button variant="quiet">Cancel</Button>
     </Inline>
   </Stack>,
   root,
@@ -48,330 +48,343 @@ const dispose = () => {
 };
 ```
 
-主题根提供可继承的正文 font、字号、行高与文字颜色；局部主题配置继承外层排版，组件仍拥有自己的控件与标题尺度。
-这不包含全局 `html/body` margin 重置、页面背景、页面留白，也不自动重置任意 `h1/h2/p`。
-页面空间用 `PageFrame` / `Container`，相关内容用 `Stack`，一组操作用 `Inline`；完整 Assistant 可直接用 `AssistantView`，不必从裸 Card 重搭一页。
-`CardHeader/Title/Content/Footer` 表达卡片内关系，原生内容则按文档语义排版；不要把每层内容都包成独立表面。
-可比较 Meowbook 的 `buttons`、`card-composition`、`workspace-composition`；它们分别展示操作关系、卡片结构与滚动工作区，压力态不等于产品必须同时展示所有状态。
-静态 CSS 交付与局部配置见[组件安装与样式交付](#组件安装与样式交付)；`examples/browser` 的 Increment 仅是包接合 smoke，不是页面设计模板。
+The theme root provides an inheritable body font, font size, line height, and text color; local theme configuration inherits the outer typography, while components still own their own control and heading scales.
+This does not include a global `html/body` margin reset, page background, or page whitespace, and does not automatically reset arbitrary `h1/h2/p`.
+Use `PageFrame` / `Container` for page space, `Stack` for related content, and `Inline` for a group of actions; the complete Assistant can use `AssistantView` directly, without rebuilding a page from bare Cards.
+`CardHeader/Title/Content/Footer` express relationships inside a card, while native content follows document semantics; do not wrap every layer of content in its own surface.
+Compare Meowbook's `buttons`, `card-composition`, and `workspace-composition`; they show action relationships, card structure, and a scrolling workspace respectively. A stress state does not mean the product must display all states at once.
+See [Component installation and style delivery](#component-installation-and-style-delivery) for static CSS delivery and local configuration; the Increment in `examples/browser` is only a package-integration smoke test, not a page design template.
 
-## 目录
+## Directory structure
 
 ```text
 src/
-  components/   # Button、Card、Input、Dialog 等基础组件；一个组件一个文件
-  chat/         # ChatFrame、ChatMessage、ChatComposer 等对话组件
-  icons/        # 品牌标记和小图标；一个图标一个文件
-  registry/     # contract 聚合、meowjsx 类型声明和安装入口
-  shared/       # 组件内部共享的小工具
-  theme/        # 标准主题的 token 定义和按 part 组织的 TS 样式
+  components/   # Base components such as Button, Card, Input, and Dialog; one component per file
+  chat/         # Conversation components such as ChatFrame, ChatMessage, and ChatComposer
+  icons/        # Brand marks and small icons; one icon per file
+  registry/     # Contract aggregation, meowjsx type declarations, and the installation entry point
+  shared/       # Small utilities shared inside components
+  theme/        # Standard theme token definitions and TS styles organized by part
 tests/
-  unit/         # Bun，按 components/chat/icons/shared/theme 分组
-  types/        # 公共类型合同，使用 *.types.ts / *.types.tsx，由 tsc 验证
-  browser/      # Playwright，按 components/chat/theme/catalog 分组
+  unit/         # Bun, grouped by components/chat/icons/shared/theme
+  types/        # Public type contracts using *.types.ts / *.types.tsx, verified by tsc
+  browser/      # Playwright, grouped by components/chat/theme/catalog
 ```
 
-产品事实、导航适配和应用专属样式留在宿主；通用活动面板、完整 Assistant 组合、共同页面壳和区域布局由本包提供，不要求消费者重新搭整页。
-通用组件通过
-className 保留宿主应用的视觉扩展点，标准主题由同一 package 的 `meowtail/theme`
-根据 registry 的 component/part 身份提供默认样式。MeowUI 的 registry 是运行时 contract
-和安装入口，不是 shadcn 式的源码分发目录。
+Product facts, navigation adaptation, and application-specific styles stay in the host; this package provides shared activity panels, the complete Assistant composition, shared page shells, and region layouts, so consumers do not need to rebuild whole pages.
+Shared components keep visual extension points for host applications through
+className, and the standard theme provides default styles from `meowtail/theme`
+in the same package based on the registry's component/part identity. The MeowUI registry is a runtime contract
+and installation entry point, not a shadcn-style source distribution directory.
 
-## 当前组件
+## Current components
 
-`PageFrame` 接收 header、toolbar 和 children，分配页头与 body 的可用高度，并提供共同页面外缘。
-业务和 iframe 放入 body，不再各自按 viewport 减去页头高度。
-默认 `variant="page"` 提供有限宽度与页面外缘；`variant="workspace"` 用于全宽工具栏和
-连续阅读/输入工作区，外壳不重复添加页面 inset，内容组件继续拥有阅读宽度和安全底缘。
-两种外壳都约束 body 高度；页头自然取高，动作可换行，就地展开内容可覆盖主体。
-`scrollOwner="content"` 是默认值，body 将滚动交给既有内部容器；`scrollOwner="layout"`
-让 body 自己承接自然文流与滚动。标题、关闭与其他 header 动作不放进 body 滚动区。
-仅 `content` 模式向直属内容根分配伸缩空间；`layout` 模式保留控件自身的默认尺寸。
-`RegionLayoutDescription` 用命名矩阵声明页面区域，浏览器宿主调用
-`mountRegionLayout(host, layout, options)`，获得 `regions` 内容根、`showGroup`、`back` 和 `dispose`。
-作者把内容放入这些根；矩形区域、有限尺寸、局部排列与滚动归属共享同一校验和 renderer。
-`content` 行按自然内容领取空间，`fill` 行领取余量；空间不足时 content 区域按其滚动 owner
-保持动作可达。组件应限制自身长内容，不能依靠外壳默认裁切来保住阅读空间。
-多列在窄窗投影为一列；区域的 `compactRow="content" | "fill"` 可指定该投影中的自然高或
-剩余高度，省略时沿原矩阵行推导。它不改变分组、桌面几何、内容挂载或滚动 owner。
-跨模块合同和内置/扩展的共同使用见
-统一 Extension 的区域布局（原产品仓库历史参考）。
-原产品的接线和 UI 验收属于历史证据，不能代替本库迁移后的独立验证。
+`PageFrame` accepts header, toolbar, notice, footer, and children, allocates available height between the page header and body, and provides the shared page outer edge.
+The optional `notice` sits between the header and the scrolling body; the optional `footer` stays after the body, so a composer or action bar does not need to float over content.
+Business content and iframes go into the body and no longer each subtract the header height from the viewport.
+The default `variant="page"` provides a bounded width and the page outer edge; `variant="workspace"` is for full-width toolbars and continuous reading/input workspaces, where the shell does not add another page inset and content components keep owning reading width and a safe bottom edge.
+Both shells constrain the body height; the header takes its natural height, actions can wrap, and content expanded in place can overlay the main region.
+`AppBar` is the compact application chrome used in `PageFrame`'s header slot: one title, one optional status line (usually `ChatStatus`), and the actions for the whole screen. It is distinct from `PageHeader` (page title block) and the keyboard `Toolbar`; use it for continuous small-screen workspaces, not as a second page header on desktop pages.
 
-`CodeBlock` 接收原始 `code` 和可选 `language`，已知语法按需加载 Shiki 高亮，提供独立复制与自动换行开关。
-换行只改变显示，复制保留原始空白；浏览器剪贴板失败时显示反馈。`onCopy` 可由宿主绑定其他
-剪贴板实现，组件不执行代码。无语言时显示“代码”，`defaultWrap` 设置初始换行状态。
-未知语言或高亮加载失败时保留纯文本显示。
+`scrollOwner="content"` is the default, where the body hands scrolling to an existing inner container; `scrollOwner="layout"` has the body itself carry natural flow and scrolling. Titles, close buttons, and other header actions do not go inside the body scroll region.
+Only `content` mode allocates stretch space to direct content roots; `layout` mode keeps controls' own default sizes.
+`RegionLayoutDescription` declares page regions with a named matrix; the browser host calls
+`mountRegionLayout(host, layout, options)` and gets `regions` content roots, `showGroup`, `back`, and `dispose`.
+Authors put content into these roots; rectangular regions, finite sizes, local arrangement, and scroll ownership share the same validation and renderer.
+`content` rows claim space by natural content, and `fill` rows claim the remainder; when space is short, content regions keep actions reachable according to their scroll owner. Components should limit their own long content rather than relying on the shell's default clipping to preserve reading space.
+Multiple columns project to one column in narrow windows; a region's `compactRow="content" | "fill"` can specify natural height or remaining height in that projection, and when omitted it is derived from the original matrix row. It does not change grouping, desktop geometry, content mounting, or scroll owner.
+See unified Extension region layout (historical reference in the original product repository) for
+cross-module contracts and shared use between built-ins and extensions.
+The original product's wiring and UI acceptance are historical evidence and cannot replace independent verification after this library's migration.
 
-`Checkbox`、`Switch` 和 `SegmentedControl` 提供原生表单选择；`Tabs` 负责保留挂载的面板切换。
-`Menu`、`HoverCard`、`Toast`、`RiskConfirmation` 提供菜单、预览和反馈，业务操作与显示寿命由宿主负责。
-Menu 的 Tab / Shift+Tab 关闭整个菜单链并沿原生顺序离开，不执行菜单项；Escape 逐层关闭并返回该层入口。
-`TerminalBlock`、`ReadBlock`、`DiffBlock`、`SearchBlock`、`WebBlock` 与 `JsonBlock/JsonTree`
-展示宿主提供的输出；组件不执行工具或读取文件。`ReadBlock` 可传 `lang`，首次进入视口时加载高亮，未知语言保留纯文本。
-`ImagePreview` 统一图片加载、失败与预览框，`ImageLightbox` 提供单图查看，
-`ShortcutKeys`、`PathLabel`、`StateDot` 和 `TextShimmer` 提供辅助呈现。
+`CodeBlock` accepts raw `code` and an optional `language`, loads Shiki highlighting on demand for known syntaxes, and provides independent copy and soft-wrap toggles.
+Wrapping changes only the display; copying preserves the original whitespace. When the browser clipboard fails, it shows feedback. The host can bind `onCopy` to another
+clipboard implementation, and the component does not execute code. With no language it shows "Code", and `defaultWrap` sets the initial wrap state.
+Unknown languages or failed highlight loads keep a plain-text display.
 
-`Pill` 用于紧凑胶囊标签或操作，选中状态由宿主提供；静态标签沿用 `Badge`，支持 outline、solid 和 quiet 呈现。
+`Checkbox`, `Switch`, and `SegmentedControl` provide native form selection; `Tabs` handles switching panels that stay mounted.
+`Menu`, `HoverCard`, `Toast`, and `RiskConfirmation` provide menus, previews, and feedback, while business actions and display lifetimes are the host's responsibility.
+Menu's Tab / Shift+Tab closes the whole menu chain and leaves along the native order without activating menu items; Escape closes one layer at a time and returns to that layer's entry point.
+`TerminalBlock`, `ReadBlock`, `DiffBlock`, `SearchBlock`, `WebBlock`, and `JsonBlock/JsonTree`
+display host-provided output; components do not execute tools or read files. `ReadBlock` accepts `lang`, loads highlighting when it first enters the viewport, and keeps unknown languages as plain text.
+`ImagePreview` unifies image loading, failure, and the preview frame; `ImageLightbox` provides single-image viewing;
+`ShortcutKeys`, `PathLabel`, `StateDot`, and `TextShimmer` provide supporting presentation.
 
-界面改版（系统设计稿（原产品仓库历史参考））新增的通用组件：
-`StatusDot` 以 processing（accent 脉冲）、success、returned（空心绿，执行返回不等于目标完成）、
-warning、danger、unknown（空心灰，不假装知道）、idle 表达状态，点本身不带文字。
-`Status` 接收 `state` 与必填 `label`，把装饰点与可见状态文字作为一个内容单元，标准主题统一点为 7px，
-不提供 `size` 或 `halo`。`label` 保留 `Child` 的组合能力并排除直接空值与布尔值；调用方须保证
-字符串、数组及动态内容实际非空且可见，并使用适合行内呈现的内容。`ListRow.status` 与
-`ResourceCard.status` 仍接收 `Child`，可传入 `Status`；`WorkCard`、`Timeline` 等组件继续拥有内部标记，
-不机械替换命令式改写、信号独立点或无逐点文字的装饰点阵。状态文字的非空语义仍由调用方审查。
-`Tag` 是挨着内容的静态事实
-（中性、强调、橙色计数、等宽路径），可选择与筛选仍用 `Pill`；`ProcessGroup` 与 `ProcessStep` 是折叠的步骤记录；
-`WorkCard` 是对话里指向一件工作的单个控件；`IconRail`、`RailItem` 与 `RailSection` 是 56px 图标栏，悬停或键盘
-聚焦时展开为覆盖在内容上的 256px 抽屉，分组收起时折成一个图标并显示子项的当前位置与橙点。
-`Button` 的 `outline` 是次要层级，另有 `accent`（关于当前活动的软底）与 `stop`（打断运行中的工作）。
-第二阶段补齐的详情与页面结构：`DetailSection`（带发丝线的分块，标题是小标签而非页面标题）、`Timeline` 与
-`TimelineItem`（一条线串起的事件，标记点沿用 `StatusDot` 语义）、`ResourceLink`（指向一个可打开对象的整行引用，
-有 href 时是链接，否则是按钮）；`PageHeader`（页名、一句用途与页面级操作）、`ListGroup` 与 `ListRow`（并列条目共用一圈
-轮廓，可在行下展开编辑区，单独使用并设 `tone="accent"` 是摘要行）、`ResourceCard`（概览页里的一项能力，停用态用虚线
-低对比）；`Drawer` 是窄屏从起始边滑入的原生模态面板，遮罩点击与 Escape 都交给宿主更新 `open`。`SegmentedControl` 的
-轨道与选中态按设计稿收紧。窄屏的 `ChatComposer` 堆叠布局把「添加、输入、发送」放在一行，模型选择留在下方。
-色板与层级只在 `theme/palette.ts`：`accentTokens`、`statusTokens`、`radiusTokens`（8/10/14/22）、`lineTokens`
-（0.5px 发丝线）、`layerTokens`；accent 只表达「正在发生」与「当前所在」，primary 仍为黑白。
+`Pill` is for compact capsule labels or actions, with selected state provided by the host; static labels use `Badge`, which supports outline, solid, and quiet presentation.
 
-`ChatToolCall` 用 `label` 表示动作，`summary` 表示折叠时仍可见的简短目标；输入/输出是可响应更新的惰性文本，
-超长结果沿共享 `OutputBlock` 折叠并完整复制。queued/running/waiting/success/error/cancelled/unknown
-分别表示宿主事实，complete 保留兼容。onRetry/onCancel 只通知宿主，组件不执行工具或自动更新业务状态。
-`ChatTask` 提供标题、状态、公开执行摘要、独立的 executionText/replyText、可选原生进度与 children/footer；
-执行成功但公开答复未收到仍可准确呈现。默认 unknown；未知进度省略，不伪造百分比。
-`ChatProcess` 用原生 details 聚合记录，任务与工具继续复用 Stack/Inline/Grid、来源、附件、产物和代码组件。
-完整生命周期的已有/补齐/宿主边界与连贯组合规则见 [Agent 组件说明](AGENT-COMPONENTS.md)，
-真实默认组合见 Meowbook 的 agent-workflow、agent-workflow-narrow 与 agent-workflow-assistant。
-已有 AssistantView JSON catalog 同步增加有限 tool/task parts 与 onToolAction，复用同一组件；
-不新增独立 ChatTask/ChatToolCall JSON entry、递归任务树或任意对象解释，支持集见 [JSON 合同](JSON.md)。
+Shared components added by the UI revision (system design draft (historical reference in the original product repository)):
+`StatusDot` expresses state as processing (accent pulse), success, returned (hollow green; an execution return does not mean the goal is complete),
+warning, danger, unknown (hollow gray; do not pretend to know), and idle; the dot itself carries no text.
+`Status` accepts `state` and a required `label`, treating the decorative dot and visible state text as one content unit; the standard theme fixes the dot at 7px
+and exposes no `size` or `halo`. `label` keeps `Child` composition and excludes direct empty values and booleans; callers must ensure
+strings, arrays, and dynamic content are actually non-empty and visible, and use content suitable for inline presentation. `ListRow.status` and
+`ResourceCard.status` still accept `Child` and can take `Status`; `WorkCard`, `Timeline`, and similar components keep their internal markers
+and are not mechanically replaced with imperative rewrites, per-signal dots, or decorative dot matrices without per-dot text. The caller still reviews the non-empty semantics of status text.
+`Tag` is a static fact next to content
+(neutral, emphasized, orange count, monospace path), while selection and filtering still use `Pill`; `ProcessGroup` and `ProcessStep` are collapsible step records;
+`WorkCard` is a single control in a conversation that points to one piece of work; `IconRail`, `RailItem`, and `RailSection` form a 56px icon rail that expands on hover or keyboard
+focus into a 256px drawer over the content, and a collapsed group folds into one icon that shows the current position of its items with an orange dot.
+`Button`'s `outline` is the secondary level, plus `accent` (a soft background related to current activity) and `stop` (to interrupt running work).
+Details and page structures added in the second stage: `DetailSection` (a block with a hairline; its title is a small label rather than a page title), `Timeline` and
+`TimelineItem` (events threaded on one line, with markers following `StatusDot` semantics), `ResourceLink` (a whole-row reference to an openable object:
+a link when href is present, otherwise a button); `PageHeader` (page name, one-sentence purpose, and page-level actions), `ListGroup` and `ListRow` (sibling entries share one
+outline, an editing area can expand below a row, and a standalone row with `tone="accent"` is a summary row), `ResourceCard` (a capability on an overview page, with a dashed
+low-contrast disabled state); `Drawer` is a narrow-screen native modal panel that slides in from the start edge, with backdrop clicks and Escape handed to the host to update `open`. `SegmentedControl`
+tightens its track and selected state to match the design draft. The narrow-screen `ChatComposer` stacked layout puts "add, input, send" on one row and keeps model selection below.
+The palette and layers live only in `theme/palette.ts`: `accentTokens`, `statusTokens`, `radiusTokens` (8/10/14/22), `lineTokens`
+(0.5px hairlines), and `layerTokens`; accent expresses only "happening now" and "where you are", while primary stays black and white.
 
-`ChatMessageList` 的行距由列声明、由行读取：列在每个非首行上给出 `--chat-row-pitch`，行按它设置
-上边距，首行的上边距来自列表自身的内距。宿主逐条挂载消息时可以在列与行之间插入无布局容器
-（`display: contents`），行距与直接子项一致。工具调用、过程分组与来源共用同一组行度量
-（leading 盒、间隙与行盒），并随 `--chat-font-body` 相对 14px 的增量一起缩放：改变对话字号时
-字形盒、字形、行盒与展开体缩进一起移动。行所拥有的内容（展开体、分组内的行）挂在行标签的
-轴线上，与标签本身区分层级；与行并列的条目留在同一轴线上。
+`ChatToolCall` uses `label` for the action and `summary` for the short target still visible when collapsed; input/output are reactive lazy text,
+and overlong results collapse through the shared `OutputBlock` and copy in full. queued/running/waiting/success/error/cancelled/unknown
+each represent host facts, and complete stays for compatibility. onRetry/onCancel only notify the host; the component does not execute tools or update business state automatically.
+`ChatTask` provides a title, state, public execution summary, separate executionText/replyText, optional native progress, and children/footer;
+execution success without a received public reply is still presented accurately. It defaults to unknown; unknown progress is omitted rather than faking percentages.
+`ChatProcess` aggregates records with native details, and tasks and tools continue to reuse Stack/Inline/Grid, sources, attachments, artifacts, and code components.
+For existing/added/host boundaries across the full lifecycle and the coherent composition rules, see [Agent components](AGENT-COMPONENTS.md);
+for real default compositions, see agent-workflow, agent-workflow-narrow, and agent-workflow-assistant in Meowbook.
+The existing AssistantView JSON catalog also gains finite tool/task parts and onToolAction while reusing the same components;
+it adds no separate ChatTask/ChatToolCall JSON entry, recursive task tree, or arbitrary object interpretation. See the [JSON contract](JSON.md) for the supported set.
 
-连续回复传入同一头像与 `continuation`，主题保留头像列并隐藏重复头像，正文轴线不依赖相邻 DOM 结构；未传头像的组继续使用无头像布局。
+`ChatMessageList` row spacing is declared by the column and read by the rows: the column sets `--chat-row-pitch` on every non-first row, and rows use it for their
+top margin, with the first row's top margin coming from the list's own inset. When the host mounts messages one by one, it can insert a layout-free container
+(`display: contents`) between the column and the rows, and row spacing matches that of direct children. Tool calls, process groups, and sources share one set of row metrics
+(leading box, gaps, and row box) and scale with the `--chat-font-body` delta relative to 14px: changing the conversation font size
+moves the glyph box, glyphs, row box, and expanded-body indentation together. Content owned by a row (expanded body, rows inside a group) hangs on the row label's
+axis and is hierarchically distinct from the label itself; entries beside the row stay on the same axis.
 
-默认尺度与组件开发顺序见 [组件开发约定](AGENTS.md)。新组件先在 Meowbook 与现有控件同屏校准，
-再接入应用；主题的字号、控件高度和三层间距是一套关系，不分别为每个组件选择一组新尺寸。
-默认按钮高 36px，紧凑按钮高 28px，输入控件高 32px。信息块内部紧凑；页面边缘、独立区块与阅读区域应有充分留白。
-局部间距 token 不是页面留白的上限，不将所有层级统一压紧。
+Consecutive replies pass the same avatar with `continuation`, and the theme keeps the avatar column while hiding repeated avatars; the body axis does not depend on adjacent DOM structure. Groups without an avatar keep the avatar-free layout.
 
-界面正文使用 `uiTokens.fontBody`，辅助说明使用 `uiTokens.fontCaption`，长文与对话正文使用
-`uiTokens.fontReading`，局部标题使用 `uiTokens.fontTitle`，完整页面标题使用
-`uiTokens.fontPageTitle`，不把页面标题尺度用于字段标签。普通控件的水平内距由
-`uiTokens.controlPaddingInline` 决定；group、section、panel 分别表达组内、区域之间和容器边缘的留白。
-阅读段落的相对缩进、媒体尺寸、图谱坐标与触摸目标仍按真实用途设置，不套用控件尺度。
+See [Component development conventions](AGENTS.md) for the default scale and component development order. Calibrate new components on the same screen as existing controls in Meowbook
+first, then integrate them into applications; the theme's font sizes, control heights, and three-level spacing form one set of relationships, and each component does not get its own new sizes.
+Default buttons are 36px high, compact buttons 28px, and input controls 32px. Information blocks are tight inside; page edges, standalone blocks, and reading areas should have generous whitespace.
+Local spacing tokens are not the ceiling for page whitespace, and not every level is uniformly compressed.
 
-`PageFrame` 的页面边缘使用 `pageInsetBlock` / `pageInsetInline`，窄窗使用对应的
-`pageInsetCompactBlock` / `pageInsetCompactInline`；页面留白不压成局部 panel 内距。
-`ResourceCard` 使用统一的局部标题、正文、辅助文字与 card 圆角；紧凑概览对象的内距和
-纵向节奏只在组件主题 token 中定义，不增加任意像素或 density 参数。需要核对的 identity
-使用辅助文字色与等宽字体，停用状态不抹去名称与操作原因。
-Meowbook 的 `page-structure-long-content` 补充长名称、准确标识、邻接状态与禁用动作的组合；
-`EmptyState` 透传调用方的原生属性，状态紧急度与加载事实仍由宿主提供。
+Use `uiTokens.fontBody` for interface body text, `uiTokens.fontCaption` for supporting descriptions, `uiTokens.fontReading` for long-form and conversation body text,
+`uiTokens.fontTitle` for local titles, and `uiTokens.fontPageTitle` for complete page titles; do not use the page-title scale for field labels. The horizontal padding of ordinary controls comes from
+`uiTokens.controlPaddingInline`; group, section, and panel express whitespace within a group, between areas, and at container edges respectively.
+Relative indentation in reading paragraphs, media sizes, graph coordinates, and touch targets still follow real usage and do not adopt control scales.
 
-从仓库根运行 `bun test packages/meowtail/tests/unit` 执行 `tests/unit` 的 Bun 测试；类型检查与 `tests/browser` 的组件行为回归分别执行。文件归属与命名遵循测试文件组织规范（原产品仓库历史参考）。
-浏览器测试只启动本包的 Meowbook 场景，不需要 Dashboard。组件交互、布局、对话组件和主题
-回归统一位于 `tests/browser`；其中 catalog 验证本包展示配置作为 Meowbook 消费者的实际接合。
-Meowbook 自身的工具与独立夹具测试仍由 `test:meowbook` 负责。
-完整 UI 回归还需运行 Meowbook 测试及本包 `playwright.config.ts` 的浏览器场景。
+`PageFrame`'s page edge uses `pageInsetBlock` / `pageInsetInline`, and narrow windows use the corresponding
+`pageInsetCompactBlock` / `pageInsetCompactInline`; page whitespace is not compressed into local panel padding.
+`ResourceCard` uses unified local titles, body text, supporting text, and card radius; padding and vertical rhythm for compact overview objects are defined only in component theme tokens,
+without arbitrary pixel or density parameters. Identities that need checking use the supporting text color and a monospace font, and the disabled state does not erase
+the name or the reason the action is unavailable.
+Meowbook's `page-structure-long-content` adds compositions with long names, precise identifiers, adjacent states, and disabled actions;
+`EmptyState` passes through the caller's native attributes, and state urgency and loading facts still come from the host.
 
-`ChoiceGroup` 直接展示少量单选项，复用原生 radio 的键盘、表单和必填校验。
-支持选项说明、禁用、受控值及表单重置；不负责提交。
-`ChatQuestion` 提供问题、补充说明、回答内容、反馈和操作的布局；回答方式、异步提交和取消的业务含义
-由宿主负责。标准主题遵循紧凑工作尺度，相关操作集中排列，不默认拉到容器两端。
+Run `bun test packages/meowtail/tests/unit` from the repository root to run the Bun tests in `tests/unit`; typechecking and the component behavior regressions in `tests/browser` run separately. File ownership and naming follow the test file organization specification (historical reference in the original product repository).
+Browser tests start only this package's Meowbook scenes and do not need the Dashboard. Component interaction, layout, conversation components, and theme
+regressions all live in `tests/browser`; the catalog there verifies the actual integration of this package's showcase configuration as a Meowbook consumer.
+Meowbook's own tool and standalone fixture tests are still handled by `test:meowbook`.
+A complete UI regression also requires running the Meowbook tests and the browser scenes in this package's `playwright.config.ts`.
 
-### 布局与内容组合
+`ChoiceGroup` directly displays a small number of single-choice options and reuses native radio keyboard, form, and required validation.
+It supports option descriptions, disabled options, controlled values, and form reset; it does not handle submission.
+`ChatQuestion` lays out the question, supporting description, answer content, feedback, and actions; the meaning of answer modes, asynchronous submission, and cancellation
+is the host's responsibility. The standard theme follows the compact work scale and keeps related actions grouped rather than stretching them to the container edges by default.
 
-`Stack` 纵向排列，`Inline` 横向排列且默认允许换行。共同提供 `gap`（none/compact/normal/relaxed）、
-`align` 和 `justify`；`Inline wrap={false}` 可明确保持单行。组件保留方向与排列结构，theme 决定语义间距。
-`Grid` 默认按容器宽度自动排列，`minColumnWidth` 为 compact/normal/wide；也可指定 `columns={1|2|3|4}`。
-固定列数不会偷偷变成响应式列数。`Container width` 为 narrow/content/wide/page/full，主题控制内容最大宽度。
-Stack 默认 stretch 便于表单与内容区域填满宽度；混合标签和按钮时用 `align="start"` 保留自然尺寸，
-或把行动放入 Inline。字段、动作与长文字按内容关系明确选择 stretch、start 或 baseline 对齐。
+### Layout and content composition
 
-局部布局可以自由嵌套这些 JSX 组件：先选择横向、纵向或并列关系，再在需要分配余量时使用
-`LayoutItem`，内容和原生语义仍由真实组件承载。页壳与命名区域矩阵分配页面空间，
-不限制区域内部的组件组合；没有新增可序列化的递归布局模板或另一套布局引擎。
+`Stack` arranges vertically; `Inline` arranges horizontally and allows wrapping by default. Both provide `gap` (none/compact/normal/relaxed),
+`align`, and `justify`; `Inline wrap={false}` explicitly keeps a single line. Components keep direction and arrangement structure, and the theme decides semantic spacing.
+`Grid` arranges automatically by container width by default, with `minColumnWidth` set to compact/normal/wide; `columns={1|2|3|4}` can also be specified.
+A fixed column count does not silently become a responsive count. `Container width` is narrow/content/wide/page/full, and the theme controls the maximum content width.
+Stack stretches by default so forms and content regions fill the width; when mixing labels and buttons, use `align="start"` to keep natural sizes,
+or put the actions in an Inline. Fields, actions, and long text clearly choose stretch, start, or baseline alignment according to their content relationship.
 
-沿用这套布局原语，不在应用中重复实现方向、对齐和间距。Stack/Inline/Grid 的 `rowGap`、
-`columnGap` 默认 auto（沿用 gap），可单独使用同一套语义间距。布局可用 `as="header"` 或
-`as="footer"` 保留区域语义；组件不会代替宿主选择业务断点、文字截断或换行策略。
+Local layout can freely nest these JSX components: first choose the horizontal, vertical, or parallel relationship, then use `LayoutItem` when space needs allocating,
+while content and native semantics are still carried by real components. The page shell and named region matrix allocate page space and do not limit component composition inside a region;
+no new serializable recursive layout template or second layout engine was added.
 
-`Toolbar` 默认横向并允许换行；`orientation="vertical"` 沿纵向排列。它为自身按钮、原生输入型按钮和有 href 的链接动作集合提供一个 Tab 停靠，方向键、Home / End 在当前集合内移动，横向尊重 RTL。原生 Input、Textarea、Select 和自管键盘的组合控件保留独立 Tab 与编辑键；嵌套 Toolbar 不重复消费。隐藏、disabled、inert 或作者显式 `tabIndex=-1` 的入口不入动作集合，动态成员变化不主动夺焦点。Enter / Space 仍沿控件原生激活，不自动将复杂输入折进 overflow 菜单；卸载恢复本组件管理过的 tabindex，保调用方后续有效属性。
+Use this set of layout primitives and do not reimplement direction, alignment, and spacing in applications. Stack/Inline/Grid `rowGap` and
+`columnGap` default to auto (following gap) and can use the same semantic spacing independently. Layouts can use `as="header"` or
+`as="footer"` to keep region semantics; components do not choose business breakpoints, text truncation, or wrapping strategies for the host.
 
-`LayoutItem` 控制直接子项的空间分配：`grow` 默认 false，`shrink` 默认 true，
-`basis` 默认 auto，`alignSelf` 默认 auto。它与 Stack/Inline/Grid 的根保留 min-width:0、min-height:0，
-让嵌套子项能够接受父容器分配的有限空间；长标识符
-是否断行、正文是否截断由内容决定。只在需要控制子项空间时使用，不要求每个元素包一层。
+`ActionRail` is one action row with named `leading`, `trailing`, and `submit` slots. The rail owns start/end anchoring and the rule that the submit action stays visible while flexible leading and trailing actions wrap; callers pass actions rather than layout classes. `MetaRow` is one page-level fact row: `items` carry an optional icon and a short label, separators are generated between facts, `progress` appends one optional progress fact (finite values clamp to 0–100; non-finite values are omitted), and `align`/`progressTone` select the two finite presentations. Neither component owns business state or actions.
 
-纵向工作区先由宿主或 PageFrame 提供有限高度，再用 `LayoutItem grow` 分配正文余量。
-实际滚动内容明确使用 `overflow: auto`；布局组件不会默认裁切内容，也不会自动选择滚动 owner。
-中间继续用 Stack 等布局组件时沿用可收缩的根；插入原生 div 等宿主包装时，仍须自行处理其
-高度和最小尺寸。无高度限制的 Stack 保持自然文流，`shrink={false}` 的动作仍保留自然尺寸。
+`Toolbar` is horizontal by default and allows wrapping; `orientation="vertical"` arranges it vertically. It provides one Tab stop for its own buttons and for the action set of native input-like buttons and links with href; arrow keys, Home / End move within the current set, and horizontal orientation respects RTL. Native Input, Textarea, Select, and composite controls that manage their own keyboard keep independent Tab stops and editing keys; nested Toolbars do not consume them twice. Entries that are hidden, disabled, inert, or explicitly set to `tabIndex=-1` by the author are excluded from the action set, and dynamic membership changes do not steal focus. Enter / Space still activate along native control behavior, and complex inputs are not automatically folded into an overflow menu; unmounting restores the tabindex values this component managed and preserves the caller's subsequent valid attributes.
+
+`LayoutItem` controls space allocation for direct children: `grow` defaults to false, `shrink` to true,
+`basis` to auto, and `alignSelf` to auto. Its root with Stack/Inline/Grid keeps min-width:0 and min-height:0
+so nested children can accept the finite space the parent allocates; whether long identifiers
+break or body text truncates is decided by the content. Use it only when child space needs controlling, not as a wrapper around every element.
+
+For a vertical workspace, first have the host or PageFrame provide a finite height, then allocate the body remainder with `LayoutItem grow`.
+Content that actually scrolls explicitly uses `overflow: auto`; layout components do not clip content by default and do not choose a scroll owner automatically.
+When continuing with layout components such as Stack in between, keep using shrinkable roots; when inserting host wrappers such as native divs, the wrapper still has to handle its own
+height and minimum size. A Stack without a height constraint keeps natural flow, and actions with `shrink={false}` keep their natural size.
 
 ```tsx
-// 标签与值属于一组，混合字号沿文字基线对齐。
+// Label and value belong to one group; mixed font sizes align along the text baseline.
 <Inline gap="compact" align="baseline">
-  <small>默认连接</small>
+  <small>Default connection</small>
   <strong>Codex</strong>
   <small>gpt-6-luna</small>
 </Inline>
 
-// 正文使用剩余宽度，动作保留自然尺寸。
+// The body uses the remaining width; the action keeps its natural size.
 <Inline wrap={false}>
   <LayoutItem grow><Stack gap="compact">{title}{description}</Stack></LayoutItem>
-  <LayoutItem shrink={false}><Button>编辑连接</Button></LayoutItem>
+  <LayoutItem shrink={false}><Button>Edit connection</Button></LayoutItem>
 </Inline>
 
-// 操作靠近排列，换行后留出更清楚的行距。
+// Actions sit close together, with clearer line spacing when they wrap.
 <Inline as="footer" gap="compact" rowGap="normal">{actions}</Inline>
 ```
 
-Meowbook 的“布局组合 · 文本基线与固定动作”同时覆盖这些组合与长模型标识符。
+Meowbook's "Layout composition · Text baseline and fixed actions" covers these compositions and long model identifiers together.
 
-`DescriptionList` / `DescriptionItem term={...}` 用原生 `dl` / `dt` / `dd` 组织相关的标签与值。
-同组标签自然取宽并有上限，值共享列起点；局部容器宽度不足时，每项按标签、值上下排列，
-不按整个窗口宽度判断。默认保留语义字号与可换行长文本，不提供表面、内距或独立滚动。
-需要父容器分配可用宽度，不承诺按内容收紧宽度的布局；当前 Web 主题使用 CSS subgrid 与容器查询。
-标签和任意值都可传 `Child`，值内继续组合已有布局与控件，不提供元数据 schema 或额外动作插槽。
-代码字体、截断和固定尺寸子内容由消费者决定；普通文字与长标识默认可断行。
-公开 parts 为 `description-list/root`、`description-item/root/term/value`，原生属性透传到各组件 root。
+`DescriptionList` / `DescriptionItem term={...}` organize related labels and values with native `dl` / `dt` / `dd`.
+Labels in the same group take their natural width up to a cap, and values share a column start; when the local container is too narrow, each item stacks label above value
+based on the local width, not the whole window. By default it keeps semantic font sizes and wrappable long text, and provides no surface, padding, or independent scrolling.
+It needs the parent container to allocate available width and does not promise a layout that tightens width to content; the current Web theme uses CSS subgrid and container queries.
+Labels and arbitrary values accept `Child`; values continue to compose existing layouts and controls, and no metadata schema or extra action slot is provided.
+Code fonts, truncation, and fixed-size child content are decided by the consumer; ordinary text and long identifiers can wrap by default.
+The public parts are `description-list/root` and `description-item/root/term/value`, and native attributes pass through to each component root.
 
 ```tsx
 <DescriptionList>
-  <DescriptionItem term="工作目录">
+  <DescriptionItem term="Working directory">
     <Inline wrap={false} gap="compact" align="start">
       <LayoutItem grow>
         <code>{workspacePath}</code>
       </LayoutItem>
       <LayoutItem shrink={false}>
-        <Button size="small">复制目录</Button>
+        <Button size="small">Copy directory</Button>
       </LayoutItem>
     </Inline>
   </DescriptionItem>
-  <DescriptionItem term="访问方式">只读</DescriptionItem>
+  <DescriptionItem term="Access mode">Read-only</DescriptionItem>
 </DescriptionList>
 ```
 
-Meowbook 的 `description-list-composition` 在同一视口展示宽、窄局部容器、长标签与标识、
-值内动作和输入，用于核对共享列、自然重排、原生语义与草稿连续性；它不代表业务页面已验收。
+Meowbook's `description-list-composition` shows wide and narrow local containers, long labels and identifiers,
+actions and inputs inside values in one viewport, for checking shared columns, natural reflow, native semantics, and draft continuity; it does not mean a business page has been accepted.
 
-`Card` 支持 CardHeader、CardTitle、CardDescription、CardAction、CardContent、CardFooter。
-默认 `variant="auto"` 通过渲染树 Context 取得深度：标准主题将顶层呈现为独立表面、后代融入父级；显式 variant 优先。
-深度跟随逻辑组件树，浮层不会因为视觉上离开父卡片而自动变成新根；需要独立表面的弹层内容显式使用 surface。
-Title 可以指定 h2–h6，标题等级仍由文档结构决定，不根据卡片嵌套自动猜测。
-内部普通分组使用共享表面，独立事项可以明确使用 `variant="surface"`；`variant="embedded"` 明确融入父表面。
-嵌套关系不等于必须重复外框和阴影。复杂内容仍使用 Stack/Inline/Grid 排版，不把 Card 变成万能布局组件。
+`Card` supports CardHeader, CardTitle, CardDescription, CardAction, CardContent, and CardFooter.
+The default `variant="auto"` takes depth from the render tree Context: the standard theme presents the top level as an independent surface and blends descendants into the parent; an explicit variant takes precedence.
+Depth follows the logical component tree, so an overlay does not automatically become a new root just because it visually leaves the parent card; overlay content that needs an independent surface uses surface explicitly.
+Title can specify h2–h6; heading levels are still decided by document structure and are not guessed automatically from card nesting.
+Ordinary internal groups use the shared surface, standalone items can explicitly use `variant="surface"`, and `variant="embedded"` explicitly blends into the parent surface.
+Nesting does not mean borders and shadows must be repeated. Complex content still uses Stack/Inline/Grid layout; do not turn Card into a universal layout component.
 
-`FieldGroup` 使用原生 fieldset/legend 组织字段，支持整组 disabled；Field 继续负责单个字段关联。
-`AspectRatio ratio={16/9}` 控制布局比例，媒体的 object-fit 与裁切由调用方选择。
-`Separator` 保留横向/纵向分隔语义。
+`FieldGroup` organizes fields with native fieldset/legend and supports disabling the whole group; Field continues to handle association for a single field.
+`AspectRatio ratio={16/9}` controls layout ratio; the caller chooses media object-fit and clipping.
+`Separator` keeps horizontal/vertical separator semantics.
 
-`Tabs` 使用必需的 id、label 与 items（value/label/content/disabled）创建关联的 tab/tabpanel；
-支持方向键、Home/End、受控 value Signal 与 defaultValue。切换时面板保持挂载，草稿不丢失。
-`Breadcrumb items` 为 label/href 数组，最后一项标记当前位置。
-`Tooltip` 使用 `trigger(bindings)` 为有名称的可聚焦控件补充文字说明，鼠标延迟出现、键盘聚焦立即出现，
-Escape 关闭；不要把必要信息或可交互内容只放进 Tooltip，后者使用 Popover。
-`Alert tone` 表达视觉状态，`role` 明确选择 status/alert，紧急度不由颜色推断。
-`Skeleton` 是 aria-hidden 的占位；调用方提供内容区域的 aria-busy 和加载文案。
-`SkeletonBoundary active={loading} label="正在更新资料"` 对已挂载的内容应用骨架呈现，
-`active` 接收 boolean 或 Signal；切换不会卸载 children，保留输入草稿与组件状态。
-加载时区域标记 aria-busy、内容 inert，屏幕阅读器从区域外的 status 获取调用方提供的加载文案。
-开始加载时释放内容内的焦点；完成后不自动抢回焦点。调用方应把取消、重试等可用操作放在边界外。
-底层使用 MeowJSX Web 的共享骨架控制器，对文字、图片、图标及输入统一去细节；这只是加载呈现，
-不负责发起请求、计时或判断完成。首次加载尚无内容几何时，仍由调用方使用 `Skeleton` 提供占位结构。
-宿主显式给 Web renderer 接入 `observation` hub 时，边界从渲染树 Context 取得来源并订阅自己的
-组件子树；嵌套边界按 contract 与节点归属定位，不依赖函数名。普通未观察的 renderer 仍用局部 DOM
-方式呈现，不强制开启组件索引。两种方式都保留外部 DOM 与主题变化的补充监听。
-`Spinner label` 提供可读加载状态，不宣称真实进度。
+`Tabs` uses the required id, label, and items (value/label/content/disabled) to create associated tabs/tabpanels;
+it supports arrow keys, Home/End, a controlled value Signal, and defaultValue. Panels stay mounted when switching, so drafts are not lost.
+`Breadcrumb items` is an array of label/href, and the last item marks the current location.
+`Tooltip` uses `trigger(bindings)` to add text descriptions to named focusable controls; it appears after a mouse delay, appears immediately on keyboard focus,
+and closes on Escape; do not put necessary information or interactive content only in a Tooltip—use Popover for the latter.
+`Alert tone` expresses visual state, and `role` explicitly chooses status/alert; urgency is not inferred from color.
+`Alert layout="bar"` is the compact page-notice form: one line with a status dot, body text and a trailing action; the default `layout="block"` keeps title/body/actions for outcomes that need reading. Use `bar` in `PageFrame`'s notice slot; it is a semantic notice shape, not a device variant.
 
-原生选择控件 `Select` 复用浏览器的选项、键盘与表单语义，提供 `root` part；视觉由 theme 决定。它同时用于 Meowbook 工具外观与场景主题选择。控件保留原生 `size`（行数）语义，不把它复用成视觉尺寸。
+`Skeleton` is an aria-hidden placeholder; the caller provides the content region's aria-busy and loading copy.
+`SkeletonBoundary active={loading} label="Updating details"` applies skeleton presentation to already mounted content;
+`active` accepts a boolean or Signal, and toggling does not unmount children, preserving input drafts and component state.
+While loading, the region is marked aria-busy and its content is inert, and screen readers get the caller-provided loading copy from a status outside the region.
+Focus inside the content is released when loading starts and is not automatically reclaimed when it finishes. Callers should put available actions such as cancel and retry outside the boundary.
+Underneath it uses MeowJSX Web's shared skeleton controller, which uniformly removes detail from text, images, icons, and inputs; this is loading presentation only and does not
+start requests, time anything, or decide completion. When there is no content geometry on first load, the caller still uses `Skeleton` to provide placeholder structure.
+When the host explicitly wires an `observation` hub into the Web renderer, the boundary gets its source from the render tree Context and subscribes to its own
+component subtree; nested boundaries are located by contract and node ownership, not by function name. An ordinary unobserved renderer still uses the local DOM
+approach and does not force the component index on. Both approaches keep supplementary listeners for external DOM and theme changes.
+`Spinner label` provides a readable loading state and does not claim real progress.
 
-`Popover` 是非模态的通用弹层，不默认设置菜单角色或锁住焦点。必需 `id` 和
-`trigger(bindings)`；触发按钮展开 bindings，内容放 children。支持 `open` Signal / `defaultOpen`、
-`onOpenChange`、`align`、`matchTriggerWidth`、`role` 和 `labelledBy`。`triggerId` 可与外部 Field 关联。
-使用浏览器 Popover API 的顶层承载，依赖支持该 API 的浏览器；定位采用 `@floating-ui/dom`
-的 offset/flip/shift/size 与打开期间的 autoUpdate，关闭或卸载时清理。外部点击关闭最上层，
-Escape 返回当前层入口；焦点移到外部时不抢回焦点。内容按普通 Tab 顺序访问，菜单键盘规则由消费者提供。
-局部 DOM 控件先处理 Escape；子 `preventDefault()` 表示消费，未消费时只由原 topmost 调用一次既有 `onKeyDown` 并尝试关闭，回调后重核原层，不能同一键再关 parent。单独 `stopPropagation()` 阻断自定义派发，不承诺阻止原生 Dialog 默认取消。正常回焦仍要求成功关闭且 trigger 可用，controlled 拒绝关闭、外部主动转焦和卸载不被强行覆盖；不吞调用方异常。
-定位与限高完成后，仅最上层弹层把内部当前聚焦项滚入可见区域，不移动焦点或滚动外层。
-parts 为 `root/panel`，表面、间距与动效归 theme。
+The native select control `Select` reuses browser option, keyboard, and form semantics and provides a `root` part; the theme decides visuals. It is used both for the Meowbook tool appearance and for scene theme selection. The control keeps native `size` (row count) semantics and does not reuse it as a visual size.
 
-`ChoiceSelect` 在 Popover 上实现自定义单选，原生 `Select` 继续用于系统选择器与多选。
-`options` 为 `{ value, label, disabled?, group? }[]`，支持 `defaultValue` 或受控 `value` Signal，
-用 `onValueChange` 接收选择。方向键、Home/End、字符定位、Enter/Space、Escape 和 Tab 可用。
-`id` 用于 Field 关联；`name/required/disabled/form` 接到原生表单控件，必填失败阻止提交并聚焦
-触发按钮。错误消息使用浏览器的原生校验文案。重置恢复非受控默认值，受控值仍归调用方。
-主题视觉隐藏原生表单载体；不以 hidden input 冒充 required 校验。不提供自定义多选或异步搜索。
-parts 为 `root/trigger/value/indicator/list/group/option/native/validation`。
+`Popover` is a non-modal general overlay; it does not set a menu role or trap focus by default. It requires `id` and
+`trigger(bindings)`; the trigger button exposes the bindings, and content goes in children. It supports `open` Signal / `defaultOpen`,
+`onOpenChange`, `align`, `matchTriggerWidth`, `role`, and `labelledBy`. `triggerId` can associate with an external Field.
+It uses the browser Popover API's top-layer hosting and depends on browsers that support that API; positioning uses `@floating-ui/dom`'s
+offset/flip/shift/size and autoUpdate while open, cleaned up on close or unmount. An outside click closes the topmost layer,
+and Escape returns to the current layer's entry point; focus moved outside is not reclaimed. Content is reached in ordinary Tab order, and menu keyboard rules are provided by the consumer.
+Local DOM controls handle Escape first; a child's `preventDefault()` means consumed, and when unconsumed only the original topmost calls the existing `onKeyDown` once and tries to close, re-checking the original layer after the callback so the same key cannot close the parent. `stopPropagation()` alone blocks custom dispatch and does not promise to prevent native Dialog default cancellation. Normal focus return still requires a successful close and an available trigger; a controlled refusal to close, an external deliberate focus move, and unmount are not forcibly overridden, and caller exceptions are not swallowed.
+After positioning and height limiting, only the topmost overlay scrolls its currently focused internal item into view, without moving focus or scrolling outer layers.
+The parts are `root/panel`; surface, spacing, and motion belong to the theme.
 
-- 基础：Button、AddButton、IconButton、Card、Badge、Input、Textarea、Select、Field、
-  SearchInput、Disclosure、Separator、NavItem、EmptyState。
-- 对话框：Dialog、DialogPanel、DialogHeader、DialogActions。
-- Chat：ChatFrame、ChatHeader、ChatStatus、ChatConversation、ChatMessageList、ChatMessage、ChatBubble、
-  ChatMessageActions、ChatComposer、ChatToolCall、ChatAttachments、ChatProcess、ChatSources。
-- 图标：统一 Lucide 子集 `Icon` 与 `iconNames`，以及 MeowlandMark、DoodleCat、NotesIcon、TasksIcon、SearchIcon、PlusIcon、
-  GithubIcon、ExternalArrowIcon。
+`ChoiceSelect` implements custom single selection on Popover; native `Select` continues to serve system pickers and multiple selection.
+`options` is `{ value, label, disabled?, group? }[]`; it supports `defaultValue` or a controlled `value` Signal,
+and `onValueChange` receives selections. Arrow keys, Home/End, character search, Enter/Space, Escape, and Tab work.
+`id` is used for Field association; `name/required/disabled/form` connect to a native form control, and a required failure blocks submission and focuses the
+trigger. Error messages use the browser's native validation copy. Reset restores the uncontrolled default value, and a controlled value still belongs to the caller.
+The theme visually hides the native form carrier; a hidden input is not used to fake required validation. It provides no custom multiple selection or asynchronous search.
+The parts are `root/trigger/value/indicator/list/group/option/native/validation`.
 
-新增组件前先确认它能在两个以上的应用或场景中复用；应用只使用一次的页面组件不要
-为了“提取”而迁入这里。
+- Basics: Button, AddButton, IconButton, Card, Badge, Input, Textarea, Select, Field,
+  SearchInput, Disclosure, Separator, NavItem, EmptyState.
+- Dialogs: Dialog, DialogPanel, DialogHeader, DialogActions.
+- Chat: ChatFrame, ChatHeader, ChatStatus, ChatConversation, ChatMessageList, ChatMessage, ChatBubble,
+  ChatMessageActions, ChatComposer, ChatToolCall, ChatAttachments, ChatProcess, ChatSources.
+- Icons: the finite semantic set `Icon` and `iconNames` sourced from the pinned Lucide dependency, caller-supplied `IconSource` and `IconNode`, and the `meowtail/icons/lucide` pass-through for application icons, plus MeowlandMark, DoodleCat, NotesIcon, TasksIcon, SearchIcon, PlusIcon, GithubIcon, ExternalArrowIcon.
 
-`Field` 在只有一个控制子节点且能从 `htmlFor`、`descriptionId` 或 `errorId` 解析关联
-时，会把描述和错误节点的 id 连接到控制节点的 `aria-describedby`，并在有错误时设置
-`aria-invalid`。多个控制节点或自定义组合仍由调用方显式传递关联属性。
+Icons outside the semantic set go through `IconSource` with structural `IconNode` data from a trusted source. The pinned pass-through at `meowtail/icons/lucide` re-exports the installed Lucide version, so an application can use any Lucide icon without adding its own icon dependency; JSON surfaces keep only the finite `iconNames` set:
 
-`Dialog` 只负责原生 `<dialog>` 的结构、标签关联和 panel/header/actions 分区；打开、关闭、
-Escape、焦点返回和提交结果仍由应用控制。它没有仿 Radix 的 context、portal 或 focus trap，
-不要把这些行为默认为组件已经提供。
-`DialogPanel header={...}` 与 `Drawer header={...}` 显式组合共享 `PageFrame`，标题和关闭
-同处固定 header，body 是唯一的主滚动区。`DialogPanel as="form"` 保留原生表单归属与提交，
-短内容自然取高，长内容继承宿主 dialog 的最大高度；不扫描 children 猜标题，也不重复计算页头高度。
-消费者将 `DialogHeader` 放进 header 属性，正文与原有末尾动作放进 children；原生窗口、
-取消、草稿及打开方式仍归宿主。正文滚动引用沿公开 `page-frame/body` part 获取。
-DialogPanel 在直属 header 与 body 内分配标准留白，保证正文首末控件的焦点轮廓位于其滚动视口内；任意 Child header 使用同一 `spaceSection` 分隔，无 header 时 body 四边取 panel 留白。既有 DialogHeader 组合保持原内容几何，不承诺任意自定义 header 总高不变；没有新增 gap 属性。固定标题、退出与唯一 body 滚动仍分开，任何极小高度都足够阅读不是承诺。原生 Dialog 的打开、取消与 caller 焦点前提不变，主题留白修复不表示所有指针/系统焦点路径均已验证。
+```tsx
+import { IconSource } from "meowtail/icons";
+import { Bell } from "meowtail/icons/lucide";
 
-`EmptyState size="compact"` 用于局部空列表或未选内容区域，沿用标题、说明和动作，去掉装饰插图。
-默认 `size="default"` 保留整页空态；加载与失败仍使用各自已有反馈，不改成空态。
+<IconSource source={Bell} size={16} label="Notifications" />;
+```
 
-`ChatAttachments` 接收 `items: readonly ChatAttachmentItem[]`，每项包含
-`id`、`name`、`url`、`mediaType` 和可选的 `sizeBytes`；`label` 默认是“消息附件”。
-调用方提供 URL，组件不获取数据。图片默认以可访问的新窗口链接和懒加载预览展示，提供 `onPreview` 时改为预览按钮；
-文件链接使用原文件名下载，提供有效大小时显示 B / KB / MB。
-主题通过 `partSelector(chatAttachmentsContract, part)` 使用 `chat-attachments` 的
-`root/entry/image/preview/file/icon/details/name/size/previewButton/remove` parts。
-每项可提供 `onRemove`，只有草稿需要移除操作时才传入；上传、删除文件和 URL 生命周期仍归宿主。
+Before adding a component, confirm it can be reused in more than two applications or scenes; page components used once by an application should not be moved
+here just to "extract" them.
 
-`ChatFrame` 只为直属 `ChatComposer` 提供阅读边距；若 footer、Card 或其他包装容器负责该区域的空间，
-其内部 Composer 使用容器内的自然宽度，不再受到祖先 Frame 的额外收窄与外边距影响。
+When `Field` has a single control child and can resolve association from `htmlFor`, `descriptionId`, or `errorId`, it
+connects the description and error node ids to the control's `aria-describedby` and sets
+`aria-invalid` when there is an error. Multiple control children or custom compositions still require the caller to pass association attributes explicitly.
 
-`ChatComposer` 的 `hintId` 会把提示节点和输入框通过 `aria-describedby` 关联；`onInput`
-绑定在 textarea 上，`onSubmit` 绑定在外层 form 上。`value` 支持 Signal，`submitDisabled`
-仅禁止提交，适合等待结果时继续编辑；`disabled` 同时禁止编辑与提交。请求状态、已提交快照和
-最新草稿由调用方管理。`attachments` 放待发送材料，`inputLabel` 提供输入名称。
-标准主题把附件、输入、辅助操作和提交组织在同一书写面中。
-`layout="inline"` 让短草稿与操作同排，长草稿保持增高；聚焦时显示提示，默认 `stacked` 保留独立工具行。
-`layout="hero"` 使用桌面母版空白对话的输入高度。`trailing` 在发送按钮左侧组合 provider、模型等选择入口；
-可传入受控 `ChoiceSelect`，用 `placement="top"`、`align="end"`、`matchTriggerWidth={false}`
-向上展开分组选项。选项来源、当前值与运行配置的实际切换仍由宿主负责。
+`Dialog` handles only the native `<dialog>` structure, label association, and panel/header/actions partitioning; opening, closing,
+Escape, focus return, and submission results are still controlled by the application. It has no Radix-like context, portal, or focus trap;
+do not assume the component already provides those behaviors.
+`DialogPanel header={...}` and `Drawer header={...}` explicitly compose the shared `PageFrame`, with the title and close
+sharing a fixed header and the body as the only main scroll region. `DialogPanel as="form"` keeps native form ownership and submission;
+short content takes its natural height, and long content inherits the host dialog's maximum height. It does not scan children to guess a title or compute the header height twice.
+Consumers put `DialogHeader` into the header prop and put the body and existing trailing actions into children; the native window,
+cancellation, drafts, and opening method still belong to the host. The body scroll reference is obtained through the public `page-frame/body` part.
+DialogPanel distributes standard whitespace inside its direct header and body, ensuring that focus outlines of the first and last body controls stay within its scroll viewport; an arbitrary Child header separates with the same `spaceSection`, and without a header the body takes panel whitespace on all four sides. The existing DialogHeader composition keeps its original content geometry, and a stable total height is not promised for arbitrary custom headers; no new gap prop was added. The fixed title, exit, and single body scroll remain separate, and it is not promised that any extremely small height is enough to read. Native Dialog opening, cancellation, and caller focus premises are unchanged; the theme whitespace fix does not mean all pointer/system focus paths have been verified.
 
-`ChatMessage` 管身份、排列与状态，默认在内容中包装 `ChatBubble`，保留原调用方式。
-需要将附件、过程和文字分别展示时，设置 `surface="none"`，自行组合 `ChatBubble` 与其他组件。
-Bubble 的 `auto` 通过 Context 读取消息角色，主题决定底色；也可显式选择 `plain` / `filled`。
-`header` / `footer` 是补充材料和送达反馈的插槽，业务状态仍由宿主提供。
+`EmptyState size="compact"` is for a local empty list or an unselected content region, keeping the title, description, and actions while removing decorative artwork.
+The default `size="default"` keeps the full-page empty state; loading and failure still use their existing feedback and do not become empty states.
 
-`ChatConversation` 是可选的滚动容器，宿主必须提供受约束的高度。
-它在靠近底部时跟随追加内容，上翻时保留位置，并提供返回最新的按钮。
-返回动作在消息视口之后参与正常布局，显示时领取自身高度，隐藏后把空间归还消息；不会浮在历史正文之上。
-它不实现历史前插、逐消息锚点或持久化阅读恢复。不要与应用已有滚动控制器叠加；
-Dashboard 继续使用自身控制器。`ChatMessageList` 仍只提供消息记录语义。
+`ChatAttachments` accepts `items: readonly ChatAttachmentItem[]`, where each item has
+`id`, `name`, `url`, `mediaType`, and an optional `sizeBytes`; `label` defaults to "Message attachments".
+The caller provides URLs, and the component does not fetch data. Images are shown by default as accessible new-window links with lazy-loaded previews and become preview buttons when `onPreview` is provided;
+file links download with the original file name and show B / KB / MB when a valid size is available.
+The theme uses the `root/entry/image/preview/file/icon/details/name/size/previewButton/remove` parts of `chat-attachments`
+through `partSelector(chatAttachmentsContract, part)`.
+Each item can provide `onRemove`, passed only when a draft needs a remove action; upload, file deletion, and URL lifecycles still belong to the host.
 
-已有滚动 owner 的宿主可以单用 `ChatConversationLatest`。它是正常流按钮，不安装控制器、不设置定位容器，也不会独自给任意宿主视口分配高度。
-例如下面的 `transcript`、`latestHidden` 与三个回调都来自宿主现有控制器：
+`ComposerPanel` is the composition directly above `ChatComposer`: it owns the writing surface and an optional page-level meta row, while draft, actions and submission stay in `ChatComposer`. It renders `ChatComposer` with `surface="none"`, so the panel never stacks a second chrome. Narrow composition stays with `ChatComposer`'s own layout and the page/footer edge; the panel has no device variant. The meta slot usually holds a `MetaRow`.
+
+`ChatFrame` provides reading margins only for a direct `ChatComposer`; if a footer, Card, or other wrapper container owns that region's space,
+the Composer inside uses its natural width within that container and is no longer narrowed or margined by an ancestor Frame.
+
+`ChatComposer`'s `hintId` associates the hint node with the input through `aria-describedby`;
+`onInput` is bound on the textarea and `onSubmit` on the outer form. `value` supports Signals, and
+`submitDisabled` only prevents submission, which suits continued editing while waiting for a result; `disabled` prevents both editing and submission.
+Request state, submitted snapshots, and the latest draft are managed by the caller. `attachments` holds materials to send, and `inputLabel` provides the input name.
+The standard theme organizes attachments, input, supporting actions, and submission on one writing surface.
+`surface="none"` removes ChatComposer's own surface chrome and padding so a parent such as `ComposerPanel` can own the writing surface; the default keeps the standard surface.
+`layout="inline"` puts short drafts and actions on the same row, and long drafts keep growing; hints appear on focus, and the default `stacked` keeps a separate tool row.
+`layout="hero"` uses the input height of the desktop master blank conversation. `trailing` composes selection entry points such as provider and model to the left of the send button;
+a controlled `ChoiceSelect` can be passed, expanding grouped options upward with `placement="top"`, `align="end"`, and `matchTriggerWidth={false}`.
+Option sources, current values, and the actual switching of runtime configuration are still the host's responsibility.
+
+`ChatMessage` handles identity, arrangement, and state, wrapping `ChatBubble` around content by default and keeping the original call style.
+To show attachments, processes, and text separately, set `surface="none"` and compose `ChatBubble` with other components yourself.
+Bubble's `auto` reads the message role through Context and the theme decides the background; `plain` / `filled` can also be chosen explicitly.
+`header` / `footer` are slots for supplementary material and delivery feedback, and business state still comes from the host.
+
+`ChatConversation` is an optional scroll container, and the host must provide a constrained height.
+It follows appended content when near the bottom, keeps position when scrolled up, and provides a return-to-latest button.
+The return action participates in normal layout after the message viewport, claiming its own height when shown and returning the space to messages when hidden; it never floats above historical body text.
+It does not implement history prepending, per-message anchors, or persisted reading restoration. Do not stack it on top of an existing application scroll controller;
+the Dashboard keeps using its own controller. `ChatMessageList` still provides only message-record semantics.
+
+A host that already has a scroll owner can use `ChatConversationLatest` alone. It is a normal-flow button that installs no controller, sets no positioning container, and does not allocate height to an arbitrary host viewport on its own.
+For example, the following `transcript`, `latestHidden`, and three callbacks all come from the host's existing controller:
 
 ```tsx
 import { h } from "meowjsx";
@@ -383,7 +396,7 @@ import { ChatMessageList, ChatConversationLatest } from "meowtail/chat";
     grow
     basis={0}
     role="region"
-    aria-label="消息阅读区"
+    aria-label="Message reading area"
     tabIndex={0}
     style={{ overflowY: "auto", overflowAnchor: "none" }}
     ref={connectTranscriptViewport}
@@ -395,39 +408,39 @@ import { ChatMessageList, ChatConversationLatest } from "meowtail/chat";
 </Stack>;
 ```
 
-父容器必须提供有限高度；上例的 LayoutItem 是唯一滚动视口，按钮是它的兄弟项。
-宿主负责读取位置、显隐、追加跟随与保位；`returnToLatest` 应滚到末端，并以 `preventScroll` 将焦点交回该视口再隐藏动作。
-不要把片段改成绝对定位后期待它自动避让正文，也不要靠消息末端 padding 或设备偏移量保护历史中段。
+The parent container must provide a finite height; the LayoutItem in the example is the only scroll viewport, and the button is its sibling.
+The host handles reading position, show/hide, append following, and holding position; `returnToLatest` should scroll to the end, hand focus back to that viewport with `preventScroll`, and then hide the action.
+Do not turn the snippet into absolute positioning and expect it to avoid the body automatically, and do not protect the middle of history with message-end padding or device offsets.
 
-`SearchInput` 提供搜索图标与原生 search input 的共同外壳，`label` 是必需的可访问名称。
-`className` 作用于外壳，`inputClassName` 作用于输入；`id/name/value/disabled/readOnly/aria-*`
-及事件都传给 input，保留 Field 的说明和错误关联。筛选、提交与结果状态仍由消费者负责。
-parts 为 `root/icon/control`，默认表面、焦点和错误边界由 theme 决定。
+`SearchInput` provides a shared shell with a search icon and a native search input; `label` is the required accessible name.
+`className` applies to the shell and `inputClassName` to the input; `id/name/value/disabled/readOnly/aria-*`
+and events all pass to the input, keeping Field descriptions and error associations. Filtering, submission, and result state remain the consumer's responsibility.
+The parts are `root/icon/control`, and the theme decides the default surface, focus, and error boundary.
 
-`PathPicker` 组合受控路径输入与可选的浏览按钮。调用方提供 `value/onValueChange`、
-可访问名称 `label`，以及返回路径或 `null`（取消）的异步 `onChoose`；`kind="file" | "directory"`
-只确定按钮文字，实际选择能力由宿主注入。不提供 `onChoose` 时仍可手动输入。
-组件负责等待、失败反馈与卸载后忽略结果；在途时暂时锁定输入，父值或禁用／只读状态变化后不写回旧选择。
-选择只填写路径，不读取文件、上传文件或授予访问权限。说明、校验与保存仍归调用方。
+`PathPicker` composes a controlled path input with an optional browse button. The caller provides `value/onValueChange`,
+the accessible name `label`, and an async `onChoose` that returns a path or `null` (canceled); `kind="file" | "directory"`
+only determines the button text, and the host injects the actual selection capability. Without `onChoose`, manual entry still works.
+The component handles waiting, failure feedback, and ignoring results after unmount; it temporarily locks the input while in flight and does not write back an old selection after the parent value or disabled/read-only state changes.
+Choosing only fills in the path; it does not read files, upload files, or grant access. Descriptions, validation, and saving remain the caller's responsibility.
 
-`Disclosure` 使用原生 details/summary，接收 `summary: Child` 与内容 children，支持
-`open/name/onToggle` 等原生属性。`summaryClassName`、`contentClassName` 用于宿主布局；
-parts 为 `root/summary/icon/content`。它不维护另一份展开状态，也不是多项 Accordion。
+`Disclosure` uses native details/summary, accepts `summary: Child` and content children, and supports
+`open/name/onToggle` and other native attributes. `summaryClassName` and `contentClassName` are for host layout;
+the parts are `root/summary/icon/content`. It does not maintain a second expansion state and is not a multi-item Accordion.
 
-## 标准主题（meowtail/theme）
+## Standard theme (meowtail/theme)
 
-标准主题导出 `standardTheme`、`standardOptions` 和类型化的 `uiTokens`。只读 `standardThemeTokens`、`standardThemeStyles` 是主题组装原件，供 MeowSlides 等扩展主题复用同一 token/fragment 对象；它们不安装组件或操作 DOM。token 与样式
-都由 TypeScript 定义；组件通过稳定的 part 标记与样式选项匹配 CSS，不再由主题插件
-生成视觉类名。完整设计见 TypeScript token 与参数化配置（原产品仓库历史参考）。
+The standard theme exports `standardTheme`, `standardOptions`, and typed `uiTokens`. The read-only `standardThemeTokens` and `standardThemeStyles` are theme assembly primitives that let extended themes such as MeowSlides reuse the same token/fragment objects; they do not install components or touch the DOM. Tokens and styles
+are both defined in TypeScript; components match CSS through stable part markers and style options, and theme plugins no longer generate
+visual class names. See TypeScript tokens and parameterized configuration (historical reference in the original product repository) for the complete design.
 
-样式文件统一采用 `<职责>.styles.ts`，标准主题按组件与对话职责分组，应用样式随应用模块维护。
-命名、组件族边界与层叠整理见样式文件组织（原产品仓库历史参考）。
-现有样式已按此规范迁移，历史对话覆写已并回消息与输入框负责文件。
+Style files use `<responsibility>.styles.ts`; the standard theme groups them by component and conversation responsibility, and application styles are maintained with application modules.
+See the style file organization (historical reference in the original product repository) for naming, component family boundaries, and cascade organization.
+Existing styles have been migrated to this specification, and historical conversation overrides have been merged back into the files owned by messages and the composer.
 
-### 组件安装与样式交付
+### Component installation and style delivery
 
-组件安装和样式加载是两个明确的步骤。`createMeowUI()` 注册组件及样式属性适配器；
-`standardTheme.cssText` 提供包含变量声明和组件规则的完整 CSS。动态宿主可以这样组装：
+Component installation and style loading are two explicit steps. `createMeowUI()` registers components and style prop adapters;
+`standardTheme.cssText` provides the complete CSS with variable declarations and component rules. A dynamic host can assemble it like this:
 
 ```tsx
 import { createRuntime, h } from "meowjsx";
@@ -444,53 +457,52 @@ const removeTheme = applyTheme(
   standardTheme,
   standardOptions.select({ scheme: "light" }),
 );
-const mounted = web.render(<Button variant="quiet">取消</Button>, container);
+const mounted = web.render(<Button variant="quiet">Cancel</Button>, container);
 
-// 宿主销毁时：
+// When the host is destroyed:
 mounted.unmount();
 removeTheme();
 removeStyles();
 ```
 
-使用 defaultRuntime 时调用 `installMeowUI(defaultRuntime)`，并让初次渲染和动态控件
-使用同一个 runtime。无需另外安装标准主题插件。样式属性的合法值、默认值和承载 part
-由组件 contract 的 `defineStyleProps` 声明；适配器负责消费属性，避免将 variant 等
-样式选项当作普通 DOM 属性透传。`ThemedProps` 提供联合类型及 Signal 输入；组件沿用
-开放的原生 Props，因此不承诺拒绝所有未知属性。
+When using defaultRuntime, call `installMeowUI(defaultRuntime)` and use the same runtime for the initial render and dynamic controls.
+No separate standard theme plugin needs to be installed. Valid values, defaults, and carrying parts for style props
+are declared by the component contract's `defineStyleProps`; the adapter consumes the props so style options such as variant are not passed through as ordinary DOM attributes.
+`ThemedProps` provides union types and Signal inputs; components keep open native Props and therefore do not promise to reject all unknown attributes.
 
-静态宿主在构建时组合 `standardTheme.cssText` 与应用 CSS，写出 `.css` 文件并由 HTML
-加载，同时通过 `themeAttributes(standardTheme, config)` 输出根属性。样式在客户端
-JavaScript 执行前即可加载。Dashboard 和 Meowbook 使用这条交付路径；
-动态预览使用 `mountStyles(document, cssText)`，由宿主持有返回的清理函数。
-源码不维护 `.css` 文件，生成的 CSS 仍是浏览器资源。模块导入本身不访问 DOM，
-`mountStyles` 不负责跨调用去重，宿主应在文档或应用生命周期内组装一次。
+A static host composes `standardTheme.cssText` with application CSS at build time, writes a `.css` file loaded by HTML,
+and outputs root attributes through `themeAttributes(standardTheme, config)`. Styles can load before client-side
+JavaScript runs. The Dashboard and Meowbook use this delivery path;
+dynamic previews use `mountStyles(document, cssText)`, with the host holding the returned cleanup function.
+Source code maintains no `.css` files, and generated CSS is still a browser asset. Module imports themselves do not access the DOM;
+`mountStyles` does not deduplicate across calls, so the host should assemble once within the document or application lifecycle.
 
-### 根配置与局部覆盖
+### Root configuration and local overrides
 
-`standardOptions` 内置 scheme，当前标准主题默认 `auto`，支持 light/dark/auto。
-标准视觉以 DeepSeek Harness 为基准：系统字体、正文 14px、辅助 12px、标题 16px；按钮
-small/default/large 使用 28/36/44px，输入框默认 32px。控件、菜单和大面板分别使用对应的
-圆角与材质，应用从同一语言组合页面。参考来源与许可证见 [第三方说明](THIRD_PARTY_NOTICES.md)，
-实施范围及尚未完成的验证见 迁移记录（原产品仓库历史参考）。
+`standardOptions` has a built-in scheme; the current standard theme defaults to `auto` and supports light/dark/auto.
+The standard visuals use DeepSeek Harness as their baseline: system fonts, 14px body, 12px supporting text, and 16px titles; buttons
+use 28/36/44px for small/default/large, and inputs default to 32px. Controls, menus, and large panels use their corresponding
+radii and materials, and applications compose pages from the same language. See [third-party notices](THIRD_PARTY_NOTICES.md) for reference sources and licenses,
+and the migration record (historical reference in the original product repository) for the implementation scope and verification not yet finished.
 
 ```tsx
 import { Theme } from "meowcss/web";
 
 <Theme theme={standardTheme} config={standardOptions.select({ scheme: "dark" })}>
-  <Button>保存</Button>
+  <Button>Save</Button>
   <Theme config={standardOptions.select({ scheme: "light" })}>
     <Preview />
   </Theme>
 </Theme>;
 ```
 
-`Theme` 只绑定配置，不加载 CSS。局部 config 省略的维度继承父级；移除局部选择恢复
-继承，组件实例和草稿不需要重建。已有 DOM 根使用 `applyTheme`，静态 HTML 使用
-`themeAttributes`，三者共享属性语义。不要为每套主题创建新的 Theme 组件。
+`Theme` binds configuration only and does not load CSS. Dimensions omitted from a local config inherit from the parent; removing a local selection restores
+inheritance, and component instances and drafts do not need rebuilding. Existing DOM roots use `applyTheme`, static HTML uses
+`themeAttributes`, and the three share attribute semantics. Do not create a new Theme component for each theme.
 
-### 样式与组件选项
+### Styles and component options
 
-普通 CSS 保持模板形式；token 与 part 在 TypeScript 中引用，避免手写生成后的名称：
+Ordinary CSS keeps the template form; tokens and parts are referenced in TypeScript to avoid hand-writing generated names:
 
 ```ts
 import { buttonContract, buttonOptions } from "meowtail";
@@ -507,26 +519,26 @@ const applicationStyles = css`
 `;
 ```
 
-宿主显式按标准主题、应用基础、应用覆写的顺序组合 CSS。hover、focus、媒体查询与动画
-继续由 CSS 执行；原生状态用原生属性匹配，组件样式选项使用 `when`。`className` 和
-`style` 保留为应用扩展入口，业务布局不进入标准主题。
+The host explicitly composes CSS in the order of standard theme, application base, and application overrides. hover, focus, media queries, and animation
+continue to be handled by CSS; native states match on native attributes, and component style options use `when`. `className` and
+`style` remain application extension entry points, and business layout does not enter the standard theme.
 
-自定义 token 使用 `defineTokens`，通过 `defineTheme` 一次组合选项、完整默认值、token
-集合和 CSS 片段。组件绑定从片段中的 typed part 引用取得；不要提前将片段转成字符串而
-丢失这些信息。无默认值的测量变量使用 `tokenRef`，通过 `.name` 交给 `setProperty`。
-纯生成与 typed adapter 的写法和作用域边界见 [MeowCSS](../meowcss/README.md)。
+Custom tokens use `defineTokens`, and `defineTheme` composes options, complete defaults, token
+sets, and CSS fragments in one call. Component bindings come from typed part references in the fragment; do not convert the fragment to a string early and
+lose that information. Measurement variables without defaults use `tokenRef`, whose `.name` is passed to `setProperty`.
+See [MeowCSS](../meowcss/README.md) for pure generation and typed adapter usage and scope boundaries.
 
-构建并安装本地包后，从仓库根运行 `bunx --no-install meowbook serve --config packages/meowtail/meowbook.config.ts`
-打开组件场景，核对明暗、桌面与窄屏、输入草稿和状态切换。尺寸是 Web 适配，
-当前视觉基准见上述 DeepSeek 迁移记录；设计判断与打磨方法见
-meow-design（原产品仓库历史参考），其历史探索配方不作为标准主题规范。
+After building and installing the local package, run `bunx --no-install meowbook serve --config packages/meowtail/meowbook.config.ts` from the repository root to
+open component scenes and check light/dark, desktop and narrow screens, input drafts, and state switching. Sizes are Web adaptations;
+see the DeepSeek migration record above for the current visual baseline. See meow-design (historical reference in the original product repository)
+for design judgment and polishing methods; its historical exploration recipes are not the standard theme specification.
 
-### 生命周期扩展
+### Lifecycle extensions
 
-静态视觉使用 CSS。只有需要真实 DOM、实例状态、监听或清理时才使用 shadow：
+Static visuals use CSS. Use a shadow only when real DOM, instance state, listeners, or cleanup are needed:
 
 ```ts
-// Web shadow：context.element 是真实 Element。
+// Web shadow: context.element is a real Element.
 import { defineShadow } from "meowjsx/web";
 
 runtime.use({
@@ -553,24 +565,24 @@ runtime.use({
 });
 ```
 
-集中注册，不生成包装组件。shadow 与组件共享 signal/effect/onCleanup 生命周期 API。
-插件卸载阻止后续应用；现有元素的实例清理由其 mount 的 unmount 负责。不要用
-renderToHtml + innerHTML 代替需要生命周期的浏览器挂载。
+Register centrally; do not generate wrapper components. A shadow shares the signal/effect/onCleanup lifecycle API with components.
+Plugin uninstall blocks later application; instance cleanup for existing elements is handled by the unmount of their mount. Do not use
+renderToHtml + innerHTML instead of browser mounting that needs a lifecycle.
 
-### 文件与验证
+### Files and verification
 
-- `meowcss`：通用 token/选项/CSS 生成；`meowcss/meowjsx` 负责 typed parts 与自动 carrier；`meowcss/web` 负责 DOM 主题生命周期，详见 [MeowCSS](../meowcss/README.md)。
-- `src/theme/tokens.ts`、`palette.ts`：共享参数与语义色板。
-- `src/theme/base.styles.ts` 与 `components/chat/icons/shared` 下的 `*.styles.ts`：按职责编写的 CSS 模板；
-  专属高亮 token 在 `shared/code-highlight.tokens.ts`。
-- `src/theme/index.ts`：标准主题的显式组装与公共导出。
-- `bun test packages/meowtail/tests/unit`：组件与标准主题合同；通用 token/选项合同在 MeowCSS 测试中验证。
-- `tsc --noEmit --project packages/meowtail/tsconfig.json`：检查实现、展示场景、浏览器测试和
-  `tests/types/` 的公共类型合同；类型用例不由 Bun 执行。
-- `tests/browser/theme/parameterized-theme.spec.ts`：参数化主题、局部覆盖及真实组件组合回归，针对
-  `tests/fixtures/theme-prototype-demo.tsx` 与 `tests/fixtures/real-controls-demo.tsx` 的独立测试场景，
-  由本包 Playwright 专用测试配置加载，不进入组件 gallery。
-- Rossovia 的 Dashboard 组合验证仍由产品仓库维护，不是本库的可运行命令；库内不保留依赖产品 checkout 的测试。
+- `meowcss`: shared token/option/CSS generation; `meowcss/meowjsx` handles typed parts and automatic carriers; `meowcss/web` handles the DOM theme lifecycle. See [MeowCSS](../meowcss/README.md).
+- `src/theme/tokens.ts`, `palette.ts`: shared parameters and semantic palettes.
+- `src/theme/base.styles.ts` and the `*.styles.ts` files under `components/chat/icons/shared`: CSS templates written by responsibility;
+  highlight-specific tokens live in `shared/code-highlight.tokens.ts`.
+- `src/theme/index.ts`: explicit assembly and public exports of the standard theme.
+- `bun test packages/meowtail/tests/unit`: component and standard theme contracts; shared token/option contracts are verified in MeowCSS tests.
+- `tsc --noEmit --project packages/meowtail/tsconfig.json`: typechecks the implementation, showcase scenes, browser tests, and
+  public type contracts in `tests/types/`; type cases are not run by Bun.
+- `tests/browser/theme/parameterized-theme.spec.ts`: parameterized theme, local override, and real component composition regressions, targeting
+  the standalone test scenes in `tests/fixtures/theme-prototype-demo.tsx` and `tests/fixtures/real-controls-demo.tsx`,
+  loaded by this package's dedicated Playwright test config and not part of the component gallery.
+- Dashboard composition verification for Rossovia is still maintained by the product repository and is not a runnable command in this library; the library keeps no tests that depend on a product checkout.
 
-浏览器验收覆盖对应场景，不能用类型或构建通过替代。组件注册必须作用于实际渲染的
-runtime；需要生命周期的内容使用 render 挂载，而非 HTML 字符串插入。
+Browser acceptance covers the corresponding scenes and cannot be replaced by passing types or build. Component registration must apply to the runtime that actually renders;
+content that needs a lifecycle is mounted with render rather than inserted as an HTML string.

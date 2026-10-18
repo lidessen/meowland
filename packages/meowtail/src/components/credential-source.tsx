@@ -28,7 +28,7 @@ export function CredentialSource(props: CredentialSourceProps) {
   const { id, disabled } = props;
   return (
     <Stack gap="compact">
-      <Field label="API Key 来源" htmlFor={`${id}-source`}>
+      <Field label="API Key source" htmlFor={`${id}-source`}>
         <Select
           id={`${id}-source`}
           value={props.source}
@@ -39,16 +39,16 @@ export function CredentialSource(props: CredentialSourceProps) {
             )
           }
         >
-          <option value="stored">输入 API Key</option>
-          <option value="environment">使用环境变量</option>
+          <option value="stored">Enter an API key</option>
+          <option value="environment">Use an environment variable</option>
         </Select>
       </Field>
       {props.source === "environment" ? (
         <Stack gap="compact">
           <Field
-            label="环境变量名"
+            label="Environment variable name"
             htmlFor={`${id}-environment`}
-            description="只保存变量名引用，不复制 Key。读取服务运行环境，与浏览器所在机器无关。"
+            description="Stores only the variable name reference; never copies the key. Reads the service runtime environment, independent of the browser machine."
           >
             <Input
               id={`${id}-environment`}
@@ -56,7 +56,7 @@ export function CredentialSource(props: CredentialSourceProps) {
               disabled={disabled}
               autoComplete="off"
               list={`${id}-variables`}
-              placeholder="例如 KIMI_API_KEY"
+              placeholder="For example, KIMI_API_KEY"
               onInput={(event: Event) =>
                 props.onEnvironmentChange((event.target as HTMLInputElement).value)
               }
@@ -74,22 +74,22 @@ export function CredentialSource(props: CredentialSourceProps) {
             disabled={disabled}
             onClick={props.onCheck}
           >
-            检查环境变量
+            Check environment variable
           </Button>
           {props.variables?.map((variable) => (
             <span>
               {variable.name} ·{" "}
               {variable.available === null
-                ? "在 WorkCell 运行环境中读取"
+                ? "Read from the WorkCell runtime environment"
                 : variable.available
-                  ? "可用"
-                  : "未设置"}
+                  ? "Available"
+                  : "Not set"}
             </span>
           ))}
         </Stack>
       ) : props.keepStored && props.hasStored ? (
         <Stack gap="compact">
-          <span>已保存 API Key</span>
+          <span>Saved API Key</span>
           <Button
             type="button"
             variant="outline"
@@ -97,11 +97,15 @@ export function CredentialSource(props: CredentialSourceProps) {
             disabled={disabled}
             onClick={props.onReplace}
           >
-            替换 API Key
+            Replace API Key
           </Button>
         </Stack>
       ) : (
-        <Field label="API Key" htmlFor={`${id}-key`} description="保存到凭据库，保存后不回显。">
+        <Field
+          label="API Key"
+          htmlFor={`${id}-key`}
+          description="Saved to the credential store; never shown again after saving."
+        >
           <Input
             id={`${id}-key`}
             type="password"
@@ -112,7 +116,7 @@ export function CredentialSource(props: CredentialSourceProps) {
           />
           {props.hasStored && props.onKeep ? (
             <Button type="button" variant="outline" disabled={disabled} onClick={props.onKeep}>
-              保留已保存的 API Key
+              Keep the saved API Key
             </Button>
           ) : null}
         </Field>

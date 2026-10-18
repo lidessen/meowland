@@ -42,12 +42,12 @@ test("layout-generated scroll does not change follow intent; temporary hidden st
 
 test("SSR emits a labelled focusable viewport without invoking browser lifecycle", () => {
   const html = createWebRenderer(createRuntime()).renderToHtml(
-    <ChatConversation ariaLabel="项目对话">
-      <p>现有内容</p>
+    <ChatConversation ariaLabel="Project conversation">
+      <p>Existing content</p>
     </ChatConversation>,
   );
-  expect(html).toContain('role="region" aria-label="项目对话" tabindex="0"');
-  expect(html).toContain("现有内容");
-  expect(html).toContain("回到最新消息");
+  expect(html).toContain('role="region" aria-label="Project conversation" tabindex="0"');
+  expect(html).toContain("Existing content");
+  expect(html).toContain("Back to latest message");
   expect(html).not.toContain("ref=");
 });

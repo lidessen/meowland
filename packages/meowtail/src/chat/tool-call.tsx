@@ -114,12 +114,12 @@ export const ChatToolCall = defineComponent<
       return value;
     };
     const copy: ChatToolCallLabels = {
-      input: "输入",
-      output: "输出",
-      emptyInput: "没有输入内容",
-      emptyOutput: "输出为空",
-      retry: "重试",
-      cancel: "取消",
+      input: "Input",
+      output: "Output",
+      emptyInput: "No input content",
+      emptyOutput: "Empty output",
+      retry: "Retry",
+      cancel: "Cancel",
       ...labels,
     };
     const status = derived(() => unwrap(statusLabel) ?? executionStateLabel(unwrap(state)));

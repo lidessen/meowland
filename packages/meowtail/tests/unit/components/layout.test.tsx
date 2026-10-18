@@ -14,17 +14,17 @@ test("layout items own flex placement without changing content semantics", () =>
   const web = createWebRenderer(createRuntime());
   const html = web.renderToHtml(
     <Inline as="footer" wrap={false}>
-      <LayoutItem as="section" grow basis="0%" alignSelf="baseline" aria-label="内容">
+      <LayoutItem as="section" grow basis="0%" alignSelf="baseline" aria-label="Content">
         Long content
       </LayoutItem>
       <LayoutItem shrink={false}>
-        <button>编辑</button>
+        <button>Edit</button>
       </LayoutItem>
     </Inline>,
   );
   expect(html).toContain("<footer");
   expect(html).toContain("<section");
-  expect(html).toContain('aria-label="内容"');
+  expect(html).toContain('aria-label="Content"');
   expect(html).toContain("flex-grow:1");
   expect(html).toContain("flex-basis:0%");
   expect(html).toContain("align-self:baseline");
@@ -39,7 +39,7 @@ test("layout spacing defaults preserve gap and expose axis overrides through con
   const web = createWebRenderer(runtime);
   const html = web.renderToHtml(
     <Inline gap="relaxed" rowGap="compact">
-      <span>内容</span>
+      <span>Content</span>
     </Inline>,
   );
   expect(html).toContain('data-option-layout-gap="relaxed"');
@@ -98,19 +98,19 @@ test("field group associates supplementary text and retains native disabled sema
 test("unthemed layouts retain semantic elements and structure without choosing visual spacing", () => {
   const web = createWebRenderer(createRuntime());
   const html = web.renderToHtml(
-    <Container as="main" width="narrow" aria-label="工作区">
+    <Container as="main" width="narrow" aria-label="Workspace">
       <Stack gap="relaxed">
         <Inline as="nav" wrap={false} align="start" justify="between">
-          工具
+          Tools
         </Inline>
         <Grid columns={3} gap="compact">
-          内容
+          Content
         </Grid>
       </Stack>
     </Container>,
   );
   expect(html).toContain("<main");
-  expect(html).toContain('aria-label="工作区"');
+  expect(html).toContain('aria-label="Workspace"');
   expect(html).toContain("<nav");
   expect(html).toContain("flex-wrap:nowrap");
   expect(html).toContain("justify-content:space-between");
@@ -125,7 +125,7 @@ test("layout themes can change spacing independently from structure and uninstal
   const web = createWebRenderer(runtime);
   const view = (
     <Grid minColumnWidth="compact" gap="relaxed">
-      <span>长内容</span>
+      <span>Long content</span>
     </Grid>
   );
   const before = web.renderToHtml(view);

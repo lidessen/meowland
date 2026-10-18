@@ -242,12 +242,13 @@ if (query.get("chrome") === "long") {
   const slides = deck.props.slides as readonly SlideDefinition[];
   content = h(deck.type, {
     ...deck.props,
-    title: "A long presentation title / 一个用于验证目录与工具栏收缩的真实标题",
+    title:
+      "A long presentation title / A realistic title for checking that the outline and toolbar shrink",
     slides: slides.map((slide, index) => ({
       ...slide,
       title:
         index === 0
-          ? "A long mixed-language slide title / 保留完整目录名称 while the toolbar remains usable"
+          ? "A long multi-line slide title / keeps the complete outline name while the toolbar remains usable"
           : `${slide.title} — ${"UnbrokenSlideTitle".repeat(12)}`,
     })),
   });

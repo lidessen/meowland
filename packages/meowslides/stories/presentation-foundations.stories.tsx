@@ -18,61 +18,85 @@ const diagram = `data:image/svg+xml,${encodeURIComponent(
 const slides: readonly SlideDefinition[] = [
   {
     id: "two-columns",
-    title: "两栏 · 列表与照片",
+    title: "Two columns · List and photo",
     render: () => (
       <PresentationLayout
         columns={2}
-        header={<h2>两栏各有任务，照片按明确的裁切方式呈现</h2>}
-        footer={<small>两列属于逻辑画布，窄窗口仍整体缩放，不自动上下重排。</small>}
+        header={<h2>Each column has its own task; the photo appears with an explicit crop</h2>}
+        footer={
+          <small>
+            The two columns belong to the logical canvas; narrow windows still scale as a whole and
+            do not automatically reflow top-bottom.
+          </small>
+        }
       >
         <Stack>
-          <h3>先说清应观察什么</h3>
+          <h3>Say clearly what to observe first</h3>
           <PresentationList
             items={[
-              "描述看见的姿态与环境。",
-              "把观察与自己的推测分开。",
-              "需要完整边缘时改用 contain。",
+              "Describe the posture and environment you see.",
+              "Keep observation separate from your own inference.",
+              "Use contain when the complete edges are needed.",
             ]}
           />
         </Stack>
         <PresentationImage
           src={panda}
-          alt="Gao Gao 在高起的结构上休息，周围可见树枝和植物"
+          alt="Gao Gao rests on a raised structure with branches and plants visible around"
           ratio="fill"
           fit="cover"
           position="center"
-          caption="Gao Gao · Mike Richey · CC BY-SA 3.0。沿用 Protecting pandas 的已署名本地照片；本页允许裁掉边缘环境。"
+          caption="Gao Gao · Mike Richey · CC BY-SA 3.0. Reuses the credited local photo from Protecting pandas; this page may crop the surrounding environment."
         />
       </PresentationLayout>
     ),
   },
   {
     id: "three-columns",
-    title: "三栏 · 原生列表",
+    title: "Three columns · Native lists",
     render: () => (
       <PresentationLayout
         columns={3}
-        header={<h2>相同列宽组织三个阅读区域</h2>}
-        footer={<small>示例是作者编排，不代表课堂步骤或评分；第三列保留原生倒序编号。</small>}
+        header={<h2>Equal column widths organize three reading areas</h2>}
+        footer={
+          <small>
+            The example is authored arrangement and does not represent classroom steps or scoring;
+            the third column keeps native reversed numbering.
+          </small>
+        }
       >
         <Stack>
-          <h3>观察</h3>
-          <PresentationList items={["保留原始描述。", "指出具体位置。", "记录尚不确定的地方。"]} />
-        </Stack>
-        <Stack>
-          <h3>核对</h3>
+          <h3>Observe</h3>
           <PresentationList
-            as="ol"
-            items={["用相同条件比较。", "区分事实与推测。", "检查来源与适用范围。"]}
+            items={[
+              "Keep the original description.",
+              "Point out the specific location.",
+              "Record what is still uncertain.",
+            ]}
           />
         </Stack>
         <Stack>
-          <h3>收敛</h3>
+          <h3>Check</h3>
+          <PresentationList
+            as="ol"
+            items={[
+              "Compare under the same conditions.",
+              "Separate facts from inference.",
+              "Check the source and applicable scope.",
+            ]}
+          />
+        </Stack>
+        <Stack>
+          <h3>Converge</h3>
           <PresentationList
             as="ol"
             start={3}
             reversed
-            items={["留下最重要的问题。", "选择一个可解释的结论。", "明确下一步。"]}
+            items={[
+              "Keep the most important question.",
+              "Choose an explainable conclusion.",
+              "State the next step.",
+            ]}
           />
         </Stack>
       </PresentationLayout>
@@ -80,28 +104,33 @@ const slides: readonly SlideDefinition[] = [
   },
   {
     id: "text-image",
-    title: "文字图 · 完整显示",
+    title: "Text diagram · Complete display",
     render: () => (
       <PresentationLayout
         columns="wide-end"
-        header={<h2>图中有文字时，先保留完整内容</h2>}
-        footer={<small>原创静态示意图；信息关系另有真实文字说明，不把图片当作唯一可读材料。</small>}
+        header={<h2>When the image contains text, keep the complete content first</h2>}
+        footer={
+          <small>
+            Original static diagram; the information relationships also have a real text
+            explanation, and the image is not the only readable material.
+          </small>
+        }
       >
         <Stack>
-          <h3>观察 → 比较 → 解释</h3>
+          <h3>Observe → Compare → Explain</h3>
           <PresentationList
             items={[
-              "默认 contain 保留边缘。",
-              "留白来自图片与区域的比例差异。",
-              "图注自然占高，画面使用余量。",
+              "contain is the default and keeps the edges.",
+              "Blank space comes from the ratio difference between the image and the region.",
+              "The caption takes natural height and the picture uses the remainder.",
             ]}
           />
         </Stack>
         <PresentationImage
           src={diagram}
-          alt="从观察到解释：保留来源，按相同标准比较，并说明结论条件；底部一行说明也须完整显示"
+          alt="From observation to explanation: keep the sources, compare by the same criteria and state the conditions of the conclusion; the bottom line of explanation must also be fully visible"
           ratio="fill"
-          caption="完整显示三个区域、两端边缘与底部说明。contain 不承诺同时填满所有可用面积。"
+          caption="Fully shows the three regions, both end edges and the bottom explanation. contain does not promise to also fill all available area."
         />
       </PresentationLayout>
     ),
@@ -110,17 +139,17 @@ const slides: readonly SlideDefinition[] = [
 
 export const PresentationFoundationsStory = defineStory({
   id: "presentation-foundations",
-  title: "演示基础 · 列、列表与图片",
-  group: "演示与媒体",
+  title: "Presentation foundations · Columns, lists and images",
+  group: "Presentation and media",
   component: "PresentationLayout",
-  variant: "两列、三列、原生列表与图片适配",
+  variant: "Two columns, three columns, native lists and image fitting",
   description:
-    "同一真实演示中观察逻辑列数、正文列表、照片 cover 与文字图 contain，以及自然图注的高度预算。",
+    "Observe logical column counts, body lists, photo cover and text-diagram contain in the same real presentation, plus the height budget of a natural caption.",
   covers: ["numeric columns", "PresentationList", "PresentationImage", "fill", "cover", "contain"],
   render: () => (
     <div style={{ height: "min(900px, calc(100dvh - 90px))" }}>
       <Presentation
-        title="演示基础组合"
+        title="Presentation foundations composition"
         slides={slides}
         position={signal<SlidePosition>({ slideId: "two-columns", step: 0 })}
         active={false}

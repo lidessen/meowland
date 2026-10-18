@@ -49,6 +49,14 @@ export {
   iconButtonOptions,
 } from "./icon-button";
 export { Toolbar, type ToolbarProps, toolbarContract } from "./toolbar";
+export { ActionRail, type ActionRailProps, actionRailContract } from "./action-rail";
+export {
+  MetaRow,
+  type MetaItem,
+  type MetaRowProps,
+  metaRowContract,
+  metaRowOptions,
+} from "./meta-row";
 export { Input, type InputProps, inputContract } from "./input";
 export { Checkbox, type CheckboxProps, checkboxContract } from "./checkbox";
 export { Switch, type SwitchProps, switchContract } from "./switch";
@@ -73,6 +81,7 @@ export { Separator, type SeparatorProps, separatorContract } from "./separator";
 export { Textarea, type TextareaProps, textareaContract } from "./textarea";
 export { Stack, type StackProps, stackContract } from "./stack";
 export { PageFrame, type PageFrameProps, pageFrameContract, pageFrameOptions } from "./page-frame";
+export { AppBar, type AppBarProps, appBarContract } from "./app-bar";
 export {
   mountRegionLayout,
   regionLayoutContract,

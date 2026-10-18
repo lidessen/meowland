@@ -1,7 +1,8 @@
 import { expect, test } from "bun:test";
 import { h } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
-import { Icon, iconNames, MeowlandMark } from "../../../src/icons";
+import { Icon, IconSource, iconNames, MeowlandMark } from "../../../src/icons";
+import { Search } from "../../../src/icons/lucide";
 
 test("Meowland mark preserves caller styling and inherits its foreground", () => {
   const html = renderToHtml(<MeowlandMark className="brand-mark" />);
@@ -24,9 +25,26 @@ test("functional icons allow caller sizing and theme styling and are decorative 
 });
 
 test("meaningful standalone icons expose their accessible label", () => {
-  const html = renderToHtml(<Icon name="file-text" label="文档" className="document-icon" />);
+  const html = renderToHtml(<Icon name="file-text" label="Document" className="document-icon" />);
   expect(html).toContain('role="img"');
-  expect(html).toContain('aria-label="文档"');
+  expect(html).toContain('aria-label="Document"');
   expect(html).toContain('class="meow-icon document-icon"');
+  expect(html).not.toContain("aria-hidden");
+});
+
+test("caller icon data renders through the shared functional frame", () => {
+  const html = renderToHtml(<IconSource source={Search} size={16} />);
+  expect(html).toContain('<svg class="meow-icon"');
+  expect(html).toContain('width="16"');
+  expect(html).toContain('d="m21 21-4.34-4.34"');
+  expect(html).toContain('aria-hidden="true"');
+  expect(html).not.toContain("data-icon");
+});
+
+test("caller icon data can expose an accessible label", () => {
+  const html = renderToHtml(<IconSource source={Search} label="Search" className="search-icon" />);
+  expect(html).toContain('role="img"');
+  expect(html).toContain('aria-label="Search"');
+  expect(html).toContain('class="meow-icon search-icon"');
   expect(html).not.toContain("aria-hidden");
 });

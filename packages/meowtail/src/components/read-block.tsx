@@ -38,7 +38,7 @@ export const ReadBlock = defineComponent<
   (typeof readBlockContract.parts)[number]
 >(
   readBlockContract,
-  ({ label = "文件内容", lines, totalLines, lang, maxLines, onCopy, ...props }, context) => {
+  ({ label = "File content", lines, totalLines, lang, maxLines, onCopy, ...props }, context) => {
     const raw = lines.map((line) => line.text).join("\n");
     const content = lines.map((line) => context.signal<Child>(line.text || "\u200b"));
     let disposed = false;
@@ -105,7 +105,7 @@ export const ReadBlock = defineComponent<
         title={
           <span>
             {label}
-            {totalLines !== undefined ? ` · 显示 ${lines.length} / ${totalLines} 行` : ""}
+            {totalLines !== undefined ? ` · Showing ${lines.length} / ${totalLines} lines` : ""}
           </span>
         }
         maxLines={maxLines}

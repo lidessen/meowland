@@ -9,14 +9,14 @@ test("Disclosure retains native semantics and host slots through its stable part
   const web = createWebRenderer(runtime);
   const view = (
     <Disclosure
-      summary="执行详情"
+      summary="Execution details"
       open
       id="run-details"
       className="host"
       summaryClassName="host-summary"
       contentClassName="host-content"
     >
-      <p>检查结果</p>
+      <p>Check results</p>
     </Disclosure>
   );
   const html = web.renderToHtml(view);

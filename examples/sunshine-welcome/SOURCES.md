@@ -1,21 +1,21 @@
-# 教材核查与改编边界
+# Textbook verification and adaptation boundaries
 
-核查日期：2026-10-17。教材范围由主线程研究者与独立内容审查交叉核对；本作品制作 owner 使用其已核摘录，不声称拿到了完整官方课本或官方课件。
+Verification date: 2026-10-17. The textbook scope was cross-checked by the main-thread researcher and an independent content reviewer; this work's production owner used their verified excerpts and does not claim to have obtained the complete official textbook or official courseware.
 
-| 资料                                                                                                                              | 实际可见范围                                                                            | 用途与边界                                                                                                                           |
-| --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| [译林官方电子资源 Unit 6 目录](https://edu.yilin.com/index.php/Category/index?cat_id=7&dt_type1=2&ebook_id=6&nav_id=5&unit_id=44) | 八年级下册、Unit 6目录可见Task/Integrated/Grammar/Reading等条目；Welcome分页/原页未成功 | 版本与单元定位；没有取得官方Welcome页全文、原图、原声或PPT，不标“2026新版”                                                           |
-| [教师之家第三方教学资源公开文字预览 p453863](https://www.renjiaoshe.com/p/453863.html)                                            | 第三方公开教学预览，标牛津译林2011体系；可见Welcome六词与Part B主题                     | 交叉确认 blind / deaf / disabled / elderly / homeless / poor；Part B讨论食物、衣物及向当地政府求助以获得住处。它不是官方电子教材全文 |
-| [第三方教学资源公开预览 p402827](https://www.renjiaoshe.com/p/402827.html)                                                        | 公开预览标注Welcome页码p79                                                              | 仅记其标注，未取得对应官方原页，因此本课件正文不写教材页码，也不使用其图号配对答案                                                   |
+| Material                                                                                                                                       | Actually visible scope                                                                                                                                    | Use and boundary                                                                                                                                                                                            |
+| ---------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| [Yilin official e-resources Unit 6 catalog](https://edu.yilin.com/index.php/Category/index?cat_id=7&dt_type1=2&ebook_id=6&nav_id=5&unit_id=44) | Grade 8 Volume 2, Unit 6 catalog shows Task/Integrated/Grammar/Reading and other entries; the Welcome subpage/original page was not successfully accessed | Edition and unit positioning; no full official Welcome page, original image, original audio or PPT obtained, and it is not labeled "2026 new edition"                                                       |
+| [Teacher's Home third-party teaching resource public text preview p453863](https://www.renjiaoshe.com/p/453863.html)                           | Third-party public teaching preview, marked as Oxford Yilin 2011 system; shows the six Welcome words and the Part B topic                                 | Cross-confirms blind / deaf / disabled / elderly / homeless / poor; Part B discusses food, clothing and asking the local government for help to get housing. This is not the full official digital textbook |
+| [Third-party teaching resource public preview p402827](https://www.renjiaoshe.com/p/402827.html)                                               | Public preview marked with Welcome page p79                                                                                                               | Records only its notation; no corresponding official original page was obtained, so this courseware's body text does not include a textbook page number, nor does it use its image-number matching answers  |
 
-## 本作品实际使用
+## What this work actually uses
 
-- 课名与六个教材关键词保留；定义、例子、词义配对、选择题、句架、出口题均为教师原创改编。
-- `read-talk` 保留Part B关于homeless people的主题，用原创Lia/Ben四轮短对话表达food/clothes/safe place/local government；不是Amy/Daniel原文重现，不提供伪造的教材原声。
-- 原书Part A为图词配对及帮助经历交流；本作品以原创符号辅助词汇、改成文字线索配对。所给参考匹配只对应本作品线索，绝非教材图片序号答案。
-- 本课只做Welcome to the unit，不加入Comic strip的Hobo/Eddie奥运志愿者话题，也不加入Reading的Special Olympics正文。
-- 语言示例鼓励先问需要与意愿，不将类别机械对应唯一帮助；允许学生用真实或想象情境，无须暴露本人、同学或家庭的贫困、住处与健康经历。
+- The lesson name and the six textbook key words are retained; definitions, examples, word matching, multiple-choice questions, sentence frames and the exit question are all original teacher adaptation.
+- `read-talk` keeps Part B's topic about homeless people, using an original four-turn Lia/Ben short dialogue to express food/clothes/safe place/local government; it is not a reproduction of the Amy/Daniel original and provides no fabricated textbook audio.
+- The original book's Part A is picture-word matching and exchanging helping experiences; this work uses original symbols to support vocabulary and changes it into text-clue matching. The reference pairs given correspond only to this work's clues, and are absolutely not textbook image-number answers.
+- This lesson covers only Welcome to the unit; it does not add Comic strip's Hobo/Eddie Olympic-volunteer topic, nor Reading's Special Olympics body text.
+- Language examples encourage asking about needs and wishes first and do not mechanically map a category to a single way of helping; students may use real or imagined situations and need not expose poverty, housing or health experiences of themselves, classmates or families.
 
-## 素材与授权
+## Assets and authorization
 
-所有SVG是本作品原创矢量图，见 [assets/NOTICES.md](assets/NOTICES.md)。不复制教材插图、他人整套课件或用户Library参考。Library参考未取得可实际查看的本机像素，作品不声称临摹或据其重建。没有网络字体、录音、背景音乐、视频或生成服务；浏览器不请求外部资源。
+All SVGs are original vector artwork for this work; see [assets/NOTICES.md](assets/NOTICES.md). No textbook illustrations, other people's complete courseware or user Library references are copied. The Library reference yielded no actually viewable local pixels, and the work does not claim to trace or rebuild from it. There are no web fonts, recordings, background music, videos or generation services; the browser requests no external resources.

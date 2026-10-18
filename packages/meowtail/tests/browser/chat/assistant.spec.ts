@@ -122,7 +122,7 @@ test("activity changes modality at narrow widths without remounting the draft or
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
     true,
   );
-  await page.getByRole("combobox", { name: "外观" }).selectOption("dark");
+  await page.getByRole("combobox", { name: "Appearance" }).selectOption("dark");
   await expect(page.locator("html")).toHaveAttribute("data-meowui-color-scheme", "dark");
   // Let the existing standard-theme color transitions settle before a static comparison.
   await page.waitForTimeout(250);

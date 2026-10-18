@@ -18,8 +18,8 @@ const showMeasurementHelp = () => {
   get("measurement-values").replaceChildren();
   get("measurement-help").textContent =
     measurementMode.value === "spacing"
-      ? "点击元素查看间距；绿色为 padding，橙色为 margin（上右下左）；gap 见数值。关闭标注恢复普通点击。"
-      : "点击画布元素查看实际数值；关闭标注恢复普通点击。";
+      ? "Click an element to see its spacing; green is padding, orange is margin (top, right, bottom, left); gap appears in the values. Turn annotations off to restore normal clicks."
+      : "Click a canvas element to see its actual values; turn annotations off to restore normal clicks.";
 };
 const syncMeasurements = () =>
   frame.contentWindow?.postMessage(
@@ -75,16 +75,17 @@ function updateURL(replace = false) {
 }
 function applyWidth() {
   frame.style.width = width === "fluid" ? "100%" : `${width}px`;
-  get("viewport-size").textContent = width === "fluid" ? "自适应" : `${width} px`;
+  get("viewport-size").textContent = width === "fluid" ? "Fluid" : `${width} px`;
   for (const button of viewportButtons)
     button.setAttribute("aria-pressed", String(button.dataset.width === width));
 }
 function showInfo() {
   const story = stories.find((item) => item.id === active);
-  get("title").textContent = story?.component ?? story?.title ?? "未找到样例";
-  get("group").textContent = story?.group ?? "组件预览";
-  get("breadcrumb-component").textContent = story?.component ?? story?.title ?? "未找到样例";
-  get("scenario-description").textContent = story?.description ?? "请从目录选择组件。";
+  get("title").textContent = story?.component ?? story?.title ?? "Sample not found";
+  get("group").textContent = story?.group ?? "Component preview";
+  get("breadcrumb-component").textContent = story?.component ?? story?.title ?? "Sample not found";
+  get("scenario-description").textContent =
+    story?.description ?? "Choose a component from the catalog.";
   const siblings = story
     ? stories.filter((item) => componentKey(item) === componentKey(story))
     : [];
@@ -92,7 +93,7 @@ function showInfo() {
     ...siblings.map((item) => storyLink(item, item.variant ?? item.title)),
   );
   get("variants").hidden = siblings.length < 2;
-  get("description").textContent = story?.description ?? "请从左侧选择一个已有样例。";
+  get("description").textContent = story?.description ?? "Choose an existing sample from the left.";
   get("covers").replaceChildren(
     ...(story?.covers ?? []).map((text) => {
       const span = document.createElement("span");
@@ -170,7 +171,7 @@ function showCatalog() {
   }
   if (!matches.length) {
     const empty = document.createElement("p");
-    empty.textContent = `没有找到“${search.value.trim()}”。试试组件名称或清空搜索。`;
+    empty.textContent = `No results for "${search.value.trim()}". Try a component name or clear the search.`;
     empty.className = "catalog-empty";
     fragment.append(empty);
   }
@@ -197,7 +198,7 @@ function load() {
   frame.src = canvasURL();
   get("events").replaceChildren();
   get("latest-event").hidden = true;
-  get("inspection").textContent = "正在渲染…";
+  get("inspection").textContent = "Rendering…";
   get("inspection").removeAttribute("data-warning");
   showInfo();
   showCatalog();
@@ -217,10 +218,10 @@ window.addEventListener("message", (event) => {
       ["name", "size", "typography", "spacing"].every((key) => typeof detail[key] === "string")
     ) {
       for (const [name, key] of [
-        ["元素", "name"],
-        ["宽 × 高", "size"],
-        ["字号 / 行高", "typography"],
-        ["间距", "spacing"],
+        ["Element", "name"],
+        ["Width × height", "size"],
+        ["Font size / line height", "typography"],
+        ["Spacing", "spacing"],
       ]) {
         const term = document.createElement("dt"),
           value = document.createElement("dd");
@@ -247,13 +248,13 @@ window.addEventListener("message", (event) => {
     if (renderError) return;
     const issues = data.issues as string[];
     get("inspection").textContent = issues.length
-      ? `${issues.length} 项提示 · ${data.width}px`
-      : `未发现基础检查问题 · ${data.width}px`;
+      ? `${issues.length} items with notes · ${data.width}px`
+      : `No basic check issues found · ${data.width}px`;
     get("inspection").dataset.warning = String(issues.length > 0);
     for (const issue of issues) log(issue);
   } else if (data.type === "error" && typeof data.message === "string") {
     renderError = true;
-    get("inspection").textContent = "样例渲染异常";
+    get("inspection").textContent = "Sample render error";
     get("inspection").dataset.warning = "true";
     log(data.message);
   }
@@ -268,7 +269,7 @@ function inspectStory(
   return new Promise((resolve) => {
     const probe = document.createElement("iframe");
     probe.className = "workshop-batch-canvas";
-    probe.title = `后台检查：${story.title}`;
+    probe.title = `Background check: ${story.title}`;
     probe.setAttribute("aria-hidden", "true");
     probe.tabIndex = -1;
     probe.inert = true;
@@ -293,7 +294,7 @@ function inspectStory(
         probe.contentWindow?.postMessage({ channel: "meowbook", type: "inspect" }, location.origin);
       }
       if (data.type === "error" && typeof data.message === "string")
-        finish([`渲染异常：${data.message}`]);
+        finish([`Render error: ${data.message}`]);
       else if (requested && data.type === "inspection" && Array.isArray(data.issues))
         finish(data.issues.filter((issue: unknown): issue is string => typeof issue === "string"));
     };
@@ -324,7 +325,7 @@ async function inspectAll() {
   let passed = 0;
   try {
     for (const story of queue) {
-      status.textContent = `检查中 ${completed + 1}/${queue.length} · ${pixels}px · ${story.title}`;
+      status.textContent = `Checking ${completed + 1}/${queue.length} · ${pixels}px · ${story.title}`;
       const issues = await inspectStory(story, pixels, controller.signal);
       if (issues === null) break;
       completed++;
@@ -344,11 +345,11 @@ async function inspectAll() {
         load();
       });
       const detail = document.createElement("span");
-      detail.textContent = issues.join("；");
+      detail.textContent = issues.join("; ");
       row.append(link, detail);
       results.append(row);
     }
-    status.textContent = `${controller.signal.aborted ? "已取消" : "检查完成"} · ${pixels}px · ${completed}/${queue.length} 已检查，${passed} 项无基础问题，${completed - passed} 项有提示`;
+    status.textContent = `${controller.signal.aborted ? "Canceled" : "Check complete"} · ${pixels}px · ${completed}/${queue.length} checked, ${passed} items without basic issues, ${completed - passed} items with notes`;
   } finally {
     batch = undefined;
     get<HTMLButtonElement>("inspect-all").disabled = stories.length === 0;
@@ -418,11 +419,11 @@ window.addEventListener("popstate", () => {
 applyWidth();
 try {
   const response = await fetch("/manifest.json");
-  if (!response.ok) throw new Error("场景清单加载失败");
+  if (!response.ok) throw new Error("Failed to load the scenario manifest");
   const entries: StoryEntry[] = await response.json();
   stories = entries.map((entry) => ({
     ...entry,
-    group: entry.group ?? "组件",
+    group: entry.group ?? "Components",
     description: entry.description ?? "",
     covers: [...(entry.covers ?? [])],
   }));

@@ -47,7 +47,7 @@ test("tool payloads are inert text, with explicit empty output and optional miss
   });
   expect(empty).toContain("&lt;script&gt;");
   expect(empty).not.toContain("<script>");
-  expect(empty).toContain("输出为空");
+  expect(empty).toContain("Empty output");
   expect(empty).toContain('data-output-wrap="true"');
   expect(render({ label: "Read" })).not.toContain('data-meowui-part="chat-tool-call/output"');
   const absent = render({ label: "Read", output: signal<string | undefined>(undefined) });

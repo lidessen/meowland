@@ -5,7 +5,7 @@ const part = (name: string) => `[data-meowui-part="${name}"]`;
 
 /** The composition story, with its process group open so its tool rows are laid out. */
 async function openComposition(page: Page): Promise<void> {
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=chat-message-composition");
+  await page.goto("/canvas.html?story=chat-message-composition");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   await page.locator(part("chat-process/summary")).first().click();
   await expect(page.locator(part("chat-tool-call/root")).first()).toBeVisible();
@@ -94,10 +94,14 @@ async function rowPitch(list: Locator): Promise<number[]> {
 }
 
 test("list rows keep their own pitch whether or not the host wraps them", async ({ page }) => {
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=chat-message-rows");
+  await page.goto("/canvas.html?story=chat-message-rows");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  const direct = await rowPitch(page.getByRole("log", { name: "直接子项的消息列表" }));
-  const wrapped = await rowPitch(page.getByRole("log", { name: "逐条挂载的消息列表" }));
+  const direct = await rowPitch(
+    page.getByRole("log", { name: "Message list with direct children" }),
+  );
+  const wrapped = await rowPitch(
+    page.getByRole("log", { name: "Message list mounted row by row" }),
+  );
   expect(wrapped).toEqual(direct);
   // A new turn, a continued reply, and the work a row reports on keep distinct spacing.
   expect(direct[0]).toBeGreaterThan(direct[1]!);
@@ -106,9 +110,9 @@ test("list rows keep their own pitch whether or not the host wraps them", async 
 });
 
 test("the first row takes the list inset instead of a row pitch", async ({ page }) => {
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=chat-message-rows");
+  await page.goto("/canvas.html?story=chat-message-rows");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  const list = page.getByRole("log", { name: "逐条挂载的消息列表" });
+  const list = page.getByRole("log", { name: "Message list mounted row by row" });
   const offset = await list.evaluate((root) => {
     const content = root.querySelector('[data-meowui-part="chat-message-list/content"]')!;
     const item = root.querySelector('[data-meowui-part="chat-message-list/item"]')!;
@@ -139,7 +143,7 @@ test("every disclosure row is measured by the same numbers", async ({ page }) =>
 });
 
 test("a group's rows hang under its label, at any chat type scale", async ({ page }) => {
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=chat-tool-sequence");
+  await page.goto("/canvas.html?story=chat-tool-sequence");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   await page.locator(part("chat-process/summary")).first().click();
   await expect(page.locator(part("chat-tool-call/root")).first()).toBeVisible();
@@ -236,7 +240,7 @@ test.describe("a coarse pointer raises the row", () => {
   test("the raised multiline row aligns its glyph and chevron with the first text line", async ({
     page,
   }) => {
-    await page.goto("http://127.0.0.1:13007/canvas.html?story=chat-tool-sequence");
+    await page.goto("/canvas.html?story=chat-tool-sequence");
     await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
     await openFirstProcess(page);
     const row = page.locator(toolCallPart).first();
@@ -272,7 +276,7 @@ test.describe("a coarse pointer raises the row", () => {
 });
 
 test("a process row centres its glyph in the leading box, as a tool row does", async ({ page }) => {
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=chat-tool-sequence");
+  await page.goto("/canvas.html?story=chat-tool-sequence");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const centres = await page
     .locator('[data-meowui-part="chat-process/summary"]')
@@ -288,7 +292,7 @@ test("a process row centres its glyph in the leading box, as a tool row does", a
 });
 
 test("a completed row keeps its default outcome out of the reading column", async ({ page }) => {
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=chat-tool-sequence");
+  await page.goto("/canvas.html?story=chat-tool-sequence");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   await openFirstProcess(page);
   const row = page.locator(toolCallPart).first();
@@ -308,7 +312,7 @@ test("a completed row keeps its default outcome out of the reading column", asyn
 });
 
 test("an activating row is one focus stop with the same row geometry", async ({ page }) => {
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=chat-tool-call-action");
+  await page.goto("/canvas.html?story=chat-tool-call-action");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const buttons = page.locator(
     `${toolCallPart} > button[data-meowui-part="chat-tool-call/header"]`,
@@ -342,13 +346,13 @@ test("an activating row is one focus stop with the same row geometry", async ({ 
   // The activating row holds no body of its own, and the host's action runs instead.
   await expect(page.locator(`${toolCallPart}[data-tool-action="demo"] details`)).toHaveCount(0);
   const feedback = page.locator("[data-tool-action-result]");
-  await expect(feedback).toHaveText("尚未激活");
+  await expect(feedback).toHaveText("Not activated yet");
   await buttons.click();
-  await expect(feedback).toHaveText("已激活：由宿主打开这次命令的记录。");
+  await expect(feedback).toHaveText("Activated: the host opens the record for this command.");
 });
 
 test("a row carries its state in the leading glyph as well as its status", async ({ page }) => {
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=chat-tool-call-action");
+  await page.goto("/canvas.html?story=chat-tool-call-action");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const colours = await page.evaluate(() => {
     const rows = Array.from(document.querySelectorAll('[data-meowui-part="chat-tool-call/root"]'));

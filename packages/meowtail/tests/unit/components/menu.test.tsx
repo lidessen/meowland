@@ -19,17 +19,22 @@ test("menu names groups and actions, blocks disabled callbacks and reports closu
       id="actions"
       trigger={(bindings) => {
         trigger = bindings;
-        return <button {...bindings}>操作</button>;
+        return <button {...bindings}>Actions</button>;
       }}
       onOpenChange={(open) => events.push(String(open))}
       items={[
         {
           type: "group",
           id: "files",
-          label: "文件",
+          label: "Files",
           items: [
-            { id: "copy", label: "复制", onSelect: () => events.push("copy") },
-            { id: "locked", label: "锁定", disabled: true, onSelect: () => events.push("locked") },
+            { id: "copy", label: "Copy", onSelect: () => events.push("copy") },
+            {
+              id: "locked",
+              label: "Locked",
+              disabled: true,
+              onSelect: () => events.push("locked"),
+            },
           ],
         },
         { type: "separator", id: "sep" },
@@ -56,7 +61,7 @@ test("menu trigger supports arrow-key opening without treating composition as a 
       onOpenChange={(value) => changes.push(value)}
       trigger={(bindings) => {
         trigger = bindings;
-        return <button {...bindings}>操作</button>;
+        return <button {...bindings}>Actions</button>;
       }}
     />,
   );
@@ -80,12 +85,12 @@ test("nested actions close their root before invoking the selected leaf", () => 
     <Menu
       id="nested"
       onOpenChange={(open) => events.push(String(open))}
-      trigger={(bindings) => <button {...bindings}>打开</button>}
+      trigger={(bindings) => <button {...bindings}>Open</button>}
       items={[
         {
           id: "formats",
-          label: "格式",
-          children: [{ id: "text", label: "文本", onSelect: () => events.push("selected") }],
+          label: "Format",
+          children: [{ id: "text", label: "Text", onSelect: () => events.push("selected") }],
         },
       ]}
     />,
@@ -109,7 +114,7 @@ test("menu keyboard walks enabled rows and typeahead excludes shortcut text", ()
   createWebRenderer(runtime).renderToHtml(
     <Menu
       id="walk"
-      trigger={(bindings) => <button {...bindings}>操作</button>}
+      trigger={(bindings) => <button {...bindings}>Actions</button>}
       items={[]}
       onOpenChange={(next) => changes.push(next)}
     />,

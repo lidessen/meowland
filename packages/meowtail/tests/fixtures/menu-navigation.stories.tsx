@@ -4,7 +4,7 @@ import { Button, Menu, Stack } from "meowtail";
 
 export const MenuNavigationStory = defineStory({
   id: "menu-navigation",
-  title: "菜单 · 表单键盘退出",
+  title: "Menu · Keyboard exit from a form",
   component: "Menu",
   render() {
     const selected = signal(0);

@@ -110,4 +110,11 @@ export const resourceCardStyles = css`
       transition: none;
     }
   }
+
+  @media (pointer: coarse) {
+    ${card("actions")}[data-meowui-part] > * {
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
 `;

@@ -69,33 +69,35 @@ function transitionExample(effect: PresentationTransitionEffect) {
 
 export const FadeTransitionsStory = defineStory({
   id: "presentation-transition-fade",
-  title: "演示入场 · fade",
-  group: "演示",
+  title: "Presentation entrance · fade",
+  group: "Presentation",
   component: "Presentation",
   variant: "fade",
-  description: "新页淡入与页内分步显现；暂停和减少动态直接呈终态。",
+  description:
+    "New pages fade in and in-page steps appear; pause and reduced motion show the final state directly.",
   covers: ["new-page entrance", "step appearance", "interruption", "reduced motion"],
   render: () => transitionExample("fade"),
 });
 
 export const SlideTransitionsStory = defineStory({
   id: "presentation-transition-slide",
-  title: "演示入场 · slide",
-  group: "演示",
+  title: "Presentation entrance · slide",
+  group: "Presentation",
   component: "Presentation",
   variant: "slide",
-  description: "新页滑入与页内分步显现；前进向左，后退向右。",
+  description:
+    "New pages slide in and in-page steps appear; forward moves left, backward moves right.",
   covers: ["new-page entrance", "step appearance", "interruption", "reduced motion"],
   render: () => transitionExample("slide"),
 });
 
 export const ZoomTransitionsStory = defineStory({
   id: "presentation-transition-zoom",
-  title: "演示入场 · zoom",
-  group: "演示",
+  title: "Presentation entrance · zoom",
+  group: "Presentation",
   component: "Presentation",
   variant: "zoom",
-  description: "新页缩放入场与页内分步显现；保持画布缩放合同。",
+  description: "New pages zoom in and in-page steps appear; the canvas scaling contract is kept.",
   covers: ["new-page entrance", "step appearance", "interruption", "reduced motion"],
   render: () => transitionExample("zoom"),
 });

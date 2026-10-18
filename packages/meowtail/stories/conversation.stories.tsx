@@ -5,13 +5,13 @@ import { ChatConversation, ChatMessageList, ChatMessage, Button, Stack, Inline }
 
 export const ConversationReading = defineStory({
   id: "chat-conversation",
-  title: "对话阅读 · 持续更新与回看",
+  title: "Conversation reading · Live updates and review",
   component: "ChatConversation",
-  variant: "阅读连续性",
-  group: "对话组件",
+  variant: "Reading continuity",
+  group: "Conversation components",
   groupOrder: 50,
   description:
-    "先向上阅读，再增加回复；阅读位置保持不动。返回动作位于正文视口之后，不覆盖历史文字；回到最新后继续跟随。按钮只更新本地示例，收起再展开会重新挂载阅读区。",
+    "Read upward first, then add replies; the reading position stays put. The return action sits after the body viewport and does not cover earlier text; after returning to the latest message it follows new content again. The buttons only update the local example, and collapsing then expanding remounts the reading region.",
   covers: [
     "ChatConversation",
     "ChatMessageList",
@@ -26,16 +26,18 @@ export const ConversationReading = defineStory({
       Array.from({ length: count }, (_, index) => (
         <ChatMessage
           role={index % 2 ? "assistant" : "user"}
-          author={index % 2 ? "Assistant" : "你"}
+          author={index % 2 ? "Assistant" : "You"}
         >
           <p>
             {index % 2
-              ? `第 ${index + 1} 条回复：我检查了页面的窄屏布局。长文件名需要保留完整名称，工具反馈应留在对应消息旁。`
-              : `第 ${index + 1} 条消息：继续检查项目的阅读体验，并说明需要我决定的事项。`}
+              ? `Reply ${index + 1}: I checked the narrow-screen layout of the page. Long file names must keep their full name, and tool feedback should stay next to its message.`
+              : `Message ${index + 1}: Continue checking the reading experience and list the items that need my decision.`}
           </p>
           {index % 2 ? (
             <p>
-              这一段是用于观察滚动的本地内容。向上回看时，新回复不会要求你离开当前阅读位置；准备好以后，可以主动回到最新消息。
+              This paragraph is local content for observing scrolling. While you review earlier
+              messages, a new reply does not force you away from your current reading position;
+              return to the latest message when you are ready.
             </p>
           ) : null}
         </ChatMessage>
@@ -44,7 +46,7 @@ export const ConversationReading = defineStory({
     const latestText = signal("");
     const makeView = () => (
       <ChatConversation
-        ariaLabel="示例对话阅读区"
+        ariaLabel="Example conversation reading area"
         style={{
           height: "360px",
           border: `1px solid ${uiTokens.border}`,
@@ -69,24 +71,25 @@ export const ConversationReading = defineStory({
               messages.value = renderMessages();
             }}
           >
-            增加一条回复
+            Add a reply
           </Button>
           <Button
             variant="outline"
             onClick={() => {
-              latestText.value += "继续补充当前回复：检查内容变化时的阅读位置。";
+              latestText.value +=
+                "Continuing the current reply: check the reading position while content changes.";
             }}
           >
-            继续当前回复
+            Continue the current reply
           </Button>
           <Button
             variant="quiet"
             onClick={() => {
               mounted = !mounted;
-              view.value = mounted ? makeView() : <p>阅读区已收起。</p>;
+              view.value = mounted ? makeView() : <p>The reading region is collapsed.</p>;
             }}
           >
-            收起 / 展开阅读区
+            Collapse / expand reading region
           </Button>
         </Inline>
         {view}

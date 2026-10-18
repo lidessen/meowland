@@ -8,7 +8,7 @@ export const resourceLinkContract = {
 
 export interface ResourceLinkProps extends Props {
   title: Child;
-  /** Where it lives and which version, for example "docs/records · 修订 1". */
+  /** Where it lives and which version, for example "docs/records · Revision 1". */
   detail?: Child;
   icon?: Child;
   /** Replaces the arrow, for a state the reader should see before opening. */

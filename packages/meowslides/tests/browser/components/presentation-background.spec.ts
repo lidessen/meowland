@@ -54,7 +54,7 @@ test("backgrounds inherit, replace and reset while decorative images fill the wh
   await expect(page.locator(overlaySelector)).toHaveCount(0);
   await expect(slide).toHaveAttribute("data-background-foreground", "theme");
   const lightThemeInk = await slide.evaluate((element) => getComputedStyle(element).color);
-  await page.getByRole("combobox", { name: "外观", exact: true }).selectOption("dark");
+  await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("dark");
   const darkThemeInk = await slide.evaluate((element) => getComputedStyle(element).color);
   expect(darkThemeInk).not.toBe(lightThemeInk);
   await picker.selectOption("contain");
@@ -73,7 +73,9 @@ test("failed decorative images retain the authored fallback, overlay and foregro
   await expect(page.locator(backgroundSelector)).toHaveCSS("background-color", "rgb(21, 58, 52)");
   await expect(page.locator(overlaySelector)).toHaveCSS("background-image", /linear-gradient/);
   await expect(page.locator(slideSelector)).toHaveAttribute("data-background-foreground", "light");
-  await expect(page.getByRole("heading", { name: "没有图， 这页也应读得清楚" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Without the image, this page should still read clearly" }),
+  ).toBeVisible();
   await expect(page.locator('[data-meowui-part="presentation/diagnostic"]')).toBeHidden();
 });
 
@@ -82,7 +84,7 @@ test("background signals preserve content identity, draft and focus, and discard
 }) => {
   const picker = page.getByRole("combobox", { name: "Choose slide" });
   await picker.selectOption("dynamic");
-  const input = page.getByRole("textbox", { name: "背景草稿" });
+  const input = page.getByRole("textbox", { name: "Background draft" });
   await input.fill("A draft survives background updates");
   const original = await input.elementHandle();
   const oldImage = await page.locator(imageSelector).elementHandle();

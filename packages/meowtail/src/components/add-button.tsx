@@ -8,7 +8,7 @@ export function AddButton(props: AddButtonProps): Child {
   return (
     <Button {...props}>
       <PlusIcon />
-      {props.children ?? "添加"}
+      {props.children ?? "Add"}
     </Button>
   );
 }

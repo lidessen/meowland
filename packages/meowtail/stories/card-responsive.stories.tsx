@@ -17,11 +17,12 @@ import {
 
 export const CardResponsiveHeaderStory = defineStory({
   id: "card-responsive-header",
-  title: "卡片 · 标题、操作与真实容器宽度",
-  group: "基础控件",
+  title: "Card · Title, actions, and real container width",
+  group: "Basic controls",
   groupOrder: 10,
   component: "CardHeader",
-  description: "宽卡和同窗窄侧栏共享标题布局；嵌套、自适应按钮卡及可选说明保持原生结构。",
+  description:
+    "A wide card and a narrow sidebar in the same window share the title layout; nested cards, intrinsic button cards, and optional descriptions keep their native structure.",
   covers: ["narrow card", "sidebar", "intrinsic card", "action first", "optional description"],
   render: () => (
     <Container width="wide">
@@ -29,22 +30,26 @@ export const CardResponsiveHeaderStory = defineStory({
         <Card data-card-responsive="wide">
           <CardHeader>
             <CardTitle>
-              需要核对的工作区设置与访问规则 — A long workspace configuration title
+              Workspace settings and access rules to verify — A long workspace configuration title
             </CardTitle>
-            <CardDescription>修改将保留已有内容，检查完成后再保存。</CardDescription>
+            <CardDescription>
+              Changes keep existing content; save after the review is complete.
+            </CardDescription>
             <CardAction>
-              <Button>查看完整配置</Button>
-              <Button variant="quiet">复制配置链接</Button>
+              <Button>View full configuration</Button>
+              <Button variant="quiet">Copy configuration link</Button>
             </CardAction>
           </CardHeader>
           <CardContent>
             <Card data-card-responsive="nested">
               <CardHeader>
-                <CardTitle>默认嵌套检查项</CardTitle>
-                <CardDescription>嵌入关系仍共享父级表面。</CardDescription>
+                <CardTitle>Default nested check item</CardTitle>
+                <CardDescription>
+                  Embedded relationships still share the parent surface.
+                </CardDescription>
               </CardHeader>
               <CardContent>
-                <Field label="保留的草稿" htmlFor="card-responsive-draft">
+                <Field label="Kept draft" htmlFor="card-responsive-draft">
                   <Input id="card-responsive-draft" />
                 </Field>
               </CardContent>
@@ -55,11 +60,13 @@ export const CardResponsiveHeaderStory = defineStory({
           <Card data-card-responsive="sidebar">
             <CardHeader>
               <CardAction>
-                <Button>查看详情</Button>
-                <Button variant="quiet">复制链接</Button>
+                <Button>View details</Button>
+                <Button variant="quiet">Copy link</Button>
               </CardAction>
               <CardTitle>A long sidebar card title with meaningful information</CardTitle>
-              <CardDescription>同一宽窗口内的窄区域，操作在 DOM 中位于标题之前。</CardDescription>
+              <CardDescription>
+                A narrow region in the same wide window; actions precede the title in the DOM.
+              </CardDescription>
             </CardHeader>
           </Card>
         </div>
@@ -67,21 +74,21 @@ export const CardResponsiveHeaderStory = defineStory({
           <Card as="button" data-card-responsive="button">
             <CardHeader>
               <CardTitle>Header-only button card</CardTitle>
-              <CardDescription>内容决定自然宽度。</CardDescription>
+              <CardDescription>Content decides the natural width.</CardDescription>
             </CardHeader>
           </Card>
           <Card data-card-responsive="intrinsic">
             <CardHeader>
               <CardTitle>Intrinsic inline card</CardTitle>
-              <CardDescription>没有手写宽度。</CardDescription>
+              <CardDescription>No hand-written width.</CardDescription>
             </CardHeader>
           </Card>
         </Inline>
         <Card data-card-responsive="title-only">
           <CardHeader>
-            <CardTitle>只有标题时不保留空说明行</CardTitle>
+            <CardTitle>No empty description row when there is only a title</CardTitle>
             <CardAction>
-              <Button>核对结果</Button>
+              <Button>Check results</Button>
             </CardAction>
           </CardHeader>
         </Card>

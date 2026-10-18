@@ -1,24 +1,41 @@
-# 播放器与生命周期合同
+# Player and lifecycle contract
 
-`meowslides` 提供 `Presentation`、`Reveal`、`PresentationVideo`、`PresentationAudio`
-和 `usePresentationActivity`；根入口重导相同实现，沿用同一 MeowJSX/Context/主题身份。
-内容区域使用 `PresentationLayout` 的可替换 header/footer、`1 | 2 | 3` 等宽列或既有命名列比，常见标题、图文、对比、
-数字、流程与总结组合见[演示内容布局](PRESENTATION-LAYOUTS.md)。
-`PresentationList items={...}` 生成原生 ul/li，`as="ol"` 可继续传 start/reversed；
-它使用演示正文 token（标准主题默认 28px），不另设 size/density，也不自动压缩无限长内容。
-正文图片用 `PresentationImage src alt`，默认 16:9、contain、center，caption 保持自然高度并复用 ImagePreview 的加载/失败反馈。
-数值 ratio 是优选框比例，`ratio="fill"` 须由有限父级分配空间；图注也占内容预算。
-cover 需明确选择，position 为与背景相同的九点；比例不同时，完整显示与填满区域需取舍，文字图优先 contain。
-Meowbook 的 `presentation-foundations` 可实际查看两列、三列、列表、照片 cover 与文字图 contain。
-整场与逐页可传 `background`：`"theme"` 或 `{ fill?, image?, overlay?, foreground? }`，
-也可传同类型 Signal。`image` 接收 src、cover/contain 的 fit（默认 cover）和九点 position（默认 center）；
-fill/overlay 支持 CSS 颜色或渐变。页省略时继承整场，整场省略时沿主题；显式 theme 回主题，
-对象完整覆盖而不与整场合并，fill 省略时使用主题纸色。foreground 的 light/dark 指文字颜色，省略沿主题。
-装饰背景铺满画布并自行裁切，不改变内容边缘、缩放或步骤生命周期；背景 Signal 更新不重挂当前内容。
-同页背景更新不触发切页入场动画，只替换装饰层。
-图片失败后保留底色、遮罩和文字明暗，作者须确保无图时仍可读；需要说明与替代文字的图片继续放正文。
-宿主在同一 Runtime 安装 `createMeowUI()` 与 `createMeowSlides()`，并加载 `meowslides/theme` 的完整 `presentationTheme`，即可取得默认演示结构和视觉。
-本地实现不表示已发布；当前公开版本和安装验收以根 README 与当次回执为准。
+`meowslides` provides `Presentation`, `Reveal`, `PresentationVideo`, `PresentationAudio` and
+`usePresentationActivity`; the root entry point re-exports the same implementations, keeping the same
+MeowJSX/Context/theme identity. The content area uses the replaceable header/footer of
+`PresentationLayout`, `1 | 2 | 3` equal-width columns or the existing named column ratios; common
+title, text-image, comparison, number, process and summary compositions are in
+[Presentation content layout](PRESENTATION-LAYOUTS.md).
+`PresentationList items={...}` renders a native ul/li, and `as="ol"` can still pass start/reversed; it
+uses the presentation body token (28px by default in the standard theme), adds no separate
+size/density, and does not automatically compress infinitely long content.
+Body images use `PresentationImage src alt`, defaulting to 16:9, contain and center; the caption keeps
+its natural height and reuses ImagePreview's loading/failure feedback.
+A numeric ratio is the preferred box ratio; `ratio="fill"` must receive space from a finite parent;
+captions also count against the content budget.
+cover must be chosen explicitly, and position uses the same nine points as the background; when ratios
+differ, showing the whole image and filling the area trade off — prefer contain for text images.
+Meowbook's `presentation-foundations` lets you actually inspect two columns, three columns, a list, a
+photo cover and a text diagram contain.
+
+The whole deck and each page can receive `background`: `"theme"` or
+`{ fill?, image?, overlay?, foreground? }`, and a Signal of the same type can also be passed. `image`
+accepts src, a cover/contain fit (default cover) and a nine-point position (default center);
+fill/overlay accept CSS colors or gradients. When a page omits it, it inherits the deck; when the deck
+omits it, it follows the theme; an explicit theme returns to the theme; an object fully overrides and
+does not merge with the deck; when fill is omitted, the theme paper color is used. foreground's
+light/dark refers to text color, and omitting it follows the theme.
+The decorative background fills the canvas and crops itself, and does not change content edges,
+scaling or step lifecycle; updating the background Signal does not remount the current content.
+Updating the background on the same page does not trigger the page-change entrance animation; it only
+replaces the decorative layer.
+After an image fails, the base color, overlay and text light/dark remain, and the author must ensure
+the page is still readable without the image; images that need description and alternative text stay
+in the body.
+The host installs `createMeowUI()` and `createMeowSlides()` in the same Runtime and loads the complete
+`presentationTheme` from `meowslides/theme` to get the default presentation structure and visuals.
+A local implementation does not mean published; the current public version and install acceptance
+follow the root README and the receipt for that round.
 
 ```tsx
 import { h, signal } from "meowjsx";
@@ -56,55 +73,91 @@ const view = (
 );
 ```
 
-实际作品应在工厂或顶层组件内创建这组值，避免模块级单例使多场演示串值。`position` 提供时
-是唯一位置来源，导航与页内跳转都整体写同一 Signal；省略时组件创建本地位置，从第一页第 0 步开始。
-页 id 必须唯一非空，`steps` 是第 0 步之外的推进次数，位置和 `Reveal at` 超出范围会明确报错。
-步骤只更新局部绑定，换页才卸载旧页。跨页保留输入、计算参数与结果由宿主普通 signals 持有，
-旧页的 DOM、媒体、计时器和监听则按各自 owner 清理。回到第 0 步不会清空实验输入。
+Actual works should create these values in a factory or top-level component, avoiding module-level
+singletons that leak values across presentations. When `position` is provided it is the only position
+source, and navigation and in-page jumps all write the same Signal as a whole; when omitted, the
+component creates a local position starting at page one, step 0. Page ids must be unique and non-empty,
+`steps` is the number of advances beyond step 0, and out-of-range positions and `Reveal at` fail
+explicitly. Steps only update local bindings; changing pages is what unmounts the old page. Inputs,
+calculation parameters and results that persist across pages are held by ordinary host signals, while
+the old page's DOM, media, timers and listeners are cleaned up by their respective owners. Returning to
+step 0 does not clear the experiment input.
 
-默认逻辑画布为 1280×720，以 contain 适合可用区域；原尺寸模式提供滚动。工具控件保留自己的
-正常尺寸。`presentationTokens` 从 `meowslides/theme` 导出，可调演示标题、正文、颜色和页面边缘，
-不改变工作界面控件字号。内容超过画布会显示诊断；仍须实际观察真实文字、字体、媒体与目标尺寸。
+The default logical canvas is 1280×720, fitted into the available area with contain; original-size
+mode provides scrolling. Tool controls keep their own normal size. `presentationTokens` is exported
+from `meowslides/theme` and can adjust presentation titles, body text, colors and page edges without
+changing the work-interface control font size. Content that exceeds the canvas shows a diagnostic; you
+must still actually observe the real text, fonts, media and target sizes.
 
-外围采用常显的分组控制带：导航与页序、原生目录及设置入口各有自己的位置。低频的暂停/尺寸
-操作放在既有 Popover 中，用原生切换按钮保留状态；打开后聚焦首项，Escape 关闭并返回设置入口。
-排列与伸缩复用 Inline/Stack/LayoutItem，目录按控制带自身的窄宽度移到整行，适用于宽窗口中的窄宿主。
-`presentationTokens` 中的 `chrome*` 值只控制围台、页眉和控制带，独立于舞台纸色/正文字体与
-通用 Button 主题；不需额外 props 或主题安装器。窄屏会重排这些分组，控件保留约 44px 的
-触控高度、可见焦点与原生键盘语义，不依赖悬停显示。
+The frame uses a permanently visible grouped control band: navigation and page order, the native
+outline and the settings entry each have their own position. Low-frequency pause/size operations live
+in the existing Popover, preserving state with native toggle buttons; after opening, focus the first
+item, and Escape closes it and returns to the settings entry.
+Arrangement and stretching reuse Inline/Stack/LayoutItem, and the outline moves to a full row according
+to the control band's own narrow width, suiting narrow hosts in wide windows.
+The `chrome*` values in `presentationTokens` control only the frame, page header and control band,
+independent of the stage paper color/body font and the generic Button theme; no extra props or theme
+installer are needed. Narrow screens reflow these groups, and controls keep roughly 44px touch height,
+visible focus and native keyboard semantics without relying on hover.
 
-`active` 是宿主运行许可，缺省 true，与文档可见性、用户暂停和祖先 Reveal 组合。
-审阅、后台 iframe 和确定状态摄影应从首次挂载传 false；前台交互再由宿主开放。
-`usePresentationActivity()` 在同步组件 render 中捕获只读 Signal；自定义动画通过现有
-`context.effect` 响应它并返回清理函数。该许可不等于正在播放或内容已就绪，不能自动暂停任意子组件。
-Reveal 保留几何与局部状态，隐藏内容从键盘和可访问树移除；嵌套层共享祖先许可。
-`Reveal` 二选一接收 `at={n}` 或 `when={booleanOrSignal}`，不能同时传或都省略。
-`at` 沿页步骤累计显现；`when` 由作品局部状态控制，可反复显隐而不改变 slide/step。
-两种入口共用保挂载、几何、焦点回退、隐藏语义、祖先活动与动画清理；仍须在 Presentation 页内使用。
-提示、答案和依据可分别用普通 signals 接入 `when`，作品不复制 visibility / inert / ARIA 接线。
+`active` is the host runtime permission, defaulting to true, combined with document visibility, user
+pause and ancestor Reveals. Review, background iframes and deterministic-state photography should pass
+false from the first mount; the host then opens foreground interaction.
+`usePresentationActivity()` captures a read-only Signal during synchronous component render; custom
+animations respond to it through the existing `context.effect` and return a cleanup function. This
+permission does not mean playing or content ready, and cannot automatically pause arbitrary child
+components.
+Reveal keeps geometry and local state, and hidden content is removed from the keyboard and the
+accessibility tree; nested layers share the ancestor permission.
+`Reveal` accepts either `at={n}` or `when={booleanOrSignal}`, not both and not neither.
+`at` accumulates appearance along page steps; `when` is controlled by the work's local state and can
+repeatedly show and hide without changing the slide/step.
+Both entries share retained mount, geometry, focus fallback, hidden semantics, ancestor activity and
+animation cleanup; they must still be used within a Presentation page.
+Hints, answers and basis can each be wired to `when` through ordinary signals; works do not copy the
+visibility / inert / ARIA wiring.
 
-作品内容样式使用 `slideClassName`：类只落在当前页 article，后代标题/表单规则不会因此选中外围播放器。
-`className` 继续作用整个 Presentation 根，保持既有合同；两者不新增内容 wrapper，也不隔离任意全局 CSS。
-固定画布诊断同时检查可见内容与命名布局区域分配，避免正文侵入 footer 却未超出整张画布时漏报；
-明确的滚动区仍由自身承担滚动。诊断指出超容量，不自动缩字、隐藏正文或保证任意内容都能装入一页。
+Work content styles use `slideClassName`: the class lands only on the current page article, so
+descendant heading/form rules do not thereby select the surrounding player. `className` continues to
+apply to the whole Presentation root, keeping the existing contract; neither adds a content wrapper or
+isolates arbitrary global CSS. The fixed-canvas diagnostic also checks visible content and named
+layout region allocation, avoiding a missed report when body text intrudes into the footer without
+exceeding the whole canvas; an explicit scroll area still owns its own scrolling. The diagnostic
+indicates over-capacity and does not auto-shrink type, hide body content or guarantee that arbitrary
+content fits on one page.
 
-Presentation 与 Reveal 可选 `transition`：none（默认）、fade、slide、zoom，或
-`{ effect, direction?, speed? }`。direction 为 left/right/up/down，表示移动方向；
-slide 前进默认向左、后退默认向右，Reveal 默认向上；fade/zoom 不使用方向。
-speed 为 fast/normal/slow。页面切换只让新页入场，旧页立即卸载；Reveal 只在已挂载内容从隐藏变为显示时入场，
-直达步骤不补播。显现时即可交互，隐藏时立即 inert 并停止协作活动。
-失活、暂停、文档隐藏或 reduced motion 会取消动画并落到终态，恢复后不补播；无 WAAPI 时直接呈现终态。
+Presentation and Reveal accept an optional `transition`: none (default), fade, slide, zoom, or
+`{ effect, direction?, speed? }`. direction is left/right/up/down and means the movement direction;
+slide advances to the left by default and reverses to the right by default, and Reveal defaults
+upward; fade/zoom do not use direction. speed is fast/normal/slow. Page changes only bring the new page
+in, and the old page unmounts immediately; Reveal only enters when already-mounted content changes from
+hidden to shown, and a direct jump does not replay the entrance. Content is interactive as soon as it
+appears, and hidden content is immediately inert and stops collaborative activity.
+Inactivity, pause, document hidden or reduced motion cancel animations and land on the final state
+without replay after recovery; without WAAPI, the final state is presented directly.
 
-媒体组件要求 `src` 与可读的 `label`，默认原生 controls、metadata 预加载和用户启动。
-共享动作提供 Play / continue、Pause 与 Back to start；后者暂停并回到开头，仍等用户明确播放。
-暂停或回到开头会使尚未完成的播放请求失效，迟到的 Promise 不会重新启动媒体。
-有限 Stack 中媒体画面可收缩并保持 contain，状态和操作保留自然高度；错误反馈与名称分块，不挤在同一段文本里。图片或视频区域可配合 `LayoutItem grow basis={0}` 分配剩余空间，文字仍需遵守有限画布容量，不承诺无限内容自动适配。
-`ref`、媒体事件、poster、track children 等原生接缝落到真实 video/audio；`className` 用于外层状态结构，
-其他原生属性落到媒体元素。显式播放按钮检查 `play()` 的异步结果；宿主通过原生 ref 调用 play 时同样负责检查结果。
-失活或卸载会暂停，恢复许可不自动开声。宿主可在 ref cleanup 中读取最后 `currentTime`，在重进的 metadata
-事件后恢复 seek；组件先调用宿主 cleanup，再暂停并释放 src。素材换版的时间失效规则仍由宿主决定。
-可选 `soundtrack` 槽沿用同一音频组件，跨页保留、退出清理，不混音，也不自动协调页内媒体音量。
+Media components require `src` and a readable `label`, with native controls, metadata preload and
+user-initiated start by default. Shared actions provide Play / continue, Pause and Back to start; the
+latter pauses and returns to the beginning, still waiting for the user to explicitly play.
+Pausing or returning to the start invalidates an unfinished play request, and a late Promise does not
+restart the media.
+In a finite Stack the media picture can shrink while keeping contain, and status and actions keep
+natural height; error feedback and the name are split into blocks, not squeezed into the same
+paragraph. Image or video areas can use `LayoutItem grow basis={0}` to allocate the remaining space;
+text must still respect the finite canvas capacity, and infinite content fitting is not promised.
+Native seams such as `ref`, media events, poster and track children land on the real video/audio;
+`className` is used for the outer status structure, and other native attributes land on the media
+element. An explicit play button checks the asynchronous result of `play()`; the host calling play
+through a native ref is equally responsible for checking the result.
+Inactivity or unmount pauses, and restoring permission does not automatically unmute. The host can read
+the last `currentTime` in ref cleanup and restore the seek after re-entering the metadata event; the
+component first calls the host cleanup, then pauses and releases src. The host still decides the
+time-invalidation rules when assets change versions.
+The optional `soundtrack` slot reuses the same audio component, persists across pages, cleans up on
+exit, does not mix, and does not automatically coordinate in-page media volume.
 
-Meowbook 用于审阅和摄影；默认 MDX 作品由新包 CLI 生成正式 HTML、脚本与资源，高级消费者也可用同一 JSX/主题构建宿主。
-本入口没有 PPT/PDF 导出器、内容编辑器或资产服务。设计边界见
-[创作能力设计](../../docs/designs/2026-10-17-presentation-authoring.md)。
+Meowbook is used for review and photography; default MDX works are generated into formal HTML, scripts
+and assets by the new package CLI, and advanced consumers can also build hosts with the same JSX/theme.
+This entry point has no PPT/PDF exporter, content editor or asset service. See
+[authoring capability design](../../docs/designs/2026-10-17-presentation-authoring.md) for design
+boundaries.

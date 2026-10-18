@@ -13,46 +13,50 @@ const sampleImage =
   );
 export const ContentViewsStory = defineStory({
   id: "content-views",
-  title: "内容查看 · 来源、JSON 与图片",
-  group: "内容",
+  title: "Content views · Sources, JSON and images",
+  group: "Content",
   render: () => (
     <Stack>
       <WebBlock
         kind="search"
-        answer="来源由宿主提供；组件不会发起检索。"
+        answer="Sources are provided by the host; the component does not run searches."
         sources={[
-          { title: "Example", url: "https://example.com", snippet: "一条可核对的来源说明。" },
-          { url: "javascript:alert(1)", title: "不可导航的来源" },
+          { title: "Example", url: "https://example.com", snippet: "A verifiable source note." },
+          { url: "javascript:alert(1)", title: "A source that cannot be navigated" },
         ]}
       />
       <JsonTree
         data={{ name: "Meowland", options: { theme: "DeepSeek", enabled: true }, items: [1, 2, 3] }}
       />
       <JsonBlock text={'{"broken":'} />
-      <ImageLightbox src={sampleImage} alt="蓝色圆形示例" caption="图片预览 · Escape 返回原按钮" />
+      <ImageLightbox
+        src={sampleImage}
+        alt="Blue circle example"
+        caption="Image preview · Escape returns to the original button"
+      />
     </Stack>
   ),
 });
 
 export const JsonTreeStatesStory = defineStory({
   id: "json-tree-states",
-  title: "JSON 查看 · 属性、展开与复制反馈",
-  group: "内容",
+  title: "JSON viewer · Properties, expansion and copy feedback",
+  group: "Content",
   render: () => (
     <Stack>
       <JsonTree
-        label="结果"
+        label="Result"
         data={{
           path: "/workspace/meowland/src/main.ts",
           count: 3,
           enabled: true,
           empty: null,
-          nested: { text: "<内容>\n第二行", items: [1, 2] },
+          nested: { text: "<content>\nsecond line", items: [1, 2] },
         }}
       />
       <JsonTree
-        label="复制失败示例"
-        data={{ message: "可以选择文本复制" }}
+        label="Copy failure example"
+        data={{ message: "You can select the text to copy" }}
         onCopy={async () => {
           throw new Error("clipboard unavailable");
         }}

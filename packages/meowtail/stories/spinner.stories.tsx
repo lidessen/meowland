@@ -3,20 +3,24 @@ import { defineStory } from "meowbook";
 import { Spinner, Button, Stack } from "meowtail";
 export const Spinners = defineStory({
   id: "spinner",
-  title: "处理中 · 可读的等待",
+  title: "In progress · A readable wait",
   component: "Spinner",
-  variant: "等待与就绪",
-  group: "浮层与反馈",
+  variant: "Waiting and ready",
+  group: "Overlays and feedback",
   groupOrder: 30,
   description:
-    "图形旁保留正在做什么的文字，不虚构百分比；减少动态效果时停止旋转。按钮切换本地演示状态。",
+    "Keep text next to the graphic that says what is happening, without inventing a percentage; the spinner stops when reduced motion is requested. The button toggles local demo state.",
   covers: ["Spinner", "status", "reduced-motion"],
   render: () => {
     const loading = signal(true);
     return (
       <Stack align="start">
         {mapSignal(loading, (value) =>
-          value ? <Spinner label="正在整理文件列表…" /> : <p role="status">文件列表已就绪。</p>,
+          value ? (
+            <Spinner label="Organizing the file list…" />
+          ) : (
+            <p role="status">The file list is ready.</p>
+          ),
         )}
         <Button
           variant="outline"
@@ -24,7 +28,7 @@ export const Spinners = defineStory({
             loading.value = !loading.value;
           }}
         >
-          {mapSignal(loading, (value) => (value ? "模拟处理完成" : "重新演示等待"))}
+          {mapSignal(loading, (value) => (value ? "Simulate completion" : "Replay the wait"))}
         </Button>
       </Stack>
     );

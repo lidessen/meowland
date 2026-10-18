@@ -38,7 +38,7 @@ test("highlighted read window keeps file numbering, grammar context, focus and r
   ).toBeVisible();
   await read.locator('[data-meowui-part="output-block/body"]').focus();
   await expect(read.locator('[data-meowui-part="output-block/body"]')).toBeFocused();
-  await read.getByRole("button", { name: "复制", exact: true }).click();
+  await read.getByRole("button", { name: "Copy", exact: true }).click();
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(
     "/* comment starts\n  still a comment\n  const notCode = 'comment';\n  comment continues\n  whitespace is preserved  \n  comment closes */\nconst result: number = 42;\n\nexport { result };",
   );

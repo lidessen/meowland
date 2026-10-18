@@ -9,7 +9,7 @@ for (const width of [1280, 390]) {
       await page.goto("/canvas.html?story=attachment-scales");
       await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
       await page.getByRole("combobox").selectOption(theme);
-      const hooked = page.locator('a[download="受保护文档.txt"]');
+      const hooked = page.locator('a[download="protected-document.txt"]');
       const regular = page.locator('a[download="empty.txt"]');
       await expect(hooked).toHaveAttribute("href", "data:text/plain,Host%20download%20example");
       await expect(regular).toHaveAttribute("href", "data:text/plain,");
@@ -24,7 +24,7 @@ for (const width of [1280, 390]) {
       await hooked.click();
       await expect(hooked).toHaveAttribute("data-default-prevented", "true");
       await expect(page.locator("[data-attachment-download-feedback]")).toHaveText(
-        "宿主已接手下载，仅本地示例。",
+        "The host took over the download; local sample only.",
       );
       expect(downloads).toBe(0);
       await hooked.focus();

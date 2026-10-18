@@ -11,15 +11,18 @@ const sample =
   );
 export const ImagePreviewStory = defineStory({
   id: "image-preview",
-  title: "图片预览 · 加载与失败",
-  group: "内容",
+  title: "Image preview · Loading and failure",
+  group: "Content",
   render: () => (
     <Stack>
-      <p>图片显示不增加点击目标；宿主可独立提供打开或移除操作。</p>
-      <ImagePreview src={sample} alt="蓝色圆形" loading="eager" />
-      <ImagePreview src="/image-preview-delayed.svg" alt="延迟加载图片" loading="eager" />
-      <ImagePreview src="data:image/png,invalid" alt="无法加载的图片" loading="eager" />
-      <Button variant="quiet">宿主操作</Button>
+      <p>
+        Displaying an image adds no click target; the host can provide open or remove actions
+        separately.
+      </p>
+      <ImagePreview src={sample} alt="Blue circle" loading="eager" />
+      <ImagePreview src="/image-preview-delayed.svg" alt="Delayed-loading image" loading="eager" />
+      <ImagePreview src="data:image/png,invalid" alt="Image that fails to load" loading="eager" />
+      <Button variant="quiet">Host action</Button>
     </Stack>
   ),
 });

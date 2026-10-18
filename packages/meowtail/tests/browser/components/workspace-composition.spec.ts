@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("a composed workspace preserves its draft while its body scrolls and its toolbar stays reachable", async ({
+test("a composed workspace preserves its draft while its body scrolls and its page header stays reachable", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1280, height: 720 });
@@ -8,27 +8,29 @@ test("a composed workspace preserves its draft while its body scrolls and its to
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const workspace = page.locator("[data-workspace-composition]");
   const body = workspace.locator('[data-meowui-part="page-frame/body"]');
-  const toolbar = page.getByRole("toolbar", { name: "组合工作区工具栏" });
-  const input = page.getByRole("textbox", { name: "组合草稿" });
+  const header = page.locator('[data-meowui-part="page-header/root"]');
+  const input = page.getByRole("textbox", { name: "Composition draft" });
   const original = await input.elementHandle();
   await input.fill("A draft across nested layouts");
-  await page.getByRole("button", { name: "展开检查项", exact: true }).click();
-  await expect(page.locator("[data-workspace-composition-content] > p")).toHaveCount(28);
+  await page.getByRole("button", { name: "Expand checks", exact: true }).click();
+  await expect(page.locator('[data-workspace-composition-content] [role="listitem"]')).toHaveCount(
+    28,
+  );
   await page.setViewportSize({ width: 390, height: 330 });
-  const last = page.getByRole("button", { name: "检查末尾草稿", exact: true });
+  const last = page.getByRole("button", { name: "Check the draft at the end", exact: true });
   await last.focus();
   await expect(last).toBeInViewport();
-  await expect(toolbar).toBeInViewport();
+  await expect(header).toBeInViewport();
   expect(await body.evaluate((element) => element.scrollTop)).toBeGreaterThan(0);
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   await last.click();
-  await expect(page.getByRole("status")).toContainText("已检查当前本地草稿。");
-  const options = page.getByRole("button", { name: "检查选项", exact: true });
+  await expect(page.getByRole("status")).toContainText("Checked the current local draft.");
+  const options = page.getByRole("button", { name: "Check options", exact: true });
   await options.click();
   const panel = page.locator("#workspace-review-options");
   await expect(panel).toBeVisible();
   await expect(panel).toBeInViewport();
-  await panel.getByRole("button", { name: "检查当前草稿" }).focus();
+  await panel.getByRole("button", { name: "Check current draft" }).focus();
   await page.keyboard.press("Escape");
   await expect(panel).toBeHidden();
   await expect(options).toBeFocused();

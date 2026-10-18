@@ -11,11 +11,12 @@ import coast from "../../../examples/presentation/assets/coast-delivery.jpg";
 
 export const PresentationBackgroundsStory = defineStory({
   id: "presentation-backgrounds",
-  title: "演示背景 · 让画面服务于阅读",
-  group: "演示与媒体",
+  title: "Presentation backgrounds · Let the picture serve reading",
+  group: "Presentation and media",
   component: "Presentation",
-  variant: "默认、逐页覆盖与动态背景",
-  description: "同一页内容骨架搭配渐变、裁切图片与可读遮罩；背景变化保留草稿和焦点。",
+  variant: "Defaults, per-page overrides and dynamic backgrounds",
+  description:
+    "The same page content skeleton paired with gradients, cropped images and a readable overlay; background changes keep the draft and focus.",
   covers: [
     "deck background",
     "page override",
@@ -42,20 +43,24 @@ export const PresentationBackgroundsStory = defineStory({
     const slides: readonly SlideDefinition[] = [
       {
         id: "deck",
-        title: "共享渐变",
+        title: "Shared gradient",
         render: () => (
-          <PresentationLayout footer={<small>渐变属于整场默认；下一页可以完整覆盖。</small>}>
+          <PresentationLayout
+            footer={
+              <small>The gradient is the deck default; the next page can fully override it.</small>
+            }
+          >
             <Stack justify="center" gap="relaxed">
-              <small>为观点留出阅读空间</small>
-              <h1>背景提供气氛，内容保持主角</h1>
-              <p>先确定文字的明暗和位置，再选择背景。</p>
+              <small>Leave reading space for the point</small>
+              <h1>The background sets the mood; the content stays the lead</h1>
+              <p>Decide the text light/dark and position first, then choose the background.</p>
             </Stack>
           </PresentationLayout>
         ),
       },
       {
         id: "cover",
-        title: "图片与阅读遮罩",
+        title: "Image and reading overlay",
         background: {
           fill: "#173d36",
           image: { src: coast, position: "top right" },
@@ -65,23 +70,28 @@ export const PresentationBackgroundsStory = defineStory({
         },
         render: () => (
           <PresentationLayout
-            footer={<small>原创海岸插画来自图片等待演示；此处作为装饰背景。</small>}
+            footer={
+              <small>
+                The original coast illustration comes from the image-waiting presentation; it is
+                decorative background here.
+              </small>
+            }
           >
             <Stack justify="center" gap="relaxed">
-              <small>图像铺满画布，阅读区保留深色遮罩</small>
+              <small>The image fills the canvas while the reading area keeps a dark overlay</small>
               <h1>
-                让文字与风景
+                Let text and scenery
                 <br />
-                各有清晰的位置
+                each keep a clear place
               </h1>
-              <p>cover 可以裁切；重点不交给背景中的细节。</p>
+              <p>cover may crop; do not leave the point to details in the background.</p>
             </Stack>
           </PresentationLayout>
         ),
       },
       {
         id: "contain",
-        title: "完整图像与底色",
+        title: "Complete image and base color",
         background: {
           fill: "#e8eee8",
           image: { src: coast, fit: "contain", position: "right" },
@@ -92,11 +102,18 @@ export const PresentationBackgroundsStory = defineStory({
         render: () => (
           <PresentationLayout
             columns="equal"
-            footer={<small>contain 保留完整图片比例；空白区域使用本页底色。</small>}
+            footer={
+              <small>
+                contain keeps the complete image ratio; blank areas use this page's base color.
+              </small>
+            }
           >
             <Stack justify="center" gap="relaxed">
-              <h2>先保留完整图像，再安排阅读区域</h2>
-              <p>背景是装饰；需要观众核对的图表仍放在正文区域，并提供说明。</p>
+              <h2>Keep the complete image first, then arrange the reading area</h2>
+              <p>
+                The background is decoration; charts the audience needs to check still stay in the
+                body area with an explanation.
+              </p>
             </Stack>
             <div />
           </PresentationLayout>
@@ -104,45 +121,50 @@ export const PresentationBackgroundsStory = defineStory({
       },
       {
         id: "theme",
-        title: "显式主题背景",
+        title: "Explicit theme background",
         background: "theme",
         render: () => (
           <PresentationLayout>
             <Stack justify="center" gap="relaxed">
-              <small>这一页回到标准主题</small>
+              <small>This page returns to the standard theme</small>
               <h1>
-                暂停视觉变化，
+                Pause the visual change,
                 <br />
-                让一句话留下来
+                and let one sentence remain
               </h1>
-              <p>显式 theme 不继承整场渐变、图片或遮罩。</p>
+              <p>An explicit theme does not inherit the deck gradient, image or overlay.</p>
             </Stack>
           </PresentationLayout>
         ),
       },
       {
         id: "dark",
-        title: "深色底与浅色字",
+        title: "Dark base and light text",
         background: { fill: "#142c35", foreground: "light" },
         render: () => (
           <PresentationLayout
-            footer={<small>foreground="light" 指文字颜色，背景由作者明确提供。</small>}
+            footer={
+              <small>
+                foreground="light" refers to text color; the background is explicitly provided by
+                the author.
+              </small>
+            }
           >
             <Stack justify="center" gap="relaxed">
-              <small>一次停顿</small>
+              <small>One pause</small>
               <h1>
-                颜色只改变画面，
+                Color only changes the picture,
                 <br />
-                不改变信息的次序
+                not the order of the information
               </h1>
-              <p>深色底配浅色正文，控件继续使用共享主题。</p>
+              <p>Dark base with light body text; controls keep using the shared theme.</p>
             </Stack>
           </PresentationLayout>
         ),
       },
       {
         id: "fallback",
-        title: "无图片时仍可阅读",
+        title: "Readable even without the image",
         background: {
           fill: "#153a34",
           image: { src: "/missing-presentation-background.jpg" },
@@ -151,36 +173,51 @@ export const PresentationBackgroundsStory = defineStory({
         },
         render: () => (
           <PresentationLayout
-            footer={<small>故意缺失的图片用于验证；底色、遮罩和文字明暗保持原约定。</small>}
+            footer={
+              <small>
+                The intentionally missing image is for verification; the base color, overlay and
+                text light/dark keep the original contract.
+              </small>
+            }
           >
             <Stack justify="center" gap="relaxed">
-              <small>图片不可用的状态</small>
+              <small>State when the image is unavailable</small>
               <h1>
-                没有图，
+                Without the image,
                 <br />
-                这页也应读得清楚
+                this page should still read clearly
               </h1>
-              <p>不要让底色的可读性依赖一张必定成功加载的图片。</p>
+              <p>
+                Do not let base-color readability depend on an image that is guaranteed to load.
+              </p>
             </Stack>
           </PresentationLayout>
         ),
       },
       {
         id: "dynamic",
-        title: "变化背景，保留输入",
+        title: "Changing background, kept input",
         background: dynamicBackground,
         render: () => {
           dynamicMounts += 1;
           return (
             <PresentationLayout
-              footer={<small>背景 Signal 只更新装饰，当前内容实例继续存在。</small>}
+              footer={
+                <small>
+                  The background Signal only updates the decoration; the current content instance
+                  keeps living.
+                </small>
+              }
             >
               <Stack justify="center" gap="relaxed" data-background-content-mount={dynamicMounts}>
-                <h2>画面可以改变，草稿继续留在这里</h2>
-                <p>先输入，再用按钮切换底色；内容、输入与焦点不因背景更新重建。</p>
+                <h2>The picture can change; the draft stays here</h2>
+                <p>
+                  Type first, then switch the base color with the button; content, input and focus
+                  are not rebuilt by background updates.
+                </p>
                 <Input
-                  aria-label="背景草稿"
-                  placeholder="写下一句要保留的草稿"
+                  aria-label="Background draft"
+                  placeholder="Write a draft line to keep"
                   value={draft}
                   onInput={(event: Event) => {
                     draft.value = (event.currentTarget as HTMLInputElement).value;
@@ -210,7 +247,7 @@ export const PresentationBackgroundsStory = defineStory({
                           };
                     }}
                   >
-                    切换背景
+                    Switch background
                   </Button>
                   <Button
                     variant="outline"
@@ -219,7 +256,7 @@ export const PresentationBackgroundsStory = defineStory({
                       dynamicBackground.value = undefined;
                     }}
                   >
-                    继承整场背景
+                    Inherit deck background
                   </Button>
                   <Button
                     variant="outline"
@@ -228,7 +265,7 @@ export const PresentationBackgroundsStory = defineStory({
                       deckBackground.value = { fill: "#e3edf2", foreground: "dark" };
                     }}
                   >
-                    更新整场底色
+                    Update deck base color
                   </Button>
                 </Inline>
               </Stack>
@@ -240,7 +277,7 @@ export const PresentationBackgroundsStory = defineStory({
     return (
       <div style={{ height: "min(900px, calc(100dvh - 90px))" }}>
         <Presentation
-          title="常用演示背景"
+          title="Common presentation backgrounds"
           slides={slides}
           background={deckBackground}
           active={false}

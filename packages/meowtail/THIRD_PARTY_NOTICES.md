@@ -25,3 +25,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+# Lucide
+
+Functional icon geometry in `Icon` and the `meowtail/icons/lucide` pass-through
+is provided by Lucide (https://lucide.dev), version 1.59.0, under the ISC
+license; icons derived from the Feather project are under the MIT license. The
+full license text, including the Feather attribution list, ships in
+`dist/src/icons/LUCIDE-LICENSE` and in the installed `lucide` package.

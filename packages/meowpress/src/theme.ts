@@ -75,7 +75,7 @@ const styles = css`
     text-rendering: optimizeLegibility;
   }
 
-  /* 顶栏：保留秩序，但不再像刊头。 */
+  /* Top bar: keep the order, but stop looking like a masthead. */
   header.site {
     display: flex;
     align-items: center;
@@ -259,7 +259,7 @@ const styles = css`
     pointer-events: none;
   }
 
-  /* 首页内容流：日期只是呼吸点，不再承担机械时间轴。 */
+  /* Home feed: dates are breathing points, not a mechanical timeline. */
   .feed {
     position: relative;
     padding: 8px 0 48px;
@@ -389,7 +389,7 @@ const styles = css`
     letter-spacing: 0.06em;
   }
 
-  /* 两类内容都像桌上的纸，但保留各自的重量。 */
+  /* Both content kinds look like paper on a desk, but keep their own weight. */
   .post-card,
   .thought {
     background-color: ${blogTokens.card};
@@ -552,7 +552,7 @@ const styles = css`
     outline: none;
   }
 
-  /* 过滤器是轻量控制，不再像出版物图例。 */
+  /* Filters are lightweight controls, not publication legends. */
   .tag-filter {
     display: flex;
     flex-wrap: wrap;
@@ -602,7 +602,7 @@ const styles = css`
     transform: translateY(1px);
   }
 
-  /* 文章与想法详情。 */
+  /* Post and thought detail. */
   .post-head {
     padding: 68px 0 37px;
     border-bottom: 1px solid ${blogTokens.line};
@@ -896,7 +896,7 @@ const styles = css`
     text-align: right;
   }
 
-  /* 索引页与关于页。 */
+  /* Index and about pages. */
   .listing,
   .about,
   .skills-index,
@@ -1013,7 +1013,7 @@ const styles = css`
     letter-spacing: 0.06em;
   }
 
-  /* Skills：用目录和文档的语义区分内容，不把它做成产品陈列。 */
+  /* Skills: separate content by catalog and document semantics instead of displaying it as a product. */
   .skills-head {
     margin-bottom: 33px;
   }

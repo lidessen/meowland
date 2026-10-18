@@ -22,6 +22,8 @@ import { toolbarStyles } from "./components/toolbar.styles";
 import { chatAttachmentsStyles } from "./chat/attachments.styles";
 import { fieldGroupStyles } from "./components/field-group.styles";
 import { cardStyles } from "./components/card.styles";
+import { actionRailStyles } from "./components/action-rail.styles";
+import { metaRowStyles } from "./components/meta-row.styles";
 import { popoverStyles } from "./components/popover.styles";
 import { tabsStyles } from "./components/tabs.styles";
 import { choiceGroupStyles } from "./components/choice-group.styles";
@@ -37,11 +39,13 @@ import { chatStatusStyles } from "./chat/status.styles";
 import { chatFrameStyles } from "./chat/frame.styles";
 import { chatMessageStyles } from "./chat/message.styles";
 import { chatComposerStyles } from "./chat/composer.styles";
+import { composerPanelStyles } from "./chat/composer-panel.styles";
 import { chatRecordsStyles } from "./chat/records.styles";
 import { codeBlockStyles } from "./components/code-block.styles";
 import { layoutStyles } from "./components/layout.styles";
 import { descriptionListStyles } from "./components/description-list.styles";
 import { pageFrameStyles } from "./components/page-frame.styles";
+import { appBarStyles } from "./components/app-bar.styles";
 import { regionLayoutStyles } from "./components/region-layout.styles";
 import { buttonStyles } from "./components/button.styles";
 import { dialogStyles } from "./components/dialog.styles";
@@ -128,6 +132,8 @@ export const standardThemeStyles = [
   toastStyles,
   outputBlockStyles,
   buttonStyles,
+  actionRailStyles,
+  metaRowStyles,
   dialogStyles,
   nativeInputStyles,
   fieldStyles,
@@ -147,6 +153,7 @@ export const standardThemeStyles = [
   layoutStyles,
   descriptionListStyles,
   pageFrameStyles,
+  appBarStyles,
   regionLayoutStyles,
   cardStyles,
   fieldGroupStyles,
@@ -158,6 +165,7 @@ export const standardThemeStyles = [
   chatFrameStyles,
   chatMessageStyles,
   chatComposerStyles,
+  composerPanelStyles,
   chatRecordsStyles,
   chatQuestionStyles,
   chatConversationStyles,

@@ -200,7 +200,7 @@ export const chatComposerStyles = css`
   }
 
   ${partSelector(chatComposerContract, "input")}::placeholder {
-    color: ${uiTokens.captionForeground};
+    color: ${uiTokens.placeholder};
     font-size: ${uiTokens.fontBody};
   }
 
@@ -314,11 +314,14 @@ export const chatComposerStyles = css`
     transition-duration: 40ms;
   }
 
-  /* A compact writing surface grows with the draft, not with an empty tools row. */
+  /* A compact writing surface grows with the draft, not with an empty tools row.
+  The inline row keeps the one-line text and the send action on the optical
+  center: equal block padding around the 24px line, a symmetric action row, and
+  no base-layout nudge on the submit button. */
   ${partSelector(chatComposerContract, "root")} {
     ${chatComposerOptions.when({ layout: "inline" })} {
       grid-template-columns: minmax(0, 1fr) auto;
-      align-items: end;
+      align-items: center;
       padding: ${uiTokens.controlPaddingInline} ${uiTokens.spaceSection};
     }
   }
@@ -327,13 +330,18 @@ export const chatComposerStyles = css`
     grid-column: 1;
     grid-row: 1;
     min-height: ${uiTokens.controlLarge};
-    padding-block: 5px;
+    padding-block: 8px;
   }
 
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] ${partSelector(chatComposerContract, "actions")} {
     grid-column: 2;
     grid-row: 1;
     flex-wrap: nowrap;
+    padding-block: 4px;
+  }
+
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] ${partSelector(chatComposerContract, "submit")} {
+    transform: none;
   }
 
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] ${partSelector(chatComposerContract, "attachments")} {
@@ -406,14 +414,18 @@ export const chatComposerStyles = css`
     color: ${uiTokens.foreground};
   }
 
-  /* The model choice sits beside the attach control; the shortcut hint and send stay right. */
+  /* The model and its supporting choices stay beside send, not stranded after attach. */
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(chatComposerContract, "trailing")} {
-    margin-left: 0;
+    margin-left: auto;
     min-width: 0;
     max-width: min(360px, 70%);
   }
 
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(chatComposerContract, "submit")} {
+    margin-left: 0;
+  }
+
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")}:not(:has(> ${partSelector(chatComposerContract, "trailing")})) > ${partSelector(chatComposerContract, "submit")} {
     margin-left: auto;
   }
 
@@ -516,6 +528,25 @@ export const chatComposerStyles = css`
       min-height: 36px;
       margin-left: 0;
       border-radius: 50%;
+    }
+  }
+
+  /* A composing panel owns the surface; the composer then contributes only its
+     editor and action row, without a second chrome or padding layer. */
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("surface")}="none"] {
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+  @media (max-width: 768px) {
+    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("surface")}="none"] {
+      padding: 0;
+      border: 0;
+      border-radius: 0;
+      background: transparent;
+      box-shadow: none;
     }
   }
 `;

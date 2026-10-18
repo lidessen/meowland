@@ -4,13 +4,14 @@ import { defineStyleProps, type StyledComponentContract, type ThemedProps } from
 
 export const alertOptions = defineOptions("alert", {
   tone: ["info", "success", "warning", "danger"],
+  layout: ["block", "bar"],
 });
 
 export const alertContract = {
   name: "alert",
   parts: ["root", "title", "body", "actions"],
   styleProps: defineStyleProps(alertOptions, {
-    defaults: { tone: "info" },
+    defaults: { tone: "info", layout: "block" },
     parts: ["root", "title"],
   }),
 } as const satisfies StyledComponentContract;

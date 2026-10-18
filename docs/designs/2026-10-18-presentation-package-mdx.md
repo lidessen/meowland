@@ -1,147 +1,147 @@
-# 演示拆包与 MDX 创作入口
+# Splitting out the presentation package and the MDX authoring entry
 
-本记录先完成设计与关键可行性验证，用户随后明确回复“拆吧”，授权本轮实施 `packages/meowslides`。以下保留设计依据，实际实现与验证以本轮回执和 public exports 为准；包名不表示 npm 名称可用性或发布承诺。前序作者负担审查见[作者体验记录](2026-10-18-presentation-authoring-experience.md)；本记录把 MDX 提升为首要创作入口，替代前序“先 JSX 简写、以后考虑 MDX”的优先顺序。
+This record first completes the design and key feasibility validation; the user then explicitly replied "split it", authorizing this round's implementation of `packages/meowslides`. The design rationale below is retained, while actual implementation and validation follow this round's receipt and public exports; the package name does not imply npm name availability or a release commitment. See the [author experience record](2026-10-18-presentation-authoring-experience.md) for the earlier author-burden review; this record promotes MDX to the primary authoring entry, replacing the earlier priority of "JSX shorthand first, MDX later".
 
-## 建议
+## Recommendation
 
-值得独立拆包。演示已拥有自己的有限画布、页与步骤导航、活动许可、媒体生命周期、诊断、专用主题和创作工具，不再只是普通 UI 组件的一组示例。
+A separate package is worthwhile. Presentations already have their own finite canvas, slide and step navigation, activity permission, media lifecycle, diagnostics, dedicated theme, and authoring tools, and are no longer just a set of examples of ordinary UI components.
 
-Meowtail 保留通用 UI、Stack/Inline/Grid 等通用布局、ImagePreview 等通用能力；演示包拥有播放、渐显、演示专用 Layout/Image/List/Text、演示主题及 MDX 创作。复杂互动继续写 MeowJSX 组件，不引入 React、不建立第二套播放器。
+Meowtail keeps generic UI, generic layouts such as Stack/Inline/Grid, and generic capabilities such as ImagePreview; the presentation package owns playback, reveals, presentation-specific Layout/Image/List/Text, the presentation theme, and MDX authoring. Complex interactions continue to be written as MeowJSX components, without introducing React or building a second player.
 
-建议默认 `slides.mdx` 一文件多页；作者只维护讲稿、素材和必要的互动组件，主题与会话扩展才需要可选配置。工具统一提供真实可用的 dev/build，不让作者复制 main、registry、theme、cleanup、媒体声明和构建脚本。
+Recommend `slides.mdx` as one file with multiple slides by default; authors maintain only the script, assets, and necessary interactive components, while themes and session extensions need optional configuration only. The tool provides genuinely usable dev/build, so authors do not copy main, registry, theme, cleanup, media declarations, and build scripts.
 
-## 已验证的编译与运行边界
+## Verified compilation and runtime boundaries
 
-基于当前 `769f489` 源码/既有 dist，使用仓库已经安装的 `@mdx-js/mdx@3.1.1`，没有新增依赖。
+Based on the current `769f489` source/existing dist, this used the repository's already-installed `@mdx-js/mdx@3.1.1` with no new dependencies.
 
-官方编译器允许指定 [jsxImportSource](https://mdxjs.com/packages/mdx/)，并支持通过 [components prop](https://mdxjs.com/guides/injecting-components/) 提供组件映射。实际试验结果：
+The official compiler allows specifying [jsxImportSource](https://mdxjs.com/packages/mdx/) and supports providing a component mapping through the [components prop](https://mdxjs.com/guides/injecting-components/). Actual experiment results:
 
-| 项目                                   | 实际结果                                                                                              |
-| -------------------------------------- | ----------------------------------------------------------------------------------------------------- |
-| program + `jsxImportSource: "meowjsx"` | 导入 `meowjsx/jsx-runtime` 的 jsx/jsxs/Fragment，没有 React runtime 导入                              |
-| development 编译                       | 生成 `meowjsx/jsx-dev-runtime` 导入；本轮未运行 development 浏览器产物                                |
-| function-body + run                    | 注入 MeowJSX automatic runtime，组件映射与静态 HTML 输出通过；仅作兼容探针                            |
-| 浏览器 ESM 模块                        | Bun 打包两页，普通 Markdown、JS 模块导入与本地 SVG 正常                                               |
-| 事件与响应式                           | 计数按钮更新 Signal，跨页后由外部会话持有的计数仍为 1                                                 |
-| Context 与步骤                         | 真实 Presentation 下挂载 MDX；Reveal 在第 0 步隐藏、第 1 步显示；活动 Context 为 true，离页记录 false |
-| 生命周期                               | 探针挂载一次、离页清理一次；宿主卸载后容器清空；浏览器 pageerror 为零                                 |
-| AST 分页                               | 只识别顶层 thematicBreak；代码围栏、引用、JSX 子树中的横线不分页                                      |
-| Setext                                 | `Title\n---` 是标题，不是分页；留空行后的顶层横线才是分页                                             |
-| 独立图片段落                           | 小型 AST 转换把独立图片变为块级 Image；静态结果不产生 p > figure，混排小图保留原生 img                |
-| 普通正文分组                           | 浏览器宿主把 MDX 正文放在一个 flow 区域，不把每段当独立 grid 项                                       |
+| Item                                   | Actual result                                                                                                                                                  |
+| -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| program + `jsxImportSource: "meowjsx"` | Imports jsx/jsxs/Fragment from `meowjsx/jsx-runtime`; no React runtime import                                                                                  |
+| development compilation                | Generates `meowjsx/jsx-dev-runtime` imports; development browser output was not run this round                                                                 |
+| function-body + run                    | Injects the MeowJSX automatic runtime; component mapping and static HTML output pass; compatibility probe only                                                 |
+| Browser ESM module                     | Bun bundles two slides; plain Markdown, JS module imports, and local SVG work                                                                                  |
+| Events and reactivity                  | A counter button updates the Signal; after crossing slides, the count held by the external session is still 1                                                  |
+| Context and steps                      | MDX mounts under a real Presentation; Reveal is hidden at step 0 and shown at step 1; the activity Context is true and records false after leaving the slide   |
+| Lifecycle                              | The probe mounts once and cleans up once when leaving the slide; the container empties after host unmount; browser pageerror count is zero                     |
+| AST pagination                         | Only top-level thematicBreak is recognized; horizontal rules inside code fences, blockquotes, or JSX subtrees do not paginate                                  |
+| Setext                                 | `Title\n---` is a heading, not pagination; only a top-level horizontal rule after a blank line paginates                                                       |
+| Standalone image paragraph             | A small AST transform turns a standalone image into a block-level Image; the static result produces no p > figure, and inline small images keep the native img |
+| Plain body grouping                    | The browser host puts MDX body content in one flow area and does not treat each paragraph as an independent grid item                                          |
 
-试验文件在忽略目录 `artifacts/presentation-mdx-feasibility/`：experiment.ts、slides.mdx、main.tsx、compile-facts.json、browser-facts.json 和 browser.png。它是有手写宿主、标题和页面数组的有界探针，**不是已完成的 MDX 插件或单文件创作产品**。图片段落转换仅做静态结构验证，不等于完整图片构建/主题验收。
+The experiment files are in the ignored directory `artifacts/presentation-mdx-feasibility/`: experiment.ts, slides.mdx, main.tsx, compile-facts.json, browser-facts.json, and browser.png. It is a bounded probe with a hand-written host, title, and slide array, **not a completed MDX plugin or single-file authoring product**. The image-paragraph transform only validates static structure and is not equal to full image build/theme acceptance.
 
-正式路径建议 build-time `compile(..., { jsxImportSource: "meowjsx", outputFormat: "program" })`，交给打包器解析 ESM 和本地资源。观众浏览器不加载 MDX 编译器，不通过 run/evaluate 接收动态文本；不需要 `@mdx-js/react` 或 React MDXProvider。
+The recommended production path is build-time `compile(..., { jsxImportSource: "meowjsx", outputFormat: "program" })`, leaving ESM and local asset resolution to the bundler. Audience browsers do not load the MDX compiler and do not receive dynamic text through run/evaluate; `@mdx-js/react` or React MDXProvider is not needed.
 
-MeowJSX 的 jsx/jsxs/Fragment 已共用 core。新包不能分别内联复制 runtime、Context、contract、token 或 fragment；显式创建多个 runtime 仍是合法隔离。
+MeowJSX's jsx/jsxs/Fragment already share core. The new package must not inline separate copies of runtime, Context, contracts, tokens, or fragments; explicitly creating multiple runtimes is still valid isolation.
 
-## 包的职责和依赖
+## Package responsibilities and dependencies
 
-| 入口/角色                 | 承担                                                         | 不应进入该图的依赖                              |
-| ------------------------- | ------------------------------------------------------------ | ----------------------------------------------- |
-| 演示包 runtime            | Presentation、页/步骤/活动、Reveal、媒体、演示内容组件及类型 | MDX 编译器、文件系统、CLI、Meowbook、Playwright |
-| 演示包 theme              | 演示 tokens/styles，与 Meowtail 标准 UI 主题组合             | build/dev、浏览器自动化                         |
-| 演示包 build 子路径与 CLI | MDX/AST、资源图、生成宿主、构建、监听重建/刷新、错误报告     | 不由 runtime/theme 反向导入                     |
-| Meowtail                  | 通用组件、布局、组件注册和标准应用主题                       | 不反向依赖演示包                                |
-| Meowbook                  | 场景、审查、截图与夹具                                       | 不是普通讲稿启动前提或观众 runtime              |
+| Entry point/role                           | Responsible for                                                                               | Dependencies that should not enter this graph                          |
+| ------------------------------------------ | --------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
+| Presentation package runtime               | Presentation, slides/steps/activity, Reveal, media, presentation content components and types | MDX compiler, filesystem, CLI, Meowbook, Playwright                    |
+| Presentation package theme                 | Presentation tokens/styles, composed with the Meowtail standard UI theme                      | build/dev, browser automation                                          |
+| Presentation package build subpath and CLI | MDX/AST, asset graph, generated host, build, watch rebuild/reload, error reporting            | Not imported back from runtime/theme                                   |
+| Meowtail                                   | Generic components, layouts, component registration, and the standard application theme       | Does not depend back on the presentation package                       |
+| Meowbook                                   | Scenarios, review, screenshots, and fixtures                                                  | Not a prerequisite for starting a normal script or an audience runtime |
 
-演示 runtime 单向依赖 Meowtail、MeowJSX、MeowCSS；同一安装图中的 JSX/CSS 由兼容 peer 提供。Bun 是首期工具宿主，可沿用仓库工具约定，不为 MDX 同时引入 Vite 生态。
+The presentation runtime depends one-way on Meowtail, MeowJSX, and MeowCSS; JSX/CSS in the same install graph are provided by compatible peers. Bun is the initial tool host and can follow the repository's tool conventions; no Vite ecosystem is introduced for MDX at the same time.
 
-先用一个演示包的独立子路径隔离模块图；这能避免浏览器打入 compiler，却**不能保证 npm 安装时完全不下载 compiler 依赖**。若后续确有仅使用 runtime 的安装成本需求，再拆工具包；不为尚未出现的需求先建立多包平台。
+First isolate the module graph with an independent subpath of one presentation package; this keeps the compiler out of the browser bundle but **cannot guarantee that npm installs never download compiler dependencies**. If a real install-cost need for runtime-only consumers appears later, split a tooling package then; do not build a multi-package platform for a need that has not appeared.
 
-### 不能只移动 presentation 目录
+### Moving the presentation directory is not enough
 
-当前演示实现还耦合于：
+The current presentation implementation is still coupled to:
 
-- `meowtail/src/registry/index.ts`：导入演示 contracts、组件名表、默认注册数组和类型扩展。
-- `meowtail/src/theme/index.ts`：导入演示 tokens/styles，并并入 standardTheme。
-- 根与 `meowtail/presentation` 公共导出，以及现有 stories、样例、两份课件和外部消费者。
+- `meowtail/src/registry/index.ts`: imports presentation contracts, the component name table, the default registration array, and type extensions.
+- `meowtail/src/theme/index.ts`: imports presentation tokens/styles and merges them into standardTheme.
+- Root and `meowtail/presentation` public exports, plus existing stories, examples, both courseware sets, and external consumers.
 
-原本考虑过 facade 过渡；在用户明确授权拆包后，本轮选择一次迁移演示实现、registry ownership、主题片段与仓库内消费者。演示包安装通用 UI 注册和自己的演示注册，演示主题复用通用 token/fragment 对象。
+A facade transition was originally considered; after the user explicitly authorized the split, this round chose a one-time migration of the presentation implementation, registry ownership, theme fragments, and in-repository consumers. The presentation package installs the generic UI registry plus its own presentation registry, and the presentation theme reuses the generic token/fragment objects.
 
-旧 Meowtail 根演示导出和 `meowtail/presentation` 移除，以新的本地破坏性候选版本标识；不能靠 Meowtail 反向 re-export 新包解决兼容，否则形成循环。既有 npm 正式版本不覆盖，Rossovia 等仓库外消费者不擅自切换。
+The old Meowtail root presentation exports and `meowtail/presentation` are removed and marked by a new local breaking candidate version; compatibility cannot be solved by Meowtail re-exporting the new package in reverse, or a cycle forms. Existing official npm versions are not overwritten, and out-of-repository consumers such as Rossovia are not switched unilaterally.
 
-## 最短作者模型
+## The shortest authoring model
 
-### 单文件多页优先
+### Single file with multiple slides first
 
-| 方式                    | 优点                                             | 代价                                             | 建议                                   |
-| ----------------------- | ------------------------------------------------ | ------------------------------------------------ | -------------------------------------- |
-| slides.mdx + 顶层横线   | 连续写讲稿、移动页面直观、少文件，适合短中篇作品 | 分页/共享 ESM/源位置需要工具处理；顶层横线被保留 | 默认                                   |
-| 每文件一页 + 排序入口   | 自然模块隔离、合作者冲突少、文件级元信息直观     | 初始即维护文件与顺序；跨页 imports/资源分散      | 大型作品后续可选，不同时实现第二套协议 |
-| 每页都用 Slide 成对标签 | 边界明确，标准 MDX 元素                          | 重复包装、闭合标签与 Markdown 空行要求           | 不作为默认                             |
+| Approach                                | Advantages                                                                                      | Cost                                                                                     | Recommendation                                                                      |
+| --------------------------------------- | ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| slides.mdx + top-level horizontal rules | Write the script continuously, move slides intuitively, few files; suits short and medium works | Pagination/shared ESM/source positions need tool handling; top-level rules are preserved | Default                                                                             |
+| One slide per file + ordering entry     | Natural module isolation, fewer collaborator conflicts, file-level metadata is direct           | Maintain files and order from the start; cross-slide imports/assets are scattered        | Optional later for large works; do not implement a second protocol at the same time |
+| Paired Slide tags on every slide        | Clear boundaries, standard MDX elements                                                         | Repeated wrappers, closing tags, and Markdown blank-line requirements                    | Not the default                                                                     |
 
-`---` 必须按 MDX AST 顶层 thematicBreak 判别，不能正则分割全文。分页前后留空行；顶层正文横线被保留为分页，不承诺同一语法同时表示装饰线。需要正文横线可显式 `<hr />`。不增加 `::right::`、自定义渐显指令或反复 YAML frontmatter。
+`---` must be recognized as a top-level thematicBreak in the MDX AST; do not split the whole text with a regex. Leave blank lines around pagination; a top-level body horizontal rule is preserved as pagination, and the same syntax is not promised to also mean a decorative line. For a body rule, explicitly use `<hr />`. No `::right::`, custom reveal directives, or repeated YAML frontmatter are added.
 
-### 页级元信息
+### Slide-level metadata
 
-可选首节点 `<Slide id="evidence" steps={1} />` 是**拟议编译期声明**，不是真正挂载的 Slide 组件。MVP 接受静态 id/title/columns/steps/notes；拒绝 spread、函数调用、对象路径和任意计算；未知字段、无效列比/步骤、重复 id 附原文件位置报错。
+The optional first node `<Slide id="evidence" steps={1} />` is a **proposed compile-time declaration**, not a really mounted Slide component. The MVP accepts static id/title/columns/steps/notes; it rejects spread, function calls, object paths, and arbitrary computation, and reports unknown fields, invalid column ratios/steps, and duplicate ids with the original file position.
 
-每页首个 `#` 标题用于目录并由默认 header 显示一次，不让作者重复写 title。无显式 id 时由静态标题生成；重复标题/id 或无标题且无 title 时要求作者明确填写，不能暗中以页序号生成易漂移定位。修改标题可能改变默认深链，要稳定引用就写 id。动态标题或特殊封面由显式元信息/高级 JSX 页面承担。
+The first `#` heading on each slide feeds the outline and is displayed once by the default header, so authors do not write the title twice. Without an explicit id, the id is generated from the static heading; duplicate headings/ids or a slide with neither a heading nor a title require the author to fill it in explicitly, and a drifting position is never silently generated from the slide number. Changing the heading may change the default deep link; write an id for a stable reference. Dynamic titles or special covers are handled by explicit metadata or advanced JSX slides.
 
-以下是建议的普通作者写法，**尚未成为公共能力**：
+The following is the recommended plain-authoring form, **not yet a public capability**:
 
 ```mdx
 import { QuickCheck } from "./QuickCheck.tsx";
 
-# 观察栖息地
+# Observe the habitat
 
-观察、比较、解释。
+Observe, compare, explain.
 
 ---
 
 <Slide id="evidence" steps={1} />
 
-# 寻找证据
+# Look for evidence
 
-![森林中的栖息环境](./forest.jpg)
+![The habitat in the forest](./forest.jpg)
 
 <Reveal at={1}>
 
-请指出支持判断的一个细节。
+Name one detail that supports your judgment.
 
 </Reveal>
 
 <QuickCheck />
 ```
 
-### 组件、布局、主题、媒体与渐显
+### Components, layouts, themes, media, and reveals
 
-- 默认 components map 只提供少量演示组件；Reveal、PresentationVideo/Audio/Image 沿用现有实现。自定义组件显式 import，按 MeowJSX 的组件、Signal、事件合同编写；React hooks 组件不因此兼容。
-- 普通标题、段落、列表、引用和代码由演示主题处理。默认单列整组正文是一个 flow 区域。不能把 Markdown 的 ul 直接映射到接收 items 的 PresentationList，需保留 ul/li 语义或经过明确 AST 转换。
-- 独立图片段落转为块级演示图片；混排图保留原生 inline img。默认 contain、alt 保留，完整资源图需把本地 Markdown url 改写为打包器可追踪的资源，不只把字符串复制进产物。
-- 双栏声明 `columns={2}`，正文明确写两组顶层 `<div>…Markdown…</div>`。工具按列组传给现有 Layout；每组可含多个段落。不按段落数猜左右，不让 Markdown 根 Fragment 的换行成为分组规则。分组数量不符时诊断。
-- 首期默认主题即可启动。可选整场配置选择主题或映射，放在文件开头的静态 `export const deck = { title: "…", theme: "standard" }`；第一版只接受内置主题标识，复杂外部主题导入可放高级配置。无需页级主题引擎。
-- 媒体示意：`import clip from "./clip.mp4"` 后写 `<PresentationVideo src={clip} label="观察片段" />`；音频同理。字幕是普通 track 子节点与本地资源。原生 video/audio 不会自动获得活动许可和离页暂停合同。
-- 渐显示意使用当前 `<Reveal at={1}>…</Reveal>` 和页级 steps。保留明确步骤，不扫描/执行嵌套组件来“自动发现”。
+- The default components map provides only a few presentation components; Reveal and PresentationVideo/Audio/Image reuse the existing implementation. Custom components are imported explicitly and written against MeowJSX's component, Signal, and event contracts; React hooks components are not made compatible by this.
+- Plain headings, paragraphs, lists, blockquotes, and code are handled by the presentation theme. By default the whole single-column body is one flow area. Markdown's ul cannot be mapped directly to PresentationList, which takes items; keep ul/li semantics or go through an explicit AST transform.
+- A standalone image paragraph becomes a block-level presentation image; an inline image keeps the native inline img. contain and alt are preserved by default; a complete asset image requires rewriting the local Markdown URL into a bundler-traceable asset, not just copying the string into the artifact.
+- Two columns are declared with `columns={2}`, and the body explicitly writes two top-level `<div>…Markdown…</div>` groups. The tool passes column groups to the existing Layout; each group may contain multiple paragraphs. Left/right is not guessed from paragraph count, and line breaks in the Markdown root Fragment do not become grouping rules. A mismatched group count is diagnosed.
+- The default theme is enough to start in the first phase. Optional whole-deck configuration selects a theme or mapping via a static `export const deck = { title: "…", theme: "standard" }` at the top of the file; the first version accepts built-in theme identifiers only, and complex external theme imports can go in advanced configuration. No slide-level theme engine is needed.
+- Media example: after `import clip from "./clip.mp4"`, write `<PresentationVideo src={clip} label="Observation clip" />`; audio works the same way. Subtitles are ordinary track child nodes plus local assets. Native video/audio does not automatically get the activity permission and leave-slide pause contract.
+- The reveal example uses the current `<Reveal at={1}>…</Reveal>` and slide-level steps. Steps stay explicit; nested components are not scanned/executed to "auto-discover" them.
 
-## ESM、状态与错误位置不能藏起来
+## ESM, state, and error positions must not be hidden
 
-单文件分页编译不能把全部 ESM 文本复制到每个页模块，导致顶层变量、模块副作用或导出执行多次。正式编译需要共享 ESM 模块保持身份，页组件只导入所需绑定；临时试验只证明共享 import 的基本路径，不证明任意声明提升已经实现。
+Single-file paginated compilation must not copy all ESM text into every slide module, causing top-level variables, module side effects, or exports to execute multiple times. Production compilation needs shared ESM modules to keep their identity, with slide components importing only the bindings they need; the temporary experiment only proves the basic shared-import path, not that arbitrary declaration hoisting is implemented.
 
-MDX 顶层代码沿 JavaScript 模块语义，不自动变成“每场会话执行一次”。普通局部互动组件随离页卸载；跨页状态由可选 createSession 工厂持有，再经 props.session/会话组件映射传给 MDX。不要把顶层 `signal()` 变成多个预览共享的默认模式，也不要为读取标题而服务端执行模块。
+MDX top-level code follows JavaScript module semantics and does not automatically become "executed once per session". Ordinary local interactive components unmount when leaving the slide; cross-slide state is held by an optional createSession factory and passed to MDX through props.session or a session component mapping. Do not turn top-level `signal()` into a default mode shared by multiple previews, and do not execute modules on the server just to read titles.
 
-编译器在 build 侧解析静态目录与元信息，不调用页面组件；真正 MDX 页内容在正常 CurrentSlide Context 中挂载。作者 position 仍唯一 owner；宿主 inactive 许可不允许被作品 props spread 覆盖。
+The compiler resolves the static outline and metadata on the build side and does not call page components; actual MDX page content mounts under the normal CurrentSlide Context. The author's position is still the sole owner; the host's inactive permission must not be overridden by a work's props spread.
 
-dev 首期可以自动重建并整页 reload，明确会重置会话；不称为保留状态 HMR。错误应包含原 slides.mdx 页与行列；共享模块、分页后的 source map、资源缺失和刷新失败恢复都需要后续实现测试，不能用当前临时脚本代替。
+In the first phase, dev may rebuild automatically and reload the whole page, explicitly resetting the session; this is not called state-preserving HMR. Errors should include the original slides.mdx page, line, and column; shared modules, post-pagination source maps, missing assets, and reload-failure recovery all need later implementation and tests and cannot be replaced by the current temporary script.
 
-## 复用 MeowPress 与 Meowbook
+## Reusing MeowPress and Meowbook
 
-MeowPress 已有 MDX 依赖，`src/content.ts` 使用 compile/function-body/run 后 renderToHtml，并拥有站点 frontmatter、日期、文章和静态资产规则。可参考 compiler 配置与资源处理经验；其内部方法非 public exports，不跨包私引、不把文章管线改成演示宿主。需要真正共享的小型能力时再有证据地抽取，不现在拆一个泛化内容平台。
+MeowPress already has an MDX dependency; `src/content.ts` uses compile/function-body/run followed by renderToHtml, and owns site frontmatter, dates, articles, and static asset rules. Its compiler configuration and asset-handling experience are worth referencing, but its internal methods are not public exports, so do not import across packages privately or turn the article pipeline into a presentation host. Extract small genuinely shared capabilities only with evidence later; do not split out a generalized content platform now.
 
-Meowbook 可接生成的 JSX 页面/既有 Presentation 夹具，复用组件观察、截图与行为回归。但当前 discovery 只识别明确 stories，不直接把 MDX 文件当 story；需要工具生成适配入口。现有 serve 也没有 HMR，不能借用其名称宣称已经实现编辑刷新。演示 runtime 不依赖 Meowbook。
+Meowbook can consume generated JSX pages or existing Presentation fixtures, reusing component observation, screenshots, and behavior regressions. However, current discovery recognizes only explicit stories and does not treat MDX files as stories directly; the tool must generate an adapter entry. The existing serve has no HMR either, so its name cannot be borrowed to claim edit-refresh is implemented. The presentation runtime does not depend on Meowbook.
 
-## 信任边界
+## Trust boundary
 
-MDX 是可信本地代码：允许 imports、表达式和组件执行，具有相应 JS 运行权限；本地配置和插件也属于代码。[官方说明](https://mdxjs.com/packages/mdx/)明确 run/evaluate 会执行 JavaScript。将 MDX 编译成 ESM 不会把不可信内容变成安全数据。
+MDX is trusted local code: imports, expressions, and component execution are allowed and carry the corresponding JS runtime permissions; local configuration and plugins are code too. The [official documentation](https://mdxjs.com/packages/mdx/) states clearly that run/evaluate executes JavaScript. Compiling MDX into ESM does not turn untrusted content into safe data.
 
-模型生成、上传或外部拉取的文本不默认作为 MDX 运行。先审阅并进入可信作品，或走既有有限 Markdown/JSON 路径；不把 JSON 入口扩展成 MDX evaluator，也不顺带承诺沙箱。
+Text generated by a model, uploaded, or fetched externally is not run as MDX by default. Review it and bring it into a trusted work first, or use the existing finite Markdown/JSON paths; do not extend the JSON entry into an MDX evaluator, and do not promise a sandbox along the way.
 
-## 设计阶段的最小范围与待验证清单
+## Minimum scope and open validation list from the design phase
 
-设计阶段约定的最小范围是：单 slides.mdx、AST 分页、静态页元信息/单次标题、普通 flow 与图片转换、显式列组、现有渐显/媒体映射、本地资源构建、默认主题、统一生成宿主，以及一条 dev/build 路径。后续用户授权真迁移，原复杂演示保留为实验场。用同一短稿验证“改标题、加页、换图、加一步、加互动”的实际操作与错误恢复。
+The minimum scope agreed in the design phase is: a single slides.mdx, AST pagination, static slide metadata/single heading, plain flow and image transforms, explicit column groups, existing reveal/media mapping, local asset builds, the default theme, a unified generated host, and one dev/build path. Later the user authorized the actual migration, with the original complex presentation kept as an experiment ground. The same short script should validate the practical operations and error recovery for "change title, add slide, swap image, add step, add interaction".
 
-设计阶段待验证的项目包括：新包 manifest/公共导出与安装态；MDX/Bun loader；共享 ESM 与会话工厂 API；元信息校验；双栏/长文/窄屏/短窗口默认主题；媒体/字幕资源；生命周期；watch/reload；source maps/TS 组件 props 检查；Meowbook 适配与消费者迁移。其中静态 deck 配置未进入本轮实现支持集，完整 HMR、source maps 与 MDX 内 TS props 检查仍是后续能力。
+Items to validate at the design stage include: the new package manifest/public exports and installed state; the MDX/Bun loader; shared ESM and the session factory API; metadata validation; the default theme for two columns/long text/narrow screens/short windows; media/subtitle assets; lifecycle; watch/reload; source maps/TS component props checks; Meowbook adaptation and consumer migration. The static deck configuration did not enter this round's implementation support set, and full HMR, source maps, and TS props checking inside MDX remain future capabilities.
 
-最初可行性探针仅验证桌面编译兼容，不能替代后续授权实施的验收。实际实施、同版检查、安装消费、宽/窄/短窗口证据及明确限制见[实施回执](../records/2026-10-18-meowslides-mdx.md)；没有推送、发布或部署。
+The initial feasibility probe only verified desktop compilation compatibility and cannot replace acceptance of the later authorized implementation. See the [implementation receipt](../records/2026-10-18-meowslides-mdx.md) for actual implementation, same-version checks, install consumption, wide/narrow/short window evidence, and explicit limitations; nothing was pushed, published, or deployed.

@@ -115,7 +115,7 @@ function markdownLinks(source: string): MarkdownLink[] {
     }
     if (url) {
       links.push({
-        label: nodeText(node).replaceAll(/\s+/g, " ").trim() || "打开",
+        label: nodeText(node).replaceAll(/\s+/g, " ").trim() || "Open",
         url,
         section,
         line: node.position?.start?.line,
@@ -124,7 +124,7 @@ function markdownLinks(source: string): MarkdownLink[] {
     }
     node.children?.forEach((child) => collectLinks(child, section));
   };
-  let section = "文档开头";
+  let section = "Beginning of document";
   for (const node of tree.children ?? []) {
     if (node.type === "heading") {
       section = nodeText(node).replaceAll(/\s+/g, " ").trim() || section;
@@ -152,7 +152,7 @@ function inferredDescription(body: string): string {
     .split(/\r?\n\s*\r?\n/)
     .map(plainText)
     .find(Boolean);
-  return (paragraph ?? "一个可以交给 Agent 使用的 Skill。").slice(0, 180);
+  return (paragraph ?? "A skill that can be handed to an Agent.").slice(0, 180);
 }
 
 async function collectFiles(directory: string): Promise<string[]> {
@@ -182,15 +182,15 @@ function isExternalUrl(url: string): boolean {
 function externalDetail(url: string): string {
   try {
     const parsed = new URL(url);
-    return `Agent 会离开 Skill，继续读取 ${parsed.hostname}。`;
+    return `The Agent leaves the Skill and continues to ${parsed.hostname}.`;
   } catch {
-    return "指向 Skill 目录之外的输入或资料。";
+    return "Points to input or material outside the Skill directory.";
   }
 }
 
 function relationLabel(label: string, target: string): string {
   const targetName = target.endsWith("/") ? target : (target.split("/").at(-1) ?? target);
-  if (label === target || label === targetName) return "引用";
+  if (label === target || label === targetName) return "Reference";
   return label.length > 16 ? `${label.slice(0, 15)}…` : label;
 }
 
@@ -291,7 +291,7 @@ async function loadSkill(
         target = link.url;
         externalNodes.set(target, {
           path: target,
-          role: "外部链接",
+          role: "External link",
           detail: externalDetail(target),
           kind: "external",
         });
@@ -304,16 +304,16 @@ async function loadSkill(
             path: target,
             role:
               resolved.kind === "asset"
-                ? "本地资源"
+                ? "Local asset"
                 : resolved.kind === "outside"
-                  ? "Skill 外部"
-                  : "缺失引用",
+                  ? "Outside the Skill"
+                  : "Missing reference",
             detail:
               resolved.kind === "asset"
-                ? "Markdown 明确链接到这个非文本资源。"
+                ? "The Markdown explicitly links to this non-text asset."
                 : resolved.kind === "outside"
-                  ? "链接指向 Skill 目录之外，Agent 会离开当前 Skill 继续读取。"
-                  : "Markdown 中存在此链接，但 Skill 目录内没有对应文件。",
+                  ? "The link points outside the Skill directory; the Agent leaves the current Skill and continues reading."
+                  : "The link exists in the Markdown, but there is no corresponding file in the Skill directory.",
             kind: resolved.kind === "outside" ? "external" : resolved.kind,
           });
         }
@@ -342,7 +342,7 @@ async function loadSkill(
       source,
       target,
       label: compactGraphLabel(
-        sections[0] === "文档开头" ? labels.join(" / ") : sections.join(" / "),
+        sections[0] === "Beginning of document" ? labels.join(" / ") : sections.join(" / "),
       ),
       contexts,
     };
@@ -366,13 +366,14 @@ async function loadSkill(
       const reachable = depth !== undefined;
       return {
         path,
-        role: path === "SKILL.md" ? "入口" : reachable ? `${depth} 级引用` : "未被引用",
+        role:
+          path === "SKILL.md" ? "Entry" : reachable ? `${depth}-level reference` : "Not referenced",
         detail:
           path === "SKILL.md"
-            ? "Agent 从这里开始读取这个 Skill。"
+            ? "The Agent starts reading this Skill here."
             : reachable
-              ? `从 SKILL.md 经过 ${depth} 次链接可以读到这里。`
-              : "不在从 SKILL.md 出发的链接链路中，Agent 不会自然读到这里。",
+              ? `Reachable from SKILL.md through ${depth} links.`
+              : "Not on the link chain from SKILL.md, so the Agent will not naturally read this.",
         content: documents.get(path)!.body,
         reachable,
         depth,

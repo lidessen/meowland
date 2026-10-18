@@ -7,9 +7,9 @@ export const processGroupContract = {
 } as const satisfies ComponentContract;
 
 export interface ProcessGroupProps extends Props {
-  /** The group's name and size, for example "过程 · 3 步". */
+  /** The group's name and size, for example "Process · 3 steps". */
   title: Child;
-  /** Outcome in words, for example "已完成 · 4.2s". */
+  /** Outcome in words, for example "Completed · 4.2s". */
   status?: Child;
   /** Right-aligned summary of the steps, usually one StatusDot per step. */
   trailing?: Child;

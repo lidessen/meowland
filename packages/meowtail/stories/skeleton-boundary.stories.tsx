@@ -16,14 +16,14 @@ import {
 import { SchemePair } from "./scheme-pair";
 
 const copy = {
-  loading: "正在更新项目资料",
-  name: "项目名称",
-  project: "Meowland 工作空间",
-  note: "资料更新期间保留内容的尺寸和排列。加载完成后继续编辑当前草稿。",
-  start: "开始加载",
-  finish: "加载完成",
-  append: "补充内容",
-  extra: "新增资料会跟随当前加载状态呈现。",
+  loading: "Updating project data",
+  name: "Project name",
+  project: "Meowland workspace",
+  note: "Content sizes and arrangement are preserved while data updates. Continue editing the current draft once loading finishes.",
+  start: "Start loading",
+  finish: "Loading finished",
+  append: "Add content",
+  extra: "New data appears according to the current loading state.",
 };
 const image =
   "data:image/svg+xml," +
@@ -33,12 +33,13 @@ const image =
 
 export const SkeletonBoundaryStory = defineStory({
   id: "skeleton-boundary",
-  title: "加载边界 · 保留已有内容",
+  title: "Loading boundary · Preserve existing content",
   component: "SkeletonBoundary",
-  variant: "已有内容与动态加载",
-  group: "浮层与反馈",
+  variant: "Existing content and dynamic loading",
+  group: "Overlays and feedback",
   groupOrder: 30,
-  description: "浅色默认可编辑，深色默认加载；切换后输入节点和草稿保持不变。操作放在边界外。",
+  description:
+    "Light defaults to editable and dark to loading; input nodes and drafts stay unchanged across the switch. Actions sit outside the boundary.",
   covers: [
     "SkeletonBoundary",
     "Signal loading",
@@ -62,11 +63,11 @@ export const SkeletonBoundaryStory = defineStory({
                 <CardContent>
                   <Stack gap="normal">
                     <Inline align="center">
-                      <img src={image} width={96} height={72} alt="项目封面" />
+                      <img src={image} width={96} height={72} alt="Project cover" />
                       <Stack gap="compact">
                         <Inline align="center" gap="compact">
                           <Icon name="folder" />
-                          <span>设计资源</span>
+                          <span>Design resources</span>
                         </Inline>
                         <span>{copy.note}</span>
                       </Stack>

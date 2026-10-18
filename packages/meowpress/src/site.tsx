@@ -23,12 +23,12 @@ function SiteHeader({ activePath, site }: { activePath?: string; site: SiteIdent
       <a className="site-name" href="/">
         {site.name}
       </a>
-      <nav className="site-nav" aria-label="主导航">
+      <nav className="site-nav" aria-label="Primary navigation">
         <a className={activePath === "/skills/" ? "active" : ""} href="/skills/">
           Skills
         </a>
         <a className={activePath === "/about/" ? "active" : ""} href="/about/">
-          关于
+          About
         </a>
       </nav>
     </header>
@@ -59,7 +59,7 @@ function Document({
 }: DocumentProps): Child {
   const documentTitle = title === site.name ? site.name : `${title} · ${site.name}`;
   return (
-    <html lang="zh-CN" {...themeAttributes(theme)}>
+    <html lang="en" {...themeAttributes(theme)}>
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -85,15 +85,15 @@ function pageHtml(props: DocumentProps): string {
 }
 
 function dateLabel(dateKey: string): { date: string; weekday: string } {
-  if (dateKey === "undated") return { date: "未标日期", weekday: "" };
+  if (dateKey === "undated") return { date: "Undated", weekday: "" };
   const date = new Date(`${dateKey}T00:00:00+08:00`);
   return {
-    date: new Intl.DateTimeFormat("zh-CN", {
+    date: new Intl.DateTimeFormat("en-US", {
       timeZone: "Asia/Shanghai",
       month: "long",
       day: "numeric",
     }).format(date),
-    weekday: new Intl.DateTimeFormat("zh-CN", {
+    weekday: new Intl.DateTimeFormat("en-US", {
       timeZone: "Asia/Shanghai",
       weekday: "short",
       year: "numeric",
@@ -110,9 +110,9 @@ function Hero({ image }: { image?: string }): Child {
     <section className="hero" aria-labelledby="hero-title">
       <div className="hero-copy">
         <h1 id="hero-title">
-          一万年太久，
+          Ten thousand years is too long;
           <br />
-          <em>只真朝夕。</em>
+          <em>only this day is true.</em>
         </h1>
       </div>
       <div className="hero-work" aria-hidden="true">
@@ -180,7 +180,7 @@ function ThoughtCard({ item, linked = false }: { item: ContentItem; linked?: boo
   const body = (
     <Fragment>
       <div className="time">
-        <span className="t">{item.timeLabel || item.dateKey}</span> · 想法
+        <span className="t">{item.timeLabel || item.dateKey}</span> · Thought
       </div>
       <div
         className="body"
@@ -205,17 +205,17 @@ function ThoughtCard({ item, linked = false }: { item: ContentItem; linked?: boo
 }
 
 function PostCard({ item }: { item: ContentItem }): Child {
-  const category = typeof item.metadata.category === "string" ? item.metadata.category : "文章";
+  const category = typeof item.metadata.category === "string" ? item.metadata.category : "Post";
   return (
     <a className="post-card" href={itemUrl(item)} data-kind="post">
       <div className="card-top">
         <span className="kind">{category}</span>
         <span className="meta">
-          约 {item.readingMinutes} 分钟 · {item.characterCount} 字
+          About {item.readingMinutes} min · {item.characterCount} characters
         </span>
       </div>
       <h3>{item.title}</h3>
-      <p className="excerpt">{item.excerpt || "这篇文章还没有摘要。"}</p>
+      <p className="excerpt">{item.excerpt || "This post has no summary yet."}</p>
       <Tags item={item} />
     </a>
   );
@@ -280,7 +280,7 @@ function Feed({ items, image }: { items: ContentItem[]; image?: string }): Child
   if (items.length === 0) {
     return (
       <main className="feed feed-empty">
-        <p className="empty-state">还没有公开内容。</p>
+        <p className="empty-state">No public content yet.</p>
         <FeedDecor image={image} />
       </main>
     );
@@ -313,15 +313,15 @@ function Feed({ items, image }: { items: ContentItem[]; image?: string }): Child
 function Filter({ posts, thoughts }: { posts: number; thoughts: number }): Child {
   const total = posts + thoughts;
   return (
-    <div className="tag-filter" data-filter-group="feed" role="group" aria-label="筛选首页内容">
+    <div className="tag-filter" data-filter-group="feed" role="group" aria-label="Filter home feed">
       <button type="button" data-filter="all" className="active" aria-pressed="true">
-        全部<i>{total}</i>
+        All<i>{total}</i>
       </button>
       <button type="button" data-filter="post" aria-pressed="false">
-        文章<i>{posts}</i>
+        Posts<i>{posts}</i>
       </button>
       <button type="button" data-filter="thought" aria-pressed="false">
-        想法<i>{thoughts}</i>
+        Thoughts<i>{thoughts}</i>
       </button>
     </div>
   );
@@ -406,19 +406,23 @@ export function listPage(
   return pageHtml({
     site,
     theme,
-    title: isPost ? "文章" : "想法",
+    title: isPost ? "Posts" : "Thoughts",
     activePath: isPost ? "/posts/" : "/thoughts/",
     styleHref: "../blog-theme.css",
     children: (
       <main className="listing">
         <header className="listing-head">
           <span className="kind">{isPost ? "Posts" : "Thoughts"}</span>
-          <h1>{isPost ? "文章" : "想法"}</h1>
-          <p>{isPost ? "从碎片里长出来的完整论述。" : "经过剪裁、可以直接展示的短想法。"}</p>
+          <h1>{isPost ? "Posts" : "Thoughts"}</h1>
+          <p>
+            {isPost
+              ? "Complete arguments grown from fragments."
+              : "Short, trimmed thoughts ready to show as they are."}
+          </p>
         </header>
         <div className={isPost ? "post-list" : "thought-list"}>
           {items.length === 0 ? (
-            <p className="empty-state">还没有公开内容。</p>
+            <p className="empty-state">No public content yet.</p>
           ) : (
             items.map((item) =>
               isPost ? <PostCard item={item} /> : <ThoughtCard item={item} linked />,
@@ -435,10 +439,10 @@ function PostNavigation({ item, posts }: { item: ContentItem; posts: ContentItem
   const older = index >= 0 ? posts[index + 1] : undefined;
   const newer = index > 0 ? posts[index - 1] : undefined;
   return (
-    <nav className="post-nav" aria-label="文章导航">
+    <nav className="post-nav" aria-label="Post navigation">
       {older ? (
         <a href={itemUrl(older)}>
-          <span className="label">← 上一篇（更早）</span>
+          <span className="label">← Previous post (older)</span>
           {older.title}
         </a>
       ) : (
@@ -446,12 +450,12 @@ function PostNavigation({ item, posts }: { item: ContentItem; posts: ContentItem
       )}
       {newer ? (
         <a className="next" href={itemUrl(newer)}>
-          <span className="label">下一篇（更新）→</span>
+          <span className="label">Next post (newer) →</span>
           {newer.title}
         </a>
       ) : (
         <span className="next">
-          <span className="label">下一篇（更新）→</span>没有了，这是最新的一篇
+          <span className="label">Next post (newer) →</span>Nothing newer — this is the latest post.
         </span>
       )}
     </nav>
@@ -469,7 +473,7 @@ function RelatedThoughts({
   if (related.length === 0) return null;
   return (
     <aside className="related-thoughts">
-      <h2>同一天的想法</h2>
+      <h2>Thoughts from the same day</h2>
       {related.map((thought) => (
         <ThoughtCard item={thought} linked />
       ))}
@@ -484,7 +488,7 @@ export function postPage(
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
 ): string {
-  const category = typeof item.metadata.category === "string" ? item.metadata.category : "文章";
+  const category = typeof item.metadata.category === "string" ? item.metadata.category : "Post";
   return pageHtml({
     site,
     theme,
@@ -499,7 +503,7 @@ export function postPage(
             <span className="kind">{category}</span>
             <h1>{item.title}</h1>
             <div className="meta">
-              {item.dateKey} · 约 {item.readingMinutes} 分钟 · {item.characterCount} 字
+              {item.dateKey} · about {item.readingMinutes} min · {item.characterCount} characters
             </div>
           </header>
           <div className="prose" dangerouslySetInnerHTML={{ __html: item.html }} />
@@ -527,7 +531,7 @@ export function thoughtPage(
       <main>
         <article>
           <header className="post-head">
-            <span className="kind">想法</span>
+            <span className="kind">Thought</span>
             <h1>{item.title}</h1>
             <div className="meta">
               {item.dateKey}
@@ -549,7 +553,7 @@ export function aboutPage(
   return pageHtml({
     site,
     theme,
-    title: "关于",
+    title: "About",
     activePath: "/about/",
     styleHref: "../blog-theme.css",
     children: (
@@ -569,7 +573,7 @@ export function aboutPage(
             ))}
             {about.links && about.links.length > 0 ? (
               <Fragment>
-                <h2>{about.linksHeading ?? "找到我"}</h2>
+                <h2>{about.linksHeading ?? "Find me"}</h2>
                 {about.links.map((link) => (
                   <a
                     className="github-link"
@@ -616,7 +620,9 @@ function SkillCard({ skill, site }: { skill: Skill; site: SiteIdentity }): Child
         <span className="skill-card-path">
           {skill.scope === "public" ? skillInstallCommand(site, skill) : skill.sourceBasePath}
         </span>
-        {skill.scope === "project" ? <span className="skill-scope-badge">项目 Skill</span> : null}
+        {skill.scope === "project" ? (
+          <span className="skill-scope-badge">Project Skill</span>
+        ) : null}
       </span>
       <span className="skill-card-main">
         <strong>{skill.name}</strong>
@@ -624,9 +630,9 @@ function SkillCard({ skill, site }: { skill: Skill; site: SiteIdentity }): Child
       </span>
       <span className="skill-card-foot">
         <span>
-          {skill.files.length} 个 Markdown · {skill.relations.length} 条引用
+          {skill.files.length} Markdown files · {skill.relations.length} references
         </span>
-        <span className="skill-open">打开目录&nbsp; →</span>
+        <span className="skill-open">Open directory&nbsp; →</span>
       </span>
     </a>
   );
@@ -690,7 +696,7 @@ function SkillTreeNodes({
 
 function SkillFileTree({ skill, activePath }: { skill: Skill; activePath: string }): Child {
   return (
-    <nav className="skill-files" aria-label={`${skill.name} 文件目录`}>
+    <nav className="skill-files" aria-label={`${skill.name} file tree`}>
       <span className="skill-files-label">Files</span>
       <SkillTreeNodes nodes={skillTree(skill.files)} activePath={activePath} />
     </nav>
@@ -707,7 +713,7 @@ function SkillGraphNodeView({ node }: { node: SkillGraphNode }): Child {
       data-map-path={node.path}
       data-map-file={node.external ? undefined : node.path}
       data-map-detail={node.detail}
-      aria-label={`${node.name}，${node.role}`}
+      aria-label={`${node.name}; ${node.role}`}
     >
       <rect x={node.x - width / 2} y={node.y - height / 2} width={width} height={height} rx="9" />
       <text className="skill-graph-node-name" x={node.x} y={node.y - 4}>
@@ -727,7 +733,7 @@ function SkillRelationGraph({ skill, direction }: { skill: Skill; direction: "LR
     <svg
       className={`skill-graph-svg skill-graph-${direction.toLowerCase()}`}
       viewBox={`0 0 ${graph.width} ${graph.height}`}
-      aria-label={`${skill.name} 文件引用关系`}
+      aria-label={`${skill.name} file reference graph`}
     >
       <defs>
         <marker
@@ -783,21 +789,21 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
   const compactGraph = skill.files.length + skill.externalNodes.length <= 3;
   return (
     <section className="skill-relations" data-skill-view-panel="relations" hidden>
-      <div className="skill-reading-summary" aria-label="阅读结构摘要">
+      <div className="skill-reading-summary" aria-label="Reading structure summary">
         <span>
           <strong>
             {reachableFiles}/{skill.files.length}
           </strong>
-          可达文档
+          reachable docs
         </span>
         <span>
-          <strong>{skill.relations.length}</strong>引用关系
+          <strong>{skill.relations.length}</strong> references
         </span>
         <span>
-          <strong>{maxDepth}</strong>最深层级
+          <strong>{maxDepth}</strong> max depth
         </span>
         <span className={missingNodes.length > 0 ? "has-issue" : ""}>
-          <strong>{missingNodes.length}</strong>缺失目标
+          <strong>{missingNodes.length}</strong> missing targets
         </span>
       </div>
 
@@ -808,7 +814,7 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
             <SkillRelationGraph skill={skill} direction="TB" />
           </div>
           <section className="skill-reading-paths" aria-labelledby={`${skill.slug}-paths`}>
-            <h3 id={`${skill.slug}-paths`}>引用发生在哪里</h3>
+            <h3 id={`${skill.slug}-paths`}>Where references happen</h3>
             <ol>
               {skill.relations.map((relation) => {
                 const sourceFile = skill.files.find((file) => file.path === relation.source);
@@ -823,9 +829,9 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
                       {relation.contexts.map((context) => (
                         <span>
                           {context.section}
-                          {context.line ? ` · 第 ${context.line} 行` : ""}
-                          {context.linkText !== relation.label ? ` · “${context.linkText}”` : ""}
-                          {!sourceFile?.reachable ? " · 入口不可达" : ""}
+                          {context.line ? ` · line ${context.line}` : ""}
+                          {context.linkText !== relation.label ? ` · "${context.linkText}"` : ""}
+                          {!sourceFile?.reachable ? " · entry unreachable" : ""}
                         </span>
                       ))}
                     </span>
@@ -837,20 +843,20 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
         </Fragment>
       ) : (
         <div className="skill-reading-empty">
-          <strong>没有跨文件阅读路径</strong>
+          <strong>No cross-file reading paths</strong>
           <p>
-            Agent 进入后只会读取 <code>SKILL.md</code>。如果还有必须阅读的参考材料，需要从相关章节用
-            Markdown 链接明确引出。
+            Once the Agent enters, it only reads <code>SKILL.md</code>. If other reference material
+            must be read, link it explicitly from the relevant sections with Markdown links.
           </p>
         </div>
       )}
 
       {unreferencedFiles.length > 0 || missingNodes.length > 0 ? (
-        <aside className="skill-reading-issues" aria-label="信息结构问题">
-          <strong>需要留意</strong>
+        <aside className="skill-reading-issues" aria-label="Information structure issues">
+          <strong>Needs attention</strong>
           {unreferencedFiles.length > 0 ? (
             <p>
-              入口无法到达：
+              Unreachable from the entry:
               {unreferencedFiles.map((file) => (
                 <code>{file.path}</code>
               ))}
@@ -858,7 +864,7 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
           ) : null}
           {missingNodes.length > 0 ? (
             <p>
-              链接目标不存在：
+              Missing link targets:
               {missingNodes.map((node) => (
                 <code>{node.path}</code>
               ))}
@@ -869,8 +875,11 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
 
       {hasRelations ? (
         <div className="skill-graph-status" data-map-status aria-live="polite">
-          点击图中的节点查看它在阅读链路中的作用
-          {externalNodes.length > 0 ? `；当前有 ${externalNodes.length} 个 Skill 外部目标` : ""}。
+          Select a node in the graph to see its role in the reading chain
+          {externalNodes.length > 0
+            ? `; ${externalNodes.length} targets outside the Skill currently`
+            : ""}
+          .
         </div>
       ) : null}
     </section>
@@ -961,8 +970,8 @@ const SKILL_BROWSER_SCRIPT = `(() => {
       const command = copyButton.dataset.copyCommand;
       if (!command) return;
       await navigator.clipboard.writeText(command);
-      copyButton.textContent = '已复制';
-      window.setTimeout(() => { copyButton.textContent = '复制'; }, 1400);
+      copyButton.textContent = 'Copied';
+      window.setTimeout(() => { copyButton.textContent = 'Copy'; }, 1400);
     });
   });
 })();`;
@@ -978,7 +987,7 @@ export function skillsIndexPage(
     site,
     theme,
     title: "Skills",
-    description: "可以交给 Agent 使用的方法与工作约定。",
+    description: "Methods and working conventions that can be handed to an Agent.",
     activePath: "/skills/",
     styleHref: "../blog-theme.css",
     children: (
@@ -986,12 +995,12 @@ export function skillsIndexPage(
         <header className="skills-head">
           <span className="skill-path">~/skills</span>
           <h1>Skills</h1>
-          <p>公开分享、可以直接交给 Agent 使用的方法。</p>
+          <p>Methods shared publicly and usable directly by an Agent.</p>
         </header>
         <section className="skill-group" aria-labelledby="public-skills-heading">
           <header className="skill-group-head">
-            <h2 id="public-skills-heading">公开 Skills</h2>
-            <span>公开内容</span>
+            <h2 id="public-skills-heading">Public Skills</h2>
+            <span>Public content</span>
           </header>
           {publicSkills.length > 0 ? (
             <div className="skill-list">
@@ -1000,15 +1009,15 @@ export function skillsIndexPage(
               ))}
             </div>
           ) : (
-            <p className="skill-group-empty">公开 Skills 目前还没有内容。</p>
+            <p className="skill-group-empty">Public Skills have no content yet.</p>
           )}
         </section>
         {projectSkills.length > 0 ? (
           <section className="skill-group project-skills" aria-labelledby="project-skills-heading">
             <header className="skill-group-head">
               <div>
-                <h2 id="project-skills-heading">项目 Skills</h2>
-                <small>本项目内部使用的开发与内容工作流</small>
+                <h2 id="project-skills-heading">Project Skills</h2>
+                <small>Development and content workflows used inside this project</small>
               </div>
               <span>.agents/skills/</span>
             </header>
@@ -1020,7 +1029,8 @@ export function skillsIndexPage(
           </section>
         ) : null}
         <p className="skills-prototype-note">
-          引用关系图从 SKILL.md 出发，根据 Markdown 链接在构建时自动生成。
+          The reference graph starts from SKILL.md and is generated at build time from Markdown
+          links.
         </p>
       </main>
     ),
@@ -1045,18 +1055,18 @@ export function skillPage(
     children: (
       <main className="skill-page">
         <a className="skill-back" href="/skills/">
-          ← 所有 Skills
+          ← All Skills
         </a>
         <header className="skill-browser-head">
           <span className="skill-command">
             {skill.scope === "project" ? (
-              <span className="skill-scope-badge">项目 Skill · 内部</span>
+              <span className="skill-scope-badge">Project Skill · Internal</span>
             ) : null}
             <code>{command}</code>
           </span>
           <span className="skill-browser-actions">
             <button type="button" data-copy-command={command}>
-              {skill.scope === "public" ? "复制" : "复制路径"}
+              {skill.scope === "public" ? "Copy" : "Copy path"}
             </button>
             {site.repositorySourceUrl ? (
               <a
@@ -1070,12 +1080,12 @@ export function skillPage(
           </span>
         </header>
         <div className="skill-stage" data-skill-browser>
-          <nav className="skill-view-tabs" aria-label="Skill 浏览方式">
+          <nav className="skill-view-tabs" aria-label="Skill view mode">
             <button type="button" data-skill-view="files" aria-pressed="true">
-              文件浏览
+              File browser
             </button>
             <button type="button" data-skill-view="relations" aria-pressed="false">
-              引用关系图
+              Reference graph
             </button>
           </nav>
           <div className="skill-browser" data-skill-view-panel="files">
@@ -1113,27 +1123,27 @@ export function agentMarkdown(
   const lines = [
     `# ${site.name}`,
     "",
-    "> 给 Agent 读取的站点索引与内容约定。",
+    "> Site index and content conventions for Agents to read.",
     "",
     "## Site map",
     "",
-    "- [首页](/)",
-    "- [文章](/posts/)",
-    "- [想法](/thoughts/)",
-    "- [Skills](/skills/)（可浏览文件与自动生成的 Markdown 引用关系）",
-    "- [关于](/about/)",
+    "- [Home](/)",
+    "- [Posts](/posts/)",
+    "- [Thoughts](/thoughts/)",
+    "- [Skills](/skills/) (browse files and the auto-generated Markdown reference graph)",
+    "- [About](/about/)",
     "",
     "## Content model",
     "",
-    `- \`${site.contentDirectory}/thoughts/\` 保存经过剪裁、可直接展示的短想法。`,
-    `- \`${site.contentDirectory}/posts/\` 保存完整文章；文件名或路径组件以 \`_\` 开头的文件是 draft，不公开、不渲染。`,
-    "- 内容文件支持 `.md` 和 `.mdx`，开头可使用 YAML Frontmatter。",
-    "- 目前 Frontmatter 没有强制字段；`title`、`date`、`created_at`、`category`、`tags` 会被站点识别。",
+    `- \`${site.contentDirectory}/thoughts/\` stores trimmed, directly presentable short thoughts.`,
+    `- \`${site.contentDirectory}/posts/\` stores full posts; files whose name or path segment starts with \`_\` are drafts and are not published or rendered.`,
+    "- Content files support `.md` and `.mdx`, and may start with YAML frontmatter.",
+    "- Frontmatter currently has no required fields; `title`, `date`, `created_at`, `category` and `tags` are recognized by the site.",
     "",
     "## Public content",
     "",
-    `公开文章：${posts.length} 篇。`,
-    `公开想法：${thoughts.length} 条。`,
+    `Public posts: ${posts.length}.`,
+    `Public thoughts: ${thoughts.length}.`,
     "",
     "### Posts",
     "",
@@ -1157,11 +1167,11 @@ export function llmText(
     `> ${site.description}`,
     "",
     "## Pages",
-    "- 首页: /",
-    "- 文章: /posts/",
-    "- 想法: /thoughts/",
+    "- Home: /",
+    "- Posts: /posts/",
+    "- Thoughts: /thoughts/",
     "- Skills: /skills/",
-    "- 关于: /about/",
+    "- About: /about/",
     "- Agent Markdown: /agents.md",
     "",
     "## Posts",
@@ -1171,7 +1181,7 @@ export function llmText(
     ...thoughts.map((thought) => `- ${thought.title}: ${itemUrl(thought)}`),
     "",
     "## Rules",
-    "- 只把公开构建产物视为可展示内容。",
-    "- posts 中以 _ 开头的 draft 不公开、不渲染。",
+    "- Only the public build output is considered presentable content.",
+    "- Drafts whose names start with _ under posts are not published or rendered.",
   ].join("\n");
 }

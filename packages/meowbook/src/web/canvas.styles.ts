@@ -23,7 +23,7 @@ export const canvasStyles = css`
     padding: 8px 16px;
   }
   #story-state[data-status="error"] {
-    color: var(${uiTokens.danger.name}, color-mix(in srgb, CanvasText 80%, #c43131));
+    color: color-mix(in srgb, CanvasText 80%, var(${uiTokens.danger.name}, #c43131));
     background: color-mix(in srgb, Canvas 90%, var(${uiTokens.danger.name}, #c43131));
     white-space: pre-wrap;
     overflow-wrap: anywhere;

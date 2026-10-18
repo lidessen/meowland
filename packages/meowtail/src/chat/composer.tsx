@@ -5,12 +5,15 @@ import { Icon } from "../icons/icon";
 
 export const chatComposerOptions = defineOptions("chat-composer", {
   layout: ["stacked", "inline", "hero"],
+  surface: ["default", "none"],
 });
 
 export const chatComposerContract = {
   name: "chat-composer",
   parts: ["root", "attachments", "field", "input", "hint", "actions", "trailing", "submit"],
-  styleProps: defineStyleProps(chatComposerOptions, { defaults: { layout: "stacked" } }),
+  styleProps: defineStyleProps(chatComposerOptions, {
+    defaults: { layout: "stacked", surface: "default" },
+  }),
 } as const satisfies StyledComponentContract;
 
 export type ChatComposerSubmit = (event: SubmitEvent) => void;
@@ -47,13 +50,13 @@ export const ChatComposer = defineComponent<
   (
     {
       value = "",
-      placeholder = "写下消息…",
-      inputLabel = "消息",
+      placeholder = "Write a message…",
+      inputLabel = "Message",
       attachments,
       trailing,
       hint,
       hintId,
-      submitLabel = "发送",
+      submitLabel = "Send",
       submitContent,
       disabled = false,
       submitDisabled = false,

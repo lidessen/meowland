@@ -11,10 +11,10 @@ import { Button } from "./button";
 import { Input } from "./input";
 
 const messages = {
-  file: "浏览文件…",
-  directory: "浏览目录…",
-  pending: "正在选择…",
-  failed: "未能打开选择器，请重试或手动输入路径。",
+  file: "Browse files…",
+  directory: "Browse directories…",
+  pending: "Choosing…",
+  failed: "Could not open the picker; try again or enter a path manually.",
 };
 
 export const pathPickerContract = {

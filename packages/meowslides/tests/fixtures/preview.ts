@@ -11,11 +11,11 @@ export default (({ root, onCleanup }) => {
   onCleanup(mountStyles(document, presentationTheme.cssText));
   onCleanup(applyTheme(scope, presentationTheme, presentationOptions.select({ scheme: "light" })));
   const label = document.createElement("label");
-  label.textContent = "外观";
+  label.textContent = "Appearance";
   const select = document.createElement("select");
   for (const [value, text] of [
-    ["light", "浅色"],
-    ["dark", "深色"],
+    ["light", "Light"],
+    ["dark", "Dark"],
   ]) {
     const option = document.createElement("option");
     option.value = value!;

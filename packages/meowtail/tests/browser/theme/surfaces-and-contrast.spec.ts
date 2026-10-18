@@ -3,9 +3,9 @@ import { themeAttributes } from "meowcss";
 import { expect, test } from "@playwright/test";
 
 test(`Studio dark attachments and dialog retain their theme surfaces`, async ({ page }, info) => {
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=content-carriers");
+  await page.goto("/canvas.html?story=content-carriers");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  await page.getByRole("combobox", { name: "外观", exact: true }).selectOption("dark");
+  await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("dark");
   const image = page.locator('[data-meowui-part="chat-attachments/image"]');
   const file = page.locator('[data-meowui-part="chat-attachments/file"]');
   await expect(image).toBeVisible();
@@ -17,7 +17,10 @@ test(`Studio dark attachments and dialog retain their theme surfaces`, async ({ 
   expect(fileSurface).toMatch(/^rgb\(/);
   await expect(image.locator("img")).toHaveCSS("object-fit", "contain");
   await page
-    .getByRole("button", { name: "预览 组件设计语言与交互状态说明.md", exact: true })
+    .getByRole("button", {
+      name: "Preview component-design-language-and-interaction-states.md",
+      exact: true,
+    })
     .click();
   const dialog = page.getByRole("dialog");
   await expect(dialog).toBeVisible();
@@ -44,9 +47,9 @@ for (const scheme of ["light", "dark"]) {
   test(`DeepSeek ${scheme} reading text and action labels keep readable contrast`, async ({
     page,
   }) => {
-    await page.goto("http://127.0.0.1:13007/canvas.html?story=design-language");
+    await page.goto("/canvas.html?story=design-language");
     await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-    await page.getByRole("combobox", { name: "外观", exact: true }).selectOption(scheme);
+    await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption(scheme);
     const actions = page.locator('[data-meowui-part="chat-message-actions/root"] button');
     expect(await actions.count()).toBeGreaterThan(0);
     for (const action of await actions.all()) {
@@ -157,9 +160,9 @@ test(`Studio nested design inherits dark appearance while explicit light islands
   page,
 }) => {
   await page.emulateMedia({ colorScheme: "light" });
-  await page.goto("http://127.0.0.1:13007/canvas.html?story=design-language");
+  await page.goto("/canvas.html?story=design-language");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  await page.getByRole("combobox", { name: "外观", exact: true }).selectOption("dark");
+  await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("dark");
   const colors = await page.evaluate(
     ({ inherited, lightConfig, darkConfig }) => {
       const panel = document.createElement("section");

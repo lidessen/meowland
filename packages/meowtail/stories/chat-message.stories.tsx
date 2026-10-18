@@ -22,30 +22,33 @@ import {
 const reference = {
   title: "AbortController",
   url: "https://developer.mozilla.org/en-US/docs/Web/API/AbortController",
-  description: "取消异步请求的浏览器接口。",
+  description: "Browser interface for canceling async requests.",
 };
 
 export const ChatToolSequenceStory = defineStory({
   id: "chat-tool-sequence",
-  title: "消息 · 工具调用序列",
-  group: "对话组件",
+  title: "Message · Tool call sequence",
+  group: "Conversation components",
   groupOrder: 60,
   component: "ChatToolCall",
-  description: "工具动作与目标保持同排；结果按需展开，非完成状态始终明确显示。静态示例不执行工具。",
+  description:
+    "Tool actions and their target stay on one row; results expand on demand, and non-complete states always show clearly. The static example runs no tools.",
   render: () => (
     <Container>
       <ChatFrame>
-        <ChatMessageList ariaLabel="工具调用序列">
-          <ChatMessage role="user" author="你" surface="none">
-            <ChatBubble>检查请求取消后，旧响应是否仍会写入列表。</ChatBubble>
+        <ChatMessageList ariaLabel="Tool call sequence">
+          <ChatMessage role="user" author="You" surface="none">
+            <ChatBubble>
+              Check whether an old response still writes to the list after a request is canceled.
+            </ChatBubble>
           </ChatMessage>
           <ChatMessage role="assistant" author="Assistant" surface="none">
             <ChatBubble>
-              <p>我会先查看请求与结果提交的位置。</p>
+              <p>I'll first look at where requests and results are submitted.</p>
             </ChatBubble>
-            <ChatProcess label="读取、搜索 · 3 次调用" icon={<Icon name="search" />}>
+            <ChatProcess label="Read, search · 3 calls" icon={<Icon name="search" />}>
               <ChatToolCall
-                label="读取"
+                label="Read"
                 summary="src/search/request.ts"
                 icon={<Icon name="file" />}
                 collapsible
@@ -55,42 +58,54 @@ export const ChatToolSequenceStory = defineStory({
                 </pre>
               </ChatToolCall>
               <ChatToolCall
-                label="搜索"
+                label="Search"
                 summary="currentRequest · src/search"
                 icon={<Icon name="search" />}
                 collapsible
               >
-                <p>发现 2 处请求身份检查。</p>
+                <p>Found 2 request identity checks.</p>
               </ChatToolCall>
               <ChatToolCall
-                label="读取"
+                label="Read"
                 summary="src/search/results.ts"
                 icon={<Icon name="file" />}
                 collapsible
               >
-                <p>提交结果前未核对请求身份。</p>
+                <p>The request identity is not checked before submitting results.</p>
               </ChatToolCall>
             </ChatProcess>
             <ChatBubble>
-              <p>结果写入处缺少身份检查，下面是验证状态。</p>
+              <p>
+                The result write path is missing an identity check; the verification states follow.
+              </p>
             </ChatBubble>
-            <ChatProcess label="执行验证 · 4 项" open>
+            <ChatProcess label="Run verification · 4 items" open>
               <ChatToolCall
-                label="执行"
+                label="Run"
                 summary="bun test search/request.test.ts"
                 state="running"
                 collapsible
               >
-                <p>等待进程输出。</p>
+                <p>Waiting for process output.</p>
               </ChatToolCall>
-              <ChatToolCall label="读取" summary="受限工作区配置" state="waiting" collapsible>
-                <p>等待权限确认。</p>
+              <ChatToolCall
+                label="Read"
+                summary="Restricted workspace configuration"
+                state="waiting"
+                collapsible
+              >
+                <p>Waiting for permission confirmation.</p>
               </ChatToolCall>
-              <ChatToolCall label="执行" summary="远端连接检查" state="error" collapsible>
-                <p>连接失败，没有修改远端内容。</p>
+              <ChatToolCall label="Run" summary="Remote connection check" state="error" collapsible>
+                <p>The connection failed; nothing on the remote was changed.</p>
               </ChatToolCall>
-              <ChatToolCall label="执行" summary="上次中断的验证" state="unknown" collapsible>
-                <p>缺少最终回执，不能确认执行结果。</p>
+              <ChatToolCall
+                label="Run"
+                summary="Previous interrupted verification"
+                state="unknown"
+                collapsible
+              >
+                <p>There is no final receipt, so the execution result cannot be confirmed.</p>
               </ChatToolCall>
             </ChatProcess>
           </ChatMessage>
@@ -102,41 +117,41 @@ export const ChatToolSequenceStory = defineStory({
 
 export const ChatToolCallActionStory = defineStory({
   id: "chat-tool-call-action",
-  title: "工具行 · 动作与展开",
-  group: "对话组件",
+  title: "Tool row · Actions and expansion",
+  group: "Conversation components",
   groupOrder: 60,
   component: "ChatToolCall",
-  variant: "宿主动作",
+  variant: "Host actions",
   description:
-    "同一个行有两种交互：展开自己的正文，或由宿主执行动作。两种都是同一个可聚焦控件，行度量、状态与悬停字形一致。示例只回显本地状态，不执行命令。",
+    "A row has two interactions: expand its own body, or let the host run an action. Both are the same focusable control, with consistent row metrics, state and hover glyph. The example only echoes local state and runs no command.",
   covers: ["onActivate", "button header", "collapsible body", "row geometry"],
   render: () => {
-    const feedback = signal("尚未激活");
+    const feedback = signal("Not activated yet");
     return (
       <Container>
         <Stack>
           <ChatFrame>
-            <ChatMessageList ariaLabel="工具行的两种交互">
+            <ChatMessageList ariaLabel="The two interactions of a tool row">
               <ChatToolCall
-                label="执行命令"
+                label="Run command"
                 summary="bun test search/request.test.ts"
                 icon={<Icon name="terminal" />}
                 onActivate={() => {
-                  feedback.value = "已激活：由宿主打开这次命令的记录。";
+                  feedback.value = "Activated: the host opens the record for this command.";
                 }}
                 data-tool-action="demo"
               />
               <ChatToolCall
-                label="读取"
+                label="Read"
                 summary="src/search/request.ts"
                 icon={<Icon name="file" />}
                 collapsible
               >
-                <p>展开的行把结果留在原位。</p>
+                <p>The expanded row leaves the result in place.</p>
               </ChatToolCall>
               <ChatToolCall
-                label="执行"
-                summary="远端连接检查"
+                label="Run"
+                summary="Remote connection check"
                 icon={<Icon name="terminal" />}
                 state="error"
               />
@@ -153,13 +168,13 @@ export const ChatToolCallActionStory = defineStory({
 
 export const ChatMessageCompositionStory = defineStory({
   id: "chat-message-composition",
-  title: "消息 · 文字、文件与依据",
-  group: "对话组件",
+  title: "Message · Text, files and evidence",
+  group: "Conversation components",
   groupOrder: 60,
   component: "ChatMessage",
-  variant: "组合与表面",
+  variant: "Composition and surface",
   description:
-    "消息负责身份与排列，Bubble负责阅读面。附件与过程可以在气泡之外，操作只回显本地状态。",
+    "The message owns identity and arrangement; the Bubble owns the reading surface. Attachments and process can sit outside the bubble, and actions only echo local state.",
   covers: [
     "ChatMessage header/footer/surface",
     "ChatBubble auto/plain/filled",
@@ -170,13 +185,13 @@ export const ChatMessageCompositionStory = defineStory({
     <Container>
       <Stack>
         <ChatFrame>
-          <ChatMessageList ariaLabel="消息组合示例">
+          <ChatMessageList ariaLabel="Message composition example">
             <ChatMessage
               role="user"
-              author="你"
+              author="You"
               timestamp="14:20"
               surface="none"
-              footer={<span>已送达</span>}
+              footer={<span>Delivered</span>}
             >
               <ChatAttachments
                 items={[
@@ -190,7 +205,10 @@ export const ChatMessageCompositionStory = defineStory({
                 ]}
               />
               <ChatBubble>
-                <p>这是连续搜索的日志。帮我看看旧结果为什么会覆盖新结果，先给出建议。</p>
+                <p>
+                  This is the log from continuous searches. Help me understand why an old result
+                  overwrote a new one; give me a suggestion first.
+                </p>
               </ChatBubble>
             </ChatMessage>
             <ChatMessage
@@ -200,48 +218,64 @@ export const ChatMessageCompositionStory = defineStory({
               header={
                 <>
                   <strong>Assistant</strong>
-                  <span>排查记录 · 静态示例</span>
+                  <span>Investigation record · Static example</span>
                 </>
               }
-              footer={<span>未执行真实请求；建议等待你确认。</span>}
+              footer={<span>No real request ran; the suggestion waits for your confirmation.</span>}
               actions={
                 <ChatMessageActions>
-                  <Button variant="outline" size="small" data-message-choice="已保留修复建议">
-                    保留建议
+                  <Button
+                    variant="outline"
+                    size="small"
+                    data-message-choice="Kept the fix suggestion"
+                  >
+                    Keep suggestion
                   </Button>
-                  <Button variant="quiet" size="small" data-message-choice="已标记需要进一步检查">
-                    继续检查
+                  <Button
+                    variant="quiet"
+                    size="small"
+                    data-message-choice="Marked for further checking"
+                  >
+                    Keep checking
                   </Button>
                 </ChatMessageActions>
               }
             >
               <ChatBubble>
                 <p>
-                  <strong>旧请求较晚返回，写入时没有确认它是否仍是当前请求。</strong>
-                  建议保留接口，在提交结果前核对请求身份。
+                  <strong>
+                    The old request returned later, and the write did not confirm that it was still
+                    the current request.
+                  </strong>
+                  Keep the interface and check the request identity before submitting results.
                 </p>
               </ChatBubble>
-              <ChatProcess label="查看排查依据 · 2 项">
+              <ChatProcess label="View investigation evidence · 2 items">
                 <ChatToolCall
-                  label="读取请求日志"
+                  label="Read request log"
                   state="complete"
                   collapsible
-                  detail="示例中第二次请求先完成。"
+                  detail="In this example the second request finished first."
                 >
-                  <p>14:20:01 搜索“组件”；14:20:02 搜索“组件库”。</p>
+                  <p>
+                    14:20:01 searched for “components”; 14:20:02 searched for “component library”.
+                  </p>
                 </ChatToolCall>
                 <ChatToolCall
-                  label="检查结果写入位置"
+                  label="Check the result write path"
                   state="complete"
                   collapsible
-                  detail="回调直接替换列表，没有身份核对。"
+                  detail="The callback replaces the list directly, without an identity check."
                 >
-                  <p>修复位置：结果提交回调。</p>
+                  <p>Fix location: the result submission callback.</p>
                 </ChatToolCall>
               </ChatProcess>
               <ChatBubble variant="plain">
-                <p>取消旧请求可以减少工作，但仍需要在写入前作最后一次确认：</p>
-                <pre tabIndex={0} aria-label="建议代码">
+                <p>
+                  Canceling the old request can reduce work, but a final check before writing is
+                  still needed:
+                </p>
+                <pre tabIndex={0} aria-label="Suggested code">
                   <code>{`if (currentRequest === request) {
   renderResults(results);
 }`}</code>
@@ -251,30 +285,30 @@ export const ChatMessageCompositionStory = defineStory({
             </ChatMessage>
             <ChatMessage
               role="user"
-              author="你"
+              author="You"
               status="error"
               surface="none"
-              footer={<span>发送失败，草稿仍在本地。</span>}
+              footer={<span>Send failed; the draft is still local.</span>}
               actions={
                 <ChatMessageActions>
                   <Button
                     variant="quiet"
                     size="small"
-                    data-message-choice="已保留重试内容（本地示例）"
+                    data-message-choice="Kept the retry content (local example)"
                   >
-                    重试发送
+                    Retry send
                   </Button>
                 </ChatMessageActions>
               }
             >
               <ChatBubble variant="filled">
-                <p>按这个方案修改，顺便补一个乱序返回的测试。</p>
+                <p>Apply this fix, and add a test for out-of-order responses while you're at it.</p>
               </ChatBubble>
             </ChatMessage>
           </ChatMessageList>
         </ChatFrame>
         <p className="workshop-feedback" role="status" data-message-result>
-          操作仅反馈到本地示例。
+          Actions only report back to the local example.
         </p>
       </Stack>
     </Container>
@@ -292,24 +326,25 @@ export const ChatMessageCompositionStory = defineStory({
 
 export const ChatProcessDetailStory = defineStory({
   id: "chat-process-detail",
-  title: "过程 · 摘要与执行细节",
-  group: "对话组件",
+  title: "Process · Summary and execution detail",
+  group: "Conversation components",
   groupOrder: 60,
   component: "ChatProcess",
-  variant: "折叠与展开",
-  description: "过程摘要保留位置，执行细节按需展开；展开和关闭由原生details提供。",
+  variant: "Collapse and expand",
+  description:
+    "The process summary keeps its position and execution details expand on demand; expansion and collapse come from native details.",
   render: () => (
     <Container>
       <Stack>
-        <ChatProcess label="检查请求顺序 · 已完成">
-          <p>查询按输入顺序发出，但响应按网络完成顺序返回。</p>
-          <p>只提交当前请求的结果，避免旧响应覆盖。</p>
+        <ChatProcess label="Check request order · Completed">
+          <p>Queries are sent in input order, but responses return in network completion order.</p>
+          <p>Submit only the current request's results to avoid overwrites from old responses.</p>
         </ChatProcess>
-        <ChatProcess label="等待验证 · 1 项" open>
+        <ChatProcess label="Waiting for verification · 1 item" open>
           <ChatToolCall
-            label="验证快速连续输入与清空搜索词后的列表恢复"
+            label="Verify quick successive input and list recovery after clearing the search term"
             state="waiting"
-            detail="需要连接真实服务后执行。"
+            detail="Requires a connection to the real service."
           />
         </ChatProcess>
       </Stack>
@@ -319,24 +354,28 @@ export const ChatProcessDetailStory = defineStory({
 
 export const ChatSourcesDetailStory = defineStory({
   id: "chat-sources-detail",
-  title: "来源 · 标题与说明",
-  group: "对话组件",
+  title: "Sources · Titles and descriptions",
+  group: "Conversation components",
   groupOrder: 60,
   component: "ChatSources",
-  variant: "展开来源",
-  description: "来源与回答分层；标题用于定位，说明帮助判断为什么需要打开它。",
+  variant: "Expanded sources",
+  description:
+    "Sources are layered away from the answer; the title locates the source and the description helps judge why to open it.",
   render: () => (
     <Container>
       <Stack>
-        <p>核对请求取消和响应处理时，可以打开下面的参考。</p>
+        <p>
+          When checking request cancellation and response handling, you can open the references
+          below.
+        </p>
         <ChatSources
           open
           items={[
             reference,
             {
-              title: "Fetch API：请求与响应的处理",
+              title: "Fetch API: Handling requests and responses",
               url: "https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API",
-              description: "请求生命周期与返回结果的语义。",
+              description: "The request lifecycle and the meaning of returned results.",
             },
           ]}
         />
@@ -351,8 +390,8 @@ const rows = (wrap: boolean): Child[] => {
   return [
     shape(
       <ChatMessageListItem>
-        <ChatMessage role="user" author="你" surface="none">
-          <ChatBubble>连续回复不用隔那么远。</ChatBubble>
+        <ChatMessage role="user" author="You" surface="none">
+          <ChatBubble>Consecutive replies don't need that much space.</ChatBubble>
         </ChatMessage>
       </ChatMessageListItem>,
     ),
@@ -365,7 +404,7 @@ const rows = (wrap: boolean): Child[] => {
           surface="none"
         >
           <ChatBubble>
-            <p>连续消息会保持紧凑。</p>
+            <p>Consecutive messages stay compact.</p>
           </ChatBubble>
         </ChatMessage>
       </ChatMessageListItem>,
@@ -380,7 +419,7 @@ const rows = (wrap: boolean): Child[] => {
           surface="none"
         >
           <ChatBubble>
-            <p>同一轮回答的下一段只隔一小步。</p>
+            <p>The next part of the same answer is only a small step away.</p>
           </ChatBubble>
         </ChatMessage>
       </ChatMessageListItem>,
@@ -389,7 +428,7 @@ const rows = (wrap: boolean): Child[] => {
       <ChatMessageListItem>
         <ChatMessage role="tool" author="worker" surface="none">
           <ChatBubble variant="plain">
-            <p>委托的行紧贴它报告的那次工作。</p>
+            <p>A delegated row sits close to the work it reports.</p>
           </ChatBubble>
         </ChatMessage>
       </ChatMessageListItem>,
@@ -399,13 +438,13 @@ const rows = (wrap: boolean): Child[] => {
 
 export const ChatMessageRowsStory = defineStory({
   id: "chat-message-rows",
-  title: "消息列表 · 行距与续接",
-  group: "对话组件",
+  title: "Message list · Row spacing and continuation",
+  group: "Conversation components",
   groupOrder: 60,
   component: "ChatMessageList",
-  variant: "两种挂载形状",
+  variant: "Two mounting shapes",
   description:
-    "行距由列表列声明、由行自己读取，因此逐条挂载时插入的无布局容器不改变结果。用户消息开新一轮，续接回答靠近上一条，工具行靠近它报告的工作。",
+    "The list column declares the row pitch and each row reads it, so layout-neutral wrappers inserted when mounting row by row do not change the result. A user message starts a new round, a continuation answer sits close to the previous one, and a tool row sits close to the work it reports.",
   covers: [
     "ChatMessageListItem",
     "ChatMessageListContent",
@@ -417,12 +456,12 @@ export const ChatMessageRowsStory = defineStory({
     <Container>
       <Stack>
         <ChatFrame>
-          <ChatMessageList ariaLabel="直接子项的消息列表">
+          <ChatMessageList ariaLabel="Message list with direct children">
             <ChatMessageListContent>{rows(false)}</ChatMessageListContent>
           </ChatMessageList>
         </ChatFrame>
         <ChatFrame>
-          <ChatMessageList ariaLabel="逐条挂载的消息列表">
+          <ChatMessageList ariaLabel="Message list mounted row by row">
             <ChatMessageListContent>{rows(true)}</ChatMessageListContent>
           </ChatMessageList>
         </ChatFrame>

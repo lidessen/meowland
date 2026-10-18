@@ -51,7 +51,7 @@ test("a task in an equal-height composition keeps its facts and footer together"
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/canvas.html?story=agent-workflow");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  const task = page.getByRole("region", { name: "确认检查范围", exact: true });
+  const task = page.getByRole("region", { name: "Confirm check scope", exact: true });
   const relation = await task.evaluate((element) => {
     const header = element.querySelector('[data-meowui-part="chat-task/header"]')!;
     const execution = element.querySelector('[data-meowui-part="chat-task/execution"]')!;
@@ -61,5 +61,5 @@ test("a task in an equal-height composition keeps its facts and footer together"
     };
   });
   expect(relation.gap).toBeLessThanOrEqual(relation.expectedGap + 1);
-  await expect(task.getByRole("button", { name: "工具与任务", exact: true })).toBeInViewport();
+  await expect(task.getByRole("button", { name: "Tools and tasks", exact: true })).toBeInViewport();
 });

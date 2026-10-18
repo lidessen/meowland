@@ -159,9 +159,9 @@ describe("Assistant public composition", () => {
     ];
     const passive = render({ messages, readOnly: true });
     expect(passive).toContain("Waiting for access");
-    expect(passive).not.toContain("重试");
+    expect(passive).not.toContain("Retry");
     const actionable = render({ messages, readOnly: true, onToolAction: () => undefined });
-    expect(actionable).toContain("重试");
+    expect(actionable).toContain("Retry");
     expect(actionable).toContain('data-tool-state="waiting"');
   });
   test("a tool with no execution state is unknown rather than completed", () => {
@@ -183,6 +183,6 @@ describe("Assistant public composition", () => {
       ],
     });
     expect(html).toContain('data-tool-state="unknown"');
-    expect(html).toContain("结果未确认");
+    expect(html).toContain("Unconfirmed result");
   });
 });

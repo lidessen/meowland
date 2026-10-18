@@ -20,4 +20,11 @@ export const toolbarStyles = css`
   :where(${partSelector(toolbarContract, "root")} > ${partSelector(iconButtonContract, "root")}) {
     flex: 0 0 auto;
   }
+
+  @media (pointer: coarse) {
+    ${partSelector(toolbarContract, "root")}[data-meowui-part] button {
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
 `;

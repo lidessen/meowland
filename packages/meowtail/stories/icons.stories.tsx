@@ -7,6 +7,7 @@ import {
   GithubIcon,
   Icon,
   IconButton,
+  IconSource,
   iconNames,
   SearchInput,
   MeowlandMark,
@@ -16,25 +17,31 @@ import {
   TasksIcon,
 } from "meowtail";
 import { defineStory } from "meowbook";
+import { Bell, Camera, Rocket } from "meowtail/icons/lucide";
 
 export const IconsStory = defineStory({
   id: "icons",
-  title: "功能图标 · 全集",
-  group: "图标与品牌",
+  title: "Functional icons · Full set",
+  group: "Icons and brand",
   groupOrder: 60,
   component: "Icon",
-  variant: "全部图标",
-  description: "查找并选择统一 Lucide 子集中的图标。名称用于调用，形状用于辨认；所有内容仅在本地。",
-  covers: ["Icon", "iconNames", "全部功能图标", "search", "selection", "keyboard"],
+  variant: "All icons",
+  description:
+    "Find and choose a semantic icon. Names are the stable call keys used by components and JSON; application-only icons use IconSource with the pinned Lucide pass-through.",
+  covers: ["Icon", "iconNames", "all functional icons", "search", "selection", "keyboard"],
   render: () => (
     <div className="workshop-stack">
-      <Field htmlFor="icon-search" label="查找图标" className="workshop-constrained">
-        <SearchInput id="icon-search" label="查找图标" placeholder="例如 search、file、arrow…" />
+      <Field htmlFor="icon-search" label="Find an icon" className="workshop-constrained">
+        <SearchInput
+          id="icon-search"
+          label="Find an icon"
+          placeholder="For example: search, file, arrow…"
+        />
       </Field>
       <p className="workshop-feedback" role="status" data-icon-feedback>
-        {iconNames.length} 个图标 · 选择一个查看名称
+        {iconNames.length} icons · select one to see its name
       </p>
-      <div className="workshop-icon-grid" aria-label="功能图标">
+      <div className="workshop-icon-grid" aria-label="Functional icons">
         {iconNames.map((name) => (
           <Button
             variant="quiet"
@@ -48,7 +55,7 @@ export const IconsStory = defineStory({
         ))}
       </div>
       <p className="workshop-note" data-icon-empty hidden>
-        没有匹配的图标，试试更短的名称。
+        No matching icons; try a shorter name.
       </p>
     </div>
   ),
@@ -60,15 +67,15 @@ export const IconsStory = defineStory({
       const query = search.value.trim().toLowerCase();
       for (const item of items) item.hidden = !item.dataset.icon!.includes(query);
       const count = items.filter((item) => !item.hidden).length;
-      feedback.textContent = `${count} / ${items.length} 个图标`;
+      feedback.textContent = `${count} / ${items.length} icons`;
       root.querySelector<HTMLElement>("[data-icon-empty]")!.hidden = count !== 0;
     };
     const choose = (event: Event) => {
       const target = (event.target as Element).closest<HTMLButtonElement>("button[data-icon]");
       if (!target) return;
       for (const item of items) item.setAttribute("aria-pressed", String(item === target));
-      feedback.textContent = `已选择 ${target.dataset.icon} · 用 Icon 的 name 引用`;
-      report(`已选择图标 ${target.dataset.icon}`);
+      feedback.textContent = `Selected ${target.dataset.icon} · Reference it with Icon's name prop`;
+      report(`Selected icon ${target.dataset.icon}`);
     };
     search.addEventListener("input", filter);
     root.addEventListener("click", choose);
@@ -81,13 +88,13 @@ export const IconsStory = defineStory({
 
 export const IconSizesStory = defineStory({
   id: "icon-sizes",
-  title: "图标 · 尺度与文字关系",
-  group: "图标与品牌",
+  title: "Icon · Scale and its relationship to text",
+  group: "Icons and brand",
   groupOrder: 60,
   component: "Icon",
-  variant: "尺度与文字",
+  variant: "Scale and text",
   description:
-    "比较默认、16、20、24px 轮廓与相邻文字，并检查有名称的图像和图标按钮。尺寸与触达区域分别判断。",
+    "Compare the default, 16, 20, and 24px outlines with adjacent text, and check named graphics and icon buttons. Size and hit area are judged separately.",
   covers: [
     "Icon",
     "IconButton",
@@ -98,47 +105,50 @@ export const IconSizesStory = defineStory({
   ],
   render: () => (
     <div className="workshop-stack">
-      <section className="workshop-stack" aria-label="尺寸参照">
-        <h2 className="workshop-section-title">相同轮廓，不同阅读距离</h2>
+      <section className="workshop-stack" aria-label="Size reference">
+        <h2 className="workshop-section-title">Same outline, different reading distance</h2>
         {[undefined, 16, 20, 24].map((size) => (
           <div className="workshop-row workshop-icon-scale">
-            <span className="workshop-note">{size === undefined ? "默认" : `${size}px`}</span>
+            <span className="workshop-note">{size === undefined ? "Default" : `${size}px`}</span>
             <span>
-              <Icon name="search" size={size} /> 查找组件
+              <Icon name="search" size={size} /> Find components
             </span>
             <span>
-              <Icon name="file" size={size} /> 设计说明
+              <Icon name="file" size={size} /> Design notes
             </span>
             <span>
-              <Icon name="folder" size={size} /> 当前项目
+              <Icon name="folder" size={size} /> Current project
             </span>
           </div>
         ))}
       </section>
-      <section className="workshop-stack" aria-label="主题笔画参照">
-        <h2 className="workshop-section-title">主题决定笔画和触感</h2>
+      <section className="workshop-stack" aria-label="Theme stroke reference">
+        <h2 className="workshop-section-title">The theme decides stroke and feel</h2>
         <div className="workshop-row">
-          <span className="workshop-note">MeowUI 标准主题</span>
+          <span className="workshop-note">MeowUI standard theme</span>
           <span className="workshop-icon-state-sample">
-            <IconButton label="studio 搜索" data-icon-action="studio">
+            <IconButton label="studio search" data-icon-action="studio">
               <Icon name="search" />
             </IconButton>
-            <span className="workshop-note">可用</span>
+            <span className="workshop-note">Available</span>
           </span>
           <span className="workshop-icon-state-sample">
-            <IconButton label="studio 不可用的搜索" disabled>
+            <IconButton label="studio search unavailable" disabled>
               <Icon name="search" />
             </IconButton>
-            <span className="workshop-note">不可用</span>
+            <span className="workshop-note">Unavailable</span>
           </span>
         </div>
       </section>
-      <section className="workshop-row" aria-label="独立图像名称">
-        <Icon name="folder" size={24} label="项目文件夹" />
-        <span className="workshop-note">独立图像可命名；按钮中的装饰图标由按钮说明动作。</span>
+      <section className="workshop-row" aria-label="Standalone graphic names">
+        <Icon name="folder" size={24} label="Project folder" />
+        <span className="workshop-note">
+          Standalone graphics can be named; decorative icons inside a button take their action from
+          the button.
+        </span>
       </section>
       <p className="workshop-feedback" role="status" data-feedback>
-        使用 Tab 与 Enter 操作图标按钮。
+        Use Tab and Enter to operate the icon buttons.
       </p>
     </div>
   ),
@@ -146,7 +156,7 @@ export const IconSizesStory = defineStory({
     const onClick = (event: Event) => {
       const button = (event.target as Element).closest<HTMLElement>("[data-icon-action]");
       if (!button) return;
-      const message = `${button.dataset.iconAction} 搜索已触发`;
+      const message = `${button.dataset.iconAction} search triggered`;
       root.querySelector("[data-feedback]")!.textContent = message;
       report(message);
     };
@@ -157,12 +167,13 @@ export const IconSizesStory = defineStory({
 
 export const BrandIconsStory = defineStory({
   id: "brand-icons",
-  title: "图形 · 品牌与便捷入口",
-  group: "图标与品牌",
+  title: "Graphics · Brand and convenience entries",
+  group: "Icons and brand",
   groupOrder: 60,
   component: "Brand icons",
-  variant: "品牌与便捷入口",
-  description: "品牌与插画保留自身构形，功能图标便捷入口复用同一 Lucide 轮廓。切换明暗检查可读性。",
+  variant: "Brand and convenience entries",
+  description:
+    "Brand and illustration graphics keep their own shapes, while functional icon convenience entries reuse the same Lucide outline. Toggle light and dark to check readability.",
   covers: [
     "MeowlandMark",
     "DoodleCat",
@@ -175,7 +186,7 @@ export const BrandIconsStory = defineStory({
   ],
   render: () => (
     <div className="workshop-stack">
-      <section className="workshop-brand-grid" aria-label="品牌与插画">
+      <section className="workshop-brand-grid" aria-label="Brand and illustration">
         <figure>
           <MeowlandMark />
           <figcaption>MeowlandMark</figcaption>
@@ -189,7 +200,7 @@ export const BrandIconsStory = defineStory({
           <figcaption>GithubIcon</figcaption>
         </figure>
       </section>
-      <section className="workshop-row" aria-label="Meowland 品牌小尺寸">
+      <section className="workshop-row" aria-label="Meowland brand at small sizes">
         {[16, 24, 32].map((size) => (
           <span className="workshop-row">
             <span style={`display:inline-flex;width:${size}px;height:${size}px`}>
@@ -199,8 +210,8 @@ export const BrandIconsStory = defineStory({
           </span>
         ))}
       </section>
-      <section className="workshop-stack" aria-label="功能图标便捷入口">
-        <h2 className="workshop-section-title">便捷入口与 Icon 共用轮廓</h2>
+      <section className="workshop-stack" aria-label="Functional icon convenience entries">
+        <h2 className="workshop-section-title">Convenience entries share the Icon outline</h2>
         <div className="workshop-icon-grid">
           {(
             [
@@ -217,6 +228,45 @@ export const BrandIconsStory = defineStory({
             </div>
           ))}
         </div>
+      </section>
+    </div>
+  ),
+});
+
+export const IconSourceStory = defineStory({
+  id: "icon-source",
+  title: "Icon · Caller icon data",
+  group: "Icons and brand",
+  groupOrder: 60,
+  component: "IconSource",
+  variant: "Caller icon data",
+  description:
+    "Render application icons outside the semantic set through IconSource. The pinned meowtail/icons/lucide pass-through supplies Lucide data; the shared frame keeps theme stroke, sizing, and accessible naming.",
+  covers: ["IconSource", "IconNode", "meowtail/icons/lucide", "theme stroke", "accessible labels"],
+  render: () => (
+    <div className="workshop-stack">
+      <section className="workshop-stack" aria-label="Application icons">
+        <h2 className="workshop-section-title">Icons outside the semantic set</h2>
+        <div className="workshop-row">
+          {(
+            [
+              [Bell, "Notifications"],
+              [Camera, "Camera"],
+              [Rocket, "Rocket"],
+            ] as const
+          ).map(([source, name]) => (
+            <span className="workshop-row">
+              <IconSource source={source} size={20} />
+              <span className="workshop-note">{name}</span>
+            </span>
+          ))}
+        </div>
+      </section>
+      <section className="workshop-row" aria-label="Named standalone icon">
+        <IconSource source={Bell} size={24} label="Notifications" />
+        <span className="workshop-note">
+          Pass label when the icon carries meaning on its own; otherwise it stays decorative.
+        </span>
       </section>
     </div>
   ),

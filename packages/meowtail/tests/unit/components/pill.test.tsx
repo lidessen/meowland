@@ -6,12 +6,12 @@ import { installMeowUI } from "../../../src/registry";
 
 installMeowUI();
 test("pill facts remain spans and actions use native buttons", () => {
-  const fact = renderToHtml(<Pill active>退出码 1</Pill>);
+  const fact = renderToHtml(<Pill active>Exit code 1</Pill>);
   expect(fact).toContain("<span");
   expect(fact).toContain('data-active="true"');
   const action = renderToHtml(
     <Pill onClick={() => {}} disabled aria-pressed="false">
-      筛选
+      Filter
     </Pill>,
   );
   expect(action).toContain("<button");

@@ -28,8 +28,8 @@ export const ImagePreview = defineComponent<
       src,
       alt,
       loading = "lazy",
-      loadingLabel = "正在加载图片",
-      failedLabel = "图片加载失败",
+      loadingLabel = "Loading image",
+      failedLabel = "Failed to load image",
       onLoad,
       onError,
       ...props

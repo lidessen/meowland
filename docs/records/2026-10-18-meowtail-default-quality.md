@@ -1,71 +1,71 @@
-# Meowtail 默认质量与组合边界检查
+# Meowtail default quality and composition-boundary checks
 
-本轮沿实际 `meowtail` 名称执行，没有重命名。起点为 `bc015b4`，开始时仅存在未知未跟踪 `data/`；本轮没有读取或修改该目录，没有修改 iOS/Rossovia、独立原型、课件内容或整体配色，没有推送、发布或部署。
+This round ran under the actual `meowtail` name, with no rename. The starting point was `bc015b4`, and only the unknown untracked `data/` existed at the start; this round did not read or modify that directory, did not modify iOS/Rossovia, separate prototypes, courseware content or overall colors, and there was no push, publish or deployment.
 
-目标是让正确接入公开组件的作者得到可靠默认值和可组合的布局，而不是用展板 CSS 补丁或固定页面模板遮盖共享缺陷。按主题基础、移动对话、接入/示例、独立质疑分工，实施者和审查者分开。
+The goal was for authors who correctly integrate the public components to get reliable defaults and composable layouts, rather than hiding shared defects with showcase CSS patches or fixed page templates. Work was divided by theme foundation, mobile conversation, integration/examples and independent challenge, with implementers and reviewers separated.
 
-## 两轮闭环
+## Two rounds of end-to-end work
 
-第一轮使用正确注册、完整标准 CSS、主题根和同一 runtime 的公开消费路径，比较无 preview CSS 的真实组件与现有 Meowbook 场景。确认普通正文与控件字体断裂、窄卡片标题被固定两列挤压、完整 Assistant 附件动作在移动输入行之外。分别修主题基线、CardHeader 和完整 Assistant 接线，并回到相同输入截图及键盘操作。
+The first round used the public consumption path with correct registration, complete standard CSS, theme root and the same runtime, comparing real components without preview CSS against existing Meowbook scenes. It confirmed broken font continuity between ordinary body text and controls, narrow card titles squeezed by a fixed two-column layout, and the complete Assistant's attachment action outside the mobile input row. The theme baseline, CardHeader and complete Assistant wiring were fixed separately, then the same input screenshots and keyboard operations were revisited.
 
-第二轮引入真实复合页面与 iOS 只读审计的最小反例：Frame 的祖先选择器与宿主 footer 同时拥有边距；普通 IIFE 下 SVG 只读属性赋值静默失败。新增会在旧版本失败的回归，独立复核，再运行统一最终构建的工程和浏览器检查。
+The second round introduced real composite pages and minimal counterexamples from the iOS read-only audit: an ancestor Frame selector and a host footer both owned margins; under a plain IIFE, assignment to an SVG read-only property silently failed. Regressions that fail on the old version were added, independently rechecked, and then engineering and browser checks ran on the unified final build.
 
-独立质疑改变了实现选择：给 CardHeader 建尺寸容器会切断自然宽度贡献，header-only 按钮卡的宽度可从正常内容宽塌到仅剩 padding。最终采用不含 size containment 的 intrinsic grid。另一个“嵌套 Card 样式 specificity 失效”的候选被 computed style 排除，未作为缺陷或修复交付。没有把暗色透明根猜成白底问题。
+Independent challenge changed the implementation choice: giving CardHeader a size container would cut off its natural width contribution, and the width of a header-only button card could collapse from normal content width to just padding. An intrinsic grid without size containment was adopted instead. Another candidate, "nested Card style specificity failure", was ruled out by computed styles and was not delivered as a defect or fix. The dark transparent root was not guessed to be a white-background problem.
 
-## 共享修复
+## Shared fixes
 
-| 修复                       | 原问题与最终行为                                                                                                                                                                                                                                        |
-| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 标准主题正文基线           | 正确安装、无 preview CSS 时，普通 p 是 Times 16px，Button/Input 是系统字体 14px。最外层主题入口现提供 font-family/body 字号/行高；嵌套主题保留作者字号，局部 appearance 重新解析文字颜色。规则低 specificity，未加入全局 margin、h/p reset 或页面背景。 |
-| CardHeader 自身宽度适配    | 原 390px 场景长标题被挤为六行。复用现有列宽 token 的 auto-fit grid，在窄卡和宽窗口的窄侧栏中让动作落到说明之后；宽处仍并列。无新 wrapper、API、断点或 containment，保留无说明、Action 在前、自然宽卡及嵌套卡组合。                                      |
-| AssistantComposer 附件动作 | 原完整组合使用 Button，而移动布局匹配 IconButton，附件因而多占一行。换成已有 IconButton，保持原生按钮、标签、disabled 和同步 file chooser。当前同一 story 的移动表单本体从 80px 降到 52px，桌面 98px 不变；这些是场景测量，不是 iOS 实机尺寸。          |
-| Frame/Composer 唯一外缘    | Frame 的阅读边距现只作用于直属 Composer。嵌入 footer/Card 的 Composer 使用其容器内自然宽度；不再被任意祖先 Frame 再收窄。375px 的外部最小复现原为直接 x20/335px、加 footer 后 x40/295px，回归覆盖同一重复 inset 机制。README 明确包装容器的空间归属。   |
-| Web renderer SVG fallback  | 普通 minified IIFE 对 getter-only `viewBox` 赋值不抛错，旧策略提前返回。现仅在 `Reflect.set` 成功时返回，false/throw 都进入原 attribute fallback。ref/style/events/null/boolean 分支未扩张，SVG 图形本身未改。                                          |
+| Fix                                 | Original problem and final behavior                                                                                                                                                                                                                                                                                                                                                                                                                    |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Standard theme body baseline        | When installed correctly and with no preview CSS, an ordinary p was Times 16px, while Button/Input were system font 14px. The outermost theme entry now provides font-family/body font size/line height; nested themes keep the author's font size, and local appearance re-resolves the text color. The rules have low specificity and add no global margin, h/p reset or page background.                                                            |
+| CardHeader adapts its own width     | In the original 390px scene a long title was squeezed into six lines. An auto-fit grid reusing the existing column-width tokens places actions after the description in narrow cards and in the narrow sidebar of wide windows; they still sit side by side where wide. There is no new wrapper, API, breakpoint or containment, and compositions without description, with Action first, natural-width cards and nested cards are preserved.          |
+| AssistantComposer attachment action | The original complete composition used Button, while the mobile layout matched IconButton, so the attachment took an extra row. It was switched to the existing IconButton, keeping the native button, label, disabled and synchronous file chooser. The current mobile form body in the same story went from 80px to 52px, while desktop stayed at 98px; these are scene measurements, not real iOS device sizes.                                     |
+| Frame/Composer single outer edge    | Frame's reading margin now applies only to a direct Composer. A Composer embedded in a footer/Card uses its natural width inside its container and is no longer narrowed again by any ancestor Frame. The external 375px minimal reproduction was originally directly x20/335px and x40/295px after adding a footer; the regression covers the same repeated-inset mechanism. The README states the space ownership of wrapping containers explicitly. |
+| Web renderer SVG fallback           | A plain minified IIFE does not throw when assigning to a getter-only `viewBox`, and the old strategy returned early. It now returns only when `Reflect.set` succeeds; both false and throw enter the original attribute fallback. The ref/style/events/null/boolean branches were not expanded, and the SVG graphics themselves were not changed.                                                                                                      |
 
-README 前置完整浏览器接入与销毁示例；ButtonsStory 使用现有 Container/Stack/Inline/LayoutItem，移除该场景对 workshop 布局类的依赖。零 preview CSS 下实看 1440、390、320 和短窗口，按钮既定 36px 尺度不变。没有为本轮新增 density 开关、自动安装器或强制 DSL。
+The README now leads with a complete browser integration and teardown example; ButtonsStory uses the existing Container/Stack/Inline/LayoutItem, and the scene's dependency on workshop layout classes was removed. With zero preview CSS, 1440, 390, 320 and short windows were actually viewed, and the established 36px button scale is unchanged. No density switch, automatic installer or forced DSL was added for this round.
 
-## iOS 归因界限
+## iOS attribution boundaries
 
-iOS 审计路径为 `/Users/lidessen/Documents/Codex/2026-10-17/task-2/ios-visual-review/component-integration-audit.md`。生产确实使用 15 类公开组件并正确加载主题，body 已补系统字体、颜色与背景，所以主题基线缺口不能解释其主要视觉问题。
+The iOS audit path is `/Users/lidessen/Documents/Codex/2026-10-17/task-2/ios-visual-review/component-integration-audit.md`. Production does use 15 classes of public components and loads the theme correctly, and the body has the system font, color and background added, so the theme baseline gap cannot explain its main visual problems.
 
-Frame/footer 双 inset 与库内复现吻合，是本轮直接处理的共享组合边界。逐条时间、短记录使用默认 28px turn gap、多条状态带、页头/footer 层级，以及 plain p 而非安全 Markdown 的选择，仍同时涉及库默认和宿主编排；本轮没有凭候选图泛改消息密度或伪造完整 Assistant 对 native ACK/切换/unknown 的适配结论。Composer 已有窄屏与 16px 输入适配，未宣称库没有移动支持。
+The Frame/footer double inset matches the in-library reproduction and is the shared composition boundary handled directly this round. Per-item times, short records using the default 28px turn gap, multiple status bars, header/footer hierarchy, and the choice of plain p rather than safe Markdown still involve both library defaults and host arrangement; this round did not broadly change message density based on candidate screenshots or fabricate a conclusion that the complete Assistant adapts to native ACK/switch/unknown. Composer already has narrow-screen and 16px input adaptation, and it was not claimed that the library has no mobile support.
 
-SVG 缺陷独立成立，但原生产没有 Mark/avatar，不能以此解释整页外观。受控 Select 的一般 WK options/value/disabled 更新原因尚未证明，本轮未将它混入 SVG 修复。没有重新运行真实 WK、软键盘或缩放验收，也没有升级 iOS 当前锁定安装包。
+The SVG defect stands independently, but the original production has no Mark/avatar, so it cannot explain the whole-page appearance. The cause of general WK options/value/disabled updates in the controlled Select has not been proven, and this round did not mix it into the SVG fix. Real WK, software keyboard or scaling acceptance was not rerun, and the currently pinned iOS install package was not upgraded.
 
-## 最终检查与实际观察
+## Final checks and actual observation
 
-统一 build 后没有再改生产实现。最终检查使用同一源码组合：`222c27c`、`64631a9`、`e23ed36`，随后仅整理既有测试归属与本文。
+Production implementation was not changed after the unified build. The final checks used the same source combination: `222c27c`, `64631a9`, `e23ed36`; afterward only existing test ownership and this document were organized.
 
-| 检查                          | 结果与范围                                                                                                                                                          |
-| ----------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bun run build`               | 六包构建通过。                                                                                                                                                      |
-| `bun run typecheck`           | 全部根定义的生产、公共类型与消费者环境通过。                                                                                                                        |
-| `bun run test`                | 356/356、2295 assertions、74 文件通过。初次受 sandbox 本地 listen 限制，允许 localhost 后重跑通过，不是产品失败。                                                   |
-| Meowtail Playwright           | 全部 166/166 通过，含明暗宽窄 story matrix、布局、滚动、toolbar、表单、弹层、键盘、草稿和新增反例。                                                                 |
-| MeowSlides 组件 Playwright    | 29/29 通过。全 UI 首次发现 ArtText 5 项仍归 Meowtail、请求已迁出的 story；仅把原用例移到 Slides 真实展板，保留所有断言，两个套件均通过。                            |
-| MeowSlides runtime Playwright | 33 项最终通过：全套 31 项先过，另两项依赖文档已说明的 13009 作品服务；补起该服务后只重跑两项，2/2 通过。未把第一次缺服务记为全套成功。                              |
-| MeowJSX DOM Playwright        | 3/3，通过真实普通 IIFE、严格 IIFE 与 ESM；断言实际 strict 状态、SVG 初始/Signal 更新、HTML value/checked、事件及 ref/unmount 清理。旧普通 IIFE 稳定红，新三格式绿。 |
-| 真实消费者                    | showcase 2/2；Sunshine 11/11；Panda 13/13；image-loading 4/4，均以当前库重新构建。课件内容未改。                                                                    |
-| fmt / lint                    | 最终全仓支持范围通过，额外排除未知 `data/`，不读取该目录；保留工程原有忽略范围。未用整仓格式写入覆盖其他内容。                                                      |
+| Check                           | Result and scope                                                                                                                                                                                                                                                        |
+| ------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bun run build`                 | Six packages built.                                                                                                                                                                                                                                                     |
+| `bun run typecheck`             | All root-defined production, public type and consumer environments passed.                                                                                                                                                                                              |
+| `bun run test`                  | 356/356, 2295 assertions, 74 files passed. The first run was limited by sandbox local listen; it passed after allowing localhost, which is not a product failure.                                                                                                       |
+| Meowtail Playwright             | All 166/166 passed, including the light/dark wide/narrow story matrix, layout, scrolling, toolbar, forms, popups, keyboard, drafts and new counterexamples.                                                                                                             |
+| MeowSlides component Playwright | 29/29 passed. The full UI first found that 5 ArtText items still belonged to Meowtail, and the request migrated the story; only the original cases were moved to the Slides real showcase, all assertions were kept, and both suites passed.                            |
+| MeowSlides runtime Playwright   | 33 items passed finally: the full set's 31 passed first, and the other two depended on the 13009 work service described in the docs; after starting that service only the two were rerun, 2/2 passed. The first missing-service run was not recorded as a full success. |
+| MeowJSX DOM Playwright          | 3/3, passing real plain IIFE, strict IIFE and ESM; asserts the actual strict state, SVG initial/Signal updates, HTML value/checked, events and ref/unmount cleanup. Old plain IIFE was stably red; the new three formats are green.                                     |
+| Real consumers                  | showcase 2/2; Sunshine 11/11; Panda 13/13; image-loading 4/4, all rebuilt against the current library. Courseware content was not changed.                                                                                                                              |
+| fmt / lint                      | The final repo-wide supported scope passed, additionally excluding the unknown `data/` without reading it; the project's original ignore scope was kept. Repo-wide format writes were not used to overwrite other content.                                              |
 
-浏览器总计 261 项通过，runtime 的两项如上分开记录。fmt/lint 是静态检查，浏览器断言与亲看原图是不同证据；本轮未做新 tgz 的独立安装验收或正式发布，也没有运行无关 MDX dev/HMR 全矩阵。
+A total of 261 browser items passed, with the two runtime items recorded separately as above. fmt/lint are static checks, and browser assertions and viewing original images in person are different evidence; this round did not do independent install acceptance of new tgz files or an official release, nor run the unrelated full MDX dev/HMR matrix.
 
-原图实际审查覆盖 Card 1440×1000、390×844、390×500、暗色窄侧栏；Assistant 宽屏、390×844、390×500；无 preview Buttons 的宽/窄/320/短；Sunshine 窄屏与 Panda 短窗口。短 Card 保持自然文档滚动，没有用 full-page 长图冒充短窗口全部内容同时可见。独立 reviewer 实际操作窄侧栏、Tab、resize 与原草稿 DOM 保持，未发现新关键阻塞。
+Actual original-image review covered Card 1440×1000, 390×844, 390×500 and dark narrow sidebar; Assistant wide screen, 390×844 and 390×500; Buttons without preview at wide/narrow/320/short; Sunshine narrow screen and Panda short window. Short Cards keep natural document scrolling, and a full-page long image was not passed off as all content being simultaneously visible in a short window. The independent reviewer actually operated the narrow sidebar, Tab, resize and original draft DOM retention, and found no new critical blocker.
 
-详细可重复探针、computed facts 与未加工截图位于忽略目录 `artifacts/meowtail-default-quality/`、`artifacts/chat-mobile-review/`、`artifacts/meowtail-adoption-audit/`、`artifacts/svg-property-review/`。本轮自建服务与浏览器均已关闭，没有关闭用户已有服务。
+Detailed repeatable probes, computed facts and unprocessed screenshots are in the ignored directories `artifacts/meowtail-default-quality/`, `artifacts/chat-mobile-review/`, `artifacts/meowtail-adoption-audit/` and `artifacts/svg-property-review/`. This round's self-built services and browsers were all closed, and no existing user service was closed.
 
-## Library 截图
+## Library screenshots
 
-以下均已成功保存，完整 ID 可直接交付；Assistant 图是库的真实 agent-workflow 场景，不是 iOS 产品图。
+The following were all saved successfully, and the full IDs can be delivered directly; the Assistant images are the library's real agent-workflow scene, not iOS product images.
 
-| 图                                | Library ID                                 |
-| --------------------------------- | ------------------------------------------ |
-| Card 改前 390                     | `libfile_8236714ad4c88191a206aaf0d2698d8b` |
-| Card 改后宽屏 1440                | `libfile_45148e18ef708191b88b0975c7a60b21` |
-| Card 改后窄屏 390                 | `libfile_53f8031ce0a08191aa9b29ab27d5eb5f` |
-| Card 改后短窗口 390×500           | `libfile_6b1065cec9b08191964105f33fca8496` |
-| Assistant 改后窄屏 390            | `libfile_4c8989883dac8191a73bdc1d37af05f0` |
-| Assistant 改后短窗口 390×500      | `libfile_7988656ecf208191ba5fbed1cd390670` |
-| 无 preview CSS 的公开按钮组合 390 | `libfile_14142b34e4188191a77a37568070c715` |
+| Image                                             | Library ID                                 |
+| ------------------------------------------------- | ------------------------------------------ |
+| Card before 390                                   | `libfile_8236714ad4c88191a206aaf0d2698d8b` |
+| Card after, wide screen 1440                      | `libfile_45148e18ef708191b88b0975c7a60b21` |
+| Card after, narrow screen 390                     | `libfile_53f8031ce0a08191aa9b29ab27d5eb5f` |
+| Card after, short window 390×500                  | `libfile_6b1065cec9b08191964105f33fca8496` |
+| Assistant after, narrow screen 390                | `libfile_4c8989883dac8191a73bdc1d37af05f0` |
+| Assistant after, short window 390×500             | `libfile_7988656ecf208191ba5fbed1cd390670` |
+| Public button composition without preview CSS 390 | `libfile_14142b34e4188191a77a37568070c715` |
 
-本轮以高优先级的确定共享缺陷已修、独立两轮审查无新增关键阻塞和上述最终验证通过收敛；不把功能与几何检查当作全部产品视觉已获认可。
+This round converged on the confirmed high-priority shared defects being fixed, two independent review rounds adding no new critical blockers, and the above final verification passing; functional and geometry checks are not treated as approval of all product visuals.

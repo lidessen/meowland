@@ -1,80 +1,80 @@
-# 八上 Unit 5 · Wild animals — Reading: Protecting pandas
+# Grade 8 Volume 1 Unit 5 · Wild animals — Reading: Protecting pandas
 
-八页可运行浏览器课件，作品标识 `protecting-pandas-a5`（外围页头可见 a5）。依据用户提供的 Reading 1 PPT 与已研究教学材料，
-从成长信息、问题/后果、保护措施走到有依据的个人行动表达。阅读材料标题为 `Xiwang in safe hands`；
-不据文件名推定教材版次或教材页码。摘录、图片和教学改编的来源与边界见 [SOURCES.md](SOURCES.md)。
-原 PPT、用户材料和另一作品 Sunshine Welcome 均不覆盖。
+An eight-page runnable browser courseware, work identity `protecting-pandas-a5` (a5 is visible in the surrounding page header). Based on the Reading 1 PPT provided by the user and researched teaching material,
+it moves from growth information through problems/consequences and protection measures to evidence-based personal action expression. The reading material title is `Xiwang in safe hands`;
+the textbook edition or page numbers are not inferred from the file name. See [SOURCES.md](SOURCES.md) for the sources and boundaries of excerpts, images and teaching adaptation.
+The original PPT, user material and the other work Sunshine Welcome are not overwritten.
 
-a5 复用共享 `PresentationImage`、`PresentationList` 与数值两/三栏。观察照片默认完整显示；
-短片页把视频、森林照片、原有问题分成三个独立区域，森林显式 `cover` 并注明裁切，避免图注和问题挤成横条。
-问题、任务状态与材料来源沿用 a4，不以照片裁切推导森林变化。通用用法见[演示布局指南](../../packages/meowslides/PRESENTATION-LAYOUTS.md)。
+a5 reuses the shared `PresentationImage`, `PresentationList` and numeric two/three columns. Observation photos are shown in full by default;
+on the short-film page, the video, forest photo and existing questions are separated into three independent regions; the forest explicitly uses `cover` and notes the cropping, avoiding captions and questions being squeezed into a horizontal strip.
+Questions, task states and material sources follow a4, and forest change is not inferred from photo cropping. For generic usage see the [presentation layout guide](../../packages/meowslides/PRESENTATION-LAYOUTS.md).
 
-## 打开与编辑
+## Open and edit
 
-在同版本 Meowland 仓库、已有 Bun 与依赖/包构建的环境，从根目录运行：
+In a same-version Meowland repository with Bun and dependencies/package builds ready, run from the repository root:
 
 ```sh
 bun examples/protecting-pandas/build.ts
 bun examples/protecting-pandas/serve.ts
 ```
 
-打开 `http://127.0.0.1:13014/`；停止本次服务用 Ctrl-C。端口冲突时先核实，可用 `PORT=13024` 更换。
-新课件使用独立地址；`13012` 仍是 Sunshine Welcome。源码改动后重建再刷新，没有 HMR。
-已打开的标签页不会自动载入新脚本；更新后按 Cmd-R（Windows/Linux 为 Ctrl-R）刷新。刷新开启新会话，会清空本页草稿。
-构建产物在忽略目录 `dist/`，仅需本地静态 HTTP，不默认支持双击 file://；没有外网字体、媒体或 API。
-`PANDA_OUTDIR` 可把候选构建放到专用目录，`PANDA_DIST` 可让验收服务读取该目录；用户预览在验证后再更新。
+Open `http://127.0.0.1:13014/`; press Ctrl-C to stop this service. Verify port conflicts first; `PORT=13024` changes the port.
+The new courseware uses its own address; `13012` is still Sunshine Welcome. Rebuild and refresh after source changes; there is no HMR.
+Already-open tabs do not load new scripts automatically; after an update press Cmd-R (Ctrl-R on Windows/Linux) to refresh. Refresh starts a new session and clears this page's drafts.
+The build output is in the ignored directory `dist/`, needing only local static HTTP; double-clicking file:// is not supported by default, and there are no external fonts, media or APIs.
+`PANDA_OUTDIR` can put a candidate build in a dedicated directory, and `PANDA_DIST` can let the acceptance server read that directory; the user preview is updated after verification.
 
-入口为 `index.html` → `main.tsx` → `lesson.tsx`，已核对内容在 `content.ts`，作品视觉在 `lesson.styles.ts`。
-画布内选项全部直接显示，使用大字卡片、可见勾选和原生按钮语义；不以 select 隐藏教学选项。
-这些是作品的内容与状态组合，不是新增的 Meowtail 教学组件或评分 API。外围播放器目录沿用现有导航。
+The entry is `index.html` → `main.tsx` → `lesson.tsx`, verified content is in `content.ts`, and the work's visuals are in `lesson.styles.ts`.
+All in-canvas options are shown directly, using large text cards, visible check marks and native button semantics; teaching options are not hidden in a select.
+These are the work's content and state composition, not a new Meowtail teaching component or grading API. The surrounding player outline follows the existing navigation.
 
-## 教学与状态
+## Teaching and state
 
-| 页 id      | 学生任务                                         | 可观察产出                                          |
-| ---------- | ------------------------------------------------ | --------------------------------------------------- |
-| `welcome`  | 了解阅读与表达目标；Next 出现目标，再翻页        | 知道需要找依据并解释行动                            |
-| `observe`  | 比较两只熊猫的可见细节，再回原文找时间信息       | 一条观察与一个待查问题；First/Then/Later 提示可撤回 |
-| `growth`   | 选一个成长阶段，从原文说明变化                   | 一句有时间线索的口头复述                            |
-| `watch`    | 看真实食竹短片，提出生活需要的问题，再查后页原文 | 区分观察、推测与 P/A 原句，形成问题—后果—措施解释   |
-| `problems` | 选问题，解释可能后果                             | 一条问题与后果关系及原句依据                        |
-| `protect`  | 选择保护措施，说明它可能回应的问题               | 有依据的关联解释，不作唯一配对判分                  |
-| `meaning`  | 讨论为何仍需保护                                 | 将文章寓意与前文问题联系起来                        |
-| `act`      | 提出具体个人行动，说明理由和第一步               | 开放行动表达及同伴核对                              |
+| Page id    | Student task                                                                                              | Observable output                                                                                                |
+| ---------- | --------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| `welcome`  | Understand the reading and expression goals; Next reveals the goals, then changes page                    | Know that evidence is needed and the action must be explained                                                    |
+| `observe`  | Compare visible details of two pandas, then return to the text for time information                       | One observation and one open question; First/Then/Later hints can be retracted                                   |
+| `growth`   | Choose a growth stage and explain the change from the text                                                | One spoken retelling with a time clue                                                                            |
+| `watch`    | Watch the real bamboo-eating clip, raise questions about life needs, then check the text on the next page | Distinguish observation, inference and the original P/A sentence; form a problem-consequence-measure explanation |
+| `problems` | Choose a problem and explain possible consequences                                                        | One problem-consequence relationship and its textual evidence                                                    |
+| `protect`  | Choose a protection measure and explain which problem it may address                                      | Evidence-based relational explanation, not graded as unique matching                                             |
+| `meaning`  | Discuss why protection is still needed                                                                    | Connect the article's message with the earlier problems                                                          |
+| `act`      | Propose a concrete personal action with reasons and a first step                                          | Open action expression plus peer checking                                                                        |
 
-先试其中一个关键片段，按实际产出调节材料量、支架与时间；八页不等于完整一课时教案。
-每人先思考或标出依据，再同伴互述；分享时听众也核对或修订理由，不只让少数学生汇报。
+Try one key segment first and adjust material volume, scaffolds and time according to actual output; eight pages do not equal a complete lesson plan.
+Each person thinks or marks evidence first, then retells to a partner; listeners also check or revise reasons during sharing, not just a few students reporting.
 
-问题、选项与阅读摘录始终可见。Hint、Reference、Evidence 三个按钮互相独立，能反复展开/收起；
-Evidence 高亮常显原文并给定位说明，不把必要原文藏起来。按钮状态不自动跟随计时、媒体或学生选择。
-三个支持区统一消费共享 `Reveal when` 保留自然布局槽位，隐藏、焦点与活动许可由组件处理；开关不会把按钮或阅读区推来推去。
-内容主题通过 `slideClassName` 仅落在画布 article，不覆盖外围标题；作品不手写隐藏/ARIA/焦点补丁，也不压小文字掩盖内部区域溢出。
-完整参考可撤回，只留提示，或全部收起让学生独立表达；可以再次求助。
+Questions, options and reading excerpts stay visible at all times. The three buttons Hint, Reference and Evidence are independent and can be expanded/collapsed repeatedly;
+Evidence highlights the always-visible original text and gives a location explanation, without hiding the necessary text. Button state does not automatically follow timers, media or student choices.
+The three support areas uniformly consume the shared `Reveal when`, keeping natural layout slots; hiding, focus and activity permission are handled by the component; toggles do not push buttons or the reading area around.
+Content themes land only on the canvas article through `slideClassName` and do not override the surrounding titles; the work does not hand-write hiding/ARIA/focus patches, nor shrink text to hide internal region overflow.
+The complete reference can be retracted, leaving only the hint, or all collapsed so students express themselves independently; they may ask for help again.
 
-每场作品工厂创建自己的位置、选择、支持开关与草稿 signals。回退、切页和回访保留本场状态；
-`Start this task again` 只清当前题的选择/草稿及三个支持开关，不清其他题；刷新开启新会话。
-选择起点不自动填入学生草稿，不自动揭晓、翻页或判分。开放题接受不同有依据的表达。
-显示隐藏是课堂呈现，不是权限或防作弊；原文摘录与参考内容都可能在观众 bundle 中查看。
+Each presentation factory creates its own position, choice, support-toggle and draft signals. Going back, changing pages and revisiting keep this session's state;
+`Start this task again` clears only the current question's choice/draft and the three support toggles, not other questions; refresh starts a new session.
+The starting point of a choice is not auto-filled into the student draft, and nothing auto-reveals, changes pages or grades. Open questions accept different evidence-based expressions.
+Showing/hiding is classroom presentation, not permission or anti-cheating; original excerpts and reference content may both be visible in the audience bundle.
 
-## 图片与短视频
+## Images and short video
 
-主视觉、幼崽/较大熊猫比较和保护区森林来自许可明确的真实照片；食竹片段是 Bao Bao 在 Smithsonian National Zoo 的真实圈养影像，18 秒、无声。外部动物不是 Xiwang 的生平记录，照片大小不能推定课文年龄/重量；森林照片不是竹林缩减的证据。原六页阅读任务与渐进支架保留，观察后回原文再解释。
+The key visual, the cub/older panda comparison and the reserve forest come from real photos with clear licenses; the bamboo-eating clip is real captive footage of Bao Bao at the Smithsonian National Zoo, 18 seconds, silent. The external animals are not a life record of Xiwang, and photo size cannot imply the text's age/weight; the forest photo is not evidence of bamboo forest shrinkage. The original six-page reading task and progressive scaffolds are retained, observing then returning to the text to explain.
 
-`media.ts` 显式导入本地图片、视频、poster 和英文观察字幕；来源、署名、加工与各项学习任务见 [SOURCES.md](SOURCES.md)，第三方许可见 [NOTICES](assets/NOTICES.md)。a4 已移除来源不明的旧 PPT 照片，不复制原 HTML 的 AI 成长视频。
+`media.ts` explicitly imports local images, video, poster and English observation captions; see [SOURCES.md](SOURCES.md) for sources, attribution, processing and each learning task, and [NOTICES](assets/NOTICES.md) for third-party licenses. a4 has removed the old PPT photo of unknown origin and does not copy the original HTML's AI growth video.
 
-视频使用共享 `PresentationVideo`，默认暂停，不自动循环、揭示或翻页。Play / continue、Pause、Back to start 可用键盘操作；Back to start 暂停并回到开头，仍等明确播放。切页停止并释放媒体，回访从开头暂停；保留其他任务的草稿、选择与教师支持。图片失败保留描述；视频失败保留 poster/文字替代及 Retry loading。所有课堂媒体本地交付，加载后无需第三方站点。
+The video uses the shared `PresentationVideo`, paused by default, and does not auto-loop, reveal or change pages. Play / continue, Pause and Back to start are keyboard-operable; Back to start pauses and returns to the beginning, still waiting for explicit playback. Changing pages stops and releases the media, and revisits start paused at the beginning; drafts, choices and teacher supports of other tasks are kept. Image failure keeps the description; video failure keeps the poster/text alternative and Retry loading. All classroom media are delivered locally and need no third-party site after loading.
 
-## 审阅与检查
+## Review and checks
 
-同源作品由 `meowbook.config.ts` 接入，五个夹具从首次挂载传 `active=false`，包括观察与视频，不复制课件实现。
-按仓库[工程检查](../../docs/development-checks.md)运行类型、格式与 lint；本作品浏览器配置为
-`tests/playwright.config.ts`，独占 `13034` 并消费正式构建产物。
+Same-source works are wired through `meowbook.config.ts`, and five fixtures pass `active=false` from the first mount, including observation and video, without copying the courseware implementation.
+Run types, format and lint according to the repository's [engineering checks](../../docs/development-checks.md); this work's browser configuration is
+`tests/playwright.config.ts`, which exclusively uses `13034` and consumes the official build artifact.
 
-实际课堂选项、隐藏内容的辅助技术可见性、键盘/焦点、回访/重做、长草稿与全支持状态需操作观察。
-固定画布在窄短窗口整体缩放，不暗中变成手机长文页；原尺寸模式可用于放大阅读。
-构建或浏览器操作通过不代表课堂学习成效，也不表示 PPTX/PDF 导出、部署或发布。
+Actual classroom options, assistive-technology visibility of hidden content, keyboard/focus, revisits/redo, long drafts and the all-supports state need operational observation.
+The fixed canvas scales as a whole in narrow/short windows and does not secretly become a phone long-form page; the actual-size mode can be used for enlarged reading.
+Passing a build or browser operation does not mean classroom learning effectiveness, nor does it mean PPTX/PDF export, deployment or publishing.
 
-## 演示包接线
+## Presentation package wiring
 
-本作品的播放、步骤、媒体、布局与演示主题来自独立 `meowslides` 包；
-通用 Button/Stack/Inline 等仍来自 `meowtail`。正式入口和 Meowbook 预览各自安装通用 UI 与演示 registry，
-并装配完整 `presentationTheme`。这次迁移只调整包与主题接线，保留作品内容、状态与选定配色。
+This work's playback, steps, media, layout and presentation theme come from the standalone `meowslides` package;
+generic Button/Stack/Inline and so on still come from `meowtail`. The official entry and the Meowbook preview each install the generic UI and presentation registry,
+and assemble the complete `presentationTheme`. This migration only adjusts package and theme wiring, keeping the work content, state and chosen colors.

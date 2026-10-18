@@ -12,8 +12,8 @@ test("code highlighting loads asynchronously without changing source or copy", a
   const original = await code.textContent();
   await expect(code.locator('span[style*="token-keyword"]').first()).toBeVisible();
   expect(await code.textContent()).toBe(original);
-  await block.getByRole("button", { name: "复制代码", exact: true }).click();
-  await expect(block.getByRole("status")).toHaveText("已复制");
+  await block.getByRole("button", { name: "Copy code", exact: true }).click();
+  await expect(block.getByRole("status")).toHaveText("Copied");
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(original);
 });
 
@@ -27,8 +27,8 @@ test("output folds preserve terminal tail and copy full raw payload", async ({ p
   await expect(terminal.getByText("case 24: passed", { exact: true })).toBeVisible();
   await fold.locator("summary").click();
   await expect(fold).toHaveJSProperty("open", true);
-  await terminal.getByRole("button", { name: "复制", exact: true }).click();
-  await expect(terminal.getByRole("status")).toHaveText("已复制");
+  await terminal.getByRole("button", { name: "Copy", exact: true }).click();
+  await expect(terminal.getByRole("status")).toHaveText("Copied");
   const copied = await page.evaluate(() => navigator.clipboard.readText());
   expect(copied).toContain("\u001b[32mPASS\u001b[0m");
   expect(copied).toContain("case 24: passed");
@@ -41,11 +41,11 @@ test("JSON expands lazily and lightbox returns keyboard focus", async ({ page })
   await expect(page.getByText('theme: "DeepSeek"', { exact: true })).toHaveCount(0);
   await options.click();
   await expect(page.getByText('theme: "DeepSeek"', { exact: true })).toBeVisible();
-  const trigger = page.getByRole("button", { name: "预览图片", exact: true });
+  const trigger = page.getByRole("button", { name: "Preview image", exact: true });
   await trigger.click();
-  const dialog = page.getByRole("dialog", { name: "蓝色圆形示例" });
+  const dialog = page.getByRole("dialog", { name: "Blue circle example" });
   await expect(dialog).toBeVisible();
-  await expect(dialog.getByRole("button", { name: "关闭图片预览" })).toBeFocused();
+  await expect(dialog.getByRole("button", { name: "Close image preview" })).toBeFocused();
   await page.keyboard.press("Escape");
   await expect(dialog).not.toBeVisible();
   await expect(trigger).toBeFocused();
@@ -61,20 +61,20 @@ test("JSON keyboard expansion and copy keep branch identity and failure visible"
   const summary = page
     .locator('summary[data-meowui-part="json-tree/summary"]')
     .filter({ hasText: "nested: Object(2)" });
-  await expect(page.getByText('"<内容>\\n第二行"', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('"<content>\\nsecond line"', { exact: true })).toHaveCount(0);
   await summary.focus();
   await page.keyboard.press("Enter");
   await expect(summary.locator("..")).toHaveJSProperty("open", true);
   await expect(summary.locator("button")).toHaveCount(0);
-  const copy = page.getByRole("button", { name: "复制 nested", exact: true });
+  const copy = page.getByRole("button", { name: "Copy nested", exact: true });
   await copy.focus();
   await page.keyboard.press("Enter");
   expect(JSON.parse(await page.evaluate(() => navigator.clipboard.readText()))).toEqual({
-    text: "<内容>\n第二行",
+    text: "<content>\nsecond line",
     items: [1, 2],
   });
   await expect(summary.locator("..")).toHaveJSProperty("open", true);
-  await page.getByRole("button", { name: "复制 复制失败示例", exact: true }).focus();
+  await page.getByRole("button", { name: "Copy Copy failure example", exact: true }).focus();
   await page.keyboard.press("Enter");
-  await expect(page.getByRole("status").filter({ hasText: "复制失败" })).toBeVisible();
+  await expect(page.getByRole("status").filter({ hasText: "Copy failed" })).toBeVisible();
 });

@@ -83,6 +83,7 @@ export const listGroupStyles = css`
     gap: 6px;
   }
   ${row("panel")} {
+    padding: 12px 16px;
     border-top: ${lineTokens.width} solid ${lineTokens.divider};
     background: ${layerTokens.sunken};
   }

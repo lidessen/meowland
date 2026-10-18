@@ -9,7 +9,7 @@ import {
 import { defineStory } from "meowbook";
 
 const sentence =
-  "Read this confirmed result carefully. 中文长文用于检查历史阅读时的真实文字行，不使用整段外框代替文字。 ";
+  "Read this confirmed result carefully. Long prose keeps the historical reading view on real text lines instead of replacing the text with a whole block frame. ";
 
 function conversationFixture(complete: boolean, latestLabel = "Return to latest") {
   const appended = signal("");

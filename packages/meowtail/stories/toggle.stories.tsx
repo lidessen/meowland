@@ -4,35 +4,36 @@ import { Button, Checkbox, Inline, Stack, Switch } from "meowtail";
 
 export const ToggleStory = defineStory({
   id: "toggles",
-  title: "选择 · 复选与开关",
-  group: "表单输入",
+  title: "Selection · Checkboxes and switches",
+  group: "Form inputs",
   component: "Checkbox",
-  description: "点击标签、空格切换和表单重置；受控开关由调用方决定是否接受修改。",
+  description:
+    "Activate labels, toggle with the space bar and reset the form; a controlled switch leaves it to the caller to accept a change.",
   covers: ["Checkbox native label/required/reset", "Switch controlled/disabled/keyboard"],
   render: () => {
     const checked = signal(true);
     return (
       <form onSubmit={(event: Event) => event.preventDefault()}>
         <Stack>
-          <Checkbox label="保存本次选择" name="remember" defaultChecked />
-          <Checkbox label="确认后才能提交" name="confirm" required />
-          <Checkbox label="当前不可选择" disabled />
-          <Switch label="显示工具过程" name="tools" defaultChecked />
+          <Checkbox label="Save this choice" name="remember" defaultChecked />
+          <Checkbox label="Required before submitting" name="confirm" required />
+          <Checkbox label="Currently unavailable" disabled />
+          <Switch label="Show tool process" name="tools" defaultChecked />
           <Switch
-            label="通知（受控）"
+            label="Notifications (controlled)"
             name="notifications"
             checked={checked}
             onChange={(event: Event) => {
               checked.value = (event.currentTarget as HTMLInputElement).checked;
             }}
           />
-          <Switch label="固定开启（拒绝修改）" checked={true} />
-          <Switch label="暂不可用" disabled />
+          <Switch label="Always on (rejects changes)" checked={true} />
+          <Switch label="Unavailable" disabled />
           <Inline>
             <Button type="reset" variant="outline">
-              重置
+              Reset
             </Button>
-            <Button type="submit">确认</Button>
+            <Button type="submit">Confirm</Button>
           </Inline>
         </Stack>
       </form>

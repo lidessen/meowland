@@ -4,19 +4,22 @@ import { defineStory } from "meowbook";
 
 export const CodeBlockStory = defineStory({
   id: "code-block",
-  title: "代码块 · 语言、复制与换行",
-  group: "内容",
+  title: "Code block · Language, copy, and wrapping",
+  group: "Content",
   render: () => (
     <Stack>
       <CodeBlock
         language="typescript"
         code={
-          'const description = "保留代码空白与长行；自动换行只改变展示，不改变复制的内容。";\nconsole.log(description);'
+          'const description = "Preserves code whitespace and long lines; soft wrap only changes the display, not the copied content.";\nconsole.log(description);'
         }
       />
-      <CodeBlock code={'<script>alert("只显示，不执行")</script>\n  保留缩进'} defaultWrap />
       <CodeBlock
-        language="复制失败示例"
+        code={'<script>alert("Displayed only, not executed")</script>\n  Preserves indentation'}
+        defaultWrap
+      />
+      <CodeBlock
+        language="Copy failed example"
         code="clipboard permission denied"
         onCopy={async () => {
           throw new Error("denied");

@@ -23,7 +23,7 @@ export const ChatQuestion = defineComponent<
   chatQuestionContract,
   (
     {
-      label = "需要你回答",
+      label = "Needs your answer",
       question,
       questionId,
       description,

@@ -18,7 +18,7 @@ export const resourceCardContract = {
 
 export interface ResourceCardProps extends Props {
   title: Child;
-  /** What kind of thing it is, for example "Channel · 消息卡片". */
+  /** What kind of thing it is, for example "Channel · Message card". */
   subtitle?: Child;
   icon?: Child;
   /** The state in words with its dot. */

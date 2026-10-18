@@ -1,76 +1,72 @@
-# Protecting pandas 浏览器课件与课堂控件复验
+# Protecting pandas browser courseware and classroom controls re-verification
 
-本记录保留 a1 阶段的交付事实；用户随后明确要求将共享问题移入组件层，后续 a3 的机制、安装态和完整逐图复验另见[组件层修复记录](2026-10-18-presentation-component-fixes.md)。下文的局部标题 class 与手写隐藏处理已由后续公共合同替代，旧验证结果不代表 a3。
+This record keeps the delivery facts of the a1 stage; the user later explicitly asked to move shared issues into the component layer, and a3's later mechanism, installed state and complete per-image re-verification are in the [component-layer fix record](2026-10-18-presentation-component-fixes.md). The local heading class and handwritten hiding described below were replaced by later public contracts, and the old verification results do not represent a3.
 
-用户在看效果时明确要求新增实际熊猫课件，并指出画布内不应以下拉框隐藏教学选项、按钮不应直接套普通应用表单样式。
-本轮从 `89c68cc` 新增 `examples/protecting-pandas`，未覆盖 Sunshine Welcome、原 PPT 或用户材料。
-未知 `data/` 和 Rossovia 均未读取或修改；本轮不推送、发布或部署。
+While viewing the result, the user explicitly asked to add a real panda courseware, and pointed out that teaching options inside the canvas should not be hidden behind a dropdown and that buttons should not directly use ordinary app form styles.
+This round added `examples/protecting-pandas` from `89c68cc` without overwriting Sunshine Welcome, the original PPT or user material.
+The unknown `data/` and Rossovia were not read or modified; this round did not push, publish or deploy.
 
-## 实际作品
+## Actual work
 
-六页同源浏览器作品为“八上 Unit 5 Wild animals — Reading: Protecting pandas”，版本标识 `protecting-pandas-a1`。
-独立入口 `http://127.0.0.1:13014/`，原 Sunshine 的 `13012` 保留。
-页面依次是导入、成长、问题与后果、保护措施、寓意讨论、个人行动；作品目标与启动见
-[README](../../examples/protecting-pandas/README.md)，两个课件都可从 [examples 索引](../../examples/README.md)找到。
+The six-slide same-source browser work is "Grade 8 Book 1 Unit 5 Wild animals — Reading: Protecting pandas", version identifier `protecting-pandas-a1`.
+The separate entry is `http://127.0.0.1:13014/`, and the original Sunshine `13012` was kept.
+The slides are, in order: introduction, growth, questions and consequences, protection measures, moral discussion, personal action; the work goal and startup are in the [README](../../examples/protecting-pandas/README.md), and both courseware pieces can be found from the [examples index](../../examples/README.md).
 
-读取用户指定的 Library 反馈图后实际查看像素，红框确实指向旧作品六个 select 和普通 Redo/Revisit 按钮。
-最新范围转向新课件，因此将反馈落实到新熊猫作品，不继续单独打磨旧课例。
-新作品教学选项直接展开为原生按钮卡片；大字、暖底、绿/金色及圆角随本场演示，选中同时有勾选和 aria-pressed，保留键盘、焦点及独立教师反馈。
-外围目录仍使用播放器的原生导航，没有因教学选项反馈而移除。
+After reading the user-specified Library feedback image and actually viewing its pixels, the red boxes did point to the old work's six selects and the ordinary Redo/Revisit buttons.
+The latest scope moved to the new courseware, so the feedback was applied to the new panda work and the old lesson was not polished separately any further.
+The new work's teaching options expand directly as native button cards; large text, warm background, green/gold colors and rounded corners follow this performance's presentation, selection has both a checkmark and aria-pressed, and keyboard, focus and separate teacher feedback are kept.
+The peripheral outline still uses the player's native navigation and was not removed because of the teaching-option feedback.
 
-页面复用现有 Presentation、PresentationLayout、PresentationText、Reveal、背景与短 fade 入场；
-作品工厂持有选择、提示/参考/依据开关与草稿，不增加教学组件平台、自动评分或新的公共 API。
-原文摘录始终可查，Evidence 只改变高亮与说明；三个支持开关独立可逆。
-选择不自动填稿、揭答或翻页，跨页保留本场状态，明确重做只清当前题。
-开放表达以行动、依据和第一步反馈，不把建议写成唯一答案或已经验证的保护成效。
+The slides reuse the existing Presentation, PresentationLayout, PresentationText, Reveal, background and short fade entrance;
+the work factory holds selection, hint/reference/evidence toggles and drafts, and does not add a teaching component platform, automatic scoring or new public APIs.
+The original-text excerpts are always available, and Evidence only changes highlighting and explanations; the three support toggles are independently reversible.
+Selection does not automatically fill the draft, reveal answers or page; cross-slide revisits keep this session's state, and explicit redo clears only the current question.
+Open expression is given through action, evidence and first-step feedback, without writing the suggestion as the only answer or as verified protection effectiveness.
 
-## 来源核实与改编
+## Source verification and adaptation
 
-独立内容 owner 只读核原 PPT ZIP/XML，并实际打开阅读图片逐行核短引文；原材料阅读标题为 `Xiwang in safe hands`。
-核实 6 个月吃竹子、12 个月超过 35kg、20 个月学会照顾自己；没有套入常见旧版节点。
-问题与措施非三个排他的配对，原文没有给出当前统计、法律名称或每项措施的独立效果。
-问题、句框、活动、参考解释均标教学改编，不推定教材版次或教材页码。
+The independent content owner verified the original PPT ZIP/XML read-only and actually opened the reading image to check the short quotations line by line; the original material's reading title is `Xiwang in safe hands`.
+Verified: eats bamboo at 6 months, exceeds 35kg at 12 months, and learns to care for itself at 20 months; common old-version milestones were not substituted.
+The questions and measures are not three exclusive pairs, and the original text does not give current statistics, legal names or the independent effect of each measure.
+Questions, sentence frames, activities and reference explanations are all marked as teaching adaptations, without assuming a textbook edition or page number.
 
-唯一照片来自用户 PPT 阅读图片的精确局部提取，原图与输出均实际查看；不声称辨认了 Xiwang 个体，不使用或执行第三方 HTML，也不复制四段原媒体。
-照片第三方权利继续保留，NOTICES 随构建交付。精确引文、位置、原图及输出哈希、素材限制见
-[SOURCES](../../examples/protecting-pandas/SOURCES.md)。七篇材料的教学反思用于任务、撤架、参与和时间取舍，不冒充本轮课堂观察。
+The only photo comes from a precise local extraction of the user's PPT reading image, and both the original and output were actually viewed; there is no claim to have identified the individual Xiwang, no third-party HTML was used or executed, and the four original media segments were not copied.
+Third-party rights in the photo are retained, and NOTICES ships with the build. Exact quotations, positions, original and output hashes and asset limitations are in [SOURCES](../../examples/protecting-pandas/SOURCES.md). The teaching reflections of seven materials were used for task, scaffolding removal, participation and time tradeoffs, and are not passed off as classroom observation from this round.
 
-## 两轮闭环
+## Two rounds of end-to-end work
 
-先尽早构建并在 Safari 实际打开首版，将 `13014` 告知用户；同时由非实现者检查内容、浏览器合同和画面。
-首轮真实截图发现作品 h1 选择器误伤播放器页头，以及长摘录、重复卡片说明和三支持面板争用固定画布，正文越过自己的区域。
-后续候选的保护页和寓意页仍有内部重叠，整页 scrollHeight 与溢出诊断没有发现它，不能据此宣布通过。
+The first version was built early and actually opened in Safari, and the user was told about `13014`; at the same time a non-implementer checked content, browser contracts and visuals.
+The first round of real screenshots found that the work's h1 selector accidentally hit the player header, and that long excerpts, duplicated card descriptions and three support panels competed for the fixed canvas, with body text crossing its own region.
+Later candidates still had internal overlap on the protection and moral slides, which the whole-page scrollHeight and overflow diagnostics did not find, so this could not be declared passing.
 
-最终用作品专有标题 class、已有紧凑布局间距与较宽阅读区，删除右侧重复摘录说明、精简支持文字，保持原文可见，不裁切正文或压成小字。
-最终正文预算与真实后代/footer 边界均成立，长草稿在 textarea 内滚动；选项保持可见。
-独立视觉最终查看五页全展开与宽窄短窗口、选中卡和长草稿，无剩余阻断；证据在
-`artifacts/protecting-pandas-review/final-visual-facts.json` 与实际原图。
+Finally, a work-specific heading class, the existing compact layout spacing and a wider reading area were used; the duplicate excerpt description on the right was removed, support text was reduced, and the original text stayed visible without clipping the body or shrinking it to small type.
+The final body budget and real descendant/footer boundaries held, long drafts scroll inside the textarea, and options stay visible.
+Independent visual review finally viewed all five slides expanded plus wide/narrow/short windows, selected cards and long drafts, with no remaining blockers; evidence is in `artifacts/protecting-pandas-review/final-visual-facts.json` and the actual original images.
 
-## 同版本检查与上线本机预览
+## Same-version checks and bringing up the local preview
 
-| 检查                                | 实际结果                                                                                               |
-| ----------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| 根 build 五包、作品正式 Web build   | 通过；作品最终候选包含来源与 notices                                                                   |
-| 根 typecheck、作品及 tests 完整 tsc | 通过；根脚本新增覆盖该作品                                                                             |
-| Oxfmt / Oxlint                      | 全仓显式排除 `data/**`，格式与 deny-warnings 通过；新增文档另做精确检查                                |
-| 根单测                              | 323 项、66 文件、1999 断言通过；库与工程检查，不替代新课件课堂行为                                     |
-| 新作品浏览器                        | 最终 7/7，10.9 秒；5 题独立开关、隐藏 AX、键盘、状态保留与局部重做、冷启动、reduce、布局及 chrome 隔离 |
-| Meowbook                            | 三个同源 stories check 通过；审阅从首次挂载 active=false                                               |
-| 指导文档                            | skill 校验器及七份相关文档的 40 个相对链接/锚点检查通过                                                |
+| Check                                             | Actual result                                                                                                                                                   |
+| ------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Root build five packages, official work Web build | Passed; the work's final candidate includes sources and notices                                                                                                 |
+| Root typecheck, full work and tests tsc           | Passed; the root script now covers this work                                                                                                                    |
+| Oxfmt / Oxlint                                    | Repo-wide explicit exclusion of `data/**`, format and deny-warnings passed; the new document had additional precise checks                                      |
+| Root unit tests                                   | 323 items, 66 files, 1999 assertions passed; library and engineering checks do not replace new courseware classroom behavior                                    |
+| New work browser                                  | Final 7/7, 10.9 seconds; 5 questions' independent toggles, hidden AX, keyboard, state retention and local redo, cold start, reduce, layout and chrome isolation |
+| Meowbook                                          | Three same-source stories checks passed; review starts with active=false on first mount                                                                         |
+| Authoring docs                                    | The skill validator and 40 relative links/anchors checks across seven related documents passed                                                                  |
 
-浏览器六页 × 1440×900、390×844、1280×330 全展开，含封面最后一步和长草稿；无外网请求、404、请求失败或 pageerror。
-18 张测试原图已保存并实际查看代表图；独立视觉另拍宽屏与窄短图。
-完整行为与测试修正记录见 [tests/REVIEW](../../examples/protecting-pandas/tests/REVIEW.md)。
+The browser ran six slides × 1440×900, 390×844 and 1280×330 fully expanded, including the cover's last step and long drafts; there were no external network requests, 404s, failed requests or pageerror.
+18 test original images were saved and representative ones actually viewed; independent visual review separately shot wide-screen and narrow/short images.
+The complete behavior and test fix record is in [tests/REVIEW](../../examples/protecting-pandas/tests/REVIEW.md).
 
-最终候选脚本 `chunk-0cehad9c.js`，manifest SHA256 为
-`a5ecd3b6cda6b3b5bf1cac05f50c83694a7a6eb62c6634d9bcf2baffb3ca5965`。
-验证后复制候选资源、逐字节核对，再原子替换 live index；保留既有 `13014` 服务与已加载资源，没有杀用户服务或无关进程。
-更新后 HTTP 200，manifest 与最终候选一致，刷新即可使用新版本。
+The final candidate script is `chunk-0cehad9c.js`, and the manifest SHA256 is
+`a5ecd3b6cda6b3b5bf1cac05f50c83694a7a6eb62c6634d9bcf2baffb3ca5965`.
+After verification the candidate assets were copied, checked byte for byte, and then the live index was replaced atomically; the existing `13014` service and loaded assets were kept, and no user service or unrelated process was killed.
+After the update it returned HTTP 200, the manifest matched the final candidate, and a refresh uses the new version.
 
-代表性“问题与后果”页原图已保存 Library；完整身份与本地文件对应在忽略目录
-`artifacts/protecting-pandas-review/library-upload.json`，交付消息直接给完整 ID。
-规范同时补入创作 skill 和布局指南：课堂选项展开，按钮匹配演示视觉，导航与课堂交互分开。
+The representative "Questions and consequences" original image was saved to Library; the full identity and its local file correspondence are in the ignored directory `artifacts/protecting-pandas-review/library-upload.json`, and the delivery message gives the full ID directly.
+The specification was also added to the authoring skill and layout guide: classroom options expand, buttons match the presentation visuals, and navigation is separate from classroom interaction.
 
-本轮没有修改 Meowtail runtime，不重跑旧作品或整库全部浏览器矩阵，不做 tarball/registry/发布验收。
-已观察 Safari 首版真实打开和 Chrome 最终行为；未做 Safari 最终完整矩阵、Firefox、人工屏幕阅读器、实体手机或真实教室投影及学习成效观察。
-窄短窗口保持画布整体缩放，控件可达不等于手机正文可读；不承诺 file://、任意部署子路径、云端保存或 PPTX/PDF 导出。
+This round did not modify the Meowtail runtime, did not rerun the old work or the full library browser matrix, and did not do tarball/registry/release acceptance.
+The Safari first-version real opening and Chrome final behavior were observed; the Safari final full matrix, Firefox, manual screen readers, physical phones, real classroom projection and learning-outcome observation were not done.
+Narrow/short windows keep whole-canvas scaling; control reachability does not mean phone body text is readable; file://, arbitrary deployment subpaths, cloud saving and PPTX/PDF export are not promised.

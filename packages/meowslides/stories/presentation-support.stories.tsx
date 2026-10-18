@@ -31,11 +31,12 @@ function ActivityStatus({ name }: { name: string }) {
 
 export const PresentationSupportStory = defineStory({
   id: "presentation-support",
-  title: "演示显隐 · 可撤回的内容区域",
-  group: "演示与媒体",
+  title: "Presentation show and hide · Withdrawable content areas",
+  group: "Presentation and media",
   component: "Reveal",
-  variant: "受控显隐与步骤组合",
-  description: "when 与 at 使用相同生命周期；隐藏保留布局和草稿，嵌套内容遵守祖先活动许可。",
+  variant: "Controlled visibility and step composition",
+  description:
+    "when and at use the same lifecycle; hiding keeps layout and draft, and nested content follows the ancestor activity permission.",
   covers: [
     "controlled visibility",
     "retained geometry",

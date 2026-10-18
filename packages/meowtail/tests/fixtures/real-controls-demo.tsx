@@ -196,29 +196,32 @@ export const RealControlsDemo = defineComponent(
         className="real-controls real-stack"
       >
         <header>
-          <h1>真实组件 · 参数化主题</h1>
-          <p>Button 与 Alert 使用同一套组件契约；根默认值、条件来源与 part 绑定由主题组装。</p>
+          <h1>Real components · Parameterized theme</h1>
+          <p>
+            Button and Alert share one set of component contracts; root defaults, conditional
+            sources, and part bindings are assembled by the theme.
+          </p>
         </header>
         <nav className="real-row">
           <Button
             variant="outline"
             onClick={() => config.set(controlsOptions.select({ scheme: "dark" }))}
           >
-            切换深色
+            Switch to dark
           </Button>
           <Button
             variant="outline"
             onClick={() => config.set(controlsOptions.select({ density: "compact" }))}
           >
-            切换紧凑
+            Switch to compact
           </Button>
           <Button variant="outline" onClick={() => config.set(controlsOptions.select({}))}>
-            恢复主题默认
+            Restore theme defaults
           </Button>
-          <a href="/">原始原型</a>
+          <a href="/">Original prototype</a>
         </nav>
         <section className="real-panel real-stack">
-          <h2>真实 Button：样式选项与表单行为</h2>
+          <h2>Real Button: style options and form behavior</h2>
           <form
             className="real-row"
             onSubmit={(event: Event) => {
@@ -228,77 +231,77 @@ export const RealControlsDemo = defineComponent(
           >
             <input
               id="real-draft"
-              aria-label="真实草稿"
+              aria-label="Real draft"
               name="draft"
-              placeholder="输入后切换配置"
+              placeholder="Type, then switch configuration"
             />
             <Button id="real-button" type="submit" variant={variant}>
-              提交
+              Submit
             </Button>
             <Button id="real-disabled" disabled type="submit">
-              禁用提交
+              Disabled submit
             </Button>
             <output id="real-submitted">{submitted}</output>
           </form>
           <div className="real-row">
             <Button variant="quiet" onClick={() => variant.set("quiet")}>
-              使用 quiet
+              Use quiet
             </Button>
             <Button variant="quiet" onClick={() => variant.set(undefined)}>
-              恢复 Button 默认
+              Restore Button defaults
             </Button>
             <Button id="real-small" size="small">
-              小尺寸
+              Small size
             </Button>
-            <Button size="large">大尺寸</Button>
+            <Button size="large">Large size</Button>
           </div>
           <div className="real-token-override">
             <Button id="real-reset" variant="outline">
-              实例常量不继承外层覆盖
+              Instance constants do not inherit outer overrides
             </Button>
           </div>
         </section>
         <section className="real-panel real-stack">
-          <h2>局部只覆盖 density</h2>
+          <h2>Local override covers density only</h2>
           <div className="real-row">
             <Button
               variant="quiet"
               onClick={() => local.set(controlsOptions.select({ density: "compact" }))}
             >
-              局部 compact
+              Local compact
             </Button>
             <Button variant="quiet" onClick={() => local.set(controlsOptions.select({}))}>
-              撤销局部配置
+              Remove local configuration
             </Button>
           </div>
           <Theme config={local} id="real-local">
-            <Button id="real-local-button">局部按钮</Button>
+            <Button id="real-local-button">Local button</Button>
           </Theme>
         </section>
         <section className="real-stack">
-          <h2>真实 Alert：多 part 与嵌套实例</h2>
+          <h2>Real Alert: multiple parts and nested instances</h2>
           <div className="real-row">
             <Button variant="quiet" onClick={() => tone.set("info")}>
-              外层改为 info
+              Outer tone to info
             </Button>
             <Button variant="quiet" onClick={() => tone.set(undefined)}>
-              恢复 Alert 默认
+              Restore Alert defaults
             </Button>
           </div>
           <Alert
             id="real-outer"
             tone={tone}
-            title="外层告警"
+            title="Outer alert"
             role="alert"
             actions={
               <Button size="small" variant="outline">
-                查看详情
+                View details
               </Button>
             }
           >
-            <p>外层强调不会覆盖内层的默认 tone。</p>
-            <Alert id="real-inner" title="内层默认提示">
-              保留独立默认值与 status 语义。
+            <p>The outer emphasis does not override the inner default tone.</p>
+            <Alert id="real-inner" title="Inner default notice">
+              Keeps its own default value and status semantics.
             </Alert>
           </Alert>
         </section>

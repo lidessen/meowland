@@ -1,84 +1,84 @@
-# 教学研究到演示创作的消化
+# From teaching research to presentation authoring
 
-日期：2026-10-18。范围是方法与设计落实，不是新增教学组件的实施授权。
-本页记录方法阶段；用户随后另行授权的实际浏览器课件见 [Protecting pandas 实作回执](../records/2026-10-18-protecting-pandas.md)，不以本页历史范围替代后续交付。
-入口已经更新到 [presentation-authoring skill](../../.agents/skills/presentation-authoring/SKILL.md) 的课件段；
-可直接借用的方法与唯一贯穿案例在[教学片段与可撤回支架](../../packages/meowtail/PRESENTATION-LAYOUTS.md#教学片段与可撤回支架)。
-不改已有课件、用户材料或运行时 API。
+Date: 2026-10-18. The scope is method and design follow-through, not implementation authorization for new teaching components.
+This page records the method phase; the actual browser courseware later authorized separately by the user is covered in the [Protecting pandas implementation receipt](../records/2026-10-18-protecting-pandas.md), and this page's historical scope does not replace later delivery.
+The entry point has been updated to the courseware section of the [presentation-authoring skill](../../.agents/skills/presentation-authoring/SKILL.md);
+methods that can be borrowed directly and the single running case are in [Teaching segments and retractable scaffolds](../../packages/meowslides/PRESENTATION-LAYOUTS.md#teaching-segments-and-retractable-scaffolds).
+It does not change existing courseware, user materials, or the runtime API.
 
-贯穿案例按用户明确指定统一为“八上 Unit 5 Wild animals — Reading: Protecting pandas”；
-标题不表示已核定教材版次或页码。活动、提问与句框标为教学改编，未核验的教材原句不补造。
-八下 Sunshine for all / Welcome 仍是另一件可运行作品，不更名、不替换。
+As explicitly specified by the user, the running case is uniformly "Grade 8, Volume 1, Unit 5 Wild animals — Reading: Protecting pandas";
+the title does not imply an approved textbook edition or page numbers. Activities, questions, and sentence frames are marked as teaching adaptations, and unverified original textbook sentences are not invented.
+"Sunshine for all / Welcome" for Grade 8, Volume 2 remains a separate runnable work; it is not renamed or replaced.
 
-## 依据与适用限度
+## Basis and limits of applicability
 
-本次依据是移交的研究任务 `01a14d3a-5234-733b-896f-d318a67fe024` 的完整分段阅读结论与用户提供的研究摘要，
-没有重新打开七篇文章、原 PPT 或 HTML，也没有访问被拒绝的微信 URL。下面是研究到创作判断的映射，
-不是本轮亲自运行这些材料的回执，也不把个案反思当作已证明的普遍教学规律。
+This basis is the complete segmented-reading conclusions of the handed-over research task `01a14d3a-5234-733b-896f-d318a67fe024` plus the research summary provided by the user;
+the seven articles, the original PPT, and the HTML were not reopened, and the denied WeChat URL was not accessed. The mapping below goes from research to authoring decisions;
+it is not a receipt for running these materials first-hand this round, and individual case reflections are not treated as proven universal teaching principles.
 
-| 材料中的线索                                                           | 改变后续创作的判断                                                                         |
-| ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------ |
-| 朱琳：成长时间表、生存条件到圈养生活的判断                             | 先让学生从材料形成依据；标题、提示和教师结论不可抢先完成学生的判断                         |
-| 袁露露：摄影展动物拓展阅读与问题定位                                   | 按本课时学生产出选择材料，拓展量不能替代明确目标                                           |
-| 徐程炜：困境、施助者、措施关系与首尾照应；反思过满、口语过难、依赖提示 | 关系需要原文可追溯；减少密度并试真实口语，支架要能撤回，不能只添加更多提示                 |
-| 冯瑞琦：已有知识、AI、课本录音记录转为表达；前段讨论挤占分享           | 来源分开，记录要转成学生表达；预算给分享和反馈，不让前段消耗全部时间                       |
-| 徐亚美：判断加原句证据，Problems / Results；静态全展开过载             | 区分学生判断、依据与参考解释，按关键状态审查信息量，不只看最终页                           |
-| 王梦芸：主体措施到个人行动、首尾语句并置                               | 连线和并置表达关系，不把装饰曲线当数据；配对正确不等于理解有效性，开放行动允许不同合理答案 |
-| 沈倩：时间线、问题措施到复述与写信；强者汇报多、听众多                 | 将材料整理转为每人的可观察产出，分享时听众也有核对或修订任务                               |
+| Clue in the material                                                                                                                                             | Decision that changed later authoring                                                                                                                                                   |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Zhu Lin: growth timeline, survival conditions, and the judgment about life in captivity                                                                          | Let students form evidence from the material first; titles, prompts, and teacher conclusions must not preempt students' judgment                                                        |
+| Yuan Lulu: photography-exhibition animal extension reading and problem positioning                                                                               | Choose materials based on this lesson's student output; extension volume cannot replace clear objectives                                                                                |
+| Xu Chengwei: plight, helpers, and relations among measures plus opening/closing echo; over-full reflection, overly hard spoken language, and reliance on prompts | Relations must be traceable in the source text; reduce density and test real spoken output; scaffolding must be retractable, not just more prompts                                      |
+| Feng Ruiqi: prior knowledge, AI, and textbook recording notes turned into expression; early discussion crowding out sharing                                      | Keep sources separate and turn records into student expression; budget time for sharing and feedback, and do not let the opening consume all the time                                   |
+| Xu Yamei: judgment plus original-sentence evidence, Problems / Results; static fully expanded overload                                                           | Separate student judgment, evidence, and reference explanation; audit information load at key states, not only the final page                                                           |
+| Wang Mengyun: from main measures to personal action, with opening and closing sentences juxtaposed                                                               | Lines and juxtaposition express relations; decorative curves are not data. Correct matching does not equal effective understanding, and open actions allow different reasonable answers |
+| Shen Qian: timeline and problem measures through retelling and letter writing; stronger students report a lot and listeners are many                             | Turn material organization into observable output per student; during sharing, listeners also get checking or revision tasks                                                            |
 
-16 页真实 PPT 的研究区分了图片配对连线、分步答案、源文高亮后提取归类、稳定复述句框、问题与提示/参考解释分离、开放表达。
-其 69 次进入效果只有两种样式，说明值得保留的是出现顺序，不能据效果数量推出需要更多 transition。
-QuickLook 静态渲染有字体裁切和动画同显限制；这些材料线索不能冒充已实际播放或完成交互验收。
+The research on a real 16-page PPT distinguished image-matching lines, stepwise answers, highlight-then-extract-and-classify from the source text, stable retelling sentence frames, separation of questions from prompts/reference explanations, and open expression.
+Its 69 entrance effects use only two styles, which shows that what is worth keeping is the order of appearance; the number of effects does not imply a need for more transitions.
+QuickLook static rendering has font clipping and animation-simultaneity limitations; these material clues cannot stand in for actual playback or completed interaction acceptance.
 
-HTML 熊猫成长材料只研究了静态源码：四阶段同步图文视频与句框练习，八空可单个/全部反复显隐，切阶段重置。
-它没有学生输入评分或选词创作 UI；尚未实际运行，键盘和辅助技术缺口也未作浏览器复现。
-中文标题或句框可能泄露答案，AI 视频不能作为真实个体的事实证据。未来借鉴时需要逐项实测，
-不把“源码里存在开关”写成“学生可访问地完成练习”。
+The HTML panda-growth material was studied only as static source: four stages synchronize text, image, and video with sentence-frame practice; eight blanks can be shown and hidden individually or all together, repeatedly; changing stages resets.
+It has no student-input scoring or word-choice authoring UI; it has not been actually run, and keyboard and assistive-technology gaps have not been reproduced in a browser.
+Chinese titles or sentence frames may leak answers, and AI video cannot serve as factual evidence of a real individual. Future borrowing requires testing each item in practice;
+"a toggle exists in the source" is not written up as "students can accessibly complete the exercise".
 
-## 创作时怎样使用
+## How to use it while authoring
 
-每个片段用学生任务、产出、依据、反馈约束内容和状态，不强制先交完整教案、批准大纲或给每页填四栏。
-先将一个关键片段与视觉、素材、互动一起运行，再按预览反馈删减、改题或调整支架；每轮处理最重要的少数问题。
-已经选定的风格和结构沿用，研究不成为重做全场的理由。
+Each segment constrains content and state through student tasks, output, evidence, and feedback; there is no requirement to first submit a complete lesson plan, get an outline approved, or fill four columns for every page.
+Run one key segment together with its visuals, assets, and interactions first, then trim, change questions, or adjust scaffolding based on preview feedback; handle the most important few problems each round.
+Keep the already-chosen style and structure; research is not a reason to redo the whole presentation.
 
-问题、定位提示、参考表达和依据标记各自选择出现时机；原始阅读材料应可查。
-完整表达、关键词、句框与独立表达是可选的支持层级，可以撤回和再次请求，不是固定教学流水线。
-步骤前进不等于支架必须增加，回退不等于擦除学生输入；切材料与明确重做才按创作意图重置对应状态。
-记录一份可调整的片段时间预算，保留独立产出、同伴表达、听众任务与反馈机会，不把自动计时用作揭晓许可。
+Choose the appearance timing separately for questions, location prompts, reference expressions, and evidence markers; the original reading material should be consultable.
+Complete expressions, keywords, sentence frames, and independent expression are optional support levels that can be withdrawn and requested again; they are not a fixed teaching pipeline.
+Advancing steps does not mean scaffolding must increase, and going back does not mean erasing student input; only switching materials and an explicit redo reset the corresponding state according to authoring intent.
+Keep an adjustable per-segment time budget that preserves independent output, peer expression, listener tasks, and feedback opportunities; automatic timing is not used as permission to reveal.
 
-Protecting pandas 案例沿成长信息、问题/后果、保护措施到有依据的个人行动表达推进，
-从整理材料走到解释关系和提出行动，不靠配对完成或一个教师答案收束所有建议。
-问题、提示、参考答案与原文依据标记分别控制，完整示例、关键词与句框可逐步撤回并恢复。
-成长节点和具体问题仍需核对原文；研究过材料组织，不等于已经逐句核验教材或实际运行原 PPT。
-它只在使用指南维护一份，未加进 gallery 或现有课程；无需为方法消化制造一个新产品组件。
+The Protecting pandas case moves along growth information, problems/consequences, and protection measures to evidence-based personal action expression:
+from organizing material to explaining relations and proposing actions, without closing out all suggestions with a completed matching exercise or a single teacher answer.
+Questions, prompts, reference answers, and original-text evidence markers are controlled separately; complete examples, keywords, and sentence frames can be withdrawn and restored step by step.
+Growth nodes and specific questions still need to be checked against the source text; studying material organization is not the same as verifying the textbook sentence by sentence or actually running the original PPT.
+It is maintained in only one usage guide, not added to the gallery or existing courses; there is no need to create a new product component just to digest the method.
 
-## 已实现与候选需求
+## Implemented capabilities and candidate needs
 
-现行能力以[包 README](../../packages/meowtail/README.md)、public exports 与源码合同为准。
+Current capabilities are defined by the [package README](../../packages/meowtail/README.md), public exports, and source contracts.
 
-| 状态           | 能力与边界                                                                                                                        |
-| -------------- | --------------------------------------------------------------------------------------------------------------------------------- |
-| 已实现         | 单一 slide/step 位置、累计 Reveal、媒体活动许可与清理；布局、文字排印、背景、入场 transition；普通作品 signals 持有输入和局部状态 |
-| 现有能力的用法 | Reveal 控制先后并保留几何；静态句框可以不动画；背景不承担证据；transition 不承担教学状态；这些能力不自动完成支架撤回、答题或评价  |
-| 优先验证的候选 | 选词挖空与单个/全部可逆显隐：先分清作者编辑和学生作答，明确可达名称、焦点、答案隐藏、反复切换及分阶段重置；不预设评分系统         |
-| 随真实困难验证 | 证据高亮和关系连线：保留原文定位、文字等价关系、键盘路径，区别配对与有效性评估；源文修改和重排后关系不可悬空                      |
-| 贯穿的设计约束 | 支架层级：每层可直接重现，能撤回/恢复，不擦草稿、不在切页重进时意外泄题；先由作品状态表达，出现重复困难才考虑共享结构             |
+| Status                             | Capability and boundary                                                                                                                                                                                                                                                              |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Implemented                        | Single slide/step position, cumulative Reveal, media activity permission and cleanup; layout, typography, backgrounds, entrance transitions; plain-work signals holding input and local state                                                                                        |
+| Usage of existing capabilities     | Reveal controls order and keeps geometry; static sentence frames can stay unanimated; backgrounds do not carry evidence; transitions do not carry teaching state; these capabilities do not automatically handle scaffolding withdrawal, answering, or assessment                    |
+| Candidates to validate first       | Word choice and fill-in-the-blank with individual/all reversible show-hide: first separate author editing from student answering, and specify accessible names, focus, answer hiding, repeated toggling, and per-stage reset; do not presuppose a scoring system                     |
+| Validate against real difficulties | Evidence highlighting and relation lines: keep source-text positioning, text-equivalence relations, and keyboard paths, and distinguish matching from effectiveness assessment; relations must not dangle after source text changes or reordering                                    |
+| Cross-cutting design constraint    | Scaffolding levels: each level can be reproduced directly and can be withdrawn/restored without erasing drafts or accidentally leaking answers when re-entering a slide; express it through work state first, and consider shared structures only after repeated difficulties appear |
 
-优先级来自当前材料反复出现的创作需要，不是本轮同时实施三类新 API 的计划。
-若进入实现，先选一个真实片段复现现有组合的具体不足，比较小组合和共享组件，
-经独立审查明确 owner、状态与可访问性边界后再补最小能力；不引入课件 DSL、自动评分或教学平台。
+The priorities come from authoring needs that recur in the current materials; they are not a plan to implement three kinds of new API in this round.
+If implementation starts, first pick one real segment and reproduce the specific shortcomings of the current composition, compare small compositions with shared components,
+and add the minimal capability only after an independent review clarifies owner, state, and accessibility boundaries; no courseware DSL, automatic scoring, or teaching platform is introduced.
 
-## 复看与退出
+## Review and exit
 
-关键状态至少包括该片段实际使用的未提示、提示、参考解释、依据标记、支架撤回/恢复、回退和明确重做。
-先查看初始标题、图注与句框是否泄题，再看长草稿、目标尺寸及窄短窗口；
-操作验证同时检查键盘、焦点、隐藏内容的辅助技术可见性、媒体许可与状态保留，不能用全展开截图替代。
-课堂参与和时间预算保留待真实使用后调整，不从浏览器测试推断学习成效。
+Key states include at least the unhinted, hinted, reference-explanation, evidence-marker, scaffolding-withdrawn/restored, back, and explicit-redo states actually used by the segment.
+First check whether initial titles, captions, and sentence frames leak answers, then look at long drafts, the target size, and narrow/short windows;
+operational verification also checks keyboard, focus, assistive-technology visibility of hidden content, media permission, and state retention, and a fully expanded screenshot cannot substitute for it.
+Classroom participation and time budget remain to be adjusted after real use; learning outcomes are not inferred from browser tests.
 
-本轮交付边界是 skill 的行动指引、指南中的教学改编案例与设计约束；没有新代码、截图或课堂实验。
-旧材料的事实、研究局限和当前 API 分开，后续用实际创作反馈收敛，不无限扩充规则或功能清单。
+This round's delivery boundary is the skill's action guidance plus the teaching-adaptation case and design constraints in the guide; there is no new code, screenshot, or classroom experiment.
+Facts from the old materials, research limitations, and the current API are kept separate; later real authoring feedback will converge them, without endlessly expanding rules or feature lists.
 
-前次 `584650d` 的独立审查澄清了口头产出、无需技术开关的支架撤回、隐藏并非权限及因果判断边界，
-另由非作者试作八分钟阅读片段方案；该试读使用更换前的案例，不冒充本次 Protecting pandas 成品验收。
-本次按用户指定更换指导案例，保留上述方法边界，检查案例名称、链接、格式与 skill；
-只改 Markdown，未重跑类型、构建、单测或浏览器矩阵，也未开发完整课件或验证课堂学习成效。
+The independent review at `584650d` clarified oral output, scaffolding withdrawal without requiring a technical toggle, hiding not being permission, and the boundary of causal judgment,
+and a non-author also trial-ran an eight-minute reading-segment plan; that trial used the case from before the switch and does not pass as acceptance of this Protecting pandas deliverable.
+This time the guiding case was switched as specified by the user, the method boundaries above were retained, and the case name, links, format, and skill were checked;
+only Markdown changed, and no typecheck, build, unit test, or browser matrix was rerun, nor was complete courseware developed or classroom learning outcome verified.

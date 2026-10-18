@@ -13,7 +13,7 @@ export function Placeholder({
     <div
       data-meowbook-placeholder={label}
       role="img"
-      aria-label={`${label} 占位`}
+      aria-label={`${label} placeholder`}
       style={{
         height: `${height}px`,
         width: typeof width === "number" ? `${width}px` : width,

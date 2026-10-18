@@ -15,7 +15,7 @@ export const ChatTaskFixture = defineStory({
   title: "Task record boundaries",
   render: () => {
     const state = signal<ChatExecutionState>("queued");
-    const status = signal("Queued for an available worker · 等待可用的审查者");
+    const status = signal("Queued for an available worker · Waiting for an available reviewer");
     const execution = signal<string | undefined>(undefined);
     const reply = signal<string | undefined>(undefined);
     const progress = signal<ChatTaskProgress | undefined>(undefined);
@@ -26,11 +26,11 @@ export const ChatTaskFixture = defineStory({
           <Button
             onClick={() => {
               state.value = "running";
-              status.value = "Review in progress · 正在检查长文本";
+              status.value = "Review in progress · Checking the long text";
               progress.value = {
                 value: 1,
                 max: 3,
-                label: "Reviewed 1 of 3 sources · 已检查一项来源",
+                label: "Reviewed 1 of 3 sources · One source checked",
               };
             }}
           >
@@ -40,8 +40,9 @@ export const ChatTaskFixture = defineStory({
             onClick={() => {
               state.value = "success";
               status.value = "Execution returned successfully";
-              execution.value = "执行已返回。所有三项来源已完成检查。";
-              reply.value = "Waiting for the author to publish the reply · 等待作者发布回复";
+              execution.value = "Execution returned. All three sources have been checked.";
+              reply.value =
+                "Waiting for the author to publish the reply · Awaiting the author's reply";
               progress.value = { value: 3, max: 3, label: "Reviewed all 3 sources" };
             }}
           >
@@ -49,10 +50,12 @@ export const ChatTaskFixture = defineStory({
           </Button>
         </Inline>
         <ChatTask
-          title={"Review the shared component contract · 检查组件组合边界与长标题 ".repeat(3)}
+          title={"Review the shared component contract · Checking composition boundaries and long titles ".repeat(
+            3,
+          )}
           state={state}
           statusLabel={status}
-          description={"A long English description must wrap alongside 中文说明 without widening a narrow task record. ".repeat(
+          description={"A long English description must wrap alongside a supplementary explanation without widening a narrow task record. ".repeat(
             3,
           )}
           executionText={execution}

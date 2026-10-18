@@ -39,4 +39,11 @@ export const pageHeaderStyles = css`
     flex-wrap: wrap;
     gap: ${uiTokens.spaceGroup};
   }
+
+  @media (pointer: coarse) {
+    ${header("actions")}[data-meowui-part] > * {
+      min-width: 44px;
+      min-height: 44px;
+    }
+  }
 `;

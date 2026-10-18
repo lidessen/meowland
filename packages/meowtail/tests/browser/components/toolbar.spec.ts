@@ -6,9 +6,9 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("actions have one Tab entry and retain native activation", async ({ page }) => {
-  const toolbar = page.getByRole("toolbar", { name: "筛选与预览", exact: true });
-  const update = toolbar.getByRole("button", { name: "更新预览" });
-  const help = toolbar.getByRole("link", { name: "查看工具栏说明" });
+  const toolbar = page.getByRole("toolbar", { name: "Filter and preview", exact: true });
+  const update = toolbar.getByRole("button", { name: "Update preview" });
+  const help = toolbar.getByRole("link", { name: "View toolbar notes" });
   await update.focus();
   await page.keyboard.press("End");
   await expect(help).toBeFocused();
@@ -35,10 +35,10 @@ test("actions have one Tab entry and retain native activation", async ({ page })
 test("mixed editors and a choice selector retain their own keys and Tab stops", async ({
   page,
 }) => {
-  const toolbar = page.getByRole("toolbar", { name: "筛选与预览", exact: true });
-  const update = toolbar.getByRole("button", { name: "更新预览" });
-  const input = toolbar.getByRole("textbox", { name: "筛选预览" });
-  const select = toolbar.getByRole("combobox", { name: "预览标注" });
+  const toolbar = page.getByRole("toolbar", { name: "Filter and preview", exact: true });
+  const update = toolbar.getByRole("button", { name: "Update preview" });
+  const input = toolbar.getByRole("textbox", { name: "Filter preview" });
+  const select = toolbar.getByRole("combobox", { name: "Preview annotations" });
   await update.focus();
   await page.keyboard.press("Tab");
   await expect(input).toBeFocused();
@@ -51,23 +51,23 @@ test("mixed editors and a choice selector retain their own keys and Tab stops", 
   await select.selectOption("off");
   // Inline native options avoid the OS popup, which headless Chromium cannot drive on macOS.
   await select.evaluate((element) => element.setAttribute("size", "3"));
-  const options = toolbar.getByRole("listbox", { name: "预览标注" });
+  const options = toolbar.getByRole("listbox", { name: "Preview annotations" });
   await page.keyboard.press("ArrowDown");
   await expect(options).toBeFocused();
   await expect(options).toHaveValue("controls");
-  const choice = toolbar.getByRole("button", { name: "预览外观" });
+  const choice = toolbar.getByRole("button", { name: "Preview appearance" });
   await choice.focus();
   await page.keyboard.press("ArrowDown");
-  await expect(page.getByRole("listbox", { name: "预览外观" })).toBeVisible();
+  await expect(page.getByRole("listbox", { name: "Preview appearance" })).toBeVisible();
   await page.keyboard.press("End");
   await expect(
     page
-      .getByRole("listbox", { name: "预览外观" })
-      .getByRole("option", { name: "深色", exact: true }),
+      .getByRole("listbox", { name: "Preview appearance" })
+      .getByRole("option", { name: "Dark", exact: true }),
   ).toBeFocused();
   await page.keyboard.press("Enter");
   await expect(choice).toBeFocused();
-  await expect(choice).toContainText("深色");
+  await expect(choice).toContainText("Dark");
   await page.keyboard.press("Shift+Tab");
   await expect(options).toBeFocused();
   await page.keyboard.press("Tab");
@@ -75,38 +75,41 @@ test("mixed editors and a choice selector retain their own keys and Tab stops", 
 });
 
 test("orientation, RTL and nested toolbars use distinct action collections", async ({ page }) => {
-  const preview = page.getByRole("toolbar", { name: "预览操作", exact: true });
+  const preview = page.getByRole("toolbar", { name: "Preview actions", exact: true });
   await preview.evaluate((element) => element.setAttribute("dir", "rtl"));
-  const desktop = preview.getByRole("button", { name: "桌面", exact: true });
-  const reset = preview.getByRole("button", { name: "重置预览" });
+  const desktop = preview.getByRole("button", { name: "Desktop", exact: true });
+  const reset = preview.getByRole("button", { name: "Reset preview" });
   await desktop.focus();
   await page.keyboard.press("ArrowRight");
   await expect(reset).toBeFocused();
-  const vertical = page.getByRole("toolbar", { name: "画布操作", exact: true });
-  await vertical.getByRole("button", { name: "缩小画布" }).focus();
+  const vertical = page.getByRole("toolbar", { name: "Canvas actions", exact: true });
+  await vertical.getByRole("button", { name: "Zoom out canvas" }).focus();
   await page.keyboard.press("ArrowDown");
-  await expect(vertical.getByRole("button", { name: "放大画布" })).toBeFocused();
+  await expect(vertical.getByRole("button", { name: "Zoom in canvas" })).toBeFocused();
   await page.keyboard.press("Home");
-  await expect(vertical.getByRole("button", { name: "缩小画布" })).toBeFocused();
-  const outer = page.getByRole("toolbar", { name: "编辑与画布", exact: true });
-  await outer.getByRole("button", { name: "保存布局" }).focus();
+  await expect(vertical.getByRole("button", { name: "Zoom out canvas" })).toBeFocused();
+  const outer = page.getByRole("toolbar", { name: "Editing and canvas", exact: true });
+  await outer.getByRole("button", { name: "Save layout" }).focus();
   await page.keyboard.press("ArrowRight");
-  await expect(outer.getByRole("button", { name: "取消编辑" })).toBeFocused();
-  const nested = page.getByRole("toolbar", { name: "画布缩放", exact: true });
-  await nested.getByRole("button", { name: "缩小预览" }).focus();
+  await expect(outer.getByRole("button", { name: "Cancel editing" })).toBeFocused();
+  const nested = page.getByRole("toolbar", { name: "Canvas zoom", exact: true });
+  await nested.getByRole("button", { name: "Zoom out preview" }).focus();
   await page.keyboard.press("ArrowRight");
-  await expect(nested.getByRole("button", { name: "放大预览" })).toBeFocused();
-  await expect(outer.getByRole("button", { name: "程序入口" })).toHaveAttribute("tabindex", "-1");
+  await expect(nested.getByRole("button", { name: "Zoom in preview" })).toBeFocused();
+  await expect(outer.getByRole("button", { name: "Programmatic entry point" })).toHaveAttribute(
+    "tabindex",
+    "-1",
+  );
 });
 
 test("dynamic exclusion and caller opt-out leave a reachable entry without stealing focus", async ({
   page,
 }) => {
-  const toolbar = page.getByRole("toolbar", { name: "预览操作", exact: true });
-  const desktop = toolbar.getByRole("button", { name: "桌面", exact: true });
-  const mobile = toolbar.getByRole("button", { name: "移动端", exact: true });
-  const reset = toolbar.getByRole("button", { name: "重置预览" });
-  const outside = page.getByRole("textbox", { name: "筛选预览" });
+  const toolbar = page.getByRole("toolbar", { name: "Preview actions", exact: true });
+  const desktop = toolbar.getByRole("button", { name: "Desktop", exact: true });
+  const mobile = toolbar.getByRole("button", { name: "Mobile", exact: true });
+  const reset = toolbar.getByRole("button", { name: "Reset preview" });
+  const outside = page.getByRole("textbox", { name: "Filter preview" });
   await reset.focus();
   await outside.focus();
   await reset.evaluate((element) => element.setAttribute("hidden", ""));
@@ -136,8 +139,8 @@ test("dynamic exclusion and caller opt-out leave a reachable entry without steal
 });
 
 test("a consumed action key is not handled again by Toolbar", async ({ page }) => {
-  const toolbar = page.getByRole("toolbar", { name: "预览操作", exact: true });
-  const desktop = toolbar.getByRole("button", { name: "桌面", exact: true });
+  const toolbar = page.getByRole("toolbar", { name: "Preview actions", exact: true });
+  const desktop = toolbar.getByRole("button", { name: "Desktop", exact: true });
   await desktop.evaluate((element) => {
     element.addEventListener("keydown", (event) => event.preventDefault());
   });
@@ -150,7 +153,7 @@ test("unmount restores owned tabindex while preserving a pending caller change",
   page,
 }) => {
   const result = await page.evaluate(() => {
-    const toolbar = document.querySelector('[role="toolbar"][aria-label="预览操作"]')!;
+    const toolbar = document.querySelector('[role="toolbar"][aria-label="Preview actions"]')!;
     const [desktop, mobile, reset] = [...toolbar.querySelectorAll("button")];
     mobile!.setAttribute("tabindex", "3");
     // pagehide invokes the actual canvas renderer's unmount, before the observer callback.
@@ -162,7 +165,7 @@ test("unmount restores owned tabindex while preserving a pending caller change",
 
 test("an open shadow root retains the last action as its return Tab entry", async ({ page }) => {
   await page.evaluate(() => {
-    const toolbar = document.querySelector('[role="toolbar"][aria-label="预览操作"]')!;
+    const toolbar = document.querySelector('[role="toolbar"][aria-label="Preview actions"]')!;
     const host = document.createElement("div");
     host.id = "toolbar-shadow-host";
     toolbar.before(host);
@@ -172,9 +175,9 @@ test("an open shadow root retains the last action as its return Tab entry", asyn
     after.setAttribute("aria-label", "After shadow toolbar");
     shadow.append(after);
   });
-  const toolbar = page.getByRole("toolbar", { name: "预览操作", exact: true });
-  const desktop = toolbar.getByRole("button", { name: "桌面", exact: true });
-  const reset = toolbar.getByRole("button", { name: "重置预览" });
+  const toolbar = page.getByRole("toolbar", { name: "Preview actions", exact: true });
+  const desktop = toolbar.getByRole("button", { name: "Desktop", exact: true });
+  const reset = toolbar.getByRole("button", { name: "Reset preview" });
   await desktop.focus();
   await page.keyboard.press("End");
   await expect(reset).toBeFocused();
@@ -194,9 +197,9 @@ test("an open shadow root retains the last action as its return Tab entry", asyn
 test("media-query hiding the current entry recomputes on resize and actions wrap", async ({
   page,
 }) => {
-  const toolbar = page.getByRole("toolbar", { name: "预览操作", exact: true });
-  const desktop = toolbar.getByRole("button", { name: "桌面", exact: true });
-  const mobile = toolbar.getByRole("button", { name: "移动端", exact: true });
+  const toolbar = page.getByRole("toolbar", { name: "Preview actions", exact: true });
+  const desktop = toolbar.getByRole("button", { name: "Desktop", exact: true });
+  const mobile = toolbar.getByRole("button", { name: "Mobile", exact: true });
   await desktop.evaluate((element) => (element.id = "responsive-toolbar-action"));
   await page.addStyleTag({
     content: "@media (max-width: 500px) { #responsive-toolbar-action { display: none; } }",
@@ -204,7 +207,7 @@ test("media-query hiding the current entry recomputes on resize and actions wrap
   await page.setViewportSize({ width: 390, height: 844 });
   await expect(desktop).toBeHidden();
   await expect(mobile).toHaveAttribute("tabindex", "0");
-  const mixed = page.getByRole("toolbar", { name: "筛选与预览", exact: true });
+  const mixed = page.getByRole("toolbar", { name: "Filter and preview", exact: true });
   const bounds = await mixed.evaluate((element) => ({
     width: element.clientWidth,
     scroll: element.scrollWidth,
@@ -221,12 +224,12 @@ test("the actual Meowbook toolbar retains its native Select and action navigatio
   page,
 }) => {
   await page.goto("/?story=toolbar");
-  const toolbar = page.getByRole("toolbar", { name: "预览工具", exact: true });
-  const desktop = toolbar.getByRole("button", { name: "桌面", exact: true });
+  const toolbar = page.getByRole("toolbar", { name: "Preview tools", exact: true });
+  const desktop = toolbar.getByRole("button", { name: "Desktop", exact: true });
   await desktop.focus();
   await page.keyboard.press("End");
-  await expect(toolbar.getByRole("button", { name: "文字占位" })).toBeFocused();
-  const select = toolbar.getByRole("combobox", { name: "标注类别" });
+  await expect(toolbar.getByRole("button", { name: "Text placeholders" })).toBeFocused();
+  const select = toolbar.getByRole("combobox", { name: "Annotation category" });
   await select.focus();
   await select.evaluate((element) => {
     element.ownerDocument.addEventListener("keydown", (event) => {
@@ -241,5 +244,5 @@ test("the actual Meowbook toolbar retains its native Select and action navigatio
   await select.selectOption("controls");
   await expect(select).toHaveValue("controls");
   await page.keyboard.press("Tab");
-  await expect(toolbar.getByRole("button", { name: "文字占位" })).toBeFocused();
+  await expect(toolbar.getByRole("button", { name: "Text placeholders" })).toBeFocused();
 });

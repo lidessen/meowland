@@ -18,11 +18,11 @@ test("image previews distinguish pending, ready and failed without activation ta
   const previews = page.locator('[data-meowui-part="image-preview/root"]');
   await expect(previews.nth(0)).toHaveAttribute("data-image-state", "ready");
   await expect(previews.nth(0).getByRole("status")).toBeHidden();
-  await expect(previews.nth(1).getByRole("status")).toHaveText("正在加载图片");
+  await expect(previews.nth(1).getByRole("status")).toHaveText("Loading image");
   await expect(previews.nth(2)).toHaveAttribute("data-image-state", "failed");
-  await expect(previews.nth(2).getByRole("status")).toHaveText("图片加载失败");
+  await expect(previews.nth(2).getByRole("status")).toHaveText("Failed to load image");
   await expect(previews.locator("button,a")).toHaveCount(0);
   release();
   await expect(previews.nth(1)).toHaveAttribute("data-image-state", "ready");
-  await expect(previews.nth(1).getByRole("img", { name: "延迟加载图片" })).toBeVisible();
+  await expect(previews.nth(1).getByRole("img", { name: "Delayed-loading image" })).toBeVisible();
 });

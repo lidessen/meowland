@@ -13,14 +13,14 @@ import {
 const { renderToHtml } = createWebRenderer(createRuntime());
 
 test("composer uses a labelled icon action and accepts alternate visible content", () => {
-  const html = renderToHtml(<ChatComposer submitLabel="发送消息" />);
-  expect(html).toContain('aria-label="发送消息"');
+  const html = renderToHtml(<ChatComposer submitLabel="Send message" />);
+  expect(html).toContain('aria-label="Send message"');
   expect(html).toContain("<svg");
-  expect(html).not.toContain(">发送消息</button>");
+  expect(html).not.toContain(">Send message</button>");
   const stopped = renderToHtml(
-    <ChatComposer submitLabel="停止执行" submitContent={<span aria-hidden="true">■</span>} />,
+    <ChatComposer submitLabel="Stop execution" submitContent={<span aria-hidden="true">■</span>} />,
   );
-  expect(stopped).toContain('aria-label="停止执行"');
+  expect(stopped).toContain('aria-label="Stop execution"');
   expect(stopped).toContain("■</span>");
   expect(stopped).not.toContain("submitContent=");
 });
@@ -98,7 +98,7 @@ test("attachments preserve image accessibility and file download markup", () => 
   expect(html).toContain('href="/photo.png"');
   expect(html).toContain('target="_blank"');
   expect(html).toContain('rel="noreferrer"');
-  expect(html).toContain('aria-label="打开图片 Cat &amp; dog.png"');
+  expect(html).toContain('aria-label="Open image Cat &amp; dog.png"');
   expect(html).toContain('src="/photo.png"');
   expect(html).toContain('alt="Cat &amp; dog.png"');
   expect(html).toContain('loading="lazy"');
@@ -132,7 +132,7 @@ test("attachment sizes are optional and use compact reference formatting", () =>
         ]}
       />,
     );
-    expect(html).toContain('aria-label="消息附件"');
+    expect(html).toContain('aria-label="Message attachments"');
     if (expected === undefined) expect(html).not.toContain("<small");
     else expect(html).toContain(`<small>${expected}</small>`);
     expect(html).not.toContain("<img");
@@ -140,52 +140,53 @@ test("attachment sizes are optional and use compact reference formatting", () =>
 });
 
 test("unknown tool result is explicitly unconfirmed", () => {
-  const html = renderToHtml(<ChatToolCall label="执行操作" state="unknown" />);
+  const html = renderToHtml(<ChatToolCall label="Run action" state="unknown" />);
   expect(html).toContain('data-tool-state="unknown"');
-  expect(html).toContain("结果未确认");
-  for (const misleading of ["等待中", "出错", "已完成"]) expect(html).not.toContain(misleading);
+  expect(html).toContain("Unconfirmed result");
+  for (const misleading of ["Waiting", "Error", "Completed"])
+    expect(html).not.toContain(misleading);
 });
 
 test("tool target remains in its native disclosure summary while details stay outside", () => {
   const html = renderToHtml(
-    <ChatToolCall label="读取" summary="src/request.ts" detail="读取范围 1–20" collapsible>
-      完整结果
+    <ChatToolCall label="Read" summary="src/request.ts" detail="Read range 1–20" collapsible>
+      Complete result
     </ChatToolCall>,
   );
   const summary = html.slice(html.indexOf("<summary"), html.indexOf("</summary>"));
   expect(summary).toContain("src/request.ts");
-  expect(summary).toContain("已完成");
-  expect(summary).not.toContain("读取范围");
-  expect(summary).not.toContain("完整结果");
+  expect(summary).toContain("Completed");
+  expect(summary).not.toContain("Read range");
+  expect(summary).not.toContain("Complete result");
   expect(summary).toContain('aria-hidden="true"');
   expect(summary).toContain('focusable="false"');
   expect(html).toContain("<details");
 });
 
 test("explicit completion outcomes remain visible instead of using the quiet default", () => {
-  const html = renderToHtml(<ChatToolCall label="执行" statusLabel="已停止" collapsible />);
-  expect(html).toContain("已停止");
+  const html = renderToHtml(<ChatToolCall label="Execute" statusLabel="Stopped" collapsible />);
+  expect(html).toContain("Stopped");
   expect(html).not.toContain("data-tool-default-complete");
-  expect(renderToHtml(<ChatToolCall label="读取" collapsible />)).toContain(
+  expect(renderToHtml(<ChatToolCall label="Read" collapsible />)).toContain(
     'data-tool-default-complete="true"',
   );
 });
 
 test("an unnamed outcome stays quiet, and a running row still states its state", () => {
   const complete = renderToHtml(
-    <ChatToolCall label="读取" state="complete" statusLabel="" collapsible />,
+    <ChatToolCall label="Read" state="complete" statusLabel="" collapsible />,
   );
   expect(complete).toContain('data-tool-default-complete="true"');
-  expect(complete).not.toContain("已完成");
+  expect(complete).not.toContain("Completed");
   const running = renderToHtml(
-    <ChatToolCall label="执行" state="running" statusLabel="" collapsible />,
+    <ChatToolCall label="Execute" state="running" statusLabel="" collapsible />,
   );
   expect(running).not.toContain("data-tool-default-complete");
 });
 
 test("empty attachments render a labelled group without links", () => {
   const html = renderToHtml(<ChatAttachments items={[]} />);
-  expect(html).toContain('aria-label="消息附件"');
+  expect(html).toContain('aria-label="Message attachments"');
   expect(html).not.toContain("<a ");
   expect(html).toContain('role="group"');
 });
@@ -223,7 +224,7 @@ test("unthemed composer preserves caller events, input semantics and disabled co
   expect(renderedInput).toBe(onInput);
   expect(html).toContain('class="host"');
   expect(html).toContain('name="message"');
-  expect(html).toContain('aria-label="消息"');
+  expect(html).toContain('aria-label="Message"');
   expect(html).toContain('aria-describedby="composer-hint"');
   expect(html).toContain('id="composer-hint">Hint</span>');
   expect(html).toContain('placeholder="Write here"');
@@ -233,12 +234,12 @@ test("unthemed composer preserves caller events, input semantics and disabled co
 });
 
 test("an activating row is one button and never discloses, even when both modes are asked for", () => {
-  const activating = renderToHtml(<ChatToolCall label="执行命令" onActivate={() => {}} />);
+  const activating = renderToHtml(<ChatToolCall label="Run command" onActivate={() => {}} />);
   expect(activating).toContain('data-tool-interactive="true"');
   expect(activating).toContain('<button type="button">');
   expect(activating).not.toContain("data-tool-collapsible");
   expect(activating).not.toContain("<details");
-  const both = renderToHtml(<ChatToolCall label="读取" collapsible onActivate={() => {}} />);
+  const both = renderToHtml(<ChatToolCall label="Read" collapsible onActivate={() => {}} />);
   expect(both).not.toContain("<details");
   expect(both).not.toContain("data-tool-collapsible");
 });

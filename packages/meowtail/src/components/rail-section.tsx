@@ -7,7 +7,7 @@ export const railSectionContract = {
 } as const satisfies ComponentContract;
 
 export interface RailSectionProps extends Props {
-  /** Eyebrow shown while the rail is expanded, for example "扩展". */
+  /** Eyebrow shown while the rail is expanded, for example "Expanded". */
   label: string;
   /** While collapsed, the whole section is this one icon, pointing at `href`. */
   icon: Child;

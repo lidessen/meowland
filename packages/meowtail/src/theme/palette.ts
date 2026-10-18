@@ -57,5 +57,5 @@ export const layerTokens = defineTokens("layer", {
   chip: ["#f1f3f5", "rgb(255 255 255 / 8%)"],
   chipInk: ["#61666b", "#cfd3d6"],
   code: ["rgb(0 0 0 / 5%)", "rgb(255 255 255 / 8%)"],
-  faint: ["#adb2b8", "#61666b"],
+  faint: ["#656a71", "#9aa0a7"],
 });

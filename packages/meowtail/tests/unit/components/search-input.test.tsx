@@ -16,12 +16,12 @@ test("SearchInput keeps native input semantics and Field associations without a 
   });
   const web = createWebRenderer(runtime);
   const view = (
-    <Field label="查找" htmlFor="query" description="本地结果" error="查询有误">
+    <Field label="Search" htmlFor="query" description="Local results" error="Invalid query">
       <SearchInput
         id="query"
-        label="查找"
+        label="Search"
         name="q"
-        value="主题"
+        value="Theme"
         disabled
         readOnly
         onInput={onInput}
@@ -32,12 +32,12 @@ test("SearchInput keeps native input semantics and Field associations without a 
   expect(inputProps).toMatchObject({
     id: "query",
     name: "q",
-    value: "主题",
+    value: "Theme",
     disabled: true,
     readOnly: true,
     onInput,
     type: "search",
-    "aria-label": "查找",
+    "aria-label": "Search",
     "aria-invalid": "true",
     "aria-describedby": "query-description query-error",
   });

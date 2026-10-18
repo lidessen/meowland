@@ -1,47 +1,47 @@
-# Protecting pandas a4：观察媒体与阅读证据
+# Protecting pandas a4: observation media and reading evidence
 
-用户要求继续补熊猫图片/视频，并明确需要结合此前 PPT、HTML 与教学内容。本轮在 a3 上保留原六页和五题的选择、原文、渐进支架、草稿及重做合同，增加 `observe`、`watch` 两个有限片段。当前八页为 `protecting-pandas-a4`。
+The user asked to continue adding panda images/videos, explicitly requiring integration with the earlier PPT, HTML and teaching content. This round kept, on top of a3, the original six slides and five questions' selection, original text, progressive scaffolding, draft and redo contracts, and added two finite segments, `observe` and `watch`. The current eight slides are `protecting-pandas-a4`.
 
-## 先有学习任务，再选媒体
+## Learning task first, then media selection
 
-- 主视觉给真实熊猫与一个待阅读的问题；比较页要求每人说一条可见细节，再回 G1–G3 的年龄/时间词复述。两图来自不同个体和取景，不构造假的 Xiwang 成长相册。
-- 18 秒 Bao Bao 食竹片要求描述动作、提出生活需要的问题，再到 P2–P3 提取问题/后果、A1–A2 解释回应，最后保留原个人行动表达。文字替代不是唯一标准答案。
-- 卧龙保护区森林提供生活环境的观察语境，不冒充竹林缩小的证据或措施成效；图像观察、推测与原文事实分开。
+- The main visual gives a real panda and one question to read; the comparison slide asks each person to say one visible detail, then return to the age/time words in G1–G3 to retell. The two images come from different individuals and framings, and no fake Xiwang growth album was constructed.
+- The 18-second Bao Bao bamboo-eating clip asks students to describe the actions, raise a question about life needs, then extract question/consequence from P2–P3, explain the response in A1–A2, and finally keep the original personal-action expression. The text alternative is not the only standard answer.
+- The Wolong reserve forest provides an observation context for the living environment and does not pass off as evidence of shrinking bamboo forests or measure effectiveness; image observation, inference and original-text facts are kept separate.
 
-依据已读的原 PPT P7–9/P10–11、HTML 四阶段表达组织，以及仓库教学研究中时间词、问题/后果/措施、每人产出和支架撤回的结论。新增两个片段各建议 1–2 分钟，按课堂缩减播放和分享，不扩成熊猫百科。
+This is based on the already-read original PPT P7–9/P10–11, the HTML four-stage expression organization, and the repository teaching research conclusions on time words, questions/consequences/measures, per-person output and scaffolding withdrawal. The two new segments each suggest 1–2 minutes, with classroom-reduced playback and sharing, and were not expanded into a panda encyclopedia.
 
-原文件仅只读静态分析和抽帧，未运行 HTML 脚本。HTML 四视频明确 AI 标识且无开放许可；PPT AI/动画、未核授权的 XinhuaVideo 照护片与旧数量字幕不加入公开资源。旧未知摄影来源的 `panda-reading.png` 从 a4 当前源和构建移除，历史不改。原文件、未知 `data/`、Rossovia 和旧 Sunshine 内容均未改。
+The original files were only statically analyzed read-only and frame-extracted; the HTML scripts were not run. The four HTML videos are explicitly AI-marked and have no open license; the PPT AI/animation, the unverified-authorization XinhuaVideo care clip and the old count subtitles were not added to public assets. The old `panda-reading.png` with unknown photography provenance was removed from a4's current source and build, without changing history. The original files, unknown `data/`, Rossovia and old Sunshine content were all unchanged.
 
-## 素材与实现
+## Assets and implementation
 
-独立素材 owner 逐一读原始 Commons 作者/许可，下载并实际看像素和视频代表帧，淘汰不符食竹任务的喂胡萝卜候选。最终三照片分别为 Sheila Lau 公有领域、Mike Richey CC BY-SA 3.0、Toni Wöhrl CC BY-SA 4.0；Bao Bao 视频及同源 poster 为 Brian Gratwicke CC BY 2.0。短片裁前 18 秒、去声、H264/方像素转换，未生成或裁画面。详细原始源页、时间、许可链接、处理链、哈希与每项教学任务见 [SOURCES](../../examples/protecting-pandas/SOURCES.md) 和 [NOTICES](../../examples/protecting-pandas/assets/NOTICES.md)。
+The independent asset owner read the original Commons authors/licenses one by one, downloaded and actually viewed pixels and representative video frames, and rejected a carrot-feeding candidate that did not match the bamboo-eating task. The final three photos are Sheila Lau public domain, Mike Richey CC BY-SA 3.0 and Toni Wöhrl CC BY-SA 4.0; the Bao Bao video and its same-source poster are Brian Gratwicke CC BY 2.0. The clip was trimmed to the first 18 seconds, muted and converted to H264/square pixels, and no frames were generated or cropped. Detailed original source pages, times, license links, processing chain, hashes and each teaching task are in [SOURCES](../../examples/protecting-pandas/SOURCES.md) and [NOTICES](../../examples/protecting-pandas/assets/NOTICES.md).
 
-显式本地 import 图片、MP4、poster、VTT；五个同源 Meowbook stories 从首次挂载 `active=false`。图片复用 `ImagePreview` 的加载/失败状态，失败仍可读描述。短片复用 `PresentationVideo` 与原生字幕/控件，默认暂停、无循环或自动翻页；原生支持加载失败文字和 Retry。所有资源随 Web 构建交付，不依赖第三方播放器或运行时外网。
+Images, MP4, poster and VTT are explicitly imported locally; the five same-source Meowbook stories start with `active=false` on first mount. Images reuse `ImagePreview`'s loading/failure states, and the description is still readable on failure. The clip reuses `PresentationVideo` with native subtitles/controls, paused by default, with no loop or automatic paging; it natively supports failure text and Retry. All assets ship with the Web build and do not depend on a third-party player or runtime external network.
 
-共享媒体增加默认尺寸的 Play / continue、Pause、Back to start，回到开头保持暂停，两种停止动作使待完成 play Promise 失效；不新增 props 或作品私有媒体状态机。切页暂停并释放 src，回访从零暂停；其他题草稿/选择/支架保留。
+Shared media gained default-sized Play / continue, Pause and Back to start; returning to the start stays paused, and both stop actions invalidate a pending play Promise; no new props or work-private media state machine were added. Changing slides pauses and releases src, and a revisit starts paused from zero; other questions' drafts/selection/scaffolding are kept.
 
-首轮正常 444/457、失败 444/475 的 body 预算反例回到共享组件修复：figure/video 可在有限 Stack 内收缩，状态/操作保留自然高度，画面 contain；名称/错误分块。右森林区复用 LayoutItem grow/basis0 分配余高，保留完整问题。全套回归又捕获 320px 宿主 soundtrack 的动作横溢 12px，限音轨 actions 最大宽为父宽并自然换行，三个动作保留完整可达。没有裁正文、缩字或逐页挪像素掩盖问题。
+The first round's body-budget counterexamples of normal 444/457 and failure 444/475 returned to the shared component for fixing: figure/video can shrink inside a finite Stack, state/actions keep natural height and the image stays contained; name/error are block-separated. The right forest region reuses LayoutItem grow/basis0 to allocate remaining height and keeps the complete questions. The full regression also caught a 12px horizontal overflow of actions in a 320px host soundtrack; the audio track actions' maximum width was limited to the parent width with natural wrapping, and all three actions stayed fully reachable. Body text was not clipped, shrunk or pixel-shifted per slide to hide the problem.
 
-## 最终验证与交付
+## Final verification and delivery
 
-| 检查                                              | 结果与范围                                                                                                 |
-| ------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
-| 根 build/typecheck、Meowtail 全包及课件 tests tsc | 通过；共享生产源码冻结后重建                                                                               |
-| 根 unit                                           | 325 项、67 文件、2019 断言通过                                                                             |
-| 格式/lint                                         | 全仓显式排除 `data/**`，格式与 deny-warnings 通过                                                          |
-| 演示 browser                                      | 33/33；媒体有限区域/错误反馈/迟到播放 Promise，既有媒体/活动/过渡/chrome；随后新增音轨动作可达断言定向 1/1 |
-| 课件 browser                                      | 最终交付 13/13，18.3 秒；八页全展开 × 三尺寸、五题状态及五项真实媒体合同                                   |
-| Sunshine browser                                  | 同版定向 3/3，2.4 秒，不宣称全套                                                                           |
-| Meowbook                                          | 五个同源 stories check 通过，不冒充完整视觉播放验收                                                        |
+| Check                                                                | Result and scope                                                                                                                                                           |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Root build/typecheck, full Meowtail package and courseware tests tsc | Passed; rebuilt after the shared production source was frozen                                                                                                              |
+| Root unit                                                            | 325 items, 67 files, 2019 assertions passed                                                                                                                                |
+| Format/lint                                                          | Repo-wide explicit exclusion of `data/**`, format and deny-warnings passed                                                                                                 |
+| Presentation browser                                                 | 33/33; media finite regions/error feedback/late play Promise, existing media/activity/transition/chrome; then a targeted new audio-track action reachability assertion 1/1 |
+| Courseware browser                                                   | Final delivery 13/13, 18.3 seconds; eight slides fully expanded × three sizes, five question states and five real media contracts                                          |
+| Sunshine browser                                                     | Same-version targeted 3/3, 2.4 seconds, not claiming the full set                                                                                                          |
+| Meowbook                                                             | Five same-source stories checks passed, not passed off as full visual playback acceptance                                                                                  |
 
-独立审查者实际查看新媒体六张三尺寸图，另一视觉 owner 实际查看宽屏三媒体状态及八张窄短代表图；各过程证据带对应候选哈希保留，不冒充最终脚本。最后两处纯文本 Fragment 清理后，根另从实际 live 拍 11 张，逐张记录脚本/预算/pageerror，并实际查看其中六张代表图（宽屏 welcome/observe/播放、窄窗 watch、极短窗 watch、宽屏失败）。没有把截图数量当作全部看过。来源/教学关联另有非实现者复审。
+The independent reviewer actually viewed six new-media images at three sizes, and another visual owner actually viewed wide-screen three-media states and eight narrow/short representative images; each process evidence carries the corresponding candidate hash and is not passed off as the final scripts. After the final two plain-text Fragment cleanups, the root also took 11 images from the actual live version, recording script/budget/pageerror per image, and actually viewed six representative images among them (wide-screen welcome/observe/playback, narrow-window watch, extremely short-window watch, wide-screen failure). The number of screenshots was not treated as all having been viewed. Source/teaching correlations were separately reviewed by a non-implementer.
 
-最终入口 `chunk-90dfy6sp.js`；build-manifest SHA256
-`ae98dc35b5f563792d93943013fd79dd219bb61b699e4da78d4570828af6ab83`。
-12 个候选文件与 live 逐字节核对后原子替换 index，HTTP 200；保留 `13014` 服务与旧哈希资源供已打开的 a3 页面，旧入口不会自动升级。刷新后外围标题显示 a4；刷新会清空本场草稿。
+The final entry is `chunk-90dfy6sp.js`; build-manifest SHA256
+`ae98dc35b5f563792d93943013fd79dd219bb61b699e4da78d4570828af6ab83`.
+After checking the 12 candidate files byte for byte against live, the index was replaced atomically, returning HTTP 200; the `13014` service and old hash assets were kept for already-open a3 pages, and the old entry does not upgrade automatically. After refreshing, the peripheral title shows a4; refreshing clears this session's draft.
 
-最终 live 证据为 `artifacts/protecting-pandas-media-a4/live/`，自动化/首轮失败/独立审查回执保留在同轮 artifacts。Library 新截图：`libfile_7ebd8cfd772c8191be98d1e6e14a6080`（version 0），来自最终 live 宽屏实际播放与字幕画面；a3 的 Library 图保留。
+Final live evidence is `artifacts/protecting-pandas-media-a4/live/`, and the automation/first-round failure/independent review receipts are kept in the same round's artifacts. New Library screenshot: `libfile_7ebd8cfd772c8191be98d1e6e14a6080` (version 0), from the final live wide-screen actual playback and subtitle frame; the a3 Library image was kept.
 
-共享修复本地提交 `b1224de`；本回执随课件媒体、来源与测试提交。六份相关文档的 17 个相对文件链接存在性检查通过，不包括锚点；构建交付的来源/notices 文本与格式化后的源码一致，内部链接已按交付位置改写。自有测试和审阅服务均关闭，用户 `13014` 与旧 `13012` 保留。
+The shared fix was committed locally as `b1224de`; this receipt was committed along with the courseware media, sources and tests. Existence checks of 17 relative file links across six related documents passed, not counting anchors; the source/notices text delivered by the build matches the formatted source, and internal links were rewritten for the delivery location. The self-owned test and review services were closed, and the user's `13014` and the old `13012` were kept.
 
-没有发布、推送或部署；没有运行全部无关组件浏览器、重新做 tgz/registry 验收或声称完整 Safari/Firefox、实体手机/屏幕阅读器和真实教室效果。新媒体仅 Chromium 真实解码/播放/失败恢复验收。窄/短窗是等比缩小的整页概览，细小图注仍需放大，不能说与宽屏有相同阅读尺寸。极端容量超过文本/控件预算时仍需诊断与合理编排，不保证任意高度适配。
+There was no publish, push or deployment; the full unrelated component browsers were not run, tgz/registry acceptance was not redone, and complete Safari/Firefox, physical phone/screen reader and real classroom results were not claimed. The new media had only Chromium real decode/playback/failure-recovery acceptance. Narrow/short windows are proportionally scaled whole-page overviews, small captions still need zooming, and they cannot be said to have the same reading size as wide screens. Extreme capacity beyond text/control budgets still needs diagnostics and reasonable composition; adaptation to any height is not guaranteed.

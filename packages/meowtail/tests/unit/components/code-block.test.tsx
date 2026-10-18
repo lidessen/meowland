@@ -10,7 +10,7 @@ test("code blocks escape executable markup and retain exact whitespace", () => {
   expect(html).toContain("&lt;script&gt;x()&lt;/script&gt;\n  trailing  ");
   expect(html).not.toContain("<script>");
   expect(html).toContain("html");
-  expect(html).toContain('aria-label="代码内容"');
+  expect(html).toContain('aria-label="Code content"');
   expect(html).toContain('data-wrap="false"');
   expect(html).toContain('aria-pressed="false"');
   const wrapped = createWebRenderer(createRuntime()).renderToHtml(
@@ -59,7 +59,9 @@ test("copy preserves raw code, prevents concurrent requests and exposes failures
     await copy();
     await pending;
     expect(copied).toEqual([code]);
-    expect(unwrap(status)).toBe(fail ? "复制失败，请选择代码后手动复制。" : "已复制");
+    expect(unwrap(status)).toBe(
+      fail ? "Copy failed; select the code and copy it manually." : "Copied",
+    );
     expect(unwrap(buttons[1].disabled)).toBe(false);
   }
 });

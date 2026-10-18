@@ -5,9 +5,9 @@ test("child DOM Escape consumption precedes the Popover callback and native Dial
 }) => {
   await page.goto("/canvas.html?story=popover-escape");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  await page.getByRole("button", { name: "打开浮层对话框", exact: true }).click();
-  await page.getByRole("button", { name: "打开父浮层", exact: true }).click();
-  const draft = page.getByRole("textbox", { name: "局部草稿", exact: true });
+  await page.getByRole("button", { name: "Open popover dialog", exact: true }).click();
+  await page.getByRole("button", { name: "Open parent popover", exact: true }).click();
+  const draft = page.getByRole("textbox", { name: "Local draft", exact: true });
   await draft.fill("Keep this draft");
   await draft.evaluate((node) =>
     node.addEventListener(
@@ -23,11 +23,11 @@ test("child DOM Escape consumption precedes the Popover callback and native Dial
   await expect(page.locator("#escape-dialog")).toBeVisible();
   await expect(draft).toHaveValue("Keep this draft");
   await expect(draft).toBeFocused();
-  await expect(page.locator("#escape-callbacks")).toHaveText("父层 0 · 子层 0");
+  await expect(page.locator("#escape-callbacks")).toHaveText("Parent 0 · Child 0");
   await draft.press("Escape");
   await expect(page.locator("#escape-parent")).toBeHidden();
   await expect(page.locator("#escape-dialog")).toBeVisible();
-  await expect(page.locator("#escape-callbacks")).toHaveText("父层 1 · 子层 0");
+  await expect(page.locator("#escape-callbacks")).toHaveText("Parent 1 · Child 0");
   await page.keyboard.press("Escape");
   await expect(page.locator("#escape-dialog")).toBeHidden();
 });
@@ -36,15 +36,15 @@ test("child stopPropagation leaves native Dialog cancellation distinct from Popo
   page,
 }) => {
   await page.goto("/canvas.html?story=popover-escape");
-  await page.getByRole("button", { name: "打开浮层对话框", exact: true }).click();
-  await page.getByRole("button", { name: "打开父浮层", exact: true }).click();
-  const draft = page.getByRole("textbox", { name: "局部草稿", exact: true });
+  await page.getByRole("button", { name: "Open popover dialog", exact: true }).click();
+  await page.getByRole("button", { name: "Open parent popover", exact: true }).click();
+  const draft = page.getByRole("textbox", { name: "Local draft", exact: true });
   await draft.evaluate((node) =>
     node.addEventListener("keydown", (event) => event.stopPropagation(), { once: true }),
   );
   await draft.press("Escape");
   await expect(page.locator("#escape-dialog")).toBeHidden();
-  await expect(page.locator("#escape-callbacks")).toHaveText("父层 0 · 子层 0");
+  await expect(page.locator("#escape-callbacks")).toHaveText("Parent 0 · Child 0");
 });
 
 test("open shadow DOM children consume Escape before their original Popover layer", async ({
@@ -61,9 +61,9 @@ test("open shadow DOM children consume Escape before their original Popover laye
       shadow.append(style.cloneNode(true));
     shadow.append(root);
   });
-  const trigger = page.getByRole("button", { name: "显示设置", exact: true });
+  const trigger = page.getByRole("button", { name: "Display settings", exact: true });
   await trigger.click();
-  const draft = page.getByRole("textbox", { name: "显示名称" });
+  const draft = page.getByRole("textbox", { name: "Display name" });
   await draft.fill("Shadow draft");
   await draft.evaluate((node) =>
     node.addEventListener("keydown", (event) => event.preventDefault(), { once: true }),
@@ -81,8 +81,8 @@ test("Escape safely closes after its connected trigger is removed by a child han
   page,
 }) => {
   await page.goto("/canvas.html?story=popover");
-  await page.getByRole("button", { name: "显示设置", exact: true }).click();
-  const draft = page.getByRole("textbox", { name: "显示名称" });
+  await page.getByRole("button", { name: "Display settings", exact: true }).click();
+  const draft = page.getByRole("textbox", { name: "Display name" });
   await draft.evaluate((node) =>
     node.addEventListener(
       "keydown",
@@ -93,22 +93,22 @@ test("Escape safely closes after its connected trigger is removed by a child han
   await draft.press("Escape");
   await expect(page.locator("#display-popover")).toBeHidden();
   await expect(page.locator("#display-popover-trigger")).toHaveCount(0);
-  await page.getByRole("button", { name: "分层设置", exact: true }).click();
+  await page.getByRole("button", { name: "Layered settings", exact: true }).click();
   await page.keyboard.press("Escape");
   await expect(page.locator("#pane-popover")).toBeHidden();
 });
 
 for (const [action, label] of [
-  ["close", "关闭子浮层"],
-  ["unmount", "移除子浮层"],
+  ["close", "Close child popover"],
+  ["unmount", "Remove child popover"],
 ]) {
   test(`child DOM ${action} consumes only the original layer even when it unmounts`, async ({
     page,
   }) => {
     await page.goto("/canvas.html?story=popover-escape");
-    await page.getByRole("button", { name: "打开浮层对话框", exact: true }).click();
-    await page.getByRole("button", { name: "打开父浮层", exact: true }).click();
-    await page.getByRole("button", { name: "打开子浮层", exact: true }).click();
+    await page.getByRole("button", { name: "Open popover dialog", exact: true }).click();
+    await page.getByRole("button", { name: "Open parent popover", exact: true }).click();
+    await page.getByRole("button", { name: "Open child popover", exact: true }).click();
     const button = page.getByRole("button", { name: label, exact: true });
     await button.evaluate((node) =>
       node.addEventListener(
@@ -124,7 +124,7 @@ for (const [action, label] of [
     if (action === "unmount") await expect(page.locator("#escape-child")).toHaveCount(0);
     await expect(page.locator("#escape-parent")).toBeVisible();
     await expect(page.locator("#escape-dialog")).toBeVisible();
-    await expect(page.locator("#escape-callbacks")).toHaveText("父层 0 · 子层 0");
+    await expect(page.locator("#escape-callbacks")).toHaveText("Parent 0 · Child 0");
     await page.keyboard.press("Escape");
     await expect(page.locator("#escape-parent")).toBeHidden();
     await expect(page.locator("#escape-dialog")).toBeVisible();
@@ -134,7 +134,7 @@ for (const [action, label] of [
 test("Escape returns its trigger after an unfocused pointer activation", async ({ page }) => {
   await page.goto("/canvas.html?story=popover");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  const trigger = page.getByRole("button", { name: "显示设置", exact: true });
+  const trigger = page.getByRole("button", { name: "Display settings", exact: true });
   await trigger.evaluate((node) => {
     node.addEventListener("mousedown", (event) => event.preventDefault());
   });
@@ -153,16 +153,19 @@ test("a callback that closes its original layer runs once and never dismisses it
   page,
 }) => {
   await page.goto("/canvas.html?story=popover-escape");
-  await page.getByRole("button", { name: "打开浮层对话框", exact: true }).click();
-  await page.getByRole("button", { name: "打开父浮层", exact: true }).click();
-  await page.getByRole("button", { name: "打开子浮层", exact: true }).click();
-  const action = page.getByRole("button", { name: "回调关闭子浮层", exact: true });
+  await page.getByRole("button", { name: "Open popover dialog", exact: true }).click();
+  await page.getByRole("button", { name: "Open parent popover", exact: true }).click();
+  await page.getByRole("button", { name: "Open child popover", exact: true }).click();
+  const action = page.getByRole("button", {
+    name: "Close child popover via callback",
+    exact: true,
+  });
   await action.click();
   await action.press("Escape");
   await expect(page.locator("#escape-child")).toBeHidden();
   await expect(page.locator("#escape-parent")).toBeVisible();
   await expect(page.locator("#escape-dialog")).toBeVisible();
-  await expect(page.locator("#escape-callbacks")).toHaveText("父层 0 · 子层 1");
+  await expect(page.locator("#escape-callbacks")).toHaveText("Parent 0 · Child 1");
 });
 
 test("Escape preserves controlled refusal and a close callback's external focus", async ({
@@ -170,15 +173,18 @@ test("Escape preserves controlled refusal and a close callback's external focus"
 }) => {
   await page.goto("/canvas.html?story=popover");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  const retained = page.getByRole("button", { name: "保持受控面板", exact: true });
+  const retained = page.getByRole("button", { name: "Keep controlled panel", exact: true });
   await retained.click();
-  const input = page.getByRole("textbox", { name: "保留面板草稿", exact: true });
+  const input = page.getByRole("textbox", { name: "Retained panel draft", exact: true });
   await input.focus();
   await page.keyboard.press("Escape");
   await expect(page.locator("#retained-popover")).toBeVisible();
   await expect(input).toBeFocused();
 
-  const redirected = page.getByRole("button", { name: "关闭后继续外部操作", exact: true });
+  const redirected = page.getByRole("button", {
+    name: "Continue external action after closing",
+    exact: true,
+  });
   await redirected.evaluate((node) => {
     node.addEventListener("mousedown", (event) => event.preventDefault());
   });
@@ -188,7 +194,7 @@ test("Escape preserves controlled refusal and a close callback's external focus"
   expect(await page.evaluate(() => document.activeElement === document.body)).toBe(true);
   await page.keyboard.press("Escape");
   await expect(page.locator("#redirected-popover")).toBeHidden();
-  await expect(page.getByRole("button", { name: "外部操作", exact: true })).toBeFocused();
+  await expect(page.getByRole("button", { name: "External action", exact: true })).toBeFocused();
 });
 
 test("short choices retain exact trigger matching without splitting short option names", async ({
@@ -208,7 +214,7 @@ test("short choices retain exact trigger matching without splitting short option
       return Math.abs(input!.width - menu!.width) < 1;
     })
     .toBe(true);
-  const option = page.getByRole("option", { name: "第一个", exact: true });
+  const option = page.getByRole("option", { name: "First option", exact: true });
   expect(
     await option.evaluate((node) => {
       const range = document.createRange();
@@ -236,7 +242,7 @@ test("choice sizing keeps a quickly focused last option visible after opening an
   await trigger.focus();
   await page.keyboard.press("ArrowDown");
   await page.keyboard.press("End");
-  const last = page.getByRole("option", { name: "归入项目存档", exact: true });
+  const last = page.getByRole("option", { name: "File into the project archive", exact: true });
   await expect(last).toBeFocused();
   const panel = page.locator("#custom-delivery-panel");
   const visible = async () => {
@@ -249,7 +255,7 @@ test("choice sizing keeps a quickly focused last option visible after opening an
   await expect.poll(visible).toBe(true);
   await expect(last).toBeFocused();
   await page.keyboard.press("Enter");
-  await expect(trigger).toContainText("归入项目存档");
+  await expect(trigger).toContainText("File into the project archive");
   await expect(trigger).toBeFocused();
   await trigger.click();
   await page.keyboard.press("Escape");
@@ -258,14 +264,14 @@ test("choice sizing keeps a quickly focused last option visible after opening an
 
 test("popover lets an inner pane handle Escape before dismissing", async ({ page }) => {
   await page.goto("/canvas.html?story=popover");
-  const trigger = page.getByRole("button", { name: "分层设置", exact: true });
+  const trigger = page.getByRole("button", { name: "Layered settings", exact: true });
   const panel = page.locator("#pane-popover");
   await trigger.click();
-  await page.getByRole("button", { name: "进入详情" }).click();
-  await expect(panel.getByRole("heading")).toHaveText("设置详情");
+  await page.getByRole("button", { name: "Open details" }).click();
+  await expect(panel.getByRole("heading")).toHaveText("Settings details");
   await page.keyboard.press("Escape");
   await expect(panel).toBeVisible();
-  await expect(panel.getByRole("heading")).toHaveText("选择设置");
+  await expect(panel.getByRole("heading")).toHaveText("Choose settings");
   await page.keyboard.press("Escape");
   await expect(panel).toBeHidden();
   await expect(trigger).toBeFocused();
@@ -282,17 +288,17 @@ test("searchable choice filters without changing selection and supports empty an
   await expect(search).toBeFocused();
   await search.fill("sol");
   await expect(panel.getByRole("option")).toHaveCount(1);
-  await expect(trigger).toHaveText("跟随运行器默认");
+  await expect(trigger).toHaveText("Follow the runner default");
   await search.dispatchEvent("keydown", { key: "Enter", isComposing: true });
   await expect(panel).toBeVisible();
-  await expect(trigger).toHaveText("跟随运行器默认");
+  await expect(trigger).toHaveText("Follow the runner default");
   await search.press("Enter");
   await expect(trigger).toContainText("gpt-6-sol");
   await expect(trigger).toBeFocused();
   await trigger.press("Enter");
   await expect(search).toBeFocused();
   await search.fill("missing-model");
-  await expect(panel.getByRole("status")).toHaveText("没有匹配的选项");
+  await expect(panel.getByRole("status")).toHaveText("No matching options");
   await search.press("Escape");
   await expect(trigger).toBeFocused();
   await trigger.click();
@@ -307,13 +313,13 @@ test("searchable choice filters without changing selection and supports empty an
 test("popover dismisses the active layer and preserves normal keyboard focus", async ({ page }) => {
   await page.goto("/canvas.html?story=popover");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  const trigger = page.getByRole("button", { name: "显示设置", exact: true });
+  const trigger = page.getByRole("button", { name: "Display settings", exact: true });
   const panel = page.locator("#display-popover");
   await trigger.click();
   await expect(panel).toBeVisible();
   await expect(trigger).toHaveAttribute("aria-expanded", "true");
-  await page.getByRole("textbox", { name: "显示名称" }).fill("保留这个名称");
-  const nestedTrigger = page.getByRole("button", { name: "更多设置", exact: true });
+  await page.getByRole("textbox", { name: "Display name" }).fill("Keep this name");
+  const nestedTrigger = page.getByRole("button", { name: "More settings", exact: true });
   await nestedTrigger.click();
   await expect(page.locator("#nested-popover")).toBeVisible();
   await page.keyboard.press("Escape");
@@ -324,14 +330,14 @@ test("popover dismisses the active layer and preserves normal keyboard focus", a
   await expect(panel).toBeHidden();
   await expect(trigger).toBeFocused();
   await trigger.click();
-  await expect(page.getByRole("textbox", { name: "显示名称" })).toHaveValue("保留这个名称");
-  const outside = page.getByRole("button", { name: "外部操作", exact: true });
+  await expect(page.getByRole("textbox", { name: "Display name" })).toHaveValue("Keep this name");
+  const outside = page.getByRole("button", { name: "External action", exact: true });
   await outside.click();
   await expect(panel).toBeHidden();
   await expect(outside).toBeFocused();
-  await page.getByRole("button", { name: "打开受控面板", exact: true }).click();
+  await page.getByRole("button", { name: "Open controlled panel", exact: true }).click();
   await expect(page.locator("#controlled-popover")).toBeVisible();
-  await page.getByRole("button", { name: "关闭受控面板", exact: true }).click();
+  await page.getByRole("button", { name: "Close controlled panel", exact: true }).click();
   await expect(page.locator("#controlled-popover")).toBeHidden();
 });
 
@@ -345,7 +351,9 @@ test("choice select supports keyboard selection, validation, form data and reset
   const deliveryPanel = page.locator("#custom-delivery-panel");
   const environmentPanel = page.locator("#custom-environment-panel");
   await expect(page.locator("#custom-delivery-native")).toHaveValue("review");
-  await expect(delivery).toContainText("交给项目负责人");
+  await expect(delivery).toContainText(
+    "Hand to the project owner to review all changes and the verification record",
+  );
   await delivery.focus();
   await page.keyboard.press("ArrowDown");
   await expect(deliveryPanel.getByRole("option").nth(1)).toBeFocused();
@@ -376,22 +384,24 @@ test("choice select supports keyboard selection, validation, form data and reset
       );
     });
   });
-  await page.getByRole("button", { name: "提交配置", exact: true }).click();
+  await page.getByRole("button", { name: "Submit configuration", exact: true }).click();
   await expect(form).not.toHaveAttribute("data-submitted");
   await expect(environment).toBeFocused();
   await expect(environment).toHaveAttribute("aria-invalid", "true");
   await environment.click();
   await environmentPanel.getByRole("option").first().click();
   await expect(environment).toBeFocused();
-  await page.getByRole("button", { name: "提交配置", exact: true }).click();
+  await page.getByRole("button", { name: "Submit configuration", exact: true }).click();
   expect(JSON.parse((await form.getAttribute("data-submitted"))!)).toEqual(
     await form.evaluate((element) => Object.fromEntries(new FormData(element as HTMLFormElement))),
   );
   const fields = JSON.parse((await form.getAttribute("data-submitted"))!);
   expect(Object.values(fields)).toEqual(expect.arrayContaining(["archived", "local"]));
-  await page.getByRole("button", { name: "恢复默认", exact: true }).click();
+  await page.getByRole("button", { name: "Restore defaults", exact: true }).click();
   await expect(page.locator("#custom-delivery-native")).toHaveValue("review");
-  await expect(delivery).toContainText("交给项目负责人");
+  await expect(delivery).toContainText(
+    "Hand to the project owner to review all changes and the verification record",
+  );
   await expect(page.locator("#custom-environment-native")).toHaveValue("");
   await expect(environment).not.toHaveAttribute("aria-invalid", "true");
 });
@@ -408,7 +418,7 @@ test("controlled choice retains the caller's current value across native form re
   await page.locator("#custom-controlled-panel").getByRole("option").nth(1).click();
   await expect(native).toHaveValue("review");
   const caption = await control.textContent();
-  await page.getByRole("button", { name: "恢复默认", exact: true }).click();
+  await page.getByRole("button", { name: "Restore defaults", exact: true }).click();
   await expect(native).toHaveValue("review");
   await expect(control).toHaveText(caption!);
   // Read after the native reset default action and the component's reconciliation.

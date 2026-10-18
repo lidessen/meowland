@@ -1,29 +1,34 @@
-# 演示内容布局
+# Presentation content layout
 
-先根据观众要读什么划分区域，再放入内容。`PresentationLayout` 是通用页面骨架，
-标题、图文、对比、数字、流程和总结继续组合现有组件。可运行的六页构图在 Meowbook 的
-`presentation-layouts`，不改变现有图片演示或英语课件。
-`presentation-foundations` 另用三页真实演示展示数值列数、原生列表、照片裁切与文字图完整显示。
+Decide what the audience needs to read first, divide regions accordingly, then place content.
+`PresentationLayout` is the generic page skeleton; titles, text-image, comparison, number, process and
+summary continue to compose existing components. The runnable six-page composition is in Meowbook's
+`presentation-layouts`, and does not change the existing image presentation or English courseware.
+`presentation-foundations` separately uses three real presentation pages to show numeric column counts,
+native lists, photo cropping and the complete display of a text diagram.
 
-## 区域与比例
+## Regions and proportions
 
-从 `meowslides` 导入 `PresentationLayout`，根入口重导同一实现。
-`header`、`footer` 接收普通 Child，保持自然高度；`children` 进入占剩余高度的 body。
-省略任一槽不会留下空行或额外间距。骨架不另加边缘，沿用 Presentation 画布的 inset。
+Import `PresentationLayout` from `meowslides`; the root entry point re-exports the same implementation.
+`header` and `footer` accept ordinary Child and keep natural height; `children` enter the body, which
+takes the remaining height. Omitting any slot leaves no empty row or extra spacing. The skeleton adds
+no extra edges and follows the Presentation canvas inset.
 
-| 关系               | `columns`              | 适合的内容                          |
-| ------------------ | ---------------------- | ----------------------------------- |
-| 单一阅读轴         | `single`（默认）或 `1` | 标题、引用、总结，或内部继续放 Grid |
-| 同等重要           | `equal` 或 `2`         | 两个方案、前后对比、两组依据        |
-| 三个同等区域       | `3`                    | 三组短要点、少量步骤或三方比较      |
-| 主要内容在逻辑起点 | `wide-start`           | 数字或主图占 2 份，旁注占 1 份      |
-| 主要内容在逻辑终点 | `wide-end`             | 说明占 1 份，图或实验占 2 份        |
+| Relationship                      | `columns`                 | Suitable content                                                          |
+| --------------------------------- | ------------------------- | ------------------------------------------------------------------------- |
+| Single reading axis               | `single` (default) or `1` | Title, quote, summary, or a further Grid inside                           |
+| Equal importance                  | `equal` or `2`            | Two options, before/after comparison, two sets of evidence                |
+| Three equal regions               | `3`                       | Three short groups of points, a few steps, or a comparison of three sides |
+| Main content at the logical start | `wide-start`              | A number or main image takes 2 parts and the side note 1 part             |
+| Main content at the logical end   | `wide-end`                | An explanation takes 1 part and the image or experiment 2 parts           |
 
-数值 `1 | 2 | 3` 表示等宽逻辑列数，既有字符串用法保持不变。
-通常提供与列数相同的直接子项；超过列数会按普通网格新增行，仍需核对有限画布的内容量。
-更复杂的区域继续在 `single` 中组合 Grid，不把每种构图变成新模板。
-`gap` 使用 none/compact/normal/relaxed，默认 normal；主题的 `presentationTokens.spaceGroup`、
-`spaceSection`、`spacePanel` 决定组内、区域和较宽间距，与工具栏控件间距独立。
+Numerical `1 | 2 | 3` means the number of equal-width logical columns, and the existing string usage
+stays unchanged. Usually provide as many direct children as columns; more than the column count adds
+rows as in an ordinary grid, and the amount of content on the finite canvas still needs checking. More
+complex regions continue to compose Grid inside `single`; do not turn every composition into a new
+template. `gap` uses none/compact/normal/relaxed, default normal; the theme's
+`presentationTokens.spaceGroup`, `spaceSection` and `spacePanel` decide within-group, region and wider
+spacing, independent of toolbar control spacing.
 
 ```tsx
 import { Stack } from "meowtail";
@@ -31,110 +36,128 @@ import { PresentationImage, PresentationLayout } from "meowslides";
 
 <PresentationLayout
   columns="wide-end"
-  header={<h2>同一观点，配一张能解释它的图</h2>}
-  footer={<small>来源、条件与必要说明</small>}
+  header={<h2>One point, with an image that explains it</h2>}
+  footer={<small>Sources, conditions and necessary notes</small>}
 >
   <Stack justify="center">
-    <p>短主张和适用条件。</p>
+    <p>A short claim and its applicable conditions.</p>
   </Stack>
   <PresentationImage
     src={image}
-    alt="说明图片表达的内容"
+    alt="Describe what the image expresses"
     ratio="fill"
-    caption="说明图中应观察的关系。"
+    caption="Explain the relationship to observe in the image."
   />
 </PresentationLayout>;
 ```
 
-这里 body 提供有限高度，图片使用余量，图注保持自然高度。替换真实图片后仍需核对长宽比与完整边缘。
-骨架不下载素材、不默认裁切，不把图中文字当可访问的正文。
+Here the body provides finite height, the image uses the remaining space, and the caption keeps
+natural height. After replacing it with a real image, still check the aspect ratio and complete edges.
+The skeleton does not download assets, does not crop by default, and does not treat text inside images
+as accessible body content.
 
-## 正文列表
+## Body lists
 
-`PresentationList` 接收 `items: readonly Child[]`，每项自动形成一个原生 li，默认使用 ul。
-顺序有意义时指定 `as="ol"`，`start`、`reversed` 等原生属性仍落在列表元素；不要再手工写重复数字。
+`PresentationList` accepts `items: readonly Child[]`, each item automatically forms a native li, using
+ul by default. When order matters, specify `as="ol"`; native attributes such as `start` and `reversed`
+still land on the list element; do not hand-write duplicate numbers.
 
 ```tsx
-<PresentationLayout columns={3} header={<h2>三个区域使用相同的阅读尺度</h2>}>
-  <PresentationList items={["记录观察。", "保留来源。"]} />
-  <PresentationList as="ol" items={["用相同条件比较。", "指出差异。"]} />
+<PresentationLayout columns={3} header={<h2>Three regions use the same reading scale</h2>}>
+  <PresentationList items={["Record observations.", "Keep the sources."]} />
+  <PresentationList
+    as="ol"
+    items={["Compare under the same conditions.", "Point out the differences."]}
+  />
   <PresentationList
     as="ol"
     start={3}
     reversed
-    items={["收敛问题。", "解释结论。", "提出下一步。"]}
+    items={["Converge on the problem.", "Explain the conclusion.", "Propose the next step."]}
   />
 </PresentationLayout>
 ```
 
-列表沿用 `presentationTokens.fontBody`（标准主题默认 28px）和演示行高、组间距，
-不另设 size/density。它不会按内容多少自动缩字；三列更不能无限塞长内容。
-先保留少量能解释的要点，过长时精简、拆页或调整区域，仍观察溢出诊断与实际阅读效果。
+Lists follow `presentationTokens.fontBody` (28px by default in the standard theme) and the
+presentation line height and group spacing, adding no separate size/density. They do not auto-shrink
+type based on content amount; three columns even less so can take unbounded long content. Keep a small
+number of explainable points first; when too long, trim, split pages or adjust regions, and still
+observe the overflow diagnostic and the actual reading result.
 
-## 正文图片与图注
+## Body images and captions
 
-`PresentationImage` 需要 `src` 和有意义的 `alt`，复用 ImagePreview 的加载、失败反馈与事件。
-可选 `caption` 为普通 Child，在原生 figure 内生成自然高度的 figcaption；它不是浮在图片上的装饰文字。
-不把关键图中文字仅留在像素里，仍提供替代文字或真实正文说明。
+`PresentationImage` requires `src` and a meaningful `alt`, and reuses ImagePreview's loading, failure
+feedback and events. The optional `caption` is an ordinary Child, rendered as a natural-height
+figcaption inside the native figure; it is not decorative text floating over the image. Do not leave
+key text inside an image only in pixels; still provide alternative text or a real body explanation.
 
-`ratio` 默认 `16 / 9`，也可传正的有限数值作为框的优选比例；`ratio="fill"` 使用有限父级分配的剩余高度。
-fill 不是自行寻找屏幕高度：直接放进 PresentationLayout body，或放进已有有限 Stack 的
-`LayoutItem grow basis={0}` 区域，再保留其他文字的自然高度。父级高度不确定时使用数值比例。
+`ratio` defaults to `16 / 9`, and a positive finite number can also be passed as the box's preferred
+ratio; `ratio="fill"` uses the remaining height allocated by a finite parent. fill does not find
+screen height on its own: put it directly in the PresentationLayout body, or in an existing finite
+Stack's `LayoutItem grow basis={0}` region, then keep the natural height of other text. When the parent
+height is uncertain, use a numeric ratio.
 
 ```tsx
 <PresentationImage
   src={photo}
-  alt="描述主体与可观察环境"
+  alt="Describe the subject and the observable environment"
   ratio="fill"
   fit="cover"
   position="top right"
-  caption="允许裁切的照片仍需核对主体是否完整。"
+  caption="A photo that allows cropping still needs the subject checked for completeness."
 />;
 <PresentationImage
   src={diagram}
-  alt="用真实文字说明图中关系"
+  alt="Use real text to explain the relationships in the image"
   ratio={4 / 3}
-  caption="文字图默认完整显示。"
+  caption="Text diagrams are fully shown by default."
 />;
 ```
 
-`fit` 默认 contain，保留完整图像；cover 必须明确选择，允许裁切。
-比例不同时，保留全部内容和填满区域不能同时成立：文字图、图表和证据图优先 contain，
-留白是比例差异的正常结果；照片仅在边缘可舍弃时选 cover，并实际看主体与裁切。
-`position` 默认 center，可选 top/bottom/left/right、top left/top right/bottom left/bottom right。
+`fit` defaults to contain, keeping the complete image; cover must be chosen explicitly and allows
+cropping. When ratios differ, keeping all content and filling the region cannot both hold: text
+diagrams, charts and evidence images prefer contain, and blank space is the normal result of a ratio
+difference; choose cover for photos only when the edges can be discarded, and actually look at the
+subject and the crop. `position` defaults to center, with top/bottom/left/right, top left/top
+right/bottom left/bottom right available.
 
-caption、页标题、footer 都领取自然高度，媒体只使用余量。长图注会减少画面空间，不能靠 fill
-保证任意内容都装下；数值比例也要与整页容量一起检查。不要让图片先占满正文，再把图注挤入 footer。
-复杂媒体组合仍可用 Stack + LayoutItem；AspectRatio 适合自然比例占位，不代替有限高度预算。
+caption, page title and footer all take natural height, and media uses only the remainder. A long
+caption reduces the picture space, and fill cannot guarantee that arbitrary content fits; numeric
+ratios must also be checked together with the whole-page capacity. Do not let the image fill the body
+first and then squeeze the caption into the footer. Complex media compositions can still use Stack +
+LayoutItem; AspectRatio suits natural-ratio placeholders and does not replace the finite height budget.
 
-## 选用构图
+## Choosing a composition
 
-| 目的         | 最小组合                                                                   |
-| ------------ | -------------------------------------------------------------------------- |
-| 标题与主张   | single + Stack justify="center"；主标题、副标题与上下文                    |
-| 图文分栏     | wide-start/wide-end + PresentationImage；根据证据的重要性选主次            |
-| 并列对比     | equal；使用同样的标题层级与比较轴，避免两边内容量悬殊                      |
-| 重点数字     | wide-start；数字、单位与条件组成一个区域，解释与来源另放，示意数值明确标记 |
-| 流程或时间线 | single + Grid/Stack 内的原生 ol/li；保留顺序语义，必要时组合 Reveal        |
-| 引用或总结   | single + blockquote/Stack；区分引用、作者结论、来源与下一步                |
+| Purpose                 | Minimal composition                                                                                                                    |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Title and claim         | single + Stack justify="center"; main title, subtitle and context                                                                      |
+| Text-image split        | wide-start/wide-end + PresentationImage; choose primary and secondary by the importance of the evidence                                |
+| Side-by-side comparison | equal; use the same heading hierarchy and comparison axis, and avoid greatly different content amounts                                 |
+| Key number              | wide-start; number, unit and conditions form one region, explanations and sources go elsewhere, illustrative values are clearly marked |
+| Process or timeline     | single + native ol/li inside Grid/Stack; keep order semantics, compose Reveal when necessary                                           |
+| Quote or summary        | single + blockquote/Stack; distinguish the quote, the author's conclusion, the source and the next step                                |
 
-阅读字号来自既有 `presentationTokens.fontTitle/fontSubtitle/fontBody/fontCaption`。
-确需强调的标题可使用 `PresentationText` editorial 或 marker；正文默认 plain，不需要全页艺术化。
-它仍是真实文本，可选择、换行、复制；原生 contenteditable 只是接缝，不构成编辑器。
-打印和 forced-colors 保留普通文字。
+Reading font sizes come from the existing
+`presentationTokens.fontTitle/fontSubtitle/fontBody/fontCaption`. Headings that truly need emphasis can
+use `PresentationText` editorial or marker; body text is plain by default, and not every page needs
+artistic treatment. It remains real text that can be selected, wrapped and copied; native
+contenteditable is only a seam and does not constitute an editor. Print and forced-colors keep
+ordinary text.
 
-## 背景与阅读区域
+## Backgrounds and reading area
 
-Presentation.background 设整场默认，SlideDefinition.background 可逐页完整覆盖。
-两者接收 `SlideBackground` 或其 Signal；页值为 undefined 时继承整场，整场 undefined 沿主题。
-显式 `"theme"` 回到主题背景与文字，不继承整场的图像、遮罩或颜色。
-对象中的字段不与整场对象合并；fill 省略使用主题纸色。
+Presentation.background sets the deck default, and SlideDefinition.background can fully override per
+page. Both accept `SlideBackground` or its Signal; when the page value is undefined it inherits the
+deck, and when the deck is undefined it follows the theme. An explicit `"theme"` returns to the theme
+background and text and does not inherit the deck's image, overlay or colors. Fields in the object do
+not merge with the deck object; when fill is omitted, the theme paper color is used.
 
 ```tsx
 const slides: readonly SlideDefinition[] = [
   {
     id: "opening",
-    title: "开场",
+    title: "Opening",
     background: {
       fill: "#173d36",
       image: { src: coast, fit: "cover", position: "top right" },
@@ -143,113 +166,163 @@ const slides: readonly SlideDefinition[] = [
     },
     render: () => (
       <PresentationLayout>
-        <h1>让阅读区域保持清楚</h1>
+        <h1>Keep the reading area clear</h1>
       </PresentationLayout>
     ),
   },
 ];
 ```
 
-fill 和 overlay 使用 CSS 颜色或渐变。image.fit 默认 cover，可选 contain；position 默认 center，
-也可选 top/bottom/left/right、top left/top right/bottom left/bottom right。
-cover 允许裁切，contain 保持完整比例并露出底色；检查实际图片与文字的位置，不依赖背景细节传达关键事实。
-foreground 的 light/dark 指文字颜色，省略使用主题文字；它不会检测图片或自动判断对比度。
+fill and overlay use CSS colors or gradients. image.fit defaults to cover, with contain available;
+position defaults to center, with top/bottom/left/right, top left/top right/bottom left/bottom right
+available. cover allows cropping, while contain keeps the complete ratio and reveals the base color;
+check the actual positions of image and text, and do not rely on background details to convey key
+facts. foreground's light/dark refers to text color, and omitting it uses the theme text; it does not
+detect the image or automatically judge contrast.
 
-背景覆盖 1280×720 整张画布，独立裁切自己的装饰；正文仍使用原有 inset 与溢出诊断。
-图片错误后仍保留 fill、overlay 与 foreground，因此要实际检查无图可读性，不把成功下载当作可读的前提。
-背景不进入可访问树；有内容含义的图片保留正文、alt 与说明，不挪进装饰层。
-背景 Signal 可在同一页更新，不重挂草稿、媒体或内容实例；视频仍使用正文媒体组件，不作为背景输入。
-同页背景更新只替换装饰层，不触发切页入场动画。
-运行场景 `presentation-backgrounds` 可观察整场渐变、逐页图、contain、主题恢复、深色、失败与动态更新。
+The background covers the whole 1280×720 canvas and crops its own decoration independently; the body
+still uses the original inset and overflow diagnostic. After an image error, fill, overlay and
+foreground are still kept, so actually check readability without the image and do not treat a
+successful download as a prerequisite for readability. The background does not enter the accessibility
+tree; images that carry content meaning keep body text, alt and explanation, and are not moved into the
+decorative layer. A background Signal can update on the same page without remounting the draft, media
+or content instance; video still uses the body media components and is not a background input.
+Updating the background on the same page only replaces the decorative layer and does not trigger the
+page-change entrance animation. The running scene `presentation-backgrounds` lets you observe the deck
+gradient, per-page image, contain, theme reset, dark, failure and dynamic updates.
 
-## 画布与重排的边界
+## Canvas and reflow boundaries
 
-Presentation 的逻辑画布为 1280×720。窄窗口或短窗口使用 contain 整体缩放，
-不会把两栏暗中改成上下排列；本骨架的命名比例属于逻辑画布。
-需要手机优先阅读页时另用 Container/Stack/Grid 自然布局，不靠演示缩放承载大量正文。
-`RegionLayout` 面向工具区、命名区域与滚动 owner，不作为演示文档 schema。
+Presentation's logical canvas is 1280×720. Narrow or short windows scale as a whole with contain, and
+two columns are not silently turned into a top-bottom arrangement; the named ratios of this skeleton
+belong to the logical canvas. When a mobile-first reading page is needed, use Container/Stack/Grid
+natural layout instead, and do not carry lots of body text through presentation scaling. `RegionLayout`
+targets tool areas, named regions and scroll owners, and is not a presentation document schema.
 
-有限画布容不下任意长文。长标题先领取自然高度，正文区可能因此不足；
-默认不裁切、不自动缩小文字、不添加隐藏滚动，保留 Presentation 的溢出诊断。
-优先精简、拆页或重新安排区域，再观察目标尺寸；原尺寸模式不能代替可读性验收。
-Reveal 隐藏时保留区域几何，逐步呈现不会把相邻内容突然推开。
-需要按局部状态反复显隐时用 `Reveal when={shown}`，与 `at` 二选一，复用同一占位、焦点与活动许可合同。
-作者用 `slideClassName` 为内容层加类，避免把内容标题规则从 Presentation 根扩到外围导航。
-正文在命名区域内放不下时会得到诊断；明确的内部滚动区不按其全部滚动内容计算为画布超量。
+The finite canvas cannot hold arbitrary long text. A long title takes natural height first, and the
+body region may therefore be insufficient; by default it does not crop, auto-shrink text or add hidden
+scrolling, and keeps Presentation's overflow diagnostic. Prefer trimming, splitting pages or
+rearranging regions, then observe the target size; original-size mode cannot replace readability
+acceptance. Reveal keeps region geometry while hidden, so progressive appearance does not suddenly push
+adjacent content away. To repeatedly show and hide by local state, use `Reveal when={shown}`, one of the
+two options with `at`, reusing the same placeholder, focus and activity permission contract. Authors
+add a class to the content layer with `slideClassName`, avoiding extending content heading rules from
+the Presentation root into the surrounding navigation. Body content that does not fit inside a named
+region gets a diagnostic; explicit inner scroll areas are not counted as canvas overflow by all their
+scrolled content.
 
-验证宽屏整页、窄屏、短窗以及真实图片、最长标题和最终步骤。
-Meowbook ready 和静态截图不证明互动、媒体或动画合同，这些按作品实际能力另验。
+Verify widescreen full pages, narrow screens, short windows, plus real images, the longest titles and
+the final step. Meowbook ready and static screenshots do not prove interaction, media or animation
+contracts; verify these separately according to the work's actual capabilities.
 
-## 教学片段与可撤回支架
+## Teaching segments and retractable scaffolds
 
-先明确学生任务、可观察产出、依据与反馈，再选择上面的构图。任务和原始材料可以同时可见，
-提示、参考表达与教师的依据标记分别出现。不要把页数、素材量或动画次数当作学习目标，
-也不要求先写完教案再预览；先试一个片段，再调整最影响理解的内容与状态。
+First clarify the student task, observable output, basis and feedback, then choose a composition above.
+The task and original material can be visible at the same time, while hints, reference expressions and
+the teacher's basis marks appear separately. Do not treat page count, asset amount or animation count
+as learning goals, and do not require finishing the lesson plan before previewing; try one segment
+first, then adjust the content and state that most affect understanding.
 
-画布内的候选答案或情境直接展开成可点击文字、选项块或卡片，不用下拉 select 隐藏教学选项。
-按钮和写作区使用本场演示的字体、尺度、色彩和形状；原生按钮/输入语义、键盘、焦点与可见选择反馈仍需保留。
-提示动作与作答区域保持可辨认关系，不以一套普通应用表单替代幻灯片构图；外围播放器目录仍是独立导航。
-支持区反复显隐时保留自然布局槽位，保持阅读区与按钮位置稳定；隐藏仍退出键盘与可访问树。
-默认、单开与全开都需实际查看，不能只以最大展开时不溢出判定可用。固定参考示例应明确对应片段，不冒充当前选择的自动判分。
+Candidate answers or situations inside the canvas expand directly into clickable text, option blocks or
+cards, and do not hide teaching options in a dropdown select. Buttons and writing areas use this
+presentation's font, scale, color and shape; native button/input semantics, keyboard, focus and visible
+selection feedback still need to be kept. Hint actions and answer areas keep a recognizable
+relationship, and do not replace the slide composition with a set of ordinary application forms; the
+surrounding player outline remains independent navigation. When supporting areas show and hide
+repeatedly, keep natural layout slots and keep the reading area and button positions stable; hiding
+still exits the keyboard and accessibility tree. Default, single-open and fully-open all need actual
+viewing; do not judge usability only by whether the maximally expanded state overflows. Fixed reference
+examples should clearly correspond to the segment and not pretend to be automatic scoring of the
+current choice.
 
-贯穿案例为用户指定的“八上 Unit 5 Wild animals — Reading: Protecting pandas”。
-以下活动、问题与句框均为教学改编，不是教材引文，也不是完整课件或可直接运行的 story；不据此推定版次或页码。
-沿已研究的真实 16 页 PPT 和七篇教学材料的组织线索，先试一个约八分钟的关键片段，
-从已核对的成长信息选一个线索进入问题与保护，不要求八分钟讲完全部 Reading。
-教材具体原句、成长节点和问题细节在正式制作前逐项核对；未核验处保留待核，不用生成文本补作课文。
-本案例与八下 Sunshine for all / Welcome 是不同作品，后者的名称、内容和入口不变。
+The running case is the user-specified "Grade 8, Volume 1, Unit 5 Wild animals — Reading: Protecting
+pandas". The following activities, questions and sentence frames are all teaching adaptations, not
+textbook quotations, and not a complete courseware or directly runnable story; do not infer edition or
+page numbers from them. Following the organizational thread of the studied real 16-page PPT and seven
+teaching materials, first try a key segment of about eight minutes, entering from one clue among the
+verified growth information into the problem and protection, without requiring all of the Reading to be
+covered in eight minutes. Specific original textbook sentences, growth points and problem details are
+checked item by item before formal production; unverified places stay marked as pending verification,
+and generated text is not used to fill in as textbook content. This case and Grade 8 Volume 2 Sunshine
+for all / Welcome are different works; the latter's name, content and entry point are unchanged.
 
-| 阅读推进   | 学生任务与可观察产出                                 | 依据与反馈                                           |
-| ---------- | ---------------------------------------------------- | ---------------------------------------------------- |
-| 成长信息   | 从已核对材料找出一个成长变化，形成简短时间顺序记录   | 年龄、食物或生存条件只填已核对信息；不提前给保护结论 |
-| 问题与后果 | 用自己的话说明一个问题及相应后果，标出支持表达的原句 | 问题与后果分别定位，不凭图片或常识补作课文事实       |
-| 保护措施   | 将一项措施与它回应的问题联系起来，并解释依据         | 原文若未证明措施效果，不把连线成功当作有效性评估     |
-| 个人行动   | 每人提出一项行动并说明它与问题的关系，同伴核对理由   | 接受不同合理表达；区分课文措施与学生提出的行动       |
+| Reading progression      | Student task and observable output                                                                                                   | Basis and feedback                                                                                                          |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------- |
+| Growth information       | Find one growth change in the verified materials and form a short chronological record                                               | Fill in age, food or survival conditions only with verified information; do not give protection conclusions in advance      |
+| Problem and consequences | Explain one problem and its corresponding consequence in your own words, and mark the original sentences that support the expression | Locate the problem and the consequence separately; do not fill in textbook facts from images or common sense                |
+| Conservation measures    | Connect one measure to the problem it responds to and explain the basis                                                              | If the original text does not prove the measure's effect, do not treat a successful matching as an effectiveness assessment |
+| Personal action          | Each person proposes one action and explains how it relates to the problem; a partner checks the reason                              | Accept different reasonable expressions; distinguish textbook measures from actions proposed by students                    |
 
-每人先独立标出一处依据，每对同伴整理一条“问题—后果—措施”关系，再各自形成带理由的个人行动表达。
-成长记录为理解问题服务，不让时间表整理占满分享时间。反馈看是否指回原文、关系是否成立、
-行动理由是否回应问题；学生建议不是教材原句，也不能冒充已经验证的保护成效。
+Each person first independently marks one basis, each pair organizes one "problem, consequence,
+measure" relationship, then each forms a personal action expression with reasons. The growth record
+serves understanding the problem; do not let timeline organization take up the whole sharing time.
+Feedback looks at whether it points back to the original text, whether the relationship holds, and
+whether the action reason responds to the problem; student suggestions are not original textbook
+sentences and cannot pretend to be verified conservation results.
 
-用 single 的一条阅读轴放选定材料，或 equal 让原文与学生关系记录并列；首轮只试一个构图。
-保留原句，不把标注后的结果替代原文。必要的关键词、高亮或关系线指向对应文字且有文字关系说明，
-分别表示成长顺序、问题/后果或措施回应，不把装饰线画成数据趋势。参考表达用普通正文，不靠背景图传递证据。
+Use one reading axis with `single` for the selected material, or `equal` to place the original text and
+the student's relationship record side by side; for the first round try only one composition. Keep the
+original sentences; do not replace the original text with the annotated result. Necessary keywords,
+highlights or relationship lines point to the corresponding text and have textual relationship
+explanations, indicating growth order, problem/consequence or measure response separately; do not draw
+decorative lines as data trends. Reference expressions use ordinary body text and do not convey
+evidence through background images.
 
-| 可重看的状态 | 学生看到与做什么                                      | 教师反馈与支架                                       |
-| ------------ | ----------------------------------------------------- | ---------------------------------------------------- |
-| 首次阅读     | 原文、问题、空白记录；先独立找依据                    | 不显示关键词、结论式标题或参考句                     |
-| 请求提示     | 原文不变，按需增加 growth / problem / action 的定位词 | 只帮助定位，不直接把原句归类给学生                   |
-| 对照解释     | 先听取或查看学生表达，再并置问题、后果与措施的原句    | 需要时给完整示例，再撤到关键词或句框；不要求全部展示 |
-| 撤回支架     | 保留可查原文和学生草稿，隐藏示例与句框，独立改写      | 学生仍可再次请求提示，不因求助清空草稿               |
-| 重看或重做   | 回退重看保留草稿；明确“重新作答”才清空本题记录        | 切到新材料时明确重置本题提示；不默默清空其他任务     |
+| Revisit state        | What students see and do                                                                                                         | Teacher feedback and scaffolding                                                                              |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| First reading        | Original text, questions, blank record; find the basis independently first                                                       | Do not show keywords, conclusion-style headings or reference sentences                                        |
+| Request a hint       | The original text is unchanged; add the locating words for growth / problem / action as needed                                   | Only help locate; do not classify the original sentences for the students directly                            |
+| Compare explanations | First hear or view the student's expression, then place the original sentences for problem, consequence and measure side by side | Give a complete example when needed, then withdraw to keywords or sentence frames; no need to show everything |
+| Withdraw scaffolding | Keep the original text and the student's draft available, hide examples and sentence frames, and rewrite independently           | Students can still request hints again; asking for help does not clear the draft                              |
+| Revisit or redo      | Going back to revisit keeps the draft; only an explicit "answer again" clears this question's record                             | When switching to new material, explicitly reset this question's hints; do not silently clear other tasks     |
 
-需要完整示例时，先用已核对的原文依据与课堂表达形成一例，再撤到 growth / problem / result / action，
-或提供“The text describes __. The suggested action is __.”、“I could __ because __.”等教学改编句框。
-空白处由已核对的阅读信息或学生建议填入，不预填未经核验的教材事实。
-顺序和层数由学生需要决定，最终表达不要求逐字复现示例；撤架后仍可恢复定位词或句框。
-“What could you do, and why?”也是教学改编问题，按行动与依据的关系讨论不同建议，不设唯一选项分数。
+When a complete example is needed, first form one example from the verified original-text basis and
+classroom expression, then withdraw to growth / problem / result / action, or provide teaching-adapted
+sentence frames such as "The text describes __. The suggested action is __." and "I could __ because
+__.". Fill the blanks with verified reading information or student suggestions, and do not pre-fill
+unverified textbook facts. The order and number of layers are decided by student needs; the final
+expression need not reproduce the example word for word; after withdrawing scaffolding, locating words
+or sentence frames can still be restored. "What could you do, and why?" is also a teaching-adapted
+question; discuss different suggestions by the relationship between action and basis, without a
+single-option score.
 
-时间可先试独立阅读一分钟、同伴表达两分钟、全班对照两分钟、独立改写两分钟、反馈一分钟；
-以实际产出调整。分享时听众也需核对依据或修订一句话，不只让少数表达熟练者反复汇报。
-时间预算用于保留学习机会，不驱动自动揭晓答案；材料太满时先删减或拆分。
+Time can initially be tried as one minute of independent reading, two minutes of partner expression,
+two minutes of whole-class comparison, two minutes of independent rewriting and one minute of
+feedback; adjust according to actual output. When sharing, listeners also need to check the basis or
+revise one sentence, rather than only letting a few fluent speakers report repeatedly. The time budget
+is used to preserve learning opportunities and does not drive automatic answer reveal; when materials
+are too full, trim or split first.
 
-### 接线与验收边界
+### Wiring and acceptance boundaries
 
-`Reveal at={n}` 只在 `step >= n` 时累计显现，后退到阈值之前会隐藏；它保留几何，
-隐藏内容退出键盘和可访问树。用它处理必要的先后；稳定复述句框可以直接静态呈现，
-不为每句加动画。`transition` 只装饰入场，background 只装饰画布，都不定义教学反馈。
+`Reveal at={n}` only appears cumulatively when `step >= n`, and hides after going back before the
+threshold; it keeps geometry, and hidden content exits the keyboard and accessibility tree. Use it for
+necessary sequencing; stable sentence frames for repetition can be presented statically and do not
+need animation for every sentence. `transition` only decorates entrances, and background only decorates
+the canvas; neither defines teaching feedback.
 
-上例中局部提示开关、支架层级与草稿是不同作品状态，由作品普通 signals 持有。
-提示区接入 `Reveal when={shown}` 保留布局槽位；`at` 与 `when` 二选一，提高 step 不会自动撤掉旧的 `at` 内容。
-支架撤回也可以是下一次任务不再提供例句，无需把每个教学选择做成按钮或运行时状态。
-不要在作品再手写一份 visibility / inert / aria-hidden / 焦点回退来替代共享 Reveal。
-草稿跨页保留于作品会话，页 DOM 与媒体仍按现有生命周期卸载，重进不自动开声。
-显示隐藏属于课堂呈现，不是权限或防作弊；参考答案进入观众 bundle 后仍可能被查看。
+In the example above, the local hint toggle, scaffolding levels and draft are different work states,
+held by the work's ordinary signals. The hint area is wired to `Reveal when={shown}` to keep the layout
+slot; `at` and `when` are alternatives, and increasing the step does not automatically withdraw old
+`at` content. Withdrawing scaffolding can also mean the next task no longer provides example
+sentences, without turning every teaching choice into a button or runtime state. Do not hand-write
+another visibility / inert / aria-hidden / focus fallback in the work to replace the shared Reveal.
+Drafts persist across pages in the work session, while page DOM and media still unmount according to
+the existing lifecycle, and re-entering does not autoplay sound. Showing and hiding belong to classroom
+presentation, not permissions or anti-cheating; reference answers may still be inspectable after they
+enter the audience bundle.
 
-当前没有专用的选词挖空创作器、逐空反复显隐组件、证据高亮连线编辑器、支架层级组件或评分引擎。
-这些只是可按真实创作困难继续验证的需求，不从本例推导新 API 或一次实现所有能力。
-普通 signals 能承载状态，也不意味着库已提供这些教学交互的结构、默认视觉或可访问性保证。
+There is currently no dedicated word-selection cloze authoring tool, repeated show/hide-per-blank
+component, evidence highlight-line editor, scaffolding level component or scoring engine. These are
+needs to keep validating against real authoring difficulties; do not derive a new API from this example
+or implement all capabilities at once. Ordinary signals can carry state, but that does not mean the
+library already provides the structure, default visuals or accessibility guarantees for these teaching
+interactions.
 
-预览覆盖表中所有关键状态，尤其未提示时的标题/图注、撤回后是否仍泄题、重新求助、回退与重做；
-最长学生草稿、目标投影尺寸与窄短窗口也要实际查看。键盘操作需有可读名称、可见焦点和明确状态，
-隐藏答案不应仍被辅助技术读取，反馈不能仅靠颜色或连线。静态全展开截图不能证明这些行为，
-没有在真实课堂观察时，也不能把操作检查报告成学习成效。
+Preview coverage of all key states in the tables, especially the title/caption when no hint is shown,
+whether the answer is still leaked after withdrawal, requesting help again, going back and redoing; the
+longest student draft, the target projection size and narrow short windows also need actual viewing.
+Keyboard operation needs readable names, visible focus and clear state; hidden answers should not
+remain readable by assistive technology, and feedback cannot rely only on color or connecting lines. A
+static fully-expanded screenshot cannot prove these behaviors, and without real classroom observation,
+operational checks cannot be reported as learning outcomes.

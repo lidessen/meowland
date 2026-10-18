@@ -1,51 +1,51 @@
-# 演示背景合同与复验
+# Presentation background contract and re-verification
 
-本轮在 UI 基础检查的 `f466c38` 上补充用户明确要求的逐页背景能力，代码提交为 `a946924`。沿用正式包名 Meowtail，没有改名、修改既有课件正文或整体配色，也没有读取或修改未知 `data/`、Rossovia。
+This round added the per-slide background capability that the user explicitly requested on top of the UI foundation check at `f466c38`, with code commit `a946924`. It kept the official package name Meowtail, without renaming, changing existing courseware body text or overall colors, and did not read or modify the unknown `data/` or Rossovia.
 
-## 公共合同
+## Public contract
 
-`Presentation.background` 设置整套默认背景，`SlideDefinition.background` 设置单页背景，两者都接受整个值的 signal。单页 `undefined` 继承整套默认值；整套值也为 `undefined` 时使用主题。显式 `"theme"` 恢复当前主题的纸面、正文与次要文字。
+`Presentation.background` sets the deck-wide default background, and `SlideDefinition.background` sets a single slide's background; both accept a signal of the whole value. A slide-level `undefined` inherits the deck-wide default; when the deck-wide value is also `undefined`, the theme is used. An explicit `"theme"` restores the current theme's paper, body and secondary text.
 
-对象支持 CSS 颜色或渐变 `fill`、图片 `image`、颜色或渐变 `overlay`，以及文字颜色预设 `foreground: "light" | "dark"`。图片提供 `cover` / `contain` 和九种有限位置；默认 cover、center。单页对象整体替换整套对象，不逐字段合并；省略 fill 使用主题纸面。foreground 表示文字颜色，仅覆盖演示局部的 ink / muted，不切换嵌套控件的完整主题。
+The object supports a CSS color or gradient `fill`, an image `image`, a color or gradient `overlay`, and a text color preset `foreground: "light" | "dark"`. Images provide `cover` / `contain` and nine finite positions; the default is cover, center. A slide object replaces the deck-wide object as a whole and does not merge field by field; omitting fill uses the theme paper. foreground means text color and only overrides the presentation-local ink / muted, without switching the complete theme of nested controls.
 
-背景铺满画布，原有内容安全边距不变。独立背景层裁切图片，不遮蔽正文溢出诊断。背景为 inert、aria-hidden 的装饰，图片空 alt、不参与焦点导航。加载失败只隐藏失败图片，保留 fill、overlay 和 foreground；作者应让无图片时的底色、遮罩与文字仍可读，不进行自动图片对比度推断。
+The background fills the canvas, and the existing content safe margins are unchanged. A separate background layer clips the image and does not obscure body overflow diagnostics. The background is inert, aria-hidden decoration; images have an empty alt and do not participate in focus navigation. A load failure only hides the failed image and keeps fill, overlay and foreground; authors should keep the base color, scrim and text readable without the image, and no automatic image contrast inference is performed.
 
-背景变化仅替换装饰层，不重新挂载同页内容、不启动切页动画。切页时背景和内容在同一 article 内共同入场，旧页仍立即卸载并结束媒体生命周期。没有新增背景视频、资源管理器、预加载系统或任意 JSON 执行合同。
+A background change only replaces the decoration layer and does not remount same-slide content or start a slide transition. On a slide change, background and content enter together inside the same article, and the old slide still unmounts immediately and ends its media lifecycle. No background video, asset manager, preload system or arbitrary JSON execution contract was added.
 
-指南在 `packages/meowtail/PRESENTATION-LAYOUTS.md`，七页真实场景为 `presentation-backgrounds`；stories 只驱动公开组件和状态，未复制实现或添加消费者 CSS 修补。
+The guide is in `packages/meowtail/PRESENTATION-LAYOUTS.md`, and the real seven-slide scene is `presentation-backgrounds`; the stories only drive public components and state and did not copy implementations or add consumer CSS patches.
 
-## 独立审查与两轮验证
+## Independent review and two rounds of verification
 
-实现前由独立质疑者确认继承、显式恢复主题、对象替换、失败回退、局部文字 token 和媒体生命周期边界。第一轮通过单测、类型正负例、真实浏览器压力场景完成实现闭环。第二轮由非实现者在最终构建上复验复合页面、动态输入、实际媒体播放、快速切页与安装态，未发现新的关键缺陷。
+Before implementation, the independent challenger confirmed the boundaries of inheritance, explicit theme restoration, object replacement, failure fallback, local text tokens and the media lifecycle. The first round completed the implementation loop through unit tests, type positive/negative cases and real browser stress scenarios. In the second round, a non-implementer re-verified composite pages, dynamic input, actual media playback, rapid slide changes and installed state on the final build, and found no new critical defects.
 
-- 宽屏、390px 窄屏、短窗口实际截图均已打开检查，覆盖 cover、contain、整套渐变、主题恢复、暗色宿主和故意失败的图片。背景与画布边缘几何差为零，背景裁切没有误报内容溢出。
-- 同页连续背景更新保持输入节点、焦点、草稿和内容挂载次数；独立音频场景实际播放且时间继续前进。切页后旧音频暂停、脱离文档并清除 src。延迟到达的旧图片错误只影响已卸载的旧节点，新背景继续可见。
-- 同页背景更新在两帧后没有 article 动画；正常切页只有共享 article 的一次入场，只有新页内容和背景。五轮快速切换后仍只有一份活动内容和背景；浏览器 pageerror 为零。
-- 独立证据位于 `artifacts/presentation-review/backgrounds-20261018/independent-background-results.json` 与 `independent-background-transition-results.json`。安装态只宣称媒体节点连续性；实际播放证据来自前述独立音频检查。
+- Actual screenshots at wide screen, 390px narrow screen and short window were all opened and checked, covering cover, contain, deck-wide gradients, theme restoration, a dark host and deliberately failing images. The geometry difference between background and canvas edges was zero, and background clipping did not falsely report content overflow.
+- Consecutive background updates on the same slide kept the input node, focus, draft and content mount count; the separate audio scenario actually played and time kept advancing. After a slide change, the old audio paused, left the document and had its src cleared. A late-arriving old image error only affected the already-unmounted old node, and the new background stayed visible.
+- A same-slide background update had no article animation after two frames; a normal slide change had only one entrance of the shared article, with only the new slide's content and background. After five rounds of rapid switching there was still exactly one active content and background; browser pageerror was zero.
+- Independent evidence is in `artifacts/presentation-review/backgrounds-20261018/independent-background-results.json` and `independent-background-transition-results.json`. The installed state only claims media node continuity; actual playback evidence comes from the separate audio check above.
 
-## 最终同版本检查
+## Final same-version checks
 
-所有源码检查均针对 `a946924` 中的同一实现，完成构建后没有再修改产品源码。
+All source checks targeted the same implementation in `a946924`, and product source was not modified after the build completed.
 
-| 层级         | 检查                                                                | 结果                                       |
-| ------------ | ------------------------------------------------------------------- | ------------------------------------------ |
-| 构建         | 根 build 五包；两份 presentation 示例；showcase build               | 全部通过                                   |
-| 类型         | 根 typecheck；Meowtail 完整 tsc                                     | 全部通过，含公共背景类型正负例             |
-| 格式与 lint  | Oxfmt 全仓 check，显式排除 `data/**`；Oxlint deny-warnings 同样排除 | 659 个格式输入通过，lint 零警告            |
-| 单测         | 根 `bun run test`                                                   | 323 项、66 文件、1999 断言通过             |
-| 组件浏览器   | Meowtail 标准配置，3 workers                                        | 157/157                                    |
-| 演示浏览器   | `bun run test:presentation`                                         | 32/32                                      |
-| 消费者浏览器 | showcase、图片示例、Sunshine                                        | 2/2、5/5、11/11；合计 207 项浏览器测试通过 |
-| 展板         | showcase check                                                      | 113 个 stories 通过                        |
+| Layer                | Check                                                                                                 | Result                                                               |
+| -------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------- |
+| Build                | Root build five packages; two presentation examples; showcase build                                   | All passed                                                           |
+| Types                | Root typecheck; full Meowtail tsc                                                                     | All passed, including public background type positive/negative cases |
+| Format and lint      | Oxfmt repo-wide check with explicit `data/**` exclusion; Oxlint deny-warnings with the same exclusion | 659 format inputs passed, lint zero warnings                         |
+| Unit tests           | Root `bun run test`                                                                                   | 323 items, 66 files, 1999 assertions passed                          |
+| Component browser    | Meowtail standard config, 3 workers                                                                   | 157/157                                                              |
+| Presentation browser | `bun run test:presentation`                                                                           | 32/32                                                                |
+| Consumer browser     | showcase, image example, Sunshine                                                                     | 2/2, 5/5, 11/11; 207 browser tests passed in total                   |
+| Showcase             | showcase check                                                                                        | 113 stories passed                                                   |
 
-没有执行会扫描未知目录的原样根 check；使用上表等价的显式排除命令。没有重复运行代码未变的 Meowbook 工具全部专用浏览器矩阵，实际 capture 路径已使用。
+The pristine root check that would scan unknown directories was not executed; equivalent explicit-exclusion commands from the table above were used. The full dedicated browser matrix of the unchanged Meowbook tooling was not rerun, and the actual capture path was used.
 
-## 本地安装态与交付边界
+## Local installed state and delivery boundaries
 
-新批次回执为 `artifacts/presentation-backgrounds/consumer-Odgs12/receipt.json`。从最终 dist 打包三个真实 tgz，在全新 `/tmp` 消费者离线安装，禁用安装脚本，不使用源码 aliases 或包根 symlink；核对当前、打包与安装后 dist 字节一致。根与 presentation 子路径身份、背景公共类型正负例、无 DOM 的 core 类型、浏览器打包、宽窄视口实际组合与卸载全部通过。
+The new batch receipt is `artifacts/presentation-backgrounds/consumer-Odgs12/receipt.json`. Three real tgz files were packed from the final dist and installed offline in a brand-new `/tmp` consumer with install scripts disabled, without source aliases or package-root symlinks; current, packed and installed dist bytes were checked to be identical. Root and presentation subpath identity, background public type positive/negative cases, DOM-free core types, browser bundling, actual composition and unmount at wide/narrow viewports all passed.
 
-Meowtail tarball SHA256 为 `9bcdb4833e89fdf3d263eeae4d15972eecf5d3d401a09377275301086d1ff4a3`；版本仍为 `0.1.1-presentation.20261017.1`，没有版本升级或覆盖历史发行资产。这是本地安装验收，不是 registry 安装或发布。
+The Meowtail tarball SHA256 is `9bcdb4833e89fdf3d263eeae4d15972eecf5d3d401a09377275301086d1ff4a3`; the version is still `0.1.1-presentation.20261017.1`, with no version bump or overwrite of historical release assets. This is local install acceptance, not a registry install or release.
 
-四张最终代表图保留在 `artifacts/presentation-background-review/`：`final-cover-wide.png`、`final-deck-wide.png`、`final-fallback-wide.png`、`final-cover-narrow.png`，由最终构建拍摄并实际查看。Library 保存未成功：恢复独立临时运行环境后，当前 Library 上传流程仍报告该执行环境不可用；未产生写入，也没有可交付的 Library ID。未绕过要求的保存流程；本地截图为剩余交付物。
+The four final representative images are kept in `artifacts/presentation-background-review/`: `final-cover-wide.png`, `final-deck-wide.png`, `final-fallback-wide.png` and `final-cover-narrow.png`, taken from the final build and actually viewed. Library saving did not succeed: after restoring a separate temporary runtime environment, the current Library upload flow still reported that execution environment unavailable; nothing was written and there is no deliverable Library ID. The required save flow was not bypassed; the local screenshots are the remaining deliverable.
 
-当前没有剩余关键代码缺陷。尚未验证 Safari/Firefox、真实移动硬件、人工屏幕阅读器或浏览器 UI 缩放；已验证 Chromium/Chrome、模拟窄短窗口、既有画布缩放与背景组合。背景本身不提供自动对比度、视频、导出或预加载保证。本轮不推送、不发布 npm、不部署。
+There are currently no remaining critical code defects. Safari/Firefox, real mobile hardware, manual screen readers or browser UI scaling were not verified; Chromium/Chrome, simulated narrow/short windows, the existing canvas scaling and background composition were verified. The background itself provides no automatic contrast, video, export or preload guarantee. This round did not push, publish npm or deploy.

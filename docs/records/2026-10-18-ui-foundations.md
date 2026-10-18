@@ -1,73 +1,70 @@
-# UI 基础与演示能力复验
+# UI foundations and presentation capability re-verification
 
-本轮从 `190d721` 扩大检查当前 `meowtail` UI 库；用户口中的 meowface 没有触发改名。既有演示工具带合同继续沿用。用户随后补充演示动画、常见内容布局与现代标题排印；未修改两份既有作品的正文、课程状态或整体配色。
+This round expanded checks of the current `meowtail` UI library from `190d721`; the user's meowface did not trigger a rename. The existing presentation toolbar contract continued to apply. The user then added presentation animation, common content layouts and modern heading typography; the body text, course state and overall colors of the two existing works were unchanged.
 
-## 两轮闭环
+## Two rounds of end-to-end work
 
-第一轮分布局模型、尺寸与内容边界、键盘交互、文档和实际消费者四个方向盘点并真实复现。改变机制前由独立审查者核对反例和更小替代；实现按文件 owner 分工。
+The first round inventoried and actually reproduced in four directions: layout model, size and content boundaries, keyboard interaction, documentation and real consumers. Before changing mechanisms, an independent reviewer checked counterexamples and smaller alternatives; implementation was split by file owner.
 
-- 180px 高度内的嵌套 Stack / LayoutItem 被自动最小高度撑到 2376px，阅读体没有取得自己的滚动空间。四个布局根补齐 `min-height:0`，不默认添加 overflow、不重置任意子元素。数值 `basis={120}` 原先被浏览器丢弃，现按 px 序列化；字符串保留原样。
-- 280px 局部容器中的 CardHeader 动作列可把标题挤至零宽，ResourceCard / ListRow 的固定状态与动作可越出边缘，Field 的连续长词可把输入撑至约 1103px。分别在所属组件收紧网格最小轨道、分配文字余量、允许状态和动作自然换行；长词由内容 part 换行，不用宿主补丁掩盖。
-- Menu 聚焦“移除”后按 Tab 原先会执行该操作。改为关闭菜单链并沿原生 Tab / Shift+Tab 顺序离开；没有激活操作或提交表单。独立覆盖同步接受和拒绝关闭的受控 owner，以及嵌套菜单。
+- A nested Stack / LayoutItem inside 180px height was stretched by automatic minimum height to 2376px, and the reading body got no scroll space of its own. The four layout roots gained `min-height:0`, without adding overflow by default or resetting arbitrary child elements. The numeric `basis={120}` was previously discarded by the browser and is now serialized as px; strings are kept as-is.
+- In a 280px local container, the CardHeader action column could squeeze the title to zero width; ResourceCard / ListRow fixed states and actions could overflow the edges; and a continuous long word in Field could stretch the input to about 1103px. The owning components respectively tightened the grid's minimum track, allocated text space and allowed states and actions to wrap naturally; long words wrap through the content part, without host patches hiding the issue.
+- After focusing "Remove" in Menu, pressing Tab previously executed that action. It was changed to close the menu chain and leave along the native Tab / Shift+Tab order; no action was activated and no form was submitted. Independent coverage includes controlled owners that synchronously accept and refuse closing, and nested menus.
 
-第二轮由非实现者重新检查内容边界与复合工作区：固定 PageFrame 页头和 Toolbar、嵌套 Grid / Card / Field、动态追加段落、正文滚动、Popover、末尾动作，以及调整窗口后的输入草稿和节点身份。自然无界 Stack 仍完整展开，有限高度才分配滚动余量；`shrink={false}` 的固定区不会被当作可裁切内容。
+The second round had a non-implementer recheck content boundaries and composite workspaces: a fixed PageFrame header and Toolbar, nested Grid / Card / Field, dynamically appended paragraphs, body scrolling, Popover, trailing actions, and input drafts and node identity after resizing the window. A naturally unbounded Stack still expands fully, and only a finite height gets scroll space; a fixed region with `shrink={false}` is not treated as clippable content.
 
-第二轮还实际发现图文 recipe 的图片按宽度取高后，图注与来源区重叠约 17.5px；改用已有 Stack / LayoutItem 分配有限媒体区，图片 contain 领取余量，图注保持自然高度。流程 recipe 去掉与原生 ol 重复的手写序号。固定画布内动态追加内容未触发原 ResizeObserver，诊断不更新的问题也继续追至 Presentation，而非删除失败断言。
+The second round also actually found that after the image-caption recipe's image took height by width, the caption and source area overlapped by about 17.5px; the existing Stack / LayoutItem was used to allocate a finite media region, the contained image took the remaining space and the caption kept natural height. The process recipe removed the handwritten numbering duplicated with the native ol. Inside a fixed canvas, dynamically appended content did not trigger the original ResizeObserver, and the issue of diagnostics not updating was traced into Presentation rather than deleting the failing assertion.
 
-新场景只挂载公开组件、传入内容和驱动状态；共享实现仍归库。没有读取或修改未知 `data/`，没有修改 Rossovia。
+The new scenes only mount public components, pass content and drive state; the shared implementation still belongs to the library. The unknown `data/` was not read or modified, and Rossovia was not modified.
 
-## 演示补充
+## Presentation additions
 
-- Presentation 与 Reveal 共用 `transition`：none、fade、slide、zoom，方向和速度使用有限预设。切页只装饰新页入场，旧页立即失活并卸载；Reveal 的隐藏、焦点和活动合同先成立，动画不改变叙事位置。没有为了 push 保留第二个可交互页面。独立检查推动补齐动画 API 失败后的 clip 恢复，以及尚未开始的下一帧在失活后取消、不补播的竞态。
-- 单个 `PresentationLayout` 提供可替换 header/footer 与 single/equal/wide-start/wide-end 内容区；列比为一列、1:1、2:1、1:2。标题、图文、对比、数字、流程、引用总结只作六种轻量 recipes，不建立六套模板组件或 JSON 文档引擎。选用说明在包内 `PRESENTATION-LAYOUTS.md`，创作 skill 指向相同合同。
-- 单个 `PresentationText` 保留真实 DOM 文本，plain 为默认，只增加 editorial 和 marker 两种克制排印。字号与字体沿用演示体系，marker 仅轻底部标记；没有彩虹渐变、厚描边、立体阴影或字体下载。明暗原图经过实施者和协调者分别查看后保留这两种，不以效果数量作为验收。
+- Presentation and Reveal share `transition`: none, fade, slide, zoom, with finite presets for direction and speed. A slide change only decorates the new slide's entrance, and the old slide immediately becomes inactive and unmounts; Reveal's hide, focus and activity contracts hold first, and animation does not change narrative position. No second interactive page was kept for push. Independent checks drove the addition of clip recovery after an animation API failure, and of the race where a not-yet-started next frame is canceled after deactivation and not replayed.
+- A single `PresentationLayout` provides replaceable header/footer and single/equal/wide-start/wide-end content regions; column ratios are one column, 1:1, 2:1 and 1:2. Heading, image-text, comparison, number, process and quote-summary are only six lightweight recipes, and no six template components or JSON document engine were built. Selection notes are in the package's `PRESENTATION-LAYOUTS.md`, and the authoring skill points to the same contract.
+- A single `PresentationText` keeps real DOM text, with plain as the default, adding only the restrained editorial and marker typographic styles. Font size and fonts follow the presentation system, and marker only adds a light bottom mark; there are no rainbow gradients, thick outlines, 3D shadows or font downloads. The light and dark original images were viewed separately by the implementer and coordinator before keeping these two, and the number of effects is not used as acceptance.
 
-## 有界取舍
+## Bounded tradeoffs
 
-280px 卡片内放五个图标动作时，标题虽不再归零，长英文仍可能碎行、卡片增高。此轮保留简单的动作列占用上限，没有为了压力例新增 Card DOM 合同或隐式容器尺寸；实际作者可用已有 Menu 收拢低频动作。
+When a 280px card holds five icon actions, the title no longer goes to zero width, but long English may still break lines and increase card height. This round kept the simple action-column occupancy cap and did not add a Card DOM contract or implicit container size for the stress case; authors can use the existing Menu to collapse low-frequency actions.
 
-布局根的最小尺寸不替代内容策略。任意原生 wrapper、明确的 Grid auto 行轨道和固定尺寸媒体仍归调用方；自然文流、局部滚动和外层滚动须分别选择 owner。演示的逻辑画布按 contain 缩放，不因手机宿主而重排讲义内容；动作可达不等于小屏正文适合阅读。
+The layout roots' minimum size does not replace content strategy. Arbitrary native wrappers, explicit Grid auto row tracks and fixed-size media still belong to the caller; natural text flow, local scrolling and outer scrolling must each choose an owner. The presentation's logical canvas scales by contain and does not reflow lesson content because of a phone host; action reachability does not mean small-screen body text is suitable for reading.
 
-## 验证与交付
+## Verification and delivery
 
-完整检查曾暴露两项既有遗漏：两个 story 的三个输入缺少真实标签关联；Assistant 的深色摄影测试在显式 light 预览下错误期待系统媒体切换重写主题属性。前者补 `htmlFor/id`（明暗场景 id 独立），后者改用真实外观选择器选择 dark，保留严格属性断言。没有放宽展板检查或浏览器断言。
+The complete checks once exposed two existing omissions: three inputs in two stories lacked real label association; and the Assistant's dark photography test, under an explicit light preview, wrongly expected a system media switch to rewrite theme attributes. The first gained `htmlFor/id` (independent ids for light and dark scenes), and the second switched to selecting dark through the real appearance selector while keeping strict attribute assertions. Showcase checks and browser assertions were not loosened.
 
-隔离安装态还发现 reduced-motion 下导航、在下一帧前恢复偏好会补播旧入场。旧候选保留为失败证据；修复为排队时即检查偏好、收到 reduce 事件取消待播，恢复不补播，也不把动态偏好混入作品活动许可。回归在两个动画帧后检查，而非以即时零动画作为通过；实施者和独立审查者分别验证五次真实切换及同帧事件窗口。
+The isolated installed state also found that under reduced motion, navigating and restoring the preference before the next frame replayed the old entrance. The old candidate was kept as failure evidence; the fix checks the preference at queue time, cancels the pending playback when a reduce event arrives, does not replay on restoration, and does not mix dynamic preferences into work activity permission. The regression checks after two animation frames instead of passing on immediate zero animation; the implementer and independent reviewer separately verified five real switches and the same-frame event window.
 
-最终实现与测试输入为 `e6b1ec1`（含 `f04efd6`、`bf11214`、`f228ea6`）；后续回执提交不改变运行代码或包内文件。Bun 1.4.2，macOS arm64，Playwright 1.63.0。
+The final implementation and test inputs are `e6b1ec1` (including `f04efd6`, `bf11214` and `f228ea6`); later receipt commits do not change runtime code or in-package files. Bun 1.4.2, macOS arm64, Playwright 1.63.0.
 
-| 层级         | 最终实际执行                                                       | 结果                                                                |
-| ------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------- |
-| 构建         | `bun run build`；两份 `examples/*/build.ts`；showcase build        | 五包、两作品、展板均通过                                            |
-| 类型         | 根 `bun run typecheck`；Meowtail 完整 tsc；两作品 tests/tsconfig   | 全部通过，含源码、stories、公共类型与浏览器测试                     |
-| 格式 / lint  | Oxfmt 全仓 check 显式排除 `data/**`；Oxlint deny-warnings 同样排除 | 655 个格式输入通过，lint 零警告；未执行会读取未知目录的原样根 check |
-| 单测         | 根 `bun run test`                                                  | 320 项、65 文件、1982 断言通过                                      |
-| 组件浏览器   | Meowtail 标准配置，3 workers                                       | 154/154，通过明暗 390/1100 全场景矩阵和新增组合                     |
-| 演示浏览器   | `bun run test:presentation`，另启动本版正式图片入口 13009          | 32/32，含原合同、工具带及 10 项动画检查                             |
-| 消费者浏览器 | showcase、图片作品、Sunshine 各自 Playwright 配置                  | 2/2、5/5、11/11，浏览器合计 204 项通过                              |
-| 展板静态检查 | showcase check                                                     | 112 个公开 gallery 场景；最终 batch 零可访问性提示                  |
+| Level                 | Final actual execution                                                                                | Result                                                                                                                     |
+| --------------------- | ----------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| Build                 | `bun run build`; two `examples/*/build.ts`; showcase build                                            | Five packages, two works and the showcase all passed                                                                       |
+| Types                 | Root `bun run typecheck`; full Meowtail tsc; two works tests/tsconfig                                 | All passed, including source, stories, public types and browser tests                                                      |
+| Format / lint         | Oxfmt repo-wide check with explicit `data/**` exclusion; Oxlint deny-warnings with the same exclusion | 655 format inputs passed, lint zero warnings; the pristine root check that would read unknown directories was not executed |
+| Unit tests            | Root `bun run test`                                                                                   | 320 items, 65 files, 1982 assertions passed                                                                                |
+| Component browser     | Meowtail standard config, 3 workers                                                                   | 154/154, passing the light/dark 390/1100 full-scene matrix and new compositions                                            |
+| Presentation browser  | `bun run test:presentation`, additionally starting this version's official image entry at 13009       | 32/32, including the original contract, toolbar and 10 animation checks                                                    |
+| Consumer browser      | showcase, image work and Sunshine each Playwright config                                              | 2/2, 5/5, 11/11, 204 browser items passed in total                                                                         |
+| Showcase static check | showcase check                                                                                        | 112 public gallery scenes; final batch zero accessibility notes                                                            |
 
-最终截图由重新构建的 Meowbook capture 服务拍摄，清单在忽略目录
-`artifacts/foundation-review/final/captures.json`；另拍两份正式浏览器入口。
-实际查看宽屏、390px 窄屏、330–390px 短窗、固定操作与阅读体、浮层、图文构图、明暗排印和长标题原图。
-12 张代表图与 `transitions-demo.webm` 已成功保存至 Library；完整 ID 与本地路径对应在
-`artifacts/foundation-review/final/library-uploads.json`，交付消息直接提供 ID。
-录屏为最终本版正常动态的真实 fade/slide/zoom 和分步 Reveal，1280×900、25fps、8.72 秒；已抽帧查看。
-独立动画审查的快速跳页、媒体卸载、暂停/隐藏、原尺寸滚动、动态诊断和待播竞态证据另在
-`artifacts/presentation-review/transitions-20261018/`，不把静态图当作动画验证。
+Final screenshots were taken by the rebuilt Meowbook capture service, and the list is in the ignored directory `artifacts/foundation-review/final/captures.json`; two official browser entry points were also shot.
+Original images were actually viewed for wide screen, 390px narrow screen, 330–390px short window, fixed actions and reading body, popups, image-text composition, light/dark typography and long titles.
+12 representative images and `transitions-demo.webm` were saved successfully to Library; the full IDs and local path correspondence are in `artifacts/foundation-review/final/library-uploads.json`, and the delivery message provides the IDs directly.
+The recording shows the final version's real normal-motion fade/slide/zoom and step-by-step Reveal at 1280×900, 25fps, 8.72 seconds; frames were extracted and viewed.
+Independent animation review evidence for rapid page jumps, media unmount, pause/hide, original-size scrolling, dynamic diagnostics and pending-play races is in `artifacts/presentation-review/transitions-20261018/`; static images are not treated as animation verification.
 
-## 本地安装态
+## Local installed state
 
-最终隔离回执为 `artifacts/final-ui-consumer-KduV6o/receipt.json`。
-在全新 staging 打包实际三包 dist 与包文件（不复制源码或 node_modules），空 `/tmp` 消费者从本机缓存离线安装真实 tgz，禁用 install scripts；不使用源码 aliases、相邻 checkout 或逃逸 symlink。
-运行时 root / presentation 子路径身份、公开类型正负例、无 DOM 的 JSX/CSS core 类型、浏览器构建、指南和许可证均通过。
-最终新包重测五轮 reduced-motion 导航恢复、正常入场、取消、卸载与零浏览器异常；未变的布局/排印三视口证据按字节一致的声明和实际 dist 比对有界复用，回执明确列出。
+The final isolated receipt is `artifacts/final-ui-consumer-KduV6o/receipt.json`.
+In a brand-new staging directory, the actual three-package dist and package files were packed (without copying source or node_modules); an empty `/tmp` consumer installed the real tgz offline from the local cache with install scripts disabled, without source aliases, adjacent checkouts or escaping symlinks.
+The runtime root / presentation subpath identity, public type positive/negative cases, DOM-free JSX/CSS core types, browser build, guides and licenses all passed.
+The final new package re-tested five rounds of reduced-motion navigation restoration, normal entrance, cancel, unmount and zero browser exceptions; unchanged layout/typography three-viewport evidence was reused in a bounded way based on byte-identical declarations and actual dist comparison, and the receipt lists it explicitly.
 
-最终 Meowtail tarball SHA256 为
-`4e58f4ca9cdf752043813e97e27291b132bccfe070ace53d14d44769ec414345`，包内版本仍为
-`0.1.1-presentation.20261017.1`，未改源版本。旧 `SvquPl` 候选与 reduced-motion 失败记录保留，没有覆盖旧 tarball 或既有发行资产。此证据仅是本地安装验收，不是 registry 安装或发布。
+The final Meowtail tarball SHA256 is
+`4e58f4ca9cdf752043813e97e27291b132bccfe070ace53d14d44769ec414345`, and the in-package version is still
+`0.1.1-presentation.20261017.1`, with no source version change. The old `SvquPl` candidate and the reduced-motion failure record are kept, and the old tarball or existing release assets were not overwritten. This evidence is only local install acceptance, not a registry install or release.
 
-没有剩余关键缺陷。尚未验真实移动硬件、Safari/Firefox、人工屏幕阅读器与浏览器 UI 缩放；已验证的是 Chromium/Chrome、模拟窄短视口、画布缩放及原尺寸模式。未重跑代码未变的 Meowbook 工具自身全部专用浏览器矩阵，相关工具单测及实际 capture 路径已运行。
-动态诊断观察内容增删、文字、资源加载与尺寸变化，不承诺任意纯样式改变或发现画布内部所有区域重叠；后者由 recipe 的实际几何与原图验证。历史原产品设计外链未成功取得，本轮以当前库合同、已有实现与第三方 notices 为依据。
+There are no remaining critical defects. Real mobile hardware, Safari/Firefox, manual screen readers and browser UI scaling were not verified; what was verified is Chromium/Chrome, simulated narrow/short viewports, canvas scaling and original-size mode. The full dedicated browser matrix of the unchanged Meowbook tooling was not rerun, and the related tool unit tests and actual capture path were run.
+Dynamic diagnostics observe content add/remove, text, asset loading and size changes, and do not promise coverage of arbitrary pure style changes or all region overlaps inside the canvas; the latter is verified by the recipes' actual geometry and original images. The historical external links to the original product design were not successfully obtained, and this round is based on the current library contract, the existing implementation and third-party notices.
 
-源码观察、自动检查、实际浏览器行为、本地安装态与正式发布分别记录；本轮不推送、不发布 npm、不部署。
+Source observation, automated checks, actual browser behavior, local installed state and official release are recorded separately; this round did not push, publish npm or deploy.

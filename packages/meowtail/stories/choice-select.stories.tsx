@@ -4,14 +4,14 @@ import { ChoiceSelect, Stack, Field, Container } from "meowtail";
 
 export const GroupedChoiceSelectStory = defineStory({
   id: "choice-select-grouped",
-  title: "选择器 · 分组选项",
+  title: "Choice select · Grouped options",
   component: "ChoiceSelect",
-  group: "基础控件",
+  group: "Basic controls",
   render() {
     const value = signal("deepseek-flash");
     return (
       <ChoiceSelect
-        aria-label="Provider 与模型"
+        aria-label="Provider and model"
         value={value}
         onValueChange={(next) => {
           value.value = next;
@@ -28,37 +28,41 @@ export const GroupedChoiceSelectStory = defineStory({
 
 export const ChoiceWidthStory = defineStory({
   id: "choice-select-width",
-  title: "选择器 · 短触发器与长选项",
+  title: "Choice select · Short trigger and long options",
   component: "ChoiceSelect",
-  group: "基础控件",
-  description: "匹配触发器保留精确宽度；自然浮层与宽表单沿各自已有合同呈现。",
+  group: "Basic controls",
+  description:
+    "A matching trigger keeps its exact width; the natural popover and wide form follow their existing contracts.",
   render() {
     return (
       <Stack align="start">
         <ChoiceSelect
           id="short-choice"
-          aria-label="短触发器选择"
+          aria-label="Short trigger choice"
           options={[
-            { value: "one", label: "第一个" },
-            { value: "two", label: "第二个" },
+            { value: "one", label: "First option" },
+            { value: "two", label: "Second option" },
           ]}
         />
         <ChoiceSelect
           id="natural-choice"
-          aria-label="自然宽度选择"
+          aria-label="Natural width choice"
           matchTriggerWidth={false}
           options={[
-            { value: "one", label: "第一个" },
-            { value: "two", label: "第二个" },
+            { value: "one", label: "First option" },
+            { value: "two", label: "Second option" },
           ]}
         />
         <Container width="narrow">
-          <Field label="完整选项名称" htmlFor="long-choice">
+          <Field label="Full option name" htmlFor="long-choice">
             <ChoiceSelect
               id="long-choice"
               defaultValue="long"
               options={[
-                { value: "long", label: "项目负责人审阅当前完整修改与验证记录" },
+                {
+                  value: "long",
+                  label: "The project owner reviews the full change and verification record",
+                },
                 {
                   value: "path",
                   label: "workspace-very-long-source-reference-for-a-readable-selection",

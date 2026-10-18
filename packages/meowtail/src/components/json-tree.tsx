@@ -55,9 +55,9 @@ export const JsonTree = defineComponent<
   const copy = async () => {
     try {
       await (onCopy ?? copyTextToClipboard)(JSON.stringify(data, null, 2));
-      if (alive) feedback.value = "已复制";
+      if (alive) feedback.value = "Copied";
     } catch {
-      if (alive) feedback.value = "复制失败";
+      if (alive) feedback.value = "Copy failed";
     }
   };
   const copyButton = context.part(
@@ -69,7 +69,7 @@ export const JsonTree = defineComponent<
         event.stopPropagation();
         void copy();
       },
-      "aria-label": `复制 ${label}`,
+      "aria-label": `Copy ${label}`,
     },
     <Icon name="copy" size={12} />,
   );

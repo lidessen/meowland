@@ -4,11 +4,12 @@ import { Button, ChatQuestion, ChoiceGroup, Textarea } from "meowtail";
 
 export const ChatQuestionStory = defineStory({
   id: "chat-question",
-  title: "问答 · 选择与文字回答",
-  group: "对话组件",
+  title: "Question · Choices and a written answer",
+  group: "Conversation components",
   component: "ChatQuestion",
-  variant: "可操作问答",
-  description: "问题优先，选项直接可见。选择不会发送，确认提交后才产生本地回执；切换输入保留草稿。",
+  variant: "Interactive question",
+  description:
+    "The question comes first and options are visible. Selecting does not send; a local receipt only appears after you confirm and submit. Switching input modes keeps the draft.",
   covers: [
     "ChoiceGroup native radio",
     "required",
@@ -20,16 +21,16 @@ export const ChatQuestionStory = defineStory({
   render: () => (
     <form data-question-form>
       <ChatQuestion
-        question="你刚才选择重试前，Meowland 宿主已经重建或重启过了吗？"
+        question="Before you chose to retry, had the Meowland host already been rebuilt or restarted?"
         questionId="restart-question"
-        description="Cell 重试仍未成功，需要确认宿主当前状态。"
+        description="The Cell retry still did not succeed, so the current host state needs confirmation."
         actions={[
-          <Button type="submit">提交回答</Button>,
+          <Button type="submit">Submit answer</Button>,
           <Button variant="quiet" size="small" data-question-mode>
-            用文字回答
+            Answer in writing
           </Button>,
           <Button variant="quiet" size="small" data-question-cancel>
-            取消问题
+            Cancel question
           </Button>,
         ]}
       >
@@ -37,30 +38,34 @@ export const ChatQuestionStory = defineStory({
           <ChoiceGroup
             id="restart-choice"
             name="answer"
-            label="选择回答"
+            label="Choose an answer"
             hideLabel
             required
             options={[
               {
                 value: "restarted",
-                label: "已经重启",
-                description: "重建并重启了宿主，可以继续排查。",
+                label: "Already restarted",
+                description: "The host was rebuilt and restarted; investigation can continue.",
               },
               {
                 value: "not-yet",
-                label: "还没有重启",
-                description: "先保留现场，说明接下来需要做什么。",
+                label: "Not restarted yet",
+                description: "Preserve the current state first and explain what to do next.",
               },
-              { value: "unsure", label: "不确定", description: "帮我确认当前运行的是哪个版本。" },
+              {
+                value: "unsure",
+                label: "Not sure",
+                description: "Help me confirm which version is currently running.",
+              },
             ]}
           />
         </div>
         <div data-question-text hidden>
           <Textarea
-            aria-label="你的回答"
+            aria-label="Your answer"
             name="freeAnswer"
             rows={3}
-            placeholder="补充当前情况…"
+            placeholder="Describe the current situation…"
             disabled
           />
         </div>
@@ -88,17 +93,18 @@ export const ChatQuestionStory = defineStory({
       });
       textarea.disabled = Boolean(text.hidden);
       textarea.required = !text.hidden;
-      mode.textContent = text.hidden ? "用文字回答" : "返回选项";
+      mode.textContent = text.hidden ? "Answer in writing" : "Back to choices";
       if (!text.hidden) textarea.focus();
     };
     const submit = (event: Event) => {
       event.preventDefault();
       const data = new FormData(form);
       show(
-        `已提交本地样例：${data.get(text.hidden ? "answer" : "freeAnswer")}。没有发送给 Agent。`,
+        `Submitted the local example: ${data.get(text.hidden ? "answer" : "freeAnswer")}. Nothing was sent to an Agent.`,
       );
     };
-    const cancel = () => show("已取消本地样例问题，保留填写内容供查看。");
+    const cancel = () =>
+      show("Canceled the local example question; the entered content is kept for review.");
     const cancelButton = root.querySelector<HTMLButtonElement>("[data-question-cancel]")!;
     mode.addEventListener("click", changeMode);
     form.addEventListener("submit", submit);
@@ -113,37 +119,42 @@ export const ChatQuestionStory = defineStory({
 
 export const ChatQuestionConflictStory = defineStory({
   id: "chat-question-conflict",
-  title: "问答 · 长内容与冲突提示",
-  group: "对话组件",
+  title: "Question · Long content and conflict feedback",
+  group: "Conversation components",
   component: "ChatQuestion",
-  variant: "静态冲突提示",
+  variant: "Static conflict feedback",
   description:
-    "展示长问题、长选项和冲突反馈的静态组合；按钮未接业务操作，不验证异步提交或输入保留。",
+    "A static composition showing a long question, long options and conflict feedback; the buttons are not wired to business actions, and async submission or input retention is not verified.",
   covers: ["long question", "long options", "static conflict feedback"],
   render: () => (
     <ChatQuestion
-      question="当前服务仍然返回 503。如果宿主暂时无法重启，你希望保留现场继续排查，还是先查看已经完成的组件源码和验证说明？"
+      question="The service still returns 503. If the host cannot be restarted for now, do you want to preserve the current state and keep investigating, or look at the component source and verification notes that are already done?"
       questionId="conflict-question"
-      feedback="问题已被更新，这份回答尚未提交。内容已保留，你可以复制后查看新问题。"
+      feedback="The question was updated and this answer has not been submitted. The content is kept; you can copy it and then read the new question."
       actions={[
-        <Button>查看新问题</Button>,
+        <Button>View new question</Button>,
         <Button variant="quiet" size="small">
-          复制回答
+          Copy answer
         </Button>,
       ]}
     >
       <ChoiceGroup
         id="long-answer"
         name="longAnswer"
-        label="你的回答"
+        label="Your answer"
         hideLabel
         defaultValue="keep"
         options={[
           {
             value: "keep",
-            label: "保留服务的当前状态和日志，继续定位激活失败的原因，暂时不要重启正在运行的宿主",
+            label:
+              "Keep the service's current state and logs, keep investigating why activation failed, and do not restart the running host for now",
           },
-          { value: "source", label: "先查看组件源码和测试说明，服务运行问题稍后处理" },
+          {
+            value: "source",
+            label:
+              "Look at the component source and test notes first; handle the service runtime problem later",
+          },
         ]}
       />
     </ChatQuestion>
@@ -152,34 +163,39 @@ export const ChatQuestionConflictStory = defineStory({
 
 export const ChoiceGroupStory = defineStory({
   id: "choice-group",
-  title: "单选组 · 直接比较选项",
-  group: "表单输入",
+  title: "Radio group · Compare options directly",
+  group: "Form inputs",
   component: "ChoiceGroup",
-  description: "适合少量需要直接比较的选项。使用原生 radio 保留方向键、Tab、表单重置与必填校验。",
+  description:
+    "For a small set of options that need direct comparison. Native radios keep arrow keys, Tab, form reset and required validation.",
   render: () => (
     <form className="workshop-stack workshop-constrained">
       <ChoiceGroup
         id="startup-choice"
         name="startup"
-        label="启动时打开什么？"
+        label="What should open at startup?"
         defaultValue="last"
         options={[
           {
             value: "last",
-            label: "上次的工作",
-            description: "回到离开前的位置，继续未完成的内容。",
+            label: "The last work",
+            description: "Return to where you left off and continue unfinished content.",
           },
-          { value: "new", label: "空白页面", description: "从一个新的工作区开始。" },
+          {
+            value: "new",
+            label: "Blank page",
+            description: "Start from a new workspace.",
+          },
           {
             value: "team",
-            label: "团队概览",
-            description: "当前工作区未连接团队。",
+            label: "Team overview",
+            description: "The current workspace is not connected to a team.",
             disabled: true,
           },
         ]}
       />
       <Button type="reset" variant="outline">
-        重置选择
+        Reset selection
       </Button>
     </form>
   ),

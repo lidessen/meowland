@@ -5,12 +5,13 @@ import { SchemePair } from "./scheme-pair";
 
 export const ProcessGroupNarrowStory = defineStory({
   id: "process-group-narrow",
-  title: "过程组 · 窄行与长序列",
-  group: "对话组件",
+  title: "Process group · Narrow rows and long sequences",
+  group: "Conversation components",
   groupOrder: 30,
   component: "ProcessGroup",
-  variant: "窄行与长序列",
-  description: "窄容器中名称与状态点保留首行，动作摘要独占第二行；长序列状态点可换行。",
+  variant: "Narrow rows and long sequences",
+  description:
+    "In a narrow container, the title and status dots stay on the first line while the action summary gets its own second line; a long sequence of status dots can wrap.",
   covers: [
     "ProcessGroup narrow summary",
     "title never wraps",
@@ -22,14 +23,14 @@ export const ProcessGroupNarrowStory = defineStory({
       <SchemePair width={340}>
         {() => (
           <ProcessGroup
-            title="过程 · 13 步"
-            status="调用本地能力、访问记忆与知识、管理任务等"
+            title="Process · 13 steps"
+            status="Calls local capabilities, reads memory and knowledge, manages tasks, and more"
             trailing={Array.from({ length: 12 }, () => (
               <StatusDot state="success" size={6} />
             ))}
           >
             <ProcessStep icon={<Icon name="terminal" />} meta="2.0s">
-              执行命令 <code>go test ./server/...</code>
+              Run command <code>go test ./server/...</code>
             </ProcessStep>
           </ProcessGroup>
         )}
@@ -40,13 +41,13 @@ export const ProcessGroupNarrowStory = defineStory({
 
 export const ProcessGroupStory = defineStory({
   id: "process-group",
-  title: "过程组 · 折叠的步骤记录",
-  group: "对话组件",
+  title: "Process group · Collapsed step record",
+  group: "Conversation components",
   groupOrder: 30,
   component: "ProcessGroup",
-  variant: "展开、收起与进行中",
+  variant: "Expanded, collapsed, and running",
   description:
-    "过程组把助手做过的事收成一行：名称与步数、结果、每一步的状态点。展开后每步一行，路径用等宽字体，时长安静地靠右。",
+    "A process group condenses what the assistant did into one line: name and step count, result, and a status dot per step. When expanded, each step gets one line, paths use a monospace font, and durations sit quietly on the right.",
   covers: [
     "ProcessGroup open/closed",
     "ProcessStep icon/meta/code",
@@ -61,27 +62,27 @@ export const ProcessGroupStory = defineStory({
           <div style={{ display: "grid", gap: "14px" }}>
             <ProcessGroup
               open
-              title="过程 · 3 步"
-              status="已完成 · 4.2s"
+              title="Process · 3 steps"
+              status="Completed · 4.2s"
               trailing={[
                 <StatusDot state="success" size={6} />,
                 <StatusDot state="success" size={6} />,
                 <StatusDot state="success" size={6} />,
               ]}
             >
-              <ProcessStep icon={<Icon name="search" />} meta="12 处">
-                搜索内容 <code>workflow-prototype</code>
+              <ProcessStep icon={<Icon name="search" />} meta="12 matches">
+                Search content <code>workflow-prototype</code>
               </ProcessStep>
               <ProcessStep icon={<Icon name="file-text" />} meta="1.1s">
-                读取文件 <code>docs/records/2026-09-16-workflow-prototype.md</code>
+                Read file <code>docs/records/2026-09-16-workflow-prototype.md</code>
               </ProcessStep>
               <ProcessStep icon={<Icon name="file-text" />} meta="0.9s">
-                读取文件 <code>…workflow-prototype-second-trial.md</code>
+                Read file <code>…workflow-prototype-second-trial.md</code>
               </ProcessStep>
             </ProcessGroup>
             <ProcessGroup
-              title="过程 · 4 步"
-              status="1 步运行中"
+              title="Process · 4 steps"
+              status="1 step running"
               trailing={[
                 <StatusDot state="success" size={6} />,
                 <StatusDot state="success" size={6} />,
@@ -90,12 +91,12 @@ export const ProcessGroupStory = defineStory({
               ]}
             >
               <ProcessStep icon={<Icon name="terminal" />} meta="2.0s">
-                执行命令 <code>go test ./server/...</code>
+                Run command <code>go test ./server/...</code>
               </ProcessStep>
             </ProcessGroup>
-            <ProcessGroup open title="过程 · 1 步" status="结果未确认">
-              <ProcessStep icon={<Icon name="folder-open" />} meta={<Tag>未核对</Tag>}>
-                查看目录{" "}
+            <ProcessGroup open title="Process · 1 step" status="Unconfirmed result">
+              <ProcessStep icon={<Icon name="folder-open" />} meta={<Tag>Not checked</Tag>}>
+                View directory{" "}
                 <code>
                   apps/meowland/web/src/a/very/long/path/that/keeps/going/and/going/index.ts
                 </code>

@@ -17,7 +17,7 @@ test("segmented choices are radios and refuse disabled or unchanged requests", (
   const html = createWebRenderer(runtime).renderToHtml(
     <SegmentedControl
       id="choice"
-      label="模式"
+      label="Mode"
       value="a"
       onValueChange={(value) => values.push(value)}
       options={[
@@ -28,7 +28,7 @@ test("segmented choices are radios and refuse disabled or unchanged requests", (
     />,
   );
   expect(html).not.toContain('role="tab"');
-  expect(html).toContain("模式");
+  expect(html).toContain("Mode");
   for (const input of inputs)
     (input.onChange as (event: Event) => void)({
       currentTarget: { checked: true },
@@ -37,12 +37,12 @@ test("segmented choices are radios and refuse disabled or unchanged requests", (
 });
 test("shimmer keeps its accessible text and marks the copy inert", () => {
   const html = createWebRenderer(createRuntime()).renderToHtml(
-    <TextShimmer text="处理内容" active />,
+    <TextShimmer text="Processing content" active />,
   );
   expect(html).toContain('data-active="true"');
   expect(html).toContain('aria-hidden="true"');
   expect(html).toContain("inert");
-  expect(html.match(/处理内容/g)?.length).toBe(2);
+  expect(html.match(/Processing content/g)?.length).toBe(2);
 });
 
 test("external form and field name reach every segmented radio", () => {
@@ -51,7 +51,7 @@ test("external form and field name reach every segmented radio", () => {
       id="display"
       name="mode"
       form="owner"
-      label="模式"
+      label="Mode"
       value="a"
       onValueChange={() => {}}
       options={[
@@ -66,14 +66,14 @@ test("external form and field name reach every segmented radio", () => {
 test("nested shimmer fragments share one inert sweep", () => {
   const html = createWebRenderer(createRuntime()).renderToHtml(
     <TextShimmer active>
-      <TextShimmer text="正在检查" />
+      <TextShimmer text="Checking" />
       {" · "}
       <TextShimmer text="src" />
     </TextShimmer>,
   );
   expect(html.match(/aria-hidden="true"/g)?.length).toBe(1);
   expect(html.match(/data-active="true"/g)?.length).toBe(1);
-  expect(html.match(/正在检查/g)?.length).toBe(2);
+  expect(html.match(/Checking/g)?.length).toBe(2);
 });
 test("confirmation only reports confirm after host acknowledgement and while enabled", () => {
   const runtime = createRuntime();
@@ -91,11 +91,11 @@ test("confirmation only reports confirm after host acknowledgement and while ena
     <RiskConfirmation
       id="risk"
       open={false}
-      title="确认"
-      description="描述"
-      acknowledgeLabel="已了解"
-      cancelLabel="取消"
-      confirmLabel="继续"
+      title="Confirm"
+      description="Description"
+      acknowledgeLabel="Understood"
+      cancelLabel="Cancel"
+      confirmLabel="Continue"
       acknowledged={acknowledged}
       disabled={disabled}
       onAcknowledgedChange={() => {}}

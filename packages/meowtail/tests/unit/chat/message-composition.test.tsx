@@ -9,15 +9,15 @@ test("message role travels through wrappers to independent bubbles without leaki
   const web = createWebRenderer(runtime);
   const Wrapped = () => (
     <div>
-      <ChatBubble>用户内容</ChatBubble>
-      <ChatBubble variant="plain">补充内容</ChatBubble>
+      <ChatBubble>User content</ChatBubble>
+      <ChatBubble variant="plain">Supplemental content</ChatBubble>
     </div>
   );
   const view = [
-    <ChatMessage role="user" author="你" surface="none" footer="未送达">
+    <ChatMessage role="user" author="You" surface="none" footer="Not delivered">
       <Wrapped />
     </ChatMessage>,
-    <ChatBubble>独立内容</ChatBubble>,
+    <ChatBubble>Standalone content</ChatBubble>,
   ];
   const html = web.renderToHtml(view);
   const bubbles = html.match(/<div\b[^>]*data-meowui-part="chat-bubble\/root"[^>]*>/g) ?? [];
@@ -29,7 +29,7 @@ test("message role travels through wrappers to independent bubbles without leaki
   expect(html.match(/data-option-chat-bubble-variant="auto"/g)).toHaveLength(2);
   expect(html.match(/data-option-chat-bubble-variant="plain"/g)).toHaveLength(1);
   expect(html).toContain('data-meowui-part="chat-message/footer"');
-  expect(html).toContain("未送达");
+  expect(html).toContain("Not delivered");
 });
 
 test("default messages retain a single automatic surface and datetime while custom header replaces metadata", () => {
@@ -37,8 +37,8 @@ test("default messages retain a single automatic surface and datetime while cust
   installMeowUI(runtime);
   const web = createWebRenderer(runtime);
   const html = web.renderToHtml(
-    <ChatMessage role="user" author="你" timestamp="14:20" dateTime="2026-09-21T14:20:00+08:00">
-      内容
+    <ChatMessage role="user" author="You" timestamp="14:20" dateTime="2026-09-21T14:20:00+08:00">
+      Content
     </ChatMessage>,
   );
   expect(html.match(/data-meowui-part="chat-bubble\/root"/g)).toHaveLength(1);
@@ -48,13 +48,13 @@ test("default messages retain a single automatic surface and datetime while cust
     <ChatMessage
       role="assistant"
       author="Assistant"
-      header={<strong>自定义身份</strong>}
+      header={<strong>Custom identity</strong>}
       surface="none"
     >
-      独立内容
+      Standalone content
     </ChatMessage>,
   );
-  expect(custom).toContain("自定义身份");
+  expect(custom).toContain("Custom identity");
   expect(custom).not.toContain('data-meowui-part="chat-message/meta"');
   expect(custom).not.toContain('data-meowui-part="chat-bubble/root"');
 });
@@ -64,13 +64,13 @@ test("process and sources retain native disclosures and reject unsafe source URL
   installMeowUI(runtime);
   const web = createWebRenderer(runtime);
   const html = web.renderToHtml([
-    <ChatProcess label="排查过程" open>
-      细节
+    <ChatProcess label="Investigation process" open>
+      Details
     </ChatProcess>,
     <ChatSources
       items={[
-        { title: "规范", url: "https://example.com/spec" },
-        { title: "危险链接", url: "javascript:alert(1)" },
+        { title: "Specification", url: "https://example.com/spec" },
+        { title: "Unsafe link", url: "javascript:alert(1)" },
       ]}
     />,
   ]);
@@ -80,5 +80,5 @@ test("process and sources retain native disclosures and reject unsafe source URL
   expect(html).toContain('href="https://example.com/spec"');
   expect(html).toContain('rel="noreferrer"');
   expect(html).not.toContain("javascript:");
-  expect(html).not.toContain("危险链接");
+  expect(html).not.toContain("Unsafe link");
 });

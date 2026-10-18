@@ -40,23 +40,23 @@ describe("static story discovery", () => {
       `
       import { defineStory } from "meowbook";
       throw new Error("must never execute");
-      export const Normal = defineStory({id:"input/normal",title:"完整可搜索标题",group:"表单输入",component:"Input",variant:"默认",render:()=>null});
-      export const Error = defineStory({id:"input/error",component:"Input",variant:"错误",render:()=>null});
+      export const Normal = defineStory({id:"input/normal",title:"Full searchable title",group:"Form inputs",component:"Input",variant:"Default",render:()=>null});
+      export const Error = defineStory({id:"input/error",component:"Input",variant:"Error",render:()=>null});
       export const Legacy = defineStory({id:"legacy",render:()=>null});
-      /** @story {"id":"annotated","component":"Button","variant":"紧凑"} */
+      /** @story {"id":"annotated","component":"Button","variant":"Compact"} */
       export const Button = () => null;
     `,
     );
     expect(stories[0]).toMatchObject({
-      title: "完整可搜索标题",
-      group: "表单输入",
+      title: "Full searchable title",
+      group: "Form inputs",
       component: "Input",
-      variant: "默认",
+      variant: "Default",
     });
-    expect(stories[1]).toMatchObject({ component: "Input", variant: "错误" });
+    expect(stories[1]).toMatchObject({ component: "Input", variant: "Error" });
     expect(stories[2]).not.toHaveProperty("component");
     expect(stories[2]).not.toHaveProperty("variant");
-    expect(stories[3]).toMatchObject({ component: "Button", variant: "紧凑" });
+    expect(stories[3]).toMatchObject({ component: "Button", variant: "Compact" });
   });
   test("indexes literal search metadata without evaluating dynamic values", () => {
     const stories = discoverSource(
@@ -64,12 +64,15 @@ describe("static story discovery", () => {
       `
       import { defineStory } from "meowbook";
       throw new Error("must never execute");
-      export const Literal = defineStory({id:"literal", description:"中文说明", covers:["Input", "ChatProcess"] as const, render:()=>null});
+      export const Literal = defineStory({id:"literal", description:"Description text", covers:["Input", "ChatProcess"] as const, render:()=>null});
       export const Dynamic = defineStory({id:"dynamic", description:makeDescription(), covers:["Input", ...getCovers()], render:()=>null});
       export const Empty = defineStory({id:"empty", description:"", covers:[], render:()=>null});
     `,
     );
-    expect(stories[0]).toMatchObject({ description: "中文说明", covers: ["Input", "ChatProcess"] });
+    expect(stories[0]).toMatchObject({
+      description: "Description text",
+      covers: ["Input", "ChatProcess"],
+    });
     expect(stories[1]).not.toHaveProperty("description");
     expect(stories[1]).not.toHaveProperty("covers");
     expect(stories[2]).toMatchObject({ description: "", covers: [] });
@@ -228,7 +231,7 @@ test("build emits a static gallery, independent canvas and manifest, then remove
     const outdir = join(root, "dist");
     await writeFile(
       join(root, "metadata.tsx"),
-      'import {defineStory} from "meowbook"; export const Metadata = defineStory({id:"build/search",title:"中文标题",description:"组件说明",covers:["Input"],render:()=>null});',
+      'import {defineStory} from "meowbook"; export const Metadata = defineStory({id:"build/search",title:"Story title",description:"Component description",covers:["Input"],render:()=>null});',
     );
     await writeFile(
       join(root, "tsconfig.json"),
@@ -246,7 +249,7 @@ test("build emits a static gallery, independent canvas and manifest, then remove
     expect(await readFile(join(outdir, "canvas.html"), "utf8")).toContain("story-root");
     expect(JSON.parse(await readFile(join(outdir, "manifest.json"), "utf8"))).toEqual(entries);
     expect(entries.find((entry) => entry.id === "build/search")).toMatchObject({
-      description: "组件说明",
+      description: "Component description",
       covers: ["Input"],
     });
     expect((await readdir(root)).some((path) => path.startsWith(".meowbook-"))).toBe(false);

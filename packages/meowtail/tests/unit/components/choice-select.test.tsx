@@ -4,9 +4,9 @@ import { createWebRenderer } from "meowjsx/web";
 import { ChoiceSelect } from "../../../src/components/choice-select";
 
 const options = [
-  { value: "draft", label: "保留草稿", group: "本地" },
-  { value: "review", label: "提交审阅", group: "远端" },
-  { value: "locked", label: "暂不可用", disabled: true },
+  { value: "draft", label: "Keep draft", group: "Local" },
+  { value: "review", label: "Submit for review", group: "Remote" },
+  { value: "locked", label: "Currently unavailable", disabled: true },
 ];
 
 test("unthemed choices retain native form validation and caller labelling", () => {

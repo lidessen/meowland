@@ -14,19 +14,21 @@ export const ChatMessageList = defineComponent<
   ChatMessageListProps,
   typeof chatMessageListContract.name,
   (typeof chatMessageListContract.parts)[number]
->(chatMessageListContract, ({ children, className, ariaLabel = "消息记录", ...props }, context) =>
-  context.part(
-    "root",
-    "div",
-    {
-      ...props,
-      className,
-      role: "log",
-      "aria-label": ariaLabel,
-      "aria-live": "polite",
-    },
-    children,
-  ),
+>(
+  chatMessageListContract,
+  ({ children, className, ariaLabel = "Message log", ...props }, context) =>
+    context.part(
+      "root",
+      "div",
+      {
+        ...props,
+        className,
+        role: "log",
+        "aria-label": ariaLabel,
+        "aria-live": "polite",
+      },
+      children,
+    ),
 );
 
 export interface ChatMessageListContentProps extends Props {

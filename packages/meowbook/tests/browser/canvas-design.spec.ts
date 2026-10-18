@@ -27,10 +27,9 @@ for (const scheme of ["light", "dark"] as const) {
     await page.setViewportSize({ width: 390, height: 800 });
     await page.goto("/canvas.html?story=runtime/partial");
     await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-    await page.evaluate((value) => {
-      document.documentElement.style.colorScheme = value;
-    }, scheme);
-    const placeholder = page.getByRole("img", { name: "子组件占位" }).first();
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    await page.emulateMedia({ colorScheme: scheme });
+    const placeholder = page.getByRole("img", { name: "Child component placeholder" }).first();
     await expect(placeholder).toContainText("placeholder");
     await expect(placeholder).toHaveCSS("height", "120px");
     expect(await placeholder.evaluate(contrast)).toBeGreaterThanOrEqual(4.5);
@@ -40,12 +39,7 @@ for (const scheme of ["light", "dark"] as const) {
     const background = await placeholder.evaluate(
       (element) => getComputedStyle(element).backgroundColor,
     );
-    await page.evaluate(
-      (value) => {
-        document.documentElement.style.colorScheme = value;
-      },
-      scheme === "light" ? "dark" : "light",
-    );
+    await page.emulateMedia({ colorScheme: scheme === "light" ? "dark" : "light" });
     expect(
       await placeholder.evaluate((element) => getComputedStyle(element).backgroundColor),
     ).not.toBe(background);
@@ -62,24 +56,70 @@ for (const scheme of ["light", "dark"] as const) {
   test(`late error remains readable with inherited ${scheme} palette`, async ({ page }) => {
     await page.goto("/canvas.html?story=runtime/late-error");
     await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-    await page.evaluate((value) => {
-      document.documentElement.style.colorScheme = value;
-    }, scheme);
-    await page.getByRole("button", { name: "触发异步错误" }).click();
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.getByRole("button", { name: "Trigger async error" }).click();
     const state = page.locator("#story-state");
     await expect(state).toHaveAttribute("data-status", "error");
     await expect(state).toContainText("fixture late error");
     expect(await state.evaluate(contrast)).toBeGreaterThanOrEqual(4.5);
     const background = await state.evaluate((element) => getComputedStyle(element).backgroundColor);
+    await page.emulateMedia({ colorScheme: scheme === "light" ? "dark" : "light" });
+    expect(await state.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe(
+      background,
+    );
+    await expect(state).toHaveAttribute("data-status", "error");
+  });
+}
+
+for (const scheme of ["light", "dark"] as const) {
+  test(`canvas diagnostics keep readable system-color fallbacks without a theme in ${scheme}`, async ({
+    page,
+    request,
+  }) => {
+    const documentResponse = await request.get("/canvas.html");
+    expect(documentResponse.ok()).toBe(true);
+    const html = await documentResponse.text();
+    const links = [...html.matchAll(/<link\b[^>]*rel="stylesheet"[^>]*>/g)];
+    expect(links.length).toBeGreaterThan(0);
+    const styles = [];
+    for (const [link] of links) {
+      const href = link.match(/href="([^"]+)"/)![1]!;
+      const response = await request.get(new URL(href, documentResponse.url()).href);
+      expect(response.ok()).toBe(true);
+      styles.push(await response.text());
+    }
+    await page.setContent(`<style>${styles.join("\n")}</style>
+      <div id="story-state" data-status="error">A readable error</div>
+      <div data-meowbook-placeholder="Child" role="img" aria-label="Child placeholder">Child placeholder</div>`);
+    await page.evaluate((value) => {
+      document.documentElement.style.colorScheme = value;
+    }, scheme);
+    expect(
+      await page.evaluate(() =>
+        getComputedStyle(document.documentElement).getPropertyValue("--ui-danger"),
+      ),
+    ).toBe("");
+    const state = page.locator("#story-state");
+    const placeholder = page.getByRole("img", { name: "Child placeholder" });
+    const backgrounds = [];
+    for (const element of [state, placeholder]) {
+      expect(await element.evaluate(contrast)).toBeGreaterThanOrEqual(4.5);
+      backgrounds.push(
+        await element.evaluate((target) => getComputedStyle(target).backgroundColor),
+      );
+    }
     await page.evaluate(
       (value) => {
         document.documentElement.style.colorScheme = value;
       },
       scheme === "light" ? "dark" : "light",
     );
-    expect(await state.evaluate((element) => getComputedStyle(element).backgroundColor)).not.toBe(
-      background,
-    );
-    await expect(state).toHaveAttribute("data-status", "error");
+    for (const [index, element] of [state, placeholder].entries()) {
+      expect(await element.evaluate(contrast)).toBeGreaterThanOrEqual(4.5);
+      expect(await element.evaluate((target) => getComputedStyle(target).backgroundColor)).not.toBe(
+        backgrounds[index],
+      );
+    }
   });
 }

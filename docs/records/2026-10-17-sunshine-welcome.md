@@ -1,27 +1,27 @@
-# Sunshine Welcome 课件实作回执
+# Sunshine Welcome courseware implementation receipt
 
-2026-10-17，作品版本 `sunshine-welcome-a3`。交付为 [九页浏览器课件](../../examples/sunshine-welcome/README.md)，范围是八下 Unit 6 Welcome 的六个词与帮助话题，约40分钟；没有扩成整个单元。复用已有 Meowtail Presentation/Reveal、signals、布局和 Meowbook，不改通用组件或播放器运行时，不新增发布包。
+2026-10-17, work version `sunshine-welcome-a3`. Delivered as a [nine-slide browser courseware](../../examples/sunshine-welcome/README.md), scoped to six words and the help topic of Grade 8 Book 2 Unit 6 Welcome, about 40 minutes; it was not expanded into the whole unit. It reuses the existing Meowtail Presentation/Reveal, signals, layout and Meowbook without changing generic components or the player runtime, and adds no new release package.
 
-## 创作与课堂行为
+## Authoring and classroom behavior
 
-先将开场、观察、选择三页与蓝黄视觉一起做成可运行粗稿并实际截图，再补齐词汇、配对、阅读、结对交流和出口题。后续依据浏览器与独立内容审查修正了词义、人物表达、空白作答反馈、选择状态和样式边界；过程见 [迭代记录](../../examples/sunshine-welcome/records/iteration.md)。
+The opening, observation and choice slides were first made into a runnable rough draft together with the blue-yellow visuals and actually screenshotted, then vocabulary, matching, reading, pair discussion and the exit question were completed. Later, browser and independent content review corrected word meaning, character expression, blank-answer feedback, selection states and style boundaries; the process is in the [iteration record](../../examples/sunshine-welcome/records/iteration.md).
 
-教师 Next 控制本页提示、参考表达和翻页；学生选择、输入不会推进步骤。回退收起参考仍保留输入，跨页回访也保留；显式 Redo 只清本题并回第0步。实例使用普通 signals，刷新开启新会话，不提供多人收集或云端保存。全部七张SVG为原创，正式构建包含10个运行资产，无外部字体或媒体请求；源码快照供同版本仓库继续编辑，不冒充已发布的独立npm工程。
+Teacher Next controls this slide's hints, reference expressions and paging; student selections and input do not advance steps. Going back collapses references but keeps input, and cross-slide revisits keep it too; explicit Redo clears only the current question and returns to step 0. The instance uses ordinary signals, refresh starts a new session, and there is no multi-person collection or cloud save. All seven SVGs are original, the official build contains 10 runtime assets, and there are no external font or media requests; the source snapshot is for continuing to edit in the same-version repository and is not passed off as a published standalone npm project.
 
-## 实际验证
+## Actual verification
 
-- 根 `bun run build`、根 `bun run typecheck`、测试工程类型检查通过；全仓 lint 排除未授权的 `data/**` 后通过。
-- Meowbook 同源5个 stories 检查通过。新工程已纳入根 typecheck；在仓库外的隔离副本注入错误类型，根命令按预期报错，探针未写入本仓库。
-- 10项课堂功能浏览器检查通过，同模块双实例隔离1项、11断言通过。最后只加深小字颜色并格式化HTML后重新构建，再补跑冷启动、作者样式与播放器隔离、实际对比度3项，全部通过；没有将两轮表述为同一次完整矩阵。
-- 九页最终步骤在舞台内，键盘输入与选择不被翻页抢走。独立新浏览器 context 阻断外部请求，图片全部解码，外部请求、请求失败、HTTP错误、页面异常均为零。42个可见小字样本按实际合成背景计算，最低约4.52:1。
-- 实际观看最终宽屏开场、词汇、选中反馈及窄屏原图；窄屏固定画布缩放仅证明控件可达，不表示正文适合手机阅读。未进行人工屏幕阅读器、真实教室投影或学习效果评估。
+- Root `bun run build`, root `bun run typecheck` and the test project typecheck passed; repo-wide lint passed after excluding the unauthorized `data/**`.
+- The 5 same-source Meowbook stories checks passed. The new project is now covered by root typecheck; an error type was injected into an isolated copy outside the repository, the root command failed as expected, and the probe was not written into this repository.
+- 10 classroom-feature browser checks passed; the same-module dual-instance isolation passed 1 item and 11 assertions. Finally only the small-text color was darkened and the HTML formatted, then the build was rerun and 3 items were rerun: cold start, author style and player isolation, and actual contrast; all passed. The two rounds were not presented as one complete matrix.
+- The final steps of the nine slides stay on the stage, and keyboard input and selection are not stolen by paging. An independent new browser context blocked external requests, all images decoded, and external requests, failed requests, HTTP errors and page errors were all zero. 42 visible small-text samples were computed against the actual composite background, and the lowest was about 4.52:1.
+- The final wide-screen opening, vocabulary, selection feedback and narrow-screen original images were actually viewed; narrow-screen fixed-canvas scaling only proves the controls are reachable and does not mean the body text is suitable for phone reading. Manual screen readers, real classroom projection and learning-outcome evaluation were not performed.
 
-详细命令、先失败后修复证据和验证范围见 [独立浏览器审查](../../examples/sunshine-welcome/tests/REVIEW.md)。最终截图保存在忽略目录 `artifacts/courseware-review/sunshine/final-a3-*.png`；开场、词汇、反馈三图已保存至 Library，最初三页粗稿开场图也单独保留在 Library。反馈截图中的选择与输入是检查夹具，不是真实学生数据。
+Detailed commands, the evidence of failing first and then fixing, and the verification scope are in the [independent browser review](../../examples/sunshine-welcome/tests/REVIEW.md). Final screenshots are kept in the ignored directory `artifacts/courseware-review/sunshine/final-a3-*.png`; the opening, vocabulary and feedback images were saved to Library, and the opening image of the first three-slide rough draft was also kept separately in Library. The selections and input in the feedback screenshot are check fixtures, not real student data.
 
-## 来源、限制与交付状态
+## Sources, limitations and delivery status
 
-译林官方资源仅实际取得单元目录；六词与Part B主题由第三方公开教学预览交叉核对。未取得官方Welcome全文、原图、原声或PPT，不标“2026新版”；对话与练习均明确为教师改编，见 [来源记录](../../examples/sunshine-welcome/SOURCES.md)。
+Of the official Yilin resources, only the unit contents were actually obtained; the six words and the Part B topic were cross-checked against third-party public teaching previews. The official full Welcome text, original images, original audio and PPT were not obtained, and it is not labeled "2026 new edition"; the dialogs and exercises are explicitly teacher adaptations, see the [source record](../../examples/sunshine-welcome/SOURCES.md).
 
-用户Library参考图的两次受支持物化尝试都在Python辅助程序启动阶段失败，未下载到可查看像素；原生读取只给出指针与描述。按重试上限停止，不声称已看或临摹，全部视觉独立创作。这是剩余的参考图读取限制，不影响当前课件运行。
+Two supported materialization attempts for the user's Library reference image both failed at the Python helper startup stage, and no viewable pixels were downloaded; native reading only returned a pointer and a description. Work stopped at the retry limit, and there is no claim of having seen or traced it; all visuals were independently created. This is the remaining reference-image reading limitation and does not affect the current courseware running.
 
-本轮只本地提交；未推送、发包或部署，未修改其他作品与未跟踪的 `data/`。没有新增 `.pptx`/PDF 导出或未请求的音视频功能。静态HTTP浏览器交付成立，`file://`、任意部署子路径与真实安装态未验。
+This round only made local commits; there was no push, package publish or deployment, and no other work or the untracked `data/` was modified. No `.pptx`/PDF export or unrequested audio/video feature was added. Static HTTP browser delivery holds; `file://`, arbitrary deployment subpaths and real installed state were not verified.

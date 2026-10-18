@@ -16,10 +16,10 @@ test("Select preserves native form semantics and change callback without a runti
   });
   const web = createWebRenderer(runtime);
   const view = (
-    <Field label="交付方式" htmlFor="delivery" description="先审阅">
+    <Field label="Delivery method" htmlFor="delivery" description="Review first">
       <Select id="delivery" name="delivery" value="review" required disabled onChange={onChange}>
-        <option value="draft">草稿</option>
-        <option value="review">审阅</option>
+        <option value="draft">Draft</option>
+        <option value="review">Review</option>
       </Select>
     </Field>
   );

@@ -4,125 +4,136 @@ import {
   Button,
   Card,
   CardContent,
-  CardHeader,
-  CardTitle,
   Container,
   Field,
-  Grid,
+  Icon,
+  IconButton,
   Inline,
   Input,
+  ListGroup,
+  ListRow,
   PageFrame,
   PageHeader,
   Popover,
   Stack,
+  StatusDot,
   Toolbar,
 } from "meowtail";
 
 export const WorkspaceCompositionStory = defineStory({
   id: "workspace-composition",
-  title: "工作区组合 · 固定页头、表单与动态正文",
-  group: "导航与布局",
+  title: "Workspace composition · Fixed header, form and dynamic body",
+  group: "Navigation and layout",
   groupOrder: 40,
   component: "PageFrame",
-  variant: "共享布局与控件组合",
-  description: "同一组公共组件组合成可滚动表单；窄短窗口仍能返回工具栏，浮层不随正文裁切。",
+  variant: "Shared layout and control composition",
+  description:
+    "One focused content page: keep the draft, inspect the checks, and finish with one action; a short narrow window still returns to the page header and never clips an overlay.",
   covers: [
     "fixed header",
     "layout scroll owner",
-    "nested grid",
-    "dynamic content",
+    "single content column",
+    "dynamic checks",
     "form draft",
-    "toolbar",
     "popover",
   ],
   render: () => {
     const expanded = signal(false);
     const draft = signal("");
-    const feedback = signal("尚未检查本地草稿。");
+    const feedback = signal("The local draft has not been checked yet.");
     return (
       <div style={{ height: "min(640px, calc(100dvh - 90px))" }} data-workspace-composition>
         <PageFrame
-          variant="workspace"
+          variant="page"
           scrollOwner="layout"
-          toolbar={
-            <Toolbar label="组合工作区工具栏">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  expanded.value = !expanded.value;
-                }}
-              >
-                {mapSignal(expanded, (value) => (value ? "收起检查项" : "展开检查项"))}
-              </Button>
-              <Popover
-                id="workspace-review-options"
-                trigger={(bindings) => (
-                  <Button {...bindings} variant="quiet">
-                    检查选项
-                  </Button>
-                )}
-              >
-                <Stack gap="compact" align="start">
-                  <span>窗口变化后继续核对当前草稿。</span>
-                  <Button
-                    size="small"
-                    onClick={() => {
-                      feedback.value = "已检查当前本地草稿。";
-                    }}
-                  >
-                    检查当前草稿
-                  </Button>
-                </Stack>
-              </Popover>
-            </Toolbar>
+          header={
+            <Container width="content">
+              <PageHeader
+                title="Check the draft"
+                description="Keep the current input, inspect the checks, and finish with one action."
+              />
+            </Container>
           }
-          header={<PageHeader title="核对共享组件中的阅读、输入与末尾动作" />}
         >
           <Container width="content">
-            <Stack>
-              <Grid minColumnWidth="compact">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>保留当前输入</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <Field label="组合草稿" htmlFor="workspace-composition-draft">
-                      <Input
-                        id="workspace-composition-draft"
-                        value={draft}
-                        onInput={(event: Event) => {
-                          draft.value = (event.currentTarget as HTMLInputElement).value;
-                        }}
-                      />
-                    </Field>
-                  </CardContent>
-                </Card>
-                <Card>
-                  <CardHeader>
-                    <CardTitle>核对内容边界</CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p>标题、表单与说明共享主题默认尺度；页面宽度改变时保留同一输入节点。</p>
-                  </CardContent>
-                </Card>
-              </Grid>
+            <Stack gap="relaxed">
+              <Card>
+                <CardContent>
+                  <Field
+                    label="Composition draft"
+                    htmlFor="workspace-composition-draft"
+                    description="The same input node stays mounted when the window or grid changes."
+                  >
+                    <Input
+                      id="workspace-composition-draft"
+                      value={draft}
+                      placeholder="Write the current composition draft"
+                      onInput={(event: Event) => {
+                        draft.value = (event.currentTarget as HTMLInputElement).value;
+                      }}
+                    />
+                  </Field>
+                </CardContent>
+              </Card>
+
               <Stack gap="compact" data-workspace-composition-content>
-                {mapSignal(expanded, (value) =>
-                  Array.from({ length: value ? 28 : 10 }, (_, index) => (
-                    <p>
-                      检查项 {index + 1}
-                      ：动态内容沿自然文流增长，正文区域承接滚动，工具栏和页头保持原位置。
-                    </p>
-                  )),
-                )}
+                <Inline justify="between" align="center">
+                  <strong>Checks</strong>
+                  <Toolbar label="Check controls">
+                    <Popover
+                      id="workspace-review-options"
+                      trigger={(bindings) => (
+                        <IconButton {...bindings} label="Check options">
+                          <Icon name="settings" />
+                        </IconButton>
+                      )}
+                    >
+                      <Stack gap="compact" align="start">
+                        <span>Keep checking the current draft after the window changes.</span>
+                        <Button
+                          size="small"
+                          onClick={() => {
+                            feedback.value = "Checked the current local draft.";
+                          }}
+                        >
+                          Check current draft
+                        </Button>
+                      </Stack>
+                    </Popover>
+                    <Button
+                      variant="quiet"
+                      size="small"
+                      onClick={() => {
+                        expanded.value = !expanded.value;
+                      }}
+                    >
+                      <Icon name="list-checks" />
+                      {mapSignal(expanded, (value) =>
+                        value ? "Collapse checks" : "Expand checks",
+                      )}
+                    </Button>
+                  </Toolbar>
+                </Inline>
+                <ListGroup>
+                  {mapSignal(expanded, (value) =>
+                    Array.from({ length: value ? 28 : 10 }, (_, index) => (
+                      <ListRow
+                        title={`Check ${index + 1}`}
+                        description="Dynamic content grows in the natural text flow; the body keeps scrolling while the page header stays put."
+                        status={[<StatusDot state="success" />, "Ready"]}
+                      />
+                    )),
+                  )}
+                </ListGroup>
               </Stack>
+
               <Inline as="footer">
                 <Button
                   onClick={() => {
-                    feedback.value = "已检查当前本地草稿。";
+                    feedback.value = "Checked the current local draft.";
                   }}
                 >
-                  检查末尾草稿
+                  Check the draft at the end
                 </Button>
                 <span role="status">{feedback}</span>
               </Inline>

@@ -1,6 +1,6 @@
-# 有限 JSON UI catalog
+# Finite JSON UI catalog
 
-`meowtail/json` 的 `createMeowUICatalog()` 注册原有 `AssistantView`、`Button`、`Input`、`Stack`，由 `meowjsx/json` 构造同一 MeowJSX VNode。它不复制 renderer、主题、组件实现或业务 store，不从 TypeScript 开放 Props 反射任意属性。
+`createMeowUICatalog()` from `meowtail/json` registers the existing `AssistantView`, `Button`, `Input`, and `Stack`, and builds the same MeowJSX VNodes through `meowjsx/json`. It does not copy the renderer, theme, component implementations, or business stores, and does not reflect arbitrary properties from TypeScript's open Props.
 
 ```ts
 import { createJsonView, parseJsonView } from "meowjsx/json";
@@ -41,15 +41,15 @@ const child = createJsonView(view, {
 });
 ```
 
-`messages` 是必填项。消息支持 text/code/process/attachments/tool/task 六个明确分支；过程步骤、活动、后台工作、问题、模型选项、读取状态、草稿和发送快照使用有限 schema。`assistantJsonSchemas` 与 catalog 复用相同定义，校验、描述与类型关联不会各维护一份。controlled 草稿必须接 `onDraftChange` 或设只读；发送是否接受仍由宿主显式返回 `{accepted:true}` 决定。
+`messages` is required. Messages support six explicit branches: text/code/process/attachments/tool/task; process steps, activity, background work, questions, model options, read state, drafts, and submission snapshots use finite schemas. `assistantJsonSchemas` and the catalog reuse the same definitions, so validation, descriptions, and type associations are not maintained in separate copies. A controlled draft must be wired to `onDraftChange` or set to read-only; whether a submission is accepted is still decided by the host explicitly returning `{accepted:true}`.
 
-tool 分支有限接收 label/summary/state/statusLabel、惰性 input/output/outputSummary、maxLines/defaultOpen，
-以及 canRetry/canCancel 和 retryDisabled/cancelDisabled。outputSummary 只在展开 body 中可见，折起摘要使用 summary。
-canRetry/canCancel 仅控制动作显隐，不授予权限；`onToolAction` action 只传已校验的 messageId、partId 和
-`"retry" | "cancel"`，执行资格和结果更新由宿主负责。task 分支接标题、状态、description、独立 executionText/replyText、
-有标签的 progress 和有限 steps，渲染同一 `ChatTask`。这不是独立 ChatTask/ChatToolCall JSON entry，
-不提供递归任务树、children/footer slots 或任意对象解释。
+The tool branch accepts label/summary/state/statusLabel, lazy input/output/outputSummary, maxLines/defaultOpen,
+and canRetry/canCancel plus retryDisabled/cancelDisabled. outputSummary is visible only in the expanded body; the collapsed summary uses summary.
+canRetry/canCancel only control action visibility and grant no permission; the `onToolAction` action passes only the validated messageId, partId, and
+`"retry" | "cancel"`; execution eligibility and result updates are the host's responsibility. The task branch accepts title, state, description, separate executionText/replyText,
+labeled progress, and finite steps, and renders the same `ChatTask`. This is not a separate ChatTask/ChatToolCall JSON entry,
+and it provides no recursive task tree, children/footer slots, or arbitrary object interpretation.
 
-本片支持序列化附件元数据（id/name/url/mediaType/sizeBytes），不支持 File、本地文件上传、附件回调、renderPart/renderWorkDetail、headerActions/composerTrailing slots。需要这些能力时使用完整 `meowtail/chat` JSX API。JSON 不提供 `onAttach`，并用有限 `allowAttachments: false` 默认值关闭本地文件选择入口，显式 true 会被拒绝；文本编辑、发送和已有附件的显示/移除仍可使用。网络、权限、持久化、数据协议和上传始终属于宿主。
+This slice supports serialized attachment metadata (id/name/url/mediaType/sizeBytes) and does not support File, local file upload, attachment callbacks, renderPart/renderWorkDetail, or headerActions/composerTrailing slots. Use the full `meowtail/chat` JSX API when these capabilities are needed. JSON provides no `onAttach` and turns off the local file selection entry with the finite default `allowAttachments: false`; an explicit true is rejected. Text editing, sending, and displaying/removing existing attachments still work. Networking, permissions, persistence, data protocols, and uploads always belong to the host.
 
-Button 的点击 action 不传原生事件；Input 的 input action 只传经校验的当前字符串值。仅列出的属性可用，开放 JSX native props、HTML 标签名、ref/raw HTML、任意事件对象、任意代码、路径表达式、动态 import 均不在 catalog 内。其他 MeowUI 组件尚未提供 JSON metadata；本片不声称完整 UI 属性自动序列化。
+Button click actions pass no native event; the Input input action passes only the validated current string value. Only the listed properties are available; open JSX native props, HTML tag names, ref/raw HTML, arbitrary event objects, arbitrary code, path expressions, and dynamic import are not in the catalog. Other MeowUI components do not yet provide JSON metadata; this slice does not claim automatic serialization of every UI property.

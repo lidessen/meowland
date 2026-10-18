@@ -4,12 +4,13 @@ import { Field, Select } from "meowtail";
 
 export const SelectStatesStory = defineStory({
   id: "select-states",
-  title: "选择 · 分组、错误与多选",
-  group: "表单输入",
+  title: "Select · Groups, errors and multiple selection",
+  group: "Form inputs",
   groupOrder: 20,
   component: "Select",
-  variant: "分组与多选",
-  description: "保留系统原生选项和键盘操作。size 表示可见行数，多选使用当前平台的组合键。",
+  variant: "Groups and multiple selection",
+  description:
+    "Keeps native options and keyboard behavior. size is the number of visible rows; multiple selection uses the platform modifier keys.",
   covers: [
     "Select required/invalid/disabled",
     "optgroup/disabled option",
@@ -18,28 +19,39 @@ export const SelectStatesStory = defineStory({
     "keyboard native",
   ],
   render() {
-    const feedback = signal("选择后会在这里显示当前值。");
+    const feedback = signal("The current value appears here after you choose.");
     const changed = (event: Event) => {
-      feedback.value = `已选择：${Array.from((event.currentTarget as HTMLSelectElement).selectedOptions, (option) => option.text).join("、") || "无"}`;
+      feedback.value = `Selected: ${Array.from((event.currentTarget as HTMLSelectElement).selectedOptions, (option) => option.text).join(", ") || "None"}`;
     };
     return (
       <div className="workshop-stack workshop-constrained">
         <header className="workshop-composition-header">
-          <h2>整理交付</h2>
-          <p>先确定交付位置，再选择要包含的成果。</p>
+          <h2>Organize the delivery</h2>
+          <p>First choose the delivery target, then select the outcomes to include.</p>
         </header>
-        <Field label="交付目标" htmlFor="select-grouped" description="可用方向键选择，Enter 确认。">
+        <Field
+          label="Delivery target"
+          htmlFor="select-grouped"
+          description="Use the arrow keys to choose and Enter to confirm."
+        >
           <Select id="select-grouped" value="review" onChange={changed}>
-            <optgroup label="当前项目">
-              <option value="draft">保留为本地草稿</option>
-              <option value="review">交给项目负责人审阅完整修改与验证记录</option>
+            <optgroup label="Current project">
+              <option value="draft">Keep as a local draft</option>
+              <option value="review">
+                Send to the project owner to review the full change and verification record
+              </option>
             </optgroup>
-            <optgroup label="外部目标">
-              <option disabled>尚未连接远端</option>
+            <optgroup label="External targets">
+              <option disabled>No remote connected yet</option>
             </optgroup>
           </Select>
         </Field>
-        <Field label="发布环境" htmlFor="select-invalid" invalid error="需要选择一个环境才能继续。">
+        <Field
+          label="Release environment"
+          htmlFor="select-invalid"
+          invalid
+          error="Select an environment to continue."
+        >
           <Select
             id="select-invalid"
             value=""
@@ -58,27 +70,27 @@ export const SelectStatesStory = defineStory({
               if (error) error.hidden = !invalid;
             }}
           >
-            <option value="">请选择环境</option>
-            <option value="local">仅本地预览</option>
-            <option value="staging">测试环境</option>
+            <option value="">Select an environment</option>
+            <option value="local">Local preview only</option>
+            <option value="staging">Staging environment</option>
           </Select>
         </Field>
         <Field
-          label="包含的成果"
+          label="Included outcomes"
           htmlFor="select-multiple"
-          description="按住 ⌘ / Ctrl 可增选，Shift 可连续选择。"
+          description="Hold ⌘ / Ctrl to add selections; use Shift for a range."
         >
           <Select id="select-multiple" multiple size={3} onChange={changed}>
             <option value="source" selected>
-              源代码修改
+              Source code changes
             </option>
-            <option value="tests">验证记录</option>
-            <option value="design">设计说明</option>
+            <option value="tests">Verification record</option>
+            <option value="design">Design notes</option>
           </Select>
         </Field>
-        <Field label="被锁定的目标" htmlFor="select-disabled">
+        <Field label="Locked target" htmlFor="select-disabled">
           <Select id="select-disabled" disabled>
-            <option>当前任务使用本地工作区</option>
+            <option>This task uses the local workspace</option>
           </Select>
         </Field>
         <p role="status" className="workshop-feedback">

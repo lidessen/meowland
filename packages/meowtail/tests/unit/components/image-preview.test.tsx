@@ -7,16 +7,16 @@ test("image preview is a passive image with localized loading and failure labels
   const html = createWebRenderer(createRuntime()).renderToHtml(
     <ImagePreview
       src="/authorized-image"
-      alt="示例"
-      loadingLabel="加载中"
-      failedLabel="无法显示"
+      alt="Sample"
+      loadingLabel="Loading"
+      failedLabel="Cannot display"
     />,
   );
   expect(html).toContain('src="/authorized-image"');
-  expect(html).toContain('alt="示例"');
+  expect(html).toContain('alt="Sample"');
   expect(html).toContain('data-image-state="loading"');
   expect(html).toContain('role="status"');
-  expect(html).toContain("加载中");
+  expect(html).toContain("Loading");
   expect(html).not.toContain("<button");
   expect(html).not.toContain("<a ");
 });

@@ -4,20 +4,21 @@ import { Button, Icon, Stack } from "meowtail";
 import { Menu } from "../src/components/menu";
 export const MenuStory = defineStory({
   id: "menu-actions",
-  title: "菜单 · 分组与键盘操作",
+  title: "Menu · Groups and keyboard operation",
   component: "Menu",
-  group: "浮层与反馈",
+  group: "Overlays and feedback",
   groupOrder: 30,
-  description: "方向键、Home/End 移动，输入文字定位；Escape 返回触发按钮。所有操作仅更新本地回执。",
+  description:
+    "Arrow keys and Home/End move the focus, typing text jumps to an item; Escape returns to the trigger button. All actions only update the local receipt.",
   render() {
-    const feedback = signal("尚未选择操作。");
+    const feedback = signal("No action selected yet.");
     return (
       <Stack align="start">
         <Menu
           id="story-actions"
           trigger={(bindings) => (
             <Button variant="outline" {...bindings}>
-              操作
+              Actions
               <Icon name="chevron-down" />
             </Button>
           )}
@@ -25,35 +26,35 @@ export const MenuStory = defineStory({
             {
               type: "group",
               id: "file",
-              label: "文件",
+              label: "File",
               items: [
                 {
                   id: "open",
-                  label: "打开",
+                  label: "Open",
                   icon: <Icon name="file" />,
                   shortcut: "↵",
                   onSelect: () => {
-                    feedback.value = "已选择打开。";
+                    feedback.value = "Selected Open.";
                   },
                 },
                 {
                   id: "copy",
-                  label: "复制",
+                  label: "Copy",
                   icon: <Icon name="copy" />,
                   onSelect: () => {
-                    feedback.value = "已选择复制。";
+                    feedback.value = "Selected Copy.";
                   },
                 },
-                { id: "export", label: "导出（不可用）", disabled: true, onSelect: () => {} },
+                { id: "export", label: "Export (unavailable)", disabled: true, onSelect: () => {} },
               ],
             },
             { type: "separator", id: "divider" },
             {
               id: "remove",
-              label: "移除",
+              label: "Remove",
               danger: true,
               onSelect: () => {
-                feedback.value = "已选择移除样例。";
+                feedback.value = "Selected Remove sample.";
               },
             },
           ]}
@@ -66,44 +67,45 @@ export const MenuStory = defineStory({
 
 export const NestedMenuStory = defineStory({
   id: "menu-nested",
-  title: "菜单 · 嵌套与触控",
+  title: "Menu · Nesting and touch",
   component: "Menu",
-  group: "浮层与反馈",
+  group: "Overlays and feedback",
   groupOrder: 30,
-  description: "悬停或点击展开子菜单；右键方向进入，左键方向返回，Escape 逐层关闭。",
+  description:
+    "Hover or click to open a submenu; the right-arrow direction enters it, the left-arrow direction goes back, and Escape closes one level at a time.",
   render() {
-    const feedback = signal("尚未选择格式。");
+    const feedback = signal("No format selected yet.");
     return (
       <Stack align="start">
         <Menu
           id="nested-actions"
           trigger={(bindings) => (
             <Button variant="outline" {...bindings}>
-              格式操作
+              Format actions
             </Button>
           )}
           items={[
             {
               id: "export",
-              label: "导出格式",
+              label: "Export format",
               children: [
                 {
                   id: "markdown",
                   label: "Markdown",
                   onSelect: () => {
-                    feedback.value = "已选择 Markdown。";
+                    feedback.value = "Selected Markdown.";
                   },
                 },
-                { id: "disabled", label: "PDF（不可用）", disabled: true, onSelect: () => {} },
+                { id: "disabled", label: "PDF (unavailable)", disabled: true, onSelect: () => {} },
                 {
                   id: "more",
-                  label: "更多格式",
+                  label: "More formats",
                   children: [
                     {
                       id: "text",
-                      label: "纯文本",
+                      label: "Plain text",
                       onSelect: () => {
-                        feedback.value = "已选择纯文本。";
+                        feedback.value = "Selected Plain text.";
                       },
                     },
                   ],
@@ -112,15 +114,15 @@ export const NestedMenuStory = defineStory({
             },
             {
               id: "locked",
-              label: "不可用子菜单",
+              label: "Unavailable submenu",
               disabled: true,
-              children: [{ id: "locked-child", label: "不可达项", onSelect: () => {} }],
+              children: [{ id: "locked-child", label: "Unreachable item", onSelect: () => {} }],
             },
             {
               id: "copy",
-              label: "复制",
+              label: "Copy",
               onSelect: () => {
-                feedback.value = "已选择复制。";
+                feedback.value = "Selected Copy.";
               },
             },
           ]}

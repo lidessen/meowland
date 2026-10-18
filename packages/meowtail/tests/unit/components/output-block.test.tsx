@@ -19,8 +19,8 @@ test("output cap keeps head and tail, with a native expandable middle", () => {
     />,
   );
   expect(html).toContain("<details");
-  expect(html).toContain("展开中间 7 行");
-  expect(html).toContain("收起中间行");
+  expect(html).toContain("Show the 7 hidden middle lines");
+  expect(html).toContain("Hide the middle lines");
 });
 
 test("output copy retains raw payload independently of cap and deduplicates pending requests", async () => {
@@ -62,7 +62,7 @@ test("read window keeps supplied numbers and escapes payload markup", () => {
       lines={[{ number: 42, text: "<script>  text", highlighted: true }]}
     />,
   );
-  expect(html).toContain("显示 1 / 100 行");
+  expect(html).toContain("Showing 1 / 100 lines");
   expect(html).toContain("42");
   expect(html).toContain('data-read-highlight="true"');
   expect(html).toContain("&lt;script&gt;  text");
@@ -90,7 +90,7 @@ test("semantic diff and search copy preserve signs, paths and line numbers", () 
   };
   expect(searchBlockText(props)).toBe("a.ts\n42:   match");
   expect(createWebRenderer(createRuntime()).renderToHtml(<SearchBlock {...props} />)).toContain(
-    "结果已截断",
+    "results truncated",
   );
 });
 
@@ -112,8 +112,8 @@ test("terminal SGR state crosses lines, resets and preserves unsupported control
   const html = createWebRenderer(createRuntime()).renderToHtml(
     <TerminalBlock command="echo a" output="a\n" />,
   );
-  expect(html).toContain("退出状态未知");
-  expect(html).not.toContain("已完成");
+  expect(html).toContain("Unknown exit status");
+  expect(html).not.toContain("Completed");
 });
 
 test("terminal presents one truthful call state and preserves multiline prompt whitespace", () => {
@@ -138,9 +138,9 @@ test("terminal presents one truthful call state and preserves multiline prompt w
   expect(settled).toContain('data-state="done"');
   const stopped = html({ command: "sleep 30", exitCode: 0, signal: "SIGTERM" });
   expect(stopped).toContain('data-state="error"');
-  expect(stopped).toContain("信号 SIGTERM");
+  expect(stopped).toContain("Signal SIGTERM");
   const unknown = html({ command: "echo result", output: "result\n" });
   expect(unknown).toContain('data-state="warning"');
-  expect(unknown).toContain("退出状态未知");
+  expect(unknown).toContain("Unknown exit status");
   expect(unknown).not.toContain('data-state="done"');
 });

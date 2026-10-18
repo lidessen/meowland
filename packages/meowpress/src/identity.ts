@@ -41,6 +41,6 @@ export interface SiteIdentity {
 export const DEFAULT_SITE: SiteIdentity = {
   name: "Meowpress site",
   id: "meowpress",
-  description: "长文与碎片想法的混排时间线。",
+  description: "A mixed timeline of long-form posts and fragmentary thoughts.",
   contentDirectory: "content",
 };

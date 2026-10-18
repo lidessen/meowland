@@ -37,8 +37,8 @@ export const HoverCard = defineComponent<
       variant = "compact",
       widthAnchor,
       copyText,
-      copyLabel = "复制",
-      copiedLabel = "已复制",
+      copyLabel = "Copy",
+      copiedLabel = "Copied",
       onCopy,
     },
     context,
@@ -84,7 +84,7 @@ export const HoverCard = defineComponent<
         if (alive && open.value && session === copySession) feedback.value = copiedLabel;
       } catch {
         if (alive && open.value && session === copySession)
-          feedback.value = "复制失败，请选择文本后重试。";
+          feedback.value = "Copy failed; select the text and try again.";
       } finally {
         copying = false;
         if (alive && session === copySession)

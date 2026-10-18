@@ -35,11 +35,11 @@ test("hover card keeps owner content available and its accessible trigger initia
     <HoverCard
       id="preview"
       disabled
-      trigger={(bindings) => <button {...bindings}>预览</button>}
-      content={<p>宿主内容</p>}
+      trigger={(bindings) => <button {...bindings}>Preview</button>}
+      content={<p>Host content</p>}
     />,
   );
-  expect(html).toContain("宿主内容");
+  expect(html).toContain("Host content");
   expect(html).toContain('aria-controls="preview"');
   expect(html).toContain('aria-expanded="false"');
 });

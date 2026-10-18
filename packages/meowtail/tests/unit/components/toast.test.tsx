@@ -4,15 +4,15 @@ import { createWebRenderer } from "meowjsx/web";
 import { Toast } from "../../../src/components/toast";
 test("toast announces routine feedback politely and preserves caller actions", () => {
   const html = createWebRenderer(createRuntime()).renderToHtml(
-    <Toast message="已保存" actions={<button>撤销</button>} />,
+    <Toast message="Saved" actions={<button>Undo</button>} />,
   );
   expect(html).toContain('role="status"');
   expect(html).toContain('aria-atomic="true"');
-  expect(html).toContain("<button>撤销</button>");
+  expect(html).toContain("<button>Undo</button>");
 });
 test("toast urgency is explicitly chosen by the host", () => {
   const html = createWebRenderer(createRuntime()).renderToHtml(
-    <Toast role="alert" message="保存失败" />,
+    <Toast role="alert" message="Save failed" />,
   );
   expect(html).toContain('role="alert"');
 });

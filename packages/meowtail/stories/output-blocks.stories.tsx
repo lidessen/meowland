@@ -8,8 +8,8 @@ import { SearchBlock } from "../src/components/search-block";
 
 export const OutputBlocksStory = defineStory({
   id: "output-blocks",
-  title: "执行结果 · 终端、文件、变更与搜索",
-  group: "内容",
+  title: "Execution output · Terminal, file, diff, and search",
+  group: "Content",
   render: () => (
     <Stack>
       <TerminalBlock
@@ -61,8 +61,8 @@ export const OutputBlocksStory = defineStory({
 
 export const TerminalStatesStory = defineStory({
   id: "terminal-states",
-  title: "终端结果 · 运行、失败与状态未知",
-  group: "内容",
+  title: "Terminal output · Running, failure, and unknown status",
+  group: "Content",
   render: () => (
     <Stack>
       <TerminalBlock

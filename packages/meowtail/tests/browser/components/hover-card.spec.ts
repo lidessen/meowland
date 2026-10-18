@@ -4,12 +4,12 @@ test("wide hover preview follows its host width and copies only activation, not 
   page,
 }) => {
   await page.goto("/canvas.html?story=reference-primitives");
-  const trigger = page.getByRole("button", { name: "宽预览与复制", exact: true });
+  const trigger = page.getByRole("button", { name: "Wide preview and copy", exact: true });
   await trigger.focus();
   const panel = page.locator("#wide-reference-preview");
   await expect(panel).toBeVisible();
   const card = panel.getByRole("button", {
-    name: "复制: packages/meowtail/src/components/hover-card.tsx",
+    name: "Copy: packages/meowtail/src/components/hover-card.tsx",
     exact: true,
   });
   await expect
@@ -48,7 +48,7 @@ test("wide hover preview follows its host width and copies only activation, not 
     "data-copied",
     "packages/meowtail/src/components/hover-card.tsx",
   );
-  await expect(panel.getByRole("status")).toHaveText("已复制");
+  await expect(panel.getByRole("status")).toHaveText("Copied");
   await page.setViewportSize({ width: 390, height: 844 });
   await expect
     .poll(async () => {

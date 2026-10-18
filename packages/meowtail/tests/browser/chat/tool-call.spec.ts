@@ -18,7 +18,7 @@ test("native keyboard disclosure preserves its node, copy focus and fold across 
   await summary.press("Enter");
   await expect(tool).toHaveJSProperty("open", true);
   const output = tool.locator(part("chat-tool-call/output"));
-  const copy = output.getByRole("button", { name: "复制", exact: true });
+  const copy = output.getByRole("button", { name: "Copy", exact: true });
   const fold = output.locator("details");
   await fold.locator("summary").click();
   await expect(fold).toHaveJSProperty("open", true);
@@ -64,7 +64,7 @@ test("missing and empty results stay distinct; retry and cancel only emit host i
   await expect(tool).toHaveAttribute("data-tool-state", "queued");
 });
 
-test("long tool names, status facts and bilingual payloads fit a narrow container", async ({
+test("long tool names, status facts and oversized payloads fit a narrow container", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 390, height: 600 });

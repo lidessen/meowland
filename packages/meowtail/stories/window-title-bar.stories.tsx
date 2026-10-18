@@ -74,14 +74,14 @@ function Window({
         title={title}
         leading={
           actions ? (
-            <IconButton size="small" label="返回">
+            <IconButton size="small" label="Back">
               <Icon name="chevron-left" />
             </IconButton>
           ) : null
         }
         trailing={
           actions ? (
-            <IconButton size="small" label="搜索">
+            <IconButton size="small" label="Search">
               <Icon name="search" />
             </IconButton>
           ) : null
@@ -95,7 +95,7 @@ function Window({
           fontSize: "13px",
         }}
       >
-        窗口内容
+        Window content
       </div>
     </div>
   );
@@ -103,13 +103,13 @@ function Window({
 
 export const WindowTitleBarStory = defineStory({
   id: "window-title-bar",
-  title: "窗口标题栏 · 桌面外壳",
-  group: "导航与布局",
+  title: "Window title bar · Desktop shell",
+  group: "Navigation and layout",
   groupOrder: 42,
   component: "WindowTitleBar",
-  variant: "浅色与深色",
+  variant: "Light and dark",
   description:
-    "桌面外壳隐藏原生标题栏后，页面自己的顶栏。外壳通过 --mygo-titlebar-height 与左右 inset 变量报告红绿灯占用的空间，标题栏据此让位；整条标题栏是拖动区域，其中的按钮、链接与输入框保持可点击。场景里手动设置这些变量并画出红绿灯，浏览器中没有外壳时变量回退为 32px 的普通顶栏。",
+    "The page's own top bar once a desktop shell hides the native title bar. The shell reports the traffic-light space through the --mygo-titlebar-height and left/right inset variables, and the title bar makes room for it; the whole title bar is a drag area whose buttons, links and inputs stay clickable. The scenario sets these variables and draws the traffic lights by hand; in a browser with no shell they fall back to a 32px ordinary top bar.",
   covers: [
     "WindowTitleBar clears the traffic lights through --mygo-titlebar-inset-left",
     "drag area with controls opted out",
@@ -121,7 +121,7 @@ export const WindowTitleBarStory = defineStory({
         {(scheme) => (
           <Window
             room={rooms.hidden}
-            title={`Meowland · ${scheme === "light" ? "浅色" : "深色"}`}
+            title={`Meowland · ${scheme === "light" ? "Light" : "Dark"}`}
           />
         )}
       </SchemePair>
@@ -131,13 +131,13 @@ export const WindowTitleBarStory = defineStory({
 
 export const WindowTitleBarRoomStory = defineStory({
   id: "window-title-bar-room",
-  title: "窗口标题栏 · 外壳留白与窄窗口",
-  group: "导航与布局",
+  title: "Window title bar · Shell room and narrow windows",
+  group: "Navigation and layout",
   groupOrder: 43,
   component: "WindowTitleBar",
-  variant: "留白与窄窗口",
+  variant: "Shell room and narrow window",
   description:
-    "TitleBarHidden 为 32px 高、左侧 69px；TitleBarHiddenInset 为 66px、79px；全屏时外壳回报 0px，标题栏随之收起。窄窗口中标题省略，两侧操作保留；没有外壳时（浏览器）回退为 32px 普通顶栏。",
+    "TitleBarHidden is 32px high with a 69px left inset; TitleBarHiddenInset is 66px and 79px. In full screen the shell reports 0px and the title bar collapses. In a narrow window the title is clipped and the actions on both sides stay; without a shell (in a browser) it falls back to a 32px ordinary top bar.",
   covers: [
     "TitleBarHidden room",
     "TitleBarHiddenInset room",
@@ -150,11 +150,11 @@ export const WindowTitleBarRoomStory = defineStory({
       <div style={{ display: "grid", gap: "16px", maxWidth: "720px" }}>
         <Window room={rooms.hidden} title="TitleBarHidden · 32px / 69px" />
         <Window room={rooms.hiddenInset} title="TitleBarHiddenInset · 66px / 79px" />
-        <Window room={rooms.fullScreen} title="全屏 · 0px" />
+        <Window room={rooms.fullScreen} title="Full screen · 0px" />
         <Window
           room={rooms.hidden}
           width={320}
-          title="一个很长很长的窗口标题用来检查窄窗口里的省略行为"
+          title="A very long window title used to check truncation in a narrow window"
         />
         <div
           style={{
@@ -164,9 +164,9 @@ export const WindowTitleBarRoomStory = defineStory({
           }}
         >
           <WindowTitleBar
-            title="没有外壳变量 · 回退"
+            title="No shell variables · Fallback"
             trailing={
-              <IconButton size="small" label="搜索">
+              <IconButton size="small" label="Search">
                 <Icon name="search" />
               </IconButton>
             }

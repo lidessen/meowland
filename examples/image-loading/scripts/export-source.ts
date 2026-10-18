@@ -36,6 +36,6 @@ await cp(resolve(root, "../../package.json"), resolve(reference, "package.json")
 await cp(resolve(root, "../../bun.lock"), resolve(reference, "bun.lock"));
 await writeFile(
   resolve(reference, "README.md"),
-  "把该快照放回同版本 Meowland checkout 的 examples/image-loading 继续编辑；workspace-reference 仅记录锁定依赖，不是独立 npm 工程。\n",
+  "Put this snapshot back into examples/image-loading of a same-version Meowland checkout to keep editing; workspace-reference only records locked dependencies and is not a standalone npm project.\n",
 );
 console.log(`Editable image-loading source: ${outdir}`);

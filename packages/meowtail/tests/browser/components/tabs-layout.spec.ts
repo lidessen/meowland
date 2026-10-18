@@ -4,10 +4,10 @@ test("one tab indicator follows selection and layout, including RTL and reduced 
   page,
 }) => {
   await page.goto("/canvas.html?story=tabs");
-  const list = page.getByRole("tablist", { name: "项目视图" });
+  const list = page.getByRole("tablist", { name: "Project views" });
   const indicator = list.locator('[data-meowui-part="tabs/indicator"]');
-  const overview = list.getByRole("tab", { name: "概览", exact: true });
-  const notes = list.getByRole("tab", { name: "工作笔记", exact: true });
+  const overview = list.getByRole("tab", { name: "Overview", exact: true });
+  const notes = list.getByRole("tab", { name: "Work notes", exact: true });
   await expect(indicator).toHaveCount(1);
   const aligns = async () => {
     const selected = list.getByRole("tab", { selected: true });

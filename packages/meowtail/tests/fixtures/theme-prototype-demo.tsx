@@ -213,117 +213,120 @@ export const PrototypeDemo = defineComponent(
     const clicks = context.signal(0);
     return (
       <Theme theme={prototypeTheme} config={application} id="scope-root" className="pt-app">
-        <h1>参数化主题原型</h1>
-        <p>区域配置改变颜色与密度；组件选项独立改变自身规则。输入、焦点与展开状态应保留。</p>
+        <h1>Parameterized theme prototype</h1>
+        <p>
+          Region configuration changes colors and density; component options independently change
+          their own rules. Input, focus, and expansion state should be preserved.
+        </p>
         <div className="pt-controls">
           <button
             onClick={() =>
               application.set(appOptions.select({ scheme: "light", density: "normal" }))
             }
           >
-            全局浅色
+            Light globally
           </button>
           <button
             onClick={() =>
               application.set(appOptions.select({ scheme: "dark", density: "normal" }))
             }
           >
-            全局深色
+            Dark globally
           </button>
           <button
             onClick={() =>
               application.set(appOptions.select({ scheme: "dark", density: "compact" }))
             }
           >
-            深色紧凑
+            Dark compact
           </button>
           <button
             onClick={() =>
               application.set(appOptions.select({ scheme: "auto", density: "normal" }))
             }
           >
-            跟随系统
+            Follow system
           </button>
         </div>
         <div className="pt-stack">
           <section className="pt-card">
-            <h2>实例选项</h2>
+            <h2>Instance options</h2>
             <div className="pt-row">
               <PrototypeButton
                 id="dynamic-button"
                 variant={variant}
                 onClick={() => clicks.update((n) => n + 1)}
               >
-                可切换按钮
+                Toggleable button
               </PrototypeButton>
               <PrototypeButton id="small-button" size="small">
-                小尺寸
+                Small
               </PrototypeButton>
-              <PrototypeButton disabled>禁用</PrototypeButton>
-              <button onClick={() => variant.set("quiet")}>切换 quiet</button>
-              <button onClick={() => variant.set(undefined)}>恢复默认</button>
+              <PrototypeButton disabled>Disabled</PrototypeButton>
+              <button onClick={() => variant.set("quiet")}>Switch to quiet</button>
+              <button onClick={() => variant.set(undefined)}>Restore defaults</button>
               <output id="click-count">{clicks}</output>
             </div>
           </section>
           <section className="pt-card">
-            <h2>局部配置与原位更新</h2>
+            <h2>Local configuration and in-place updates</h2>
             <div className="pt-controls">
               <button onClick={() => local.set(appOptions.select({ density: "compact" }))}>
-                局部紧凑
+                Compact locally
               </button>
               <button onClick={() => local.set(appOptions.select({ scheme: "light" }))}>
-                局部浅色
+                Light locally
               </button>
               <button onClick={() => local.set(appOptions.select({ scheme: "auto" }))}>
-                局部跟随系统
+                Follow system locally
               </button>
-              <button onClick={() => local.set(appOptions.select({}))}>撤销局部</button>
+              <button onClick={() => local.set(appOptions.select({}))}>Undo local</button>
             </div>
             <Theme config={local} id="scope-local" className="pt-card pt-stack">
               <div className="pt-row">
-                <PrototypeButton id="local-button">继承区域参数</PrototypeButton>
+                <PrototypeButton id="local-button">Inherit region parameters</PrototypeButton>
                 <input
                   id="draft"
-                  aria-label="草稿"
+                  aria-label="Draft"
                   className="pt-input"
-                  placeholder="切换前输入内容"
+                  placeholder="Content entered before switching"
                 />
               </div>
               <details id="details">
-                <summary>展开状态验证</summary>
-                <p>切换配置时，这个节点应保持原位。</p>
+                <summary>Expansion state check</summary>
+                <p>This node should stay in place when the configuration changes.</p>
               </details>
             </Theme>
           </section>
-          <PrototypePane id="outer-pane" title="外层强调标题" tone="emphasis">
-            <PrototypePane id="inner-pane" title="内层默认标题">
-              <p>内层不继承外层的组件选项。</p>
+          <PrototypePane id="outer-pane" title="Outer emphasized title" tone="emphasis">
+            <PrototypePane id="inner-pane" title="Inner default title">
+              <p>The inner pane does not inherit the outer component options.</p>
             </PrototypePane>
           </PrototypePane>
           <section className="pt-card pt-fixed-surface" id="override-parent">
-            <h2>原生变量覆盖</h2>
+            <h2>Native variable overrides</h2>
             <Theme
               config={appOptions.select({ scheme: "dark" })}
               className="pt-card"
               id="override-child"
             >
-              显式深色边界重新声明颜色。
+              An explicit dark boundary redeclares colors.
             </Theme>
           </section>
           <section
             className="pt-card pt-reference"
             {...themeAttributes(standardTheme, standardOptions.select({ scheme: "light" }))}
           >
-            <h2>现有组件参照 · 浅色</h2>
+            <h2>Existing component reference · light</h2>
             <div className="pt-row">
-              <Button>标准 Button</Button>
-              <Input aria-label="标准输入" placeholder="现有 Input" />
-              <Select aria-label="原生行数" size={2}>
-                <option>第一行</option>
-                <option>第二行</option>
+              <Button>Standard Button</Button>
+              <Input aria-label="Standard input" placeholder="Existing Input" />
+              <Select aria-label="Native rows" size={2}>
+                <option>First row</option>
+                <option>Second row</option>
               </Select>
             </div>
-            <Field label="标准 Field" htmlFor="reference-input">
+            <Field label="Standard Field" htmlFor="reference-input">
               <Input id="reference-input" />
             </Field>
           </section>

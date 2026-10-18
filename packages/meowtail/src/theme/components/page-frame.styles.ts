@@ -17,7 +17,7 @@ export const pageFrameStyles = css`
     padding: ${uiTokens.pageInsetBlock} ${uiTokens.pageInsetInline};
     overflow: hidden;
   }
-  :where(${partSelector(pageFrameContract, "toolbar")}, ${partSelector(pageFrameContract, "header")}) {
+  :where(${partSelector(pageFrameContract, "toolbar")}, ${partSelector(pageFrameContract, "header")}, ${partSelector(pageFrameContract, "notice")}, ${partSelector(pageFrameContract, "footer")}) {
     min-width: 0;
     flex: 0 0 auto;
     max-height: none;
@@ -29,6 +29,12 @@ export const pageFrameStyles = css`
     min-width: 0;
     min-height: 0;
     overflow: hidden;
+  }
+  ${partSelector(pageFrameContract, "root")}[${pageFrameOptions.attribute("variant")}="workspace"] > ${partSelector(pageFrameContract, "notice")} {
+    padding: 8px 12px 0;
+  }
+  ${partSelector(pageFrameContract, "root")}[${pageFrameOptions.attribute("variant")}="workspace"] > ${partSelector(pageFrameContract, "footer")} {
+    padding: 8px 12px max(8px, env(safe-area-inset-bottom));
   }
   ${partSelector(pageFrameContract, "root")}[${pageFrameOptions.attribute("scrollOwner")}="content"] >
   ${partSelector(pageFrameContract, "body")} > * {

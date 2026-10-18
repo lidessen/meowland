@@ -2,7 +2,9 @@
 export function inspectCanvas(root: HTMLElement, document: Document): string[] {
   const issues: string[] = [];
   if (document.documentElement.scrollWidth > document.documentElement.clientWidth + 1)
-    issues.push("画布出现横向溢出：请检查固定宽度、长标题和容器约束。");
+    issues.push(
+      "Horizontal overflow in the canvas: check fixed widths, long titles and container constraints.",
+    );
   for (const element of root.querySelectorAll<HTMLElement>(
     "button, input:not([type=hidden]), select, textarea",
   )) {
@@ -18,7 +20,7 @@ export function inspectCanvas(root: HTMLElement, document: Document): string[] {
       (element.tagName === "BUTTON" && element.textContent?.trim());
     if (!named)
       issues.push(
-        `缺少可访问名称：${element.tagName.toLowerCase()}${element.id ? `#${element.id}` : ""}`,
+        `Missing accessible name: ${element.tagName.toLowerCase()}${element.id ? `#${element.id}` : ""}`,
       );
   }
   return issues;

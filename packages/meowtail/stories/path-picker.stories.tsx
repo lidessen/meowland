@@ -4,8 +4,8 @@ import { Button, Field, Input, PathPicker, Stack } from "meowtail";
 
 export const PathPickerStory = defineStory({
   id: "path-picker",
-  title: "路径选择 · 手动输入与宿主浏览",
-  group: "表单输入",
+  title: "Path picker · Manual entry and host browsing",
+  group: "Form inputs",
   groupOrder: 20,
   component: "PathPicker",
   covers: ["PathPicker", "Field", "Input", "Button", "cancel", "failure", "disabled", "readonly"],
@@ -14,17 +14,17 @@ export const PathPickerStory = defineStory({
     let result: "selected" | "cancelled" | "failed" = "selected";
     return (
       <Stack gap="normal" className="workshop-constrained">
-        <Field label="项目名称" htmlFor="picker-name">
-          <Input id="picker-name" value="个人网站" />
+        <Field label="Project name" htmlFor="picker-name">
+          <Input id="picker-name" value="Personal website" />
         </Field>
         <Field
-          label="本地目录"
+          label="Local directory"
           htmlFor="picker-directory"
-          description="演示选择器只返回固定路径，不读取文件或授予访问权限。"
+          description="The demo picker only returns a fixed path; it does not read files or grant access."
         >
           <PathPicker
             id="picker-directory"
-            label="本地目录"
+            label="Local directory"
             value={value}
             kind="directory"
             onValueChange={(next) => {
@@ -44,7 +44,7 @@ export const PathPickerStory = defineStory({
               result = "selected";
             }}
           >
-            演示成功选择
+            Simulate a successful choice
           </Button>
           <Button
             variant="quiet"
@@ -52,7 +52,7 @@ export const PathPickerStory = defineStory({
               result = "cancelled";
             }}
           >
-            演示取消选择
+            Simulate a canceled choice
           </Button>
           <Button
             variant="quiet"
@@ -60,23 +60,23 @@ export const PathPickerStory = defineStory({
               result = "failed";
             }}
           >
-            演示选择失败
+            Simulate a failed choice
           </Button>
         </Stack>
-        <Field label="文件路径" htmlFor="picker-file">
+        <Field label="File path" htmlFor="picker-file">
           <PathPicker
             id="picker-file"
-            label="文件路径"
+            label="File path"
             value="/tmp/report.md"
             onValueChange={() => {}}
             onChoose={async () => null}
             readOnly
           />
         </Field>
-        <Field label="等待保存" htmlFor="picker-disabled">
+        <Field label="Waiting to save" htmlFor="picker-disabled">
           <PathPicker
             id="picker-disabled"
-            label="等待保存"
+            label="Waiting to save"
             value="/tmp/project"
             kind="directory"
             onValueChange={() => {}}
@@ -85,13 +85,13 @@ export const PathPickerStory = defineStory({
           />
         </Field>
         <Field
-          label="手动输入目录"
+          label="Enter a directory manually"
           htmlFor="picker-manual"
-          description="宿主未提供选择能力时，继续手动填写绝对路径。"
+          description="When the host offers no picker, keep entering an absolute path manually."
         >
           <PathPicker
             id="picker-manual"
-            label="手动输入目录"
+            label="Enter a directory manually"
             value={value}
             onValueChange={(next) => {
               value.value = next;

@@ -97,7 +97,7 @@ test("unthemed base components preserve caller classes and native semantics", ()
         <Badge tone="accent" size="small" className="host-badge">
           Demo
         </Badge>
-        <Field label="标题" htmlFor="title" description="Required" error="Missing">
+        <Field label="Title" htmlFor="title" description="Required" error="Missing">
           <Input id="title" name="title" required />
         </Field>
         <Textarea name="copy">Draft</Textarea>
@@ -106,8 +106,8 @@ test("unthemed base components preserve caller classes and native semantics", ()
         <IconButton label="Close" type="submit" disabled>
           ×
         </IconButton>
-        <Toolbar label="编辑工具">
-          <IconButton label="搜索">⌕</IconButton>
+        <Toolbar label="Edit tools">
+          <IconButton label="Search">⌕</IconButton>
         </Toolbar>
         <AddButton variant="quiet" size="small" />
         <EmptyState title="Empty" copy="Add a note" action="Create" />
@@ -115,14 +115,14 @@ test("unthemed base components preserve caller classes and native semantics", ()
       <Dialog labelledBy="dialog-title" describedBy="dialog-description" open>
         <DialogPanel as="form" method="dialog">
           <DialogHeader
-            title="确认"
+            title="Confirm"
             titleId="dialog-title"
             eyebrow="Note"
             description="Review"
             descriptionId="dialog-description"
             actions="Close"
           />
-          <DialogActions>操作</DialogActions>
+          <DialogActions>Actions</DialogActions>
         </DialogPanel>
       </Dialog>
     </main>,
@@ -130,7 +130,7 @@ test("unthemed base components preserve caller classes and native semantics", ()
   expect(html).toContain('<article class="feature-card"');
   expect(html).toContain('data-card-depth="0"');
   expect(html).toContain('data-option-badge-tone="accent"');
-  expect(html).toContain('<label for="title" data-meowui-part="field/label">标题</label>');
+  expect(html).toContain('<label for="title" data-meowui-part="field/label">Title</label>');
   expect(html).toContain(
     'id="title-description" data-meowui-part="field/description">Required</span>',
   );
@@ -142,9 +142,11 @@ test("unthemed base components preserve caller classes and native semantics", ()
   expect(html).toContain('role="separator" aria-orientation="vertical"');
   expect(html).toContain('aria-current="page"');
   expect(html).toContain('type="submit" disabled aria-label="Close"');
-  expect(html).toContain('role="toolbar" aria-label="编辑工具" aria-orientation="horizontal"');
+  expect(html).toContain('role="toolbar" aria-label="Edit tools" aria-orientation="horizontal"');
   expect(html).toContain('aria-labelledby="dialog-title" aria-describedby="dialog-description"');
-  expect(html).toContain('<h2 id="dialog-title" data-meowui-part="dialog-header/title">确认</h2>');
+  expect(html).toContain(
+    '<h2 id="dialog-title" data-meowui-part="dialog-header/title">Confirm</h2>',
+  );
   expect(html).toContain(
     '<p id="dialog-description" data-meowui-part="dialog-header/description">Review</p>',
   );
@@ -160,7 +162,7 @@ test("registered components expose stable parts without a visual plugin", () => 
     [<Input />, ["input/root"]],
     [<Textarea />, ["textarea/root"]],
     [<IconButton label="Close">×</IconButton>, ["icon-button/root"]],
-    [<Toolbar label="编辑工具" />, ["toolbar/root"]],
+    [<Toolbar label="Edit tools" />, ["toolbar/root"]],
     [<AddButton />, ["button/root"]],
     [<Separator />, ["separator/root"]],
     [
@@ -233,10 +235,10 @@ test("theme sees original visual props while native elements do not", () => {
 
 test("navigation retains zero as meaningful badge content", () => {
   const app = web();
-  expect(app.renderToHtml(<NavItem label="等待审阅" badge={0} />)).toContain(
+  expect(app.renderToHtml(<NavItem label="Waiting for review" badge={0} />)).toContain(
     '<span data-meowui-part="nav-item/badge">0</span>',
   );
-  expect(app.renderToHtml(<NavItem label="等待审阅" badge={false} />)).not.toContain(
+  expect(app.renderToHtml(<NavItem label="Waiting for review" badge={false} />)).not.toContain(
     'data-meowui-part="nav-item/badge"',
   );
 });

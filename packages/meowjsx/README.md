@@ -2,64 +2,52 @@
 
 ## Render-tree context
 
-`createContext(defaultValue)` 返回类型化的 Context 和 `Provider` 组件。
-`<Context.Provider value={value}>…</Context.Provider>` 不创建宿主节点；后代组件在同步
-render 中通过 `useContext(Context)` 读取最近的祖先值，没有 Provider 时得到默认值。
-显式提供 `undefined` 仍是一个值，不会退回默认值。兄弟、独立根节点和 runtime 不共享环境。
+`createContext(defaultValue)` returns a typed Context and a `Provider` component.
+`<Context.Provider value={value}>…</Context.Provider>` does not create a host node; descendant components read the nearest
+ancestor value with `useContext(Context)` during synchronous render, and get the default when there is no Provider.
+An explicitly provided `undefined` is still a value and does not fall back to the default. Siblings, independent root nodes and runtimes do not share environment.
 
-环境跟随渲染树遍历，而非 VNode 创建时的位置。预先创建的 VNode、数组、宿主包装层和
-Signal 后续替换的子树使用当前区域捕获的环境；Promise 与 AsyncIterable 的延迟挂载同样保留它。
-同步 HTML 输出采用相同祖先规则，但仍不支持 Promise / AsyncIterable 内容，遇到时抛错。
+Environment follows render-tree traversal, not the location where the VNode was created. Pre-created VNodes, arrays, host wrapper layers and subtrees replaced later by a Signal use the environment captured in the current area; deferred mounting of Promises and AsyncIterables preserves it as well.
+Synchronous HTML output follows the same ancestor rule, but still does not support Promise / AsyncIterable content and throws when it encounters them.
 
-`useContext` 只在组件同步执行期间读取环境。事件处理和 `await` 后需要使用 render 中预先
-捕获的值，不把它当异步局部存储。Provider 不添加整树重渲染或依赖追踪；需要动态共享值时，
-可将 Signal 对象作为 value，消费者使用原有 Signal 绑定。更换 Provider 的普通 value 不会
-自动重跑已挂载后代。Context 的内部 scope 由 renderer 传递，用户不应修改它。
+`useContext` reads environment only during the component's synchronous execution. Event handlers and code after `await` must use the value captured in render beforehand; do not treat it as asynchronous local storage. Provider does not add whole-tree re-render or dependency tracking; to share a dynamic value, pass a Signal object as the value and let consumers use the existing Signal binding. Replacing a Provider's ordinary value does not automatically re-run already mounted descendants. Context's internal scope is passed by the renderer and users must not modify it.
 
-`RuntimePlugin.resolveComponent({ component, props, runtime })` 可在组件调用前选择替代函数。
-按 `pre`、普通、`post` 和各组注册顺序调用；首个非 `undefined` 结果胜出，返回原函数也停止，
-结果不再递归解析。选择发生在 lifecycle scope 创建前，所选组件使用自己的 contract、parts
-和清理逻辑，原组件不执行。`props` 是只读类型视图，不会复制或冻结对象。
+`RuntimePlugin.resolveComponent({ component, props, runtime })` can select a replacement function before the component is called.
+It is called in the order `pre`, normal, `post`, and within each group's registration order; the first non-`undefined` result wins, and returning the original function also stops resolution; the result is not resolved recursively. Selection happens before the lifecycle scope is created, and the selected component uses its own contract, parts and cleanup logic while the original component does not execute. `props` is a read-only typed view and does not copy or freeze the object.
 
-此 hook 属于执行 runtime：预先创建的 VNode、Signal/Promise 后续挂载以及同步 HTML 均适用。
-`runtime.use()` 返回的 cleanup 卸载规则，不改写已挂载实例；其他 runtime 不受影响。
-它不拦截模块副作用或直接函数调用，也不改变 `create` / `render` hook 的含义。
+This hook belongs to the execution runtime: pre-created VNodes, Signal/Promise deferred mounts and synchronous HTML all apply. The cleanup returned by `runtime.use()` unmounts rules and does not rewrite already mounted instances; other runtimes are unaffected.
+It does not intercept module side effects or direct function calls, and does not change the meaning of the `create` / `render` hooks.
 
-## 开发 metadata 与实例观察
+## Development metadata and instance observation
 
-组件函数可赋值 `metadata?: ComponentMetadata`。`ComponentMetadata` 是开放的类型扩展接口，
-开发工具通过 declaration merging 注册自己的命名空间；core 不解释或读取其中的工具字段。
-`Component<Props>` 和 `defineComponent` 返回值均保留这个约束，普通函数可用
-`satisfies ComponentMetadata` 检查赋值。metadata 不属于 props 或组件运行选项。
+Component functions may carry `metadata?: ComponentMetadata`. `ComponentMetadata` is an open type-extension interface; development tools register their own namespaces through declaration merging, and core does not interpret or read their tool fields.
+Both `Component<Props>` and the value returned by `defineComponent` preserve this constraint, and ordinary functions can use
+`satisfies ComponentMetadata` to check assignment. Metadata is not part of props or component runtime options.
 
-`runtime.createRenderer(strategy, { observer })` 可启用目标中立的实例观察：
-`onComponent(instance)` 报告创建，`onUnmount(instance)` 报告卸载；可选的
-`onNode(instance, node, mounted)` 报告节点关联变化。实例包含本 renderer 内的 `id`、
-`parent`、原函数 `originalComponent`、实际执行函数 `component`，以及实时只读的 `nodes` 集合。
-集合含该实例及后代的宿主和文本输出，排除内部 marker；Signal、Promise、AsyncIterable 更新后仍保持当前关联。
-数组和宿主标签不增加组件层级，直接函数调用不会产生组件实例。
+`runtime.createRenderer(strategy, { observer })` enables target-neutral instance observation:
+`onComponent(instance)` reports creation, `onUnmount(instance)` reports unmounting; the optional
+`onNode(instance, node, mounted)` reports node-association changes. An instance includes this renderer's `id`,
+`parent`, the original function `originalComponent`, the actually executed function `component`, and a live read-only `nodes` collection.
+The collection includes host and text output of that instance and its descendants, excluding internal markers; Signal, Promise and AsyncIterable updates keep the current associations.
+Arrays and host tags do not add component levels, and direct function calls do not create component instances.
 
-内置 Fragment 和 Context Provider 按实际执行函数身份报告 `semantic` 为 `fragment` 或
-`context-provider`，不按名称猜测。替换组件使用所选函数的语义身份和 metadata。
-观察不增加宿主包装层；未启用时不创建实例或节点索引。回调同步执行，抛错按挂载或清理失败处理，
-工具应在自身边界处理诊断。实例卸载后从工具投影中移除，`id` 不用于跨次运行定位。
+Built-in Fragment and Context Provider report `semantic` as `fragment` or
+`context-provider` according to their actual executed function identity, not by name guessing. Replaced components use the selected function's semantic identity and metadata.
+Observation adds no host wrapper layers; when disabled, no instance or node index is created. Callbacks run synchronously, and a throw is handled as a mount or cleanup failure; tools should handle diagnostics at their own boundary. Instances are removed from the tool projection after unmount, and `id` is not used to locate instances across runs.
 
-可选 `onFlush(changed)` 在微任务中合并实例失效通知，覆盖组件加卸载、节点关联及已挂载
-宿主 Signal 属性更新；异常与回滚也通知当前事实可能改变的实例。`changed` 使用真实实例
-identity，包含本轮已卸载实例，不是成功提交记录。集合在调用前清空，回调引起的新变化进入
-下一轮，不递归投递。它不表示 DOM layout、paint、全部异步工作或应用 ready；没有此回调时
-不建立额外 dirty 集合或微任务。此回调抛错走 renderer 的 `onError(error, "async")`，不回滚
-已发生的渲染；未提供错误出口则异步抛出。
+The optional `onFlush(changed)` merges instance-invalidation notices in a microtask, covering component mount/unmount, node associations and updates to mounted host Signal props; exceptions and rollbacks also notify instances whose current facts may have changed. `changed` uses real instance
+identity and includes instances unloaded in this round; it is not a successful-commit record. The set is cleared before the callback runs, and new changes caused by the callback go into the
+next round without recursive delivery. It does not mean DOM layout, paint, all asynchronous work or application readiness; without this callback,
+no additional dirty set or microtask is established. A throw from this callback goes through the renderer's `onError(error, "async")` and does not roll back
+rendering that already happened; if no error outlet is provided, it is thrown asynchronously.
 
-工具可设置 `observer.roots`，按 child 对象引用限定观察子树；省略时观察整棵渲染树，
-空数组时不观察实例。进入每个根后，首层组件的 `parent` 为 `null`，外层容器仍正常渲染、
-传递 context 和执行 lifecycle，但不进入观察投影。根可为 VNode、Signal、Promise 或
-AsyncIterable，延迟输出继续使用该范围。调用方若把内容数组展开交给容器，应传入其中的
-实际 child 引用。此范围不增加组件调用，不影响 runtime hooks 或组件替换。
+Tools can set `observer.roots` to limit the observed subtree by child object reference; when omitted the whole render tree is observed, and an empty array observes no instances. After entering each root, the first-level component's `parent` is `null`; outer containers still render normally,
+pass context and run lifecycle, but do not enter the observation projection. A root may be a VNode, Signal, Promise or
+AsyncIterable, and deferred output continues to use that scope. If the caller expands a content array into a container, it should pass the actual child references inside it. This scope adds no component calls and does not affect runtime hooks or component replacement.
 
-多消费者使用 `createComponentObservation<TNode>({ roots?, onError? })`，而不是各自复制
-实例 Map。它返回 `observer`、`read(root?)`、`subscribe(listener, { root? })` 和 `dispose()`。
-将 `observer` 接入 renderer 后，先订阅再读取即可取得当前状态和后续失效通知：
+Multiple consumers use `createComponentObservation<TNode>({ roots?, onError? })` instead of each copying
+its own instance Map. It returns `observer`, `read(root?)`, `subscribe(listener, { root? })` and `dispose()`.
+After wiring `observer` into the renderer, subscribe first and then read to obtain the current state and subsequent invalidation notices:
 
 ```ts
 const observation = createComponentObservation<HostNode>({ onError: reportObserverError });
@@ -68,70 +56,67 @@ const unsubscribe = observation.subscribe(() => inspect(observation.read()));
 const current = observation.read();
 ```
 
-`read` 返回当前实例成员数组的副本，实例 `nodes` 仍是 renderer 所有的实时集合；它不是
-不可变历史快照。`root` 是真实实例对象，包含其自身及后代；已卸载根读取为空。根内改动与
-祖先改动均可使订阅失效，通知允许保守，不承诺精确的布局影响集。订阅没有隐式首次回放；
-投递使用订阅名单快照，调用前再次检查有效性，因此本轮取消的订阅不再执行，新加入的
-订阅从后续通知开始。一个消费者抛错不阻断其他消费者，错误交给观察中心的 `onError`；
-缺少该出口或出口再次抛错时异步报错，不静默吞错。
+`read` returns a copy of the current instance-member array; the instance `nodes` is still the renderer-owned live collection; it is not
+an immutable historical snapshot. `root` is the real instance object and includes itself and its descendants; reading an unmounted root is empty. Changes inside the root and ancestor changes can both invalidate subscriptions; notification may be conservative and does not promise a precise layout-impact set. Subscriptions have no implicit first replay;
+delivery uses a snapshot of the subscriber list and re-checks validity before calling, so subscriptions cancelled in this round no longer run, and newly added
+subscriptions begin with later notifications. A throwing consumer does not block other consumers; the error goes to the observation center's `onError`;
+if that outlet is missing or throws again, the error is reported asynchronously rather than silently swallowed.
 
-`dispose` 只停止观察并清理投影，不卸载视图。之后 `read` 为空、`subscribe` 拒绝；已有
-renderer 的迟到通知被忽略。通常一个观察中心接一个 renderer；实现按实例 identity 存储，
-不会因不同 renderer 的数字 id 相同而覆盖。`roots` 可使用 getter，但范围仍在创建 renderer
-时读取并固定，适用于工具在创建前设置真实 child；不是运行时动态切换入口。纯宿主或文本根
-没有组件实例，外部 DOM/样式、字体加载和浏览器尺寸变化也不属于该观察合同。
+`dispose` only stops observation and clears the projection; it does not unmount the view. Afterwards `read` is empty and `subscribe` rejects; late notifications
+from an existing renderer are ignored. Usually one observation center is attached to one renderer; the implementation stores by instance identity and does not overwrite because different renderers have the same numeric id. `roots` may use a getter, but the scope is read and fixed when the renderer is created, suitable for tools that set the real child before creation; it is not a runtime dynamic-switch entry. Purely host or text roots
+have no component instances, and external DOM/styles, font loading and browser size changes also do not belong to this observation contract.
 
-MeowJSX 的 core：JSX/VNode 工厂、Signal/batch/effect、组件与 part 契约、shadow/plugin/theme
-契约、lifecycle 与 context，以及目标中立的 renderer seam（`RenderStrategy<TNode>` /
-`createRenderer()`）。core 不知道目标平台。
+MeowJSX core: the JSX/VNode factory, Signal/batch/effect, component and part contracts, shadow/plugin/theme
+contracts, lifecycle and context, and the target-neutral renderer seam (`RenderStrategy<TNode>` /
+`createRenderer()`). Core does not know the target platform.
 
 ```text
-JSX 源码 / 组件逻辑
+JSX source / component logic
           │
-meowjsx（本包：core + JSX contract）
-       └─→ meowjsx/web   同包的 DOM / event / HTML / mount 模块
+meowjsx (this package: core + JSX contract)
+       └─→ meowjsx/web   the same package's DOM / event / HTML / mount modules
 ```
 
-## 导出
+## Exports
 
-- `.`、`./runtime`：`h`、`Fragment`、`raw`、`part`、`signal`/`batch`/`mapSignal`、
-  `createRuntime`、`defaultRuntime`、`defineComponent`、`defineShadow`、
-  `createThemePlugin`，以及 VNode/Signal/契约类型。
-- `./renderer`：`RenderStrategy<TNode>`、`createRenderer()`、`Renderer`/`Rendered`/
-  `RendererOptions`、`ComponentObserver`/`ObservedComponent` 等 target seam 类型。`createRenderer()` 注入 component lifecycle、
-  render hook、override 和 `key`/`componentPart` 身份，target 只实现节点与属性落地。
-- `./jsx-runtime`：`jsx`/`jsxs`/`jsxDEV`/`Fragment`。
-- `./jsx-dev-runtime`：development 自动 JSX 所需的 `jsxDEV`/`Fragment`，重用同一实现。
-- `./web`：DOM mount、静态 HTML、Web shadow、实例观察来源和骨架视觉控制。
-- `./json`：有限描述、host binding/action 引用、单源 metadata 校验与 catalog 描述，见 [JSON 入口](JSON.md)。
-- `Runtime.targetHooks`：target 自己拥有输出路径时（Web 的静态 HTML）复用 runtime 的
-  组件调用、render hook 与 override 语义，不必在 target 里复制一套。
+- `.`, `./runtime`: `h`, `Fragment`, `raw`, `part`, `signal`/`batch`/`mapSignal`,
+  `createRuntime`, `defaultRuntime`, `defineComponent`, `defineShadow`,
+  `createThemePlugin`, plus VNode/Signal/contract types.
+- `./renderer`: `RenderStrategy<TNode>`, `createRenderer()`, `Renderer`/`Rendered`/
+  `RendererOptions`, `ComponentObserver`/`ObservedComponent` and other target-seam types. `createRenderer()` injects component lifecycle,
+  render hooks, overrides and `key`/`componentPart` identity; the target only implements node and attribute placement.
+- `./jsx-runtime`: `jsx`/`jsxs`/`jsxDEV`/`Fragment`.
+- `./jsx-dev-runtime`: the `jsxDEV`/`Fragment` needed by development automatic JSX, reusing the same implementation.
+- `./web`: DOM mount, static HTML, Web shadow, instance-observation sources and skeleton visual controls.
+- `./json`: finite descriptions, host binding/action references, single-source metadata validation and catalog descriptions; see [JSON entry](JSON.md).
+- `Runtime.targetHooks`: when the target owns the output path (Web's static HTML), reuse the runtime's
+  component calls, render hooks and override semantics instead of copying a set into the target.
 
-core 根没有 `render`/`renderToHtml`：`render(node, Element)` 与 HTML 序列化从
-`meowjsx/web` 导入。根不回导 Web；两者使用同一份 core 模块，多个显式 Runtime 仍可独立创建。
+The core root has no `render`/`renderToHtml`: `render(node, Element)` and HTML serialization are imported from
+`meowjsx/web`. The root does not import Web back; both use the same core module, and multiple explicit Runtimes can still be created independently.
 
-## 不变量：core 不含平台
+## Invariant: core contains no platform
 
-core 源码（含类型）不出现 `document`、`window`、DOM `Element`/`HTMLElement`、
-浏览器 `Event`、CSS API 或终端 API。`packages/meowjsx/tsconfig.core.json` 在不含
-`dom` lib、`types: []` 的配置下检查整个 core：
+The core source (including types) does not contain `document`, `window`, DOM `Element`/`HTMLElement`,
+browser `Event`, CSS APIs or terminal APIs. `packages/meowjsx/tsconfig.core.json` checks the whole core under a configuration without the
+`dom` lib and with `types: []`:
 
 ```sh
 bun node_modules/typescript/bin/tsc -p packages/meowjsx/tsconfig.core.json
 ```
 
-上面命令从仓库根运行，只检查无 DOM 的 core 分组。包内 `bun run typecheck` 依次运行 core、renderer、Web 三个配置，最后的 Web 分组明确包含 DOM；它不等价于仅 core 的无 DOM 检查。`tsconfig.renderer.json` 独立检查目标中立 renderer seam，行为用例使用 fake target。
+The command above runs from the repository root and only checks the DOM-free core group. The package's `bun run typecheck` runs core, renderer and Web configurations in order; the final Web group explicitly includes the DOM and is not equivalent to the DOM-free core-only check. `tsconfig.renderer.json` independently checks the target-neutral renderer seam, and behavior cases use a fake target.
 
-`ShadowContext.element` 是目标提供的 host handle，core 里类型为泛型 `TNode`
-（默认 `unknown`）；Web 模块把它收窄成真实元素。主题契约（`Theme`/`ThemeRule`/
-`ThemeStyle` 及其合并规则）按规划留在 core，它只承载值，不接触任何样式 API。
+`ShadowContext.element` is the target-provided host handle, typed as generic `TNode` in core
+(defaults to `unknown`); the Web module narrows it to a real element. Theme contracts (`Theme`/`ThemeRule`/
+`ThemeStyle` and their merge rules) stay in core as planned; they carry values only and touch no style API.
 
-## 验证
+## Verification
 
-- `bun test packages/meowjsx/tests/unit`：Signal、VNode、plugin、契约、fake target seam，以及 Web 宿主测试。
-- `tests/types/` 中 core 与 Web 类型用例分别检查；core 类型环境不包含 DOM。
+- `bun test packages/meowjsx/tests/unit`: Signal, VNode, plugin, contracts, fake target seam and Web host tests.
+- `tests/types/` checks core and Web type cases separately; the core type environment does not include the DOM.
 
-## Web 模块
+## Web module
 
 ```ts
 import { createRuntime, h } from "meowjsx";
@@ -142,19 +127,19 @@ const mounted = web.render(h("p", {}, "Hello"), document.querySelector("main")!)
 mounted.unmount();
 ```
 
-Web 源码位于 `web/`，DOM 类型只从该入口到达。静态 `renderToHtml` 不挂载 DOM、不执行 shadow；
-`createSkeletonController` 调用时才需要真实文档与 CSS Custom Highlight 支持。
-模块导入会创建默认 Web renderer 和观察 Context，不会安装样式或监听器。
-`createWebRenderer(runtime)` 尊重该 runtime 已安装的组件、主题和 plugin；显式传入观察来源时，
-其生命周期由消费者管理，不建立跨 renderer 的全局观察树。
+The Web source lives in `web/`, and DOM types only arrive through that entry. Static `renderToHtml` does not mount a DOM or run shadow;
+`createSkeletonController` needs a real document and CSS Custom Highlight support only when called.
+Importing the module creates the default Web renderer and observation Context; it does not install styles or listeners.
+`createWebRenderer(runtime)` respects the components, themes and plugins already installed in that runtime; when an observation source is passed explicitly,
+its lifecycle is managed by the consumer, and no global observation tree is created across renderers.
 
-公共 JS 产物保留模块关系：根、runtime、自动 JSX 与 Web 入口引用同一份 core。
-发布构建不能为每个入口复制一份 defaultRuntime、Context 或响应式调度器。
+Public JS artifacts preserve module relationships: the root, runtime, automatic JSX and Web entries reference the same core.
+Release builds must not copy a defaultRuntime, Context or reactive scheduler per entry.
 
-## 有身份的动态列表
+## Keyed dynamic lists
 
-`keyed(items, key, render)` 让同 key 的行保持组件、节点、Context 与观察父链；更新只改变该行的只读 item Signal，
-删除释放该行生命周期，重新排列移动已有范围。普通数组与 Signal 的整体替换语义不变。
+`keyed(items, key, render)` keeps rows with the same key holding the same components, nodes, Context and observation parent chain; an update only changes that row's read-only item Signal,
+a deletion releases that row's lifecycle, and reordering moves the existing range. Whole-replacement semantics for plain arrays and Signals are unchanged.
 
 ```ts
 const items = signal([{ id: "one", label: "First" }]);
@@ -170,7 +155,7 @@ const rows = keyed(
 );
 ```
 
-`render` 构造 Child，不是额外的生命周期 hook；在组件内读取 Signal 时仍用现有 Signal 属性或 `mapSignal`。
-key 必须唯一，且为字符串或有限数字；重复/非法 key、新行挂载失败保留原行与值，后续合法更新仍可继续。
-目标的 insert/remove 失败不提供事务回滚。普通前后追加不移动旧行；任意重排时原生焦点是否保留取决于目标移动能力。
-静态 HTML 读取一次列表，不订阅或挂载 DOM。
+`render` constructs a Child and is not an extra lifecycle hook; when reading Signals inside a component, keep using the existing Signal properties or `mapSignal`.
+Keys must be unique and must be strings or finite numbers; duplicate/invalid keys and new-row mount failures keep the original rows and values, and later valid updates still continue.
+Target insert/remove failures provide no transactional rollback. Ordinary appends at either end do not move old rows; whether native focus survives arbitrary reordering depends on the target's move capability.
+Static HTML reads the list once and does not subscribe or mount a DOM.

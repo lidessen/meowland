@@ -19,10 +19,10 @@ const imageUrl =
     '<svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240"><rect width="360" height="240" fill="#edf1ec"/><rect x="24" y="28" width="72" height="184" rx="8" fill="#c5cec2"/><rect x="112" y="28" width="224" height="112" rx="8" fill="#fff"/><rect x="112" y="156" width="224" height="56" rx="8" fill="#dbe3d8"/></svg>',
   );
 const sampleFiles = [
-  { id: "layout", name: "工作区草图.svg", mediaType: "image/svg+xml", url: imageUrl },
+  { id: "layout", name: "workspace-sketch.svg", mediaType: "image/svg+xml", url: imageUrl },
   {
     id: "notes",
-    name: "交互评审与验收记录.md",
+    name: "interaction-review-and-acceptance-notes.md",
     mediaType: "text/markdown",
     url: "data:text/plain;charset=utf-8,%23%20Review",
     sizeBytes: 2480,
@@ -31,21 +31,22 @@ const sampleFiles = [
 
 export const InlineComposer = defineStory({
   id: "composer-inline",
-  title: "输入 · 短草稿与多行编辑",
+  title: "Composer · Short drafts and multi-line editing",
   component: "ChatComposer",
-  variant: "行内编辑",
-  group: "对话组件",
+  variant: "Inline editing",
+  group: "Conversation components",
   groupOrder: 50,
-  description: "短草稿与操作同排，长草稿自然增高；聚焦时显示键盘提示。仅本地编辑。",
+  description:
+    "Short drafts sit on the same row as actions; long drafts grow naturally. Keyboard hints appear on focus. Local editing only.",
   render: () => (
     <Container width="content">
       <ChatComposer
         layout="inline"
-        hint="Enter 发送 · Shift + Enter 换行"
+        hint="Enter to send · Shift + Enter for a new line"
         hintId="inline-composer-hint"
         onSubmit={(event) => event.preventDefault()}
       >
-        <Button variant="quiet" size="small" aria-label="添加材料">
+        <Button variant="quiet" size="small" aria-label="Add attachment">
           <Icon name="plus" />
         </Button>
       </ChatComposer>
@@ -55,18 +56,20 @@ export const InlineComposer = defineStory({
 
 export const ComposerAttachments = defineStory({
   id: "composer-attachments",
-  title: "输入附件 · 辨认、移除与继续写作",
+  title: "Composer attachments · Identify, remove, and keep writing",
   component: "ChatComposer",
-  variant: "附件与草稿",
-  group: "对话组件",
+  variant: "Attachments and draft",
+  group: "Conversation components",
   groupOrder: 50,
   description:
-    "图片用缩略图辨认，文件保留名称；发送只保存本地快照，等待与失败都不丢失继续编辑的草稿。",
+    "Images are identified by thumbnails and files keep their names; sending saves only a local snapshot, and neither waiting nor failure loses the draft you keep editing.",
   render() {
-    const draft = signal("结合这份草图，检查窄屏下的阅读顺序。");
+    const draft = signal("Use this sketch to check the reading order on a narrow screen.");
     const pending = signal(false);
-    const feedback = signal("本地模拟。附件不会上传，消息不会发送到服务。 ");
-    const submitted = signal("尚未提交。");
+    const feedback = signal(
+      "Local simulation. Attachments are not uploaded and messages are not sent to a service. ",
+    );
+    const submitted = signal("Not submitted yet.");
     const attachments = signal<Child>(null);
     let files = [...sampleFiles];
     let preview: HTMLDialogElement | undefined;
@@ -77,21 +80,24 @@ export const ComposerAttachments = defineStory({
       previewContent.value = file.mediaType.startsWith("image/") ? (
         <img src={file.url} alt={file.name} style={{ maxWidth: "100%", maxHeight: "50vh" }} />
       ) : (
-        <p>检查窄屏阅读顺序、长文件名和继续编辑。此处展示内置评审记录，未读取本地文件。</p>
+        <p>
+          Check the narrow-screen reading order, long file names, and continued editing. Shows a
+          built-in review record; no local file is read.
+        </p>
       );
       preview?.showModal();
     };
     const refresh = () => {
       attachments.value = files.length ? (
         <ChatAttachments
-          label="待发送附件"
+          label="Pending attachments"
           items={files.map((file) => ({
             ...file,
             onPreview: () => show(file),
             onRemove: () => {
               files = files.filter((entry) => entry.id !== file.id);
               refresh();
-              feedback.value = `已移除 ${file.name}。草稿保持不变。`;
+              feedback.value = `Removed ${file.name}. The draft is unchanged.`;
             },
           }))}
         />
@@ -102,15 +108,15 @@ export const ComposerAttachments = defineStory({
       <Container width="content">
         <Stack gap="relaxed">
           <Stack gap="compact">
-            <strong>检查工作区的阅读顺序</strong>
-            <span>先确认附带材料，再写下要推进的事。</span>
+            <strong>Check the reading order in the workspace</strong>
+            <span>Confirm the attached materials first, then write down what to move forward.</span>
           </Stack>
           <ChatComposer
             value={draft}
             attachments={attachments}
             submitDisabled={pending}
-            inputLabel="工作草稿"
-            hint="等待结果时可以继续编辑；移除附件只影响下一次提交。"
+            inputLabel="Working draft"
+            hint="You can keep editing while waiting for a result; removing an attachment only affects the next submission."
             hintId="input-attachment-hint"
             onInput={(event) => {
               draft.value = (event.target as HTMLTextAreaElement).value;
@@ -118,9 +124,10 @@ export const ComposerAttachments = defineStory({
             onSubmit={(event) => {
               event.preventDefault();
               if (pending.value) return;
-              submitted.value = `本次提交：${draft.value} · ${files.length} 个附件`;
+              submitted.value = `This submission: ${draft.value} · ${files.length} attachment${files.length === 1 ? "" : "s"}`;
               pending.value = true;
-              feedback.value = "本地模拟等待中，可以继续修改下一份草稿。";
+              feedback.value =
+                "Simulating locally; you can keep editing the next draft while waiting.";
             }}
           >
             <Button
@@ -129,11 +136,11 @@ export const ComposerAttachments = defineStory({
               onClick={() => {
                 files = [...sampleFiles];
                 refresh();
-                feedback.value = "已恢复两份内置示例附件。";
+                feedback.value = "Restored the two built-in sample attachments.";
               }}
             >
               <Icon name="paperclip" />
-              恢复示例附件
+              Restore sample attachments
             </Button>
           </ChatComposer>
           <Stack gap="compact">
@@ -145,10 +152,11 @@ export const ComposerAttachments = defineStory({
                 onClick={() => {
                   if (!pending.value) return;
                   pending.value = false;
-                  feedback.value = "模拟发送失败。最新草稿和当前附件已保留，可再次发送。";
+                  feedback.value =
+                    "Simulated send failure. The latest draft and current attachments were kept; you can send again.";
                 }}
               >
-                模拟失败
+                Simulate failure
               </Button>
               <Button
                 variant="quiet"
@@ -156,10 +164,11 @@ export const ComposerAttachments = defineStory({
                 onClick={() => {
                   if (!pending.value) return;
                   pending.value = false;
-                  feedback.value = "模拟发送成功。最新草稿和当前附件仍保留。";
+                  feedback.value =
+                    "Simulated send success. The latest draft and current attachments are still kept.";
                 }}
               >
-                模拟成功
+                Simulate success
               </Button>
             </Inline>
             <p role="status">{feedback}</p>
@@ -175,7 +184,7 @@ export const ComposerAttachments = defineStory({
                 <DialogHeader
                   title={previewName}
                   titleId="input-preview-title"
-                  description="内置材料预览"
+                  description="Built-in material preview"
                 />
               }
             >
@@ -183,7 +192,7 @@ export const ComposerAttachments = defineStory({
                 {previewContent}
                 <Inline justify="end">
                   <Button variant="outline" onClick={() => preview?.close()}>
-                    返回草稿
+                    Back to draft
                   </Button>
                 </Inline>
               </Stack>
@@ -197,18 +206,21 @@ export const ComposerAttachments = defineStory({
 
 export const SentAttachments = defineStory({
   id: "attachments-sent",
-  title: "已发送附件 · 作为可回看的材料",
+  title: "Sent attachments · Materials you can revisit",
   component: "ChatAttachments",
-  variant: "已发送材料",
-  group: "对话组件",
+  variant: "Sent materials",
+  group: "Conversation components",
   groupOrder: 50,
-  description: "已发送材料保留查看与下载，不再提供移除草稿操作。",
+  description: "Sent materials keep preview and download; no draft-removal action is offered.",
   render: () => (
     <Container width="content">
       <Stack gap="compact">
-        <strong>工作区阅读顺序</strong>
-        <p>附件是这次讨论的依据。打开图片查看原始比例，下载记录回看检查项目。</p>
-        <ChatAttachments label="已发送材料" items={sampleFiles} />
+        <strong>Workspace reading order</strong>
+        <p>
+          The attachments are the basis for this discussion. Open the image to see its original
+          proportions, and download the record to revisit the checked items.
+        </p>
+        <ChatAttachments label="Sent materials" items={sampleFiles} />
       </Stack>
     </Container>
   ),

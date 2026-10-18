@@ -34,22 +34,22 @@ for (const viewport of [
     await page.setViewportSize(viewport);
     await page.goto("/canvas.html?story=dialog-layout");
     await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-    for (const name of ["短表单", "长正文", "受限高度", "完整工作区"]) {
-      const trigger = page.getByRole("button", { name: `打开${name}`, exact: true });
+    for (const name of ["Short form", "Long body", "Limited height", "Full workspace"]) {
+      const trigger = page.getByRole("button", { name: `Open ${name}`, exact: true });
       await trigger.focus();
       await trigger.press("Enter");
       const dialog = page.getByRole("dialog", {
-        name: `${name} · 当前对象与关闭动作`,
+        name: `${name} · Current item and close action`,
         exact: true,
       });
       const header = dialog.locator('[data-meowui-part="page-frame/header"]');
       const body = dialog.locator('[data-meowui-part="page-frame/body"]');
-      const save = dialog.getByRole("button", { name: `保存${name}`, exact: true });
+      const save = dialog.getByRole("button", { name: `Save ${name}`, exact: true });
       const minimum = await trigger.evaluate((node) => getComputedStyle(node).minHeight);
       expect(await save.evaluate((node) => getComputedStyle(node).minHeight)).toBe(minimum);
       expect(await save.evaluate((node) => getComputedStyle(node).flexGrow)).toBe("0");
       const originalHeader = await header.boundingBox();
-      const close = dialog.getByRole("button", { name: `关闭${name}`, exact: true });
+      const close = dialog.getByRole("button", { name: `Close ${name}`, exact: true });
       await page.keyboard.press("Tab");
       await close.focus();
       expect(await focusInkFits(close)).toBe(true);
@@ -60,11 +60,11 @@ for (const viewport of [
       });
       expect((await header.boundingBox())!.y).toBe(originalHeader!.y);
       await expect(
-        dialog.getByRole("button", { name: `关闭${name}`, exact: true }),
+        dialog.getByRole("button", { name: `Close ${name}`, exact: true }),
       ).toBeInViewport();
       expect(await dialog.evaluate((node) => node.scrollTop)).toBe(0);
       expect(await body.evaluate((node) => node.clientHeight)).toBeGreaterThan(0);
-      if (name !== "短表单")
+      if (name !== "Short form")
         expect(await body.evaluate((node) => node.scrollHeight > node.clientHeight)).toBe(true);
       await save.focus();
       expect(await focusInkFits(save)).toBe(true);
@@ -80,11 +80,11 @@ for (const viewport of [
       await expect(input).toHaveValue("Retained draft");
       expect(await originalInput!.evaluate((node) => node.isConnected)).toBe(true);
       await input.fill("");
-      await dialog.getByRole("button", { name: `保存${name}`, exact: true }).click();
+      await dialog.getByRole("button", { name: `Save ${name}`, exact: true }).click();
       await expect(dialog).toBeVisible();
       await expect(input).toBeFocused();
       await input.fill("Validated draft");
-      await dialog.getByRole("button", { name: `保存${name}`, exact: true }).click();
+      await dialog.getByRole("button", { name: `Save ${name}`, exact: true }).click();
       await expect(dialog).toBeHidden();
       await expect(trigger).toBeFocused();
     }
@@ -121,10 +121,10 @@ test("dialog body insets protect first and last focus ink with optional custom h
 test("pointer-opened dialogs close and leave the main actions usable", async ({ page }) => {
   await page.goto("/canvas.html?story=dialog-layout");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  for (const name of ["短表单", "长正文", "短表单"]) {
-    await page.getByRole("button", { name: `打开${name}`, exact: true }).click();
+  for (const name of ["Short form", "Long body", "Short form"]) {
+    await page.getByRole("button", { name: `Open ${name}`, exact: true }).click();
     const dialog = page.getByRole("dialog", {
-      name: `${name} · 当前对象与关闭动作`,
+      name: `${name} · Current item and close action`,
       exact: true,
     });
     await expect(dialog).toBeVisible();
@@ -139,18 +139,18 @@ test("shared drawer keeps title and close above the independently scrolling navi
   await page.setViewportSize({ width: 390, height: 330 });
   await page.goto("/canvas.html?story=drawer");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  const trigger = page.getByRole("button", { name: "打开导航抽屉" });
+  const trigger = page.getByRole("button", { name: "Open navigation drawer" });
   await trigger.focus();
   await trigger.press("Enter");
-  const drawer = page.getByRole("dialog", { name: "主导航" });
+  const drawer = page.getByRole("dialog", { name: "Main navigation" });
   const header = drawer.locator('[data-meowui-part="page-frame/header"]');
   const before = await header.boundingBox();
   await drawer.locator('[data-meowui-part="page-frame/body"]').evaluate((node) => {
     node.scrollTop = node.scrollHeight;
   });
   expect((await header.boundingBox())!.y).toBe(before!.y);
-  await expect(page.getByRole("button", { name: "关闭导航" })).toBeInViewport();
-  await expect(page.getByRole("button", { name: "设置", exact: true })).toBeInViewport();
+  await expect(page.getByRole("button", { name: "Close navigation" })).toBeInViewport();
+  await expect(page.getByRole("button", { name: "Settings", exact: true })).toBeInViewport();
   await page.keyboard.press("Escape");
   await expect(drawer).toBeHidden();
   await expect(trigger).toBeFocused();
@@ -163,7 +163,7 @@ test("page headers allocate natural height to wrapped identity, actions, and cat
   await page.goto("/canvas.html?story=page-frame-catalog");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const header = page.locator('[data-meowui-part="page-frame/header"]');
-  const categories = page.getByRole("group", { name: "目录分类" });
+  const categories = page.getByRole("group", { name: "Catalog categories" });
   const insideHeader = async () => {
     const outer = await header.boundingBox(),
       inner = await categories.boundingBox();
@@ -172,5 +172,5 @@ test("page headers allocate natural height to wrapped identity, actions, and cat
   expect(await insideHeader()).toBe(true);
   await page.setViewportSize({ width: 390, height: 330 });
   expect(await insideHeader()).toBe(true);
-  await expect(page.getByRole("button", { name: "刷新目录", exact: true })).toBeInViewport();
+  await expect(page.getByRole("button", { name: "Refresh catalog", exact: true })).toBeInViewport();
 });

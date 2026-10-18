@@ -15,19 +15,19 @@ export type ChatExecutionState =
 export function executionStateLabel(state: ChatExecutionState): string {
   switch (state) {
     case "queued":
-      return "排队中";
+      return "Queued";
     case "running":
-      return "运行中";
+      return "Running";
     case "waiting":
-      return "等待中";
+      return "Waiting";
     case "error":
-      return "出错";
+      return "Error";
     case "cancelled":
-      return "已取消";
+      return "Canceled";
     case "unknown":
-      return "结果未确认";
+      return "Unconfirmed result";
     default:
-      return "已完成";
+      return "Completed";
   }
 }
 

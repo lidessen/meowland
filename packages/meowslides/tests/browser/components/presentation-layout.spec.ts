@@ -70,7 +70,7 @@ test("common slide recipes fit their canvas and preserve the numbered flow", asy
       await expect
         .poll(() =>
           page
-            .locator('img[alt="原创海岸示例插画"]')
+            .locator('img[alt="Original coast example illustration"]')
             .evaluate((image) => (image as HTMLImageElement).naturalWidth),
         )
         .toBeGreaterThan(0);

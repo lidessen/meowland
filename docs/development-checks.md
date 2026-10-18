@@ -1,56 +1,56 @@
-# 工程检查
+# Development checks
 
-状态：正在落地；命令以根 `package.json` 为准。检查与修复分开，检查失败返回非零，不自动改源码、更新 golden 或发布包。
+Status: being implemented; commands follow the root `package.json`. Checks and fixes are separate: a failing check returns non-zero and does not automatically change source, update golden files, or publish packages.
 
-## 安装与版本
+## Installation and versions
 
-使用 Bun 1.4.2，首次运行或 CI 先执行 `bun install --frozen-lockfile`。根开发依赖精确固定 Oxlint 1.88.0、Oxfmt 0.73.0 与 TypeScript 7.0.2，解析结果保存在唯一 `bun.lock`。
+Use Bun 1.4.2; on first run or in CI, run `bun install --frozen-lockfile` first. Root dev dependencies pin Oxlint 1.88.0, Oxfmt 0.73.0, and TypeScript 7.0.2 exactly, and the resolution result is stored in the single `bun.lock`.
 
-首次检查先执行 `bun run build`，再执行 `bun run check`。包间公共 exports 指向 dist，现有类型检查和单测会真实消费这些入口；源码或导出修改后重新 build，不能让旧 dist 代替当前源码。`check` 自身不隐式生成产物。
+On a first check, run `bun run build` before `bun run check`. Cross-package public exports point at dist, and the existing typecheck and unit tests actually consume those entry points; after source or export changes, rebuild and do not let an old dist stand in for the current source. `check` itself never generates artifacts implicitly.
 
-2026-10-16 从官方 npm registry 的 [Oxlint](https://registry.npmjs.org/oxlint/1.88.0) 与 [Oxfmt](https://registry.npmjs.org/oxfmt/0.73.0) 元数据核对版本。上游声明 Node `^20.19.0 || >=22.12.0`；本仓库脚本显式用 Bun 执行 JS launcher，再调用其平台原生 binding，不依赖 PATH 上的 Node。兼容性以本版本实际运行结果为准。
+On 2026-10-16, versions were cross-checked against the official npm registry metadata for [Oxlint](https://registry.npmjs.org/oxlint/1.88.0) and [Oxfmt](https://registry.npmjs.org/oxfmt/0.73.0). Upstream declares Node `^20.19.0 || >=22.12.0`; this repository's scripts explicitly run the JS launcher with Bun and then call its platform native binding, without relying on Node on PATH. Compatibility is determined by this version's actual run results.
 
-## 本地命令与范围
+## Local commands and scope
 
-| 命令                        | 范围与作用                                                                                                                                                                                          |
-| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bun run lint`              | Oxlint correctness 规则与默认插件，覆盖源码、单测、浏览器用例、示例、脚本和 TS 配置；警告也导致失败                                                                                                 |
-| `bun run lint:fix`          | 相同规则的普通 `--fix`；不启用 suggestions 或 dangerous fixes，修改后仍需审阅 diff                                                                                                                  |
-| `bun run format:check`      | Oxfmt 检查支持的源码、文档及配置，不写文件                                                                                                                                                          |
-| `bun run format`            | Oxfmt 写入格式；局部任务优先直接传本次修改的精确路径，避免覆盖其它作者 WIP                                                                                                                          |
-| `bun run typecheck`         | 六包生产入口、JSX core/renderer/Web 环境、无 DOM 的 CSS core、CSS/UI/Slides 公共类型用例，以及根工程脚本、MDX 作者互动组件、图片加载作品、两份课件和展板 host；不等于全部 unit/prototype 的 TS 检查 |
-| `bun run test`              | JSX/CSS/UI/Slides 单测、Slides MDX/build 工具测试、Book 的 Bun/单测与生命周期、Press 单测与根工程脚本单测；`.spec.ts(x)` 浏览器场景另用 Playwright                                                  |
-| `bun run test:presentation` | 演示组件的独立浏览器合同，包括跨页信号、Reveal、活动许可、媒体与清理；使用专属本地服务，不混入 Meowbook 组件展板配置                                                                                |
-| `bun run check`             | 顺序执行 format:check → lint → typecheck → test；任一步失败即停止                                                                                                                                   |
-| `bun run build`             | 构建六包 ESM 与声明及必要资源；清理并更新各包 dist，不发布                                                                                                                                          |
-| `bun run pack`              | 把当前 dist 打成本地 tgz；不自动 build，不代表安装态或浏览器验收通过                                                                                                                                |
+| Command                     | Scope and purpose                                                                                                                                                                                                                                                                                                                       |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bun run lint`              | Oxlint correctness rules and default plugins covering source, unit tests, browser specs, examples, scripts, and TS config; warnings also fail                                                                                                                                                                                           |
+| `bun run lint:fix`          | Plain `--fix` for the same rules; suggestions and dangerous fixes are not enabled, and the diff still needs review after changes                                                                                                                                                                                                        |
+| `bun run format:check`      | Oxfmt checks supported source, docs, and config; does not write files                                                                                                                                                                                                                                                                   |
+| `bun run format`            | Oxfmt writes formatting; for local tasks prefer passing the exact paths changed this time, to avoid overwriting other authors' WIP                                                                                                                                                                                                      |
+| `bun run typecheck`         | Production entry points of the six packages, the JSX core/renderer/Web environments, the DOM-free CSS core, CSS/UI/Slides public-type cases, plus root project scripts, MDX author interactive components, the image-loading work, both courseware sets, and the showcase host; not equivalent to a TS check of all unit/prototype code |
+| `bun run test`              | JSX/CSS/UI/Slides unit tests, Slides MDX/build tool tests, Book's Bun/unit tests and lifecycle, Press unit tests, and root project script unit tests; `.spec.ts(x)` browser scenarios use Playwright separately                                                                                                                         |
+| `bun run test:presentation` | Standalone browser contract for presentation components, including cross-slide signals, Reveal, activity permission, media, and cleanup; uses a dedicated local server and does not mix in the Meowbook component showcase config                                                                                                       |
+| `bun run check`             | Runs format:check → lint → typecheck → test in order; stops at the first failing step                                                                                                                                                                                                                                                   |
+| `bun run build`             | Builds ESM and declarations plus necessary resources for the six packages; cleans and updates each package's dist; does not publish                                                                                                                                                                                                     |
+| `bun run pack`              | Packs the current dist into local tarballs; does not build automatically and does not imply installed-state or browser acceptance                                                                                                                                                                                                       |
 
-检查排除 `node_modules`、`dist`、`artifacts`、Playwright 报告、测试结果和 Book 生成目录。格式工具另外跳过 Bun 生成的锁文件及原样保留的 `packages/meowtail/THIRD_PARTY_NOTICES.md`；不因历史源码存在告警而整体忽略包或测试目录。具体边界在 `.oxlintrc.json` 与 `.oxfmtrc.json`。
+Checks exclude `node_modules`, `dist`, `artifacts`, Playwright reports, test results, and Book-generated directories. The formatter additionally skips Bun-generated lockfiles and the preserved-as-is `packages/meowtail/THIRD_PARTY_NOTICES.md`; packages or test directories are not ignored wholesale just because historical source has warnings. The exact boundaries are in `.oxlintrc.json` and `.oxfmtrc.json`.
 
-两个 JSON 类型/行为用例文件对 `no-unused-vars` 设置 `_` 前缀的参数占位约定，保留回调 props 的类型推断；其它文件保持 Oxlint 默认规则选项，未用导入仍报错。Reactive effect 的信号读取具有订阅语义，不能作为普通无用表达式随意删除。
+Two JSON type/behavior test files set a `_`-prefix parameter placeholder convention for `no-unused-vars` so callback prop type inference is retained; other files keep Oxlint's default rule options, and unused imports still error. Signal reads in reactive effects have subscription semantics and cannot be deleted as ordinary no-op expressions.
 
-Web renderer 的真实 DOM 属性回归用 `bun node_modules/@playwright/test/cli.js test --config packages/meowjsx/playwright.config.ts`。先 build 当前 public exports；用例实际构建普通 IIFE、严格 IIFE 和 ESM，验证 SVG 只读属性回退、响应更新及 HTML 控件与清理，不由无 DOM 单测替代。
+Real DOM attribute regressions for the Web renderer use `bun node_modules/@playwright/test/cli.js test --config packages/meowjsx/playwright.config.ts`. Build the current public exports first; the specs actually build plain IIFE, strict IIFE, and ESM and verify SVG readonly-attribute fallback, reactive updates, and HTML controls plus cleanup; DOM-free unit tests do not substitute for this.
 
-平台环境类型不能合并处理：JSX core 与 CSS core 不加载 DOM/Bun 类型，Web 与 UI 使用 DOM；Book 的 Bun/Playwright 入口保留自身所需宿主类型。`bun scripts/build.ts --check --package <name>` 仅检查该包的生产 build 配置，不包含根 typecheck 的额外环境和公共类型用例。
+Platform environment types cannot be merged: JSX core and CSS core do not load DOM/Bun types, Web and UI use the DOM, and Book's Bun/Playwright entries keep the host types they need. `bun scripts/build.ts --check --package <name>` checks only that package's production build config and does not include the root typecheck's additional environments and public-type cases.
 
-MDX 作者入口的构建和预览见[作者示例](../examples/presentation/README.md)，完整自定义讲解与素材验收见[图片加载作品](../examples/image-loading/README.md)。演示运行时合同 `bun run test:presentation` 使用独立端口；Meowbook 演示组件测试用 `bun node_modules/@playwright/test/cli.js test --config packages/meowslides/playwright.config.ts`，MDX 作者浏览器测试用 `bun node_modules/@playwright/test/cli.js test --config packages/meowslides/tests/browser/authoring/playwright.config.ts`，分别记录执行结果。
+See the [authoring example](../examples/presentation/README.md) for building and previewing the MDX authoring entry, and the [image-loading work](../examples/image-loading/README.md) for the complete custom explanation and asset acceptance. The presentation runtime contract `bun run test:presentation` uses a dedicated port; Meowbook presentation component tests use `bun node_modules/@playwright/test/cli.js test --config packages/meowslides/playwright.config.ts`, and MDX authoring browser tests use `bun node_modules/@playwright/test/cli.js test --config packages/meowslides/tests/browser/authoring/playwright.config.ts`; record their results separately.
 
-英语 Welcome 课件的课堂状态与浏览器验收见[课件 README](../examples/sunshine-welcome/README.md)。根 typecheck 包含作者组件、图片加载作品和两件课件工程，作品浏览器用例仍按各自配置独立运行。正式 Web 产物与组件合同浏览器测试分别验收；字体/图片 ready、静态图与实际播放、断网冷启动也分别记录，不由其中一项代替另一项。
+The English Welcome courseware's classroom state and browser acceptance are described in the [courseware README](../examples/sunshine-welcome/README.md). Root typecheck includes the authoring components, the image-loading work, and both courseware projects; each work's browser specs still run independently under their own config. The official Web artifact and the component-contract browser tests are accepted separately; font/image ready, static images versus actual playback, and offline cold start are also recorded separately, with no item standing in for another.
 
-Protecting pandas 为另一独立课件，入口与构建/浏览器检查见[熊猫课件 README](../examples/protecting-pandas/README.md)。根 typecheck 同样覆盖其作品工程；浏览器配置独占 `13034`，用户预览使用 `13014`，不复用或覆盖 Sunshine 的作品与服务。
+Protecting pandas is another standalone courseware; its entry and build/browser checks are described in the [pandas courseware README](../examples/protecting-pandas/README.md). Root typecheck also covers its work project; its browser config uses the dedicated port `13034` and user previews use `13014`, without reusing or overwriting Sunshine's work and server.
 
-## CI 与发行验证
+## CI and release validation
 
-`.github/workflows/checks.yml` 是工程检查 workflow，仅在 main push、pull request 或手动触发时执行 frozen install → build → lint。它不执行完整本地 check，也不执行格式检查、单测、浏览器、打包、tag 发布、npm 发布或部署；只有只读 repository 权限。
+`.github/workflows/checks.yml` is the development check workflow; it runs frozen install → build → lint only on main pushes, pull requests, or manual triggers. It does not run the full local check, or format checks, unit tests, browser tests, packing, tag releases, npm publishes, or deployments; it has read-only repository permission.
 
-`.github/workflows/npm-release.yml` 是用户明确授权的独立手动发布入口，普通 push/PR 不触发；只在 publish job 取得 OIDC 权限，按精确 SHA 和选包执行检查、tarball 消费验收、npm 发布。细节以[发布合同](releasing.md)为准；本地配置通过不等于 workflow、npm trust 或 Billing 实际可用。
+`.github/workflows/npm-release.yml` is the standalone manual release entry explicitly authorized by the user; regular pushes/PRs do not trigger it. Only the publish job obtains OIDC permission, and it runs checks, tarball consumption acceptance, and npm publishing for the exact SHA and selected packages. See the [release contract](releasing.md) for details; passing local config does not mean the workflow, npm trust, or Billing is actually available.
 
-需要本地完整工程检查时执行 `bun run check`。UI/交互改动仍须按受影响场景实际打开页面；公开 exports、资源或打包改动须另做 build → pack → 独立目录安装消费。旧 tgz 的成功属于当时源码，不因为后续格式或工程配置改变而自动升级为本版发行验收。
+Run `bun run check` when a full local development check is needed. UI/interaction changes still require actually opening the affected scenarios; changes to public exports, resources, or packaging require a separate build → pack → install-and-consume in an independent directory. An old tarball's success belongs to the source at that time and does not automatically become this version's release acceptance because later formatting or engineering config changed.
 
-## 修复与证据
+## Fixes and evidence
 
-先区分真实缺陷、类型表达与工具环境差异，再选择最小修复。不能用全局关闭有效规则、删除失败断言、放宽 props 或 `skipLibCheck` 隐藏当前问题。必要例外限于准确规则和范围，并说明原因。
+First distinguish real defects, type expression, and tool-environment differences, then choose the smallest fix. Do not hide current problems by globally disabling valid rules, deleting failing assertions, loosening props, or using `skipLibCheck`. Necessary exceptions are limited to exact rules and scope, with the reason stated.
 
-检查结果应写清输入版本、实际命令和退出状态。格式、lint、类型、单测、浏览器观察、安装态消费和正式发布分别报告。检查脚本或 CI 本身有改动时，在隔离副本植入格式、lint、类型或断言错误，验证相应命令返回非零；负例不留在产品源码，不为它新增生产分支或常驻状态。
+Check results should state the input version, actual command, and exit status. Format, lint, types, unit tests, browser observations, installed-state consumption, and official release are reported separately. When check scripts or CI themselves change, plant format, lint, type, or assertion errors in an isolated copy and verify the corresponding command returns non-zero; negative cases are not left in product source, and no production branch or persistent state is added for them.
 
-官方行为参考：[Oxlint 配置](https://oxc.rs/docs/guide/usage/linter/config)、[Oxlint CLI](https://oxc.rs/docs/guide/usage/linter/cli)、[Oxfmt 配置](https://oxc.rs/docs/guide/usage/formatter/config)。
+Official behavior references: [Oxlint config](https://oxc.rs/docs/guide/usage/linter/config), [Oxlint CLI](https://oxc.rs/docs/guide/usage/linter/cli), [Oxfmt config](https://oxc.rs/docs/guide/usage/formatter/config).

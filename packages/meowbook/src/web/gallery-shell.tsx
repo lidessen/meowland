@@ -21,43 +21,43 @@ export function mountGallery() {
         <SearchInput
           className="workshop-search"
           id="search"
-          label="查找组件"
-          placeholder="查找组件…"
+          label="Find components"
+          placeholder="Find components…"
         />
         <div className="catalog-label">
-          组件目录 <span id="story-count" />
+          Component catalog <span id="story-count" />
         </div>
-        <nav id="catalog" aria-label="组件样例">
-          <p>正在加载样例…</p>
+        <nav id="catalog" aria-label="Component samples">
+          <p>Loading samples…</p>
         </nav>
         <div className="workshop-local">
           <label className="workshop-appearance">
-            工具外观
-            <Select id="gallery-scheme" aria-label="工具外观">
-              <option value="auto">跟随系统</option>
-              <option value="light">浅色</option>
-              <option value="dark">深色</option>
+            Tool appearance
+            <Select id="gallery-scheme" aria-label="Tool appearance">
+              <option value="auto">Follow system</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
             </Select>
           </label>
           <span className="workshop-local-note">
             <span className="status-dot" />
-            本地组件环境
+            Local component environment
           </span>
         </div>
       </aside>
-      <button id="catalog-backdrop" aria-label="关闭组件目录" tabindex={-1} hidden />
+      <button id="catalog-backdrop" aria-label="Close component catalog" tabindex={-1} hidden />
       <main className="workshop-main">
         <header className="workshop-header">
           <Button
             id="toggle-sidebar"
             variant="quiet"
-            aria-label="切换组件目录"
+            aria-label="Toggle component catalog"
             aria-controls="sidebar"
             aria-expanded="false"
           >
             <Icon name="panel-left" size={17} />
           </Button>
-          <span id="group">组件预览</span>
+          <span id="group">Component preview</span>
           <span className="breadcrumb-separator">/</span>
           <span id="breadcrumb-component">Meowbook</span>
           <a
@@ -65,30 +65,35 @@ export function mountGallery() {
             href="/canvas.html"
             target="_blank"
             rel="noopener"
-            aria-label="独立预览"
-            title="独立预览"
+            aria-label="Standalone preview"
+            title="Standalone preview"
           >
             <Icon name="external-link" size={16} />
           </a>
         </header>
-        <section className="workshop-intro" aria-label="当前组件场景">
+        <section className="workshop-intro" aria-label="Current component scenario">
           <h1 id="title" tabindex={-1}>
             Meowbook
           </h1>
           <p id="scenario-description" />
-          <nav id="variants" aria-label="组件场景" />
+          <nav id="variants" aria-label="Component scenarios" />
         </section>
-        <Toolbar className="workshop-toolbar" label="预览工具">
+        <Toolbar className="workshop-toolbar" label="Preview tools">
           <span className="preview-label">
             <Icon name="eye" size={15} />
-            预览
+            Preview
           </span>
-          <div id="viewport" className="workshop-viewport" role="group" aria-label="预览设备">
+          <div
+            id="viewport"
+            className="workshop-viewport"
+            role="group"
+            aria-label="Preview devices"
+          >
             {[
-              ["1100", "桌面"],
-              ["390", "移动端"],
-              ["768", "平板"],
-              ["fluid", "自适应"],
+              ["1100", "Desktop"],
+              ["390", "Mobile"],
+              ["768", "Tablet"],
+              ["fluid", "Fluid"],
             ].map(([value, label]) => (
               <Button variant="quiet" size="small" data-width={value} aria-pressed="false">
                 {label}
@@ -98,26 +103,29 @@ export function mountGallery() {
           <span id="viewport-size" className="viewport-size">
             1100 px
           </span>
-          <Button id="reset" variant="quiet" size="small" title="重置样例">
+          <Button id="reset" variant="quiet" size="small" title="Reset sample">
             <Icon name="refresh-cw" size={14} />
-            <span>重置样例</span>
+            <span>Reset sample</span>
           </Button>
-          <Select id="measure-mode" aria-label="标注类别">
-            <option value="off">标注关闭</option>
-            <option value="controls">控件尺寸</option>
-            <option value="text">文字排版</option>
-            <option value="spacing">间距布局</option>
-            <option value="structure">结构轮廓</option>
+          <Select id="measure-mode" aria-label="Annotation category">
+            <option value="off">Annotations off</option>
+            <option value="controls">Control sizes</option>
+            <option value="text">Text typography</option>
+            <option value="spacing">Spacing layout</option>
+            <option value="structure">Structure outlines</option>
           </Select>
           <Button id="text-placeholder" variant="quiet" size="small" aria-pressed="false">
-            文字占位
+            Text placeholders
           </Button>
         </Toolbar>
         <div className="workshop-stage">
-          <iframe id="canvas" title="组件预览画布" />
+          <iframe id="canvas" title="Component preview canvas" />
         </div>
-        <section id="measurement-detail" aria-label="选中元素详情" hidden>
-          <p id="measurement-help">点击画布元素查看实际数值；关闭标注恢复普通点击。</p>
+        <section id="measurement-detail" aria-label="Selected element details" hidden>
+          <p id="measurement-help">
+            Click a canvas element to see its actual values; turn annotations off to restore normal
+            clicks.
+          </p>
           <dl id="measurement-values" />
         </section>
         <Disclosure
@@ -126,42 +134,45 @@ export function mountGallery() {
           contentClassName="inspection-body"
           summary={[
             <Icon name="list-checks" size={15} />,
-            <strong>检查与说明</strong>,
+            <strong>Checks and notes</strong>,
             <span id="latest-event" role="status" hidden />,
             <span id="inspection" role="status">
-              等待画布…
+              Waiting for the canvas…
             </span>,
           ]}
         >
-          <section className="workshop-description" aria-label="样例说明">
-            <p id="description">加载中…</p>
+          <section className="workshop-description" aria-label="Sample description">
+            <p id="description">Loading…</p>
             <div id="covers" />
           </section>
           <div className="workshop-observation-head">
-            <strong>交互记录</strong>
+            <strong>Interaction log</strong>
             <Button id="inspect" variant="quiet" size="small">
-              重新检查
+              Check again
             </Button>
             <Button id="clear-log" variant="quiet" size="small">
-              清空记录
+              Clear log
             </Button>
           </div>
           <ol id="events" aria-live="polite" />
-          <section className="workshop-batch" aria-label="全部样例检查">
+          <section className="workshop-batch" aria-label="All sample checks">
             <div className="workshop-observation-head">
               <Button id="inspect-all" variant="outline" size="small" disabled>
-                检查全部样例
+                Check all samples
               </Button>
               <Button id="cancel-inspection" variant="quiet" size="small" hidden>
-                取消检查
+                Cancel check
               </Button>
               <span id="batch-status" role="status">
-                按当前宽度检查所有场景。
+                Check all scenarios at the current width.
               </span>
             </div>
             <ul id="batch-results" />
           </section>
-          <p className="workshop-limits">检查渲染、横向溢出与控件名称；不替代交互和视觉验收。</p>
+          <p className="workshop-limits">
+            Checks rendering, horizontal overflow and control names; does not replace interaction or
+            visual acceptance.
+          </p>
         </Disclosure>
       </main>
     </div>,

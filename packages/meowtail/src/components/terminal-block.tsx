@@ -94,14 +94,14 @@ export const TerminalBlock = defineComponent<
     context,
   ) => {
     const status = running
-      ? "运行中"
+      ? "Running"
       : signal
-        ? `信号 ${signal}`
+        ? `Signal ${signal}`
         : exitCode === 0
-          ? "已完成"
+          ? "Completed"
           : typeof exitCode === "number"
-            ? `退出码 ${exitCode}`
-            : "退出状态未知";
+            ? `Exit code ${exitCode}`
+            : "Unknown exit status";
     const failed =
       !running && (Boolean(signal) || (typeof exitCode === "number" && exitCode !== 0));
     const state = running ? "ongoing" : failed ? "error" : exitCode === 0 ? "done" : "warning";
@@ -154,7 +154,7 @@ export const TerminalBlock = defineComponent<
         copyText={copyText ?? output}
         maxLines={maxLines}
         onCopy={onCopy}
-        emptyText={running ? "等待输出" : "没有输出"}
+        emptyText={running ? "Waiting for output" : "No output"}
         rows={
           rows.length
             ? rows.map((row) =>

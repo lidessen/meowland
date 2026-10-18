@@ -1,22 +1,22 @@
-# 演示工具带布局复验
+# Presentation toolbar layout re-verification
 
-本轮在 `1a65fcd` 基础上局部打磨共享 Presentation 外围。图片演示与 Sunshine Welcome 的正文、素材、叙事状态和配色未改；不新增作品或发布包。
+This round locally refined the shared Presentation chrome on top of `1a65fcd`. The body text, assets, narrative state and colors of the image presentation and Sunshine Welcome were unchanged; no new work or release package was added.
 
-## 改动
+## Changes
 
-- 工具带、导航、目录内部排列复用 Inline，目录图标组与文字的伸缩复用 LayoutItem，选项内部复用 Stack。主题只保留演示外围的尺寸、分组边线、颜色和响应式责任，移除原来重复定义的 flex/grid 排列。
-- 翻页、页序和原生目录常显；效果暂停与原尺寸切换进入现有 Popover，继续用原生 Button 与 `aria-pressed` 表达动态状态。两项是切换设置，使用有名称的非模态 dialog，没有扩展 Menu 的静态 action 合同或另造菜单实现。
-- 按工具带容器宽度将目录移到完整第二行，覆盖宽窗口里的窄宿主。长标题保留完整可访问名称、原生选项与 title，视觉可收缩；导航与设置入口不被长文挤小。分组间距、工具高度和阅读宽度优先使用现有语义 token。
-- 打开选项聚焦首个设置；Escape 返回入口，外部点击保留被点击目标的焦点。每实例的弹层关联 id 独立，关闭与定位继续使用既有 Popover。没有新增全屏、播放器状态平台或编辑器。
+- The toolbar, navigation and outline internal arrangement reuse Inline, the outline icon group and text stretching reuse LayoutItem, and the options internal layout reuses Stack. The theme keeps only the presentation chrome's sizes, group borders, colors and responsive responsibilities, and the previously duplicated flex/grid arrangement definitions were removed.
+- Paging, page order and the native outline are always visible; effect pause and original-size switching go into the existing Popover, still using native Button and `aria-pressed` to express dynamic state. Both are toggle settings and use a named non-modal dialog; the Menu's static action contract was not extended and no separate menu implementation was created.
+- Based on the toolbar container width, the outline moves to a complete second row, covering a narrow host inside a wide window. Long titles keep the complete accessible name, native option and title and can shrink visually; navigation and settings entry points are not squeezed smaller by long text. Group spacing, tool height and reading width prefer the existing semantic tokens.
+- Opening the options focuses the first setting; Escape returns to the entry point, and an outside click keeps focus on the clicked target. Each instance's popover association id is independent, and closing and positioning still use the existing Popover. No fullscreen, player state platform or editor was added.
 
-首轮原图发现通用 Popover 样式覆盖了外围面板尺寸/颜色，已限制到真实外围 panel 修正 specificity。主作者进一步运行旧合同发现：移除默认最小高度后，无明确宿主高度的双实例夹具舞台塌缩。该轮两项失败、另一项被中止；恢复默认最小高度，并让短窗口下限不超过视口高度，重新构建后原13项全部通过，未放宽断言或给夹具补固定高度掩盖问题。
+The first round of original images found that generic Popover styles overrode the peripheral panel size/color, and specificity was corrected by scoping to the real peripheral panel. The main author further ran the old contract and found that after removing the default minimum height, the two-instance fixture stage with no explicit host height collapsed. In that run two items failed and another was aborted; the default minimum height was restored, and the short-window lower bound was kept within the viewport height; after rebuilding, all original 13 items passed, without weakening assertions or giving the fixture a fixed height to hide the problem.
 
-## 最终检查
+## Final checks
 
-五包 `bun run build` 和两正式示例构建通过；根 typecheck、两示例测试类型检查、全仓 lint（显式排除未授权 `data/**`）与改动文件格式检查通过。相关演示/布局单测14项、92断言通过。
+The five-package `bun run build` and the two official example builds passed; root typecheck, the two example test typechecks, repo-wide lint (explicitly excluding the unauthorized `data/**`) and the changed-file format check passed. The related presentation/layout unit tests passed: 14 items, 92 assertions.
 
-最终浏览器检查分配置执行：原演示合同13项通过（8.1s）；独立工具带检查9项通过；正式图片演示5项通过（4.0s）；九页课件11项通过（7.2s）。原尺寸切换、活动门和媒体清理继续沿原合同成立，课件选择与文字跨页保留、教师步骤及作者表单样式隔离也通过。独立检查的具体矩阵与真实测量见 [审查记录](../../packages/meowtail/tests/browser/presentation/REVIEW.md)。
+The final browser checks ran by configuration: the original presentation contract's 13 items passed (8.1s); the separate toolbar check's 9 items passed; the official image presentation's 5 items passed (4.0s); the nine-slide courseware's 11 items passed (7.2s). Original-size switching, the activity gate and media cleanup continue under the original contract, and courseware selection with cross-slide text retention, teacher steps and author form style isolation also passed. The separate check's concrete matrix and real measurements are in the [review record](../../packages/meowtail/tests/browser/presentation/REVIEW.md).
 
-主作者实际拍摄并查看两作品的桌面1440×960、手机窄屏390×844、短窗844×390与选项展开原图。独立视觉审查另查看两作品六张原图、极短窗、深色键盘焦点与窄宿主图，无剩余视觉或复杂度阻断。六张代表截图已保存至 Library；完整结果与本机原图位于忽略目录 `artifacts/presentation-review/toolbar-20261018/`，不作为观众端运行依赖。
+The main author actually took and viewed original images of the two works at desktop 1440×960, phone narrow 390×844, short window 844×390 and options expanded. The independent visual review separately viewed six original images of the two works, an extremely short window, a dark keyboard focus and a narrow host image, with no remaining visual or complexity blockers. Six representative screenshots were saved to Library; complete results and local original images are in the ignored directory `artifacts/presentation-review/toolbar-20261018/` and are not viewer runtime dependencies.
 
-没有把“选项关闭时控件不遮舞台”扩述为弹层展开时也不覆盖内容；展开的 Popover 可暂时覆盖舞台/音轨。窄屏保持16:9固定画布缩放，控件可达不等于正文适合手机阅读。触摸为本机 Chrome 的模拟输入，未声称实体 iPhone/Safari、人工屏幕阅读器或真实教室投影验收。没有新增安装态检查、推送、发包或部署，未访问或修改 `data/` 与 Rossovia。
+The statement that controls do not cover the stage when options are closed was not expanded to mean that an open popover also does not cover content; an expanded Popover can temporarily cover the stage/audio track. Narrow screens keep the 16:9 fixed-canvas scaling, and control reachability does not mean body text is suitable for phone reading. Touch was simulated input in local Chrome, without claiming acceptance on a physical iPhone/Safari, manual screen readers or real classroom projection. No new installed-state check, push, package publish or deployment was added, and `data/` and Rossovia were not accessed or modified.

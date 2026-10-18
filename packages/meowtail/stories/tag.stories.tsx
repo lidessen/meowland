@@ -5,13 +5,13 @@ import { SchemePair } from "./scheme-pair";
 
 export const TagStory = defineStory({
   id: "tag-facts",
-  title: "标签 · 事实、计数与路径",
-  group: "基础控件",
+  title: "Tag · Facts, counts and paths",
+  group: "Basic controls",
   groupOrder: 13,
   component: "Tag",
-  variant: "中性、强调与计数",
+  variant: "Neutral, accent and count",
   description:
-    "标签是挨着内容的静态事实，不能点击。中性标签说明数量或类别，强调标签标出当前或默认项，橙色计数是唯一会打断你的颜色；路径、模型 ID、版本是可核对的事实，用等宽字体。",
+    "A tag is a static fact next to content and cannot be clicked. Neutral tags state a count or category, accent tags mark the current or default item, and the orange count is the only color that interrupts you; paths, model IDs and versions are checkable facts set in a monospace font.",
   covers: [
     "Tag tone neutral/accent/warning",
     "kind label/count/path",
@@ -24,9 +24,9 @@ export const TagStory = defineStory({
         {() => (
           <div style={{ display: "grid", gap: "16px" }}>
             <Inline gap="compact" align="center">
-              <Tag>中性标签</Tag>
-              <Tag>完成条件 2</Tag>
-              <Tag tone="accent">默认</Tag>
+              <Tag>Neutral tag</Tag>
+              <Tag>2 completion conditions</Tag>
+              <Tag tone="accent">Default</Tag>
               <Tag tone="warning" kind="count">
                 1
               </Tag>

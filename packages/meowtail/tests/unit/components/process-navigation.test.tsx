@@ -38,46 +38,58 @@ test("tags are static spans; count and path are separate kinds", () => {
 
 test("process group keeps native details and one row per step", () => {
   const html = renderToHtml(
-    <ProcessGroup title="过程 · 2 步" status="已完成" trailing={<StatusDot state="success" />} open>
-      <ProcessStep meta="1.1s">读取文件</ProcessStep>
+    <ProcessGroup
+      title="Process · 2 steps"
+      status="Completed"
+      trailing={<StatusDot state="success" />}
+      open
+    >
+      <ProcessStep meta="1.1s">Read file</ProcessStep>
     </ProcessGroup>,
   );
   expect(html).toContain("<details");
   expect(html).toContain("<summary");
   expect(html).toContain(" open");
-  expect(html).toContain("过程 · 2 步");
+  expect(html).toContain("Process · 2 steps");
   expect(html).toContain("1.1s");
 });
 
 test("work card is one native button with a status dot and an open affordance", () => {
   const html = renderToHtml(
-    <WorkCard title="整理记录" state="returned" status="正在推进" detail="已关联 1 项成果" />,
+    <WorkCard
+      title="Organize records"
+      state="returned"
+      status="In progress"
+      detail="1 outcome linked"
+    />,
   );
   expect(html.startsWith("<button")).toBe(true);
   expect(html).toContain('type="button"');
   expect(html).toContain('data-option-status-dot-state="returned"');
-  expect(html).toContain("已关联 1 项成果");
-  expect(html).toContain("详情");
+  expect(html).toContain("1 outcome linked");
+  expect(html).toContain("Details");
 });
 
 test("rail items are routes or actions and keep the current location semantic", () => {
-  const route = renderToHtml(<RailItem href="/records" current icon="i" label="记忆与知识" />);
+  const route = renderToHtml(
+    <RailItem href="/records" current icon="i" label="Memory and knowledge" />,
+  );
   expect(route.startsWith("<a")).toBe(true);
   expect(route).toContain('aria-current="page"');
-  const action = renderToHtml(<RailItem icon="i" label="设置" />);
+  const action = renderToHtml(<RailItem icon="i" label="Settings" />);
   expect(action.startsWith("<button")).toBe(true);
   expect(action).not.toContain("aria-current");
 });
 
 test("rail section folds into a shortcut while keeping all destinations in the document", () => {
   const html = renderToHtml(
-    <IconRail label="主导航">
-      <RailSection label="扩展" icon="i" href="/extensions">
-        <RailItem href="/extensions?view=channels" icon="i" label="通信" />
+    <IconRail label="Main navigation">
+      <RailSection label="Extensions" icon="i" href="/extensions">
+        <RailItem href="/extensions?view=channels" icon="i" label="Communication" />
       </RailSection>
     </IconRail>,
   );
-  expect(html).toContain('aria-label="主导航"');
+  expect(html).toContain('aria-label="Main navigation"');
   expect(html).toContain('href="/extensions"');
   expect(html).toContain('href="/extensions?view=channels"');
   expect(html).toContain('role="group"');

@@ -4,10 +4,11 @@ import { installPrototype, PrototypeDemo, prototypeCSS } from "./theme-prototype
 
 export const ParameterizedThemeStory = defineStory({
   id: "parameterized-theme-prototype",
-  title: "参数化主题 · 原型验证",
-  group: "测试夹具",
+  title: "Parameterized theme · Prototype validation",
+  group: "Test fixtures",
   component: "Theme",
-  description: "独立原型：区域配置、组件选项、多 part 隔离与静态 CSS。尚未迁移标准主题。",
+  description:
+    "Standalone prototype: region configuration, component options, multi-part isolation, and static CSS. The standard theme is not migrated yet.",
   render({ runtime, root, onCleanup }) {
     onCleanup(installPrototype(runtime));
     const style = root.ownerDocument.createElement("style");

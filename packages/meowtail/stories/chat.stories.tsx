@@ -19,12 +19,13 @@ import {
 
 export const MessagePartsStory = defineStory({
   id: "message-parts",
-  title: "消息 · 头像、长标题与操作",
-  group: "对话组件",
+  title: "Message · Avatar, long title, and actions",
+  group: "Conversation components",
   groupOrder: 50,
   component: "ChatMessage",
-  variant: "头像与操作",
-  description: "同一段对话中的头像、作者、时间、正文和操作；长内容不能挤走操作或撑破窄屏。",
+  variant: "Avatar and actions",
+  description:
+    "The avatar, author, time, body, and actions of one conversation; long content must not crowd out actions or break narrow screens.",
   covers: [
     "ChatHeader all parts",
     "ChatMessage avatar/time/actions",
@@ -36,56 +37,61 @@ export const MessagePartsStory = defineStory({
     <div className="workshop-composition">
       <ChatFrame>
         <ChatHeader
-          eyebrow="当前项目"
-          title="重新检查组件的文字、图标、暗色表面与窄屏交互"
-          description="标题和说明在空间不足时换行，不隐藏工作上下文。"
-          status={<ChatStatus label="等待审阅" tone="waiting" />}
+          eyebrow="Current project"
+          title="Review the component's text, icons, dark surfaces, and narrow-screen interactions"
+          description="The title and description wrap when space runs out without hiding the work context."
+          status={<ChatStatus label="Waiting for review" tone="waiting" />}
           actions={
-            <IconButton label="查看会话信息" data-message-info>
+            <IconButton label="View conversation information" data-message-info>
               <Icon name="eye" />
             </IconButton>
           }
         />
-        <ChatMessageList ariaLabel="组件审阅示例消息">
+        <ChatMessageList ariaLabel="Component review sample messages">
           <ChatMessage
             role="assistant"
-            author="负责组件审阅的 Assistant"
+            author="Assistant handling the component review"
             timestamp="09:41"
             avatar={<Icon name="brain" />}
             actions={
               <ChatMessageActions>
-                <Button variant="quiet" size="small" data-message-action="已标记这段回复">
-                  标记回复
+                <Button variant="quiet" size="small" data-message-action="Marked this reply.">
+                  Mark reply
                 </Button>
-                <IconButton label="回复详情" data-message-info>
+                <IconButton label="Reply details" data-message-info>
                   <Icon name="eye" />
                 </IconButton>
                 <Button variant="quiet" size="small" disabled>
-                  等待检查结果
+                  Waiting for check results
                 </Button>
               </ChatMessageActions>
             }
           >
-            <p>标题、作者与操作需要共同维持阅读顺序。较长的路径也应能留在当前容器中：</p>
+            <p>
+              The title, author, and actions must keep the reading order together. Longer paths
+              should also stay inside the current container:
+            </p>
             <p>
               packages/meowtail/stories/review-of-typography-and-component-interaction-states.tsx
             </p>
           </ChatMessage>
           <ChatMessage
             role="assistant"
-            author="负责组件审阅的 Assistant"
+            author="Assistant handling the component review"
             continuation
             timestamp="09:42"
           >
-            接续上一段，不重复视觉标题，但仍保留可访问的作者信息。
+            Continues the previous message without repeating the visual heading, while keeping
+            accessible author information.
           </ChatMessage>
           <ChatMessage
             role="user"
-            author="你"
+            author="You"
             timestamp="09:43"
             avatar={<Icon name="user-round" />}
           >
-            请保持输入、消息与附件之间的关系，长内容也要完整可读。
+            Keep the relationship between input, messages, and attachments, and make sure long
+            content stays fully readable.
           </ChatMessage>
           <ChatMessage
             role="assistant"
@@ -93,23 +99,31 @@ export const MessagePartsStory = defineStory({
             timestamp="09:44"
             actions={
               <ChatMessageActions>
-                <Button data-message-action="已打开本地建议示例">审阅建议</Button>
-                <Button variant="outline" data-message-action="已打开本地差异示例">
-                  查看差异
+                <Button data-message-action="Opened the local suggestion sample.">
+                  Review suggestion
                 </Button>
-                <button type="button" data-message-action="已保留检查记录，可稍后回来">
-                  稍后处理
+                <Button variant="outline" data-message-action="Opened the local diff sample.">
+                  View diff
+                </Button>
+                <button
+                  type="button"
+                  data-message-action="Kept the check record; you can come back later"
+                >
+                  Handle later
                 </button>
               </ChatMessageActions>
             }
           >
-            <p>检查记录已准备好。可以先审阅建议，再决定是否采用；也可以保留记录稍后处理。</p>
+            <p>
+              The check record is ready. You can review the suggestion first and then decide whether
+              to adopt it, or keep the record and handle it later.
+            </p>
           </ChatMessage>
         </ChatMessageList>
       </ChatFrame>
-      <ChatHeader title="只有标题的紧凑会话" />
+      <ChatHeader title="Compact conversation with a title only" />
       <p className="workshop-feedback" role="status" data-message-feedback>
-        操作仅反馈到本地示例。
+        Actions only report back to the local sample.
       </p>
     </div>
   ),
@@ -120,7 +134,8 @@ export const MessagePartsStory = defineStory({
       );
       if (target)
         root.querySelector("[data-message-feedback]")!.textContent =
-          target.dataset.messageAction ?? "这是组件审阅示例，没有真实会话数据。";
+          target.dataset.messageAction ??
+          "This is a component review sample with no real conversation data.";
     };
     root.addEventListener("click", click);
     onCleanup(() => root.removeEventListener("click", click));
@@ -129,13 +144,13 @@ export const MessagePartsStory = defineStory({
 
 export const ComposerRecoveryStory = defineStory({
   id: "composer-recovery",
-  title: "输入 · 发送、失败与恢复",
-  group: "对话组件",
+  title: "Composer · Send, failure, and recovery",
+  group: "Conversation components",
   groupOrder: 50,
   component: "ChatComposer",
-  variant: "发送与恢复",
+  variant: "Sending and recovery",
   description:
-    "手动推进本地模拟状态，不使用计时器或网络。等待时可继续编辑；已提交内容与最新草稿分别保留。",
+    "Local simulated states are advanced by hand, with no timer or network. You can keep editing while waiting; submitted content and the latest draft are kept separately.",
   covers: [
     "ChatComposer value/placeholder/hint/submitLabel/submitDisabled",
     "onInput/onSubmit",
@@ -145,31 +160,31 @@ export const ComposerRecoveryStory = defineStory({
   render: () => (
     <div className="workshop-composition">
       <ChatComposer
-        value="检查明暗主题下的组件状态，并保留我正在编辑的这段输入。"
-        submitLabel="提交检查"
-        hint="本地发送模拟：等待结果时可以继续写，最新草稿不会被清空。"
+        value="Check component states in light and dark themes, and keep this input I am editing."
+        submitLabel="Submit check"
+        hint="Local send simulation: you can keep writing while waiting, and the latest draft is not cleared."
         hintId="recovery-hint"
       >
-        <IconButton label="附件暂不可用" disabled>
+        <IconButton label="Attachments not available yet" disabled>
           <Icon name="plus" />
         </IconButton>
       </ChatComposer>
       <p className="workshop-feedback" data-composer-submitted>
-        尚未提交内容。
+        No content submitted yet.
       </p>
       <div className="workshop-row">
         <Button variant="outline" data-composer-result="failure" disabled>
-          模拟失败
+          Simulate failure
         </Button>
         <Button variant="outline" data-composer-result="success" disabled>
-          模拟成功
+          Simulate success
         </Button>
         <Button variant="quiet" data-composer-recover disabled>
-          恢复并继续编辑
+          Recover and keep editing
         </Button>
       </div>
       <p className="workshop-feedback" role="status" data-composer-feedback>
-        等待提交。仅在本地演示。
+        Waiting for submission. Local demo only.
       </p>
     </div>
   ),
@@ -185,16 +200,17 @@ export const ComposerRecoveryStory = defineStory({
       event.preventDefault();
       if (submit.disabled) return;
       if (!input.value.trim()) {
-        feedback.textContent = "请先输入检查要求。";
+        feedback.textContent = "Enter the check request first.";
         input.focus();
         return;
       }
-      submitted.textContent = `本次提交：${input.value}`;
+      submitted.textContent = `This submission: ${input.value}`;
       submit.disabled = true;
       results.forEach((button) => {
         button.disabled = false;
       });
-      feedback.textContent = "已接纳本地发送模拟，等待结果。可以继续编辑下一段草稿。";
+      feedback.textContent =
+        "Accepted the local send simulation and waiting for a result. You can keep editing the next draft.";
     };
     const click = (event: Event) => {
       const result = (event.target as Element).closest<HTMLElement>("[data-composer-result]");
@@ -205,21 +221,21 @@ export const ComposerRecoveryStory = defineStory({
         recover.disabled = false;
         feedback.textContent =
           result.dataset.composerResult === "failure"
-            ? "模拟连接失败。尚未完成，可恢复并重试。"
-            : "本地检查示例完成，可继续编辑。";
+            ? "Simulated connection failure. Not completed yet; you can recover and retry."
+            : "The local check sample completed; you can keep editing.";
         recover.focus();
       }
       if ((event.target as Element).closest("[data-composer-recover]")) {
         submit.disabled = false;
         recover.disabled = true;
-        feedback.textContent = "已恢复，输入保持原样。";
+        feedback.textContent = "Recovered; the input is unchanged.";
         input.focus();
       }
     };
     const edit = () => {
       feedback.textContent = submit.disabled
-        ? "正在编辑最新草稿；此前提交内容保持不变，等待结果或恢复后可再提交。"
-        : "正在编辑；最新修改尚未提交。";
+        ? "Editing the latest draft; the previously submitted content is unchanged, and you can submit again after the result or recovery."
+        : "Editing; the latest changes have not been submitted.";
     };
     form.addEventListener("submit", send);
     input.addEventListener("input", edit);
@@ -234,12 +250,13 @@ export const ComposerRecoveryStory = defineStory({
 
 export const ExecutionDetailsStory = defineStory({
   id: "execution-details",
-  title: "执行 · 四种状态与按需展开",
-  group: "对话组件",
+  title: "Execution · Four states and expansion on demand",
+  group: "Conversation components",
   groupOrder: 50,
   component: "ChatToolCall",
-  variant: "执行与依据",
-  description: "静态状态与真实原生展开行为分开：四种状态分别展示普通与可展开载体。",
+  variant: "Execution and evidence",
+  description:
+    "Static states and real native expansion behavior are separate: each of the four states shows both a plain and a collapsible carrier.",
   covers: [
     "ChatToolCall running/complete/waiting/error × collapsible",
     "ChatProcess open/closed",
@@ -247,43 +264,46 @@ export const ExecutionDetailsStory = defineStory({
   ],
   render: () => (
     <div className="workshop-composition">
-      <ChatProcess label="已展开的检查依据" open>
-        <p>这些内容只展示组件状态，不代表检查了真实项目。</p>
+      <ChatProcess label="Expanded check evidence" open>
+        <p>
+          This content shows only component states; it does not mean a real project was checked.
+        </p>
       </ChatProcess>
-      <ChatProcess label="需要时再展开的补充过程">
-        <p>Tab 到标题后可用 Enter 或空格展开，再次操作可收起。</p>
+      <ChatProcess label="Supporting process you expand when needed">
+        <p>Tab to the heading, then use Enter or Space to expand and the same keys to collapse.</p>
       </ChatProcess>
       {(["running", "complete", "waiting", "error"] as const).map((state) => (
-        <section className="workshop-section" aria-label={`${state} 执行状态`}>
+        <section className="workshop-section" aria-label={`${state} execution state`}>
           <ChatToolCall
-            label={`组件检查 · ${state}`}
+            label={`Component check · ${state}`}
             state={state}
-            detail="普通载体直接展示依据。"
+            detail="The plain carrier shows the evidence directly."
           />
           <ChatToolCall
-            label={`展开 ${state} 的完整检查信息与后续处理说明`}
+            label={`Expand the full check details and follow-up notes for ${state}`}
             state={state}
             collapsible
-            detail="摘要信息与详细内容属于同一项执行。"
+            detail="The summary and details belong to the same execution."
           >
             <p>
-              继续检查长路径 packages/meowtail/src/theme/components-and-conversation-state-review.ts
-              的显示情况。
+              Continue checking how the long path
+              packages/meowtail/src/theme/components-and-conversation-state-review.ts is displayed.
             </p>
           </ChatToolCall>
         </section>
       ))}
       <ChatSources
-        label="设计依据"
+        label="Design evidence"
         open
         items={[
           {
-            title: "Apple 的桌面排版角色及本地 Web 适配边界",
+            title: "Apple's typography roles on desktop and the boundary of local Web adaptation",
             url: "https://developer.apple.com/design/human-interface-guidelines/typography",
-            description: "来源标题和说明可以换行；打开链接会离开本地示例。",
+            description:
+              "Source titles and descriptions can wrap; opening the link leaves the local sample.",
           },
           {
-            title: "不带补充说明的来源",
+            title: "Source without a supporting description",
             url: "https://www.w3.org/WAI/WCAG22/Understanding/target-size-minimum.html",
           },
         ]}
@@ -295,13 +315,13 @@ export const ExecutionDetailsStory = defineStory({
 
 export const ExecutionWorkflowStory = defineStory({
   id: "execution-workflow",
-  title: "执行 · 任务、进展与实际结果",
-  group: "对话组件",
+  title: "Execution · Task, progress, and actual results",
+  group: "Conversation components",
   groupOrder: 50,
   component: "ChatToolCall",
-  variant: "对话中的执行过程",
+  variant: "Execution within a conversation",
   description:
-    "固定工程示例：折叠时辨认做了什么，展开后核对命令与结果。运行、等待、失败分别说明当前进展；不执行命令或请求模型。",
+    "A fixed engineering example: identify what was done while collapsed, then check the command and result when expanded. Running, waiting, and failure each describe the current progress; no command is executed and no model is requested.",
   covers: [
     "ChatToolCall concrete task and result",
     "running/complete/waiting/error",
@@ -311,72 +331,90 @@ export const ExecutionWorkflowStory = defineStory({
   ],
   render: () => (
     <ChatFrame>
-      <ChatMessageList ariaLabel="订单汇总修复示例">
-        <ChatMessage role="user" author="你">
-          修复订单汇总对特殊 SKU 的处理，补回归测试，并更新变更记录。
+      <ChatMessageList ariaLabel="Order summary fix sample">
+        <ChatMessage role="user" author="You">
+          Fix how the order summary handles special SKUs, add regression tests, and update the
+          changelog.
         </ChatMessage>
         <ChatMessage role="assistant" author="Assistant">
-          <p>我会先核对汇总逻辑，再检查特殊键名和空订单的测试结果。</p>
-          <ChatProcess label="检查与修改 · 3 项" open>
-            <ChatToolCall label="阅读订单汇总与测试" state="complete" collapsible>
+          <p>
+            I'll check the summary logic first, then review the test results for special key names
+            and empty orders.
+          </p>
+          <ChatProcess label="Checks and changes · 3 items" open>
+            <ChatToolCall label="Read the order summary and tests" state="complete" collapsible>
               <p>
-                已阅读 <code>orders.ts</code>、<code>orders.test.ts</code>。汇总对象使用普通对象，
-                <code>__proto__</code> 与 <code>constructor</code> 会碰到原型属性。
+                Read <code>orders.ts</code> and <code>orders.test.ts</code>. The summary object uses
+                a plain object, so <code>__proto__</code> and <code>constructor</code> hit prototype
+                properties.
               </p>
             </ChatToolCall>
-            <ChatToolCall label="修复特殊 SKU 的汇总" state="complete" collapsible>
+            <ChatToolCall label="Fix the summary for special SKUs" state="complete" collapsible>
               <p>
-                使用 <code>Object.create(null)</code> 保存 SKU 数量，保留现有返回字段。
-                已为特殊键名新增回归测试，并更新 <code>CHANGELOG.md</code>。
+                Store SKU counts with <code>Object.create(null)</code> while keeping the existing
+                return fields. Added regression tests for special key names and updated{" "}
+                <code>CHANGELOG.md</code>.
               </p>
             </ChatToolCall>
-            <ChatToolCall label="运行订单汇总测试" state="complete" collapsible open>
+            <ChatToolCall label="Run the order summary tests" state="complete" collapsible open>
               <pre>
                 <code>{`$ bun test orders.test.ts
 
-✓ 空订单返回零计数
-✓ 只统计已支付订单
-✓ 重复 SKU 合并数量
-✓ 支持 __proto__、constructor、toString
+✓ empty orders return zero counts
+✓ counts only paid orders
+✓ merges quantities for duplicate SKUs
+✓ supports __proto__, constructor, toString
 
 4 pass · 0 fail · 10 expect calls
-退出代码 0`}</code>
+Exit code 0`}</code>
               </pre>
             </ChatToolCall>
           </ChatProcess>
-          <p>修复和回归测试已完成。可以展开过程核对修改依据与测试输出。</p>
+          <p>
+            The fix and regression tests are complete. Expand the process to check the change
+            evidence and test output.
+          </p>
         </ChatMessage>
         <ChatMessage role="assistant" author="Assistant" continuation>
           <ChatToolCall
-            label="检查组件库类型"
+            label="Check component library types"
             state="running"
             collapsible
             open
-            detail="已开始检查 MeowUI，尚未收到最终结果。"
+            detail="Started checking MeowUI; no final result yet."
           >
             <pre>
               <code>{`$ bun run --filter meowtail typecheck
-正在检查 packages/meowtail/src/chat/tool-call.tsx`}</code>
+Checking packages/meowtail/src/chat/tool-call.tsx`}</code>
             </pre>
           </ChatToolCall>
           <ChatToolCall
-            label="安装项目依赖"
+            label="Install project dependencies"
             state="waiting"
             collapsible
-            detail="等待允许访问依赖仓库，尚未安装。"
+            detail="Waiting for permission to access the dependency repository; nothing installed yet."
           >
             <p>
-              <code>bun install</code> 需要下载缺少的依赖。等待期间，已经完成的文件修改仍然保留。
+              <code>bun install</code> needs to download the missing dependencies. During the wait,
+              file changes that are already done are kept.
             </p>
           </ChatToolCall>
-          <ChatToolCall label="检查全仓格式" state="error" collapsible open>
+          <ChatToolCall
+            label="Check formatting across the repository"
+            state="error"
+            collapsible
+            open
+          >
             <pre>
               <code>{`$ bun run format:check
 [warn] packages/meowtail/stories/conversation/long-running-execution-and-recovery.stories.tsx
 [warn] Code style issues found in the above file.
-退出代码 1`}</code>
+Exit code 1`}</code>
             </pre>
-            <p>格式检查未通过；该结果不能当作类型检查或测试失败。修正格式后可重新检查。</p>
+            <p>
+              The format check did not pass; this result is not a typecheck or test failure. Recheck
+              after fixing the formatting.
+            </p>
           </ChatToolCall>
         </ChatMessage>
       </ChatMessageList>
@@ -386,12 +424,13 @@ export const ExecutionWorkflowStory = defineStory({
 
 export const AttachmentScaleStory = defineStory({
   id: "attachment-scales",
-  title: "附件 · 比例、大小与缺省信息",
-  group: "对话组件",
+  title: "Attachments · Ratios, sizes, and missing information",
+  group: "Conversation components",
   groupOrder: 50,
   component: "ChatAttachments",
-  variant: "比例与缺省信息",
-  description: "宽图、长图和文件使用各自载体。下载为内置示例，不读取本地文件。",
+  variant: "Ratios and missing information",
+  description:
+    "Wide images, tall images, and files each use their own carrier. Downloads are built-in samples; no local file is read.",
   covers: [
     "ChatAttachments image/file",
     "host download callback/default link",
@@ -401,15 +440,15 @@ export const AttachmentScaleStory = defineStory({
     "empty list/custom label",
   ],
   render: () => {
-    const downloadFeedback = signal("宿主下载回调示例，不连接服务。");
+    const downloadFeedback = signal("Host download callback sample; no service is connected.");
     return (
       <div className="workshop-composition">
         <ChatAttachments
-          label="图片比例示例"
+          label="Image ratio samples"
           items={[
             {
               id: "wide",
-              name: "横向结构图.svg",
+              name: "wide-structure-diagram.svg",
               mediaType: "image/svg+xml",
               url:
                 "data:image/svg+xml," +
@@ -419,7 +458,7 @@ export const AttachmentScaleStory = defineStory({
             },
             {
               id: "tall",
-              name: "纵向结构图.svg",
+              name: "tall-structure-diagram.svg",
               mediaType: "image/svg+xml",
               url:
                 "data:image/svg+xml," +
@@ -430,7 +469,7 @@ export const AttachmentScaleStory = defineStory({
           ]}
         />
         <ChatAttachments
-          label="文件大小示例"
+          label="File size samples"
           items={[
             {
               id: "zero",
@@ -441,7 +480,7 @@ export const AttachmentScaleStory = defineStory({
             },
             {
               id: "kb",
-              name: "组件设计语言和全部交互状态检查记录以及后续修改建议.md",
+              name: "component-design-language-and-all-interaction-state-check-records-with-follow-up-change-suggestions.md",
               mediaType: "text/markdown",
               sizeBytes: 2860,
               url: "data:text/plain,Example",
@@ -461,23 +500,27 @@ export const AttachmentScaleStory = defineStory({
             },
           ]}
         />
-        <p className="workshop-note">文件大小为固定展示数据，不声称与下载内容的实际字节数一致。</p>
+        <p className="workshop-note">
+          File sizes are fixed display data and do not claim to match the actual byte count of the
+          downloaded content.
+        </p>
         <ChatAttachments
-          label="宿主下载回调示例"
+          label="Host download callback sample"
           items={[
             {
               id: "host-download",
-              name: "受保护文档.txt",
+              name: "protected-document.txt",
               mediaType: "text/plain",
               url: "data:text/plain,Host%20download%20example",
-              onDownload: () => downloadFeedback.set("宿主已接手下载，仅本地示例。"),
+              onDownload: () =>
+                downloadFeedback.set("The host took over the download; local sample only."),
             },
           ]}
         />
         <p className="workshop-feedback" role="status" data-attachment-download-feedback>
           {downloadFeedback}
         </p>
-        <ChatAttachments label="暂无附件" items={[]} />
+        <ChatAttachments label="No attachments" items={[]} />
       </div>
     );
   },

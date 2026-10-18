@@ -3,23 +3,24 @@ import { defineStory } from "meowbook";
 import { Skeleton, Button, Stack, Container } from "meowtail";
 export const Skeletons = defineStory({
   id: "skeleton",
-  title: "加载占位 · 保留内容结构",
+  title: "Loading placeholder · Preserve content structure",
   component: "Skeleton",
-  variant: "加载与结果",
-  group: "浮层与反馈",
+  variant: "Loading and result",
+  group: "Overlays and feedback",
   groupOrder: 30,
-  description: "占位本身不播报。容器表达加载状态，并保留文字说明；按钮模拟本地加载完成。",
+  description:
+    "The placeholder itself is not announced. The container expresses the loading state and keeps a text description; the button simulates the local load finishing.",
   covers: ["Skeleton", "loading", "aria-busy"],
   render: () => {
     const loading = signal(true);
     return (
       <Container width="content">
         <Stack>
-          <section aria-label="项目摘要" aria-busy={loading}>
+          <section aria-label="Project summary" aria-busy={loading}>
             {mapSignal(loading, (value) =>
               value ? (
                 <Stack>
-                  <p>正在读取项目摘要…</p>
+                  <p>Reading the project summary…</p>
                   <Skeleton shape="circle" />
                   <Skeleton style={{ width: "70%" }} />
                   <Skeleton />
@@ -27,8 +28,8 @@ export const Skeletons = defineStory({
                 </Stack>
               ) : (
                 <div>
-                  <h3>网站改版</h3>
-                  <p>设计稿已整理完成，下一步核对窄屏布局。</p>
+                  <h3>Website redesign</h3>
+                  <p>The design drafts are organized; next, check the narrow-screen layout.</p>
                 </div>
               ),
             )}
@@ -39,7 +40,7 @@ export const Skeletons = defineStory({
               loading.value = !loading.value;
             }}
           >
-            {mapSignal(loading, (value) => (value ? "模拟加载完成" : "重新演示加载"))}
+            {mapSignal(loading, (value) => (value ? "Simulate load completion" : "Replay loading"))}
           </Button>
         </Stack>
       </Container>

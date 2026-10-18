@@ -4,26 +4,27 @@ import { DetailSection, ResourceLink, Stack, Timeline, TimelineItem } from "meow
 
 export const DetailComponentsStory = defineStory({
   id: "detail-components",
-  title: "详情组件 · 分块、时间线与资源引用",
-  group: "导航与布局",
+  title: "Detail components · Sections, timeline, and resource references",
+  group: "Navigation and layout",
   groupOrder: 32,
   component: "DetailSection",
-  variant: "独立组件状态",
-  description: "独立展示公共详情组件，不模拟工作详情面板。",
+  variant: "Standalone component states",
+  description:
+    "Shows the shared detail components on their own; does not simulate a work detail panel.",
   render: () => (
     <Stack>
-      <DetailSection title="分块标题" aside="辅助说明">
-        <p>正文由调用方提供。</p>
+      <DetailSection title="Section title" aside="Supporting note">
+        <p>The body is provided by the caller.</p>
       </DetailSection>
       <Timeline>
-        <TimelineItem state="processing" title="处理中" stateLabel="处理中" />
-        <TimelineItem state="returned" title="执行返回" stateLabel="已返回" />
-        <TimelineItem state="success" title="完成" stateLabel="完成" />
+        <TimelineItem state="processing" title="In progress" stateLabel="In progress" />
+        <TimelineItem state="returned" title="Run returned" stateLabel="Returned" />
+        <TimelineItem state="success" title="Completed" stateLabel="Completed" />
       </Timeline>
-      <ResourceLink href="#sample" title="示例链接" detail="链接形式" />
+      <ResourceLink href="#sample" title="Sample link" detail="Link style" />
       <ResourceLink
-        title="一个很长的示例资源名称用于观察调用方传入长文本的表现"
-        detail="按钮形式"
+        title="A very long sample resource name to observe how caller-supplied long text behaves"
+        detail="Button style"
       />
     </Stack>
   ),

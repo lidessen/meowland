@@ -4,10 +4,11 @@ import { CredentialSource, Stack } from "meowtail";
 
 export const CredentialSourceStory = defineStory({
   id: "credential-source",
-  title: "凭据来源 · 环境引用与手动 Key",
-  group: "表单",
+  title: "Credential source · Environment references and manual keys",
+  group: "Forms",
   component: "CredentialSource",
-  description: "宿主提供可用性；控件不查询环境或保存密钥。",
+  description:
+    "The host reports availability; the control does not query the environment or store keys.",
   render() {
     const callbacks = {
       onSourceChange() {},

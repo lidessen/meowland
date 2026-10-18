@@ -233,7 +233,9 @@ test.describe("a coarse pointer raises the row", () => {
     isMobile: true,
   });
 
-  test("the raised row keeps its glyphs and disclosure chevron on one line", async ({ page }) => {
+  test("the raised multiline row aligns its glyph and chevron with the first text line", async ({
+    page,
+  }) => {
     await page.goto("http://127.0.0.1:13007/canvas.html?story=chat-tool-sequence");
     await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
     await openFirstProcess(page);
@@ -246,14 +248,26 @@ test.describe("a coarse pointer raises the row", () => {
         const box = root.querySelector(part)!.getBoundingClientRect();
         return box.top + box.height / 2;
       };
+      const header = root.querySelector('[data-meowui-part="chat-tool-call/header"]')!;
+      const label = root.querySelector('[data-meowui-part="chat-tool-call/label"]')!;
+      const target = root.querySelector('[data-meowui-part="chat-tool-call/summary"]')!;
+      const labelBox = label.getBoundingClientRect();
       return {
-        row: centre('[data-meowui-part="chat-tool-call/header"]'),
+        // A narrow row stacks its target below the action; the leading glyph still identifies
+        // the first action line, rather than the centre of the whole multiline header.
+        firstLine: labelBox.top + Number.parseFloat(getComputedStyle(label).lineHeight) / 2,
+        labelBottom: labelBox.bottom,
+        targetTop: target.getBoundingClientRect().top,
+        targetBottom: target.getBoundingClientRect().bottom,
+        headerBottom: header.getBoundingClientRect().bottom,
         icon: centre('[data-meowui-part="chat-tool-call/icon"]'),
         chevron: centre('[data-meowui-part="chat-tool-call/chevron"]'),
       };
     });
-    expect(centres.icon).toBeCloseTo(centres.row, 0);
+    expect(centres.icon).toBeCloseTo(centres.firstLine, 0);
     expect(centres.chevron).toBeCloseTo(centres.icon, 0);
+    expect(centres.targetTop).toBeGreaterThanOrEqual(centres.labelBottom - 1);
+    expect(centres.targetBottom).toBeLessThanOrEqual(centres.headerBottom + 1);
   });
 });
 

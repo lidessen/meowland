@@ -137,4 +137,52 @@ describe("Assistant public composition", () => {
     expect(html).not.toContain('type="file"');
     expect(html).not.toContain('aria-label="Attach files"');
   });
+  test("tool action availability requires an explicit host handler and does not imply an outcome", () => {
+    const messages = [
+      {
+        id: "m",
+        role: "assistant" as const,
+        author: "Assistant",
+        parts: [
+          {
+            id: "t",
+            kind: "tool" as const,
+            label: "Read source",
+            state: "waiting" as const,
+            statusLabel: "Waiting for access",
+            canRetry: true,
+            canCancel: false,
+            defaultOpen: true,
+          },
+        ],
+      },
+    ];
+    const passive = render({ messages, readOnly: true });
+    expect(passive).toContain("Waiting for access");
+    expect(passive).not.toContain("重试");
+    const actionable = render({ messages, readOnly: true, onToolAction: () => undefined });
+    expect(actionable).toContain("重试");
+    expect(actionable).toContain('data-tool-state="waiting"');
+  });
+  test("a tool with no execution state is unknown rather than completed", () => {
+    const html = render({
+      readOnly: true,
+      messages: [
+        {
+          id: "m",
+          role: "assistant",
+          author: "Assistant",
+          parts: [
+            {
+              id: "t",
+              kind: "tool",
+              label: "Waiting for a report",
+            },
+          ],
+        },
+      ],
+    });
+    expect(html).toContain('data-tool-state="unknown"');
+    expect(html).toContain("结果未确认");
+  });
 });

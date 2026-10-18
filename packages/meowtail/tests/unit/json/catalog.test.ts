@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { h, signal } from "meowjsx";
+import { h, signal, type VNode } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
 import { createJsonView, describeJsonCatalog, parseJsonView } from "meowjsx/json";
 import { AssistantView } from "../../../src/chat/assistant";
@@ -36,7 +36,7 @@ const messages = [
   },
 ];
 
-test("JSON Assistant is the public component with the same four message part renderers", () => {
+test("JSON Assistant is the public component with the same message part renderers", () => {
   const catalog = createMeowUICatalog();
   expect(catalog.get("AssistantView")!.component).toBe(AssistantView);
   expect(catalog.get("Button")!.component).toBe(Button);
@@ -66,6 +66,93 @@ test("JSON Assistant is the public component with the same four message part ren
       ),
     ),
   ).not.toContain('type="file"');
+});
+
+test("agent parts render the same escaped tool data and independent task facts in JSON and JSX", () => {
+  const catalog = createMeowUICatalog();
+  const props = {
+    messages: [
+      {
+        id: "agent-message",
+        role: "assistant" as const,
+        author: "Assistant",
+        parts: [
+          {
+            id: "tool",
+            kind: "tool" as const,
+            label: "Read files",
+            state: "running" as const,
+            input: "<script>not executable</script>",
+            output: "",
+            defaultOpen: true,
+            canRetry: true,
+            retryDisabled: true,
+          },
+          {
+            id: "task",
+            kind: "task" as const,
+            title: "Review files",
+            state: "success" as const,
+            executionText: "Execution completed",
+            replyText: "Awaiting a public reply",
+            progress: { value: 2, max: 2, label: "Reviewed two files" },
+            steps: [{ id: "step", title: "Read source", statusText: "Reviewed" }],
+          },
+        ],
+      },
+    ],
+    readOnly: true,
+    allowAttachments: false,
+  };
+  const jsonHtml = renderToHtml(
+    createJsonView(parseJsonView({ component: "AssistantView", props }, catalog), { catalog }),
+  );
+  expect(jsonHtml).toBe(renderToHtml(h(AssistantView, props)));
+  expect(jsonHtml).toContain("&lt;script&gt;not executable&lt;/script&gt;");
+  expect(jsonHtml).not.toContain("<script>");
+  expect(jsonHtml).toContain("Execution completed");
+  expect(jsonHtml).toContain("Awaiting a public reply");
+  expect(jsonHtml).toContain("Reviewed two files");
+});
+
+test("agent JSON fields and intents remain a finite data contract", () => {
+  const catalog = createMeowUICatalog();
+  const view = (part: unknown) => ({
+    component: "AssistantView",
+    props: {
+      messages: [{ id: "m", role: "assistant", author: "Assistant", parts: [part] }],
+    },
+  });
+  for (const invalid of [
+    { id: "t", kind: "tool", label: "Read", state: "not-replied" },
+    { id: "t", kind: "tool", label: "Read", input: { html: "<b>data</b>" } },
+    { id: "t", kind: "tool", label: "Read", onRetry: "execute" },
+    { id: "t", kind: "task", title: "Review", state: "running", children: [] },
+    { id: "t", kind: "task", title: "Review", state: "running", progress: { value: 1, max: 2 } },
+  ])
+    expect(() => parseJsonView(view(invalid), catalog)).toThrow("union");
+  const parsed = parseJsonView(
+    {
+      component: "AssistantView",
+      props: {
+        messages: [],
+        onToolAction: { $action: "tool.intent" },
+      },
+    },
+    catalog,
+  );
+  const intents: unknown[][] = [];
+  const child = createJsonView(parsed, {
+    catalog,
+    actions: new Map([["tool.intent", (...args: unknown[]) => intents.push(args)]]),
+  }) as VNode;
+  const intent = child.props.onToolAction as (...args: unknown[]) => void;
+  intent("m", "t", "retry");
+  expect(intents).toEqual([["m", "t", "retry"]]);
+  expect(() => intent("m", "t", "execute")).toThrow("enum");
+  expect(() => intent("m", "t", "cancel", { event: true })).toThrow("argument count");
+  expect(intents).toHaveLength(1);
+  expect(JSON.stringify(describeJsonCatalog(catalog))).toContain('"onToolAction"');
 });
 
 test("Assistant catalog validates real data unions and describes only its supported finite properties", () => {

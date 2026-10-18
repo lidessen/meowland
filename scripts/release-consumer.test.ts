@@ -3,16 +3,20 @@ import { createHash } from "node:crypto";
 import { mkdir, mkdtemp, realpath, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { consumerInput, consumerOptions } from "./release-consumer";
+import { consumerInput, consumerOptions, publicImportProbe } from "./release-consumer";
 
 test("consumer requires explicit unique supported selection and rejects execution flags", () => {
   expect(() => consumerOptions([])).toThrow("Explicit");
   expect(() =>
     consumerOptions(["--manifest", "input.json", "--packages", "meowjsx,meowjsx"]),
   ).toThrow("unique");
-  expect(() => consumerOptions(["--manifest", "input.json", "--packages", "meowslides"])).toThrow(
-    "supported",
-  );
+  expect(
+    consumerOptions(["--manifest", "input.json", "--packages", "meowslides"]).selected,
+  ).toEqual(["meowslides"]);
+  for (const name of ["meowpress", "unknown"])
+    expect(() => consumerOptions(["--manifest", "input.json", "--packages", name])).toThrow(
+      "supported",
+    );
   expect(() =>
     consumerOptions(["--manifest", "input.json", "--packages", "meowjsx", "--execute"]),
   ).toThrow("Unknown");
@@ -60,6 +64,53 @@ test("consumer checks actual tarball identity and hash before installation", asy
     await Bun.write(join(directory, input.packages[0]!.file), file);
     await writeFile(manifest, JSON.stringify(input));
     await expect(consumerInput(options)).rejects.toThrow("Packed identity");
+  } finally {
+    await rm(directory, { recursive: true, force: true });
+  }
+});
+
+test("the standard native Node public probe catches a broken Slides theme specifier", async () => {
+  const directory = await mkdtemp(join(tmpdir(), "release-consumer-node-test-"));
+  try {
+    const packageDirectory = join(directory, "node_modules/meowslides");
+    await mkdir(packageDirectory, { recursive: true });
+    await writeFile(
+      join(packageDirectory, "package.json"),
+      JSON.stringify({
+        name: "meowslides",
+        type: "module",
+        exports: { ".": "./index.js", "./theme": "./theme.js", "./build": "./build.js" },
+      }),
+    );
+    await writeFile(join(packageDirectory, "index.js"), "export const runtime = true;");
+    await writeFile(join(packageDirectory, "theme.styles.js"), "export const theme = true;");
+    await writeFile(join(packageDirectory, "theme.js"), 'export {theme} from "./theme.styles";');
+    await writeFile(
+      join(packageDirectory, "build.js"),
+      'throw Error("Bun-only tooling must not execute under Node");',
+    );
+    await writeFile(join(directory, "public-imports.mjs"), publicImportProbe(["meowslides"]));
+    const run = async () => {
+      const child = Bun.spawn(["node", "public-imports.mjs"], {
+        cwd: directory,
+        stdout: "pipe",
+        stderr: "pipe",
+      });
+      const [code, stdout, stderr] = await Promise.all([
+        child.exited,
+        new Response(child.stdout).text(),
+        new Response(child.stderr).text(),
+      ]);
+      return { code, stdout, stderr };
+    };
+    const broken = await run();
+    expect(broken.code).not.toBe(0);
+    expect(broken.stderr).toContain("ERR_MODULE_NOT_FOUND");
+    expect(broken.stderr).toContain("theme.styles");
+    await writeFile(join(packageDirectory, "theme.js"), 'export {theme} from "./theme.styles.js";');
+    const repaired = await run();
+    expect(repaired.code).toBe(0);
+    expect(JSON.parse(repaired.stdout)).toEqual(["meowslides", "meowslides/theme"]);
   } finally {
     await rm(directory, { recursive: true, force: true });
   }

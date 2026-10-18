@@ -341,6 +341,20 @@ test("selection stays explicit and an unselected optional peer does not expand i
     await expect(inspect(root, manifest, selected, local)).rejects.toThrow();
 });
 
+test("Slides alpha follows its explicitly selected runtime and UI peers", async () => {
+  const { plan, root, manifest, local } = await fixture(3, "*", "0.1.0-alpha.0", false, {
+    names: ["meowslides", "meowtail", "meowjsx"],
+    peers: {
+      meowslides: { meowtail: "^0.1.0-alpha.0", meowjsx: "^0.1.0-alpha.0" },
+      meowtail: { meowjsx: "^0.1.0-alpha.0" },
+    },
+    channel: "alpha",
+  });
+  expect(plan.packages.map(({ name }) => name)).toEqual(["meowjsx", "meowtail", "meowslides"]);
+  const subset = await inspect(root, manifest, ["meowjsx"], local, "alpha");
+  expect(subset.packages.map(({ name }) => name)).toEqual(["meowjsx"]);
+});
+
 test("legacy GitHub flags are rejected and modes cannot be combined", async () => {
   for (const args of [
     ["--prepare-github"],

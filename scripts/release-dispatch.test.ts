@@ -57,6 +57,18 @@ test("dispatch refuses unpublished local commits and sends only main plus valida
     "channel=alpha",
   ]);
 });
+test("Slides can be selected explicitly without expanding a four-package request", async () => {
+  const packages = "meowjsx,meowcss,meowtail,meowbook";
+  const four = ["--commit", commit, "--packages", packages, "--channel", "alpha"];
+  expect(request(four).packages).toEqual(packages.split(","));
+  expect(
+    request(["--commit", commit, "--packages", "meowslides", "--channel", "alpha"]).packages,
+  ).toEqual(["meowslides"]);
+  const ready = fixture();
+  await dispatch([...four, "--execute"], ready.runner);
+  expect(ready.calls.at(-1)).toContain(`packages=${packages}`);
+  expect(ready.calls.at(-1)).not.toContain("meowslides");
+});
 test("workflow grants OIDC only to publication after the inspected artifact", async () => {
   const workflow = Bun.YAML.parse(
     await Bun.file(new URL("../.github/workflows/npm-release.yml", import.meta.url)).text(),

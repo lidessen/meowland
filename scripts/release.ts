@@ -6,7 +6,7 @@ import { gt, prerelease, satisfies, valid, validRange } from "semver";
 import { tmpdir } from "node:os";
 
 export type Channel = "stable" | "alpha";
-export const publishNames = ["meowjsx", "meowcss", "meowtail", "meowbook"];
+export const publishNames = ["meowjsx", "meowcss", "meowtail", "meowbook", "meowslides"];
 export const workflow = "npm-release.yml";
 export const repository = "lidessen/meowland";
 const names = ["meowjsx", "meowcss", "meowtail", "meowslides", "meowbook", "meowpress"];

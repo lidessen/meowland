@@ -1,8 +1,8 @@
 # 本地 npm 发布
 
-各包独立 SemVer，由维护者或 Agent 显式确定选包、版本与依赖范围。唯一发布算法 `scripts/release.ts` 消费已验收 tarball；不自动改版本、扩展选包、build、pack、提交或推送。稳定版显式使用 `latest`，测试版必须为 `x.y.z-alpha.N` 并显式使用 `alpha`。`*-slides.*` 等其它预发行格式不会被映射为 alpha。`meowslides` 当前仍为 private，不可发布；根与 showcase 也不发布。
+各包独立 SemVer，由维护者或 Agent 显式确定选包、版本与依赖范围。唯一发布算法 `scripts/release.ts` 消费已验收 tarball；不自动改版本、扩展选包、build、pack、提交或推送。稳定版显式使用 `latest`，测试版必须为 `x.y.z-alpha.N` 并显式使用 `alpha`。`*-slides.*` 等其它预发行格式不会被映射为 alpha。`meowslides` 已准备 `0.1.0-alpha.0` 公开候选，实际发布仍须本次明确授权；根与 showcase 不发布。
 
-普通 push/PR 继续只运行 build/lint；真实发布仅由 `.github/workflows/npm-release.yml` 的手动 `workflow_dispatch` 触发，使用 npm Trusted Publishing OIDC，不使用 `NPM_TOKEN` 或个人 npm 登录态。用户已明确授权此方式替代原本地发包安排。脚本不创建 Git tag、GitHub Release 或部署。历史 tag/Release 与[原发布回执](records/2026-10-17-tail-book-press-publish.md)保持原样。当前流程支持 `meowjsx`、`meowcss`、`meowtail`、`meowbook` 的显式子集；其它包不自动加入。
+普通 push/PR 继续只运行 build/lint；真实发布仅由 `.github/workflows/npm-release.yml` 的手动 `workflow_dispatch` 触发，使用 npm Trusted Publishing OIDC，不使用 `NPM_TOKEN` 或个人 npm 登录态。用户已明确授权此方式替代原本地发包安排。脚本不创建 Git tag、GitHub Release 或部署。历史 tag/Release 与[原发布回执](records/2026-10-17-tail-book-press-publish.md)保持原样。当前流程支持 `meowjsx`、`meowcss`、`meowtail`、`meowbook`、`meowslides` 的显式子集；其它包不自动加入。选包接线不构成发布授权；四包和新增 Slides 可以分别选择，未选中的包不会随批发布。
 
 ## 准备与固定输入
 
@@ -10,6 +10,8 @@
 2. 按[开发检查](development-checks.md)完成必要检查，build/pack，并在仓库外空目录安装实际 tgz，验证公开入口、资源、CLI 和受影响行为。pack 不代表 build 已完成；本地 tgz 消费不等于 registry 消费。
 3. 提交候选源码，固定候选完整 SHA 与已验收 tgz 的 SHA256。工具提交可为候选后继；候选须是工具 HEAD 的祖先。已跟踪工作区/index 须干净，origin 须与输入仓库一致。未跟踪内容（包括未知 `data/`）不参与检查，不读取或清理。
 4. 在被忽略的 `artifacts/releases/<本批名称>/` 保存输入 JSON 与精确 tarball，之后不重打包、不改哈希假装同一批。
+
+存在其它任务 WIP 时，保持其原目录和内容，使用已提交候选的独立干净 checkout 构建与验收，不 stash/reset、复制未验收源码或修改输入 hash 将其混入。新 ESM 修复后的候选必须使用新提交和精确哈希，旧 `857c0fb` 四包输入不得继续发布。具体批次与消费者回执见当次记录。
 
 输入示例（哈希与 SHA 需替换为实际值）：
 
@@ -73,6 +75,10 @@ OIDC 不以 `npm whoami/access` 作权限预检：公开 metadata/依赖/bytes �
 | Allowed actions      | 明确允许 `npm publish`；为同 bytes 重试时修复 alpha/latest tag，另允许 `npm dist-tag` |
 
 需配置的包为 `meowjsx`、`meowcss`、`meowtail`、`meowbook`。当前新 trust 默认允许 staging，不能把默认值误当 direct publish 已启用。workflow 固定 Node 24/npm 11.21.0，覆盖 dist-tag OIDC 所需版本；使用 GitHub-hosted runner。首次成功发布须在新 trust 创建后两天内完成，否则需由用户重新配置。保存 trust 不等于服务端已验证匹配，首次实际发布才确立有效性。不需要长期 npm token，也不要求每次运行输入 npm 验证码。
+
+Slides 的本地公开候选与脚本接线不创建 npm 包或 trust。首包名称/占位创建、所需 trust 配置与首次实际发布须在获用户明确授权后执行；不要复用四包授权自动增加第五包。新包引导若涉及公开占位或 staging，必须先说明该动作的公开影响；本地准备可完整完成，不以创建占位作为验收前置。
+
+官方另有[新包 staged creation](https://github.blog/changelog/2026-10-02-npm-staged-publishing-now-supports-creating-new-packages/) 路径：使用用户本地登录会话暂存首版，再由维护者以 2FA 审核批准；不要求长期 token 或 token bypass。对不存在的包，暂存会创建公开 `0.0.0-stage` 占位，真实版本须经批准才可安装，详见 [staged publishing](https://docs.npmjs.com/staged-publishing/)。这是有独立公开影响的新包引导流程，不是现有四包的正常 OIDC 自动发布，也没有接入本脚本；首次引导、维护者批准及之后的 trust 绑定应在一次明确授权中说明，不能假定尚不存在的包已经有可用 trust。OIDC 本身兼容禁止传统 token 的发布设置，不要求启用 Bypass 2FA。
 
 不降低账户 2FA，不建议开启 bypass。npm 2026-07-31 公告说明 bypass 的管理权限已限制、直接发包也在弃用；本流程直接采用短期 OIDC。之后如要删除旧 token 或调整 package publishing access，须另获授权，不随配置自动执行。
 

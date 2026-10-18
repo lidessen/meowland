@@ -1,10 +1,14 @@
 {
   "name": "meowslides",
-  "version": "0.1.0-slides.20261018.1",
-  "private": true,
+  "version": "0.1.0-alpha.0",
   "license": "MIT",
   "type": "module",
   "description": "MeowJSX presentation runtime and trusted local MDX authoring",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lidessen/meowland.git",
+    "directory": "packages/meowslides"
+  },
   "scripts": {
     "test": "bun test tests/unit tests/build",
     "typecheck": "tsc --noEmit -p tsconfig.json"

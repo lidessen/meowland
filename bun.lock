@@ -51,9 +51,9 @@
         "meowtail": "workspace:*",
       },
       "peerDependencies": {
-        "meowcss": "^0.1.0",
-        "meowjsx": "^0.1.0",
-        "meowtail": "^0.1.0 || ^0.2.0-slides.20261018.1",
+        "meowcss": "^0.1.0 || ^0.1.1-alpha.0",
+        "meowjsx": "^0.1.0 || ^0.1.1-alpha.0",
+        "meowtail": "^0.1.0 || ^0.2.0-alpha.0",
       },
     },
     "packages/meowcss": {
@@ -98,7 +98,7 @@
     },
     "packages/meowslides": {
       "name": "meowslides",
-      "version": "0.1.0-slides.20261018.1",
+      "version": "0.1.0-alpha.0",
       "bin": {
         "meowslides": "./dist/src/cli.js",
       },
@@ -115,9 +115,9 @@
         "meowtail": "workspace:*",
       },
       "peerDependencies": {
-        "meowcss": "^0.1.0",
-        "meowjsx": "^0.1.0",
-        "meowtail": "^0.2.0-slides.20261018.1",
+        "meowcss": "^0.1.0 || ^0.1.1-alpha.0",
+        "meowjsx": "^0.1.0 || ^0.1.1-alpha.0",
+        "meowtail": "^0.2.0-alpha.0",
       },
     },
     "packages/meowtail": {
@@ -135,8 +135,8 @@
         "meowjsx": "workspace:*",
       },
       "peerDependencies": {
-        "meowcss": "^0.1.0",
-        "meowjsx": "^0.1.0",
+        "meowcss": "^0.1.0 || ^0.1.1-alpha.0",
+        "meowjsx": "^0.1.0 || ^0.1.1-alpha.0",
       },
     },
   },

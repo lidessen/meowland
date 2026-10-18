@@ -1,6 +1,6 @@
 # MeowSlides
 
-`meowslides` 是独立演示包，拥有播放器、页和步骤、活动许可、渐显、媒体生命周期、演示布局与主题，以及可信本地 MDX 创作入口。本包当前为私有本地候选，未发布 npm。
+`meowslides` 是独立演示包，拥有播放器、页和步骤、活动许可、渐显、媒体生命周期、演示布局与主题，以及可信本地 MDX 创作入口。本包当前准备 `0.1.0-alpha.0` 公开候选，尚未发布 npm；发布接线与包外验收不代表已获实际发布授权。
 
 Meowtail 保留通用 UI、布局、图片预览和标准应用主题。新包单向依赖 Meowtail、MeowJSX、MeowCSS；旧 `meowtail/presentation` 与根演示导出已移除，不做反向兼容转导出。
 
@@ -109,4 +109,4 @@ export { createSession } from "./QuickCheck.tsx";
 
 ## 检查
 
-根统一 build 后运行 `bun test packages/meowslides/tests/unit packages/meowslides/tests/build`、`tsc --noEmit -p packages/meowslides/tsconfig.json`、`tsc -p packages/meowslides/tsconfig.types.json`。浏览器与实际 tarball 包外消费另行验收；build、pack、私有候选都不等于发布。工程统一命令见 [开发检查](../../docs/development-checks.md)。
+根统一 build 后运行 `bun test packages/meowslides/tests/unit packages/meowslides/tests/build`、`tsc --noEmit -p packages/meowslides/tsconfig.json`、`tsc -p packages/meowslides/tsconfig.types.json`。浏览器与实际 tarball 包外消费另行验收；build、pack、候选都不等于发布。工程统一命令见 [开发检查](../../docs/development-checks.md)。

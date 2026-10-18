@@ -359,8 +359,8 @@ export const CompactEmptyStateStory = defineStory({
   description: "整页与局部空态共用结构；局部说明保持阅读尺度，操作与对应空区域相邻。",
   render: () => (
     <Stack>
-      <Field label="目录筛选">
-        <Input placeholder="输入文件名" />
+      <Field label="目录筛选" htmlFor="compact-empty-filter">
+        <Input id="compact-empty-filter" placeholder="输入文件名" />
       </Field>
       <Grid minColumnWidth="normal">
         <Card>

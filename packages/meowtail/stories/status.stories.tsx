@@ -28,7 +28,7 @@ export const StatusStory = defineStory({
   ],
   render: () => (
     <SchemePair>
-      {() => (
+      {(scheme) => (
         <Stack gap="relaxed">
           <Inline gap="normal">
             <Status state="processing" label="正在推进" />
@@ -60,8 +60,8 @@ export const StatusStory = defineStory({
             state="danger"
             label="Connection failed for development-workspace-with-a-long-identifier; retry after checking its configuration."
           />
-          <Field label="连接名称">
-            <Input value="Development workspace" />
+          <Field label="连接名称" htmlFor={`status-connection-${scheme}`}>
+            <Input id={`status-connection-${scheme}`} value="Development workspace" />
           </Field>
         </Stack>
       )}

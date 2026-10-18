@@ -7,6 +7,7 @@ import { presentationTokens } from "./presentation/presentation.tokens";
 export { presentationTokens } from "./presentation/presentation.tokens";
 import { defineTheme } from "meowcss/meowjsx";
 import { assistantStyles } from "./chat/assistant.styles";
+import { chatTaskStyles } from "./chat/task.styles";
 import { baseStyles, cornerShapeStyles } from "./base.styles";
 import { pillStyles } from "./components/pill.styles";
 import { imagePreviewStyles } from "./components/image-preview.styles";
@@ -108,6 +109,7 @@ export const standardTheme = defineTheme({
     presentationTextStyles,
     presentationListStyles,
     assistantStyles,
+    chatTaskStyles,
     statusDotStyles,
     statusStyles,
     tagStyles,

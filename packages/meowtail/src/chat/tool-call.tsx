@@ -1,25 +1,75 @@
-import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
+import {
+  defineComponent,
+  h,
+  unwrap,
+  type Child,
+  type ComponentContract,
+  type MaybeSignal,
+  type Props,
+} from "meowjsx";
 import { Icon } from "../icons/icon";
+import { Button } from "../components/button";
+import { OutputBlock } from "../components/output-block";
+import { executionStateLabel, type ChatExecutionState } from "../shared/execution-state";
 
 export const chatToolCallContract = {
   name: "chat-tool-call",
-  parts: ["root", "header", "icon", "label", "summary", "status", "chevron", "detail", "body"],
+  parts: [
+    "root",
+    "header",
+    "icon",
+    "label",
+    "summary",
+    "status",
+    "chevron",
+    "detail",
+    "body",
+    "input",
+    "output",
+    "outputSummary",
+    "actions",
+  ],
 } as const satisfies ComponentContract;
 
-export type ChatToolCallState = "running" | "complete" | "waiting" | "error" | "unknown";
+/** The complete spelling remains supported for existing tool consumers. */
+export type ChatToolCallState = ChatExecutionState;
+
+export interface ChatToolCallLabels {
+  input: string;
+  output: string;
+  emptyInput: string;
+  emptyOutput: string;
+  retry: string;
+  cancel: string;
+}
 
 export interface ChatToolCallProps extends Props {
-  label: string;
+  label: MaybeSignal<string>;
   /** Short target or action summary, visible while collapsed. */
-  summary?: string;
-  state?: ChatToolCallState;
-  statusLabel?: string;
+  summary?: MaybeSignal<string | undefined>;
+  state?: MaybeSignal<ChatToolCallState>;
+  /** State facts, including who or what is being waited on, belong to the host. */
+  statusLabel?: MaybeSignal<string | undefined>;
   detail?: Child;
   icon?: Child;
+  /** Tool payloads are inert text. Undefined omits a region; an empty string is explicit empty data. */
+  input?: MaybeSignal<string | undefined>;
+  output?: MaybeSignal<string | undefined>;
+  outputSummary?: MaybeSignal<string | undefined>;
+  maxLines?: number;
   /** Reveals this row's own body in place. */
   collapsible?: boolean;
   /** Runs the host's own action instead of revealing a body; the row keeps the row chrome. */
   onActivate?: () => void;
+  /** Intent only. The host owns execution, pending state, permissions and the resulting status. */
+  onRetry?: () => void;
+  onCancel?: () => void;
+  /** Whether the host currently offers this intent; unlike disabled, false hides it. */
+  canRetry?: MaybeSignal<boolean>;
+  canCancel?: MaybeSignal<boolean>;
+  retryDisabled?: MaybeSignal<boolean>;
+  cancelDisabled?: MaybeSignal<boolean>;
+  labels?: Partial<ChatToolCallLabels>;
   className?: string;
 }
 
@@ -38,21 +88,70 @@ export const ChatToolCall = defineComponent<
       statusLabel,
       detail,
       icon,
+      input,
+      output,
+      outputSummary,
+      maxLines,
       collapsible = false,
       onActivate,
+      onRetry,
+      onCancel,
+      canRetry = true,
+      canCancel = true,
+      retryDisabled = false,
+      cancelDisabled = false,
+      labels,
       className,
       ...props
     },
     context,
   ) => {
-    const status = statusLabel ?? stateLabel(state);
-    // A completed row already shows its outcome in the leading glyph, so a status the caller
-    // did not spell out stays out of the reading column; it remains as the row's description.
-    const quietStatus = state === "complete" && !statusLabel;
-    // An activating row is an action of its own, so it never reveals a body: one interactive
-    // header, the same chrome, and the host decides what the action is.
+    const derived = <T,>(read: () => T) => {
+      const value = context.signal(read());
+      context.effect(() => {
+        value.value = read();
+      });
+      return value;
+    };
+    const copy: ChatToolCallLabels = {
+      input: "输入",
+      output: "输出",
+      emptyInput: "没有输入内容",
+      emptyOutput: "输出为空",
+      retry: "重试",
+      cancel: "取消",
+      ...labels,
+    };
+    const status = derived(() => unwrap(statusLabel) ?? executionStateLabel(unwrap(state)));
+    // Preserve the existing quiet completion default without interpreting missing data as success.
+    const quietStatus = derived(() => unwrap(state) === "complete" && !unwrap(statusLabel));
+    // One interactive header: activation never also toggles an in-place disclosure.
     const reveals = collapsible && onActivate === undefined;
     const interactive = reveals || onActivate !== undefined;
+    const payload = (kind: "input" | "output", text: MaybeSignal<string | undefined> | undefined) =>
+      context.part(
+        kind,
+        "div",
+        { hidden: derived(() => unwrap(text) === undefined) },
+        h(OutputBlock, {
+          title: copy[kind],
+          rows: derived(() => {
+            const value = unwrap(text);
+            return value === undefined || value === "" ? [] : value.split("\n");
+          }),
+          copyText: derived(() => unwrap(text) ?? ""),
+          emptyText: kind === "input" ? copy.emptyInput : copy.emptyOutput,
+          maxLines,
+          wrap: true,
+        }),
+      );
+    const hasBody =
+      children !== undefined ||
+      input !== undefined ||
+      output !== undefined ||
+      outputSummary !== undefined ||
+      onRetry !== undefined ||
+      onCancel !== undefined;
     return context.part(
       "root",
       reveals ? "details" : "div",
@@ -60,7 +159,7 @@ export const ChatToolCall = defineComponent<
         ...props,
         className,
         "data-tool-state": state,
-        "data-tool-default-complete": quietStatus ? "true" : undefined,
+        "data-tool-default-complete": derived(() => (quietStatus.value ? "true" : undefined)),
         "data-tool-interactive": interactive ? "true" : undefined,
         "data-tool-collapsible": reveals ? "true" : undefined,
       },
@@ -70,7 +169,14 @@ export const ChatToolCall = defineComponent<
         onActivate !== undefined ? { type: "button", onClick: onActivate } : null,
         context.part("icon", "span", { "aria-hidden": "true" }, icon ?? <Icon name="wrench" />),
         context.part("label", "strong", null, label),
-        summary ? context.part("summary", "span", { title: summary }, summary) : null,
+        summary !== undefined
+          ? context.part(
+              "summary",
+              "span",
+              { title: summary, hidden: derived(() => !unwrap(summary)) },
+              summary,
+            )
+          : null,
         context.part("status", "span", null, status),
         interactive
           ? context.part(
@@ -82,22 +188,57 @@ export const ChatToolCall = defineComponent<
           : null,
       ),
       detail ? context.part("detail", "p", null, detail) : null,
-      children ? context.part("body", "div", null, children) : null,
+      hasBody
+        ? context.part(
+            "body",
+            "div",
+            null,
+            input !== undefined ? payload("input", input) : null,
+            outputSummary !== undefined
+              ? context.part(
+                  "outputSummary",
+                  "p",
+                  { hidden: derived(() => !unwrap(outputSummary)) },
+                  outputSummary,
+                )
+              : null,
+            output !== undefined ? payload("output", output) : null,
+            children,
+            onRetry || onCancel
+              ? context.part(
+                  "actions",
+                  "div",
+                  {
+                    hidden: derived(
+                      () => !(onRetry && unwrap(canRetry)) && !(onCancel && unwrap(canCancel)),
+                    ),
+                  },
+                  onRetry ? (
+                    <Button
+                      variant="outline"
+                      size="small"
+                      hidden={derived(() => !unwrap(canRetry))}
+                      disabled={derived(() => !unwrap(canRetry) || unwrap(retryDisabled))}
+                      onClick={onRetry}
+                    >
+                      {copy.retry}
+                    </Button>
+                  ) : null,
+                  onCancel ? (
+                    <Button
+                      variant="quiet"
+                      size="small"
+                      hidden={derived(() => !unwrap(canCancel))}
+                      disabled={derived(() => !unwrap(canCancel) || unwrap(cancelDisabled))}
+                      onClick={onCancel}
+                    >
+                      {copy.cancel}
+                    </Button>
+                  ) : null,
+                )
+              : null,
+          )
+        : null,
     );
   },
 );
-
-function stateLabel(state: ChatToolCallState): string {
-  switch (state) {
-    case "running":
-      return "运行中";
-    case "waiting":
-      return "等待中";
-    case "error":
-      return "出错";
-    case "unknown":
-      return "结果未确认";
-    default:
-      return "已完成";
-  }
-}

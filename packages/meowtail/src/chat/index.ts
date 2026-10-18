@@ -22,6 +22,8 @@ export {
   type AssistantAttachment,
   type AssistantMessage,
   type AssistantMessagePart,
+  type AssistantToolPart,
+  type AssistantTaskPart,
   type AssistantProcessStep,
   type AssistantActivity,
   type AssistantWork,
@@ -63,8 +65,11 @@ export {
   ChatToolCall,
   type ChatToolCallProps,
   type ChatToolCallState,
+  type ChatToolCallLabels,
   chatToolCallContract,
 } from "./tool-call";
+export { ChatTask, chatTaskContract, type ChatTaskProps, type ChatTaskProgress } from "./task";
+export type { ChatExecutionState } from "../shared/execution-state";
 export { ChatProcess, chatProcessContract, type ChatProcessProps } from "./process";
 export { ChatQuestion, chatQuestionContract, type ChatQuestionProps } from "./question";
 export {

@@ -4,6 +4,7 @@ import { accentTokens } from "../palette";
 import { chatProcessContract } from "../../chat/process";
 import { chatSourcesContract } from "../../chat/sources";
 import { chatToolCallContract } from "../../chat/tool-call";
+import { outputBlockContract } from "../../components/output-block";
 
 /** How far the chat type scale sits above the 14px body the row metrics were drawn at. */
 const rowDelta = "--chat-row-delta";
@@ -70,6 +71,8 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatToolCallContract, "root")} {
+    container-type: inline-size;
+    min-width: 0;
     display: grid;
     gap: 0;
     margin-top: 0;
@@ -94,8 +97,10 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatToolCallContract, "status")} {
-    flex: 0 0 auto;
-    white-space: nowrap;
+    flex: 0 1 auto;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    min-width: 0;
     margin-left: 2px;
     color: ${uiTokens.mutedForeground};
     font-size: ${uiTokens.fontCaption};
@@ -109,9 +114,9 @@ export const chatRecordsStyles = css`
     font-weight: 400;
   }
 
-  /* With a separate target summary, the action name stays intact and the target yields space. */
+  /* Both the action and its target can yield to long state facts in constrained containers. */
   ${partSelector(chatToolCallContract, "header")}:has(> ${partSelector(chatToolCallContract, "summary")}) > ${partSelector(chatToolCallContract, "label")} {
-    flex-shrink: 0;
+    flex-shrink: 1;
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"] ${partSelector(chatToolCallContract, "status")} {
@@ -143,6 +148,31 @@ export const chatRecordsStyles = css`
     margin-inline-start: var(${rowIndent});
   }
 
+  ${partSelector(chatToolCallContract, "body")} {
+    display: grid;
+    gap: ${uiTokens.spaceGroup};
+    overflow-wrap: anywhere;
+  }
+  ${partSelector(chatToolCallContract, "root")} [hidden] {
+    display: none;
+  }
+  ${partSelector(chatToolCallContract, "outputSummary")} {
+    margin: 0;
+    color: ${uiTokens.foreground};
+  }
+  ${partSelector(chatToolCallContract, "actions")} {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: ${uiTokens.spaceGroup};
+  }
+  ${partSelector(chatToolCallContract, "input")} ${partSelector(outputBlockContract, "body")},
+  ${partSelector(chatToolCallContract, "output")} ${partSelector(outputBlockContract, "body")} {
+    max-height: 24rem;
+  }
+  ${partSelector(chatToolCallContract, "root")}[data-tool-state="success"] ${partSelector(chatToolCallContract, "status")} {
+    color: ${uiTokens.success};
+  }
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] {
     color: ${uiTokens.subtleForeground};
   }
@@ -319,8 +349,8 @@ export const chatRecordsStyles = css`
   ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "status")} {
     margin-left: 2px;
     font-size: ${uiTokens.fontCaption};
-    white-space: nowrap;
-    flex-shrink: 0;
+    white-space: normal;
+    flex-shrink: 1;
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"][data-tool-interactive="true"] ${partSelector(chatToolCallContract, "status")} {
@@ -359,7 +389,7 @@ export const chatRecordsStyles = css`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    flex: 1 1 auto;
+    flex: 1 1 0;
     color: inherit;
   }
 
@@ -382,6 +412,48 @@ export const chatRecordsStyles = css`
     overflow: hidden;
     clip-path: inset(50%);
     white-space: nowrap;
+  }
+
+  /* A narrow host gives each fact a readable line instead of making two thin text columns. */
+  @container (max-width: 400px) {
+    ${partSelector(chatToolCallContract, "header")} {
+      display: grid;
+      grid-template-columns: calc(${uiTokens.iconSize} + var(${rowDelta}, 0px)) minmax(0, 1fr);
+      align-items: start;
+      row-gap: 0;
+    }
+    ${partSelector(chatToolCallContract, "icon")} {
+      grid-column: 1;
+      grid-row: 1;
+      align-self: start;
+      margin-block-start: calc(
+        (
+            (${chatTokens.rowLine} + var(${rowDelta}, 0px)) -
+              (${uiTokens.iconSize} + var(${rowDelta}, 0px))
+          ) /
+          2
+      );
+    }
+    ${partSelector(chatToolCallContract, "label")},
+    ${partSelector(chatToolCallContract, "summary")},
+    ${partSelector(chatToolCallContract, "status")} {
+      grid-column: 2;
+      margin-inline-start: 0;
+    }
+    ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "chevron")} {
+      inset-block: auto;
+      top: calc(
+        (
+            (${chatTokens.rowLine} + var(${rowDelta}, 0px)) -
+              (${uiTokens.iconSize} + var(${rowDelta}, 0px))
+          ) /
+          2
+      );
+      margin-block: 0;
+    }
+    ${partSelector(chatToolCallContract, "summary")}::before {
+      display: none;
+    }
   }
 
   @media (pointer: coarse) {

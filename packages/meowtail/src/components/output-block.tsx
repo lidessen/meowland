@@ -1,4 +1,12 @@
-import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
+import {
+  defineComponent,
+  h,
+  type Child,
+  type ComponentContract,
+  type Props,
+  type MaybeSignal,
+  unwrap,
+} from "meowjsx";
 import { copyTextToClipboard } from "../clipboard";
 
 export const outputBlockContract = {
@@ -8,9 +16,11 @@ export const outputBlockContract = {
 
 export interface OutputBlockProps extends Props {
   title: Child;
-  rows: readonly Child[];
-  copyText: string;
+  rows: MaybeSignal<readonly Child[]>;
+  copyText: MaybeSignal<string>;
   maxLines?: number;
+  /** Wrap prose-like tool output; code and terminal output keep their existing horizontal scroll. */
+  wrap?: boolean;
   emptyText?: string;
   onCopy?: (text: string) => Promise<void>;
 }
@@ -29,7 +39,17 @@ export const OutputBlock = defineComponent<
   (typeof outputBlockContract.parts)[number]
 >(
   outputBlockContract,
-  ({ title, rows, copyText, maxLines, emptyText = "没有内容", onCopy, ...props }, context) => {
+  (
+    { title, rows, copyText, maxLines, wrap = false, emptyText = "没有内容", onCopy, ...props },
+    context,
+  ) => {
+    const derived = <T,>(read: () => T) => {
+      const value = context.signal(read());
+      context.effect(() => {
+        value.value = read();
+      });
+      return value;
+    };
     const feedback = context.signal("");
     const busy = context.signal(false);
     let disposed = false;
@@ -40,7 +60,7 @@ export const OutputBlock = defineComponent<
       if (busy.value) return;
       busy.value = true;
       try {
-        await (onCopy ?? copyTextToClipboard)(copyText);
+        await (onCopy ?? copyTextToClipboard)(unwrap(copyText));
         if (!disposed) feedback.value = "已复制";
       } catch {
         if (!disposed) feedback.value = "复制失败，请手动选择文本。";
@@ -48,40 +68,48 @@ export const OutputBlock = defineComponent<
         if (!disposed) busy.value = false;
       }
     };
-    const { head, tail, hidden } = outputWindow(rows.length, maxLines);
+    const window = derived(() => outputWindow(unwrap(rows).length, maxLines));
     const renderRows = (items: readonly Child[]) =>
       items.map((row) => context.part("line", "div", {}, row));
-    return context.part("root", "section", props, [
-      context.part("header", "div", {}, [
-        context.part("title", "div", {}, title),
-        context.part(
-          "actions",
-          "button",
-          { type: "button", disabled: busy, onClick: copy },
-          "复制",
-        ),
-      ]),
-      context.part(
-        "body",
-        "div",
-        { tabIndex: 0, "aria-label": "输出内容" },
-        rows.length === 0
-          ? emptyText
-          : [
-              renderRows(hidden ? rows.slice(0, head) : rows),
-              hidden
-                ? context.part("fold", "details", {}, [
-                    context.part("toggle", "summary", {}, [
-                      <span data-fold-closed>展开中间 {hidden} 行</span>,
-                      <span data-fold-open>收起中间行</span>,
-                    ]),
-                    renderRows(rows.slice(head, rows.length - tail)),
-                  ])
-                : null,
-              hidden ? renderRows(rows.slice(rows.length - tail)) : null,
-            ],
-      ),
-      context.part("feedback", "span", { role: "status", "aria-live": "polite" }, feedback),
-    ]);
+    return context.part(
+      "root",
+      "section",
+      { ...props, "data-output-wrap": wrap ? "true" : undefined },
+      [
+        context.part("header", "div", {}, [
+          context.part("title", "div", {}, title),
+          context.part(
+            "actions",
+            "button",
+            { type: "button", disabled: busy, onClick: copy },
+            "复制",
+          ),
+        ]),
+        context.part("body", "div", { tabIndex: 0, "aria-label": "输出内容" }, [
+          derived(() => {
+            const values = unwrap(rows);
+            return values.length === 0
+              ? emptyText
+              : renderRows(window.value.hidden ? values.slice(0, window.value.head) : values);
+          }),
+          context.part("fold", "details", { hidden: derived(() => window.value.hidden === 0) }, [
+            context.part("toggle", "summary", {}, [
+              <span data-fold-closed>{derived(() => `展开中间 ${window.value.hidden} 行`)}</span>,
+              <span data-fold-open>收起中间行</span>,
+            ]),
+            derived(() => {
+              const values = unwrap(rows);
+              return window.value.hidden
+                ? renderRows(values.slice(window.value.head, values.length - window.value.tail))
+                : null;
+            }),
+          ]),
+          derived(() =>
+            window.value.hidden ? renderRows(unwrap(rows).slice(-window.value.tail)) : null,
+          ),
+        ]),
+        context.part("feedback", "span", { role: "status", "aria-live": "polite" }, feedback),
+      ],
+    );
   },
 );

@@ -8,6 +8,7 @@ import { presentationLayoutContract } from "../presentation/layout";
 import { presentationTextContract } from "../presentation/presentation-text";
 import { presentationListContract } from "../presentation/list";
 import { presentationImageContract } from "../presentation/image";
+import { chatTaskContract } from "../chat/task";
 import { defaultRuntime, type ComponentContract, type Runtime, type RuntimePlugin } from "meowjsx";
 import { pillContract } from "../components/pill";
 import { pageFrameContract } from "../components/page-frame";
@@ -217,6 +218,7 @@ export const MeowUIComponent = {
   ChatMessageActions: chatMessageActionsContract.name,
   ChatComposer: chatComposerContract.name,
   ChatToolCall: chatToolCallContract.name,
+  ChatTask: chatTaskContract.name,
   StatusDot: statusDotContract.name,
   Status: statusContract.name,
   Tag: tagContract.name,
@@ -338,6 +340,7 @@ export const meowUIComponents = [
   chatMessageActionsContract,
   chatComposerContract,
   chatToolCallContract,
+  chatTaskContract,
   statusDotContract,
   statusContract,
   tagContract,
@@ -464,6 +467,7 @@ declare module "meowjsx" {
       parts: (typeof chatComposerContract.parts)[number];
     };
     "chat-tool-call": { parts: (typeof chatToolCallContract.parts)[number] };
+    "chat-task": { parts: (typeof chatTaskContract.parts)[number] };
     "status-dot": { parts: (typeof statusDotContract.parts)[number] };
     status: { parts: (typeof statusContract.parts)[number] };
     tag: { parts: (typeof tagContract.parts)[number] };

@@ -44,6 +44,14 @@ export const outputBlockStyles = css`
     min-height: 22px;
     white-space: pre;
   }
+  ${partSelector(block, "root")}[data-output-wrap="true"] ${partSelector(block, "line")},
+  ${partSelector(block, "root")}[data-output-wrap="true"] ${partSelector(block, "fold")} {
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  ${partSelector(block, "fold")}[hidden] {
+    display: none;
+  }
   ${partSelector(block, "fold")} {
     white-space: pre;
   }

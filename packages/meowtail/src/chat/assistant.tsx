@@ -220,7 +220,12 @@ export const AssistantView = defineComponent<
   const transcript = keyed(
     messages,
     (message) => message.id,
-    (value) => h(AssistantMessageView, { value, renderPart: options.renderPart }),
+    (value) =>
+      h(AssistantMessageView, {
+        value,
+        renderPart: options.renderPart,
+        onToolAction: options.onToolAction,
+      }),
   );
   const messageRegion = context.part(
     "messages",
@@ -502,6 +507,8 @@ export type {
   AssistantAttachment,
   AssistantMessage,
   AssistantMessagePart,
+  AssistantToolPart,
+  AssistantTaskPart,
   AssistantProcessStep,
   AssistantActivity,
   AssistantWork,

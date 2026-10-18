@@ -2,6 +2,7 @@ import type { Child, MaybeSignal, Props } from "meowjsx";
 import type { ChatAttachmentItem } from "./attachments";
 import type { ChatMessageRole, ChatMessageStatus } from "./message";
 import type { StatusDotState } from "../components/status-dot";
+import type { ChatExecutionState } from "../shared/execution-state";
 
 export interface AssistantAttachment extends Omit<ChatAttachmentItem, "onRemove"> {
   /** Optional local source. The component never uploads or persists files. */
@@ -21,7 +22,42 @@ export interface AssistantProcessStep {
   tone?: StatusDotState;
 }
 
+/** Serializable tool data. Actions only notify the host; they never execute the tool. */
+export interface AssistantToolPart {
+  id: string;
+  kind: "tool";
+  label: string;
+  summary?: string;
+  state?: ChatExecutionState;
+  statusLabel?: string;
+  input?: string;
+  output?: string;
+  outputSummary?: string;
+  maxLines?: number;
+  defaultOpen?: boolean;
+  canRetry?: boolean;
+  canCancel?: boolean;
+  retryDisabled?: boolean;
+  cancelDisabled?: boolean;
+}
+
+/** Execution and reply facts are independent, including after a task succeeds. */
+export interface AssistantTaskPart {
+  id: string;
+  kind: "task";
+  title: string;
+  state: ChatExecutionState;
+  statusLabel?: string;
+  description?: string;
+  executionText?: string;
+  replyText?: string;
+  progress?: { value: number; max: number; label: string };
+  steps?: readonly AssistantProcessStep[];
+}
+
 export type AssistantMessagePart =
+  | AssistantToolPart
+  | AssistantTaskPart
   | { id: string; kind: "text"; text: string }
   | { id: string; kind: "code"; code: string; language?: string }
   | {
@@ -114,6 +150,8 @@ export interface AssistantViewProps extends Props {
   onReasoningChange?: (value: string) => void;
   onAnswer?: (questionId: string, answer: string) => void | Promise<void>;
   onDismissQuestion?: (questionId: string) => void;
+  /** An explicit host intent. The host owns availability, execution and subsequent state. */
+  onToolAction?: (messageId: string, partId: string, action: "retry" | "cancel") => void;
   onRefreshWork?: (workId: string) => void;
   onLoadOlder?: () => void;
   loadingOlder?: MaybeSignal<boolean>;

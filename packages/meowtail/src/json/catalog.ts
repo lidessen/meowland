@@ -32,6 +32,17 @@ const step = s.object({
   tone: optional(tone),
 });
 const steps = s.array(step);
+const executionState = s.enum(
+  "queued",
+  "running",
+  "waiting",
+  "success",
+  "error",
+  "cancelled",
+  "unknown",
+  "complete",
+);
+const taskProgress = s.object({ value: s.number(), max: s.number(), label: s.string() });
 const part = s.union(
   s.object({ id: s.string(), kind: s.enum("text"), text: s.string() }),
   s.object({
@@ -49,6 +60,35 @@ const part = s.union(
     defaultOpen: optional(s.boolean()),
   }),
   s.object({ id: s.string(), kind: s.enum("attachments"), items: s.array(attachment) }),
+  s.object({
+    id: s.string(),
+    kind: s.enum("tool"),
+    label: s.string(),
+    summary: optional(s.string()),
+    state: optional(executionState),
+    statusLabel: optional(s.string()),
+    input: optional(s.string()),
+    output: optional(s.string()),
+    outputSummary: optional(s.string()),
+    maxLines: optional(s.number()),
+    defaultOpen: optional(s.boolean()),
+    canRetry: optional(s.boolean()),
+    canCancel: optional(s.boolean()),
+    retryDisabled: optional(s.boolean()),
+    cancelDisabled: optional(s.boolean()),
+  }),
+  s.object({
+    id: s.string(),
+    kind: s.enum("task"),
+    title: s.string(),
+    state: executionState,
+    statusLabel: optional(s.string()),
+    description: optional(s.string()),
+    executionText: optional(s.string()),
+    replyText: optional(s.string()),
+    progress: optional(taskProgress),
+    steps: optional(steps),
+  }),
 ) satisfies JsonSchema<AssistantMessagePart>;
 const message = s.object({
   id: s.string(),
@@ -103,6 +143,8 @@ export const assistantJsonSchemas = Object.freeze({
   work,
   question,
   choice,
+  executionState,
+  taskProgress,
 });
 const value = <T>(schema: JsonSchema<T>) => ({ kind: "value" as const, schema });
 const binding = <T>(schema: JsonSchema<T>) => ({
@@ -140,6 +182,7 @@ const assistant = defineJsonComponent<AssistantViewProps>(AssistantView, {
   onReasoningChange: action(s.string()),
   onAnswer: action(s.string(), s.string()),
   onDismissQuestion: action(s.string()),
+  onToolAction: action(s.string(), s.string(), s.enum("retry", "cancel")),
   onRefreshWork: action(s.string()),
   onLoadOlder: action(),
   loadingOlder: binding(s.boolean()),

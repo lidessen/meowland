@@ -110,6 +110,12 @@ test("activity and reduced motion cancel current or pending entrances without re
   await jump(page, "experiment", 2);
   expect(await animations(page)).toBe(0);
   await page.emulateMedia({ reducedMotion: "no-preference" });
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
   expect(await animations(page)).toBe(0);
   await page.evaluate(async () => {
     window.presentationTest.jump(0, { slideId: "discussion", step: 0 });
@@ -120,6 +126,54 @@ test("activity and reduced motion cancel current or pending entrances without re
     await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
   });
   expect(await animations(page)).toBe(0);
+});
+
+test("reduced motion cannot queue an entrance that replays after the preference is restored", async ({
+  page,
+}) => {
+  await page.goto("/?chrome=single&transition=slide");
+  for (let iteration = 0; iteration < 5; iteration++) {
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await jump(page, iteration % 2 ? "experiment" : "discussion");
+    await page.emulateMedia({ reducedMotion: "no-preference" });
+    await page.evaluate(
+      () =>
+        new Promise<void>((resolve) =>
+          requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+        ),
+    );
+    expect(await animations(page)).toBe(0);
+    await expect(first(page).locator(slide)).toHaveCSS("opacity", "1");
+  }
+});
+
+test("a reduce change cancels a queued entrance even if restored before its frame", async ({
+  page,
+}) => {
+  // Dispatch a real preference-list change before the pending frame, without
+  // relying on the browser's preference notification scheduling between frames.
+  await page.addInitScript(() => {
+    const nativeMatchMedia = window.matchMedia.bind(window);
+    const motion = nativeMatchMedia("(prefers-reduced-motion: reduce)");
+    window.matchMedia = (query) => (query === motion.media ? motion : nativeMatchMedia(query));
+  });
+  await page.goto("/?chrome=single&transition=slide");
+  await page.evaluate(async () => {
+    window.presentationTest.jump(0, { slideId: "discussion", step: 0 });
+    await Promise.resolve();
+    const preference = matchMedia("(prefers-reduced-motion: reduce)");
+    preference.dispatchEvent(
+      new MediaQueryListEvent("change", { matches: true, media: preference.media }),
+    );
+    preference.dispatchEvent(
+      new MediaQueryListEvent("change", { matches: false, media: preference.media }),
+    );
+    await new Promise<void>((resolve) =>
+      requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+    );
+  });
+  expect(await animations(page)).toBe(0);
+  await expect(first(page).locator(slide)).toHaveCSS("opacity", "1");
 });
 
 test("dynamic text waits for Reveal movement before diagnosing logical overflow", async ({

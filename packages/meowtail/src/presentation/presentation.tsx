@@ -127,6 +127,7 @@ export const Presentation = defineComponent<
     let currentId = position.value.slideId;
     let currentEnabled = context.signal(true);
     const motion = entranceMotion(context, activity);
+    let reducedMotion: MediaQueryList | undefined;
     let entranceFrame: number | undefined;
     let navigationGeneration = 0;
     const cancelEntrance = () => {
@@ -201,7 +202,7 @@ export const Presentation = defineComponent<
       );
       // Rendering is flushed before the next frame. A superseded navigation must
       // never decorate a page that has already stopped or been replaced.
-      if (activity.value)
+      if (activity.value && !reducedMotion?.matches)
         entranceFrame = stage?.ownerDocument.defaultView?.requestAnimationFrame(() => {
           entranceFrame = undefined;
           if (generation !== navigationGeneration || currentId !== position.value.slideId) return;
@@ -280,6 +281,11 @@ export const Presentation = defineComponent<
             },
             ref: (element: HTMLElement) => {
               const document = element.ownerDocument;
+              reducedMotion = document.defaultView?.matchMedia("(prefers-reduced-motion: reduce)");
+              const updateMotionPreference = (event: MediaQueryListEvent) => {
+                if (event.matches) cancelEntrance();
+              };
+              reducedMotion?.addEventListener("change", updateMotionPreference);
               const updateVisibility = () => {
                 visible.value = document.visibilityState !== "hidden";
               };
@@ -289,6 +295,8 @@ export const Presentation = defineComponent<
               try {
                 hostCleanup = typeof props.ref === "function" ? props.ref(element) : undefined;
               } catch (error) {
+                reducedMotion?.removeEventListener("change", updateMotionPreference);
+                reducedMotion = undefined;
                 document.removeEventListener("visibilitychange", updateVisibility);
                 visible.value = false;
                 throw error;
@@ -297,6 +305,8 @@ export const Presentation = defineComponent<
                 try {
                   if (typeof hostCleanup === "function") hostCleanup();
                 } finally {
+                  reducedMotion?.removeEventListener("change", updateMotionPreference);
+                  reducedMotion = undefined;
                   document.removeEventListener("visibilitychange", updateVisibility);
                   visible.value = false;
                 }

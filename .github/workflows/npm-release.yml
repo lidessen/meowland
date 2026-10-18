@@ -1,0 +1,98 @@
+name: Publish npm packages
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: Full source SHA, equal to main and this workflow run
+        required: true
+        type: string
+      packages:
+        description: Explicit comma-separated meowjsx,meowcss,meowtail,meowbook subset
+        required: true
+        type: string
+      channel:
+        description: Explicit npm distribution channel
+        required: true
+        type: choice
+        options: [alpha, stable]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: npm-publish
+  cancel-in-progress: false
+
+jobs:
+  prepare:
+    if: github.repository == 'lidessen/meowland' && github.ref == 'refs/heads/main' && inputs.source_sha == github.sha
+    runs-on: ubuntu-latest
+    env:
+      SOURCE_SHA: ${{ inputs.source_sha }}
+      PACKAGES: ${{ inputs.packages }}
+      CHANNEL: ${{ inputs.channel }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - run: bun run build
+      - run: bun run check
+      - name: Pack the exact source and inspect the batch
+        run: bun scripts/release-prepare.ts --commit "$SOURCE_SHA" --packages "$PACKAGES" --channel "$CHANNEL" --out artifacts/npm-release
+      - name: Verify an isolated tarball consumer
+        run: bun scripts/release-consumer.ts --manifest artifacts/npm-release/release-input.json --packages "$PACKAGES" --out artifacts/npm-release/consumer-receipt.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npm-release-${{ github.sha }}
+          path: artifacts/npm-release/
+          if-no-files-found: error
+          retention-days: 30
+
+  publish:
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      SOURCE_SHA: ${{ inputs.source_sha }}
+      PACKAGES: ${{ inputs.packages }}
+      CHANNEL: ${{ inputs.channel }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - run: npm install --global npm@11.21.0 --ignore-scripts
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - uses: actions/download-artifact@v4
+        with:
+          name: npm-release-${{ github.sha }}
+          path: artifacts/npm-release
+      - name: Publish inspected bytes through npm OIDC
+        shell: bash
+        run: |
+          set -o pipefail
+          bun run release --manifest artifacts/npm-release/release-input.json --packages "$PACKAGES" --channel "$CHANNEL" --execute | tee artifacts/npm-release/publication.log
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: npm-publication-${{ github.run_id }}-${{ github.run_attempt }}
+          path: artifacts/npm-release/
+          if-no-files-found: warn
+          retention-days: 30

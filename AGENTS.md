@@ -17,4 +17,4 @@
 
 检查命令及覆盖范围见[开发检查](docs/development-checks.md)。视觉和交互变化实际打开对应场景；静态检查、行为观察、安装态验收与正式发布分别报告。必要检查成立后，只为新改动、失败或未决风险补测，不用重复全矩阵代替判断。
 
-发布合同见[本地发布](docs/releasing.md)。Actions 只做 build/lint，不发布或部署；构建、打包、tag 或 draft Release 都不等于完成发布。提交、推送与真实发布仍按本次任务授权执行。
+发布合同见[本地发布](docs/releasing.md)。普通 push/PR 的 Actions 只做 build/lint；npm 发布仅走用户已授权的手动 workflow_dispatch + Trusted Publishing OIDC，不部署；构建、打包、tag 或 draft Release 都不等于完成发布。提交、推送与真实发布仍按本次任务授权执行。

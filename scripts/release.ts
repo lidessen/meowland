@@ -6,6 +6,9 @@ import { gt, prerelease, satisfies, valid, validRange } from "semver";
 import { tmpdir } from "node:os";
 
 export type Channel = "stable" | "alpha";
+export const publishNames = ["meowjsx", "meowcss", "meowtail", "meowbook"];
+export const workflow = "npm-release.yml";
+export const repository = "lidessen/meowland";
 const names = ["meowjsx", "meowcss", "meowtail", "meowslides", "meowbook", "meowpress"];
 // Historical inputs remain readable, but retired packages cannot be selected for release.
 const reviewedNames = [...names, "meowui"];
@@ -47,9 +50,38 @@ const text = (result: Result) => decoder.decode(result.stdout).trim();
 function assert(value: unknown, message: string): asserts value {
   if (!value) throw new Error(message);
 }
-/** npm runs without project/global/user auth or npm_config_* environment overrides. */
+/** OIDC is the only publishing credential; never fall back to saved npm auth. */
 export function npmEnvironment(source: NodeJS.ProcessEnv) {
-  return Object.fromEntries(Object.entries(source).filter(([key]) => !/^npm_config_/i.test(key)));
+  return Object.fromEntries(
+    Object.entries(source).filter(
+      ([key]) =>
+        !/^npm_config_/i.test(key) &&
+        !["NPM_TOKEN", "NODE_AUTH_TOKEN", "NPM_AUTH_TOKEN", "NPM_ID_TOKEN"].includes(
+          key.toUpperCase(),
+        ),
+    ),
+  );
+}
+export function assertOIDC(source?: string, env: NodeJS.ProcessEnv = process.env) {
+  assert(
+    env.GITHUB_ACTIONS === "true" && env.RUNNER_ENVIRONMENT === "github-hosted",
+    "Publishing requires a GitHub-hosted Actions runner",
+  );
+  assert(
+    env.GITHUB_REPOSITORY === repository &&
+      env.GITHUB_EVENT_NAME === "workflow_dispatch" &&
+      env.GITHUB_REF === "refs/heads/main" &&
+      env.GITHUB_WORKFLOW_REF === `${repository}/.github/workflows/${workflow}@refs/heads/main`,
+    "Publishing requires the approved manual main workflow",
+  );
+  assert(
+    /^[a-f0-9]{40}$/.test(env.GITHUB_SHA ?? "") && (!source || source === env.GITHUB_SHA),
+    "Source SHA must equal the workflow SHA",
+  );
+  assert(
+    Boolean(env.ACTIONS_ID_TOKEN_REQUEST_URL) && Boolean(env.ACTIONS_ID_TOKEN_REQUEST_TOKEN),
+    "OIDC request context is missing; grant id-token: write to the publishing job",
+  );
 }
 export const run: Runner = async (args, cwd) => {
   if (args[0] === "registry") {
@@ -71,9 +103,15 @@ export const run: Runner = async (args, cwd) => {
   }
   let isolated: string | undefined;
   let env: NodeJS.ProcessEnv | undefined;
-  if (basename(args[0] ?? "") === "npm") {
-    assert(Boolean(process.env.NPM_TOKEN), "Set NPM_TOKEN in the local publishing environment");
+  const npm = basename(args[0] ?? "") === "npm";
+  if (npm) {
+    assert(
+      args[1] === "publish" || (args[1] === "dist-tag" && args[2] === "add"),
+      "Unsupported OIDC operation",
+    );
+    assertOIDC();
     isolated = await mkdtemp(join(tmpdir(), "meowland-npm-"));
+    await writeFile(join(isolated, "user.npmrc"), "");
     await writeFile(join(isolated, "global.npmrc"), "");
     cwd = isolated;
     env = npmEnvironment(process.env);
@@ -82,7 +120,7 @@ export const run: Runner = async (args, cwd) => {
       "--registry",
       registry,
       "--userconfig",
-      resolve(import.meta.dir, "npmrc"),
+      join(isolated, "user.npmrc"),
       "--globalconfig",
       join(isolated, "global.npmrc"),
       "--ignore-scripts",
@@ -96,8 +134,7 @@ export const run: Runner = async (args, cwd) => {
       new Response(child.stderr).text(),
       child.exited,
     ]);
-    // npm diagnostics can contain account/config data; never forward them to logs.
-    return { code, stdout: new Uint8Array(stdout), stderr: isolated ? "" : stderr };
+    return { code, stdout: new Uint8Array(stdout), stderr: npm ? "" : stderr };
   } finally {
     if (isolated) await rm(isolated, { recursive: true, force: true });
   }
@@ -107,7 +144,7 @@ async function checked(runner: Runner, args: string[], cwd: string) {
   assert(
     result.code === 0,
     args[0] === "npm"
-      ? `npm ${args[1]} failed (exit ${result.code}); verify token permissions, registry availability and 2FA outside this script`
+      ? `npm ${args[1]} failed (exit ${result.code}); verify trusted publisher configuration, allowed actions and registry availability`
       : `${args[0]} ${args[1]} failed (exit ${result.code}): ${result.stderr || text(result)}`,
   );
   return result;
@@ -247,6 +284,18 @@ export async function inspect(
       const bundled = text(await checked(runner, ["tar", "-xOf", path, "package/LICENSE"], root));
       if (bundled !== license.trim()) blockers.push(`Bundled LICENSE differs from root: ${name}`);
     }
+    if (publishNames.includes(name)) {
+      const expectedURL = `git+https://github.com/${input.repository}.git`;
+      assert(
+        local.repository?.url === expectedURL &&
+          packed.repository?.url === expectedURL &&
+          local.repository?.type === "git" &&
+          packed.repository?.type === "git" &&
+          local.repository?.directory === `packages/${name}` &&
+          packed.repository?.directory === `packages/${name}`,
+        `Repository metadata must match the reviewed source: ${name}`,
+      );
+    }
     const targets = [...exportedFiles(packed.exports), ...exportedFiles(packed.bin)];
     assert(
       targets.length > 0 &&
@@ -336,19 +385,6 @@ function publishOrder(packages: Package[]) {
   return ordered;
 }
 
-async function npmJSON(runner: Runner, root: string, args: string[]) {
-  const response = await runner(["npm", ...args, "--json"], root);
-  let value;
-  try {
-    value = JSON.parse(text(response));
-  } catch {
-    throw new Error(`npm ${args[0]} returned invalid JSON (exit ${response.code})`);
-  }
-  if (response.code === 0) return value;
-  throw new Error(
-    `npm ${args[0]} read failed (exit ${response.code}); check registry/auth outside this script`,
-  );
-}
 async function unchanged(plan: Plan, runner: Runner) {
   assert(
     text(await checked(runner, ["git", "rev-parse", "HEAD"], plan.root)) === plan.toolCommit,
@@ -422,30 +458,14 @@ export async function release(
   plan: Plan,
   runner: Runner = run,
   mode: "check" | "execute" = "execute",
+  onVerified: (record: Record<string, unknown>) => void = () => {},
 ) {
   assert(plan.blockers.length === 0, plan.blockers.join("\n"));
   await unchanged(plan, runner);
-  const identity = await npmJSON(runner, plan.root, ["whoami"]);
-  assert(
-    typeof identity === "string" && /^[a-z0-9][a-z0-9._-]*$/i.test(identity),
-    "Invalid npm identity",
-  );
-  const access = await npmJSON(runner, plan.root, ["access", "list", "packages", identity]);
-  assert(
-    access && typeof access === "object" && !Array.isArray(access),
-    "Invalid npm access response",
-  );
   const states: { item: Package; exists: boolean; tags: Record<string, string> }[] = [];
   for (const item of plan.packages) {
     const packageMetadata = await metadata(runner, plan.root, item.name);
     const tags = tagsOf(packageMetadata);
-    if (packageMetadata !== null) {
-      assert(packageMetadata.name === item.name, `Unexpected registry identity: ${item.name}`);
-      assert(
-        access[item.name] === "read-write",
-        `Account lacks visible write access: ${item.name}`,
-      );
-    }
     const current = tags[plan.distTag];
     assert(
       !current || !gt(current, item.version),
@@ -515,13 +535,22 @@ export async function release(
         after.latest === state.tags.latest,
         `latest changed during alpha release: ${item.name}; investigate without automatic rollback`,
       );
+    onVerified({
+      name: item.name,
+      version: item.version,
+      integrity: item.integrity,
+      distTag: plan.distTag,
+      latestBefore: state.tags.latest ?? null,
+      latestAfter: after.latest ?? null,
+      action: state.exists ? "reuse" : "publish",
+    });
   }
 }
 
 export async function main(args: string[]) {
   if (args.length === 1 && args[0] === "--help") {
     console.log(
-      "Usage: bun run release --manifest <reviewed.json> --packages <name,name> [--channel stable|alpha] [--check | --execute]\nDefault: local-only dry-run. --check reads registry/auth; --execute publishes exact reviewed bytes. alpha never targets latest. Requires local NPM_TOKEN for either registry mode.",
+      "Usage: bun run release --manifest <reviewed.json> --packages <name,name> [--channel stable|alpha] [--check | --execute]\nDefault: local-only dry-run. --check reads public registry metadata; --execute publishes exact reviewed bytes. alpha never targets latest. Execution requires the approved manual GitHub Actions OIDC workflow; use release:dispatch locally.",
     );
     return;
   }
@@ -572,7 +601,7 @@ export async function main(args: string[]) {
         })),
         blockers: plan.blockers,
         remoteState: mode
-          ? "Checking registry; account visibility does not prove token publish/2FA permission"
+          ? "Checking registry; OIDC trust is verified only by the intended publish/tag operation"
           : "Not checked; dry-run uses no registry or credentials",
       },
       null,
@@ -580,7 +609,11 @@ export async function main(args: string[]) {
     ),
   );
   assert(plan.blockers.length === 0, plan.blockers.join("\n"));
-  if (mode) await release(plan, run, mode);
+  if (mode === "execute") {
+    assertOIDC(plan.input.commit);
+    assert(plan.toolCommit === plan.input.commit, "Tool/source SHA must match in Actions");
+  }
+  if (mode) await release(plan, run, mode, (verified) => console.log(JSON.stringify({ verified })));
 }
 if (import.meta.main)
   main(process.argv.slice(2)).catch((error) => {

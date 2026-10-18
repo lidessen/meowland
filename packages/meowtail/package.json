@@ -61,5 +61,10 @@
     "meowjsx": "workspace:*",
     "meowcss": "workspace:*",
     "meowbook": "workspace:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lidessen/meowland.git",
+    "directory": "packages/meowtail"
   }
 }

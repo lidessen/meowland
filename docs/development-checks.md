@@ -41,7 +41,9 @@ Protecting pandas 为另一独立课件，入口与构建/浏览器检查见[熊
 
 ## CI 与发行验证
 
-`.github/workflows/checks.yml` 是唯一工程 workflow，仅在 main push、pull request 或手动触发时执行 frozen install → build → lint。它不执行完整本地 check，也不执行格式检查、单测、浏览器、打包、tag 发布、npm 发布或部署；只有只读 repository 权限。
+`.github/workflows/checks.yml` 是工程检查 workflow，仅在 main push、pull request 或手动触发时执行 frozen install → build → lint。它不执行完整本地 check，也不执行格式检查、单测、浏览器、打包、tag 发布、npm 发布或部署；只有只读 repository 权限。
+
+`.github/workflows/npm-release.yml` 是用户明确授权的独立手动发布入口，普通 push/PR 不触发；只在 publish job 取得 OIDC 权限，按精确 SHA 和选包执行检查、tarball 消费验收、npm 发布。细节以[发布合同](releasing.md)为准；本地配置通过不等于 workflow、npm trust 或 Billing 实际可用。
 
 需要本地完整工程检查时执行 `bun run check`。UI/交互改动仍须按受影响场景实际打开页面；公开 exports、资源或打包改动须另做 build → pack → 独立目录安装消费。旧 tgz 的成功属于当时源码，不因为后续格式或工程配置改变而自动升级为本版发行验收。
 

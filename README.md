@@ -41,7 +41,7 @@ bun run pack
 
 ## 发布状态
 
-当前操作采用[本地 npm 发布](docs/releasing.md)：显式选包、独立版本；测试版使用 `alpha`，稳定版使用 `latest`。脚本不再管理 GitHub Release，以下已完成发行仍保留历史事实。本轮四包 alpha 为本地候选，尚未发布。
+当前操作采用[手动 Actions + npm OIDC 发布](docs/releasing.md)：显式选包、独立版本；测试版使用 `alpha`，稳定版使用 `latest`。普通 push 只检查，发布由手动 workflow 触发，不依赖长期 npm token。脚本不管理 GitHub Release，以下已完成发行仍保留历史事实。本轮四包 alpha 为本地候选，尚未发布。
 
 公开源码仓库为 [lidessen/meowland](https://github.com/lidessen/meowland)。当前正式版本为 `meowjsx@0.1.0`、`meowcss@0.1.0`、`meowtail@0.1.0`、`meowbook@0.1.1`、`meowpress@0.1.0`，均已完成 npm 发布、独立 registry 安装验收和正式 GitHub Release。JSX/CSS 原 tag 与资产保持不变；本批精确候选、产物与验收范围见[发布回执](docs/records/2026-10-17-tail-book-press-publish.md)。
 

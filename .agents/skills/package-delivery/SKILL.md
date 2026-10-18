@@ -21,7 +21,7 @@ exports 的 JS 与 types 都指向正式包内产物；浏览器入口不夹 Bun
 
 维护者或 Agent 准备受影响包的源 manifest 独立版本、依赖范围与发布说明，按[本地发布](../../../docs/releasing.md)当前合同执行；不要求每个 commit、PR 或纯文档改动都生成版本记录。build/pack 并验收选定产物后，在 release manifest 显式列出包与目标版本，交本地唯一发布脚本核对源 manifest、tarball、目标和依赖范围。脚本不推断版本联动，技能不另编版本算法、固定版本组、命令表或发布账本。
 
-Actions 只做 build/lint，不发 npm、不部署，也不以 tag 自动发布。只有本次任务已授权真实发布时才进入脚本的执行模式；否则停在其本地 dry-run/只读计划。选定版本与 tarball 不因进入发布阶段重新打包。alpha 与稳定版使用发布合同中的显式 dist-tag；本地脚本不再管理 Git tag/GitHub Release。中断恢复沿同一已核身份接续，不覆盖已发版本或盲目重发。
+普通 push/PR 的 Actions 只做 build/lint，不部署，也不以 tag 自动发布；npm 发行仅走用户已明确授权的手动 workflow_dispatch + Trusted Publishing OIDC。只有本次任务已授权真实发布时才进入脚本的执行模式；否则停在其本地 dry-run/只读计划；配置 npm trust、推送和触发发布分别按本次授权执行。选定版本与 tarball 不因进入发布阶段重新打包。alpha 与稳定版使用发布合同中的显式 dist-tag；本地脚本不再管理 Git tag/GitHub Release。中断恢复沿同一已核身份接续，不覆盖已发版本或盲目重发。
 
 名称可查询、代码已有许可决定或本地包可用，都不自动提供当前账号的发布权。当前阻断从根 README、发布合同与实际回执读取，不把一次工具拒绝或历史 npm 查询写成永久规范。保留第三方许可，既定用户决定不因技能示例被改写。
 

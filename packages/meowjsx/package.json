@@ -44,5 +44,10 @@
       "types": "./dist/src/json/index.d.ts",
       "import": "./dist/src/json/index.js"
     }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lidessen/meowland.git",
+    "directory": "packages/meowjsx"
   }
 }

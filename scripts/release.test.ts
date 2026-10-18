@@ -4,6 +4,7 @@ import { chmod, mkdtemp, mkdir, readFile, rm, writeFile } from "node:fs/promises
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import {
+  assertOIDC,
   inspect,
   main,
   npmEnvironment,
@@ -57,6 +58,11 @@ async function fixture(
       name,
       version,
       license: "MIT",
+      repository: {
+        type: "git",
+        url: "git+https://github.com/example/meowland.git",
+        directory: `packages/${name}`,
+      },
       exports: { ".": "./dist/index.js" },
       ...(name === "meowcss"
         ? {
@@ -245,14 +251,14 @@ test("stable explicitly uses latest and check never mutates", async () => {
 });
 
 test("all packages preflight before mutation; conflicts and tag downgrades fail closed", async () => {
-  for (const problem of ["bytes", "newer", "auth", "withdrawn", "dependency"] as const) {
+  for (const problem of ["bytes", "newer", "registry", "withdrawn", "dependency"] as const) {
     const { plan, local } = await fixture(2, "^1.0.0", "1.2.3", false);
     const remote = external(plan, local);
     const second = plan.packages[1]!;
     if (problem === "bytes") remote.published.set(second.tag, "sha512-different");
     if (problem === "newer") remote.tags.get(second.name)!.latest = "2.0.0";
     const runner: Runner = (args, cwd) => {
-      if (problem === "auth" && args[1] === "access")
+      if (problem === "registry" && args[0] === "registry")
         return Promise.resolve(result('{"error":{"code":"E403"}}', 1));
       if (problem === "withdrawn" && args[0] === "registry" && args[2] === second.name)
         return Promise.resolve(
@@ -355,7 +361,7 @@ test("npm environment drops config overrides without reading or exposing credent
     NPM_CONFIG_USERCONFIG: "/wrong",
     npm_config__authToken: "wrong",
   });
-  expect(env).toEqual({ PATH: "/tools", NPM_TOKEN: "fixture-placeholder" });
+  expect(env).toEqual({ PATH: "/tools" });
 });
 
 test("candidate Git files stay exact under a newer tool commit without consuming untracked data", async () => {
@@ -415,7 +421,25 @@ test("candidate Git files stay exact under a newer tool commit without consuming
   expect(unrelated.blockers).toEqual(["Reviewed commit is not an ancestor of the tool commit"]);
 });
 
-test("real subprocess isolates npm configuration and never uses the repository cwd", async () => {
+const oidc = {
+  GITHUB_ACTIONS: "true",
+  RUNNER_ENVIRONMENT: "github-hosted",
+  GITHUB_REPOSITORY: "lidessen/meowland",
+  GITHUB_EVENT_NAME: "workflow_dispatch",
+  GITHUB_REF: "refs/heads/main",
+  GITHUB_SHA: commit,
+  GITHUB_WORKFLOW_REF: "lidessen/meowland/.github/workflows/npm-release.yml@refs/heads/main",
+  ACTIONS_ID_TOKEN_REQUEST_URL: "https://fixture.invalid",
+  ACTIONS_ID_TOKEN_REQUEST_TOKEN: "fixture-placeholder",
+};
+test("OIDC context fails closed outside the approved exact-source manual workflow", () => {
+  assertOIDC(commit, oidc);
+  for (const key of Object.keys(oidc))
+    expect(() => assertOIDC(commit, { ...oidc, [key]: "" })).toThrow();
+  expect(() => assertOIDC("b".repeat(40), oidc)).toThrow("SHA");
+});
+
+test("real subprocess excludes saved/token auth while preserving OIDC", async () => {
   const directory = await mkdtemp(join(tmpdir(), "meowland-npm-isolation-"));
   temporary.push(directory);
   const executable = join(directory, "npm");
@@ -429,37 +453,42 @@ const flag = (name) => args[args.indexOf(name) + 1];
 console.log(JSON.stringify({
   isolated: process.cwd() !== ${JSON.stringify(directory)},
   configOverrides: Object.keys(process.env).some((key) => /^npm_config_/i.test(key)),
+  traditionalAuth: ['NPM_TOKEN','NODE_AUTH_TOKEN','NPM_AUTH_TOKEN','NPM_ID_TOKEN'].some(key=>Boolean(process.env[key])),
+  oidcPresent: Boolean(process.env.ACTIONS_ID_TOKEN_REQUEST_TOKEN),
   globalEmpty: await readFile(flag('--globalconfig'), 'utf8') === '',
-  template: (await readFile(flag('--userconfig'), 'utf8')).trim() === '//registry.npmjs.org/:_authToken=$' + '{NPM_TOKEN}',
+  userEmpty: await readFile(flag('--userconfig'), 'utf8') === '',
   registry: flag('--registry') === 'https://registry.npmjs.org',
   scriptsOff: args.includes('--ignore-scripts'), workspacesOff: args.includes('--workspaces=false')
 }));
 `,
   );
   await chmod(executable, 0o700);
-  const prior = process.env.NPM_TOKEN;
-  const priorConfig = process.env.NPM_CONFIG_USERCONFIG;
-  process.env.NPM_TOKEN = "isolated-test-placeholder";
-  process.env.NPM_CONFIG_USERCONFIG = join(directory, ".npmrc");
+  const previous = Object.fromEntries(Object.keys(oidc).map((key) => [key, process.env[key]]));
+  Object.assign(process.env, oidc);
   try {
-    const output = await run([executable, "whoami", "--json"], directory);
+    const output = await run([executable, "publish", "fixture.tgz"], directory);
     expect(output.code).toBe(0);
     expect(JSON.parse(new TextDecoder().decode(output.stdout))).toEqual({
       isolated: true,
       configOverrides: false,
+      traditionalAuth: false,
+      oidcPresent: true,
       globalEmpty: true,
-      template: true,
+      userEmpty: true,
       registry: true,
       scriptsOff: true,
       workspacesOff: true,
     });
-    delete process.env.NPM_TOKEN;
-    await expect(run([executable, "whoami"], directory)).rejects.toThrow("Set NPM_TOKEN");
+    delete process.env.GITHUB_ACTIONS;
+    await expect(run([executable, "publish", "fixture.tgz"], directory)).rejects.toThrow(
+      "GitHub-hosted",
+    );
+    await expect(run([executable, "whoami"], directory)).rejects.toThrow("Unsupported OIDC");
   } finally {
-    if (prior === undefined) delete process.env.NPM_TOKEN;
-    else process.env.NPM_TOKEN = prior;
-    if (priorConfig === undefined) delete process.env.NPM_CONFIG_USERCONFIG;
-    else process.env.NPM_CONFIG_USERCONFIG = priorConfig;
+    for (const [key, value] of Object.entries(previous)) {
+      if (value === undefined) delete process.env[key];
+      else process.env[key] = value;
+    }
   }
 });
 

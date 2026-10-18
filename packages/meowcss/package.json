@@ -38,5 +38,10 @@
   },
   "devDependencies": {
     "meowjsx": "workspace:*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lidessen/meowland.git",
+    "directory": "packages/meowcss"
   }
 }

@@ -1,6 +1,15 @@
 import { expect, test, type Locator, type Page } from "@playwright/test";
 
-const slideIds = ["welcome", "growth", "problems", "protect", "meaning", "act"] as const;
+const slideIds = [
+  "welcome",
+  "observe",
+  "growth",
+  "watch",
+  "problems",
+  "protect",
+  "meaning",
+  "act",
+] as const;
 const tasks = ["growth", "problems", "protect", "meaning", "act"] as const;
 const supportNames = ["Hint", "Reference", "Evidence"] as const;
 const canvas = (page: Page) => page.locator('[data-meowui-part="presentation/slide"]');
@@ -16,6 +25,10 @@ async function ready(page: Page) {
     await document.fonts.ready;
     await Promise.all(Array.from(document.images, (image) => image.decode()));
   });
+  for (const media of await canvas(page).locator("video,audio").all())
+    await expect
+      .poll(() => media.evaluate((element: HTMLMediaElement) => element.readyState))
+      .toBeGreaterThan(0);
 }
 
 async function visit(page: Page, id: string) {
@@ -182,9 +195,17 @@ test("the delivered lesson cold-starts every scene without outside resources or 
 }) => {
   const outside: string[] = [];
   const failures: string[] = [];
+  const requests: Array<{ url: string; error: string; type: string }> = [];
+  const releasedMedia = new Set<string>();
   const errors: string[] = [];
   page.on("pageerror", (error) => errors.push(error.message));
-  page.on("requestfailed", (request) => failures.push(request.url()));
+  page.on("requestfailed", (request) =>
+    requests.push({
+      url: request.url(),
+      error: request.failure()?.errorText ?? "",
+      type: request.resourceType(),
+    }),
+  );
   page.on("response", (response) => {
     if (response.status() >= 400) failures.push(`${response.status()} ${response.url()}`);
   });
@@ -202,7 +223,26 @@ test("the delivered lesson cold-starts every scene without outside resources or 
       .evaluateAll((options) => options.map((option) => (option as HTMLOptionElement).value)),
   ).toEqual(slideIds);
   for (const id of slideIds) {
+    const outgoing = await canvas(page).locator("video,audio").elementHandles();
+    const sources = await Promise.all(
+      outgoing.map((handle) =>
+        handle.evaluate((element: HTMLMediaElement) => ({
+          url: element.currentSrc,
+          loaded: element.readyState > 0,
+        })),
+      ),
+    );
     await visit(page, id);
+    for (let index = 0; index < outgoing.length; index++) {
+      const source = sources[index]!;
+      if (
+        source.loaded &&
+        (await outgoing[index]!.evaluate(
+          (element: HTMLMediaElement) => element.paused && !element.hasAttribute("src"),
+        ))
+      )
+        releasedMedia.add(source.url);
+    }
     await expect(canvas(page).locator("select")).toHaveCount(0);
     for (const image of await canvas(page).locator("img").all()) {
       expect(
@@ -214,6 +254,15 @@ test("the delivered lesson cold-starts every scene without outside resources or 
   await page.reload();
   await ready(page);
   await expect(directory(page)).toHaveValue("welcome");
+  for (const request of requests)
+    if (
+      !(
+        request.error === "net::ERR_ABORTED" &&
+        request.type === "media" &&
+        releasedMedia.has(request.url)
+      )
+    )
+      failures.push(`${request.error} ${request.url}`);
   expect(outside).toEqual([]);
   expect(failures).toEqual([]);
   expect(errors).toEqual([]);
@@ -248,8 +297,9 @@ test("expanded classroom scenes fit the canvas and keep controls reachable in wi
     for (const id of slideIds) {
       await page.goto(`/?slide=${id}`);
       await ready(page);
-      if (id === "welcome") await page.getByRole("button", { name: "Next", exact: true }).click();
-      if (id !== "welcome")
+      if (id === "welcome" || id === "observe")
+        await page.getByRole("button", { name: "Next", exact: true }).click();
+      if (id !== "welcome" && id !== "observe" && id !== "watch")
         for (const name of supportNames) await supportButton(page, name).click();
       if (id === "act")
         await page

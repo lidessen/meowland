@@ -1,17 +1,18 @@
 import { h, mapSignal, signal, type Child, type MaybeSignal, type WritableSignal } from "meowjsx";
-import { Inline, Stack } from "meowtail";
+import { AspectRatio, ImagePreview, Inline, LayoutItem, Stack } from "meowtail";
 import {
   Presentation,
   PresentationLayout,
   PresentationText,
+  PresentationVideo,
   Reveal,
   type SlideDefinition,
   type SlidePosition,
 } from "meowtail/presentation";
 import { growthStages, problemCards, protectionCards, readingExcerpts } from "./content";
-import panda from "./assets/panda-reading.png" with { type: "file" };
+import { pandaMedia } from "./media";
 
-export const lessonVersion = "protecting-pandas-a3";
+export const lessonVersion = "protecting-pandas-a4";
 type TaskId = "growth" | "problems" | "protect" | "meaning" | "act";
 type SupportKind = "hint" | "reference" | "evidence";
 let nextInstance = 0;
@@ -86,6 +87,21 @@ export function createPandaLesson(options: LessonOptions = {}) {
       <h2>{title}</h2>
       <p className="panda-question">{question}</p>
     </header>
+  );
+  const photo = (src: string, alt: string, caption: Child, ratio = 16 / 9) => (
+    <figure className="panda-photo-card">
+      <AspectRatio ratio={ratio}>
+        <ImagePreview
+          src={src}
+          alt={alt}
+          loading="eager"
+          className="panda-photo"
+          loadingLabel="Loading observation photo…"
+          failedLabel="Photo unavailable. Use the description below."
+        />
+      </AspectRatio>
+      <figcaption className="panda-image-note">{caption}</figcaption>
+    </figure>
   );
   const reading = (id: TaskId, group: string) => (
     <section className="panda-reading" aria-label="Reading excerpts">
@@ -216,15 +232,60 @@ export function createPandaLesson(options: LessonOptions = {}) {
             </Reveal>
           </Stack>
           <Stack justify="center" gap="compact">
-            <img
+            <ImagePreview
               className="panda-hero"
-              src={panda}
-              alt="A young giant panda resting on a mossy log, from the supplied reading material"
+              src={pandaMedia.adult}
+              loading="eager"
+              loadingLabel="Loading panda photograph…"
+              failedLabel="Photo unavailable. Continue with Xiwang’s reading story."
+              alt="Gao Gao, an adult giant panda, resting over a raised structure at San Diego Zoo"
             />
             <p className="panda-image-note">
-              Photo from the supplied reading · individual not independently identified
+              Gao Gao at San Diego Zoo · Mike Richey · CC BY-SA 3.0
+              <br />
+              A real panda to observe; this is not Xiwang.
             </p>
           </Stack>
+        </PresentationLayout>
+      ),
+    },
+    {
+      id: "observe",
+      title: "Look, compare, then read",
+      steps: 1,
+      render: () => (
+        <PresentationLayout
+          columns="equal"
+          gap="compact"
+          header={header(
+            "LOOK",
+            "What can a photograph tell us?",
+            "Compare colour, eyes and posture. What can you see? What can’t you know yet?",
+          )}
+          footer={
+            <Stack gap="compact">
+              <p className="panda-question">
+                Describe one visible detail. Then use G1–G3 on the next page to tell Xiwang’s story.
+              </p>
+              <Reveal at={1} transition="fade">
+                <p className="panda-caption">
+                  First… Then… Later… · Photos show different pandas, not Xiwang’s timeline. Ages
+                  and weight come from the reading.
+                </p>
+              </Reveal>
+            </Stack>
+          }
+        >
+          {photo(
+            pandaMedia.cub,
+            "A giant panda cub resting beside grass and facing the camera at Wolong",
+            "A · A cub rests beside grass, Wolong · Sheila Lau · public domain.",
+          )}
+          {photo(
+            pandaMedia.adult,
+            "Gao Gao resting over a raised structure at San Diego Zoo",
+            "B · Gao Gao rests over a raised structure · Mike Richey · CC BY-SA 3.0.",
+          )}
         </PresentationLayout>
       ),
     },
@@ -265,6 +326,76 @@ export function createPandaLesson(options: LessonOptions = {}) {
             evidence: "Match a card to G1–G3. Half a year after six months means twelve months.",
           },
         ),
+    },
+    {
+      id: "watch",
+      title: "Watch, question, find evidence",
+      render: () => (
+        <PresentationLayout
+          columns="equal"
+          gap="compact"
+          header={header(
+            "WATCH",
+            "What does a panda need?",
+            "Watch once. Describe an action. Ask a question that the reading could help answer.",
+          )}
+          footer={
+            <p className="panda-caption">
+              External observation examples, not Xiwang’s life or proof of a protection measure’s
+              effect. Pause to discuss; the reading supplies the story’s facts.{" "}
+              <a href="./SOURCES.md" target="_blank" rel="noreferrer">
+                Sources &amp; licenses
+              </a>
+            </p>
+          }
+        >
+          <Stack gap="compact">
+            <PresentationVideo
+              src={pandaMedia.clip}
+              poster={pandaMedia.poster}
+              label="Panda observation clip"
+              preload="metadata"
+              controls
+            >
+              <track
+                kind="captions"
+                src={pandaMedia.captions}
+                srcLang="en"
+                label="Observation captions"
+                default
+              />
+            </PresentationVideo>
+            <p className="panda-caption" data-observation-description="true">
+              Text alternative: a captive giant panda holds bamboo and brings it to its mouth. Bao
+              Bao · Smithsonian National Zoo, 2016 · Brian Gratwicke · CC BY 2.0 · silent 18 s.
+            </p>
+          </Stack>
+          <Stack gap="normal">
+            <LayoutItem grow basis={0}>
+              <ImagePreview
+                src={pandaMedia.forest}
+                alt="Forest in Wolong National Nature Reserve"
+                loading="eager"
+                className="panda-photo"
+                loadingLabel="Loading protected forest photograph…"
+                failedLabel="Photo unavailable. Read the forest description below."
+              />
+            </LayoutItem>
+            <p className="panda-image-note">
+              Forest in Wolong National Nature Reserve · Toni Wöhrl · CC BY-SA 4.0. A still
+              photograph cannot show a forest shrinking.
+            </p>
+            <ol className="panda-observation-questions">
+              <li>What can you see? “The panda is…”</li>
+              <li>What might it need? Separate observation from your idea.</li>
+              <li>
+                On the next pages, read P2–P3 for a problem and consequence. Then use A1–A2 to
+                explain a possible response.
+              </li>
+            </ol>
+          </Stack>
+        </PresentationLayout>
+      ),
     },
     {
       id: "problems",
@@ -432,7 +563,7 @@ export function createPandaLesson(options: LessonOptions = {}) {
     view: (
       <Presentation
         slideClassName="panda-lesson"
-        title="8A Unit 5 · Wild animals / Protecting pandas · a3"
+        title="8A Unit 5 · Wild animals / Protecting pandas · a4"
         slides={slides}
         position={position}
         active={options.active}

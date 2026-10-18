@@ -68,7 +68,7 @@
 法律、保护区、科学家工作与问题之间可以讨论多个合理联系。原文没有提供三对排他的配对答案，
 不应将连线或选择完成当作已经会解释原因，更不以固定一对一答案自动判分。
 
-## 六页教学改编方案
+## 原六页教学改编方案
 
 以下是可调整的课堂组织建议，约 20 分钟，取决于学生对原阅读的熟悉程度；不宣称覆盖整节 Reading
 的全部目标。每人先形成自己的表达，再与同伴核对；少数学生汇报时，其他学生也标记依据或修订一句话。
@@ -91,9 +91,9 @@
 新作品不将其当真实邀请或资格。P13 的“who was saved by people”是讲解层的解释，本作品依据原文只说
 Xiwang grew with care，不补野外救助经历。
 
-## 唯一提取图片
+## a1–a3 历史提取图片（a4 已替换）
 
-[`assets/panda-reading.png`](assets/panda-reading.png) 是 PPT p.7 阅读图 `image25.png` 中熊猫照片区域的
+旧 `assets/panda-reading.png` 是 PPT p.7 阅读图 `image25.png` 中熊猫照片区域的
 **精确矩形裁切**，420×284，无文字；原图已经实际打开，输出也已实际打开检查。
 裁切只提取照片，不生成、重绘、换背景、移除水印或改变图像内容。它不是视频帧，也不能证明是 Xiwang
 个体的真实记录；图注与 alt 只说“provided reading material”中的 young giant panda。
@@ -119,8 +119,47 @@ output: assets/panda-reading.png
 16ce4e24959426b27bc4e52bc940bd8a5d48f2a13a777a17ee351ff09351054e
 ```
 
-照片摄影者与最初来源在本材料中未见可核信息。本轮仅在用户授权的材料改编范围内提取用于本地课件，
+照片摄影者与最初来源在本材料中未见可核信息。a1–a3 仅在用户授权的材料改编范围内提取用于本地课件，
 不将其标成原创、生成素材、教材授权通用素材或 MIT 照片；第三方权利继续保留，详见
 [`assets/NOTICES.md`](assets/NOTICES.md)。原稿中另有带 AI 标识的插画，本作品没有把它们当真实照片或事实证据。
+
+a4 已从当前源与构建中移除此图片，改用下列许可明确的素材；历史可从 `afd7fd3` 查看，不重新复制未知许可的原稿照片或媒体。
+
+## a4：每项媒体对应的学习任务
+
+延续原 PPT P7–9 的时间词/成长复述、P10–11 的原文问题—后果—措施，以及研究中每人先观察、同伴表达、听众核对的组织。新增两个有限片段，原六页、五题选择与 Hint/Reference/Evidence 渐进支架保持。
+
+| 素材                                    | 学生任务与可观察产出                                                                                 | 判断依据与限制                                                                                                    |
+| --------------------------------------- | ---------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- |
+| Gao Gao 主视觉                          | 提出一个想通过阅读了解的问题                                                                         | 不是 Xiwang，也不凭照片判断野生种群现状。                                                                         |
+| Wolong 幼崽与 Gao Gao 两图（`observe`） | 每人描述一条可见细节；比较颜色、眼睛、姿态；转到 `growth`，用 G1–G3 的年龄与时间词复述 Xiwang 的变化 | 两图是不同个体、不同取景比例，不能从大小推年龄或重量；不是四阶段生平照片。一步提示给 First/Then/Later，可再撤回。 |
+| Bao Bao 握竹进食短片（`watch`）         | 看一次，描述自选动作，再提出食物/生活需要的问题；到后页 P2–P3 找问题与后果，A1–A2 解释可能回应       | 真实圈养动物观察，非 Xiwang、非野外；观察、推测、课文事实分开。文字替代不是唯一标准答案。                         |
+| 卧龙保护区森林（`watch`）               | 比较画面能给的信息与 P2–P3 需要原文支撑的说法，再讨论保护环境与个人行动的理由                        | 这是杉木森林照片，不是竹林；静照不证明森林缩小或措施有效。                                                        |
+
+建议为两片段各留约 1–2 分钟，先独立观察再同伴说一句，按课堂减少播放/分享次数；不把媒体加长等同于学习更充分。回到原 `act` 用阅读依据提出具体行动，不声称一次课堂提议已改变野生熊猫数量。
+
+## a4：开放许可媒体
+
+2026-10-18 逐一读取 Commons 源页的描述、作者、许可，下载后实际查看图像与视频代表帧。图片均保留原文件字节；视频和 poster 的派生说明在下表。所有文件本地随 Web 构建交付，无第三方播放器或运行时外网请求。
+
+| 本地文件                                                              | 作者、源页与许可                                                                                                                                                                                                                                                         | 原场景与修改                                                                                                                                                                                                                                        |
+| --------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `assets/panda-cub.jpg`                                                | Sheila Lau / Sheilalau，[Panda Cub from Wolong, Sichuan, China](https://commons.wikimedia.org/wiki/File:Panda_Cub_from_Wolong,_Sichuan,_China.JPG)，作者公有领域声明                                                                                                     | 源页称约七个月；课件只称 cub，不映射课文节点。Commons 当前文件含 GeeAlice 2008 年亮度/对比度调整，本地无修改。                                                                                                                                      |
+| `assets/panda-adult.jpg`                                              | Mike Richey，[GaoGao01](https://commons.wikimedia.org/wiki/File:GaoGao01.jpeg)，选用 [CC BY-SA 3.0](https://creativecommons.org/licenses/by-sa/3.0/)                                                                                                                     | Gao Gao，San Diego Zoo，2005-08-08；本地无修改，封面仅通过 CSS 取景。照片及其裁切派生继续适用该许可。                                                                                                                                               |
+| `assets/wolong-forest.jpg`                                            | Toni Wöhrl，[Cryptomeria sinensis forest](https://commons.wikimedia.org/wiki/File:Cryptomeria_sinensis_forest.jpg)，[CC BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/)                                                                                      | Wolong National Nature Reserve，2015-03-27；本地无修改，不标成竹林或发生退化的现场。                                                                                                                                                                |
+| `assets/panda-observation.mp4`、`assets/panda-observation-poster.jpg` | Brian Gratwicke，[Giant panda in a zoo](<https://commons.wikimedia.org/wiki/File:Giant_panda_(Ailuropoda_melanoleuca)_in_a_zoo.webm>)，[原 Flickr](https://www.flickr.com/photos/briangratwicke/24601275422/)，[CC BY 2.0](https://creativecommons.org/licenses/by/2.0/) | Bao Bao，Smithsonian National Zoo，2016-01-30。Commons 已稳定处理的视频取 0–18 秒、去音轨、转 H264/yuv420p、按显示比例归一方像素至 1280×720、faststart；实际 18.015 秒。未裁画面、未生成内容；poster 取 8 秒并转 1600×900。派生媒体保留 CC BY 2.0。 |
+| `assets/panda-observation.vtt`                                        | 本作品编写的英文观察字幕                                                                                                                                                                                                                                                 | 描述动作与身份，不假造旁白/对话，不把镜头说成 Xiwang 成长事件；常显文字替代配合原生字幕。                                                                                                                                                           |
+
+文件 SHA256：
+
+```text
+panda-cub.jpg 3eb2884c29a1d6290b30a46f5676cf23b03ed338e05989c40aba809d8913aac7
+panda-adult.jpg 4d111c71a9ccb540e859a5a8ee9c6015c813fbd387e3c9679040084f88821a65
+wolong-forest.jpg 30d65775753cfa432ee84d910b8a3991992e78ab4b8a5f2215a0718ff6139739
+panda-observation.mp4 de11105357b885717b16834655d91f58308478dfd3df453d96da3223e7f4c4df
+panda-observation-poster.jpg 9269664debc8f2e89f59a876775a7f0874601c3d46de1cba3c9096c9c68760a1
+```
+
+用户 HTML 本轮仅静态解析、解码与抽帧，未运行其脚本。四段影像均明确标 AI 生成且没有开放许可；原 PPT 的 P3/P16 AI 画面、P4 动画与 P11 XinhuaVideo 照护片也不作为本轮新增公开素材。P11 旧数量字幕和 HTML “20个月可独立野外生活”未沿用。完整只读研究保存在本轮忽略的 `artifacts/panda-user-media-study/`，不复制其媒体进仓库。
 
 本文件记录内容与素材核实；构建、浏览器交互、实际课堂使用及学习效果须分别验收，不能从本页推定已通过。

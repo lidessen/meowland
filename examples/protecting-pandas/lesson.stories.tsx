@@ -19,6 +19,22 @@ export const Problems = defineStory({
     createPandaLesson({ active: false, initialPosition: { slideId: "problems", step: 0 } }).view,
   ready,
 });
+export const Observation = defineStory({
+  id: "protecting-pandas-observation",
+  title: "Protecting pandas · observe, then read",
+  group: "Courseware",
+  render: () =>
+    createPandaLesson({ active: false, initialPosition: { slideId: "observe", step: 1 } }).view,
+  ready,
+});
+export const Video = defineStory({
+  id: "protecting-pandas-video",
+  title: "Protecting pandas · video before reading evidence",
+  group: "Courseware",
+  render: () =>
+    createPandaLesson({ active: false, initialPosition: { slideId: "watch", step: 0 } }).view,
+  ready,
+});
 export const Action = defineStory({
   id: "protecting-pandas-act",
   title: "Protecting pandas · personal action",

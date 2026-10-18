@@ -107,11 +107,11 @@ export function setDOMProperty(element: Element, name: string, value: unknown): 
     name in target
   ) {
     try {
-      target[name] = resolved;
-      return () => {};
+      if (Reflect.set(target, name, resolved)) return () => {};
     } catch {
-      // Read-only DOM properties fall through to an attribute.
+      // Some DOM setters reject values by throwing instead of returning false.
     }
+    // Getter-only DOM properties must also fall through in non-strict bundles.
   }
 
   element.setAttribute(attributeName, String(resolved));

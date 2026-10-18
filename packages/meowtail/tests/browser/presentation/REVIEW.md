@@ -52,3 +52,17 @@ PLAYWRIGHT_CHANNEL=chrome bun node_modules/@playwright/test/cli.js test --config
 证据目录为 `artifacts/presentation-review/chrome-20261017/`，`final-*` 是最后一次统一重建后重新生成，`baseline-*` 为前版。已亲自打开并观看正式 opening 宽屏/390px、短窗、深色宽/窄、深色键盘焦点、作品内容置于深色宿主，以及原生 fullscreen 原图：控件完整可达，无舞台覆盖，焦点环可辨。优先交付 `final-formal-opening-wide-light.png`、`final-formal-opening-narrow-light.png`；诊断原值见 `final-computed.json`。
 
 Fullscreen 结果仅表示本机无头 Chrome 允许宿主对真实容器调用原生 API 并保留控件，不表示新增播放器全屏功能或完成物理显示器验收。正式作品始终使用浅色；深色测试实际绑定主题于夹具，验证外围独立配色与作者指定的纸色/标题，不声称强制作者全部内容控件跨主题视觉恒定。未发现本轮剩余行为阻断。
+
+## 2026-10-18 工具带局部优化复审
+
+本轮改为固定导航、可伸缩的原生目录、常显选项触发按钮；低频暂停/尺寸 toggle 放入既有 Popover，使用有可读名称的非模态 dialog 和原生 Button，而未扩展公共 Menu。初期独立试验确认现有 Menu 的 Tab 会选择当前项，与本轮 toggle 场景不符；方案调整后已删除临时探针，未保留无关失败门禁或修改 Menu。
+
+已授权测试夹具只给真实 Presentation props 添加长中英标题、无空格长目录标题和 390px 宿主，没有复制工具栏。测试沿用 public exports。验证覆盖 320/390/479/480/481/513/514/515/700/701px 窗口、844×390 短窗、390×320 极短窗，以及 1280px 宽窗口内的 390px 窄宿主。目录在实际容器内容宽度 479/480px 时位于第二行、481px 时回同排，所有样本横向溢出为零；完整选项名称和选中项 title 保留，目录跳转到第 0 步。
+
+父任务在原 13 项合同测试发现一次真实回归：将 root min-height 置 0 后，没有明确高度的双实例宿主舞台塌缩，导致滑杆/Reveal 不可见，出现 2 项失败并停止该轮。生产作者恢复默认 `min-height:min(480px,100dvh)`、短窗 `min-height:min(320px,100dvh)`，父任务重新运行 13 项通过（8.1 s）。此发现属于父任务，不记为独立测试作者发现。另一个父任务实拍发现的通用 Popover 样式覆盖由 chrome 局部选择器修复；独立测试比较选项弹层与控制带 computed 背景一致，验证公共样式接线，未固定具体配色。
+
+上述最后统一重建后，独立执行 `chrome.spec.ts` 全部 9 项，通过（12.3 s）；定向 lint、测试类型与格式检查通过。新测试验证：Enter/Space 打开并聚焦首项；Tab/Shift+Tab 不触发 toggle，离开弹层会关闭；Space/Enter 才改变对应 aria-pressed；Escape 回触发；外部点击保留实际外部目标焦点。原尺寸模式实际发生横向滚动后选项仍可达，已打开弹层在窗口缩小后重新定位。双实例 aria-controls 唯一，开关状态互不串，退出移除打开的 top-layer。可见性同时检查 viewport 几何和实际中心命中，触控目标在入场动画完成后测量，避免把中途缩放的 43.34px 当最终 44px 布局缺陷。
+
+已亲自打开最终正式宽/窄图、长标题窄屏、宽窗口窄宿主、短窗弹层、窗口缩小后的弹层和深色焦点原图；未发现剩余遮挡或行为阻断。短窗夹具舞台约 366.22×206px，桌面控制带 720×62px，窄屏控制带约 374×123px，选项触发按钮 44×44px。弹层打开时临时覆盖部分舞台或目录属于既定浮层行为，可由 Escape/外部点击关闭；未承诺浮层与全部底层内容同时可见。
+
+本轮证据独立保留于 `artifacts/presentation-review/toolbar-20261018/` 的 `final-*`；关键原图为 `final-formal-opening-wide-light.png`、`final-formal-opening-narrow-light.png`、`final-options-844x390.png`、`final-options-resized-open.png` 和 `final-options-keyboard-dark.png`，几何原值见 `final-container-boundaries.json` / `final-computed.json`。旧 2026-10-17 数值和通过结果只描述上一轮，不能代替本轮。实体触摸、人工屏幕阅读器和完整 fullscreen 弹层交互未单独验收；原生 fullscreen 检查仍仅覆盖宿主进入/退出与主控件保留。

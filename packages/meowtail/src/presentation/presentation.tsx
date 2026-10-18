@@ -11,6 +11,10 @@ import {
   type WritableSignal,
 } from "meowjsx";
 import { Button } from "../components/button";
+import { Inline } from "../components/inline";
+import { LayoutItem } from "../components/layout-item";
+import { Popover } from "../components/popover";
+import { Stack } from "../components/stack";
 import { Icon } from "../icons/icon";
 import {
   PresentationActivity,
@@ -46,6 +50,8 @@ export const presentationContract = {
     "diagnostic",
   ],
 } as const satisfies ComponentContract;
+
+let nextPresentationId = 0;
 
 interface CurrentSlideProps extends Props {
   slide: SlideDefinition;
@@ -93,6 +99,9 @@ export const Presentation = defineComponent<
       suppliedPosition ?? context.signal<SlidePosition>({ slideId: slides[0]!.id, step: 0 });
     positionIndex(slides, position.value);
     const paused = context.signal(false);
+    const optionsOpen = context.signal(false);
+    const optionsId = `meowui-presentation-options-${++nextPresentationId}`;
+    let firstOption: HTMLButtonElement | undefined;
     const visible = context.signal(false);
     const activity = activitySignal(
       context,
@@ -249,6 +258,7 @@ export const Presentation = defineComponent<
               "h1",
               {
                 tabIndex: -1,
+                title,
                 ref: (element: HTMLElement) => {
                   heading = element;
                   return () => {
@@ -320,99 +330,149 @@ export const Presentation = defineComponent<
             "controls",
             "nav",
             { "aria-label": "Presentation controls" },
-            context.part(
-              "navigation",
-              "div",
-              { role: "group", "aria-label": "Presentation navigation" },
-              <Button
-                variant="quiet"
-                aria-label="Previous"
-                title="Previous"
-                onClick={() => move(-1)}
-                disabled={previousDisabled}
-              >
-                <Icon name="chevron-left" aria-hidden="true" />
-              </Button>,
-              context.part(
-                "page-number",
+            <Inline gap="compact">
+              {context.part(
+                "navigation",
                 "div",
-                { "aria-hidden": "true" },
-                <span>
-                  {mapSignal(position, (value) =>
-                    String(positionIndex(slides, value) + 1).padStart(2, "0"),
-                  )}
-                </span>,
-                <span> / {String(slides.length).padStart(2, "0")}</span>,
-                context.part(
-                  "step",
-                  "small",
-                  {
-                    hidden: mapSignal(
-                      position,
-                      (value) => (slides[positionIndex(slides, value)]!.steps ?? 0) === 0,
+                { role: "group", "aria-label": "Presentation navigation" },
+                <Inline gap="none" wrap={false}>
+                  <Button
+                    variant="quiet"
+                    aria-label="Previous"
+                    title="Previous"
+                    onClick={() => move(-1)}
+                    disabled={previousDisabled}
+                  >
+                    <Icon name="chevron-left" aria-hidden="true" />
+                  </Button>
+                  {context.part(
+                    "page-number",
+                    "div",
+                    { "aria-hidden": "true" },
+                    <span>
+                      {mapSignal(position, (value) =>
+                        String(positionIndex(slides, value) + 1).padStart(2, "0"),
+                      )}
+                    </span>,
+                    <span> / {String(slides.length).padStart(2, "0")}</span>,
+                    context.part(
+                      "step",
+                      "small",
+                      {
+                        hidden: mapSignal(
+                          position,
+                          (value) => (slides[positionIndex(slides, value)]!.steps ?? 0) === 0,
+                        ),
+                      },
+                      mapSignal(
+                        position,
+                        (value) =>
+                          `Step ${value.step} / ${slides[positionIndex(slides, value)]!.steps ?? 0}`,
+                      ),
                     ),
-                  },
-                  mapSignal(
-                    position,
-                    (value) =>
-                      `Step ${value.step} / ${slides[positionIndex(slides, value)]!.steps ?? 0}`,
-                  ),
-                ),
-              ),
-              <Button
-                variant="quiet"
-                aria-label="Next"
-                title="Next"
-                onClick={() => move(1)}
-                disabled={nextDisabled}
-              >
-                <Icon name="chevron-right" aria-hidden="true" />
-              </Button>,
-            ),
-            context.part(
-              "slide-picker",
-              "label",
-              null,
-              <Icon name="list" aria-hidden="true" />,
-              <span>Contents</span>,
-              <select
-                aria-label="Choose slide"
-                value={mapSignal(position, (value) => value.slideId)}
-                onChange={(event: Event) => {
-                  position.value = {
-                    slideId: (event.currentTarget as HTMLSelectElement).value,
-                    step: 0,
-                  };
-                }}
-              >
-                {slides.map((slide) => (
-                  <option value={slide.id}>{slide.title}</option>
-                ))}
-              </select>,
-            ),
-            context.part(
-              "tools",
-              "div",
-              { role: "group", "aria-label": "Presentation options" },
-              <Button
-                variant="quiet"
-                aria-pressed={mapSignal(paused, String)}
-                onClick={() => {
-                  paused.value = !paused.value;
-                }}
-              >
-                {mapSignal(paused, (value) => (value ? "Resume effects" : "Pause effects"))}
-              </Button>,
-              <Button
-                variant="quiet"
-                aria-pressed={mapSignal(actualSize, String)}
-                onClick={() => {
-                  actualSize.value = !actualSize.value;
-                }}
-              >
-                {mapSignal(actualSize, (value) => (value ? "Fit to window" : "Actual size"))}
-              </Button>,
-            ),
+                  )}
+                  <Button
+                    variant="quiet"
+                    aria-label="Next"
+                    title="Next"
+                    onClick={() => move(1)}
+                    disabled={nextDisabled}
+                  >
+                    <Icon name="chevron-right" aria-hidden="true" />
+                  </Button>
+                </Inline>,
+              )}
+              {context.part(
+                "slide-picker",
+                "label",
+                null,
+                <Inline as="span" gap="compact" wrap={false}>
+                  <LayoutItem as="span" shrink={false}>
+                    <Inline as="span" gap="compact" wrap={false}>
+                      <Icon name="list" aria-hidden="true" />
+                      <span>Contents</span>
+                    </Inline>
+                  </LayoutItem>
+                  <LayoutItem as="span" grow>
+                    <select
+                      aria-label="Choose slide"
+                      title={mapSignal(
+                        position,
+                        (value) => slides[positionIndex(slides, value)]!.title,
+                      )}
+                      value={mapSignal(position, (value) => value.slideId)}
+                      onChange={(event: Event) => {
+                        position.value = {
+                          slideId: (event.currentTarget as HTMLSelectElement).value,
+                          step: 0,
+                        };
+                      }}
+                    >
+                      {slides.map((slide) => (
+                        <option value={slide.id}>{slide.title}</option>
+                      ))}
+                    </select>
+                  </LayoutItem>
+                </Inline>,
+              )}
+              {context.part(
+                "tools",
+                "div",
+                null,
+                <Popover
+                  id={optionsId}
+                  role="dialog"
+                  labelledBy={`${optionsId}-trigger`}
+                  open={optionsOpen}
+                  align="end"
+                  onOpenChange={(next) => {
+                    optionsOpen.value = next;
+                    if (next)
+                      queueMicrotask(() => {
+                        if (optionsOpen.value) firstOption?.focus();
+                      });
+                  }}
+                  trigger={(bindings) => (
+                    <Button
+                      {...bindings}
+                      variant="quiet"
+                      aria-label="Presentation options"
+                      aria-haspopup="dialog"
+                      title="Presentation options"
+                    >
+                      <Icon name="settings" aria-hidden="true" />
+                    </Button>
+                  )}
+                >
+                  <Stack gap="compact">
+                    <Button
+                      variant="quiet"
+                      aria-pressed={mapSignal(paused, String)}
+                      ref={(element: HTMLButtonElement) => {
+                        firstOption = element;
+                        return () => {
+                          firstOption = undefined;
+                        };
+                      }}
+                      onClick={() => {
+                        paused.value = !paused.value;
+                      }}
+                    >
+                      {mapSignal(paused, (value) => (value ? "Resume effects" : "Pause effects"))}
+                    </Button>
+                    <Button
+                      variant="quiet"
+                      aria-pressed={mapSignal(actualSize, String)}
+                      onClick={() => {
+                        actualSize.value = !actualSize.value;
+                      }}
+                    >
+                      {mapSignal(actualSize, (value) => (value ? "Fit to window" : "Actual size"))}
+                    </Button>
+                  </Stack>
+                </Popover>,
+              )}
+            </Inline>,
           ),
           soundtrack ? context.part("soundtrack", "div", null, soundtrack) : null,
         )}

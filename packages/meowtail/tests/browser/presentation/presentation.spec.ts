@@ -103,6 +103,7 @@ test("host permission and user pause stop recurring work without unmounting or c
   expect((await facts(page)).renders.experiment).toBe(1);
   await page.evaluate(() => window.presentationTest.allow(0, true));
   await expect.poll(async () => (await facts(page)).ticks).toBeGreaterThan(stopped.after);
+  await first.getByRole("button", { name: "Presentation options", exact: true }).click();
   await first.getByRole("button", { name: "Pause effects", exact: true }).click();
   stopped = await stableTickCount(page);
   expect(stopped.after).toBe(stopped.before);
@@ -344,6 +345,7 @@ test("contain mode does not leave the unscaled canvas as empty horizontal scroll
   await expect
     .poll(() => viewport.evaluate((element) => element.scrollWidth - element.clientWidth))
     .toBeLessThanOrEqual(1);
+  await first.getByRole("button", { name: "Presentation options", exact: true }).click();
   await first.getByRole("button", { name: "Actual size", exact: true }).click();
   await expect
     .poll(() => viewport.evaluate((element) => element.scrollWidth - element.clientWidth))

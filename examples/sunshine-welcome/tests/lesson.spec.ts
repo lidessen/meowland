@@ -307,9 +307,15 @@ test("wide and narrow hosts keep classroom inputs and player controls reachable"
     await page.setViewportSize(size);
     await page.goto("/?slide=choose&step=0");
     await ready(page);
-    for (const name of ["Previous", "Next", "Pause effects", "Actual size"])
+    for (const name of ["Previous", "Next", "Presentation options"])
       await reachable(navigation(page).getByRole("button", { name, exact: true }));
     await reachable(directory(page));
+    await navigation(page)
+      .getByRole("button", { name: "Presentation options", exact: true })
+      .click();
+    for (const name of ["Pause effects", "Actual size"])
+      await reachable(navigation(page).getByRole("button", { name, exact: true }));
+    await page.keyboard.press("Escape");
     await page.getByRole("button", { name: "Choose B:", exact: false }).click();
     await page.getByRole("textbox", { name: "Give a reason" }).fill("Ask first.");
     await next(page).click();

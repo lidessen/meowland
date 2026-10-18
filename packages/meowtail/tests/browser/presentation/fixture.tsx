@@ -203,6 +203,7 @@ function createDeck(instance: number) {
 const root = document.querySelector<HTMLElement>("#test-root")!;
 const query = new URL(location.href).searchParams;
 if (query.get("chrome") === "single") root.style.height = "100dvh";
+if (query.get("host") === "narrow") root.style.width = "390px";
 const removeStyles = mountStyles(document, standardTheme.cssText + talkCss);
 const scheme = query.get("scheme");
 const removeTheme = applyTheme(
@@ -227,6 +228,22 @@ if (new URL(location.href).searchParams.get("sample") === "reordered") {
     ...slides.filter((slide) => slide.id !== "experiment"),
   ];
   content = h(view.type, { ...view.props, slides: reordered });
+}
+if (query.get("chrome") === "long") {
+  root.style.height = "100dvh";
+  const deck = decks[0]!.node as VNode;
+  const slides = deck.props.slides as readonly SlideDefinition[];
+  content = h(deck.type, {
+    ...deck.props,
+    title: "A long presentation title / 一个用于验证目录与工具栏收缩的真实标题",
+    slides: slides.map((slide, index) => ({
+      ...slide,
+      title:
+        index === 0
+          ? "A long mixed-language slide title / 保留完整目录名称 while the toolbar remains usable"
+          : `${slide.title} — ${"UnbrokenSlideTitle".repeat(12)}`,
+    })),
+  });
 }
 const web = createWebRenderer(createRuntime({ plugins: [createMeowUI()] }));
 const mounted = web.render(content, root);

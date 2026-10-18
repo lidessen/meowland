@@ -18,6 +18,8 @@
 
 课件实作见 [8B Unit 6 · Sunshine for all / Welcome](examples/sunshine-welcome/README.md)：依照核实的课时范围创作课堂活动，教师控制提示和参考答案，学生输入由作品 signals 保留；教材来源、课堂改编与启动方式在样例中区分说明，验证与限制见[课件回执](docs/records/2026-10-17-sunshine-welcome.md)。
 
+共享演示工具带的标准布局、窄容器目录重排与设置浮层见[布局复验回执](docs/records/2026-10-18-presentation-toolbar.md)，同时覆盖图片演示与英语课件。
+
 ## 本地开发
 
 使用 Bun 1.4.2：

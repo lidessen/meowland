@@ -81,6 +81,15 @@ const view = (
 `usePresentationActivity()` 在同步组件 render 中捕获只读 Signal；自定义动画通过现有
 `context.effect` 响应它并返回清理函数。该许可不等于正在播放或内容已就绪，不能自动暂停任意子组件。
 Reveal 保留几何与局部状态，隐藏内容从键盘和可访问树移除；嵌套层共享祖先许可。
+`Reveal` 二选一接收 `at={n}` 或 `when={booleanOrSignal}`，不能同时传或都省略。
+`at` 沿页步骤累计显现；`when` 由作品局部状态控制，可反复显隐而不改变 slide/step。
+两种入口共用保挂载、几何、焦点回退、隐藏语义、祖先活动与动画清理；仍须在 Presentation 页内使用。
+提示、答案和依据可分别用普通 signals 接入 `when`，作品不复制 visibility / inert / ARIA 接线。
+
+作品内容样式使用 `slideClassName`：类只落在当前页 article，后代标题/表单规则不会因此选中外围播放器。
+`className` 继续作用整个 Presentation 根，保持既有合同；两者不新增内容 wrapper，也不隔离任意全局 CSS。
+固定画布诊断同时检查可见内容与命名布局区域分配，避免正文侵入 footer 却未超出整张画布时漏报；
+明确的滚动区仍由自身承担滚动。诊断指出超容量，不自动缩字、隐藏正文或保证任意内容都能装入一页。
 
 Presentation 与 Reveal 可选 `transition`：none（默认）、fade、slide、zoom，或
 `{ effect, direction?, speed? }`。direction 为 left/right/up/down，表示移动方向；

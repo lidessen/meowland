@@ -1,7 +1,11 @@
 import { cp, mkdir, readdir, rm, writeFile } from "node:fs/promises";
-import { join } from "node:path";
+import { join, resolve, sep } from "node:path";
 const root = import.meta.dir;
-const outdir = join(root, "dist");
+const outdir = resolve(root, process.env.SUNSHINE_OUTDIR ?? "dist");
+if (outdir !== join(root, "dist") && !outdir.startsWith(resolve(root, "../../artifacts") + sep))
+  throw new Error(
+    "SUNSHINE_OUTDIR must be this example's dist or a dedicated artifacts subdirectory",
+  );
 await rm(outdir, { recursive: true, force: true });
 await mkdir(outdir, { recursive: true });
 const result = await Bun.build({

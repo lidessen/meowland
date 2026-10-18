@@ -15,6 +15,8 @@ bun examples/sunshine-welcome/serve.ts
 
 打开 `http://127.0.0.1:13012/`。本轮新API尚未正式发布，不能从旧稳定npm包安装后声称等价；缺依赖或包构建先沿根README处理。停止本次服务用Ctrl-C。可以设 `PORT=13022` 更换端口。源改动后重建并刷新，没有HMR，不执行全仓库清理或额外发布。
 
+安全回归共享组件时可设 `SUNSHINE_OUTDIR` 构建到专用 `artifacts/` 子目录，再用 `SUNSHINE_DIST` 让独立测试服务读取该候选；默认入口和作品内容不变，不必覆盖用户正在看的 `13012` 产物。
+
 入口 `index.html` → `main.tsx` → `lesson.tsx`，词汇事实在 `vocabulary.ts`，作品样式在 `lesson.styles.ts`。作品表单只用`.lesson-field`等内容class，不覆盖演示chrome的目录、控件或容器结构。逻辑画布1280×720，固定米白/深蓝/阳光黄；系统暗色偏好不改变所选作品颜色。
 
 ## 课堂节奏与教师推进

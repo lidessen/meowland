@@ -590,7 +590,7 @@ export function createSunshineLesson(options: LessonOptions = {}) {
   return {
     view: (
       <Presentation
-        className="sunshine-lesson"
+        slideClassName="sunshine-lesson"
         title="8B Unit 6 · Sunshine for all / Welcome"
         slides={slides}
         position={position}

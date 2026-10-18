@@ -11,7 +11,7 @@ import {
 import { growthStages, problemCards, protectionCards, readingExcerpts } from "./content";
 import panda from "./assets/panda-reading.png" with { type: "file" };
 
-export const lessonVersion = "protecting-pandas-a1";
+export const lessonVersion = "protecting-pandas-a3";
 type TaskId = "growth" | "problems" | "protect" | "meaning" | "act";
 type SupportKind = "hint" | "reference" | "evidence";
 let nextInstance = 0;
@@ -83,7 +83,7 @@ export function createPandaLesson(options: LessonOptions = {}) {
   const header = (number: string, title: string, question: string) => (
     <header>
       <p className="panda-kicker">{number} / Read · think · explain</p>
-      <h2 className="panda-heading">{title}</h2>
+      <h2>{title}</h2>
       <p className="panda-question">{question}</p>
     </header>
   );
@@ -139,16 +139,17 @@ export function createPandaLesson(options: LessonOptions = {}) {
             ["evidence", "Evidence"],
           ] as const
         ).map(([kind, label]) => (
-          <section
-            className="panda-support-panel"
-            data-kind={kind}
-            id={`${prefix}-${id}-${kind}`}
-            aria-label={`${label} panel`}
-            hidden={mapSignal(supports[id][kind], (shown) => !shown)}
-          >
-            <h3>{label}</h3>
-            <p>{texts[kind]}</p>
-          </section>
+          <Reveal when={supports[id][kind]}>
+            <section
+              className="panda-support-panel"
+              data-kind={kind}
+              id={`${prefix}-${id}-${kind}`}
+              aria-label={`${label} panel`}
+            >
+              <h3>{label}</h3>
+              <p>{texts[kind]}</p>
+            </section>
+          </Reveal>
         ))}
       </div>
       <p className="panda-footer-note">
@@ -195,7 +196,7 @@ export function createPandaLesson(options: LessonOptions = {}) {
         >
           <Stack gap="normal" justify="center">
             <p className="panda-kicker">Wild animals / Reading</p>
-            <h1 className="panda-title">
+            <h1>
               <PresentationText effect="editorial">
                 Protecting
                 <br />
@@ -430,8 +431,8 @@ export function createPandaLesson(options: LessonOptions = {}) {
   return {
     view: (
       <Presentation
-        className="panda-lesson"
-        title="8A Unit 5 · Wild animals / Protecting pandas"
+        slideClassName="panda-lesson"
+        title="8A Unit 5 · Wild animals / Protecting pandas · a3"
         slides={slides}
         position={position}
         active={options.active}

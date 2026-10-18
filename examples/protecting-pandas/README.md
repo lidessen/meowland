@@ -1,6 +1,6 @@
 # 八上 Unit 5 · Wild animals — Reading: Protecting pandas
 
-六页可运行浏览器课件，作品标识 `protecting-pandas-a1`。依据用户提供的 Reading 1 PPT 与已研究教学材料，
+六页可运行浏览器课件，作品标识 `protecting-pandas-a3`（外围页头可见 a3）。依据用户提供的 Reading 1 PPT 与已研究教学材料，
 从成长信息、问题/后果、保护措施走到有依据的个人行动表达。阅读材料标题为 `Xiwang in safe hands`；
 不据文件名推定教材版次或教材页码。摘录、图片和教学改编的来源与边界见 [SOURCES.md](SOURCES.md)。
 原 PPT、用户材料和另一作品 Sunshine Welcome 均不覆盖。
@@ -16,6 +16,7 @@ bun examples/protecting-pandas/serve.ts
 
 打开 `http://127.0.0.1:13014/`；停止本次服务用 Ctrl-C。端口冲突时先核实，可用 `PORT=13024` 更换。
 新课件使用独立地址；`13012` 仍是 Sunshine Welcome。源码改动后重建再刷新，没有 HMR。
+已打开的标签页不会自动载入新脚本；更新后按 Cmd-R（Windows/Linux 为 Ctrl-R）刷新。刷新开启新会话，会清空本页草稿。
 构建产物在忽略目录 `dist/`，仅需本地静态 HTTP，不默认支持双击 file://；没有外网字体、媒体或 API。
 `PANDA_OUTDIR` 可把候选构建放到专用目录，`PANDA_DIST` 可让验收服务读取该目录；用户预览在验证后再更新。
 
@@ -39,6 +40,8 @@ bun examples/protecting-pandas/serve.ts
 
 问题、选项与阅读摘录始终可见。Hint、Reference、Evidence 三个按钮互相独立，能反复展开/收起；
 Evidence 高亮常显原文并给定位说明，不把必要原文藏起来。按钮状态不自动跟随计时、媒体或学生选择。
+三个支持区统一消费共享 `Reveal when` 保留自然布局槽位，隐藏、焦点与活动许可由组件处理；开关不会把按钮或阅读区推来推去。
+内容主题通过 `slideClassName` 仅落在画布 article，不覆盖外围标题；作品不手写隐藏/ARIA/焦点补丁，也不压小文字掩盖内部区域溢出。
 完整参考可撤回，只留提示，或全部收起让学生独立表达；可以再次求助。
 
 每场作品工厂创建自己的位置、选择、支持开关与草稿 signals。回退、切页和回访保留本场状态；

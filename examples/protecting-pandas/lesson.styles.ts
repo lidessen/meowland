@@ -4,9 +4,9 @@ export const lessonCss = `
 html,body{margin:0;min-width:320px;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#e7ece6;color:#203c32}#app{height:100dvh}
 .panda-lesson{${presentationTokens.paper.name}:#fbf8ed;${presentationTokens.ink.name}:#203c32;${presentationTokens.muted.name}:#53685b;${presentationTokens.accent.name}:#a16f26}
 .panda-lesson .panda-kicker{font-size:15px;line-height:1.2;text-transform:uppercase;letter-spacing:.14em;font-weight:750;color:#89682f;margin:0 0 12px}
-.panda-lesson .panda-title{font-size:78px;line-height:1.02;letter-spacing:-.055em;margin:12px 0 26px;max-width:680px}
-.panda-lesson .panda-title em{font-style:normal;color:#a16f26}
-.panda-lesson .panda-heading{font-size:43px;line-height:1.1;letter-spacing:-.035em;margin:0 0 12px}
+.panda-lesson h1{font-size:78px;line-height:1.02;letter-spacing:-.055em;margin:12px 0 26px;max-width:680px}
+.panda-lesson h1 em{font-style:normal;color:#a16f26}
+.panda-lesson h2{font-size:43px;line-height:1.1;letter-spacing:-.035em;margin:0 0 12px}
 .panda-lesson .panda-question{font-size:23px;line-height:1.35;margin:0;max-width:930px;color:#466253}
 .panda-lesson .panda-lead{font-size:28px;line-height:1.4;margin:0;max-width:680px}
 .panda-lesson .panda-caption{font-size:14px;line-height:1.4;color:#617063;margin:0}
@@ -36,7 +36,6 @@ html,body{margin:0;min-width:320px;font-family:ui-sans-serif,system-ui,-apple-sy
 .panda-lesson .panda-support-panel[data-kind=reference]{background:#f9e9bd}
 .panda-lesson .panda-support-panel h3{font-size:12px;text-transform:uppercase;letter-spacing:.1em;margin:0 0 6px;color:#6d673d}
 .panda-lesson .panda-support-panel p{margin:0}
-.panda-lesson .panda-support-panel[hidden]{display:none}
 .panda-lesson .panda-footer-note{font-size:12px;line-height:1.35;color:#69735e;margin:8px 0 0}
 .panda-lesson .panda-writing{display:block;width:100%;box-sizing:border-box;resize:none;background:#fffdf5;color:#203c32;border:2px solid #c2c9ad;border-radius:20px;padding:18px 20px;font-family:inherit;font-size:23px;line-height:1.5;min-height:140px}
 .panda-lesson .panda-label{font-size:18px;font-weight:650;display:block;margin:0 0 10px}

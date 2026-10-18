@@ -1,5 +1,5 @@
 import { resolve, sep } from "node:path";
-const root = resolve(import.meta.dir, "dist");
+const root = resolve(import.meta.dir, process.env.SUNSHINE_DIST ?? "dist");
 const port = Number(process.env.PORT ?? 13012);
 if (!(await Bun.file(resolve(root, "index.html")).exists()))
   throw new Error("Build first: bun examples/sunshine-welcome/build.ts");

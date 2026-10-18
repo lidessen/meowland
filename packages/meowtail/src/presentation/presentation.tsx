@@ -31,6 +31,7 @@ import {
   type SlideBackground,
 } from "./types";
 import { entranceMotion, pendingEntranceAnimations } from "./transition";
+import { hasPresentationOverflow } from "./diagnostics";
 
 export const presentationContract = {
   name: "presentation",
@@ -105,6 +106,7 @@ export const Presentation = defineComponent<
       background,
       soundtrack,
       className,
+      slideClassName,
       ...props
     },
     context,
@@ -186,7 +188,9 @@ export const Presentation = defineComponent<
         }
         return;
       }
-      overflow.value = stage.scrollWidth > 1280 || stage.scrollHeight > 720;
+      // Signal-bound transforms may flush after this resize callback. Geometry
+      // and its one-logical-pixel tolerance must use the same applied scale.
+      overflow.value = hasPresentationOverflow(stage, stage.getBoundingClientRect().width / 1280);
     };
     context.effect(fit);
     context.effect(() => {
@@ -389,6 +393,7 @@ export const Presentation = defineComponent<
                 "slide",
                 "article",
                 {
+                  className: slideClassName,
                   style: { transform: mapSignal(scale, (value) => `scale(${value})`) },
                   "data-background-foreground": mapSignal(resolvedBackground, (value) =>
                     value === "theme" ? "theme" : (value.foreground ?? "theme"),
@@ -399,6 +404,24 @@ export const Presentation = defineComponent<
                     const Resize = view?.ResizeObserver;
                     const observer = Resize ? new Resize(fit) : undefined;
                     observer?.observe(element);
+                    const regions = new Set<Element>();
+                    const observeRegions = () => {
+                      const current = new Set(
+                        element.querySelectorAll(
+                          '[data-meowui-part="presentation-layout/header"],[data-meowui-part="presentation-layout/body"],[data-meowui-part="presentation-layout/footer"]',
+                        ),
+                      );
+                      for (const region of regions)
+                        if (!current.has(region)) {
+                          observer?.unobserve(region);
+                          regions.delete(region);
+                        }
+                      for (const region of current)
+                        if (!regions.has(region)) {
+                          observer?.observe(region);
+                          regions.add(region);
+                        }
+                    };
                     let connected = true;
                     let queued = false;
                     const contentChanged = () => {
@@ -406,22 +429,46 @@ export const Presentation = defineComponent<
                       queued = true;
                       queueMicrotask(() => {
                         queued = false;
-                        if (connected) fit();
+                        if (connected) {
+                          observeRegions();
+                          fit();
+                        }
                       });
                     };
                     const Mutation = view?.MutationObserver;
-                    const mutations = Mutation ? new Mutation(contentChanged) : undefined;
+                    const mutations = Mutation
+                      ? new Mutation((records) => {
+                          if (
+                            records.some(
+                              (record) =>
+                                record.target !== element ||
+                                record.type !== "attributes" ||
+                                record.attributeName !== "style",
+                            )
+                          )
+                            contentChanged();
+                        })
+                      : undefined;
                     mutations?.observe(element, {
                       childList: true,
                       characterData: true,
                       subtree: true,
+                      attributes: true,
+                      attributeFilter: ["class", "style", "hidden", "data-revealed"],
                     });
+                    element.ownerDocument.fonts?.addEventListener("loadingdone", contentChanged);
+                    contentChanged();
                     element.addEventListener("load", contentChanged, true);
                     element.addEventListener("loadedmetadata", contentChanged, true);
                     return () => {
                       connected = false;
                       observer?.disconnect();
                       mutations?.disconnect();
+                      regions.clear();
+                      element.ownerDocument.fonts?.removeEventListener(
+                        "loadingdone",
+                        contentChanged,
+                      );
                       element.removeEventListener("load", contentChanged, true);
                       element.removeEventListener("loadedmetadata", contentChanged, true);
                       stage = undefined;
@@ -471,7 +518,7 @@ export const Presentation = defineComponent<
             "diagnostic",
             "p",
             { role: "status", hidden: mapSignal(overflow, (value) => !value) },
-            "Content exceeds the slide. Check the layout or use actual size.",
+            "Content exceeds the slide or an allocated layout region. Check the content and layout.",
           ),
           context.part(
             "controls",

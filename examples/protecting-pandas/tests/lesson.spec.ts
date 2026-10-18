@@ -352,3 +352,48 @@ test("authored classroom rules leave the shared player heading and directory unt
   expect(removed).toBeGreaterThan(0);
   expect(authored).toEqual(await page.evaluate(readChrome));
 });
+
+test("teacher support toggles preserve their positions and the reading frame in every visibility state", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1100, height: 760 });
+  await page.goto("/");
+  await ready(page);
+  const states = [[], ["Hint"], ["Reference"], ["Evidence"], [...supportNames], []];
+  for (const id of tasks) {
+    await visit(page, id);
+    const reading = canvas(page).getByRole("region", { name: "Reading excerpts", exact: true });
+    const frame = (await reading.count())
+      ? reading
+      : canvas(page).locator('[data-meowui-part="presentation-layout/body"]');
+    const measure = async () => {
+      const boxes: Record<string, readonly number[]> = {};
+      for (const [name, locator] of [
+        ...supportNames.map((name) => [name, supportButton(page, name)] as const),
+        ["reading frame", frame] as const,
+      ]) {
+        const box = await locator.boundingBox();
+        expect(box).not.toBeNull();
+        boxes[name] = [box!.x, box!.y, box!.width, box!.height];
+      }
+      return boxes;
+    };
+    const baseline = await measure();
+    for (const expanded of states) {
+      for (const name of supportNames) {
+        const next = expanded.includes(name);
+        if ((await supportButton(page, name).getAttribute("aria-expanded")) !== String(next))
+          await supportButton(page, name).click();
+        await expectSupport(page, name, next);
+      }
+      const current = await measure();
+      for (const [name, dimensions] of Object.entries(baseline)) {
+        for (let axis = 0; axis < dimensions.length; axis++)
+          expect(
+            Math.abs(current[name]![axis]! - dimensions[axis]!),
+            `${id}: ${name} moved with ${expanded.join("+") || "no support"}`,
+          ).toBeLessThanOrEqual(0.5);
+      }
+    }
+  }
+});

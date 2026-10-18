@@ -10,6 +10,51 @@
 
 完整组合的使用合同见 [Assistant](ASSISTANT.md)，有限 JSON 入口见 [JSON catalog](JSON.md)。两者的实现与独立验收仍在进行；本页的 API 说明和早期产物验证不等于当前全部源码的同源验收通过。
 
+## 最小浏览器接入
+
+在包含 `<main id="app"></main>` 的浏览器入口中，先完成同一 runtime 的组件注册、完整 CSS 加载和主题根绑定，再渲染内容。
+仅导入组件、仅安装 registry 或只用 `Theme` 都不能代替这三项；缺少任意一项，页面仍可能显示原生控件，却没有标准主题的尺寸与状态。
+
+```tsx
+import { createRuntime, h } from "meowjsx";
+import { createWebRenderer } from "meowjsx/web";
+import { Button, Inline, Stack, createMeowUI } from "meowtail";
+import { standardTheme, standardOptions } from "meowtail/theme";
+import { applyTheme, mountStyles } from "meowcss/web";
+
+const root = document.querySelector<HTMLElement>("#app");
+if (!root) throw new Error("Missing app root");
+const runtime = createRuntime();
+const uninstall = runtime.use(createMeowUI());
+const removeStyles = mountStyles(root.ownerDocument, standardTheme.cssText);
+const removeTheme = applyTheme(root, standardTheme, standardOptions.select({ scheme: "light" }));
+const mounted = createWebRenderer(runtime).render(
+  <Stack align="start">
+    <strong>连接设置</strong>
+    <Inline gap="compact">
+      <Button>保存</Button>
+      <Button variant="quiet">取消</Button>
+    </Inline>
+  </Stack>,
+  root,
+);
+
+// Dispose with the host that owns this mount.
+const dispose = () => {
+  mounted.unmount();
+  removeTheme();
+  removeStyles();
+  uninstall();
+};
+```
+
+主题根提供可继承的正文 font、字号、行高与文字颜色；局部主题配置继承外层排版，组件仍拥有自己的控件与标题尺度。
+这不包含全局 `html/body` margin 重置、页面背景、页面留白，也不自动重置任意 `h1/h2/p`。
+页面空间用 `PageFrame` / `Container`，相关内容用 `Stack`，一组操作用 `Inline`；完整 Assistant 可直接用 `AssistantView`，不必从裸 Card 重搭一页。
+`CardHeader/Title/Content/Footer` 表达卡片内关系，原生内容则按文档语义排版；不要把每层内容都包成独立表面。
+可比较 Meowbook 的 `buttons`、`card-composition`、`workspace-composition`；它们分别展示操作关系、卡片结构与滚动工作区，压力态不等于产品必须同时展示所有状态。
+静态 CSS 交付与局部配置见[组件安装与样式交付](#组件安装与样式交付)；`examples/browser` 的 Increment 仅是包接合 smoke，不是页面设计模板。
+
 ## 目录
 
 ```text

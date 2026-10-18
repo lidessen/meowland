@@ -1,5 +1,6 @@
 import { h } from "meowjsx/runtime";
 import { signal } from "meowjsx";
+import { uiTokens } from "meowtail/theme";
 import {
   Badge,
   Button,
@@ -17,6 +18,9 @@ import {
   Card,
   Stack,
   Grid,
+  Container,
+  Inline,
+  LayoutItem,
 } from "meowtail";
 import { defineStory } from "meowbook";
 
@@ -30,48 +34,66 @@ export const ButtonsStory = defineStory({
   description: "四种真实按钮变体及禁用状态。可用 Tab 查看焦点；禁用按钮不能触发操作。",
   covers: ["Button", "primary / quiet / outline / danger", "disabled", "keyboard focus"],
   render: () => (
-    <div className="workshop-stack workshop-constrained">
-      <header className="workshop-composition-header">
-        <h2>准备好交付这次修改</h2>
-        <p className="workshop-note">主要操作明确，辅助操作退后一步。所有操作只在本地演示。</p>
-      </header>
-      <div className="workshop-row">
-        <Button data-action="已保存本地示例">保存修改</Button>
-        <Button variant="outline" data-action="差异示例已选择">
-          查看差异
-        </Button>
-        <Button variant="quiet" data-action="继续编辑">
-          继续编辑
-        </Button>
-      </div>
-      <section className="workshop-stack" aria-label="尚不可用的操作">
-        <p className="workshop-note">尚未选择提交目标</p>
-        <div className="workshop-row">
-          <Button disabled>提交修改</Button>
-          <Button variant="outline" disabled>
-            预览提交
+    <Container width="narrow">
+      <Stack data-button-composition>
+        <Stack as="header" gap="compact">
+          <h2 style={{ margin: 0, fontSize: uiTokens.fontTitle, fontWeight: 600 }}>
+            准备好交付这次修改
+          </h2>
+          <span style={{ color: uiTokens.mutedForeground }}>
+            主要操作明确，辅助操作退后一步。所有操作只在本地演示。
+          </span>
+        </Stack>
+        <Inline gap="compact">
+          <Button data-action="已保存本地示例">保存修改</Button>
+          <Button variant="outline" data-action="差异示例已选择">
+            查看差异
           </Button>
-          <Button variant="quiet" disabled>
-            撤销
+          <Button variant="quiet" data-action="继续编辑">
+            继续编辑
           </Button>
-          <Button variant="danger" disabled>
-            删除
-          </Button>
-        </div>
-      </section>
-      <p className="workshop-feedback" role="status" data-feedback>
-        选择一个操作，查看即时反馈。
-      </p>
-      <section className="workshop-foundation-destructive" aria-label="丢弃草稿演示">
-        <div className="workshop-composition-header">
-          <h2 className="workshop-section-title">重新开始</h2>
-          <p className="workshop-note">仅演示丢弃操作，不会删除真实文件。</p>
-        </div>
-        <Button variant="danger" data-action="已演示丢弃草稿；没有删除真实文件">
-          丢弃本地草稿
-        </Button>
-      </section>
-    </div>
+        </Inline>
+        <Stack as="section" gap="compact" aria-label="尚不可用的操作">
+          <span style={{ color: uiTokens.mutedForeground, fontSize: uiTokens.fontCaption }}>
+            尚未选择提交目标
+          </span>
+          <Inline gap="compact">
+            <Button disabled>提交修改</Button>
+            <Button variant="outline" disabled>
+              预览提交
+            </Button>
+            <Button variant="quiet" disabled>
+              撤销
+            </Button>
+            <Button variant="danger" disabled>
+              删除
+            </Button>
+          </Inline>
+        </Stack>
+        <span
+          style={{ color: uiTokens.mutedForeground, fontSize: uiTokens.fontCaption }}
+          role="status"
+          data-feedback
+        >
+          选择一个操作，查看即时反馈。
+        </span>
+        <Inline as="section" gap="normal" aria-label="丢弃草稿演示">
+          <LayoutItem grow>
+            <Stack gap="compact">
+              <h2 style={{ margin: 0, fontSize: uiTokens.fontBody, fontWeight: 600 }}>重新开始</h2>
+              <span style={{ color: uiTokens.mutedForeground, fontSize: uiTokens.fontCaption }}>
+                仅演示丢弃操作，不会删除真实文件。
+              </span>
+            </Stack>
+          </LayoutItem>
+          <LayoutItem shrink={false}>
+            <Button variant="danger" data-action="已演示丢弃草稿；没有删除真实文件">
+              丢弃本地草稿
+            </Button>
+          </LayoutItem>
+        </Inline>
+      </Stack>
+    </Container>
   ),
   setup({ root, report, onCleanup }) {
     const clicked = (event: Event) => {

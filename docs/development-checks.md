@@ -33,6 +33,8 @@
 
 图片演示的正式构建、Meowbook 审阅、源文件与媒体交付入口见[样例 README](../examples/presentation/README.md)；英语 Welcome 课件的课堂状态与浏览器验收见[课件 README](../examples/sunshine-welcome/README.md)。根 typecheck 包含两项作品工程，作品浏览器用例仍按各自配置独立运行。正式 Web 产物与组件合同浏览器测试分别验收；字体/图片 ready、静态图与实际播放、断网冷启动也分别记录，不由其中一项代替另一项。
 
+Protecting pandas 为另一独立课件，入口与构建/浏览器检查见[熊猫课件 README](../examples/protecting-pandas/README.md)。根 typecheck 同样覆盖其作品工程；浏览器配置独占 `13034`，用户预览使用 `13014`，不复用或覆盖 Sunshine 的作品与服务。
+
 ## CI 与发行验证
 
 `.github/workflows/checks.yml` 是唯一工程 workflow，仅在 main push、pull request 或手动触发时执行 frozen install → build → lint。它不执行完整本地 check，也不执行格式检查、单测、浏览器、打包、tag 发布、npm 发布或部署；只有只读 repository 权限。

@@ -1,6 +1,7 @@
 # 教学研究到演示创作的消化
 
 日期：2026-10-18。范围是方法与设计落实，不是新增教学组件的实施授权。
+本页记录方法阶段；用户随后另行授权的实际浏览器课件见 [Protecting pandas 实作回执](../records/2026-10-18-protecting-pandas.md)，不以本页历史范围替代后续交付。
 入口已经更新到 [presentation-authoring skill](../../.agents/skills/presentation-authoring/SKILL.md) 的课件段；
 可直接借用的方法与唯一贯穿案例在[教学片段与可撤回支架](../../packages/meowtail/PRESENTATION-LAYOUTS.md#教学片段与可撤回支架)。
 不改已有课件、用户材料或运行时 API。

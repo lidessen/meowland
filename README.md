@@ -20,6 +20,8 @@
 
 共享演示工具带的标准布局、窄容器目录重排与设置浮层见[布局复验回执](docs/records/2026-10-18-presentation-toolbar.md)，同时覆盖图片演示与英语课件。
 
+八上 Unit 5 的另一件作品见 [Protecting pandas 阅读课件](examples/protecting-pandas/README.md)：成长、问题与后果、保护措施到个人行动，课堂选项直接展开，提示/参考/依据可分别撤回与恢复。两件课件独立保留，全部演示入口见 [examples 索引](examples/README.md)。
+
 ## 本地开发
 
 使用 Bun 1.4.2：

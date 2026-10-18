@@ -1,0 +1,10 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "types": ["bun"],
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "ESNext.Disposable"],
+    "noUncheckedSideEffectImports": true
+  },
+  "include": ["*.ts", "*.tsx", "media-modules.d.ts"],
+  "exclude": ["dist", "tests"]
+}

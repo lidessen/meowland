@@ -29,6 +29,8 @@
 
 两个 JSON 类型/行为用例文件对 `no-unused-vars` 设置 `_` 前缀的参数占位约定，保留回调 props 的类型推断；其它文件保持 Oxlint 默认规则选项，未用导入仍报错。Reactive effect 的信号读取具有订阅语义，不能作为普通无用表达式随意删除。
 
+Web renderer 的真实 DOM 属性回归用 `bun node_modules/@playwright/test/cli.js test --config packages/meowjsx/playwright.config.ts`。先 build 当前 public exports；用例实际构建普通 IIFE、严格 IIFE 和 ESM，验证 SVG 只读属性回退、响应更新及 HTML 控件与清理，不由无 DOM 单测替代。
+
 平台环境类型不能合并处理：JSX core 与 CSS core 不加载 DOM/Bun 类型，Web 与 UI 使用 DOM；Book 的 Bun/Playwright 入口保留自身所需宿主类型。`bun scripts/build.ts --check --package <name>` 仅检查该包的生产 build 配置，不包含根 typecheck 的额外环境和公共类型用例。
 
 MDX 作者入口的构建和预览见[作者示例](../examples/presentation/README.md)，完整自定义讲解与素材验收见[图片加载作品](../examples/image-loading/README.md)。演示运行时合同 `bun run test:presentation` 使用独立端口；Meowbook 演示组件测试用 `bun node_modules/@playwright/test/cli.js test --config packages/meowslides/playwright.config.ts`，MDX 作者浏览器测试用 `bun node_modules/@playwright/test/cli.js test --config packages/meowslides/tests/browser/authoring/playwright.config.ts`，分别记录执行结果。

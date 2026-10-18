@@ -7,11 +7,13 @@ description: Create and iteratively revise Meowland browser presentations and cl
 
 让 agent 和人围绕可运行作品共创。当前交付浏览器演示；PPT 导出是后续能力，不以可导出支持集限制互动，也不承诺已有 PPT/PDF 转换器。
 
-先读作品已有 README、入口与素材说明。新作品参考[可运行样例](../../../examples/presentation/README.md)，以它的实际入口和命令为准；组件能力从 [Meowtail README](../../../packages/meowtail/README.md)与 public exports 核实，不把[设计提案](../../../docs/designs/2026-10-17-presentation-authoring.md)中的草案当作可用 API。复用真实组件和布局，作品只持有内容、实验状态与宿主接线。
+先读作品已有 README、入口与素材说明。新作品从 [MDX 作者示例](../../../examples/presentation/README.md)开始，以 [Meowslides README](../../../packages/meowslides/README.md)和 public exports 为准；普通作者维护 `slides.mdx`、素材和必要的 MeowJSX 互动组件，宿主和构建由工具承担。复杂作品参考[互动实验场](../../../examples/presentation-lab/README.md)，不把实验动画、素材制作和浏览器夹具当作每份讲稿的起步任务。
+
+MDX 是可信本地代码，支持 import、表达式和组件执行；外部上传、模型生成或拉取的任意文本须先审阅，不默认当 MDX 执行。顶层 `---` 分页前后留空行；页级元信息和渐显沿实际实现，复杂互动显式导入 MeowJSX 组件，不假定 React hooks 兼容。不要把历史设计草稿当作已实现能力。
 
 ## 从内容区域开始选布局
 
-先读[演示内容布局](../../../packages/meowtail/PRESENTATION-LAYOUTS.md)，按观点、依据和操作的关系划分区域，
+先读[演示内容布局](../../../packages/meowslides/PRESENTATION-LAYOUTS.md)，按观点、依据和操作的关系划分区域，
 再放入标题、图片和正文。优先 PresentationLayout 的 header/footer 槽与 `1 | 2 | 3` 等宽列，
 或 single/equal/wide-start/wide-end 命名列比；区域内部继续用 Stack/Grid，标题、图文、对比、数字、流程、引用与总结是组合配方。
 短要点用 PresentationList 的 items，顺序有意义时 as="ol" 并保留 start/reversed 等原生语义。
@@ -54,7 +56,7 @@ Presentation 缩放整张画布。长标题和最终步骤装不下时先精简�
 
 翻页/回退、切阶段、重做分别说明保留或重置什么，回退不自动擦除作答。开放题按依据、表达与可讨论的理由反馈，参考例不冒充唯一答案，配对完成也不等于会解释或评价。给独立思考、同伴表达与全班分享留可改的时间预算，并安排每位学生的产出，避免演示内容和少数汇报占满课堂。
 
-制作课件时读[教学片段与改编案例](../../../packages/meowtail/PRESENTATION-LAYOUTS.md#教学片段与可撤回支架)，先借用合适的小组合。贯穿案例按用户指定为“八上 Unit 5 Wild animals — Reading: Protecting pandas”，沿成长信息、问题/后果、保护措施到有依据的个人行动表达组织；活动和句框标明教学改编，未核验的教材原句不补造，不推定版次或页码。它不替换另一作品 Sunshine for all / Welcome。预览重放未提示、提示、参考解释、支架撤回/恢复、前进/回退和明确重做等本片段关键状态，检查键盘、辅助技术隐藏与答案泄露；不以全展开截图代替。需要新增教学能力时再读[研究消化与能力边界](../../../docs/designs/2026-10-18-classroom-authoring.md)，将候选需求与已实现 API 分开，不一次扩建整套教学平台。
+制作课件时读[教学片段与改编案例](../../../packages/meowslides/PRESENTATION-LAYOUTS.md#教学片段与可撤回支架)，先借用合适的小组合。贯穿案例按用户指定为“八上 Unit 5 Wild animals — Reading: Protecting pandas”，沿成长信息、问题/后果、保护措施到有依据的个人行动表达组织；活动和句框标明教学改编，未核验的教材原句不补造，不推定版次或页码。它不替换另一作品 Sunshine for all / Welcome。预览重放未提示、提示、参考解释、支架撤回/恢复、前进/回退和明确重做等本片段关键状态，检查键盘、辅助技术隐藏与答案泄露；不以全展开截图代替。需要新增教学能力时再读[研究消化与能力边界](../../../docs/designs/2026-10-18-classroom-authoring.md)，将候选需求与已实现 API 分开，不一次扩建整套教学平台。
 
 引用与素材来源沿用后文的素材约定，教材另记版次、册次与可核页码/课名。参考课件用于比较组织和讲解方法，不把来源标注当作授权整套搬运；文字引用、图片与音视频按实际授权使用，生成素材不冒充课文、教材插图或教学事实依据。
 
@@ -64,7 +66,7 @@ Presentation 缩放整张画布。长标题和最终步骤装不下时先精简�
 
 位置、实验输入和运行许可分别处理：所有导航写同一个位置 Signal；每场作品一次创建普通实验 signals，页只引用它们，使选择跨页保留、总结同步，又不让不同作品串值。步骤是可直接呈现的状态，回退不撤销独立实验；实验 reset 由作者明确提供。跳回来源需要恢复原步骤时，作品保存一个普通位置值即可，不扩导航历史系统。
 
-源改动后按现有 Meowbook 工作流重启并 reload，确认是新构建。改前记录与反馈相关的少量输入和位置，改后重放；重复时再形成普通 typed fixture。重载不保证恢复现场，临时参数也不能偷偷成为作品默认值。
+源改动后用 Meowslides dev 的重建/刷新，或按实际 Meowbook 审阅流程重启并 reload，确认是新构建。改前记录与反馈相关的少量输入和位置，改后重放；重复时再形成普通 typed fixture。reload 不保证恢复会话，不能把它称作保留状态 HMR，临时参数也不能偷偷成为作品默认值。
 
 ## 占位、真实素材与依据
 
@@ -76,7 +78,7 @@ Presentation 缩放整张画布。长标题和最终步骤装不下时先精简�
 
 ## 预览、操作与交付
 
-作品整体作为 Meowbook story，关键夹具仍消费同一页源。沿 [Meowbook 合同](../../../packages/meowbook/README.md)和[视觉取证](../ui-development/references/visual-checks.md)发现场景、检查、预览和拍摄，不复制第二套工程命令。审阅/后台实例从首次挂载传 `active=false`；前台实际操作时由宿主开放许可，不能只用文档可见性判断。各预览与正式入口创建独立会话，避免模块级单例。
+普通作品用 Meowslides dev/build 预览与交付；需要组件审查时再把同一页源接为 Meowbook story，而非起步就要求维护 story。沿 [Meowbook 合同](../../../packages/meowbook/README.md)和[视觉取证](../ui-development/references/visual-checks.md)发现场景、检查、预览和拍摄，不复制第二套工程命令。审阅/后台实例从首次挂载传 `active=false`；前台实际操作时由宿主开放许可，不能只用文档可见性判断。各预览与正式入口创建独立会话，避免模块级单例。
 
 自定义动画和媒体响应活动许可并登记清理；结构存在不表示可以播放。正常动画、reduced motion、键盘、跨页/回退、暂停、后台与退出按本作品实际能力观察；步骤不重挂整页，互动按键不被翻页抢走。媒体结束不推动叙事，恢复时间不等于恢复声音。`ready`、字体等待、poster 或截图成功不证明所有资源/动画已就绪，等待明确夹具条件，再看实际原图和操作。
 

@@ -1,6 +1,7 @@
 import { render } from "meowjsx/web";
 import { installMeowUI } from "meowtail";
-import { standardOptions, standardTheme } from "meowtail/theme";
+import { installMeowSlides } from "meowslides";
+import { presentationOptions, presentationTheme } from "meowslides/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 import { createPandaLesson } from "./lesson";
 import { lessonCss } from "./lesson.styles";
@@ -8,12 +9,13 @@ import { lessonCss } from "./lesson.styles";
 const root = document.querySelector<HTMLElement>("#app");
 if (!root) throw new Error("Lesson mount point is missing");
 const uninstall = installMeowUI();
+const uninstallSlides = installMeowSlides();
 const restore = applyTheme(
   document.documentElement,
-  standardTheme,
-  standardOptions.select({ scheme: "light" }),
+  presentationTheme,
+  presentationOptions.select({ scheme: "light" }),
 );
-const removeStyles = mountStyles(document, standardTheme.cssText + lessonCss);
+const removeStyles = mountStyles(document, presentationTheme.cssText + lessonCss);
 const query = new URLSearchParams(location.search);
 const slideId = query.get("slide");
 const lesson = createPandaLesson({
@@ -27,6 +29,7 @@ window.addEventListener(
     mounted.unmount();
     removeStyles();
     restore();
+    uninstallSlides();
     uninstall();
   },
   { once: true },

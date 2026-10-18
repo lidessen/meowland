@@ -1,0 +1,61 @@
+{
+  "name": "meowslides",
+  "version": "0.1.0-slides.20261018.1",
+  "private": true,
+  "license": "MIT",
+  "type": "module",
+  "description": "MeowJSX presentation runtime and trusted local MDX authoring",
+  "scripts": {
+    "test": "bun test tests/unit tests/build",
+    "typecheck": "tsc --noEmit -p tsconfig.json"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "PRESENTATION.md",
+    "PRESENTATION-LAYOUTS.md",
+    "LICENSE"
+  ],
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "import": "./dist/src/index.js"
+    },
+    "./theme": {
+      "types": "./dist/src/theme/index.d.ts",
+      "import": "./dist/src/theme/index.js"
+    },
+    "./registry": {
+      "types": "./dist/src/registry.d.ts",
+      "import": "./dist/src/registry.js"
+    },
+    "./mdx": {
+      "types": "./dist/src/mdx.d.ts",
+      "import": "./dist/src/mdx.js"
+    },
+    "./build": {
+      "types": "./dist/src/build/index.d.ts",
+      "import": "./dist/src/build/index.js"
+    }
+  },
+  "bin": {
+    "meowslides": "./dist/src/cli.js"
+  },
+  "dependencies": {
+    "@mdx-js/mdx": "^3.1.1",
+    "remark-gfm": "^4.0.1",
+    "@types/bun": "1.4.2",
+    "@types/node": "26.6.5"
+  },
+  "peerDependencies": {
+    "meowjsx": "^0.1.0",
+    "meowcss": "^0.1.0",
+    "meowtail": "^0.2.0-slides.20261018.1"
+  },
+  "devDependencies": {
+    "meowjsx": "workspace:*",
+    "meowcss": "workspace:*",
+    "meowtail": "workspace:*",
+    "meowbook": "workspace:*"
+  }
+}

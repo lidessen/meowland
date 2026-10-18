@@ -1,18 +1,20 @@
 import { render } from "meowjsx/web";
 import { installMeowUI } from "meowtail";
-import { standardOptions, standardTheme } from "meowtail/theme";
+import { installMeowSlides } from "meowslides";
+import { presentationOptions, presentationTheme } from "meowslides/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 import { createSunshineLesson } from "./lesson";
 import { lessonCss } from "./lesson.styles";
 const root = document.querySelector<HTMLElement>("#app");
 if (!root) throw new Error("Lesson mount point is missing");
 const uninstall = installMeowUI();
+const uninstallSlides = installMeowSlides();
 const restore = applyTheme(
   document.documentElement,
-  standardTheme,
-  standardOptions.select({ scheme: "light" }),
+  presentationTheme,
+  presentationOptions.select({ scheme: "light" }),
 );
-const remove = mountStyles(document, standardTheme.cssText + lessonCss);
+const remove = mountStyles(document, presentationTheme.cssText + lessonCss);
 const query = new URLSearchParams(location.search);
 const slideId = query.get("slide");
 const step = Number(query.get("step") ?? 0);
@@ -25,6 +27,7 @@ window.addEventListener(
     mounted.unmount();
     remove();
     restore();
+    uninstallSlides();
     uninstall();
   },
   { once: true },

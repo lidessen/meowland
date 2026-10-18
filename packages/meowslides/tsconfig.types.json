@@ -1,0 +1,9 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "types": [],
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "ESNext.Disposable"],
+    "skipLibCheck": false
+  },
+  "include": ["tests/types/**/*.types.ts", "tests/types/**/*.types.tsx"]
+}

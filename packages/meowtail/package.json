@@ -1,6 +1,6 @@
 {
   "name": "meowtail",
-  "version": "0.1.1-presentation.20261017.1",
+  "version": "0.2.0-slides.20261018.1",
   "license": "MIT",
   "type": "module",
   "scripts": {
@@ -14,7 +14,6 @@
     "README.md",
     "ASSISTANT.md",
     "JSON.md",
-    "PRESENTATION-LAYOUTS.md",
     "LICENSE",
     "THIRD_PARTY_NOTICES.md"
   ],
@@ -46,10 +45,6 @@
     "./json": {
       "types": "./dist/src/json/index.d.ts",
       "import": "./dist/src/json/index.js"
-    },
-    "./presentation": {
-      "types": "./dist/src/presentation/index.d.ts",
-      "import": "./dist/src/presentation/index.js"
     }
   },
   "dependencies": {

@@ -1,6 +1,7 @@
 import { createRuntime } from "meowjsx";
 import { createMeowUI } from "meowtail";
-import { standardOptions, standardTheme } from "meowtail/theme";
+import { createMeowSlides } from "meowslides";
+import { presentationOptions, presentationTheme } from "meowslides/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 import type { PreviewEnvironment } from "meowbook";
 import { lessonCss } from "./lesson.styles";
@@ -9,13 +10,13 @@ export default (({ root, onCleanup }) => {
   onCleanup(() => {
     root.style.removeProperty("height");
   });
-  onCleanup(mountStyles(root.ownerDocument, standardTheme.cssText + lessonCss));
+  onCleanup(mountStyles(root.ownerDocument, presentationTheme.cssText + lessonCss));
   onCleanup(
     applyTheme(
       root.ownerDocument.documentElement,
-      standardTheme,
-      standardOptions.select({ scheme: "light" }),
+      presentationTheme,
+      presentationOptions.select({ scheme: "light" }),
     ),
   );
-  return createRuntime({ plugins: [createMeowUI()] });
+  return createRuntime({ plugins: [createMeowUI(), createMeowSlides()] });
 }) satisfies PreviewEnvironment;

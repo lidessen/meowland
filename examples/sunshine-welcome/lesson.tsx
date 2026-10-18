@@ -1,11 +1,6 @@
 import { h, mapSignal, signal, type MaybeSignal } from "meowjsx";
 import { Button, Grid, Inline, Stack } from "meowtail";
-import {
-  Presentation,
-  Reveal,
-  type SlideDefinition,
-  type SlidePosition,
-} from "meowtail/presentation";
+import { Presentation, Reveal, type SlideDefinition, type SlidePosition } from "meowslides";
 import community from "./assets/community.svg" with { type: "file" };
 import { vocabulary } from "./vocabulary";
 

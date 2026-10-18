@@ -64,3 +64,9 @@ bun packages/meowbook/src/cli.ts serve --config examples/sunshine-welcome/meowbo
 构建输出在忽略目录`dist/`，包含运行所需JS/全部SVG、来源声明、构建清单，以及`source/`可编辑课件源与根manifest/bun.lock参考。源码快照须放回同版本Meowland checkout继续编辑；这份快照不冒充独立npm稳定包工程。产物可由普通静态HTTP提供，无外部运行资源；不默认支持双击file://。
 
 已从三页粗稿逐步接成九页，保留开场蓝黄方向；局部修过选择按钮ARIA字符串与内容表单选择器范围。实际图、交互与冷启动测试分别记录，不把截图成功当课堂接受或完整行为验收。独立测试位于`tests/`，由独立owner维护，最终执行结果沿父任务回执。
+
+## 演示包接线
+
+本作品的播放、步骤、媒体、布局与演示主题来自独立 `meowslides` 包；
+通用 Button/Stack/Inline 等仍来自 `meowtail`。正式入口和 Meowbook 预览各自安装通用 UI 与演示 registry，
+并装配完整 `presentationTheme`。这次迁移只调整包与主题接线，保留作品内容、状态与选定配色。

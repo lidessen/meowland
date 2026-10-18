@@ -6,9 +6,16 @@
     "dev": "meowbook serve --config meowbook.config.ts --port 13003",
     "check": "meowbook check --config meowbook.config.ts",
     "test": "playwright test --config playwright.config.ts",
-    "build": "bun build.ts"
+    "build": "bun build.ts",
+    "dev:slides": "meowbook serve --config slides.meowbook.config.ts --port 13006",
+    "check:slides": "meowbook check --config slides.meowbook.config.ts",
+    "build:slides": "bun slides.build.ts"
   },
   "devDependencies": {
-    "meowbook": "workspace:*"
+    "meowbook": "workspace:*",
+    "meowcss": "workspace:*",
+    "meowjsx": "workspace:*",
+    "meowslides": "workspace:*",
+    "meowtail": "workspace:*"
   }
 }

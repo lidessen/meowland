@@ -5,7 +5,7 @@ description: Change public exports, types, dependencies, CLI or package resource
 
 # 包合同与本地交付
 
-从受影响包的 manifest、README 和实际外部用法确定范围。五包独立 semver；Web 随 `meowjsx`、CSS adapters 随 `meowcss`，根与 showcase 私有。普通按钮修复不因本技能存在就强制全五包发行验收。
+从受影响包的 manifest、README 和实际外部用法确定范围。各包独立 semver；Web 随 `meowjsx`、CSS adapters 随 `meowcss`，演示归 `meowslides`，根与 showcase 私有。普通按钮修复不因本技能存在就强制全包发行验收。
 
 ## 验证真正的消费边界
 

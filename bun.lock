@@ -11,6 +11,7 @@
         "meowbook": "workspace:*",
         "meowcss": "workspace:*",
         "meowjsx": "workspace:*",
+        "meowslides": "workspace:*",
         "meowtail": "workspace:*",
         "oxfmt": "0.73.0",
         "oxlint": "1.88.0",
@@ -22,6 +23,10 @@
       "name": "@meowland/showcase",
       "devDependencies": {
         "meowbook": "workspace:*",
+        "meowcss": "workspace:*",
+        "meowjsx": "workspace:*",
+        "meowslides": "workspace:*",
+        "meowtail": "workspace:*",
       },
     },
     "packages/meowbook": {
@@ -48,7 +53,7 @@
       "peerDependencies": {
         "meowcss": "^0.1.0",
         "meowjsx": "^0.1.0",
-        "meowtail": "^0.1.0",
+        "meowtail": "^0.1.0 || ^0.2.0-slides.20261018.1",
       },
     },
     "packages/meowcss": {
@@ -91,9 +96,33 @@
         "meowjsx": "^0.1.0",
       },
     },
+    "packages/meowslides": {
+      "name": "meowslides",
+      "version": "0.1.0-slides.20261018.1",
+      "bin": {
+        "meowslides": "./dist/src/cli.js",
+      },
+      "dependencies": {
+        "@mdx-js/mdx": "^3.1.1",
+        "@types/bun": "1.4.2",
+        "@types/node": "26.6.5",
+        "remark-gfm": "^4.0.1",
+      },
+      "devDependencies": {
+        "meowbook": "workspace:*",
+        "meowcss": "workspace:*",
+        "meowjsx": "workspace:*",
+        "meowtail": "workspace:*",
+      },
+      "peerDependencies": {
+        "meowcss": "^0.1.0",
+        "meowjsx": "^0.1.0",
+        "meowtail": "^0.2.0-slides.20261018.1",
+      },
+    },
     "packages/meowtail": {
       "name": "meowtail",
-      "version": "0.1.1-presentation.20261017.1",
+      "version": "0.2.0-slides.20261018.1",
       "dependencies": {
         "@floating-ui/dom": "^1.8.0",
         "@shikijs/langs": "4.3.1",
@@ -419,6 +448,8 @@
     "meowjsx": ["meowjsx@workspace:packages/meowjsx"],
 
     "meowpress": ["meowpress@workspace:packages/meowpress"],
+
+    "meowslides": ["meowslides@workspace:packages/meowslides"],
 
     "meowtail": ["meowtail@workspace:packages/meowtail"],
 

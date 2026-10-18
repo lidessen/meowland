@@ -10,7 +10,7 @@ import {
   Reveal,
   type SlideDefinition,
   type SlidePosition,
-} from "meowtail/presentation";
+} from "meowslides";
 import { growthStages, problemCards, protectionCards, readingExcerpts } from "./content";
 import { pandaMedia } from "./media";
 

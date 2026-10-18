@@ -2,7 +2,7 @@ import { chmod, cp, mkdir, readdir, readFile, rm, stat, writeFile } from "node:f
 import { dirname, extname, join, resolve } from "node:path";
 
 const root = resolve(import.meta.dir, "..");
-const allPackages = ["meowjsx", "meowcss", "meowtail", "meowbook", "meowpress"];
+const allPackages = ["meowjsx", "meowcss", "meowtail", "meowslides", "meowbook", "meowpress"];
 const selected = process.argv.indexOf("--package");
 const packages = selected < 0 ? allPackages : [process.argv[selected + 1]!];
 if (packages.some((name) => !allPackages.includes(name))) throw new Error("Unknown package");
@@ -92,7 +92,7 @@ for (const name of packages) {
 }
 
 if (checking && selected < 0) {
-  for (const name of ["meowcss", "meowtail"]) {
+  for (const name of ["meowcss", "meowtail", "meowslides"]) {
     const child = Bun.spawn(
       [
         "bun",

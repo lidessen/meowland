@@ -47,7 +47,7 @@
   "peerDependencies": {
     "meowjsx": "^0.1.0",
     "meowcss": "^0.1.0",
-    "meowtail": "^0.1.0"
+    "meowtail": "^0.1.0 || ^0.2.0-slides.20261018.1"
   },
   "devDependencies": {
     "@types/pngjs": "^6.0.5",

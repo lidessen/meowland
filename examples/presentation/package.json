@@ -3,13 +3,12 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "build": "bun build.ts",
-    "serve": "bun serve.ts"
+    "dev": "meowslides dev slides.mdx",
+    "build": "meowslides build slides.mdx --outdir dist"
   },
   "dependencies": {
-    "meowjsx": "^0.1.0",
-    "meowcss": "^0.1.0",
-    "meowtail": "0.1.1-presentation.20261017.1",
-    "meowbook": "^0.1.1"
+    "meowjsx": "workspace:*",
+    "meowslides": "workspace:*",
+    "meowtail": "workspace:*"
   }
 }

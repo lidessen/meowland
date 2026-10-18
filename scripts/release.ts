@@ -3,7 +3,7 @@ import { readFile, realpath } from "node:fs/promises";
 import { basename, dirname, resolve } from "node:path";
 import { prerelease, satisfies, valid, validRange } from "semver";
 
-const names = ["meowjsx", "meowcss", "meowtail", "meowbook", "meowpress"];
+const names = ["meowjsx", "meowcss", "meowtail", "meowslides", "meowbook", "meowpress"];
 // Historical inputs remain readable, but retired packages cannot be selected for release.
 const reviewedNames = [...names, "meowui"];
 const registry = "https://registry.npmjs.org";

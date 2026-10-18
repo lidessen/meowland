@@ -1,4 +1,4 @@
-import { presentationTokens } from "meowtail/theme";
+import { presentationTokens } from "meowslides/theme";
 
 export const lessonCss = `
 html,body{margin:0;min-width:320px;font-family:ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:#e7ece6;color:#203c32}#app{height:100dvh}

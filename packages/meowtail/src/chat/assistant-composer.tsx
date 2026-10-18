@@ -1,7 +1,7 @@
 import { defineComponent, h, unwrap } from "meowjsx";
 import { ChatComposer } from "./composer";
 import { ChatAttachments } from "./attachments";
-import { Button } from "../components/button";
+import { IconButton } from "../components/icon-button";
 import { ChoiceSelect } from "../components/choice-select";
 import { Icon } from "../icons/icon";
 import { assistantDerived } from "./assistant-content";
@@ -241,10 +241,8 @@ export const AssistantComposer = defineComponent<
         options.allowAttachments === false
           ? []
           : [
-              h(Button, {
-                variant: "quiet",
-                size: "small",
-                "aria-label": assistantCopy.attach,
+              h(IconButton, {
+                label: assistantCopy.attach,
                 disabled: assistantDerived(context, () => disabled.value || attaching.value),
                 onClick: () => fileInput?.click(),
                 children: h(Icon, { name: "paperclip" }),

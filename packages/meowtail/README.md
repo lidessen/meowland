@@ -346,6 +346,9 @@ DialogPanel 在直属 header 与 body 内分配标准留白，保证正文首末
 `root/entry/image/preview/file/icon/details/name/size/previewButton/remove` parts。
 每项可提供 `onRemove`，只有草稿需要移除操作时才传入；上传、删除文件和 URL 生命周期仍归宿主。
 
+`ChatFrame` 只为直属 `ChatComposer` 提供阅读边距；若 footer、Card 或其他包装容器负责该区域的空间，
+其内部 Composer 使用容器内的自然宽度，不再受到祖先 Frame 的额外收窄与外边距影响。
+
 `ChatComposer` 的 `hintId` 会把提示节点和输入框通过 `aria-describedby` 关联；`onInput`
 绑定在 textarea 上，`onSubmit` 绑定在外层 form 上。`value` 支持 Signal，`submitDisabled`
 仅禁止提交，适合等待结果时继续编辑；`disabled` 同时禁止编辑与提交。请求状态、已提交快照和

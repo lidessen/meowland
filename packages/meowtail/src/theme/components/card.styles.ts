@@ -41,7 +41,10 @@ ${partSelector(cardHeaderContract, "root")} {
   min-width: 0;
 }
 :where(${partSelector(cardHeaderContract, "root")}:has(> ${partSelector(cardActionContract, "root")})) {
-  grid-template-columns: minmax(0, 1fr) fit-content(50%);
+  /* Tracks collapse at the card's own width without size containment affecting intrinsic cards. */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, ${uiTokens.gridColumnNormal}), max-content));
+  grid-auto-flow: row dense;
+  justify-content: space-between;
 }
 :where(${partSelector(cardHeaderContract, "root")} > ${partSelector(cardTitleContract, "root")}, ${partSelector(cardHeaderContract, "root")} > ${partSelector(cardDescriptionContract, "root")}) {
   grid-column: 1;
@@ -68,8 +71,11 @@ ${partSelector(cardActionContract, "root")} {
   align-items: center;
 }
 :where(${partSelector(cardHeaderContract, "root")} > ${partSelector(cardActionContract, "root")}) {
-  grid-column: 2;
-  grid-row: 1 / span 2;
+  grid-column: auto;
+  grid-row: span 2;
+  order: 1;
+  min-width: 0;
+  max-width: 100%;
   justify-self: end;
 }
 ${partSelector(cardContentContract, "root")} {

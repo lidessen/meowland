@@ -96,7 +96,8 @@ export const chatComposerStyles = css`
     border-radius: ${radiusTokens.float};
   }
 
-  ${partSelector(chatFrameContract, "root")} ${partSelector(chatComposerContract, "root")} {
+  /* The frame owns its direct writing surface; a footer or card owns its own inset. */
+  ${partSelector(chatFrameContract, "root")} > ${partSelector(chatComposerContract, "root")} {
     flex: 0 0 auto;
     box-sizing: border-box;
     width: calc(100% - 2 * ${chatTokens.readingInset});

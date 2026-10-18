@@ -41,7 +41,7 @@ const view = (
 
 ## 内容与局部定制
 
-消息 `parts` 包含 `text`、`code`、`process` 和 `attachments`。`text` 默认安全 Markdown：原始 HTML 与图片作为文字，只有明确的 HTTP、HTTPS、mailto 链接可导航；代码 part 使用共享 `CodeBlock`。过程使用原生 disclosure，过程步骤只接归一化的标题、说明、状态文字与视觉 tone。
+消息 `parts` 包含 `text`、`code`、`process`、`attachments`、`tool` 和 `task`。`text` 默认安全 Markdown：原始 HTML 与图片作为文字，只有明确的 HTTP、HTTPS、mailto 链接可导航；代码 part 使用共享 `CodeBlock`。过程使用原生 disclosure，过程步骤只接归一化的标题、说明、状态文字与视觉 tone。
 
 `renderPart` 可只替换一个 part，返回 `undefined` 使用默认实现；`renderWorkDetail` 只替换详情正文。`composerTrailing` 和 `headerActions` 放局部控件，无需替换整页。自定义组件仍在原渲染树中消费祖先 Context，不另建 renderer root。
 
@@ -50,3 +50,22 @@ const view = (
 宿主传历史消息时直接前插 `messages`，组件保留可见消息锚点；向上阅读时追加与流式更新不强制跳到底。`onLoadOlder` 只请求宿主加载，UI 不拥有分页、网络或记录权限。列表使用同一 MeowJSX keyed 机制；删除项释放其组件生命周期。
 
 模型选择、文件、路径、URL、回调名字及 UI 状态都不授予后端权限。连接、上传、执行、停止、发布、授权与恢复由应用 adapter 接入；这里没有 Agent 执行框架。
+
+## 标准 Agent 内容
+
+`tool` part 默认复用 `ChatToolCall`：动作与目标、显式执行状态、惰性 input/output、outputSummary、
+长结果窗口和默认展开。outputSummary 只在展开 body 中显示，折起时的摘要使用 summary。
+`canRetry/canCancel` 仅决定是否提供对应入口，不授予执行权限，
+`retryDisabled/cancelDisabled` 只控制入口禁用；`onToolAction(messageId, partId, action)`
+通知宿主重试或取消意图，不执行工具、不自行切换状态。动作随工具 body 折起而隐藏；
+全局停止/打断应由宿主放在折叠区域外的 headerActions、composerTrailing 或普通操作组。缺省工具 state 使用 unknown，
+没有输出或未收到公开答复都不自动判为失败。
+
+`task` part 复用 `ChatTask`，执行状态、executionText、replyText 和有标签的 progress 分别由宿主提供，
+可附已有 process steps。执行 success 与“公开答复尚未收到”可以同时存在。
+相同 message/part 的稳定 id 与 kind 保留组件实例、原生展开和焦点；不可变更新数据即可，
+不必重新创建整个会话。defaultOpen 只表示初始化展开，后续输出更新不强迫重新折起。
+
+标准组合与完整能力矩阵见 [Agent 组件说明](AGENT-COMPONENTS.md)。本轮同时扩 typed JSX/Assistant parts 与已有 AssistantView JSON catalog 的有限 tool/task schema、onToolAction action。
+JSON 仍不提供独立 ChatTask/ChatToolCall entry、递归任务树、任意对象解释、执行协议或私有推理披露要求；
+确切字段见 [JSON 合同](JSON.md)。

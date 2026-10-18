@@ -41,7 +41,14 @@ const child = createJsonView(view, {
 });
 ```
 
-`messages` 是必填项。消息支持 text/code/process/attachments 四个明确分支；过程步骤、活动、后台工作、问题、模型选项、读取状态、草稿和发送快照使用有限 schema。`assistantJsonSchemas` 与 catalog 复用相同定义，校验、描述与类型关联不会各维护一份。controlled 草稿必须接 `onDraftChange` 或设只读；发送是否接受仍由宿主显式返回 `{accepted:true}` 决定。
+`messages` 是必填项。消息支持 text/code/process/attachments/tool/task 六个明确分支；过程步骤、活动、后台工作、问题、模型选项、读取状态、草稿和发送快照使用有限 schema。`assistantJsonSchemas` 与 catalog 复用相同定义，校验、描述与类型关联不会各维护一份。controlled 草稿必须接 `onDraftChange` 或设只读；发送是否接受仍由宿主显式返回 `{accepted:true}` 决定。
+
+tool 分支有限接收 label/summary/state/statusLabel、惰性 input/output/outputSummary、maxLines/defaultOpen，
+以及 canRetry/canCancel 和 retryDisabled/cancelDisabled。outputSummary 只在展开 body 中可见，折起摘要使用 summary。
+canRetry/canCancel 仅控制动作显隐，不授予权限；`onToolAction` action 只传已校验的 messageId、partId 和
+`"retry" | "cancel"`，执行资格和结果更新由宿主负责。task 分支接标题、状态、description、独立 executionText/replyText、
+有标签的 progress 和有限 steps，渲染同一 `ChatTask`。这不是独立 ChatTask/ChatToolCall JSON entry，
+不提供递归任务树、children/footer slots 或任意对象解释。
 
 本片支持序列化附件元数据（id/name/url/mediaType/sizeBytes），不支持 File、本地文件上传、附件回调、renderPart/renderWorkDetail、headerActions/composerTrailing slots。需要这些能力时使用完整 `meowtail/chat` JSX API。JSON 不提供 `onAttach`，并用有限 `allowAttachments: false` 默认值关闭本地文件选择入口，显式 true 会被拒绝；文本编辑、发送和已有附件的显示/移除仍可使用。网络、权限、持久化、数据协议和上传始终属于宿主。
 

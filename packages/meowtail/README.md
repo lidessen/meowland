@@ -202,10 +202,16 @@ warning、danger、unknown（空心灰，不假装知道）、idle 表达状态�
 色板与层级只在 `theme/palette.ts`：`accentTokens`、`statusTokens`、`radiusTokens`（8/10/14/22）、`lineTokens`
 （0.5px 发丝线）、`layerTokens`；accent 只表达「正在发生」与「当前所在」，primary 仍为黑白。
 
-`ChatToolCall` 用 `label` 表示动作，`summary` 表示折叠时仍可见的简短目标；`detail` 与结果 children
-在展开后显示。完成状态保留可访问描述，运行、等待、失败和未确认状态始终可见。
-`ChatProcess` 用原生 details 聚合过程，可传 `icon` 表示动作类别，展开时显示向上折叠图标。
-工具名称、摘要与结果均由宿主提供，组件不推断执行事实。
+`ChatToolCall` 用 `label` 表示动作，`summary` 表示折叠时仍可见的简短目标；输入/输出是可响应更新的惰性文本，
+超长结果沿共享 `OutputBlock` 折叠并完整复制。queued/running/waiting/success/error/cancelled/unknown
+分别表示宿主事实，complete 保留兼容。onRetry/onCancel 只通知宿主，组件不执行工具或自动更新业务状态。
+`ChatTask` 提供标题、状态、公开执行摘要、独立的 executionText/replyText、可选原生进度与 children/footer；
+执行成功但公开答复未收到仍可准确呈现。默认 unknown；未知进度省略，不伪造百分比。
+`ChatProcess` 用原生 details 聚合记录，任务与工具继续复用 Stack/Inline/Grid、来源、附件、产物和代码组件。
+完整生命周期的已有/补齐/宿主边界与连贯组合规则见 [Agent 组件说明](AGENT-COMPONENTS.md)，
+真实默认组合见 Meowbook 的 agent-workflow、agent-workflow-narrow 与 agent-workflow-assistant。
+已有 AssistantView JSON catalog 同步增加有限 tool/task parts 与 onToolAction，复用同一组件；
+不新增独立 ChatTask/ChatToolCall JSON entry、递归任务树或任意对象解释，支持集见 [JSON 合同](JSON.md)。
 
 `ChatMessageList` 的行距由列声明、由行读取：列在每个非首行上给出 `--chat-row-pitch`，行按它设置
 上边距，首行的上边距来自列表自身的内距。宿主逐条挂载消息时可以在列与行之间插入无布局容器

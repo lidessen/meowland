@@ -5,11 +5,17 @@ import { chatConversationContract } from "../../chat/conversation";
 export const chatConversationStyles = css`
   ${partSelector(chatConversationContract, "root")} {
     position: relative;
+    display: flex;
+    flex-direction: column;
     min-height: 0;
+    min-width: 0;
     font-family: ${uiTokens.font};
     font-size: ${uiTokens.fontBody};
   }
   ${partSelector(chatConversationContract, "viewport")} {
+    flex: 1 1 0;
+    min-height: 0;
+    min-width: 0;
     scrollbar-gutter: stable;
     overscroll-behavior-y: contain;
   }
@@ -17,17 +23,19 @@ export const chatConversationStyles = css`
     outline: 2px solid ${uiTokens.focus};
     outline-offset: -2px;
   }
-  ${partSelector(chatConversationContract, "content")} {
-    padding-bottom: calc(${uiTokens.spaceGroup} + ${uiTokens.controlHeight});
-  }
   ${partSelector(chatConversationContract, "latest")} {
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    position: absolute;
-    bottom: 16px;
-    right: 16px;
-    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: flex-end;
+    justify-self: end;
+    width: fit-content;
+    min-width: 0;
+    max-width: calc(100% - 2 * ${uiTokens.spaceSection});
+    margin: ${uiTokens.spaceGroup} ${uiTokens.spaceSection};
+    white-space: normal;
+    overflow-wrap: anywhere;
     min-height: 34px;
     padding: 0 ${uiTokens.controlPaddingInline};
     box-sizing: border-box;

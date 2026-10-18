@@ -11,8 +11,15 @@ export const ConversationReading = defineStory({
   group: "对话组件",
   groupOrder: 50,
   description:
-    "先向上阅读，再增加回复；阅读位置保持不动。回到最新后继续跟随。按钮只更新本地示例，收起再展开会重新挂载阅读区。",
-  covers: ["ChatConversation", "ChatMessageList", "streaming", "scroll", "cleanup"],
+    "先向上阅读，再增加回复；阅读位置保持不动。返回动作位于正文视口之后，不覆盖历史文字；回到最新后继续跟随。按钮只更新本地示例，收起再展开会重新挂载阅读区。",
+  covers: [
+    "ChatConversation",
+    "ChatMessageList",
+    "streaming",
+    "scroll",
+    "normal-flow latest",
+    "cleanup",
+  ],
   render: () => {
     let count = 8;
     const renderMessages = (): Child =>

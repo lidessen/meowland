@@ -316,11 +316,10 @@ export const AssistantView = defineComponent<
     context.part(
       "latest",
       "div",
-      null,
+      { hidden: latestHidden },
       h(Button, {
         variant: "outline",
         size: "small",
-        hidden: latestHidden,
         onClick: () => scroll?.latest(),
         children: assistantCopy.latest,
       }),

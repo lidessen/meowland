@@ -11,7 +11,10 @@ export interface ChatConversationProps extends Props {
   className?: string;
 }
 
-/** Presentation only, for hosts that already own transcript scrolling. */
+/** A normal-flow action for hosts that already own transcript scrolling.
+ * Place it beside the host viewport in a height-constrained column; the host
+ * owns visibility, returning to the end and restoring viewport focus.
+ */
 export const ChatConversationLatest = defineComponent<
   Props,
   "chat-conversation",
@@ -86,7 +89,7 @@ export const ChatConversation = defineComponent<
           role: "region",
           "aria-label": ariaLabel,
           tabIndex: 0,
-          style: { overflowY: "auto", minHeight: 0, height: "100%", overflowAnchor: "none" },
+          style: { overflowY: "auto", minHeight: 0, overflowAnchor: "none" },
         },
         context.part("content", "div", { style: { display: "flow-root" } }, children),
       ),

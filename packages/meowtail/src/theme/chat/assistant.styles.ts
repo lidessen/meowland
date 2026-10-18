@@ -9,6 +9,7 @@ import { chatHeaderContract } from "../../chat/header";
 import { pageFrameContract } from "../../components/page-frame";
 import { chatComposerContract } from "../../chat/composer";
 import { workCardContract } from "../../components/work-card";
+import { buttonContract } from "../../components/button";
 
 const root = partSelector(assistantViewContract, "root");
 const layout = partSelector(assistantViewContract, "layout");
@@ -51,11 +52,15 @@ export const assistantStyles = css`
   ${messages} {
     grid-area: messages;
     position: relative;
+    display: flex;
+    flex-direction: column;
     min-height: 0;
     min-width: 0;
   }
   ${viewport} {
-    height: 100%;
+    flex: 1 1 0;
+    min-height: 0;
+    min-width: 0;
     overflow-y: auto;
     overflow-anchor: none;
     overscroll-behavior-y: contain;
@@ -122,13 +127,20 @@ export const assistantStyles = css`
     color: ${uiTokens.info};
   }
   ${partSelector(assistantViewContract, "latest")} {
-    position: absolute;
-    bottom: ${uiTokens.spaceGroup};
-    right: max(
-      ${uiTokens.spacePanel},
-      calc((100% - ${uiTokens.containerContent}) / 2 + ${uiTokens.spacePanel})
-    );
-    z-index: 1;
+    display: flex;
+    justify-content: flex-end;
+    flex-shrink: 0;
+    width: 100%;
+    max-width: ${uiTokens.containerContent};
+    margin-inline: auto;
+    padding: ${uiTokens.spaceGroup} ${uiTokens.spacePanel};
+    box-sizing: border-box;
+  }
+  ${partSelector(assistantViewContract, "latest")} > ${partSelector(buttonContract, "root")} {
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
   }
   ${composer} {
     grid-area: composer;
@@ -282,7 +294,7 @@ export const assistantStyles = css`
       padding-inline: ${uiTokens.pageInsetCompactInline};
     }
     ${partSelector(assistantViewContract, "latest")} {
-      right: ${uiTokens.pageInsetCompactInline};
+      padding-inline: ${uiTokens.pageInsetCompactInline};
     }
   }
   ${root} {

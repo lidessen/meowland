@@ -366,8 +366,38 @@ Bubble 的 `auto` 通过 Context 读取消息角色，主题决定底色；也�
 
 `ChatConversation` 是可选的滚动容器，宿主必须提供受约束的高度。
 它在靠近底部时跟随追加内容，上翻时保留位置，并提供返回最新的按钮。
+返回动作在消息视口之后参与正常布局，显示时领取自身高度，隐藏后把空间归还消息；不会浮在历史正文之上。
 它不实现历史前插、逐消息锚点或持久化阅读恢复。不要与应用已有滚动控制器叠加；
 Dashboard 继续使用自身控制器。`ChatMessageList` 仍只提供消息记录语义。
+
+已有滚动 owner 的宿主可以单用 `ChatConversationLatest`。它是正常流按钮，不安装控制器、不设置定位容器，也不会独自给任意宿主视口分配高度。
+例如下面的 `transcript`、`latestHidden` 与三个回调都来自宿主现有控制器：
+
+```tsx
+import { h } from "meowjsx";
+import { Stack, LayoutItem } from "meowtail";
+import { ChatMessageList, ChatConversationLatest } from "meowtail/chat";
+
+<Stack gap="none" style={{ height: "100%" }}>
+  <LayoutItem
+    grow
+    basis={0}
+    role="region"
+    aria-label="消息阅读区"
+    tabIndex={0}
+    style={{ overflowY: "auto", overflowAnchor: "none" }}
+    ref={connectTranscriptViewport}
+    onScroll={readTranscriptPosition}
+  >
+    <ChatMessageList>{transcript}</ChatMessageList>
+  </LayoutItem>
+  <ChatConversationLatest hidden={latestHidden} onClick={returnToLatest} />
+</Stack>;
+```
+
+父容器必须提供有限高度；上例的 LayoutItem 是唯一滚动视口，按钮是它的兄弟项。
+宿主负责读取位置、显隐、追加跟随与保位；`returnToLatest` 应滚到末端，并以 `preventScroll` 将焦点交回该视口再隐藏动作。
+不要把片段改成绝对定位后期待它自动避让正文，也不要靠消息末端 padding 或设备偏移量保护历史中段。
 
 `SearchInput` 提供搜索图标与原生 search input 的共同外壳，`label` 是必需的可访问名称。
 `className` 作用于外壳，`inputClassName` 作用于输入；`id/name/value/disabled/readOnly/aria-*`

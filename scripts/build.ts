@@ -1,5 +1,6 @@
-import { chmod, cp, mkdir, readdir, readFile, rm, stat, writeFile } from "node:fs/promises";
+import { chmod, cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, extname, join, resolve } from "node:path";
+import { rewriteRelativeImports } from "./esm-specifiers";
 
 const root = resolve(import.meta.dir, "..");
 const allPackages = ["meowjsx", "meowcss", "meowtail", "meowslides", "meowbook", "meowpress"];
@@ -18,14 +19,6 @@ async function files(directory: string): Promise<string[]> {
       }),
     )
   ).flat();
-}
-
-async function existing(file: string): Promise<boolean> {
-  try {
-    return (await stat(file)).isFile();
-  } catch {
-    return false;
-  }
 }
 
 if (checking && selected < 0) {
@@ -68,19 +61,7 @@ for (const name of packages) {
   for (const file of await files(join(directory, "dist"))) {
     if (!file.endsWith(".js") && !file.endsWith(".d.ts")) continue;
     const original = await readFile(file, "utf8");
-    const pattern = /((?:from\s*|import\s*|import\s*\(\s*)["'])(\.[^"']+)(["'])/g;
-    let updated = original;
-    for (const match of original.matchAll(pattern)) {
-      const specifier = match[2]!;
-      let replacement = specifier.replace(/\.(tsx?|jsx)$/, ".js");
-      if (!extname(replacement)) {
-        if (await existing(resolve(dirname(file), replacement + ".js"))) replacement += ".js";
-        else if (await existing(resolve(dirname(file), replacement, "index.js")))
-          replacement += "/index.js";
-      }
-      if (replacement !== specifier)
-        updated = updated.replace(match[0], match[1] + replacement + match[3]);
-    }
+    const updated = await rewriteRelativeImports(file, original);
     if (updated !== original) await writeFile(file, updated);
   }
   const manifest = JSON.parse(await readFile(join(directory, "package.json"), "utf8")) as {

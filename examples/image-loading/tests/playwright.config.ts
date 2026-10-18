@@ -14,7 +14,7 @@ export default defineConfig({
     trace: "retain-on-failure",
   },
   webServer: {
-    command: "PORT=13029 bun examples/presentation-lab/serve.ts",
+    command: "PORT=13029 bun examples/image-loading/serve.ts",
     cwd: new URL("../../..", import.meta.url).pathname,
     url: "http://127.0.0.1:13029/",
     reuseExistingServer: false,

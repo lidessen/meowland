@@ -2,7 +2,7 @@ import { resolve, sep } from "node:path";
 const root = resolve(import.meta.dir, "dist");
 const port = Number(process.env.PORT ?? 13009);
 if (!(await Bun.file(resolve(root, "index.html")).exists()))
-  throw new Error("Build first: bun examples/presentation-lab/build.ts");
+  throw new Error("Build first: bun examples/image-loading/build.ts");
 const server = Bun.serve({
   hostname: "127.0.0.1",
   port,
@@ -15,4 +15,4 @@ const server = Bun.serve({
     return new Response(body, { headers: { "Cache-Control": "no-store" } });
   },
 });
-console.log(`Presentation: ${server.url}`);
+console.log(`Image loading: ${server.url}`);

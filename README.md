@@ -15,7 +15,7 @@
 
 [`apps/showcase`](apps/showcase/README.md) 是私有展板，不是第六个发布包。本轮完整 Assistant 与有限 JSON→UI 已完成本地实现及有限独立验收，实际同源输入、产物与未覆盖范围见[本地迁移回执](docs/local-migration-receipt.md)；早期混合产物的通过不作为本轮同源证据，也不表示 Rossovia 产品已切换或发布。
 
-浏览器演示从 [MDX 作者示例](examples/presentation/README.md)开始，创作方法见 [presentation-authoring skill](.agents/skills/presentation-authoring/SKILL.md)。普通作者维护讲稿、素材和必要的 MeowJSX 互动组件；共享播放、默认主题、构建和预览由 `meowslides` 提供，Meowbook 用于额外审查。原[图片等待实验场](examples/presentation-lab/README.md)保留复杂动画、媒体和验收工程，不再代表写讲稿的最低成本。首期浏览器交付，PPT 导出留待以后。[拆包与 MDX 设计](docs/designs/2026-10-18-presentation-package-mdx.md)记录职责与信任边界；首期历史见[原实施回执](docs/records/2026-10-17-presentation-authoring.md)。
+浏览器演示从 [MDX 作者示例](examples/presentation/README.md)开始，创作方法见 [presentation-authoring skill](.agents/skills/presentation-authoring/SKILL.md)。普通作者维护讲稿、素材和必要的 MeowJSX 互动组件；共享播放、默认主题、构建和预览由 `meowslides` 提供，Meowbook 用于额外审查。[图片加载讲解](examples/image-loading/README.md)是一件完整的五页自定义互动作品，围绕编码、网速估算和真实受控录屏组织，源码、专用动画与审阅工具各有归属；通用音轨展示在包 stories 中。首期浏览器交付，PPT 导出留待以后。[拆包与 MDX 设计](docs/designs/2026-10-18-presentation-package-mdx.md)记录职责与信任边界；首期历史见[原实施回执](docs/records/2026-10-17-presentation-authoring.md)。
 
 课件实作见 [8B Unit 6 · Sunshine for all / Welcome](examples/sunshine-welcome/README.md)：依照核实的课时范围创作课堂活动，教师控制提示和参考答案，学生输入由作品 signals 保留；教材来源、课堂改编与启动方式在样例中区分说明，验证与限制见[课件回执](docs/records/2026-10-17-sunshine-welcome.md)。
 

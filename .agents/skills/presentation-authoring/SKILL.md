@@ -7,7 +7,7 @@ description: Create and iteratively revise Meowland browser presentations and cl
 
 让 agent 和人围绕可运行作品共创。当前交付浏览器演示；PPT 导出是后续能力，不以可导出支持集限制互动，也不承诺已有 PPT/PDF 转换器。
 
-先读作品已有 README、入口与素材说明。新作品从 [MDX 作者示例](../../../examples/presentation/README.md)开始，以 [Meowslides README](../../../packages/meowslides/README.md)和 public exports 为准；普通作者维护 `slides.mdx`、素材和必要的 MeowJSX 互动组件，宿主和构建由工具承担。复杂作品参考[互动实验场](../../../examples/presentation-lab/README.md)，不把实验动画、素材制作和浏览器夹具当作每份讲稿的起步任务。
+先读作品已有 README、入口与素材说明。新作品从 [MDX 作者示例](../../../examples/presentation/README.md)开始，以 [Meowslides README](../../../packages/meowslides/README.md)和 public exports 为准；普通作者维护 `slides.mdx`、素材和必要的 MeowJSX 互动组件，宿主和构建由工具承担。完整互动讲解参考[图片加载作品](../../../examples/image-loading/README.md)，不把专用动画、素材制作和浏览器夹具当作每份讲稿的起步任务。
 
 MDX 是可信本地代码，支持 import、表达式和组件执行；外部上传、模型生成或拉取的任意文本须先审阅，不默认当 MDX 执行。顶层 `---` 分页前后留空行；页级元信息和渐显沿实际实现，复杂互动显式导入 MeowJSX 组件，不假定 React hooks 兼容。不要把历史设计草稿当作已实现能力。
 

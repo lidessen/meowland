@@ -151,23 +151,3 @@ test("direct step fixtures work in normal and reduced motion without replaying c
     ).toBeHidden();
   }
 });
-
-test("optional real music persists across pages and pauses without automatically resuming", async ({
-  page,
-}) => {
-  await page.goto("/?demo=music");
-  const audio = page.locator("audio");
-  const original = await audio.elementHandle();
-  await page.getByRole("button", { name: "Play / continue", exact: true }).click();
-  await expect
-    .poll(() => audio.evaluate((element: HTMLAudioElement) => element.currentTime))
-    .toBeGreaterThan(0);
-  await page.getByRole("button", { name: "Next", exact: true }).click();
-  expect(await original!.evaluate((element: HTMLAudioElement) => element.isConnected)).toBe(true);
-  expect(await audio.evaluate((element: HTMLAudioElement) => element.paused)).toBe(false);
-  await page.getByRole("button", { name: "Presentation options", exact: true }).click();
-  await page.getByRole("button", { name: "Pause effects", exact: true }).click();
-  await expect.poll(() => audio.evaluate((element: HTMLAudioElement) => element.paused)).toBe(true);
-  await page.getByRole("button", { name: "Resume effects", exact: true }).click();
-  expect(await audio.evaluate((element: HTMLAudioElement) => element.paused)).toBe(true);
-});

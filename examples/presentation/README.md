@@ -1,7 +1,7 @@
 # 最小浏览器演示：Read a landscape
 
 作者主要编辑 [slides.mdx](slides.mdx)：普通 Markdown、双栏、图片、逐步呈现和一个课堂问答。
-复杂的图片传输实验、视频、跨页状态与压力场景保留在 [presentation-lab](../presentation-lab/README.md)，不作为每份讲稿的起点。
+完整自定义互动讲解见[图片加载作品](../image-loading/README.md)；通用媒体场景与压力验证归 Meowslides stories/tests，不作为每份讲稿的起点。
 
 刚开始只需要下面这样的 `slides.mdx`，不用 import、页数组或 `Slide` 声明：
 
@@ -19,6 +19,15 @@ Use one visible detail to support your claim.
 
 目录标题、默认布局和排版由工具生成。本目录的七页实稿继续展示可选的双栏、图片、渐显、互动和音频；
 不需要这些能力时不必保留对应页面或 TSX 文件。需要长期引用某页时再显式填写稳定 id。
+
+Panda 完整课件单独位于 [examples/protecting-pandas](../protecting-pandas/README.md)，不在这个最小示例中。同版包就绪后，从仓库根运行：
+
+```sh
+bun examples/protecting-pandas/build.ts
+bun examples/protecting-pandas/serve.ts
+```
+
+打开 `http://127.0.0.1:13014/`。课件独立保留，教学内容没有复制到本例。
 
 ## 预览与构建
 

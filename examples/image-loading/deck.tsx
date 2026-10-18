@@ -1,109 +1,23 @@
-import {
-  defineComponent,
-  h,
-  mapSignal,
-  signal,
-  type Child,
-  type MaybeSignal,
-  type ReadableSignal,
-} from "meowjsx";
+import { h, mapSignal, signal, type Child, type MaybeSignal } from "meowjsx";
 import { Button, Grid, ImagePreview, Inline, Stack } from "meowtail";
 import {
   Presentation,
-  PresentationAudio,
   PresentationVideo,
   Reveal,
-  usePresentationActivity,
   type SlideDefinition,
   type SlidePosition,
 } from "meowslides";
 import { assets, bytesLabel, imageFacts, secondsLabel, transferSeconds } from "./assets";
+import { TransferEstimate } from "./transfer-estimate";
 
-export const talkVersion = "image-waiting-b3";
-export interface TalkOptions {
+export const imageLoadingVersion = "image-waiting-b3";
+export interface ImageLoadingOptions {
   initialPosition?: SlidePosition;
   speed?: number;
   active?: MaybeSignal<boolean>;
 }
 
-const TransferPreview = defineComponent<
-  { speed: ReadableSignal<number> },
-  "image-talk-transfer",
-  "root"
->({ name: "image-talk-transfer", parts: ["root"] }, ({ speed }, context) => {
-  const active = usePresentationActivity();
-  const progress = context.signal(1);
-  const replay = context.signal(0);
-  const reduceMotion = context.signal(false);
-  context.effect(() => {
-    const query = matchMedia("(prefers-reduced-motion: reduce)");
-    const update = () => {
-      reduceMotion.value = query.matches;
-    };
-    update();
-    query.addEventListener("change", update);
-    return () => query.removeEventListener("change", update);
-  });
-  context.effect(() => {
-    const permitted = active.value;
-    const reduced = reduceMotion.value;
-    const duration = transferSeconds(imageFacts.originalBytes, speed.value) * 1000;
-    void replay.value;
-    progress.value = 1;
-    if (!permitted || reduced) return;
-    let frame = 0;
-    const started = performance.now();
-    progress.value = 0;
-    const tick = (now: number) => {
-      progress.value = Math.min(1, (now - started) / duration);
-      if (progress.value < 1) frame = requestAnimationFrame(tick);
-    };
-    frame = requestAnimationFrame(tick);
-    return () => cancelAnimationFrame(frame);
-  });
-  const compactRatio = imageFacts.originalBytes / imageFacts.deliveryBytes;
-  return context.part(
-    "root",
-    "section",
-    { "aria-label": "Illustrative transfer comparison", "data-transfer-active": active },
-    [
-      <p className="fine-print">Same connection · animation follows the estimate</p>,
-      <div className="transfer-name">
-        <span>Original PNG</span>
-        <span>{bytesLabel(imageFacts.originalBytes)}</span>
-      </div>,
-      <div className="transfer-track">
-        <div
-          className="transfer-fill"
-          style={{ width: mapSignal(progress, (p) => `${p * 100}%`) }}
-        />
-      </div>,
-      <div className="transfer-name">
-        <span>Delivery JPEG</span>
-        <span>{bytesLabel(imageFacts.deliveryBytes)}</span>
-      </div>,
-      <div className="transfer-track">
-        <div
-          className="transfer-fill delivery"
-          style={{ width: mapSignal(progress, (p) => `${Math.min(1, p * compactRatio) * 100}%`) }}
-        />
-      </div>,
-      <Button
-        variant="outline"
-        onClick={() => replay.update((v) => v + 1)}
-        disabled={mapSignal(active, (value) => !value)}
-      >
-        Replay estimate
-      </Button>,
-      <p className="fine-print">
-        Animation is an illustration, not a live network measurement. Reduced motion shows the
-        complete bars.
-      </p>,
-    ],
-  );
-});
-
-export function createImageTalk(options: TalkOptions = {}) {
+export function createImageLoadingDeck(options: ImageLoadingOptions = {}) {
   const position = signal<SlidePosition>(
     options.initialPosition ?? { slideId: "opening", step: 0 },
   );
@@ -272,7 +186,7 @@ export function createImageTalk(options: TalkOptions = {}) {
                 <p className="formula">seconds ≈ bytes × 8 ÷ (Mbit/s × 1,000,000)</p>
               </Reveal>
               <Reveal at={2}>
-                <TransferPreview speed={speed} />
+                <TransferEstimate speed={speed} />
               </Reveal>
               <Reveal at={3}>
                 <p className="fine-print">
@@ -400,52 +314,5 @@ export function createImageTalk(options: TalkOptions = {}) {
       active={options.active}
     />
   );
-  return { view, position, speed, version: talkVersion };
-}
-
-export function createMusicDemo(active: MaybeSignal<boolean> = true) {
-  return (
-    <Presentation
-      className="image-talk"
-      title="Optional single-track audio"
-      active={active}
-      soundtrack={
-        <PresentationAudio src={assets.tone} label="Original quiet tone" preload="metadata" />
-      }
-      slides={[
-        {
-          id: "music-first",
-          title: "Music is optional.",
-          render: () => (
-            <Stack gap="relaxed">
-              <p className="eyebrow">Separate media check</p>
-              <h1 className="talk-title">Music is optional.</h1>
-              <p className="music-copy">
-                Play the quiet six-second tone using its native controls. It can continue while
-                navigating between these two pages. Pausing the presentation closes its activity
-                permission.
-              </p>
-              <p className="fine-print">
-                Original synthesized 220 Hz tone. No autoplay. Keep your system volume low.
-              </p>
-            </Stack>
-          ),
-        },
-        {
-          id: "music-second",
-          title: "One track. Two pages.",
-          render: () => (
-            <Stack gap="relaxed">
-              <p className="eyebrow">Separate media check</p>
-              <h2 className="talk-heading">One track. Two pages.</h2>
-              <p className="music-copy">
-                The root audio element belongs to this presentation, rather than either page.
-                Leaving the work releases it.
-              </p>
-            </Stack>
-          ),
-        },
-      ]}
-    />
-  );
+  return { view, position, speed, version: imageLoadingVersion };
 }

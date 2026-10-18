@@ -1,11 +1,7 @@
 import { presentationTokens } from "meowslides/theme";
 
-// Content design belongs to this work; stage/navigation remain in Meowtail.
-export const talkCss = `
-html, body { margin: 0; background: #e8ece8; color: #163f3a; font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-body { min-width: 320px; }
-#app { height: 100dvh; }
-.preview-shell { height: 100%; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+// Content design belongs to this work; stage/navigation remain in Meowslides.
+export const imageLoadingCss = `
 .image-talk { --talk-ink: #163f3a; --talk-muted: #536c65; --talk-paper: #f5f4ea; --talk-accent: #d85b37; color: var(--talk-ink); ${presentationTokens.paper.name}: var(--talk-paper); ${presentationTokens.ink.name}: var(--talk-ink); ${presentationTokens.muted.name}: var(--talk-muted); ${presentationTokens.accent.name}: var(--talk-accent); }
 .image-talk .eyebrow { margin: 0; color: var(--talk-accent); text-transform: uppercase; letter-spacing: .14em; font-size: 16px; font-weight: 750; }
 .image-talk .talk-title { color: var(--talk-ink); margin: 12px 0 20px; font-size: 64px; max-width: 760px; letter-spacing: -.045em; line-height: 1.04; }
@@ -39,7 +35,5 @@ body { min-width: 320px; }
 .image-talk .result-line strong { color: var(--talk-accent); }
 .image-talk .source-list { font-size: 20px; line-height: 1.5; padding-left: 22px; }
 .image-talk .talk-actions { font-size: 16px; }
-.image-talk .preview-gate { padding: 12px 20px; background: #fff3d7; display: flex; gap: 16px; align-items: center; font-size: 15px; }
-.image-talk .music-copy { font-size: 24px; line-height: 1.5; }
 @media (prefers-reduced-motion: reduce) { .image-talk *, .image-talk *::before, .image-talk *::after { scroll-behavior: auto; } }
 `;

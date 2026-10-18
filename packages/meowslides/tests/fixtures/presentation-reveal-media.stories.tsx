@@ -2,7 +2,7 @@ import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
 import { Button, Stack } from "meowtail";
 import { Presentation, PresentationAudio, Reveal } from "meowslides";
-import tone from "../../../../examples/presentation-lab/assets/quiet-tone.wav";
+import tone from "../../stories/assets/quiet-tone.wav";
 
 export const ControlledRevealMediaFixture = defineStory({
   id: "presentation-reveal-media",

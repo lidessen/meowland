@@ -12,18 +12,18 @@
 
 ## 本地命令与范围
 
-| 命令                        | 范围与作用                                                                                                                                                                                        |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `bun run lint`              | Oxlint correctness 规则与默认插件，覆盖源码、单测、浏览器用例、示例、脚本和 TS 配置；警告也导致失败                                                                                               |
-| `bun run lint:fix`          | 相同规则的普通 `--fix`；不启用 suggestions 或 dangerous fixes，修改后仍需审阅 diff                                                                                                                |
-| `bun run format:check`      | Oxfmt 检查支持的源码、文档及配置，不写文件                                                                                                                                                        |
-| `bun run format`            | Oxfmt 写入格式；局部任务优先直接传本次修改的精确路径，避免覆盖其它作者 WIP                                                                                                                        |
-| `bun run typecheck`         | 六包生产入口、JSX core/renderer/Web 环境、无 DOM 的 CSS core、CSS/UI/Slides 公共类型用例，以及根工程脚本、MDX 作者互动组件、演示实验场、两份课件和展板 host；不等于全部 unit/prototype 的 TS 检查 |
-| `bun run test`              | JSX/CSS/UI/Slides 单测、Slides MDX/build 工具测试、Book 的 Bun/单测与生命周期、Press 单测与根工程脚本单测；`.spec.ts(x)` 浏览器场景另用 Playwright                                                |
-| `bun run test:presentation` | 演示组件的独立浏览器合同，包括跨页信号、Reveal、活动许可、媒体与清理；使用专属本地服务，不混入 Meowbook 组件展板配置                                                                              |
-| `bun run check`             | 顺序执行 format:check → lint → typecheck → test；任一步失败即停止                                                                                                                                 |
-| `bun run build`             | 构建六包 ESM 与声明及必要资源；清理并更新各包 dist，不发布                                                                                                                                        |
-| `bun run pack`              | 把当前 dist 打成本地 tgz；不自动 build，不代表安装态或浏览器验收通过                                                                                                                              |
+| 命令                        | 范围与作用                                                                                                                                                                                          |
+| --------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `bun run lint`              | Oxlint correctness 规则与默认插件，覆盖源码、单测、浏览器用例、示例、脚本和 TS 配置；警告也导致失败                                                                                                 |
+| `bun run lint:fix`          | 相同规则的普通 `--fix`；不启用 suggestions 或 dangerous fixes，修改后仍需审阅 diff                                                                                                                  |
+| `bun run format:check`      | Oxfmt 检查支持的源码、文档及配置，不写文件                                                                                                                                                          |
+| `bun run format`            | Oxfmt 写入格式；局部任务优先直接传本次修改的精确路径，避免覆盖其它作者 WIP                                                                                                                          |
+| `bun run typecheck`         | 六包生产入口、JSX core/renderer/Web 环境、无 DOM 的 CSS core、CSS/UI/Slides 公共类型用例，以及根工程脚本、MDX 作者互动组件、图片加载作品、两份课件和展板 host；不等于全部 unit/prototype 的 TS 检查 |
+| `bun run test`              | JSX/CSS/UI/Slides 单测、Slides MDX/build 工具测试、Book 的 Bun/单测与生命周期、Press 单测与根工程脚本单测；`.spec.ts(x)` 浏览器场景另用 Playwright                                                  |
+| `bun run test:presentation` | 演示组件的独立浏览器合同，包括跨页信号、Reveal、活动许可、媒体与清理；使用专属本地服务，不混入 Meowbook 组件展板配置                                                                                |
+| `bun run check`             | 顺序执行 format:check → lint → typecheck → test；任一步失败即停止                                                                                                                                   |
+| `bun run build`             | 构建六包 ESM 与声明及必要资源；清理并更新各包 dist，不发布                                                                                                                                          |
+| `bun run pack`              | 把当前 dist 打成本地 tgz；不自动 build，不代表安装态或浏览器验收通过                                                                                                                                |
 
 检查排除 `node_modules`、`dist`、`artifacts`、Playwright 报告、测试结果和 Book 生成目录。格式工具另外跳过 Bun 生成的锁文件及原样保留的 `packages/meowtail/THIRD_PARTY_NOTICES.md`；不因历史源码存在告警而整体忽略包或测试目录。具体边界在 `.oxlintrc.json` 与 `.oxfmtrc.json`。
 
@@ -31,9 +31,9 @@
 
 平台环境类型不能合并处理：JSX core 与 CSS core 不加载 DOM/Bun 类型，Web 与 UI 使用 DOM；Book 的 Bun/Playwright 入口保留自身所需宿主类型。`bun scripts/build.ts --check --package <name>` 仅检查该包的生产 build 配置，不包含根 typecheck 的额外环境和公共类型用例。
 
-MDX 作者入口的构建和预览见[作者示例](../examples/presentation/README.md)，复杂图片演示与素材验收见[实验场](../examples/presentation-lab/README.md)。演示运行时合同 `bun run test:presentation` 使用独立端口；Meowbook 演示组件测试用 `bun node_modules/@playwright/test/cli.js test --config packages/meowslides/playwright.config.ts`，MDX 作者浏览器测试用 `bun node_modules/@playwright/test/cli.js test --config packages/meowslides/tests/browser/authoring/playwright.config.ts`，分别记录执行结果。
+MDX 作者入口的构建和预览见[作者示例](../examples/presentation/README.md)，完整自定义讲解与素材验收见[图片加载作品](../examples/image-loading/README.md)。演示运行时合同 `bun run test:presentation` 使用独立端口；Meowbook 演示组件测试用 `bun node_modules/@playwright/test/cli.js test --config packages/meowslides/playwright.config.ts`，MDX 作者浏览器测试用 `bun node_modules/@playwright/test/cli.js test --config packages/meowslides/tests/browser/authoring/playwright.config.ts`，分别记录执行结果。
 
-英语 Welcome 课件的课堂状态与浏览器验收见[课件 README](../examples/sunshine-welcome/README.md)。根 typecheck 包含作者组件、实验场和两件课件工程，作品浏览器用例仍按各自配置独立运行。正式 Web 产物与组件合同浏览器测试分别验收；字体/图片 ready、静态图与实际播放、断网冷启动也分别记录，不由其中一项代替另一项。
+英语 Welcome 课件的课堂状态与浏览器验收见[课件 README](../examples/sunshine-welcome/README.md)。根 typecheck 包含作者组件、图片加载作品和两件课件工程，作品浏览器用例仍按各自配置独立运行。正式 Web 产物与组件合同浏览器测试分别验收；字体/图片 ready、静态图与实际播放、断网冷启动也分别记录，不由其中一项代替另一项。
 
 Protecting pandas 为另一独立课件，入口与构建/浏览器检查见[熊猫课件 README](../examples/protecting-pandas/README.md)。根 typecheck 同样覆盖其作品工程；浏览器配置独占 `13034`，用户预览使用 `13014`，不复用或覆盖 Sunshine 的作品与服务。
 

@@ -1,10 +1,11 @@
 {
-  "name": "meowland-presentation-lab",
+  "name": "meowland-image-loading-example",
   "private": true,
   "type": "module",
   "scripts": {
     "build": "bun build.ts",
-    "serve": "bun serve.ts"
+    "serve": "bun serve.ts",
+    "export:source": "bun scripts/export-source.ts"
   },
   "dependencies": {
     "meowjsx": "^0.1.0",

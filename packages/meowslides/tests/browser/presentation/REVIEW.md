@@ -4,7 +4,7 @@
 
 ## 本轮输入与结果
 
-实际消费 `meowslides`、`meowslides/theme` 公共入口，运行时同时安装通用 MeowUI 与演示插件，主题只加载完整的 `presentationTheme`。旧复杂图片作品由 `examples/presentation-lab/build.ts` 使用当前包重新构建；新作者入口直接消费 `examples/presentation/slides.mdx` 和其真实 QuickCheck 组件。
+实际消费 `meowslides`、`meowslides/theme` 公共入口，运行时同时安装通用 MeowUI 与演示插件，主题只加载完整的 `presentationTheme`。旧复杂图片作品由 `examples/image-loading/build.ts` 使用当前包重新构建；新作者入口直接消费 `examples/presentation/slides.mdx` 和其真实 QuickCheck 组件。
 
 - 独立播放器合同 33 / 33 通过（32.7 s）：跨页 signals、多实例、步骤、键盘、隐藏与焦点、活动许可、原生媒体、迟到播放、清理、重排、窄短窗外围控件。
 - Meowbook 组件组合 22 / 22 通过（6.0 s）：背景、有限区域、动态诊断、两/三栏、长列表、图片完整显示与显式裁切、controlled Reveal、原生媒体。
@@ -16,8 +16,8 @@
 当前从仓库根执行：
 
 ```sh
-bun examples/presentation-lab/build.ts
-bun examples/presentation-lab/serve.ts
+bun examples/image-loading/build.ts
+bun examples/image-loading/serve.ts
 PLAYWRIGHT_CHANNEL=chrome bun node_modules/@playwright/test/cli.js test --config packages/meowslides/tests/browser/presentation/playwright.config.ts
 PLAYWRIGHT_CHANNEL=chrome bun node_modules/@playwright/test/cli.js test --config packages/meowslides/playwright.config.ts
 PLAYWRIGHT_CHANNEL=chrome bun node_modules/@playwright/test/cli.js test --config packages/meowslides/tests/browser/authoring/playwright.config.ts

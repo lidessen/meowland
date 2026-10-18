@@ -22,8 +22,8 @@ import {
   type SlidePosition,
   type PresentationTransitionEffect,
 } from "meowslides";
-import { createImageTalk } from "../../../../../examples/presentation-lab/talk";
-import { talkCss } from "../../../../../examples/presentation-lab/talk.styles";
+import { createImageLoadingDeck } from "../../../../../examples/image-loading/deck";
+import { imageLoadingCss } from "../../../../../examples/image-loading/styles";
 
 interface DeckFacts {
   renders: Record<string, number>;
@@ -211,7 +211,7 @@ const root = document.querySelector<HTMLElement>("#test-root")!;
 const query = new URL(location.href).searchParams;
 if (query.get("chrome") === "single") root.style.height = "100dvh";
 if (query.get("host") === "narrow") root.style.width = "390px";
-const removeStyles = mountStyles(document, presentationTheme.cssText + talkCss);
+const removeStyles = mountStyles(document, presentationTheme.cssText + imageLoadingCss);
 const scheme = query.get("scheme");
 const removeTheme = applyTheme(
   root,
@@ -222,7 +222,7 @@ const decks = [createDeck(0), createDeck(1)];
 let content: Child =
   query.get("chrome") === "single" ? decks[0]!.node : decks.map((deck) => deck.node);
 if (new URL(location.href).searchParams.get("sample") === "reordered") {
-  const talk = createImageTalk({
+  const talk = createImageLoadingDeck({
     initialPosition: { slideId: "experiment", step: 3 },
     speed: 71,
     active: false,

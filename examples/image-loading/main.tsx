@@ -3,8 +3,8 @@ import { installMeowUI } from "meowtail";
 import { installMeowSlides } from "meowslides";
 import { presentationOptions, presentationTheme } from "meowslides/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
-import { createImageTalk, createMusicDemo } from "./talk";
-import { talkCss } from "./talk.styles";
+import { createImageLoadingDeck } from "./deck";
+import { imageLoadingCss } from "./styles";
 
 const root = document.querySelector<HTMLElement>("#app");
 if (!root) throw new Error("Presentation mount point is missing");
@@ -15,7 +15,7 @@ const restoreTheme = applyTheme(
   presentationTheme,
   presentationOptions.select({ scheme: "light" }),
 );
-const removeStyles = mountStyles(document, presentationTheme.cssText + talkCss);
+const removeStyles = mountStyles(document, presentationTheme.cssText + imageLoadingCss);
 const options = new URLSearchParams(location.search);
 const knownSlides = new Set(["opening", "compare", "experiment", "evidence", "summary"]);
 const slideId = options.get("slide");
@@ -25,17 +25,17 @@ if (slideId !== null && !knownSlides.has(slideId)) throw new Error(`Unknown slid
 if (!Number.isInteger(step) || step < 0) throw new Error("Step must be a nonnegative integer");
 if (!Number.isFinite(speed) || speed < 1 || speed > 101)
   throw new Error("Speed must be between 1 and 101 Mbit/s");
-const talk = createImageTalk({ initialPosition: slideId ? { slideId, step } : undefined, speed });
-const mounted = render(options.get("demo") === "music" ? createMusicDemo() : talk.view, root);
+const deck = createImageLoadingDeck({
+  initialPosition: slideId ? { slideId, step } : undefined,
+  speed,
+});
+const mounted = render(deck.view, root);
 root.dataset.ready = "true";
-window.addEventListener(
-  "pagehide",
-  () => {
-    mounted.unmount();
-    removeStyles();
-    restoreTheme();
-    uninstallSlides();
-    uninstall();
-  },
-  { once: true },
-);
+window.addEventListener("pagehide", (event) => {
+  if (event.persisted) return;
+  mounted.unmount();
+  removeStyles();
+  restoreTheme();
+  uninstallSlides();
+  uninstall();
+});

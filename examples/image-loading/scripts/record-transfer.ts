@@ -1,5 +1,5 @@
 import { chromium } from "@playwright/test";
-import { mkdir, readFile, writeFile } from "node:fs/promises";
+import { readFile, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 const assetRoot = join(import.meta.dir, "../assets");
 const temporary = await import("node:fs/promises").then((fs) =>
@@ -90,9 +90,8 @@ try {
     { stdout: "inherit", stderr: "inherit" },
   );
   if ((await encode.exited) !== 0) throw new Error("FFmpeg recording encode failed");
-  await mkdir(join(assetRoot, "../records"), { recursive: true });
   await writeFile(
-    join(assetRoot, "../records/recording.json"),
+    join(assetRoot, "recording.json"),
     JSON.stringify(
       {
         generator: "scripts/record-transfer.ts",

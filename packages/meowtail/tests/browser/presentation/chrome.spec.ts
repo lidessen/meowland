@@ -527,6 +527,9 @@ test("long titles and narrow hosts preserve reachable controls across container 
       slideId: "media",
       step: 0,
     });
+    const soundtrack = deck.locator('[data-meowui-part="presentation/soundtrack"]');
+    for (const name of ["Play / continue", "Pause", "Back to start"])
+      await reachable(soundtrack.getByRole("button", { name, exact: true }));
     const dialog = await openOptions(chrome);
     await reachable(dialog.getByRole("button", { name: "Pause effects", exact: true }));
     await reachable(dialog.getByRole("button", { name: "Actual size", exact: true }));

@@ -203,9 +203,7 @@ test("real audio stops on host and document hiding and never resumes itself", as
   expect(await audio.evaluate((element: HTMLMediaElement) => element.paused)).toBe(true);
 });
 
-test("late play resolution after fast navigation cannot reactivate detached media", async ({
-  page,
-}) => {
+test("late play resolution cannot undo pause, rewind or navigation", async ({ page }) => {
   await page.addInitScript(() => {
     const pending: Array<{ element: HTMLMediaElement; resolve: () => void }> = [];
     const state = new WeakMap<HTMLMediaElement, boolean>();
@@ -239,6 +237,20 @@ test("late play resolution after fast navigation cannot reactivate detached medi
   await page.reload();
   await jump(page, "media");
   const video = page.getByRole("region", { name: "First test deck", exact: true }).locator("video");
+  const figure = video.locator("..");
+  for (const action of ["Pause", "Back to start"]) {
+    await figure.getByRole("button", { name: "Play / continue", exact: true }).click();
+    await figure.getByRole("button", { name: action, exact: true }).click();
+    await page.evaluate(() => {
+      (window as unknown as { resolvePendingMedia(): void }).resolvePendingMedia();
+    });
+    await expect
+      .poll(() => video.evaluate((element: HTMLMediaElement) => element.paused))
+      .toBe(true);
+    expect((await facts(page)).position.slideId).toBe("media");
+    if (action === "Back to start")
+      expect(await video.evaluate((element: HTMLMediaElement) => element.currentTime)).toBe(0);
+  }
   const oldVideo = await video.elementHandle();
   await video.locator("..").getByRole("button", { name: "Play / continue", exact: true }).click();
   await jump(page, "discussion");
@@ -306,6 +318,48 @@ test("native loading retry is visible only after failure and hides throughout re
   expect(await video.evaluate((element: HTMLVideoElement) => element.readyState)).toBeGreaterThan(
     0,
   );
+});
+
+test("finite media space preserves its controls and failure feedback while the video viewport shrinks", async ({
+  page,
+}) => {
+  await jump(page, "media");
+  const video = page.getByRole("region", { name: "First test deck", exact: true }).locator("video");
+  const figure = video.locator("..");
+  await expect(figure).toHaveAttribute("data-media-state", "ready");
+  await figure.evaluate((element: HTMLElement) => {
+    element.style.width = "390px";
+    element.style.height = "240px";
+  });
+  for (const failed of [false, true]) {
+    if (failed) await video.evaluate((element) => element.dispatchEvent(new Event("error")));
+    if (failed) await expect(figure).toHaveAttribute("data-media-state", "failed");
+    const boxes = await figure.evaluate((element) => {
+      const root = element.getBoundingClientRect();
+      return {
+        root: { top: root.top, bottom: root.bottom },
+        children: Array.from(element.children, (child) => {
+          const rect = child.getBoundingClientRect();
+          return { top: rect.top, bottom: rect.bottom, height: rect.height };
+        }),
+      };
+    });
+    for (const child of boxes.children) {
+      expect(child.top).toBeGreaterThanOrEqual(boxes.root.top - 1);
+      expect(child.bottom).toBeLessThanOrEqual(boxes.root.bottom + 1);
+    }
+    expect(
+      await video.evaluate((element: HTMLVideoElement) => element.clientHeight),
+    ).toBeGreaterThan(60);
+    for (const name of ["Play / continue", "Pause", "Back to start"])
+      await expect(figure.getByRole("button", { name, exact: true })).toBeVisible();
+    if (failed) {
+      await expect(
+        figure.getByRole("button", { name: "Retry loading", exact: true }),
+      ).toBeVisible();
+      expect(await figure.getByRole("status").innerText()).toMatch(/\S\s+Media could not load/);
+    }
+  }
 });
 
 test("an inert background iframe needs explicit host denial before any clocks can run", async ({

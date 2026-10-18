@@ -99,6 +99,9 @@ speed 为 fast/normal/slow。页面切换只让新页入场，旧页立即卸载
 失活、暂停、文档隐藏或 reduced motion 会取消动画并落到终态，恢复后不补播；无 WAAPI 时直接呈现终态。
 
 媒体组件要求 `src` 与可读的 `label`，默认原生 controls、metadata 预加载和用户启动。
+共享动作提供 Play / continue、Pause 与 Back to start；后者暂停并回到开头，仍等用户明确播放。
+暂停或回到开头会使尚未完成的播放请求失效，迟到的 Promise 不会重新启动媒体。
+有限 Stack 中媒体画面可收缩并保持 contain，状态和操作保留自然高度；错误反馈与名称分块，不挤在同一段文本里。图片或视频区域可配合 `LayoutItem grow basis={0}` 分配剩余空间，文字仍需遵守有限画布容量，不承诺无限内容自动适配。
 `ref`、媒体事件、poster、track children 等原生接缝落到真实 video/audio；`className` 用于外层状态结构，
 其他原生属性落到媒体元素。显式播放按钮检查 `play()` 的异步结果；宿主通过原生 ref 调用 play 时同样负责检查结果。
 失活或卸载会暂停，恢复许可不自动开声。宿主可在 ref cleanup 中读取最后 `currentTime`，在重进的 metadata

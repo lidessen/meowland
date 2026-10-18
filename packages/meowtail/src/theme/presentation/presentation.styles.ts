@@ -285,12 +285,14 @@ export const presentationStyles = css`
     display: flex;
     flex-direction: column;
     min-width: 0;
+    min-height: 0;
     gap: 8px;
     margin: 0;
   }
   ${partSelector(presentationVideoContract, "media")} {
     display: block;
     width: 100%;
+    min-height: 0;
     max-height: 440px;
     object-fit: contain;
     background: #101820;
@@ -300,6 +302,10 @@ export const presentationStyles = css`
     max-width: 100%;
   }
   :where(${partSelector(presentationVideoContract, "status")}, ${partSelector(presentationAudioContract, "status")}) {
+    display: flex;
+    flex-direction: column;
+    flex: none;
+    gap: 4px;
     font-size: ${tokens.fontCaption};
     color: ${tokens.muted};
   }
@@ -308,6 +314,10 @@ export const presentationStyles = css`
     flex-wrap: wrap;
     gap: 8px;
     font-size: ${uiTokens.fontBody};
+    flex: none;
+  }
+  :where(${partSelector(presentationVideoContract, "status")}, ${partSelector(presentationAudioContract, "status")}) > [hidden] {
+    display: none;
   }
   :where(${partSelector(presentationVideoContract, "actions")}, ${partSelector(presentationAudioContract, "actions")}) > [hidden] {
     display: none;
@@ -320,6 +330,10 @@ export const presentationStyles = css`
   ${part("soundtrack")} ${partSelector(presentationAudioContract, "status")} {
     font-size: ${uiTokens.fontCaption};
     color: ${uiTokens.mutedForeground};
+  }
+  ${part("soundtrack")} ${partSelector(presentationAudioContract, "actions")} {
+    min-width: 0;
+    max-width: 100%;
   }
   @media (max-height: 520px) {
     ${part("root")} {

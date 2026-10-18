@@ -193,15 +193,40 @@ function mediaComponent<T extends HTMLMediaElement>(
           "status",
           "figcaption",
           { role: "status", "aria-live": "polite" },
-          mapSignal(state, (value) => (value === "loading" ? `${label} · Loading media…` : label)),
-          feedback,
+          h(
+            "span",
+            null,
+            mapSignal(state, (value) =>
+              value === "loading" ? `${label} · Loading media…` : label,
+            ),
+          ),
+          h("span", { hidden: mapSignal(feedback, (value) => !value) }, feedback),
         ),
         context.part(
           "actions",
           "div",
           null,
-          <Button variant="outline" size="small" onClick={play}>
+          <Button variant="outline" onClick={play}>
             Play / continue
+          </Button>,
+          <Button variant="outline" onClick={pause}>
+            Pause
+          </Button>,
+          <Button
+            variant="quiet"
+            onClick={() => {
+              pause();
+              if (!media || state.value !== "ready") return;
+              try {
+                media.currentTime = 0;
+                feedback.value = "";
+              } catch {
+                feedback.value =
+                  "Unable to return to the start. Wait for the media to load or retry.";
+              }
+            }}
+          >
+            Back to start
           </Button>,
           <Button
             variant="quiet"

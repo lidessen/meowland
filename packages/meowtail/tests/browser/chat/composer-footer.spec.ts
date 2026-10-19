@@ -18,6 +18,11 @@ async function expectAllocated(composer: Locator) {
     const hint = part("hint") as HTMLElement;
     return {
       root: rect(element),
+      surface: rect(part("surface")),
+      actions: rect(part("actions")),
+      externalHint: !part("surface").contains(hint) && hint.parentElement === element,
+      emptyDraft: (part("input") as HTMLTextAreaElement).value === "",
+      narrow: matchMedia("(max-width: 768px)").matches,
       hint: rect(hint),
       hintFits: hint.scrollWidth <= hint.clientWidth + 1,
       controls: [
@@ -30,6 +35,8 @@ async function expectAllocated(composer: Locator) {
       ].map(rect),
     };
   });
+  expect(geometry.externalHint).toBe(true);
+  expect(geometry.hint.top).toBeGreaterThanOrEqual(geometry.surface.bottom);
   expect(geometry.hint.width).toBeGreaterThan(0);
   expect(geometry.hint.height).toBeGreaterThan(0);
   expect(geometry.hintFits).toBe(true);
@@ -37,6 +44,27 @@ async function expectAllocated(composer: Locator) {
     expect(box.left).toBeGreaterThanOrEqual(geometry.root.left - 1);
     expect(box.right).toBeLessThanOrEqual(geometry.root.right + 1);
     expect(box.bottom).toBeLessThanOrEqual(geometry.root.bottom + 1);
+  }
+  for (const control of geometry.controls) {
+    expect(control.left).toBeGreaterThanOrEqual(geometry.surface.left - 1);
+    expect(control.right).toBeLessThanOrEqual(geometry.surface.right + 1);
+    expect(control.top).toBeGreaterThanOrEqual(geometry.surface.top - 1);
+    expect(control.bottom).toBeLessThanOrEqual(geometry.surface.bottom + 1);
+  }
+  const [input, model, send, attach] = geometry.controls;
+  if (geometry.narrow) {
+    expect(attach!.right).toBeLessThanOrEqual(input!.left);
+    expect(input!.right).toBeLessThanOrEqual(send!.left);
+    expect(model!.top).toBeGreaterThanOrEqual(Math.max(input!.bottom, send!.bottom) - 1);
+    if (geometry.emptyDraft) {
+      const center = (box: typeof input) => (box!.top + box!.bottom) / 2;
+      expect(Math.abs(center(attach) - center(input))).toBeLessThan(1);
+      expect(Math.abs(center(send) - center(input))).toBeLessThan(1);
+    }
+  } else {
+    expect(geometry.actions.top).toBeGreaterThanOrEqual(input!.bottom - 1);
+    expect(geometry.actions.bottom).toBeLessThanOrEqual(geometry.surface.bottom + 1);
+    expect(model!.right).toBeLessThanOrEqual(send!.left + 1);
   }
   for (const [index, control] of geometry.controls.entries()) {
     for (const other of geometry.controls.slice(index + 1)) {
@@ -106,11 +134,13 @@ for (const viewport of [
     await input.focus();
     await page.screenshot({ path: info.outputPath("footer-focused.png"), fullPage: true });
     await page.keyboard.press("Tab");
+    await expect(page.getByRole("button", { name: "Attach files", exact: true })).toBeFocused();
+    await page.keyboard.press("Tab");
+    await expect(page.getByRole("button", { name: "Send draft", exact: true })).toBeFocused();
+    await page.keyboard.press("Tab");
     await expect(page.getByRole("link", { name: "Keyboard help" })).toBeFocused();
     await page.keyboard.press("Enter");
     await expect(page.locator("#footer-help")).toHaveText("Help opened: 1. Submissions: 0.");
-    await page.keyboard.press("Tab");
-    await expect(page.getByRole("button", { name: "Attach files", exact: true })).toBeFocused();
     await page.getByRole("button", { name: "Send draft", exact: true }).click();
     await expect(page.locator("#footer-help")).toHaveText("Help opened: 1. Submissions: 1.");
     await hint.evaluate((element) => {

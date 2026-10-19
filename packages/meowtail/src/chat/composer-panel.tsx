@@ -13,9 +13,8 @@ export interface ComposerPanelProps extends Omit<ChatComposerProps, "surface" | 
 }
 
 /**
- * Composer chrome: one surface around a bare ChatComposer, plus an optional
- * page-level meta row below it. Behavior, draft and submission stay in
- * ChatComposer; this component only owns the surrounding composition.
+ * A ChatComposer and optional page-level meta row. The composer keeps its single
+ * writing surface and external hint; this panel owns the surrounding composition.
  */
 export const ComposerPanel = defineComponent<
   ComposerPanelProps,
@@ -26,7 +25,7 @@ export const ComposerPanel = defineComponent<
     "root",
     "div",
     { className, "data-pattern": "composer-panel" },
-    context.part("surface", "div", null, h(ChatComposer, { ...props, surface: "none" })),
+    context.part("surface", "div", null, h(ChatComposer, props)),
     meta !== undefined && meta !== null ? context.part("meta", "div", null, meta) : null,
   ),
 );

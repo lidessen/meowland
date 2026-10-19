@@ -51,6 +51,8 @@ export function MobilePage(): Child {
       }
       footer={
         <ComposerPanel
+          hint="Enter for a new line · Use Send to submit"
+          hintId="mobile-composer-hint"
           placeholder="Type a message"
           inputLabel="Message"
           submitLabel="Send message"

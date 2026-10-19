@@ -1,5 +1,7 @@
 # Stacked Composer footer allocation
 
+**Superseded and rejected:** the user rejected this candidate's visual hierarchy after inspecting the delivered screenshots. Its hint remains inside the rounded writing surface, and geometric/interaction checks do not establish visual approval. Do not publish source `35631999042c4ff626f45910aee3f794c4d67c06`'s frozen tarball `86f56f36927f62cd363f85669e930c5256cadd663470445a5c675a959ba52676`. The original results below remain historical evidence; follow the [writing-surface correction](2026-10-19-composer-surface.md) for current status.
+
 This fixes a confirmed regression in `meowtail@0.2.0-alpha.1`. The next local candidate is **meowtail 0.2.0-alpha.2**; no other package version or peer floor changes. This task authorizes a local commit and isolated consumer acceptance only, with no push, npm publication, Slides bootstrap, credential changes or installed application replacement.
 
 ## Reproduction and ownership

@@ -13,7 +13,7 @@ test("App shell keeps the bar, notice, scrolling body and composer in one page",
     await expect(page.locator('[data-meowui-part="app-bar/root"]')).toBeVisible();
     await expect(page.locator('[data-meowui-part="alert/root"]')).toBeVisible();
     await expect(page.locator('[data-meowui-part="page-frame/footer"]')).toBeVisible();
-    await expect(page.locator('[data-meowui-part="composer-panel/surface"]')).toBeVisible();
+    await expect(page.locator('[data-meowui-part="chat-composer/surface"]')).toBeVisible();
     const geometry = await page.evaluate(() => {
       const box = (selector: string) => {
         const element = document.querySelector<HTMLElement>(selector);
@@ -26,7 +26,7 @@ test("App shell keeps the bar, notice, scrolling body and composer in one page",
         notice: box('[data-meowui-part="alert/root"]'),
         body: box('[data-meowui-part="page-frame/body"]'),
         footer: box('[data-meowui-part="page-frame/footer"]'),
-        surface: box('[data-meowui-part="composer-panel/surface"]'),
+        surface: box('[data-meowui-part="chat-composer/surface"]'),
         overflow: document.documentElement.scrollWidth > innerWidth + 1,
       };
     });

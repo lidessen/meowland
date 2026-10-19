@@ -11,6 +11,8 @@ export function ComposerPage(): Child {
       value="Continue — I'm wondering whether the component set is still too thin, especially for containers. Here's a simple example: if we want to write one…"
       placeholder="Continue, type a message…"
       inputLabel="Message"
+      hint="Enter for a new line · Use Send to submit"
+      hintId="reference-composer-hint"
       submitLabel="Send message"
       submitContent={<Icon name="arrow-up" />}
       trailing={[

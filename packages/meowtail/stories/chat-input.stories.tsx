@@ -37,12 +37,12 @@ export const InlineComposer = defineStory({
   group: "Conversation components",
   groupOrder: 50,
   description:
-    "Short drafts sit on the same row as actions; long drafts grow naturally. Keyboard hints appear on focus. Local editing only.",
+    "Short drafts sit on the same row as actions; long drafts grow naturally. Supporting instructions appear outside the writing surface on focus. Local editing only.",
   render: () => (
     <Container width="content">
       <ChatComposer
         layout="inline"
-        hint="Enter to send · Shift + Enter for a new line"
+        hint="Enter for a new line · Use Send to submit"
         hintId="inline-composer-hint"
         onSubmit={(event) => event.preventDefault()}
       >

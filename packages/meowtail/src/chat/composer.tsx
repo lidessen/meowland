@@ -10,7 +10,17 @@ export const chatComposerOptions = defineOptions("chat-composer", {
 
 export const chatComposerContract = {
   name: "chat-composer",
-  parts: ["root", "attachments", "field", "input", "hint", "actions", "trailing", "submit"],
+  parts: [
+    "root",
+    "surface",
+    "attachments",
+    "field",
+    "input",
+    "hint",
+    "actions",
+    "trailing",
+    "submit",
+  ],
   styleProps: defineStyleProps(chatComposerOptions, {
     defaults: { layout: "stacked", surface: "default" },
   }),
@@ -28,6 +38,7 @@ export interface ChatComposerProps extends Props, ThemedProps<typeof chatCompose
   attachments?: Child;
   /** Model/provider selection beside the send action; options and state belong to the host. */
   trailing?: Child;
+  /** Supporting instructions below the writing surface, associated through hintId. */
   hint?: Child;
   hintId?: string;
   submitLabel?: string;
@@ -76,40 +87,45 @@ export const ChatComposer = defineComponent<
         className,
         onSubmit,
       },
-      attachments ? context.part("attachments", "div", null, attachments) : null,
       context.part(
-        "field",
+        "surface",
         "div",
         null,
-        context.part("input", "textarea", {
-          "data-chat-input": true,
-          name: "message",
-          rows: 1,
-          value,
-          placeholder,
-          "aria-label": inputLabel,
-          "aria-describedby": hint && hintId ? hintId : undefined,
-          disabled,
-          onInput,
-        }),
-        hint ? context.part("hint", "span", hintId ? { id: hintId } : null, hint) : null,
-      ),
-      context.part(
-        "actions",
-        "div",
-        null,
-        children,
-        trailing ? context.part("trailing", "div", null, trailing) : null,
+        attachments ? context.part("attachments", "div", null, attachments) : null,
         context.part(
-          "submit",
-          "button",
-          {
-            type: "submit",
-            disabled: disabled ? true : submitDisabled,
-            "aria-label": submitLabel,
-          },
-          submitContent ?? <Icon name="arrow-up" />,
+          "field",
+          "div",
+          null,
+          context.part("input", "textarea", {
+            "data-chat-input": true,
+            name: "message",
+            rows: 1,
+            value,
+            placeholder,
+            "aria-label": inputLabel,
+            "aria-describedby": hint && hintId ? hintId : undefined,
+            disabled,
+            onInput,
+          }),
+        ),
+        context.part(
+          "actions",
+          "div",
+          null,
+          children,
+          trailing ? context.part("trailing", "div", null, trailing) : null,
+          context.part(
+            "submit",
+            "button",
+            {
+              type: "submit",
+              disabled: disabled ? true : submitDisabled,
+              "aria-label": submitLabel,
+            },
+            submitContent ?? <Icon name="arrow-up" />,
+          ),
         ),
       ),
+      hint ? context.part("hint", "span", hintId ? { id: hintId } : null, hint) : null,
     ),
 );

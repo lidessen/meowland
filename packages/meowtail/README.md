@@ -356,7 +356,7 @@ The theme uses the `root/entry/image/preview/file/icon/details/name/size/preview
 through `partSelector(chatAttachmentsContract, part)`.
 Each item can provide `onRemove`, passed only when a draft needs a remove action; upload, file deletion, and URL lifecycles still belong to the host.
 
-`ComposerPanel` is the composition directly above `ChatComposer`: it owns the writing surface and an optional page-level meta row, while draft, actions and submission stay in `ChatComposer`. It renders `ChatComposer` with `surface="none"`, so the panel never stacks a second chrome. Narrow composition stays with `ChatComposer`'s own layout and the page/footer edge; the panel has no device variant. The meta slot usually holds a `MetaRow`.
+`ComposerPanel` composes one `ChatComposer` and an optional page-level meta row, usually a `MetaRow`. It refines the same internal writing surface rather than wrapping the whole form in a second surface. Draft, actions, submission and the external supporting hint stay in `ChatComposer`. Narrow composition stays with `ChatComposer`'s own layout and the page/footer edge; the panel has no device variant.
 
 `ChatFrame` provides reading margins only for a direct `ChatComposer`; if a footer, Card, or other wrapper container owns that region's space,
 the Composer inside uses its natural width within that container and is no longer narrowed or margined by an ancestor Frame.
@@ -365,9 +365,9 @@ the Composer inside uses its natural width within that container and is no longe
 `onInput` is bound on the textarea and `onSubmit` on the outer form. `value` supports Signals, and
 `submitDisabled` only prevents submission, which suits continued editing while waiting for a result; `disabled` prevents both editing and submission.
 Request state, submitted snapshots, and the latest draft are managed by the caller. `attachments` holds materials to send, and `inputLabel` provides the input name.
-The standard theme organizes attachments, input, supporting actions, and submission on one writing surface.
-`surface="none"` removes ChatComposer's own surface chrome and padding so a parent such as `ComposerPanel` can own the writing surface; the default keeps the standard surface.
-`layout="inline"` puts short drafts and actions on the same row, and long drafts keep growing; hints appear on focus. The default `stacked` keeps a separate tool row, with the hint in its own normal-flow row so model state, shortcuts and submission never share an overlay. On narrow screens the model row and hint remain below the writing row; long hints wrap instead of being hidden.
+The form groups a writing `surface` and its supporting `hint`. Attachments, input and actions stay inside the surface; the hint follows outside its rounded edge and focus outline, associated with the textarea by `hintId`. Page-level metadata follows the whole composer.
+`surface="none"` removes only the internal writing surface's chrome and padding for explicit bare embedding; it does not move the hint back inside a surface.
+`layout="inline"` puts short drafts and actions on the same row, and long drafts keep growing; its external hint appears on focus. The default `stacked` keeps the tool row at the bottom of the writing surface. On narrow screens, attach/input/send share the writing row and model selection sits below it; the supporting hint remains outside the surface and wraps. The `hero` hint retains its visually hidden presentation.
 `layout="hero"` uses the input height of the desktop master blank conversation. `trailing` composes selection entry points such as provider and model to the left of the send button;
 a controlled `ChoiceSelect` can be passed, expanding grouped options upward with `placement="top"`, `align="end"`, and `matchTriggerWidth={false}`.
 Option sources, current values, and the actual switching of runtime configuration are still the host's responsibility.

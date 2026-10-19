@@ -14,6 +14,9 @@ export const composerPanelStyles = css`
   }
   ${partSelector(composerPanelContract, "surface")} {
     min-width: 0;
+  }
+  ${partSelector(composerPanelContract, "surface")}[data-meowui-part] > ${partSelector(chatComposerContract, "root")} > ${partSelector(chatComposerContract, "surface")} {
+    min-width: 0;
     padding: 12px 14px 10px;
     border: 1px solid ${uiTokens.borderSoft};
     border-radius: 24px;
@@ -21,7 +24,7 @@ export const composerPanelStyles = css`
     box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
     transition: border-color ${uiTokens.durationResponse} ${uiTokens.ease};
   }
-  ${partSelector(composerPanelContract, "surface")}:focus-within {
+  ${partSelector(composerPanelContract, "surface")}[data-meowui-part] > ${partSelector(chatComposerContract, "root")} > ${partSelector(chatComposerContract, "surface")}:focus-within {
     border-color: ${uiTokens.border};
   }
   ${partSelector(composerPanelContract, "meta")} {

@@ -97,7 +97,8 @@ for (const scheme of ["light", "dark"]) {
     await expect(selected).toHaveCSS("background-color", selectedSurface);
 
     const input = page.getByRole("textbox", { name: "Message", exact: true });
-    const surface = page.locator('[data-meowui-part="chat-composer/root"]');
+    const composer = page.locator('[data-meowui-part="chat-composer/root"]');
+    const surface = composer.locator('[data-meowui-part="chat-composer/surface"]');
     await input.scrollIntoViewIfNeeded();
     await page.mouse.move(0, 0);
     await surface.evaluate(async (element) => {
@@ -120,6 +121,7 @@ for (const scheme of ["light", "dark"]) {
     await page.keyboard.type("Keep this edit");
     await expect(input).toBeFocused();
     await expect(surface).toHaveCSS("outline-style", "solid");
+    await expect(composer).toHaveCSS("outline-style", "none");
     expect(
       await surface.evaluate((element) => {
         const style = getComputedStyle(element);

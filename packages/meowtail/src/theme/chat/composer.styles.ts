@@ -83,7 +83,20 @@ export const chatComposerStyles = css`
     background-color: ${uiTokens.hover};
   }
 
+  /* The form groups the writing surface and its external supporting instructions. */
   ${partSelector(chatComposerContract, "root")} {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 6px;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  ${partSelector(chatComposerContract, "surface")} {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
@@ -122,25 +135,18 @@ export const chatComposerStyles = css`
     display: none;
   }
 
-  ${partSelector(chatComposerContract, "root")}:has(> ${partSelector(chatComposerContract, "attachments")}:not(:empty)):not(
+  ${partSelector(chatComposerContract, "surface")}:has(> ${partSelector(chatComposerContract, "attachments")}:not(:empty)):not(
   :has(> ${partSelector(chatComposerContract, "attachments")} > [hidden]:only-child)
   )
   ${partSelector(chatComposerContract, "input")} {
     grid-row: 2;
   }
 
-  ${partSelector(chatComposerContract, "root")}:has(> ${partSelector(chatComposerContract, "attachments")}:not(:empty)):not(
+  ${partSelector(chatComposerContract, "surface")}:has(> ${partSelector(chatComposerContract, "attachments")}:not(:empty)):not(
   :has(> ${partSelector(chatComposerContract, "attachments")} > [hidden]:only-child)
   )
   ${partSelector(chatComposerContract, "actions")} {
     grid-row: 3;
-  }
-
-  ${partSelector(chatComposerContract, "root")}:has(> ${partSelector(chatComposerContract, "attachments")}:not(:empty)):not(
-  :has(> ${partSelector(chatComposerContract, "attachments")} > [hidden]:only-child)
-  )
-  ${partSelector(chatComposerContract, "hint")} {
-    grid-row: 4;
   }
 
   ${partSelector(chatComposerContract, "attachments")} ${partSelector(chatAttachmentsContract, "file")} {
@@ -168,13 +174,14 @@ export const chatComposerStyles = css`
     caret-color: ${uiTokens.focus};
   }
 
-  ${partSelector(chatComposerContract, "root")}:has(${partSelector(chatComposerContract, "input")}:focus:not(:disabled)) {
+  /* Focus paint stays inside the surface when an embedding form clips overflow. */
+  ${partSelector(chatComposerContract, "surface")}:has(${partSelector(chatComposerContract, "input")}:focus:not(:disabled)) {
     outline: 1px solid color-mix(in srgb, ${uiTokens.primary} 45%, transparent);
-    outline-offset: 1px;
+    outline-offset: -1px;
   }
 
   @media (hover: hover) {
-    ${partSelector(chatComposerContract, "root")}:has(${partSelector(chatComposerContract, "input")}:hover:not(:disabled):not(:focus)) {
+    ${partSelector(chatComposerContract, "surface")}:has(${partSelector(chatComposerContract, "input")}:hover:not(:disabled):not(:focus)) {
       border-color: transparent;
     }
   }
@@ -188,9 +195,9 @@ export const chatComposerStyles = css`
     outline: none;
   }
 
-  ${partSelector(chatComposerContract, "root")}:has(${partSelector(chatComposerContract, "input")}:focus-visible) {
+  ${partSelector(chatComposerContract, "surface")}:has(${partSelector(chatComposerContract, "input")}:focus-visible) {
     outline: 2px solid ${uiTokens.focus};
-    outline-offset: 2px;
+    outline-offset: -2px;
   }
 
   @supports (field-sizing: content) {
@@ -209,7 +216,7 @@ export const chatComposerStyles = css`
     color: ${uiTokens.subtleForeground};
   }
 
-  ${partSelector(chatComposerContract, "root")}:has(${partSelector(chatComposerContract, "input")}:disabled) {
+  ${partSelector(chatComposerContract, "surface")}:has(${partSelector(chatComposerContract, "input")}:disabled) {
     background: ${uiTokens.surfaceMuted};
     box-shadow: none;
   }
@@ -293,19 +300,13 @@ export const chatComposerStyles = css`
   }
 
   @media (max-width: 680px) {
-    ${partSelector(chatComposerContract, "root")} {
+    ${partSelector(chatComposerContract, "surface")} {
       grid-template-columns: minmax(0, 1fr);
       padding: 8px 0 0;
     }
 
     ${partSelector(chatComposerContract, "hint")} {
       font-size: ${uiTokens.fontCaption};
-    }
-  }
-
-  @media (max-width: 760px) {
-    ${partSelector(chatComposerContract, "hint")} {
-      position: absolute;
     }
   }
 
@@ -318,12 +319,10 @@ export const chatComposerStyles = css`
   The inline row keeps the one-line text and the send action on the optical
   center: equal block padding around the 24px line, a symmetric action row, and
   no base-layout nudge on the submit button. */
-  ${partSelector(chatComposerContract, "root")} {
-    ${chatComposerOptions.when({ layout: "inline" })} {
-      grid-template-columns: minmax(0, 1fr) auto;
-      align-items: center;
-      padding: ${uiTokens.controlPaddingInline} ${uiTokens.spaceSection};
-    }
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] > ${partSelector(chatComposerContract, "surface")} {
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    padding: ${uiTokens.controlPaddingInline} ${uiTokens.spaceSection};
   }
 
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] ${partSelector(chatComposerContract, "input")} {
@@ -348,23 +347,11 @@ export const chatComposerStyles = css`
     grid-column: 1 / -1;
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"]:has(> ${partSelector(chatComposerContract, "attachments")}:not(:empty)):not(
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] > ${partSelector(chatComposerContract, "surface")}:has(> ${partSelector(chatComposerContract, "attachments")}:not(:empty)):not(
   :has(> ${partSelector(chatComposerContract, "attachments")} > [hidden]:only-child)
   )
   :is(${partSelector(chatComposerContract, "input")}, ${partSelector(chatComposerContract, "actions")}) {
     grid-row: 2;
-  }
-
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"]:focus-within ${partSelector(chatComposerContract, "hint")} {
-    position: static;
-    grid-column: 1 / -1;
-    grid-row: 3;
-    width: auto;
-    height: auto;
-    clip-path: none;
-    white-space: normal;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
   }
 
   @media (pointer: coarse) {
@@ -374,14 +361,14 @@ export const chatComposerStyles = css`
   }
 
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(chatComposerContract, "root")},
+    ${partSelector(chatComposerContract, "surface")},
     ${partSelector(chatComposerContract, "input")},
     ${partSelector(chatComposerContract, "submit")} {
       transition: none;
     }
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] {
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] > ${partSelector(chatComposerContract, "surface")} {
     position: relative;
     gap: 4px;
     padding: 12px 12px 10px;
@@ -448,11 +435,10 @@ export const chatComposerStyles = css`
     opacity: 0.35;
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "hint")} {
-    /* Hint and model state must each own space, including when either wraps. */
+  /* Supporting text is outside the writing surface and never joins its action grid. */
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] > ${partSelector(chatComposerContract, "hint")},
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"]:focus-within > ${partSelector(chatComposerContract, "hint")} {
     position: static;
-    grid-column: 1 / -1;
-    grid-row: 3;
     min-width: 0;
     width: auto;
     height: auto;
@@ -469,7 +455,7 @@ export const chatComposerStyles = css`
 
   /* A phone writes on one row: attach, text, send. The model choice keeps a quiet row beneath. */
   @media (max-width: 768px) {
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] {
+    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] > ${partSelector(chatComposerContract, "surface")} {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr) auto;
       align-items: end;
@@ -530,28 +516,15 @@ export const chatComposerStyles = css`
       border-radius: 50%;
     }
 
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "hint")} {
-      grid-row: 4;
-      padding: 4px 4px 0;
-    }
   }
 
-  /* A composing panel owns the surface; the composer then contributes only its
-     editor and action row, without a second chrome or padding layer. */
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("surface")}="none"] {
+  /* Explicit bare embedding removes only the writing surface chrome. The form
+     and external supporting instructions keep their normal layout. */
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("surface")}="none"] > ${partSelector(chatComposerContract, "surface")} {
     padding: 0;
     border: 0;
     border-radius: 0;
     background: transparent;
     box-shadow: none;
-  }
-  @media (max-width: 768px) {
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("surface")}="none"] {
-      padding: 0;
-      border: 0;
-      border-radius: 0;
-      background: transparent;
-      box-shadow: none;
-    }
   }
 `;

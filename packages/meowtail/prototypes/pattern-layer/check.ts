@@ -27,6 +27,7 @@ for (const file of authorFiles) {
 }
 
 const server = Bun.serve({
+  hostname: "127.0.0.1",
   port: 0,
   async fetch(request) {
     const url = new URL(request.url);
@@ -77,15 +78,16 @@ async function pageFor(path: string, options: Record<string, unknown>) {
       return { x: box.x, y: box.y, width: box.width, height: box.height };
     };
     const surface = document.querySelector<HTMLElement>(
-      '[data-meowui-part="composer-panel/surface"]',
+      '[data-meowui-part="chat-composer/surface"]',
     );
     return {
       panel: rect('[data-meowui-part="composer-panel/root"]'),
-      surface: rect('[data-meowui-part="composer-panel/surface"]'),
+      surface: rect('[data-meowui-part="chat-composer/surface"]'),
       editor: rect('[data-meowui-part="chat-composer/input"]'),
       actions: rect('[data-meowui-part="chat-composer/actions"]'),
       trailing: rect('[data-meowui-part="chat-composer/trailing"]'),
       submit: rect('[data-meowui-part="chat-composer/submit"]'),
+      hint: rect('[data-meowui-part="chat-composer/hint"]'),
       meta: rect('[data-meowui-part="composer-panel/meta"]'),
       overflow: document.documentElement.scrollWidth > innerWidth + 1,
       surfaceBackground: surface ? getComputedStyle(surface).backgroundColor : "",
@@ -114,6 +116,14 @@ async function pageFor(path: string, options: Record<string, unknown>) {
     geometry.meta.y <= geometry.surface.y + geometry.surface.height - 1
   )
     findings.push("composer: meta not below surface");
+  if (
+    geometry.hint &&
+    geometry.surface &&
+    geometry.hint.y < geometry.surface.y + geometry.surface.height
+  )
+    findings.push("composer: supporting hint not outside the writing surface");
+  if (geometry.meta && geometry.hint && geometry.meta.y < geometry.hint.y + geometry.hint.height)
+    findings.push("composer: page facts not after the supporting hint");
   if (geometry.surfaceBackground === "rgb(255, 255, 255)")
     findings.push("composer: dark scheme not applied");
   console.log("composer geometry", JSON.stringify(geometry, null, 2));
@@ -146,7 +156,7 @@ async function pageFor(path: string, options: Record<string, unknown>) {
         body: rect('[data-meowui-part="page-frame/body"]'),
         notice: rect('[data-meowui-part="alert/root"]'),
         footer: rect('[data-meowui-part="page-frame/footer"]'),
-        composer: rect('[data-meowui-part="composer-panel/surface"]'),
+        composer: rect('[data-meowui-part="chat-composer/surface"]'),
         overflow: document.documentElement.scrollWidth > innerWidth + 1,
         notices: document.querySelectorAll('[data-meowui-part="alert/root"]').length,
         reading: rect('[role="log"]'),

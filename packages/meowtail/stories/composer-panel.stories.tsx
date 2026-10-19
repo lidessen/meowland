@@ -19,16 +19,16 @@ export const ComposerPanelStory = defineStory({
   component: "ComposerPanel",
   variant: "Editor, action rail and facts",
   description:
-    "ComposerPanel owns the writing surface and an optional page-level meta row. ChatComposer remains the editor and action behavior; the panel only removes its own chrome and supplies the composition.",
-  covers: ["ComposerPanel default", "ComposerPanel meta row", "ChatComposer surface none"],
+    "ComposerPanel refines ChatComposer's single writing surface. The keyboard hint and optional page-level facts follow outside the rounded editor and its bottom action row.",
+  covers: ["ComposerPanel default", "ComposerPanel external hint", "ComposerPanel meta row"],
   render: () => (
     <Container width="content">
       <Stack gap="relaxed">
         <Stack gap="compact">
           <strong>Default panel</strong>
           <span>
-            The surface and meta row belong to the panel; draft, actions and submission remain in
-            ChatComposer.
+            Draft and actions share one writing surface. Supporting instructions and page facts stay
+            below its edge.
           </span>
         </Stack>
         <ComposerPanel

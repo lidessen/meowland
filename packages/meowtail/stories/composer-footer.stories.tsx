@@ -21,7 +21,7 @@ export const ComposerFooterStory = defineStory({
   group: "Conversation components",
   groupOrder: 50,
   description:
-    "The shared stacked layout reserves normal-flow space for model state, hint and submit. Controls only change fixture data; the story adds no layout styles.",
+    "The writing surface contains draft and bottom actions; keyboard help follows outside its rounded edge. Controls only change fixture data; the story adds no layout styles.",
   covers: ["stacked hint with trailing", "long model and status", "draft and focus", "attachments"],
   render() {
     const draft = signal("");

@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   isSignal,
   unwrap,
   type Child,
@@ -68,8 +69,9 @@ export const Popover = defineComponent<PopoverProps, "popover", "root" | "panel"
     context,
   ) => {
     const local = context.signal(defaultOpen);
-    const state = open ?? local;
-    const expanded = context.signal(String(unwrap(state)));
+    // A signal object is controlled even when its current value is false.
+    const state = open !== undefined ? open : local;
+    const expanded = derived(() => String(unwrap(state)));
     let panel: HTMLElement | undefined;
     let anchor: HTMLElement | null = null;
     let restore = true;
@@ -79,7 +81,6 @@ export const Popover = defineComponent<PopoverProps, "popover", "root" | "panel"
       if (!panel?.isConnected) return;
       anchor ??= elementByIdInRoot(panel, triggerId);
       const next = unwrap(state);
-      expanded.value = String(next);
       const shown = panel.matches(":popover-open");
       const stack = layers.get(panel.ownerDocument) ?? [];
       layers.set(panel.ownerDocument, stack);

@@ -79,7 +79,7 @@ meowjsx (this package: core + JSX contract)
 
 ## Exports
 
-- `.`, `./runtime`: `h`, `Fragment`, `raw`, `part`, `signal`/`batch`/`mapSignal`,
+- `.`, `./runtime`: `h`, `Fragment`, `raw`, `part`, `signal`/`batch`/`mapSignal`/`derived`,
   `createRuntime`, `defaultRuntime`, `defineComponent`, `defineShadow`,
   `createThemePlugin`, plus VNode/Signal/contract types.
 - `./renderer`: `RenderStrategy<TNode>`, `createRenderer()`, `Renderer`/`Rendered`/
@@ -135,6 +135,10 @@ its lifecycle is managed by the consumer, and no global observation tree is crea
 
 Public JS artifacts preserve module relationships: the root, runtime, automatic JSX and Web entries reference the same core.
 Release builds must not copy a defaultRuntime, Context or reactive scheduler per entry.
+
+## Derived signals
+
+`derived(read)` is a read-only signal. `read` runs again when any signal it read changes, and subscribers hear the value when `Object.is` says it changed. `read` must not write signals. One source can also use `mapSignal`. A computation is not stored by writing another signal from `effect`.
 
 ## Keyed dynamic lists
 

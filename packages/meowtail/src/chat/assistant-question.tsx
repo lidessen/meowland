@@ -1,8 +1,7 @@
-import { defineComponent, h, type Signal } from "meowjsx";
+import { defineComponent, derived, h, keyed, type Signal } from "meowjsx";
 import { ChatQuestion } from "./question";
 import { Button } from "../components/button";
 import { Select } from "../components/select";
-import { assistantDerived } from "./assistant-content";
 import {
   assistantCopy as defaultAssistantCopy,
   type AssistantLabels,
@@ -28,10 +27,7 @@ export const AssistantQuestionView = defineComponent<
   const answer = context.signal("");
   const sending = context.signal(false);
   const error = context.signal("");
-  const disabled = assistantDerived(
-    context,
-    () => sending.value || value.value.state !== "open" || !onAnswer,
-  );
+  const disabled = derived(() => sending.value || value.value.state !== "open" || !onAnswer);
   let disposed = false;
   context.onCleanup(() => {
     disposed = true;
@@ -55,11 +51,10 @@ export const AssistantQuestionView = defineComponent<
     "form",
     { onSubmit: submit },
     h(ChatQuestion, {
-      question: assistantDerived(context, () => value.value.title),
+      question: derived(() => value.value.title),
       label: assistantCopy.questions,
-      description: assistantDerived(context, () => value.value.description),
-      feedback: assistantDerived(
-        context,
+      description: derived(() => value.value.description),
+      feedback: derived(
         () =>
           error.value ||
           value.value.feedback ||
@@ -75,26 +70,33 @@ export const AssistantQuestionView = defineComponent<
         context.part(
           "options",
           "div",
-          { hidden: assistantDerived(context, () => !value.value.options?.length) },
+          { hidden: derived(() => !value.value.options?.length) },
           h(Select, {
             value: answer,
             disabled,
-            "aria-label": value.value.title,
+            "aria-label": derived(() => value.value.title),
             onChange: (event: Event) => {
               answer.value = (event.currentTarget as HTMLSelectElement).value;
             },
-            children: assistantDerived(context, () => [
+            children: [
               h("option", { value: "" }, assistantCopy.answerPlaceholder),
-              ...(value.value.options ?? []).map((option) =>
-                h("option", { value: option.value }, option.label),
+              keyed(
+                derived(() => value.value.options ?? []),
+                (option) => option.value,
+                (option) =>
+                  h(
+                    "option",
+                    { value: derived(() => option.value.value) },
+                    derived(() => option.value.label),
+                  ),
               ),
-            ]),
+            ],
           }),
         ),
         context.part("answer", "textarea", {
           value: answer,
           rows: 2,
-          "aria-label": `${assistantCopy.answer}: ${value.value.title}`,
+          "aria-label": derived(() => `${assistantCopy.answer}: ${value.value.title}`),
           placeholder: assistantCopy.answerPlaceholder,
           disabled,
           onInput: (event: Event) => {
@@ -106,17 +108,14 @@ export const AssistantQuestionView = defineComponent<
         h(Button, {
           type: "submit",
           size: "small",
-          disabled: assistantDerived(context, () => disabled.value || !answer.value.trim()),
+          disabled: derived(() => disabled.value || !answer.value.trim()),
           children: assistantCopy.answer,
         }),
         onDismiss
           ? h(Button, {
               variant: "quiet",
               size: "small",
-              disabled: assistantDerived(
-                context,
-                () => sending.value || value.value.state !== "open",
-              ),
+              disabled: derived(() => sending.value || value.value.state !== "open"),
               onClick: () => onDismiss(value.value.id),
               children: assistantCopy.dismiss,
             })

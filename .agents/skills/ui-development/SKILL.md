@@ -5,6 +5,8 @@ description: Build, refine or review Meowtail components, complete Assistant vie
 
 # UI development and real-scene walkthroughs
 
+Before writing or changing a component, read [Component model: MeowJSX is not React](../../../packages/meowtail/AGENTS.md#component-model-meowjsx-is-not-react) and [Styling: MeowCSS is not ordinary CSS](../../../packages/meowtail/AGENTS.md#styling-meowcss-is-not-ordinary-css). Setup runs once per mount. Visuals are theme parts and tokens.
+
 Read the [Meowtail README](../../../packages/meowtail/README.md), the [component development conventions](../../../packages/meowtail/AGENTS.md) and nearby components. First clarify what users read, compare or operate here, then judge structure, visuals and feedback; local polish under an existing design language does not need a full product redesign.
 
 ## Default experience and implementation owner

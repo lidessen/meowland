@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { createReactiveEffect, derived } from "../../src/reactive";
 import {
   batch,
   createRuntime,
@@ -115,6 +116,107 @@ test("batch merges multiple writes into one notification", () => {
   });
 
   expect(values).toEqual([2]);
+});
+
+test("derived notifies on the next microtask and reads the current value immediately", async () => {
+  const count = signal(1);
+  const doubled = derived(() => count.value * 2);
+  const values: number[] = [];
+
+  doubled.subscribe((value) => values.push(value));
+  expect(doubled.value).toBe(2);
+  count.value = 4;
+  expect(doubled.value).toBe(8);
+  expect(values).toEqual([]);
+  await Promise.resolve();
+  expect(values).toEqual([8]);
+});
+
+test("derived skips notifications Object.is treats as the same value", async () => {
+  const count = signal(1);
+  const positive = derived(() => count.value > 0);
+  const values: boolean[] = [];
+
+  positive.subscribe((value) => values.push(value));
+  count.value = 2;
+  await Promise.resolve();
+  expect(values).toEqual([]);
+  count.value = 0;
+  await Promise.resolve();
+  expect(values).toEqual([false]);
+});
+
+test("derived tracks every signal a read touches and batch collapses those writes", () => {
+  const left = signal(1);
+  const right = signal(1);
+  const sum = derived(() => left.value + right.value);
+  const values: number[] = [];
+
+  sum.subscribe((value) => values.push(value));
+  batch(() => {
+    left.value = 2;
+    right.value = 3;
+  });
+  expect(values).toEqual([5]);
+});
+
+test("derived replaces dependencies that a later read no longer touches", async () => {
+  const mode = signal<"a" | "b">("a");
+  const alpha = signal(1);
+  const beta = signal(2);
+  const value = derived(() => (mode.value === "a" ? alpha.value : beta.value));
+  const values: number[] = [];
+
+  value.subscribe((next) => values.push(next));
+  alpha.value = 3;
+  await Promise.resolve();
+  beta.value = 9;
+  await Promise.resolve();
+  expect(values).toEqual([3]);
+  mode.value = "b";
+  await Promise.resolve();
+  beta.value = 8;
+  await Promise.resolve();
+  alpha.value = 1;
+  await Promise.resolve();
+  expect(values).toEqual([3, 9, 8]);
+});
+
+test("derived stops listening after its last subscriber leaves", async () => {
+  const count = signal(0);
+  const doubled = derived(() => count.value * 2);
+  const values: number[] = [];
+  const stop = doubled.subscribe((value) => values.push(value));
+
+  count.value = 1;
+  await Promise.resolve();
+  stop();
+  count.value = 2;
+  await Promise.resolve();
+  expect(values).toEqual([2]);
+  expect(doubled.value).toBe(4);
+});
+
+test("an effect that reads a derived signal runs once per source change", async () => {
+  const count = signal(1);
+  const doubled = derived(() => count.value * 2);
+  let runs = 0;
+  const stop = createReactiveEffect(() => {
+    void doubled.value;
+    runs += 1;
+  });
+
+  expect(runs).toBe(1);
+  count.value = 2;
+  await Promise.resolve();
+  expect(runs).toBe(2);
+  expect(doubled.value).toBe(4);
+  stop();
+});
+
+test("derived throws when a read calls itself", () => {
+  const value = derived(() => value.value);
+  expect(() => value.value).toThrow("derived read is cyclic");
 });
 
 test("runtime can bind its component and Signal semantics to a target renderer", async () => {

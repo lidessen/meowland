@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { createRuntime, h } from "meowjsx";
+import { createRuntime, h, unwrap } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { ChatComposer } from "../../../src/chat/composer";
 import { ChatAttachments } from "../../../src/chat/attachments";
@@ -22,7 +22,7 @@ test("draft images expose distinct preview and removal callbacks while sent imag
   runtime.use({
     render: ({ vnode }, next) => {
       if (vnode.type === "button")
-        actions.set(String(vnode.props["aria-label"]), vnode.props.onClick as () => void);
+        actions.set(String(unwrap(vnode.props["aria-label"])), vnode.props.onClick as () => void);
       return next(vnode);
     },
   });

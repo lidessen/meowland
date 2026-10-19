@@ -1,4 +1,12 @@
-import { defineComponent, h, type ComponentContract, type Props } from "meowjsx";
+import {
+  defineComponent,
+  derived,
+  h,
+  keyed,
+  type ComponentContract,
+  type MaybeSignal,
+  type Props,
+} from "meowjsx";
 import { Icon } from "../icons/icon";
 import { FileTypeIcon, fileExtension } from "../icons/file-type-icon";
 import { ImagePreview } from "../components/image-preview";
@@ -34,7 +42,8 @@ export interface ChatAttachmentItem {
 }
 
 export interface ChatAttachmentsProps extends Props {
-  items: readonly ChatAttachmentItem[];
+  /** Plain arrays are fixed for the mount. A signal updates rows in place. */
+  items: MaybeSignal<readonly ChatAttachmentItem[]>;
   label?: string;
   className?: string;
 }
@@ -55,109 +64,122 @@ export const ChatAttachments = defineComponent<
         role: "group",
         "aria-label": label,
       },
-      items.map((item) => {
-        const remove = item.onRemove
-          ? context.part(
-              "remove",
-              "button",
-              {
-                type: "button",
-                onClick: item.onRemove,
-                "aria-label": `Remove ${item.name}`,
-              },
-              <Icon name="x" />,
-            )
-          : null;
-        return item.mediaType.startsWith("image/")
-          ? context.part(
-              "entry",
-              "div",
-              { key: item.id, "data-kind": "image" },
-              context.part(
-                "image",
-                item.onPreview ? "button" : "a",
-                item.onPreview
-                  ? {
-                      type: "button",
-                      onClick: item.onPreview,
-                      "aria-label": `Preview ${item.name}`,
-                    }
-                  : {
-                      href: item.url,
-                      target: "_blank",
-                      rel: "noreferrer",
-                      "aria-label": `Open image ${item.name}`,
-                    },
-                context.part(
-                  "preview",
-                  "span",
-                  null,
-                  <ImagePreview src={item.url} alt={item.name} />,
-                ),
-              ),
-              remove,
-            )
-          : context.part(
-              "entry",
-              "div",
-              { key: item.id, "data-kind": "file" },
-              context.part(
-                "file",
-                "a",
+      keyed(
+        items,
+        (item) =>
+          [
+            item.id,
+            item.mediaType.startsWith("image/") ? "image" : "file",
+            item.onRemove ? "remove" : "keep",
+            item.onPreview ? "preview" : "plain",
+          ].join(":"),
+        (item) => {
+          const current = item.value;
+          const remove = current.onRemove
+            ? context.part(
+                "remove",
+                "button",
                 {
-                  key: item.id,
-                  href: item.url,
-                  download: item.name,
-                  onClick: item.onDownload
-                    ? (event: MouseEvent) => {
-                        event.preventDefault();
-                        item.onDownload!();
-                      }
-                    : undefined,
+                  type: "button",
+                  onClick: () => item.value.onRemove?.(),
+                  "aria-label": derived(() => `Remove ${item.value.name}`),
                 },
-                context.part(
-                  "icon",
-                  "span",
-                  { "aria-hidden": "true" },
-                  <FileTypeIcon path={item.name} />,
-                ),
-                context.part(
-                  "details",
-                  "span",
-                  null,
-                  context.part("name", "strong", null, item.name),
-                  item.sizeBytes !== undefined &&
-                    Number.isFinite(item.sizeBytes) &&
-                    item.sizeBytes >= 0
-                    ? context.part(
-                        "size",
-                        "small",
-                        null,
-                        [
-                          fileExtension(item.name).toUpperCase().slice(0, 8),
-                          formatBytes(item.sizeBytes),
-                        ]
-                          .filter(Boolean)
-                          .join(" "),
-                      )
-                    : null,
-                ),
-              ),
-              item.onPreview
-                ? context.part(
-                    "previewButton",
-                    "button",
-                    {
-                      type: "button",
-                      onClick: item.onPreview,
-                      "aria-label": `Preview ${item.name}`,
-                    },
-                    "Preview",
-                  )
-                : null,
-              remove,
+                <Icon name="x" />,
+              )
+            : null;
+          const size = derived(() => {
+            const bytes = item.value.sizeBytes;
+            if (bytes === undefined || !Number.isFinite(bytes) || bytes < 0) return null;
+            return context.part(
+              "size",
+              "small",
+              null,
+              [fileExtension(item.value.name).toUpperCase().slice(0, 8), formatBytes(bytes)]
+                .filter(Boolean)
+                .join(" "),
             );
-      }),
+          });
+          return current.mediaType.startsWith("image/")
+            ? context.part(
+                "entry",
+                "div",
+                { "data-kind": "image" },
+                context.part(
+                  "image",
+                  current.onPreview ? "button" : "a",
+                  current.onPreview
+                    ? {
+                        type: "button",
+                        onClick: () => item.value.onPreview?.(),
+                        "aria-label": derived(() => `Preview ${item.value.name}`),
+                      }
+                    : {
+                        href: derived(() => item.value.url),
+                        target: "_blank",
+                        rel: "noreferrer",
+                        "aria-label": derived(() => `Open image ${item.value.name}`),
+                      },
+                  context.part(
+                    "preview",
+                    "span",
+                    null,
+                    <ImagePreview src={current.url} alt={current.name} />,
+                  ),
+                ),
+                remove,
+              )
+            : context.part(
+                "entry",
+                "div",
+                { "data-kind": "file" },
+                context.part(
+                  "file",
+                  "a",
+                  {
+                    href: derived(() => item.value.url),
+                    download: derived(() => item.value.name),
+                    onClick: (event: MouseEvent) => {
+                      const download = item.value.onDownload;
+                      if (!download) return;
+                      event.preventDefault();
+                      download();
+                    },
+                  },
+                  context.part(
+                    "icon",
+                    "span",
+                    { "aria-hidden": "true" },
+                    <FileTypeIcon path={current.name} />,
+                  ),
+                  context.part(
+                    "details",
+                    "span",
+                    null,
+                    context.part(
+                      "name",
+                      "strong",
+                      null,
+                      derived(() => item.value.name),
+                    ),
+                    size,
+                  ),
+                ),
+                current.onPreview
+                  ? context.part(
+                      "previewButton",
+                      "button",
+                      {
+                        type: "button",
+                        onClick: () => item.value.onPreview?.(),
+                        "aria-label": derived(() => `Preview ${item.value.name}`),
+                      },
+                      "Preview",
+                    )
+                  : null,
+                remove,
+              );
+        },
+      ),
     ),
 );
 

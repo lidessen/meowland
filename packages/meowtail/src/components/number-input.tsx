@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   h,
   unwrap,
   type ComponentContract,
@@ -100,16 +101,13 @@ export const NumberInput = defineComponent<
     const local = context.signal<number | undefined>(
       value === undefined ? defaultValue : unwrap(value),
     );
-    const current = () => (value === undefined ? local.value : unwrap(value));
-    const text = context.signal(
-      current() === undefined ? "" : formatNumber(current() as number, places),
-    );
-    let editing = false;
-    context.effect(() => {
-      if (editing) return;
-      const next = current();
-      text.value = next === undefined ? "" : formatNumber(next, places);
-    });
+    const current = value !== undefined ? value : local;
+    const readValue = () => unwrap(current);
+    const editing = context.signal(false);
+    const draft = context.signal("");
+    const formatted = (next: number | undefined) =>
+      next === undefined ? "" : formatNumber(next, places);
+    const text = derived(() => (editing.value ? draft.value : formatted(readValue())));
     const assign = (next: number | undefined) => {
       if (value === undefined) local.value = next;
       onValueChange?.(next);
@@ -118,22 +116,20 @@ export const NumberInput = defineComponent<
       const parsed = parseInput(raw);
       if (parsed === undefined) {
         assign(undefined);
-        text.value = "";
         return undefined;
       }
       const next = clampNumber(parsed, lower, upper, step, origin);
       assign(next);
-      text.value = formatNumber(next, places);
       return next;
     };
     const nudge = (direction: 1 | -1) => {
       if (disabled || readOnly) return;
+      editing.value = false;
       const base =
-        current() ??
+        readValue() ??
         (direction > 0 ? (Number.isFinite(lower) ? lower : 0) : Number.isFinite(upper) ? upper : 0);
       const next = clampNumber(base + direction * step, lower, upper, step, origin);
       assign(next);
-      text.value = formatNumber(next, places);
     };
     return context.part(
       "root",
@@ -167,23 +163,21 @@ export const NumberInput = defineComponent<
         "aria-valuemin": Number.isFinite(lower) ? lower : undefined,
         "aria-valuemax": Number.isFinite(upper) ? upper : undefined,
         onInput: (event: Event) => {
-          editing = true;
           const input = event.currentTarget as HTMLInputElement;
-          text.value = input.value;
+          editing.value = true;
+          draft.value = input.value;
           onInput?.(event);
         },
         onChange: (event: Event) => {
           onChange?.(event);
         },
         onBlur: (event: FocusEvent) => {
-          editing = false;
           const input = event.currentTarget as HTMLInputElement;
           const next = commit(input.value);
-          if (value !== undefined) {
-            const controlled = unwrap(value);
-            text.value = controlled === undefined ? "" : formatNumber(controlled, places);
-            if (next !== undefined && controlled === undefined) input.value = text.value;
-          }
+          editing.value = false;
+          // A controlled owner that stays empty must clear a parsed draft immediately.
+          if (value !== undefined && next !== undefined && unwrap(value) === undefined)
+            input.value = "";
           onBlur?.(event);
         },
         onKeyDown: (event: KeyboardEvent) => {
@@ -196,6 +190,7 @@ export const NumberInput = defineComponent<
             nudge(-1);
           } else if (event.key === "Enter") {
             commit((event.currentTarget as HTMLInputElement).value);
+            editing.value = false;
           }
         },
       }),

@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   h,
   unwrap,
   type Child,
@@ -61,7 +62,7 @@ function nextValue(
   return [...list];
 }
 
-/** Grouped disclosures. Expansion state is handed to the caller when `value` is set. */
+/** Grouped disclosures. Items are fixed for the mount. Expansion is handed to the caller when `value` is set. */
 export const Accordion = defineComponent<
   AccordionProps,
   typeof accordionContract.name,
@@ -73,16 +74,11 @@ export const Accordion = defineComponent<
     context,
   ) => {
     const local = context.signal<AccordionValue>(defaultValue ?? (type === "single" ? "" : []));
-    const current = () => (value === undefined ? local.value : unwrap(value));
-    const opened = items.map((item) => context.signal(isOpen(current(), type, item.id)));
-    context.effect(() => {
-      const state = current();
-      for (const [index, item] of items.entries()) {
-        opened[index]!.value = isOpen(state, type, item.id);
-      }
-    });
+    const current = value !== undefined ? value : local;
+    const readValue = () => unwrap(current);
+    const opened = items.map((item) => derived(() => isOpen(readValue(), type, item.id)));
     const request = (id: string, open: boolean) => {
-      const next = nextValue(current(), type, id, open);
+      const next = nextValue(readValue(), type, id, open);
       if (value === undefined) local.value = next;
       onValueChange?.(next);
     };

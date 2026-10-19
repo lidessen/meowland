@@ -189,3 +189,92 @@ export function mapSignal<T, M>(
   };
   return mapped;
 }
+
+/**
+ * Read-only signal. `read` runs again when any signal it touched changes.
+ * Subscribers are told only when `Object.is` sees a new value. `read` must not
+ * write signals; a cyclic read throws.
+ */
+export function derived<T>(read: () => T): ReadableSignal<T> {
+  const listeners = new Set<(value: T) => void>();
+  let cleanups: Cleanup[] = [];
+  let previous: T;
+  let ready = false;
+  let computing = false;
+  let queued = false;
+
+  const detach = (): void => {
+    for (const cleanup of cleanups) cleanup();
+    cleanups = [];
+  };
+
+  const refresh = (notify: boolean): void => {
+    if (computing) {
+      queued = true;
+      return;
+    }
+    const dependencies = new Set<ReadableSignal<unknown>>();
+    const previousEffect = activeEffect;
+    activeEffect = {
+      dependencies,
+      subscriptions: [],
+      stopped: false,
+      scheduled: false,
+    };
+    computing = true;
+    let next: T;
+    try {
+      next = read();
+    } finally {
+      activeEffect = previousEffect;
+      computing = false;
+    }
+    detach();
+    if (listeners.size > 0) {
+      cleanups = [...dependencies].map((source) => source.subscribe(() => refresh(true)));
+    }
+    const changed = !ready || !Object.is(previous, next);
+    previous = next;
+    ready = true;
+    if (notify && changed) {
+      for (const listener of Array.from(listeners)) listener(next);
+    }
+    if (queued) {
+      queued = false;
+      refresh(true);
+    }
+  };
+
+  const computed: ReadableSignal<T> = {
+    get value(): T {
+      if (computing) throw new Error("derived read is cyclic");
+      trackSignal(computed);
+      computing = true;
+      try {
+        return read();
+      } finally {
+        computing = false;
+      }
+    },
+    subscribe(listener: (value: T) => void): () => void {
+      const start = listeners.size === 0;
+      listeners.add(listener);
+      try {
+        if (start) refresh(false);
+      } catch (error) {
+        listeners.delete(listener);
+        detach();
+        ready = false;
+        throw error;
+      }
+      return () => {
+        listeners.delete(listener);
+        if (listeners.size === 0) {
+          detach();
+          ready = false;
+        }
+      };
+    },
+  };
+  return computed;
+}

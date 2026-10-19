@@ -1,6 +1,6 @@
 import {
   defineComponent,
-  mapSignal,
+  derived,
   unwrap,
   type ComponentContract,
   type MaybeSignal,
@@ -60,19 +60,18 @@ export const Slider = defineComponent<
   ) => {
     const initial = value === undefined ? (defaultValue ?? min) : unwrap(value);
     const local = context.signal(initial);
-    const current = () => (value === undefined ? local.value : unwrap(value));
-    const display = context.signal(String(current()));
-    const fill = context.signal("0%");
-    context.effect(() => {
-      const next = current();
-      display.value = String(next);
+    const current = value !== undefined ? value : local;
+    const readValue = () => unwrap(current);
+    const display = derived(() => String(readValue()));
+    const fill = derived(() => {
+      const next = readValue();
       const range = max - min;
       const pct = range <= 0 ? 0 : Math.min(100, Math.max(0, ((next - min) / range) * 100));
-      fill.value = `${pct}%`;
+      return `${pct}%`;
     });
     const commit = (event: Event) => {
       const input = event.currentTarget as HTMLInputElement;
-      const next = asNumber(input.value, current());
+      const next = asNumber(input.value, readValue());
       if (value === undefined) local.value = next;
       onValueChange?.(next);
       onInput?.(event);
@@ -83,7 +82,7 @@ export const Slider = defineComponent<
       "div",
       {
         className,
-        style: mapSignal(fill, (amount) => ({ "--slider-fill": amount })),
+        style: { "--slider-fill": fill },
       },
       context.part("control", "input", {
         ...props,

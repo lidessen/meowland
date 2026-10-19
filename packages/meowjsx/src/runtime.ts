@@ -103,6 +103,7 @@ export {
   batch,
   isAsyncIterable,
   isPromiseLike,
+  derived,
   isSignal,
   mapSignal,
   signal,

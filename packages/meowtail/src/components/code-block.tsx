@@ -1,4 +1,13 @@
-import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
+import {
+  defineComponent,
+  derived,
+  h,
+  unwrap,
+  type Child,
+  type ComponentContract,
+  type MaybeSignal,
+  type Props,
+} from "meowjsx";
 import { Button } from "./button";
 import { copyTextToClipboard } from "../clipboard";
 import { highlightCode } from "../syntax-highlight";
@@ -9,8 +18,8 @@ export const codeBlockContract = {
 } as const satisfies ComponentContract;
 
 export interface CodeBlockProps extends Props {
-  code: string;
-  language?: string;
+  code: MaybeSignal<string>;
+  language?: MaybeSignal<string | undefined>;
   defaultWrap?: boolean;
   /** Hosts may supply a clipboard implementation; the default uses the browser clipboard. */
   onCopy?: (code: string) => Promise<void>;
@@ -25,18 +34,44 @@ export const CodeBlock = defineComponent<
   const wrap = context.signal(defaultWrap ? "true" : "false");
   const copying = context.signal(false);
   const feedback = context.signal("");
-  const highlighted = context.signal<Child>(code);
+  const highlighted = context.signal<Child>(unwrap(code));
+  const languageLabel = derived(() => unwrap(language)?.trim() || "Code");
   let disposed = false;
   context.onCleanup(() => {
     disposed = true;
+  });
+  context.effect(() => {
+    const currentCode = unwrap(code);
+    const currentLanguage = unwrap(language);
+    highlighted.value = currentCode;
+    let active = true;
+    void highlightCode(currentCode, currentLanguage).then((spans) => {
+      if (!active || disposed || !spans) return;
+      highlighted.value = spans.map((span) => (
+        <span
+          style={{
+            color: span.color,
+            fontStyle: (span.fontStyle ?? 0) & 1 ? "italic" : undefined,
+            fontWeight: (span.fontStyle ?? 0) & 2 ? "bold" : undefined,
+            textDecoration: (span.fontStyle ?? 0) & 4 ? "underline" : undefined,
+          }}
+        >
+          {span.text}
+        </span>
+      ));
+    });
+    return () => {
+      active = false;
+    };
   });
   const copy = async () => {
     if (copying.value) return;
     copying.value = true;
     feedback.value = "";
+    const text = unwrap(code);
     try {
-      if (onCopy) await onCopy(code);
-      else await copyTextToClipboard(code);
+      if (onCopy) await onCopy(text);
+      else await copyTextToClipboard(text);
       if (!disposed) feedback.value = "Copied";
     } catch {
       if (!disposed) feedback.value = "Copy failed; select the code and copy it manually.";
@@ -46,7 +81,7 @@ export const CodeBlock = defineComponent<
   };
   return context.part("root", "figure", props, [
     context.part("header", "figcaption", {}, [
-      context.part("language", "span", {}, language?.trim() || "Code"),
+      context.part("language", "span", {}, languageLabel),
       context.part("actions", "div", {}, [
         <Button
           variant="quiet"
@@ -67,34 +102,7 @@ export const CodeBlock = defineComponent<
       "content",
       "pre",
       { tabIndex: 0, "aria-label": "Code content", "data-wrap": wrap },
-      context.part(
-        "code",
-        "code",
-        {
-          ref: () => {
-            let active = true;
-            void highlightCode(code, language).then((spans) => {
-              if (!active || disposed || !spans) return;
-              highlighted.value = spans.map((span) => (
-                <span
-                  style={{
-                    color: span.color,
-                    fontStyle: (span.fontStyle ?? 0) & 1 ? "italic" : undefined,
-                    fontWeight: (span.fontStyle ?? 0) & 2 ? "bold" : undefined,
-                    textDecoration: (span.fontStyle ?? 0) & 4 ? "underline" : undefined,
-                  }}
-                >
-                  {span.text}
-                </span>
-              ));
-            });
-            return () => {
-              active = false;
-            };
-          },
-        },
-        highlighted,
-      ),
+      context.part("code", "code", null, highlighted),
     ),
     context.part("feedback", "span", { role: "status", "aria-live": "polite" }, feedback),
   ]);

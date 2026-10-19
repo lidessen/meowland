@@ -1,4 +1,4 @@
-import { defineComponent, h, keyed, unwrap, type Signal } from "meowjsx";
+import { defineComponent, derived, h, keyed, unwrap, type Signal } from "meowjsx";
 import { PageFrame } from "../components/page-frame";
 import { Button } from "../components/button";
 import { WorkCard } from "../components/work-card";
@@ -7,7 +7,7 @@ import { Dialog } from "../components/dialog";
 import { ChatHeader } from "./header";
 import { ChatMessageList } from "./message-list";
 import { AssistantComposer } from "./assistant-composer";
-import { AssistantMessageView, AssistantSteps, assistantDerived } from "./assistant-content";
+import { AssistantMessageView, AssistantSteps } from "./assistant-content";
 import { AssistantQuestionView } from "./assistant-question";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { assistantScroll } from "./assistant-scroll";
@@ -46,13 +46,13 @@ const AssistantWorkRow = defineComponent<
   },
   "assistant-work-row",
   "root"
->({ name: "assistant-work-row", parts: ["root"] }, ({ value, onOpen, actionLabel }, context) =>
+>({ name: "assistant-work-row", parts: ["root"] }, ({ value, onOpen, actionLabel }) =>
   h(WorkCard, {
     action: actionLabel,
-    title: assistantDerived(context, () => value.value.title),
-    state: assistantDerived(context, () => value.value.tone ?? "unknown"),
-    status: assistantDerived(context, () => value.value.statusText),
-    detail: assistantDerived(context, () =>
+    title: derived(() => value.value.title),
+    state: derived(() => value.value.tone ?? "unknown"),
+    status: derived(() => value.value.statusText),
+    detail: derived(() =>
       [value.value.executionText, value.value.replyText].filter(Boolean).join(" · "),
     ),
     onClick: (event: MouseEvent) => onOpen(value.value.id, event.currentTarget as HTMLElement),
@@ -70,8 +70,8 @@ const AssistantWorkDetail = defineComponent<
   { name: "assistant-work-detail", parts: ["root", "feedback", "facts"] },
   ({ value, options }, context) => {
     const assistantCopy = { ...defaultAssistantCopy, ...options.labels };
-    const hidden = assistantDerived(context, () => value.value?.readState === "unavailable");
-    const feedback = assistantDerived(context, () => {
+    const hidden = derived(() => value.value?.readState === "unavailable");
+    const feedback = derived(() => {
       const work = value.value;
       return (
         work?.feedback ||
@@ -85,14 +85,15 @@ const AssistantWorkDetail = defineComponent<
       );
     });
     const detail = h(AssistantMarkdown, {
-      text: assistantDerived(context, () =>
+      text: derived(() =>
         value.value?.readState === "unavailable"
           ? ""
           : (value.value?.detail ?? value.value?.summary ?? ""),
       ),
     });
+    // The host detail slot may return a node. The default markdown view stays mounted otherwise.
     const custom = options.renderWorkDetail
-      ? assistantDerived(context, () =>
+      ? derived(() =>
           value.value && value.value.readState !== "unavailable"
             ? (options.renderWorkDetail!(value.value) ?? detail)
             : null,
@@ -105,7 +106,7 @@ const AssistantWorkDetail = defineComponent<
       context.part(
         "feedback",
         "p",
-        { role: "status", hidden: assistantDerived(context, () => !feedback.value) },
+        { role: "status", hidden: derived(() => !feedback.value) },
         feedback,
       ),
       context.part(
@@ -115,27 +116,27 @@ const AssistantWorkDetail = defineComponent<
         h(
           "h3",
           null,
-          assistantDerived(context, () => value.value?.title ?? ""),
+          derived(() => value.value?.title ?? ""),
         ),
         h(
           "p",
           null,
-          h(StatusDot, { state: assistantDerived(context, () => value.value?.tone ?? "unknown") }),
+          h(StatusDot, { state: derived(() => value.value?.tone ?? "unknown") }),
           " ",
-          assistantDerived(context, () => value.value?.statusText ?? ""),
+          derived(() => value.value?.statusText ?? ""),
         ),
         h(
           "p",
           null,
-          assistantDerived(context, () => value.value?.executionText ?? ""),
+          derived(() => value.value?.executionText ?? ""),
         ),
         h(
           "p",
           null,
-          assistantDerived(context, () => value.value?.replyText ?? ""),
+          derived(() => value.value?.replyText ?? ""),
         ),
         custom,
-        h(AssistantSteps, { steps: assistantDerived(context, () => value.value?.steps ?? []) }),
+        h(AssistantSteps, { steps: derived(() => value.value?.steps ?? []) }),
       ),
       options.onRefreshWork
         ? h(Button, {
@@ -158,18 +159,16 @@ export const AssistantView = defineComponent<
   (typeof assistantViewContract.parts)[number]
 >(assistantViewContract, (options, context) => {
   const assistantCopy = { ...defaultAssistantCopy, ...options.labels };
-  const messages = assistantDerived(context, () => unwrap(options.messages));
-  const work = assistantDerived(context, () => unwrap(options.work ?? []));
-  const questions = assistantDerived(context, () => unwrap(options.questions ?? []));
-  const activity = assistantDerived(context, () => unwrap(options.activity));
+  const messages = derived(() => unwrap(options.messages));
+  const work = derived(() => unwrap(options.work ?? []));
+  const questions = derived(() => unwrap(options.questions ?? []));
+  const activity = derived(() => unwrap(options.activity));
   const panelOpen = context.signal(false);
   const selected = context.signal("");
-  const selectedWork = assistantDerived(context, () =>
-    work.value.find((item) => item.id === selected.value),
-  );
+  const selectedWork = derived(() => work.value.find((item) => item.id === selected.value));
   const latestHidden = context.signal(true);
-  const bodyHidden = assistantDerived(context, () => !!selected.value);
-  const detailHidden = assistantDerived(context, () => !selected.value);
+  const bodyHidden = derived(() => !!selected.value);
+  const detailHidden = derived(() => !selected.value);
   let content: HTMLElement | undefined;
   let scroll: ReturnType<typeof assistantScroll> | undefined;
   let dialog: HTMLDialogElement | undefined;
@@ -284,13 +283,9 @@ export const AssistantView = defineComponent<
           "p",
           {
             role: "status",
-            hidden: assistantDerived(
-              context,
-              () => unwrap(options.readState ?? "ready") === "ready",
-            ),
+            hidden: derived(() => unwrap(options.readState ?? "ready") === "ready"),
           },
-          assistantDerived(
-            context,
+          derived(
             () =>
               unwrap(options.readFeedback ?? "") ||
               (unwrap(options.readState ?? "ready") === "loading"
@@ -302,8 +297,7 @@ export const AssistantView = defineComponent<
           "empty",
           "div",
           {
-            hidden: assistantDerived(
-              context,
+            hidden: derived(
               () => messages.value.length > 0 || unwrap(options.readState ?? "ready") !== "ready",
             ),
           },
@@ -338,31 +332,27 @@ export const AssistantView = defineComponent<
         "status",
         "p",
         null,
-        h(StatusDot, { state: assistantDerived(context, () => activity.value?.tone ?? "idle") }),
-        assistantDerived(context, () => activity.value?.statusText ?? assistantCopy.noActivity),
+        h(StatusDot, { state: derived(() => activity.value?.tone ?? "idle") }),
+        derived(() => activity.value?.statusText ?? assistantCopy.noActivity),
       ),
       h(
         "strong",
         null,
-        assistantDerived(context, () => activity.value?.title ?? ""),
+        derived(() => activity.value?.title ?? ""),
       ),
       h(
         "p",
         null,
-        assistantDerived(context, () => activity.value?.description ?? ""),
+        derived(() => activity.value?.description ?? ""),
       ),
-      h(AssistantSteps, { steps: assistantDerived(context, () => activity.value?.steps ?? []) }),
+      h(AssistantSteps, { steps: derived(() => activity.value?.steps ?? []) }),
     ),
     context.part(
       "section",
       "section",
       null,
       h("h3", null, assistantCopy.background),
-      h(
-        "p",
-        { hidden: assistantDerived(context, () => work.value.length > 0) },
-        assistantCopy.noWork,
-      ),
+      h("p", { hidden: derived(() => work.value.length > 0) }, assistantCopy.noWork),
       keyed(
         work,
         (item) => item.id,
@@ -384,7 +374,7 @@ export const AssistantView = defineComponent<
     context.part(
       "section",
       "section",
-      { hidden: assistantDerived(context, () => questions.value.length === 0) },
+      { hidden: derived(() => questions.value.length === 0) },
       h("h3", null, assistantCopy.questions),
       keyed(
         questions,
@@ -456,7 +446,7 @@ export const AssistantView = defineComponent<
       style: options.style,
       "aria-label": options["aria-label"],
       className: options.className,
-      "data-activity-open": assistantDerived(context, () => String(panelOpen.value)),
+      "data-activity-open": derived(() => String(panelOpen.value)),
       ref: (element: HTMLElement) => {
         root = element;
         const observer = new ResizeObserver(syncDialog);
@@ -477,7 +467,7 @@ export const AssistantView = defineComponent<
           h(Button, {
             variant: "quiet",
             size: "small",
-            "aria-expanded": assistantDerived(context, () => String(panelOpen.value)),
+            "aria-expanded": derived(() => String(panelOpen.value)),
             ref: (element: HTMLElement) => {
               activityTrigger = element;
             },

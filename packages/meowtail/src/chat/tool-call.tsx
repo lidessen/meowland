@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   h,
   unwrap,
   type Child,
@@ -106,13 +107,6 @@ export const ChatToolCall = defineComponent<
     },
     context,
   ) => {
-    const derived = <T,>(read: () => T) => {
-      const value = context.signal(read());
-      context.effect(() => {
-        value.value = read();
-      });
-      return value;
-    };
     const copy: ChatToolCallLabels = {
       input: "Input",
       output: "Output",

@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   createContext,
   useContext,
   h,
@@ -33,10 +34,7 @@ export const TextShimmer = defineComponent<
     const content = text ?? children;
     if (useContext(ShimmerContent))
       return context.part("content", "span", { ...props, className }, content);
-    const activity = context.signal(String(unwrap(active)));
-    context.effect(() => {
-      activity.value = String(unwrap(active));
-    });
+    const activity = derived(() => String(unwrap(active)));
     return context.part(
       "root",
       "span",

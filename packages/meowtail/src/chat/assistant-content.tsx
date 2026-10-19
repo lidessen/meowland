@@ -1,12 +1,4 @@
-import {
-  defineComponent,
-  h,
-  keyed,
-  unwrap,
-  type Child,
-  type LifecycleScope,
-  type Signal,
-} from "meowjsx";
+import { defineComponent, derived, h, keyed, unwrap, type Child, type Signal } from "meowjsx";
 import { ChatMessage } from "./message";
 import { ChatAttachments } from "./attachments";
 import { ChatToolCall } from "./tool-call";
@@ -22,18 +14,6 @@ import type {
   AssistantViewProps,
 } from "./assistant-types";
 
-/** All derived values live in their owning component lifecycle. */
-export function assistantDerived<T>(
-  context: Pick<LifecycleScope, "signal" | "effect">,
-  read: () => T,
-) {
-  const value = context.signal(read());
-  context.effect(() => {
-    value.value = read();
-  });
-  return value;
-}
-
 export const assistantStepsContract = {
   name: "assistant-steps",
   parts: ["root", "step", "label", "description", "status"],
@@ -47,7 +27,7 @@ const AssistantStep = defineComponent<
     "step",
     "li",
     null,
-    h(StatusDot, { state: assistantDerived(context, () => value.value.tone ?? "unknown") }),
+    h(StatusDot, { state: derived(() => value.value.tone ?? "unknown") }),
     context.part(
       "label",
       "div",
@@ -55,20 +35,20 @@ const AssistantStep = defineComponent<
       h(
         "strong",
         null,
-        assistantDerived(context, () => value.value.title),
+        derived(() => value.value.title),
       ),
       context.part(
         "description",
         "p",
-        { hidden: assistantDerived(context, () => !value.value.description) },
-        assistantDerived(context, () => value.value.description ?? ""),
+        { hidden: derived(() => !value.value.description) },
+        derived(() => value.value.description ?? ""),
       ),
     ),
     context.part(
       "status",
       "span",
       null,
-      assistantDerived(context, () => value.value.statusText ?? ""),
+      derived(() => value.value.statusText ?? ""),
     ),
   ),
 );
@@ -103,24 +83,23 @@ export const AssistantPartView = defineComponent<
   ({ value, message, renderPart, onToolAction }, context) => {
     // The keyed identity includes kind, so this component's structural variant is stable.
     const initial = value.value;
-    const custom = renderPart
-      ? assistantDerived(context, () => renderPart(value.value, message.value))
-      : undefined;
+    // Host slots may return a node. Component fallbacks stay mounted and take signals instead.
+    const custom = renderPart ? derived(() => renderPart(value.value, message.value)) : undefined;
     let fallback: Child;
     if (initial.kind === "text") {
       fallback = h(AssistantMarkdown, {
-        text: assistantDerived(context, () => (value.value as typeof initial).text),
+        text: derived(() => (value.value as typeof initial).text),
       });
     } else if (initial.kind === "tool") {
       const tool = () => value.value as typeof initial;
       fallback = h(ChatToolCall, {
-        label: assistantDerived(context, () => tool().label),
-        summary: assistantDerived(context, () => tool().summary),
-        state: assistantDerived(context, () => tool().state ?? "unknown"),
-        statusLabel: assistantDerived(context, () => tool().statusLabel),
-        input: assistantDerived(context, () => tool().input),
-        output: assistantDerived(context, () => tool().output),
-        outputSummary: assistantDerived(context, () => tool().outputSummary),
+        label: derived(() => tool().label),
+        summary: derived(() => tool().summary),
+        state: derived(() => tool().state ?? "unknown"),
+        statusLabel: derived(() => tool().statusLabel),
+        input: derived(() => tool().input),
+        output: derived(() => tool().output),
+        outputSummary: derived(() => tool().outputSummary),
         maxLines: initial.maxLines,
         collapsible: true,
         open: initial.defaultOpen ?? false,
@@ -136,46 +115,45 @@ export const AssistantPartView = defineComponent<
                 onToolAction(message.value.id, tool().id, "cancel");
             }
           : undefined,
-        canRetry: assistantDerived(context, () => tool().canRetry ?? false),
-        canCancel: assistantDerived(context, () => tool().canCancel ?? false),
-        retryDisabled: assistantDerived(context, () => tool().retryDisabled ?? false),
-        cancelDisabled: assistantDerived(context, () => tool().cancelDisabled ?? false),
+        canRetry: derived(() => tool().canRetry ?? false),
+        canCancel: derived(() => tool().canCancel ?? false),
+        retryDisabled: derived(() => tool().retryDisabled ?? false),
+        cancelDisabled: derived(() => tool().cancelDisabled ?? false),
       });
     } else if (initial.kind === "task") {
       const task = () => value.value as typeof initial;
       fallback = h(ChatTask, {
-        title: assistantDerived(context, () => task().title),
-        state: assistantDerived(context, () => task().state),
-        statusLabel: assistantDerived(context, () => task().statusLabel),
-        description: assistantDerived(context, () => task().description),
-        executionText: assistantDerived(context, () => task().executionText),
-        replyText: assistantDerived(context, () => task().replyText),
-        progress: assistantDerived(context, () => task().progress),
+        title: derived(() => task().title),
+        state: derived(() => task().state),
+        statusLabel: derived(() => task().statusLabel),
+        description: derived(() => task().description),
+        executionText: derived(() => task().executionText),
+        replyText: derived(() => task().replyText),
+        progress: derived(() => task().progress),
         children: h(AssistantSteps, {
-          steps: assistantDerived(context, () => task().steps ?? []),
+          steps: derived(() => task().steps ?? []),
         }),
       });
     } else if (initial.kind === "process") {
       fallback = h(ProcessGroup, {
-        title: assistantDerived(context, () => (value.value as typeof initial).title),
-        status: assistantDerived(context, () => (value.value as typeof initial).statusText),
+        title: derived(() => (value.value as typeof initial).title),
+        status: derived(() => (value.value as typeof initial).statusText),
         open: initial.defaultOpen ?? false,
         children: h(AssistantSteps, {
-          steps: assistantDerived(context, () => (value.value as typeof initial).steps),
+          steps: derived(() => (value.value as typeof initial).steps),
         }),
       });
     } else if (initial.kind === "code") {
-      // CodeBlock owns its copy/wrap/highlight lifecycle. Replace only this block on code changes.
-      fallback = assistantDerived(context, () => {
-        const part = value.value as typeof initial;
-        return h(CodeBlock, { code: part.code, language: part.language });
+      fallback = h(CodeBlock, {
+        code: derived(() => (value.value as typeof initial).code),
+        language: derived(() => (value.value as typeof initial).language),
       });
     } else {
-      fallback = assistantDerived(context, () =>
-        h(ChatAttachments, { items: (value.value as typeof initial).items }),
-      );
+      fallback = h(ChatAttachments, {
+        items: derived(() => (value.value as typeof initial).items),
+      });
     }
-    const content = custom ? assistantDerived(context, () => unwrap(custom) ?? fallback) : fallback;
+    const content = custom ? derived(() => unwrap(custom) ?? fallback) : fallback;
     return context.part(
       "root",
       "div",
@@ -196,7 +174,7 @@ export const AssistantMessageView = defineComponent<
 >(
   { name: "assistant-message", parts: ["root"] },
   ({ value, renderPart, onToolAction }, context) => {
-    const parts = assistantDerived(context, () => value.value.parts);
+    const parts = derived(() => value.value.parts);
     return context.part(
       "root",
       "div",
@@ -210,17 +188,17 @@ export const AssistantMessageView = defineComponent<
           h(
             "strong",
             null,
-            assistantDerived(context, () => value.value.author),
+            derived(() => value.value.author),
           ),
           h(
             "time",
             null,
-            assistantDerived(context, () => value.value.timestamp ?? ""),
+            derived(() => value.value.timestamp ?? ""),
           ),
           h(
             "span",
             { role: "status" },
-            assistantDerived(context, () =>
+            derived(() =>
               value.value.status && value.value.status !== "complete" ? value.value.status : "",
             ),
           ),

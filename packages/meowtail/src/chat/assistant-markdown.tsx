@@ -1,4 +1,4 @@
-import { defineComponent, h, type Signal } from "meowjsx";
+import { defineComponent, derived, type Signal } from "meowjsx";
 import { Marked, Renderer } from "marked";
 
 const escape = (text: string) =>
@@ -37,10 +37,8 @@ export const AssistantMarkdown = defineComponent<
   { text: Signal<string> },
   "assistant-markdown",
   "root"
->(assistantMarkdownContract, ({ text }, context) => {
-  const html = context.signal({ __html: assistantMarkdown(text.value) });
-  context.effect(() => {
-    html.value = { __html: assistantMarkdown(text.value) };
-  });
-  return context.part("root", "div", { dangerouslySetInnerHTML: html });
-});
+>(assistantMarkdownContract, ({ text }, context) =>
+  context.part("root", "div", {
+    dangerouslySetInnerHTML: derived(() => ({ __html: assistantMarkdown(text.value) })),
+  }),
+);

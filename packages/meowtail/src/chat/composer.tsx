@@ -1,6 +1,14 @@
 import { defineOptions } from "meowcss";
 import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
-import { defineComponent, h, type Child, type MaybeSignal, type Props } from "meowjsx";
+import {
+  defineComponent,
+  derived,
+  h,
+  unwrap,
+  type Child,
+  type MaybeSignal,
+  type Props,
+} from "meowjsx";
 import { Icon } from "../icons/icon";
 
 export const chatComposerOptions = defineOptions("chat-composer", {
@@ -44,7 +52,8 @@ export interface ChatComposerProps extends Props, ThemedProps<typeof chatCompose
   submitLabel?: string;
   /** Visible action content; the accessible name always comes from submitLabel. */
   submitContent?: Child;
-  disabled?: boolean;
+  disabled?: MaybeSignal<boolean>;
+  readOnly?: MaybeSignal<boolean>;
   /** Prevent another submission while keeping the draft editable. */
   submitDisabled?: MaybeSignal<boolean>;
   onSubmit?: ChatComposerSubmit;
@@ -70,6 +79,7 @@ export const ChatComposer = defineComponent<
       submitLabel = "Send",
       submitContent,
       disabled = false,
+      readOnly = false,
       submitDisabled = false,
       onSubmit,
       onInput,
@@ -78,8 +88,20 @@ export const ChatComposer = defineComponent<
       ...props
     },
     context,
-  ) =>
-    context.part(
+  ) => {
+    const submitBlocked =
+      disabled === true
+        ? true
+        : typeof disabled === "boolean"
+          ? submitDisabled
+          : derived(() => Boolean(unwrap(disabled)) || Boolean(unwrap(submitDisabled)));
+    let field: HTMLTextAreaElement | undefined;
+    const resize = () => {
+      if (!field?.isConnected) return;
+      field.style.height = "auto";
+      field.style.height = `${field.scrollHeight}px`;
+    };
+    return context.part(
       "root",
       "form",
       {
@@ -105,7 +127,29 @@ export const ChatComposer = defineComponent<
             "aria-label": inputLabel,
             "aria-describedby": hint && hintId ? hintId : undefined,
             disabled,
+            readOnly,
             onInput,
+            ref: (textarea: HTMLTextAreaElement) => {
+              field = textarea;
+              const stop = context.effect(() => {
+                unwrap(value);
+                resize();
+              });
+              const onResizeInput = () => resize();
+              textarea.addEventListener("input", onResizeInput);
+              const observer =
+                typeof ResizeObserver === "function" ? new ResizeObserver(resize) : undefined;
+              observer?.observe(textarea);
+              queueMicrotask(() => {
+                if (textarea.isConnected) resize();
+              });
+              return () => {
+                stop();
+                textarea.removeEventListener("input", onResizeInput);
+                observer?.disconnect();
+                field = undefined;
+              };
+            },
           }),
         ),
         context.part(
@@ -119,7 +163,7 @@ export const ChatComposer = defineComponent<
             "button",
             {
               type: "submit",
-              disabled: disabled ? true : submitDisabled,
+              disabled: submitBlocked,
               "aria-label": submitLabel,
             },
             submitContent ?? <Icon name="arrow-up" />,
@@ -127,5 +171,6 @@ export const ChatComposer = defineComponent<
         ),
       ),
       hint ? context.part("hint", "span", hintId ? { id: hintId } : null, hint) : null,
-    ),
+    );
+  },
 );

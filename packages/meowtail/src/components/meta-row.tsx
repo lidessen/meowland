@@ -1,6 +1,15 @@
 import { defineOptions } from "meowcss";
 import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
-import { defineComponent, h, type Child, type Props } from "meowjsx";
+import {
+  defineComponent,
+  derived,
+  h,
+  keyed,
+  unwrap,
+  type Child,
+  type MaybeSignal,
+  type Props,
+} from "meowjsx";
 
 export const metaRowOptions = defineOptions("meta-row", {
   align: ["start", "center"],
@@ -23,9 +32,10 @@ export interface MetaItem {
 }
 
 export interface MetaRowProps extends Props, ThemedProps<typeof metaRowOptions> {
-  items: readonly MetaItem[];
-  /** Finite values clamp to 0–100; non-finite values omit the progress segment. */
-  progress?: number;
+  /** Plain arrays are fixed for the mount. A signal keeps the row live. */
+  items: MaybeSignal<readonly MetaItem[]>;
+  /** Finite values clamp to 0–100; non-finite values omit the progress segment. A signal stays live. */
+  progress?: MaybeSignal<number | undefined>;
   /** Accessible name for the progress segment. */
   progressLabel?: string;
   className?: string;
@@ -46,44 +56,61 @@ export const MetaRow = defineComponent<
     context,
   ) => {
     void hostChildren;
-    const value =
-      progress === undefined || !Number.isFinite(progress)
-        ? undefined
-        : Math.max(0, Math.min(100, Math.round(progress)));
-    const parts: Child[] = [];
-    items.forEach((item, index) => {
-      if (index > 0) parts.push(context.part("separator", "span", { "aria-hidden": "true" }, "·"));
-      parts.push(
-        context.part(
+    const entries = derived(() => unwrap(items).map((item, index) => ({ item, key: index })));
+    const percent = derived(() => {
+      const next = unwrap(progress);
+      if (next === undefined || !Number.isFinite(next)) return undefined;
+      return Math.max(0, Math.min(100, Math.round(next)));
+    });
+    const rows = keyed(
+      entries,
+      (entry) => entry.key,
+      (entry) => {
+        const item = context.part(
           "item",
           "span",
           null,
-          item.icon !== undefined && item.icon !== null
-            ? context.part("icon", "span", null, item.icon)
-            : null,
-          context.part("label", "span", null, item.label),
-        ),
+          derived(() => {
+            const icon = entry.value.item.icon;
+            if (icon === undefined || icon === null) return null;
+            return context.part("icon", "span", null, icon);
+          }),
+          context.part(
+            "label",
+            "span",
+            null,
+            derived(() => entry.value.item.label),
+          ),
+        );
+        // Index keys stay with their position, so the first row never owns a separator.
+        if (entry.value.key === 0) return item;
+        return [
+          context.part("separator", "span", { "aria-hidden": "true" }, "·"),
+          item,
+        ] as unknown as Child;
+      },
+    );
+    // The segment is omitted until progress is finite, matching the static contract.
+    const progressSegment = derived(() => {
+      const value = percent.value;
+      if (value === undefined) return null;
+      const bar = context.part(
+        "progress",
+        "span",
+        {
+          role: "progressbar",
+          "aria-label": progressLabel,
+          "aria-valuemin": 0,
+          "aria-valuemax": 100,
+          "aria-valuenow": value,
+          style: { "--meta-progress": `${value}%` },
+        },
+        h("span", { "aria-hidden": "true" }, `${value}%`),
       );
+      return unwrap(items).length > 0
+        ? [context.part("separator", "span", { "aria-hidden": "true" }, "·"), bar]
+        : bar;
     });
-    if (value !== undefined) {
-      if (items.length > 0)
-        parts.push(context.part("separator", "span", { "aria-hidden": "true" }, "·"));
-      parts.push(
-        context.part(
-          "progress",
-          "span",
-          {
-            role: "progressbar",
-            "aria-label": progressLabel,
-            "aria-valuemin": 0,
-            "aria-valuemax": 100,
-            "aria-valuenow": value,
-            style: { "--meta-progress": `${value}%` },
-          },
-          h("span", { "aria-hidden": "true" }, `${value}%`),
-        ),
-      );
-    }
-    return context.part("root", "div", { ...props, className }, parts);
+    return context.part("root", "div", { ...props, className }, rows, progressSegment);
   },
 );

@@ -1,9 +1,11 @@
 ---
 name: jsx-css-development
-description: Develop or debug MeowJSX core/Web rendering, reactive lifecycle and module identity, generic JSON descriptions, or MeowCSS generation and adapters. Not ordinary UI composition.
+description: Develop or debug MeowJSX core/Web rendering, reactive lifecycle and module identity, generic JSON descriptions, or MeowCSS generation and adapters. Authoring a Meowtail component or its styles starts in the UI skill and the Meowtail component-model and styling sections.
 ---
 
 # JSX and CSS mechanism development
+
+Authoring a Meowtail component or its styles is UI work. Start with [UI development](../ui-development/SKILL.md) and the [component model](../../../packages/meowtail/AGENTS.md#component-model-meowjsx-is-not-react) and [styling](../../../packages/meowtail/AGENTS.md#styling-meowcss-is-not-ordinary-css) sections. This skill is for changing the MeowJSX or MeowCSS mechanism itself.
 
 Start from the actual consumer failure or new usage to locate the responsible layer; do not decide package splits from file names. Read the current contract of [MeowJSX](../../../packages/meowjsx/README.md) or [MeowCSS](../../../packages/meowcss/README.md), along with nearby implementations and cases with independent value; when only one layer is involved, do not load the other layer's full material.
 

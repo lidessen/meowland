@@ -1,7 +1,8 @@
 import {
   defineComponent,
+  derived,
   h,
-  mapSignal,
+  keyed,
   unwrap,
   type Child,
   type ComponentContract,
@@ -107,11 +108,11 @@ export const Table = defineComponent<
   ) => {
     const localSort = context.signal<TableSort | undefined>(defaultSort);
     const localSelected = context.signal<readonly string[]>(defaultSelected);
-    const currentSort = () => (sort === undefined ? localSort.value : unwrap(sort));
-    const currentSelected = () => (selected === undefined ? localSelected.value : unwrap(selected));
-    const currentRows = context.signal<readonly TableRow[]>(unwrap(rows));
-    const sortState = context.signal<TableSort | undefined>(currentSort());
-    const selectedState = context.signal<readonly string[]>(currentSelected());
+    const rowsView = derived(() => unwrap(rows));
+    const sortState = derived(() => (sort === undefined ? localSort.value : unwrap(sort)));
+    const selectedState = derived(() =>
+      selected === undefined ? localSelected.value : unwrap(selected),
+    );
     const widths = context.signal<Record<string, number>>(
       Object.fromEntries(
         columns.flatMap((column) =>
@@ -119,13 +120,8 @@ export const Table = defineComponent<
         ),
       ),
     );
-    context.effect(() => {
-      currentRows.value = unwrap(rows);
-      sortState.value = currentSort();
-      selectedState.value = currentSelected();
-    });
     const requestSort = (column: TableColumn) => {
-      const next = sortFor(column, currentSort());
+      const next = sortFor(column, sortState.value);
       if (!next) return;
       if (sort === undefined) localSort.value = next;
       onSortChange?.(next);
@@ -135,12 +131,12 @@ export const Table = defineComponent<
       onSelectedChange?.(ids);
     };
     const toggleRow = (id: string, checked: boolean) => {
-      const next = new Set(currentSelected());
+      const next = new Set(selectedState.value);
       if (checked) next.add(id);
       else next.delete(id);
       requestSelected([...next]);
     };
-    const enabledIds = () => currentRows.value.filter((row) => !row.disabled).map((row) => row.id);
+    const enabledIds = () => rowsView.value.filter((row) => !row.disabled).map((row) => row.id);
     let resize: { id: string; startX: number; startWidth: number; minWidth: number } | undefined;
     const onResizeMove = (event: PointerEvent) => {
       if (!resize) return;
@@ -163,11 +159,22 @@ export const Table = defineComponent<
               onClick: () => requestSort(column),
             },
             column.header,
-            mapSignal(sortState, (current) =>
-              current?.columnId === column.id ? (
-                <Icon name={current.direction === "asc" ? "arrow-up" : "arrow-down"} size={12} />
-              ) : null,
-            ),
+            <span
+              hidden={derived(
+                () =>
+                  sortState.value?.columnId !== column.id || sortState.value.direction !== "asc",
+              )}
+            >
+              <Icon name="arrow-up" size={12} />
+            </span>,
+            <span
+              hidden={derived(
+                () =>
+                  sortState.value?.columnId !== column.id || sortState.value.direction !== "desc",
+              )}
+            >
+              <Icon name="arrow-down" size={12} />
+            </span>,
           )
         : column.header;
       return context.part(
@@ -175,10 +182,12 @@ export const Table = defineComponent<
         "th",
         {
           scope: "col",
-          "aria-sort": mapSignal(sortState, (current) => ariaSort(column, current)),
+          "aria-sort": derived(() => ariaSort(column, sortState.value)),
           "data-align": column.align,
-          style: mapSignal(widths, (current) =>
-            current[column.id] !== undefined ? { width: `${current[column.id]}px` } : undefined,
+          style: derived(() =>
+            widths.value[column.id] !== undefined
+              ? { width: `${widths.value[column.id]}px` }
+              : undefined,
           ),
         },
         heading,
@@ -235,24 +244,26 @@ export const Table = defineComponent<
                       "select",
                       "div",
                       null,
-                      mapSignal(selectedState, (chosen) => {
-                        const enabled = enabledIds();
-                        const selectedEnabled = enabled.filter((id) => chosen.includes(id));
-                        const all = enabled.length > 0 && selectedEnabled.length === enabled.length;
-                        const mixed = selectedEnabled.length > 0 && !all;
-                        return (
-                          <Checkbox
-                            label="Select all rows"
-                            labelHidden
-                            checked={all}
-                            indeterminate={mixed}
-                            onChange={(event: Event) => {
-                              const box = event.currentTarget as HTMLInputElement;
-                              requestSelected(box.checked ? enabledIds() : []);
-                            }}
-                          />
-                        );
-                      }),
+                      <Checkbox
+                        label="Select all rows"
+                        labelHidden
+                        checked={derived(() => {
+                          const enabled = enabledIds();
+                          const chosen = selectedState.value;
+                          return enabled.length > 0 && enabled.every((id) => chosen.includes(id));
+                        })}
+                        indeterminate={derived(() => {
+                          const enabled = enabledIds();
+                          const count = enabled.filter((id) =>
+                            selectedState.value.includes(id),
+                          ).length;
+                          return count > 0 && count < enabled.length;
+                        })}
+                        onChange={(event: Event) => {
+                          const box = event.currentTarget as HTMLInputElement;
+                          requestSelected(box.checked ? enabledIds() : []);
+                        }}
+                      />,
                     ),
                   )
                 : null,
@@ -263,15 +274,17 @@ export const Table = defineComponent<
             "body",
             "tbody",
             null,
-            mapSignal(currentRows, (list) =>
-              list.map((row, rowIndex) =>
+            keyed(
+              rowsView,
+              (row) => row.id,
+              (row) =>
                 context.part(
                   "row",
                   "tr",
                   {
-                    "data-row-id": row.id,
-                    "data-selected": mapSignal(selectedState, (chosen) =>
-                      chosen.includes(row.id) ? "true" : undefined,
+                    "data-row-id": derived(() => row.value.id),
+                    "data-selected": derived(() =>
+                      selectedState.value.includes(row.value.id) ? "true" : undefined,
                     ),
                   },
                   selectable
@@ -283,28 +296,37 @@ export const Table = defineComponent<
                           "select",
                           "div",
                           null,
-                          mapSignal(selectedState, (chosen) => (
-                            <Checkbox
-                              label={row.label ?? `Select row ${rowIndex + 1}`}
-                              labelHidden
-                              disabled={row.disabled}
-                              checked={chosen.includes(row.id)}
-                              onChange={(event: Event) => {
-                                toggleRow(
-                                  row.id,
-                                  (event.currentTarget as HTMLInputElement).checked,
-                                );
-                              }}
-                            />
-                          )),
+                          <Checkbox
+                            label={derived(() => {
+                              const current = row.value;
+                              if (current.label) return current.label;
+                              const index = rowsView.value.findIndex(
+                                (item) => item.id === current.id,
+                              );
+                              return `Select row ${index + 1}`;
+                            })}
+                            labelHidden
+                            disabled={derived(() => Boolean(row.value.disabled))}
+                            checked={derived(() => selectedState.value.includes(row.value.id))}
+                            onChange={(event: Event) => {
+                              toggleRow(
+                                row.value.id,
+                                (event.currentTarget as HTMLInputElement).checked,
+                              );
+                            }}
+                          />,
                         ),
                       )
                     : null,
                   ...columns.map((column, index) =>
-                    context.part("cell", "td", { "data-align": column.align }, row.cells[index]),
+                    context.part(
+                      "cell",
+                      "td",
+                      { "data-align": column.align },
+                      derived(() => row.value.cells[index]),
+                    ),
                   ),
                 ),
-              ),
             ),
           ),
         ),

@@ -68,17 +68,22 @@ export const sliderStyles = css`
   ${control}:focus-visible {
     outline: none;
   }
-  ${root}:has(${control}:focus-visible) ${thumb} {
-    outline: 2px solid ${uiTokens.focus};
-    outline-offset: 2px;
-  }
   @media (hover: hover) {
-    ${root}:has(${control}:hover:not(:disabled)) ${thumb} {
+    ${root}:has(${control}:hover:not(:disabled):not(:focus-visible)) ${thumb} {
       box-shadow: ${thumbShadowHover};
     }
   }
-  ${root}:has(${control}:active:not(:disabled)) ${thumb} {
+  ${root}:has(${control}:active:not(:disabled):not(:focus-visible)) ${thumb} {
     box-shadow: 0 1px 1px rgb(0 0 0 / 14%);
+  }
+  /* Offset outline is transparent, so the track would show through the gap.
+     An opaque halo keeps the 2px spacing of Button/Switch while covering the
+     fill. Hosts on a painted surface set --meowui-focus-halo to that surface. */
+  ${root}:has(${control}:focus-visible) ${thumb} {
+    outline: none;
+    box-shadow:
+      0 0 0 2px var(--meowui-focus-halo, ${uiTokens.background}),
+      0 0 0 4px ${uiTokens.focus};
   }
   ${root}:has(${control}:disabled) {
     color: ${uiTokens.subtleForeground};

@@ -16,6 +16,7 @@ ${partSelector(cardContract, "root")} {
   border: 0.5px solid ${uiTokens.border};
   border-radius: ${uiTokens.panelRadius};
   background: ${uiTokens.surface};
+  --meowui-focus-halo: ${uiTokens.surface};
   color: ${uiTokens.foreground};
   font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
 }
@@ -31,6 +32,7 @@ button${partSelector(cardContract, "root")}:focus-visible {
   border: 0;
   border-radius: 0;
   background: transparent;
+  --meowui-focus-halo: inherit;
   box-shadow: none;
 }
 ${partSelector(cardHeaderContract, "root")} {

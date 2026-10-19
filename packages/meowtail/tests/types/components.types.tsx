@@ -13,6 +13,15 @@ import {
   IconButton,
   Input,
   Inline,
+  Link,
+  NumberInput,
+  Progress,
+  Slider,
+  Avatar,
+  Accordion,
+  Table,
+  MenuButton,
+  ContextMenu,
   NavItem,
   Separator,
   Textarea,
@@ -47,6 +56,43 @@ const field: JSX.Element = (
     <Input name="name" />
   </Field>
 );
+const progress: JSX.Element = <Progress label="Copying" value={1} max={4} />;
+const avatar: JSX.Element = <Avatar name="Ada Lovelace" size="small" />;
+const link: JSX.Element = <Link href="#docs">Docs</Link>;
+const slider: JSX.Element = <Slider label="Volume" defaultValue={40} />;
+const numberInput: JSX.Element = <NumberInput defaultValue={2} min={1} max={12} />;
+const accordion: JSX.Element = (
+  <Accordion items={[{ id: "general", summary: "General", content: "Body" }]} />
+);
+const table: JSX.Element = (
+  <Table
+    label="Files"
+    columns={[{ id: "name", header: "Name", sortable: true }]}
+    rows={[{ id: "a", cells: ["alpha.md"] }]}
+  />
+);
+const menuButton: JSX.Element = (
+  <MenuButton id="export" items={[{ id: "text", label: "Plain text" }]}>
+    Export
+  </MenuButton>
+);
+const contextMenu: JSX.Element = (
+  <ContextMenu id="file" items={[{ id: "open", label: "Open" }]}>
+    Region
+  </ContextMenu>
+);
+void progress;
+void avatar;
+void link;
+void slider;
+void numberInput;
+void accordion;
+void table;
+void menuButton;
+void contextMenu;
+// @ts-expect-error Avatar sizes are the three control scales.
+const invalidAvatar: JSX.Element = <Avatar name="Ada" size="tiny" />;
+void invalidAvatar;
 const dialog: JSX.Element = (
   <Dialog labelledBy="dialog-title">
     <DialogPanel as="form" header={<DialogHeader title="Confirm" />}>

@@ -80,6 +80,14 @@ import { resourceCardStyles } from "./components/resource-card.styles";
 import { resourceCardTokens } from "./components/resource-card.tokens";
 import { drawerStyles } from "./components/drawer.styles";
 import { windowTitleBarStyles } from "./components/window-title-bar.styles";
+import { progressStyles } from "./components/progress.styles";
+import { avatarStyles } from "./components/avatar.styles";
+import { linkStyles } from "./components/link.styles";
+import { tableStyles } from "./components/table.styles";
+import { sliderStyles } from "./components/slider.styles";
+import { numberInputStyles } from "./components/number-input.styles";
+import { accordionStyles } from "./components/accordion.styles";
+import { contextMenuStyles } from "./components/context-menu.styles";
 
 export { standardOptions, uiTokens, chatTokens, logoTokens } from "./tokens";
 export { accentTokens, statusTokens, radiusTokens, lineTokens, layerTokens } from "./palette";
@@ -114,6 +122,14 @@ export const standardThemeStyles = [
   resourceCardStyles,
   drawerStyles,
   windowTitleBarStyles,
+  progressStyles,
+  avatarStyles,
+  linkStyles,
+  tableStyles,
+  sliderStyles,
+  numberInputStyles,
+  accordionStyles,
+  contextMenuStyles,
   pillStyles,
   cornerShapeStyles,
   segmentedControlStyles,

@@ -18,6 +18,7 @@ export const ToggleStory = defineStory({
           <Checkbox label="Save this choice" name="remember" defaultChecked />
           <Checkbox label="Required before submitting" name="confirm" required />
           <Checkbox label="Currently unavailable" disabled />
+          <Checkbox label="Some children selected" indeterminate defaultChecked={false} />
           <Switch label="Show tool process" name="tools" defaultChecked />
           <Switch
             label="Notifications (controlled)"

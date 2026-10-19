@@ -58,7 +58,25 @@ export {
   metaRowOptions,
 } from "./meta-row";
 export { Input, type InputProps, inputContract } from "./input";
+export {
+  NumberInput,
+  type NumberInputProps,
+  numberInputContract,
+  clampNumber,
+  formatNumber,
+  numberPrecision,
+} from "./number-input";
 export { Checkbox, type CheckboxProps, checkboxContract } from "./checkbox";
+export { Slider, type SliderProps, sliderContract } from "./slider";
+export { Progress, type ProgressProps, progressContract } from "./progress";
+export {
+  Avatar,
+  type AvatarProps,
+  avatarContract,
+  avatarOptions,
+  initialsFromName,
+} from "./avatar";
+export { Link, type LinkProps, linkContract } from "./link";
 export { Switch, type SwitchProps, switchContract } from "./switch";
 export { Select, type SelectProps, selectContract } from "./select";
 export {
@@ -76,6 +94,23 @@ export {
 export { SearchInput, type SearchInputProps, searchInputContract } from "./search-input";
 export { PathPicker, type PathPickerProps, pathPickerContract } from "./path-picker";
 export { Disclosure, type DisclosureProps, disclosureContract } from "./disclosure";
+export {
+  Accordion,
+  type AccordionProps,
+  type AccordionItem,
+  type AccordionType,
+  type AccordionValue,
+  accordionContract,
+} from "./accordion";
+export {
+  Table,
+  type TableProps,
+  type TableColumn,
+  type TableRow,
+  type TableSort,
+  type TableSortDirection,
+  tableContract,
+} from "./table";
 export { NavItem, type NavItemProps, navItemContract } from "./nav-item";
 export { Separator, type SeparatorProps, separatorContract } from "./separator";
 export { Textarea, type TextareaProps, textareaContract } from "./textarea";
@@ -155,6 +190,8 @@ export {
   type MenuAction,
   type MenuTriggerBindings,
 } from "./menu";
+export { MenuButton, type MenuButtonProps } from "./menu-button";
+export { ContextMenu, type ContextMenuProps, contextMenuContract } from "./context-menu";
 export { Toast, toastContract, type ToastProps } from "./toast";
 export { TerminalBlock, terminalBlockContract, type TerminalBlockProps } from "./terminal-block";
 export {

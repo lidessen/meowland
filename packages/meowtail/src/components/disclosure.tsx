@@ -1,4 +1,11 @@
-import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
+import {
+  defineComponent,
+  h,
+  type Child,
+  type ComponentContract,
+  type MaybeSignal,
+  type Props,
+} from "meowjsx";
 import { Icon } from "../icons/icon";
 
 export const disclosureContract = {
@@ -8,7 +15,7 @@ export const disclosureContract = {
 
 export interface DisclosureProps extends Props {
   summary: Child;
-  open?: boolean;
+  open?: MaybeSignal<boolean>;
   onToggle?: (event: Event) => void;
   className?: string;
   summaryClassName?: string;

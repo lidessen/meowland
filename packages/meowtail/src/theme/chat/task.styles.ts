@@ -55,12 +55,7 @@ export const chatTaskStyles = css`
     font-size: ${uiTokens.fontCaption};
   }
   ${part("progressBar")} {
-    display: block;
-    box-sizing: border-box;
-    width: 100%;
-    min-width: 0;
-    height: ${uiTokens.spaceGroup};
-    accent-color: ${uiTokens.info};
+    display: contents;
   }
   ${part("body")} {
     display: grid;

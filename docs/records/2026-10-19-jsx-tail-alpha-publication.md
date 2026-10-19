@@ -1,6 +1,6 @@
 # JSX derived signals and Tail component alpha release
 
-Status: release preparation verified locally; OIDC publication and independent registry consumption are pending.
+Status: published under `alpha`; runner, local, and public bytes match, and isolated exact registry consumption passed.
 
 ## Scope and source
 
@@ -69,9 +69,55 @@ viewport, not all text simultaneously. Temporary local hosts are stopped after u
 
 ## Publication boundary
 
-Only the existing manual Actions OIDC workflow may publish this explicit two-package selection.
-It must check, build, pack, and consume one pinned source SHA, then publish those exact workflow
-artifacts. Registry bytes and provenance must be checked against the workflow artifacts afterward,
-and an independent directory must consume exact registry versions. All five existing `latest`
-tags must remain at their initial values. Actual source, artifact identities, run links, and final
-registry consumption will be appended after execution; preparation is not publication.
+The existing manual Actions OIDC workflow published only this explicit two-package selection.
+The exact published source is `5b4661479035178a4e0aaa39ee39b4b691387842`.
+Its [normal build/lint CI](https://github.com/lidessen/meowland/actions/runs/39260788949) passed;
+the single [OIDC publication run](https://github.com/lidessen/meowland/actions/runs/39260904218)
+completed successfully, including prepare checks, isolated tarball consumption, and publish.
+
+| Package  | Published alpha | Public tarball SHA256                                            | Latest before and after |
+| -------- | --------------- | ---------------------------------------------------------------- | ----------------------- |
+| meowjsx  | 0.1.1-alpha.1   | 18ca5053a088f8f50f62f3422dec78f3068d44aa10048b7f60420054811d8733 | 0.1.0                   |
+| meowtail | 0.2.0-alpha.2   | 3e0a118d39098ff2812f172d0cb32980623bc8e32c23950fb4d64d75464d033b | 0.1.0                   |
+
+The original runner manifest and both tarballs match the accepted local batch exactly. The publish
+job downloaded that prepare artifact without repacking; its retained manifest and tarballs also
+match. Public tarball downloads match both SHA256 and registry SHA512 integrity. All five existing
+`latest` tags retain their initial values: JSX/CSS/Tail/Press `0.1.0`, Book `0.1.1`. Unselected alpha
+tags are unchanged: CSS `0.1.1-alpha.0`, Book `0.1.2-alpha.1`, Press `0.1.1-alpha.1`.
+
+The workflow used existing Trusted Publishing with Node 24.21.0 and npm 11.21.0. Each selected package
+had exactly one publish invocation with HTTP 202. The workflow then used public visibility reads,
+verifying JSX after three reads and Tail after four, without retrying uploads or repairing tags.
+Public SLSA provenance subject SHA512, source commit, workflow path/repository, and invocation run
+all match. This is a public metadata/provenance-field comparison, not an independent Sigstore
+signature-verification session.
+
+## Exact registry consumption and final scope
+
+A fresh empty-cache consumer installed exact official registry versions into
+`/var/folders/tp/_xjgy2tx3zd6phhhd2mb63hc0000gn/T/meowland-registry-derived-l7zlf2vi`:
+JSX `0.1.1-alpha.1`, CSS `0.1.1-alpha.0`, Tail `0.2.0-alpha.2`, Book `0.1.2-alpha.1`, and Press
+`0.1.1-alpha.1`. Both initial and frozen installs passed with lifecycle scripts disabled and no
+file dependency, override, workspace alias, adjacent checkout, or parent node_modules.
+
+Native Node and Bun public imports, cross-entry Signal/Context/component/theme identity, and strict
+core/DOM/tool declarations under Bundler and NodeNext all passed. Actual `derived` updates and all
+nine new public component exports passed under both runtimes. Each shared package has exactly one
+installed copy; all official package files equal the verified registry archives: JSX 52, CSS 21,
+Tail 491, Book 66, and Press 21. The earlier mixed consumer separately exercised the unchanged
+official Book/Press bytes with the new byte-identical JSX/Tail archives, including real Book CLI
+list/check and Press CLI builds with Geist/OFL and custom-theme identity.
+
+Browser evidence is reused only because the final official package bytes match the locally accepted
+archives. This does not claim a fresh browser matrix from the registry directory, actual Rossovia
+adoption, a real provider request, installed-App changes, iOS testing, or a full accessibility audit.
+All owned temporary story servers exited normally. Slides bootstrap, npm login/trust/security
+changes, Git tags, GitHub Releases, and deployments were not performed.
+
+Evidence is preserved under `artifacts/releases/20261019-jsx-tail-alpha-oidc-39260904218/`: original
+runner/publication artifacts and log, final run status, runner-versus-local byte proof, official
+registry metadata and provenance, `registry-verification.json`, and `registry-consumer.json` with
+the exact dependency declaration, lock, command results, and installed-file audit. This receipt
+and root README status are a documentation-only follow-up; they do not replace the published
+source SHA or repack its artifacts.

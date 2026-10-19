@@ -11,7 +11,8 @@ export const sliderStyles = css`
     display: flex;
     align-items: center;
     gap: ${uiTokens.spaceGroup};
-    width: 100%;
+    width: 16rem;
+    max-width: 100%;
     min-width: 0;
     color: ${uiTokens.foreground};
     font: ${uiTokens.fontCaption}/20px ${uiTokens.font};

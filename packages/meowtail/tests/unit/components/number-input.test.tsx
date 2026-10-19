@@ -26,6 +26,10 @@ test("number input names its steppers and shows a committed default", () => {
   expect(html).toContain('name="copies"');
   expect(html).toContain('aria-label="Decrease"');
   expect(html).toContain('aria-label="Increase"');
+  expect(html).toContain('data-icon="minus"');
+  expect(html).toContain('data-icon="plus"');
+  expect(html).toContain('d="M5 12h14"');
+  expect(html).toContain('d="M12 5v14"');
   expect(html).toContain('value="2"');
 });
 

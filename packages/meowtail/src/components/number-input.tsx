@@ -149,7 +149,7 @@ export const NumberInput = defineComponent<
           "aria-label": "Decrease",
           onClick: () => nudge(-1),
         },
-        <Icon name="minus" />,
+        <Icon name="minus" size={16} />,
       ),
       context.part("control", "input", {
         ...props,
@@ -209,7 +209,7 @@ export const NumberInput = defineComponent<
           "aria-label": "Increase",
           onClick: () => nudge(1),
         },
-        <Icon name="plus" />,
+        <Icon name="plus" size={16} />,
       ),
     );
   },

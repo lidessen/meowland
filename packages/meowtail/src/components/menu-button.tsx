@@ -32,7 +32,7 @@ export function MenuButton({
       trigger={(bindings) => (
         <Button {...button} {...bindings}>
           {children}
-          <Icon name="chevron-down" />
+          <Icon name="chevron-down" size={16} />
         </Button>
       )}
     />

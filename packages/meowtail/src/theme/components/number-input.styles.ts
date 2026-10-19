@@ -26,6 +26,11 @@ export const numberInputStyles = css`
   ${root}:focus-within {
     border-color: ${uiTokens.focus};
   }
+  @media (hover: hover) {
+    ${root}:hover:not(:focus-within):not(:has(${control}:disabled)):not(:has([aria-invalid="true"])) {
+      border-color: ${uiTokens.mutedForeground};
+    }
+  }
   ${root}:has([aria-invalid="true"]) {
     border-color: ${uiTokens.danger};
   }
@@ -67,15 +72,23 @@ export const numberInputStyles = css`
     font: inherit;
     line-height: 0;
     cursor: pointer;
+    transition:
+      color ${uiTokens.durationResponse} ${uiTokens.ease},
+      background-color ${uiTokens.durationResponse} ${uiTokens.ease};
   }
   ${stepper} svg {
     display: block;
     width: ${uiTokens.iconSize};
     height: ${uiTokens.iconSize};
   }
-  ${stepper}:hover:not(:disabled) {
-    color: ${uiTokens.foreground};
-    background: ${uiTokens.hover};
+  @media (hover: hover) {
+    ${stepper}:hover:not(:disabled) {
+      color: ${uiTokens.foreground};
+      background: ${uiTokens.hover};
+    }
+  }
+  ${stepper}:active:not(:disabled) {
+    background: ${uiTokens.active};
   }
   ${stepper}:focus-visible {
     outline: 2px solid ${uiTokens.focus};
@@ -87,7 +100,8 @@ export const numberInputStyles = css`
     color: inherit;
   }
   @media (prefers-reduced-motion: reduce) {
-    ${root} {
+    ${root},
+    ${stepper} {
       transition: none;
     }
   }

@@ -1,6 +1,6 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Button, Inline, Progress, Stack } from "meowtail";
+import { Button, Container, Inline, Progress, Stack } from "meowtail";
 
 export const ProgressStory = defineStory({
   id: "progress",
@@ -14,30 +14,38 @@ export const ProgressStory = defineStory({
   render: () => {
     const value = signal(2);
     return (
-      <Stack align="start">
-        <Progress label="Reviewed 2 of 5 files" value={value} max={5} />
-        <Inline gap="compact">
-          <Button
-            variant="outline"
-            size="small"
-            onClick={() => {
-              value.value = Math.max(0, value.value - 1);
-            }}
-          >
-            Less
-          </Button>
-          <Button
-            variant="outline"
-            size="small"
-            onClick={() => {
-              value.value = Math.min(5, value.value + 1);
-            }}
-          >
-            More
-          </Button>
-        </Inline>
-        <Progress label="Connecting to the workspace" />
-      </Stack>
+      <Container width="narrow">
+        <Stack>
+          <Stack gap="compact">
+            <span>Reviewed 2 of 5 files</span>
+            <Progress label="Reviewed 2 of 5 files" value={value} max={5} />
+          </Stack>
+          <Inline gap="compact">
+            <Button
+              variant="outline"
+              size="small"
+              onClick={() => {
+                value.value = Math.max(0, value.value - 1);
+              }}
+            >
+              Less
+            </Button>
+            <Button
+              variant="outline"
+              size="small"
+              onClick={() => {
+                value.value = Math.min(5, value.value + 1);
+              }}
+            >
+              More
+            </Button>
+          </Inline>
+          <Stack gap="compact">
+            <span>Connecting to the workspace</span>
+            <Progress label="Connecting to the workspace" />
+          </Stack>
+        </Stack>
+      </Container>
     );
   },
 });

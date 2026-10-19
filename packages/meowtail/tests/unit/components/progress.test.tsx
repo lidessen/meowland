@@ -16,6 +16,7 @@ test("determinate progress uses native semantics and keeps the accessible name",
   expect(output).toContain('max="5"');
   expect(output).toContain('aria-label="Reviewed 2 of 5 files"');
   expect(output).toContain('data-meowui-part="progress/root"');
+  expect(output).toContain('data-meowui-part="progress/bar"');
 });
 
 test("omitting value leaves an indeterminate native progress", () => {

@@ -9,6 +9,7 @@ import {
   type Props,
 } from "meowjsx";
 import { Checkbox } from "./checkbox";
+import { Icon } from "../icons/icon";
 
 export const tableContract = {
   name: "table",
@@ -162,6 +163,11 @@ export const Table = defineComponent<
               onClick: () => requestSort(column),
             },
             column.header,
+            mapSignal(sortState, (current) =>
+              current?.columnId === column.id ? (
+                <Icon name={current.direction === "asc" ? "arrow-up" : "arrow-down"} size={12} />
+              ) : null,
+            ),
           )
         : column.header;
       return context.part(

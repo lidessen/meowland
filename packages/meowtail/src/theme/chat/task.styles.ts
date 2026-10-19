@@ -54,6 +54,10 @@ export const chatTaskStyles = css`
     color: ${uiTokens.mutedForeground};
     font-size: ${uiTokens.fontCaption};
   }
+  ${part("progressLabel")} {
+    min-width: 0;
+    line-height: 1.4;
+  }
   ${part("progressBar")} {
     display: contents;
   }

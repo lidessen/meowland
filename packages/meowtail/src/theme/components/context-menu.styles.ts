@@ -5,9 +5,11 @@ import { uiTokens } from "../tokens";
 export const contextMenuStyles = css`
   ${partSelector(contextMenuContract, "root")} {
     min-width: 0;
+    cursor: context-menu;
   }
   ${partSelector(contextMenuContract, "root")}:focus-visible {
     outline: 2px solid ${uiTokens.focus};
     outline-offset: 2px;
+    border-radius: ${uiTokens.controlRadius};
   }
 `;

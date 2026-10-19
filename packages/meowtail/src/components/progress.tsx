@@ -2,7 +2,7 @@ import { defineComponent, type ComponentContract, type MaybeSignal, type Props }
 
 export const progressContract = {
   name: "progress",
-  parts: ["root"],
+  parts: ["root", "bar"],
 } as const satisfies ComponentContract;
 
 export interface ProgressProps extends Props {
@@ -20,11 +20,15 @@ export const Progress = defineComponent<
   typeof progressContract.name,
   (typeof progressContract.parts)[number]
 >(progressContract, ({ label, value, max = 1, className, ...props }, context) =>
-  context.part("root", "progress", {
-    ...props,
-    className,
-    ...(value === undefined ? {} : { value }),
-    max,
-    "aria-label": label,
-  }),
+  context.part(
+    "root",
+    "div",
+    { className },
+    context.part("bar", "progress", {
+      ...props,
+      ...(value === undefined ? {} : { value }),
+      max,
+      "aria-label": label,
+    }),
+  ),
 );

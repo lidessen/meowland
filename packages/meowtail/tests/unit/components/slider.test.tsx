@@ -16,6 +16,8 @@ test("slider exposes a named native range and the same visible value", () => {
   expect(html).toContain('step="5"');
   expect(html).toContain('value="40"');
   expect(html).toContain('data-meowui-part="slider/value">40');
+  expect(html).toContain('data-meowui-part="slider/track"');
+  expect(html).toContain('data-meowui-part="slider/thumb"');
 });
 
 test("controlled sliders report a change and restore the caller value when it is refused", () => {

@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  mapSignal,
   unwrap,
   type ComponentContract,
   type MaybeSignal,
@@ -8,7 +9,7 @@ import {
 
 export const sliderContract = {
   name: "slider",
-  parts: ["root", "control", "value"],
+  parts: ["root", "control", "track", "thumb", "value"],
 } as const satisfies ComponentContract;
 
 export interface SliderProps extends Props {
@@ -61,8 +62,13 @@ export const Slider = defineComponent<
     const local = context.signal(initial);
     const current = () => (value === undefined ? local.value : unwrap(value));
     const display = context.signal(String(current()));
+    const fill = context.signal("0%");
     context.effect(() => {
-      display.value = String(current());
+      const next = current();
+      display.value = String(next);
+      const range = max - min;
+      const pct = range <= 0 ? 0 : Math.min(100, Math.max(0, ((next - min) / range) * 100));
+      fill.value = `${pct}%`;
     });
     const commit = (event: Event) => {
       const input = event.currentTarget as HTMLInputElement;
@@ -75,7 +81,10 @@ export const Slider = defineComponent<
     return context.part(
       "root",
       "div",
-      { className },
+      {
+        className,
+        style: mapSignal(fill, (amount) => ({ "--slider-fill": amount })),
+      },
       context.part("control", "input", {
         ...props,
         id,
@@ -89,6 +98,12 @@ export const Slider = defineComponent<
         value: display,
         onInput: commit,
       }),
+      context.part(
+        "track",
+        "span",
+        { "aria-hidden": "true" },
+        context.part("thumb", "span", { "aria-hidden": "true" }),
+      ),
       context.part(
         "value",
         "output",

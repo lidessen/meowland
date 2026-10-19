@@ -1,16 +1,22 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { accentTokens, layerTokens } from "../palette";
 import { sliderContract } from "../../components/slider";
 
 const root = partSelector(sliderContract, "root");
 const control = partSelector(sliderContract, "control");
+const track = partSelector(sliderContract, "track");
+const thumb = partSelector(sliderContract, "thumb");
 const value = partSelector(sliderContract, "value");
+const fill = `linear-gradient(to right, ${accentTokens.base} 0%, ${accentTokens.base} var(--slider-fill, 0%), ${uiTokens.surfaceMuted} var(--slider-fill, 0%), ${uiTokens.surfaceMuted} 100%)`;
+const mutedFill = `linear-gradient(to right, ${uiTokens.mutedForeground} 0%, ${uiTokens.mutedForeground} var(--slider-fill, 0%), ${uiTokens.surfaceMuted} var(--slider-fill, 0%), ${uiTokens.surfaceMuted} 100%)`;
 
 export const sliderStyles = css`
   ${root} {
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    column-gap: ${uiTokens.spaceGroup};
     width: 16rem;
     max-width: 100%;
     min-width: 0;
@@ -18,67 +24,94 @@ export const sliderStyles = css`
     font: ${uiTokens.fontCaption}/20px ${uiTokens.font};
   }
   ${control} {
-    flex: 1 1 8rem;
+    grid-column: 1;
+    grid-row: 1;
+    z-index: 1;
+    width: 100%;
     min-width: 0;
     height: ${uiTokens.controlHeight};
     margin: 0;
+    opacity: 0;
+    -webkit-appearance: none;
     appearance: none;
     background: transparent;
     cursor: pointer;
   }
-  ${control}::-webkit-slider-runnable-track {
+  ${track} {
+    grid-column: 1;
+    grid-row: 1;
+    position: relative;
     height: 6px;
     border-radius: 999px;
     corner-shape: round;
-    background: ${uiTokens.surfaceMuted};
+    background: ${fill};
+    pointer-events: none;
   }
-  ${control}::-webkit-slider-thumb {
-    appearance: none;
+  ${thumb} {
+    position: absolute;
+    top: 50%;
+    left: clamp(0px, calc(var(--slider-fill, 0%) - 8px), calc(100% - 16px));
     width: 16px;
     height: 16px;
-    margin-top: -5px;
-    border: 0;
+    margin-top: -8px;
     border-radius: 50%;
     corner-shape: round;
-    background: ${uiTokens.primary};
-  }
-  ${control}::-moz-range-track {
-    height: 6px;
-    border: 0;
-    border-radius: 999px;
-    background: ${uiTokens.surfaceMuted};
-  }
-  ${control}::-moz-range-thumb {
-    width: 16px;
-    height: 16px;
-    border: 0;
-    border-radius: 50%;
-    background: ${uiTokens.primary};
+    background: ${layerTokens.raised};
+    box-shadow:
+      0 0 0 1.5px ${uiTokens.primary},
+      0 1px 2px rgb(0 0 0 / 12%);
+    transition: box-shadow ${uiTokens.durationResponse} ${uiTokens.ease};
   }
   ${control}:focus-visible {
     outline: none;
   }
-  ${control}:focus-visible::-webkit-slider-thumb {
+  ${root}:has(${control}:focus-visible) ${thumb} {
     outline: 2px solid ${uiTokens.focus};
     outline-offset: 2px;
   }
-  ${control}:focus-visible::-moz-range-thumb {
-    outline: 2px solid ${uiTokens.focus};
-    outline-offset: 2px;
+  @media (hover: hover) {
+    ${root}:has(${control}:hover:not(:disabled)) ${thumb} {
+      box-shadow:
+        0 0 0 1.5px ${uiTokens.primary},
+        0 2px 6px rgb(0 0 0 / 16%);
+    }
+  }
+  ${root}:has(${control}:active:not(:disabled)) ${thumb} {
+    box-shadow: 0 0 0 1.5px ${uiTokens.primary};
+  }
+  ${root}:has(${control}:disabled) {
+    color: ${uiTokens.subtleForeground};
+  }
+  ${root}:has(${control}:disabled) ${track} {
+    background: ${mutedFill};
+  }
+  ${root}:has(${control}:disabled) ${thumb} {
+    background: ${uiTokens.surfaceMuted};
+    box-shadow: 0 0 0 1.5px ${uiTokens.mutedForeground};
   }
   ${control}:disabled {
     cursor: not-allowed;
-    opacity: 0.5;
   }
   ${value} {
-    flex: 0 0 auto;
+    grid-column: 2;
+    grid-row: 1;
     min-width: 2.5ch;
     color: ${uiTokens.mutedForeground};
     font-variant-numeric: tabular-nums;
     text-align: end;
   }
+  @media (prefers-reduced-motion: reduce) {
+    ${thumb} {
+      transition: none;
+    }
+  }
   @media (forced-colors: active) {
+    ${track},
+    ${thumb} {
+      display: none;
+    }
     ${control} {
+      opacity: 1;
       appearance: auto;
     }
   }

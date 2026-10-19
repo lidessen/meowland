@@ -1,6 +1,6 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
-import { ContextMenu, Icon, Stack } from "meowtail";
+import { Card, ContextMenu, Icon, Stack } from "meowtail";
 
 export const ContextMenuStory = defineStory({
   id: "context-menu",
@@ -57,10 +57,10 @@ export const ContextMenuStory = defineStory({
             },
           ]}
         >
-          <div className="workshop-composition">
-            <p>Right-click this region for file actions.</p>
+          <Card>
+            <p>Right-click this card for file actions.</p>
             <p>Shift+F10 opens the same menu when the region is focused.</p>
-          </div>
+          </Card>
         </ContextMenu>
         <p role="status">{feedback}</p>
       </Stack>

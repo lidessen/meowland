@@ -128,7 +128,6 @@ export const standardThemeStyles = [
   tableStyles,
   sliderStyles,
   numberInputStyles,
-  accordionStyles,
   contextMenuStyles,
   pillStyles,
   cornerShapeStyles,
@@ -191,6 +190,7 @@ export const standardThemeStyles = [
   searchInputStyles,
   pathPickerStyles,
   disclosureStyles,
+  accordionStyles,
   baseStyles,
 ] as const;
 

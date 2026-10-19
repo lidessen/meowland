@@ -162,7 +162,7 @@ test("registered components expose stable parts without a visual plugin", () => 
     [<Card />, ["card/root"]],
     [<Badge />, ["badge/root"]],
     [<Input />, ["input/root"]],
-    [<Progress label="Copying" value={1} max={4} />, ["progress/root"]],
+    [<Progress label="Copying" value={1} max={4} />, ["progress/root", "progress/bar"]],
     [<Link href="#docs">Docs</Link>, ["link/root"]],
     [<Textarea />, ["textarea/root"]],
     [<IconButton label="Close">×</IconButton>, ["icon-button/root"]],

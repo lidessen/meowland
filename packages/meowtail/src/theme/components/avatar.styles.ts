@@ -1,9 +1,12 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { lineTokens } from "../palette";
 import { avatarContract, avatarOptions } from "../../components/avatar";
 
+const root = partSelector(avatarContract, "root");
+
 export const avatarStyles = css`
-  ${partSelector(avatarContract, "root")} {
+  ${root} {
     position: relative;
     display: inline-grid;
     place-items: center;
@@ -11,13 +14,14 @@ export const avatarStyles = css`
     box-sizing: border-box;
     width: 32px;
     height: 32px;
+    border: ${lineTokens.width} solid ${lineTokens.edge};
     border-radius: ${uiTokens.controlRadius};
     background: ${uiTokens.primary};
     color: ${uiTokens.onPrimary};
     font: 600 ${uiTokens.fontCaption}/1 ${uiTokens.font};
     user-select: none;
   }
-  ${partSelector(avatarContract, "root")} {
+  ${root} {
     ${avatarOptions.when({ size: "small" })} {
       width: 24px;
       height: 24px;
@@ -25,7 +29,7 @@ export const avatarStyles = css`
       font-size: 10px;
     }
   }
-  ${partSelector(avatarContract, "root")} {
+  ${root} {
     ${avatarOptions.when({ size: "large" })} {
       width: 40px;
       height: 40px;
@@ -35,7 +39,7 @@ export const avatarStyles = css`
   ${partSelector(avatarContract, "initials")} {
     display: grid;
     place-items: center;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
   }
   ${partSelector(avatarContract, "image")} {
     position: absolute;

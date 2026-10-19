@@ -1,54 +1,73 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { accentTokens } from "../palette";
 import { progressContract } from "../../components/progress";
 
+const root = partSelector(progressContract, "root");
+const bar = partSelector(progressContract, "bar");
+const native = `progress[data-meowui-part="progress/bar"]`;
+
 export const progressStyles = css`
-  ${partSelector(progressContract, "root")} {
+  ${root} {
+    position: relative;
     display: block;
     box-sizing: border-box;
     width: 100%;
     min-width: 0;
-    height: ${uiTokens.spaceGroup};
+    height: 6px;
     overflow: hidden;
-    border: 0;
     border-radius: 999px;
     corner-shape: round;
     background: ${uiTokens.surfaceMuted};
-    accent-color: ${uiTokens.info};
+  }
+  ${bar} {
+    display: block;
+    box-sizing: border-box;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: inherit;
+    background: transparent;
+    accent-color: ${accentTokens.base};
     vertical-align: middle;
   }
-  ${partSelector(progressContract, "root")}::-webkit-progress-bar {
+  ${native}::-webkit-progress-bar {
     background: ${uiTokens.surfaceMuted};
     border-radius: inherit;
   }
-  ${partSelector(progressContract, "root")}::-webkit-progress-value {
-    background: ${uiTokens.info};
+  ${native}::-webkit-progress-value {
+    background: ${accentTokens.base};
     border-radius: inherit;
   }
-  ${partSelector(progressContract, "root")}::-moz-progress-bar {
-    background: ${uiTokens.info};
+  ${native}::-moz-progress-bar {
+    background: ${accentTokens.base};
     border-radius: inherit;
   }
-  ${partSelector(progressContract, "root")}:not([value])::-webkit-progress-value {
-    background: ${uiTokens.info};
-    animation: ui-progress-indeterminate 1.2s ${uiTokens.ease} infinite;
+  ${native}:not([value]) {
+    opacity: 0;
   }
-  ${partSelector(progressContract, "root")}:not([value])::-moz-progress-bar {
-    background: ${uiTokens.info};
+  ${root}:has(${bar}:not([value]))::after {
+    content: "";
+    position: absolute;
+    inset-block: 0;
+    inset-inline-start: 0;
+    width: 36%;
+    border-radius: inherit;
+    background: ${accentTokens.base};
     animation: ui-progress-indeterminate 1.2s ${uiTokens.ease} infinite;
   }
   @keyframes ui-progress-indeterminate {
     0% {
-      transform: translateX(-60%);
+      inset-inline-start: -36%;
     }
     100% {
-      transform: translateX(160%);
+      inset-inline-start: 100%;
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(progressContract, "root")}:not([value])::-webkit-progress-value,
-    ${partSelector(progressContract, "root")}:not([value])::-moz-progress-bar {
+    ${root}:has(${bar}:not([value]))::after {
       animation: none;
+      inset-inline-start: 32%;
     }
   }
 `;

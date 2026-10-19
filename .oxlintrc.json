@@ -3,6 +3,31 @@
   "categories": {
     "correctness": "error"
   },
+  "rules": {
+    "no-restricted-imports": [
+      "error",
+      {
+        "paths": [
+          {
+            "name": "react",
+            "message": "Meowland components use meowjsx. React is not a dependency."
+          },
+          {
+            "name": "react-dom",
+            "message": "DOM mounting comes from meowjsx/web. Do not import react-dom."
+          },
+          {
+            "name": "react/jsx-runtime",
+            "message": "JSX compiles to the meowjsx factory (h). Do not import React's JSX runtime."
+          },
+          {
+            "name": "react/jsx-dev-runtime",
+            "message": "JSX compiles to the meowjsx factory (h). Do not import React's JSX runtime."
+          }
+        ]
+      }
+    ]
+  },
   "overrides": [
     {
       "files": [

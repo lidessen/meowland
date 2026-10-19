@@ -27,6 +27,8 @@ On 2026-10-16, versions were cross-checked against the official npm registry met
 
 Checks exclude `node_modules`, `dist`, `artifacts`, Playwright reports, test results, and Book-generated directories. The formatter additionally skips Bun-generated lockfiles and the preserved-as-is `packages/meowtail/THIRD_PARTY_NOTICES.md`; packages or test directories are not ignored wholesale just because historical source has warnings. The exact boundaries are in `.oxlintrc.json` and `.oxfmtrc.json`.
 
+Oxlint `no-restricted-imports` rejects `react`, `react-dom`, `react/jsx-runtime`, and `react/jsx-dev-runtime`. Components and JSX compile against `meowjsx`. The rule does not judge class names or inline styles; those conventions are the Meowtail [component model](../packages/meowtail/AGENTS.md#component-model-meowjsx-is-not-react) and [styling](../packages/meowtail/AGENTS.md#styling-meowcss-is-not-ordinary-css) sections.
+
 Two JSON type/behavior test files set a `_`-prefix parameter placeholder convention for `no-unused-vars` so callback prop type inference is retained; other files keep Oxlint's default rule options, and unused imports still error. Signal reads in reactive effects have subscription semantics and cannot be deleted as ordinary no-op expressions.
 
 Real DOM attribute regressions for the Web renderer use `bun node_modules/@playwright/test/cli.js test --config packages/meowjsx/playwright.config.ts`. Build the current public exports first; the specs actually build plain IIFE, strict IIFE, and ESM and verify SVG readonly-attribute fallback, reactive updates, and HTML controls plus cleanup; DOM-free unit tests do not substitute for this.

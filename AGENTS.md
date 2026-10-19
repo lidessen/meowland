@@ -5,6 +5,7 @@ This is a standalone UI capability library. Start with the [root README](README.
 ## Boundaries that break easily
 
 - The MeowJSX root and its types do not depend on the DOM; Web goes explicitly through `meowjsx/web`. The MeowCSS root does not depend on JSX, UI or the DOM; components and Web adaptation are carried by subpaths.
+- Before writing a Meowtail component or its styles, read the [component model](packages/meowtail/AGENTS.md#component-model-meowjsx-is-not-react) and [styling](packages/meowtail/AGENTS.md#styling-meowcss-is-not-ordinary-css) sections. Setup runs once per mount, and the theme paints parts and tokens.
 - One render graph shares core modules; one theme assembly shares CSS token/fragment identity. Entry points must not be inlined into multiple runtimes, Contexts or Symbol/WeakMap copies. Explicitly creating multiple Runtimes is still valid isolation.
 - Meowtail owns generic structure, the complete Assistant, concrete themes and semantic layout. `apps/showcase` and stories only pass scenario data and drive interactions; they do not copy component implementations. Backend, business facts, permissions, uploads and persistence stay with the host.
 - Meowslides owns presentation playback, presentation content layouts, reveals, media and authoring tools; it depends one-way on Meowtail's generic capabilities. MDX is trusted local code; arbitrary uploaded or generated text is not executed by default.

@@ -103,7 +103,15 @@ clipboard implementation, and the component does not execute code. With no langu
 Unknown languages or failed highlight loads keep a plain-text display.
 
 `Checkbox`, `Switch`, and `SegmentedControl` provide native form selection; `Tabs` handles switching panels that stay mounted.
-`Menu`, `HoverCard`, `Toast`, and `RiskConfirmation` provide menus, previews, and feedback, while business actions and display lifetimes are the host's responsibility.
+A `Checkbox` can be `indeterminate` for a parent of mixed children; assistive technology reads `aria-checked="mixed"`.
+`Slider` is a native range with a visible figure for the same value; `NumberInput` steps and clamps a number and formats the committed figure.
+`Progress` is a labeled native progress bar, determinate or indeterminate; `Spinner` remains the wait with no known amount. `ChatTask` reuses `Progress` for explicit host progress.
+`Avatar` shows a picture or initials; `ChatMessage` still takes any avatar child in its identity column, because that slot already hosts icons and other artwork.
+`Link` is a themed inline text link. It is not `ResourceLink`, which remains the whole-row reference to an openable object.
+`Table` shows host rows in columns that the user can sort, resize, and multi-select; row order and records stay with the caller.
+`Accordion` groups `Disclosure` sections in single- or multiple-open mode.
+`Menu`, `MenuButton`, `ContextMenu`, `HoverCard`, `Toast`, and `RiskConfirmation` provide menus, previews, and feedback, while business actions and display lifetimes are the host's responsibility.
+`MenuButton` is a button that opens the existing `Menu`; `ContextMenu` opens that same `Menu` from a right-click or Shift+F10, including nested items.
 Menu's Tab / Shift+Tab closes the whole menu chain and leaves along the native order without activating menu items; Escape closes one layer at a time and returns to that layer's entry point.
 `TerminalBlock`, `ReadBlock`, `DiffBlock`, `SearchBlock`, `WebBlock`, and `JsonBlock/JsonTree`
 display host-provided output; components do not execute tools or read files. `ReadBlock` accepts `lang`, loads highlighting when it first enters the viewport, and keeps unknown languages as plain text.
@@ -312,8 +320,9 @@ trigger. Error messages use the browser's native validation copy. Reset restores
 The theme visually hides the native form carrier; a hidden input is not used to fake required validation. It provides no custom multiple selection or asynchronous search.
 The parts are `root/trigger/value/indicator/list/group/option/native/validation`.
 
-- Basics: Button, AddButton, IconButton, Card, Badge, Input, Textarea, Select, Field,
-  SearchInput, Disclosure, Separator, NavItem, EmptyState.
+- Basics: Button, AddButton, IconButton, MenuButton, Card, Badge, Avatar, Input, NumberInput,
+  Textarea, Select, Field, SearchInput, Slider, Progress, Link, Disclosure, Accordion, Table,
+  Separator, NavItem, EmptyState.
 - Dialogs: Dialog, DialogPanel, DialogHeader, DialogActions.
 - Chat: ChatFrame, ChatHeader, ChatStatus, ChatConversation, ChatMessageList, ChatMessage, ChatBubble,
   ChatMessageActions, ChatComposer, ChatToolCall, ChatAttachments, ChatProcess, ChatSources.
@@ -425,7 +434,8 @@ Choosing only fills in the path; it does not read files, upload files, or grant 
 
 `Disclosure` uses native details/summary, accepts `summary: Child` and content children, and supports
 `open/name/onToggle` and other native attributes. `summaryClassName` and `contentClassName` are for host layout;
-the parts are `root/summary/icon/content`. It does not maintain a second expansion state and is not a multi-item Accordion.
+the parts are `root/summary/icon/content`. `Accordion` groups several Disclosures, with `type="single"` or
+`type="multiple"`, and still does not own business content.
 
 ## Standard theme (meowtail/theme)
 

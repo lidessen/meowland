@@ -43,7 +43,10 @@ test("task facts remain text and explicit progress uses native semantics", () =>
   expect(output).toContain("&lt;img src=x onerror=alert(1)&gt;");
   expect(output).not.toContain("<script>");
   expect(output).not.toContain("<img");
-  expect(output).toContain('<progress value="0" max="4" aria-label="Reviewed 0 of 4 files"');
+  expect(output).toContain("<progress");
+  expect(output).toContain('value="0"');
+  expect(output).toContain('max="4"');
+  expect(output).toContain('aria-label="Reviewed 0 of 4 files"');
 });
 
 test("invalid progress is rejected rather than reported as an invented percentage", () => {

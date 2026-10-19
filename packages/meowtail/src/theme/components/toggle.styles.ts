@@ -64,6 +64,16 @@ export const toggleStyles = css`
     cursor: default;
     opacity: 0.5;
   }
+  ${partSelector(checkboxContract, "root")}[data-label-hidden] {
+    gap: 0;
+  }
+  ${partSelector(checkboxContract, "label")}[data-label-hidden] {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+  }
   @media (prefers-reduced-motion: reduce) {
     ${partSelector(switchContract, "thumb")} {
       transition: none;

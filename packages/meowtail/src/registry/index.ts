@@ -19,7 +19,7 @@ import {
   stateDotContract,
   hoverCardContract,
 } from "../components";
-import { menuContract, toastContract } from "../components";
+import { menuContract, toastContract, contextMenuContract } from "../components";
 import { outputBlockContract } from "../components/output-block";
 import {
   terminalBlockContract,
@@ -66,8 +66,15 @@ import {
   actionRailContract,
   metaRowContract,
   inputContract,
+  numberInputContract,
   checkboxContract,
   switchContract,
+  sliderContract,
+  progressContract,
+  avatarContract,
+  linkContract,
+  accordionContract,
+  tableContract,
   selectContract,
   choiceSelectContract,
   choiceGroupContract,
@@ -139,6 +146,7 @@ export const MeowUIComponent = {
   StateDot: stateDotContract.name,
   HoverCard: hoverCardContract.name,
   Menu: menuContract.name,
+  ContextMenu: contextMenuContract.name,
   Toast: toastContract.name,
   TerminalBlock: terminalBlockContract.name,
   ReadBlock: readBlockContract.name,
@@ -177,8 +185,13 @@ export const MeowUIComponent = {
   Card: cardContract.name,
   Badge: badgeContract.name,
   Input: inputContract.name,
+  NumberInput: numberInputContract.name,
   Checkbox: checkboxContract.name,
   Switch: switchContract.name,
+  Slider: sliderContract.name,
+  Progress: progressContract.name,
+  Avatar: avatarContract.name,
+  Link: linkContract.name,
   Select: selectContract.name,
   ChoiceSelect: choiceSelectContract.name,
   ChoiceGroup: choiceGroupContract.name,
@@ -186,6 +199,8 @@ export const MeowUIComponent = {
   SearchInput: searchInputContract.name,
   PathPicker: pathPickerContract.name,
   Disclosure: disclosureContract.name,
+  Accordion: accordionContract.name,
+  Table: tableContract.name,
   Textarea: textareaContract.name,
   Field: fieldContract.name,
   Separator: separatorContract.name,
@@ -250,6 +265,7 @@ export const meowUIComponents = [
   stateDotContract,
   hoverCardContract,
   menuContract,
+  contextMenuContract,
   toastContract,
   outputBlockContract,
   terminalBlockContract,
@@ -258,6 +274,13 @@ export const meowUIComponents = [
   searchBlockContract,
   checkboxContract,
   switchContract,
+  sliderContract,
+  progressContract,
+  avatarContract,
+  linkContract,
+  accordionContract,
+  tableContract,
+  numberInputContract,
   codeBlockContract,
   choiceGroupContract,
   chatQuestionContract,
@@ -367,6 +390,7 @@ declare module "meowjsx" {
     "state-dot": { parts: (typeof stateDotContract.parts)[number] };
     "hover-card": { parts: (typeof hoverCardContract.parts)[number] };
     menu: { parts: (typeof menuContract.parts)[number] };
+    "context-menu": { parts: (typeof contextMenuContract.parts)[number] };
     toast: { parts: (typeof toastContract.parts)[number] };
     "output-block": { parts: (typeof outputBlockContract.parts)[number] };
     "terminal-block": { parts: (typeof terminalBlockContract.parts)[number] };
@@ -406,8 +430,13 @@ declare module "meowjsx" {
     card: { parts: "root" };
     badge: { parts: "root" };
     input: { parts: "root" };
+    "number-input": { parts: (typeof numberInputContract.parts)[number] };
     checkbox: { parts: (typeof checkboxContract.parts)[number] };
     switch: { parts: (typeof switchContract.parts)[number] };
+    slider: { parts: (typeof sliderContract.parts)[number] };
+    progress: { parts: (typeof progressContract.parts)[number] };
+    avatar: { parts: (typeof avatarContract.parts)[number] };
+    link: { parts: (typeof linkContract.parts)[number] };
     select: { parts: "root" };
     "choice-select": { parts: (typeof choiceSelectContract.parts)[number] };
     "choice-group": { parts: (typeof choiceGroupContract.parts)[number] };
@@ -415,6 +444,8 @@ declare module "meowjsx" {
     "search-input": { parts: (typeof searchInputContract.parts)[number] };
     "path-picker": { parts: (typeof pathPickerContract.parts)[number] };
     disclosure: { parts: (typeof disclosureContract.parts)[number] };
+    accordion: { parts: (typeof accordionContract.parts)[number] };
+    table: { parts: (typeof tableContract.parts)[number] };
     textarea: { parts: "root" };
     field: { parts: (typeof fieldContract.parts)[number] };
     separator: { parts: "root" };

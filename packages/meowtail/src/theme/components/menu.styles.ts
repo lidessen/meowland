@@ -16,8 +16,8 @@ export const menuStyles = css`
     align-items: center;
     gap: 6px;
     width: 100%;
-    min-height: 34px;
-    padding: 6px 8px;
+    min-height: 32px;
+    padding: 6px 12px;
     border: 0;
     border-radius: ${uiTokens.controlRadius};
     background: transparent;
@@ -25,6 +25,7 @@ export const menuStyles = css`
     font: inherit;
     text-align: left;
     cursor: pointer;
+    transition: background-color ${uiTokens.durationResponse} ${uiTokens.ease};
   }
   ${partSelector(menuContract, "item")}:is(:hover, :focus-visible):not(:disabled) {
     background: ${uiTokens.hover};
@@ -64,7 +65,7 @@ export const menuStyles = css`
     white-space: nowrap;
   }
   ${partSelector(menuContract, "heading")} {
-    padding: 6px 8px;
+    padding: 6px 12px;
     font-size: 11px;
     line-height: 15px;
     color: ${uiTokens.subtleForeground};
@@ -73,5 +74,10 @@ export const menuStyles = css`
     height: 0.5px;
     background: ${uiTokens.borderSoft};
     margin: 3px 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ${partSelector(menuContract, "item")} {
+      transition: none;
+    }
   }
 `;

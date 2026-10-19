@@ -36,6 +36,10 @@ export interface MenuProps extends Props {
   open?: MaybeSignal<boolean>;
   onOpenChange?: (open: boolean) => void;
   align?: "start" | "end";
+  /** Position against a point such as a right-click, instead of the trigger box. */
+  anchorRect?: () => DOMRect;
+  /** Element whose layout defines a custom rect; observed by the same autoUpdate. */
+  anchorElement?: () => HTMLElement | null;
   className?: string;
 }
 export const menuContract = {
@@ -61,6 +65,8 @@ export const Menu = defineComponent<MenuLevelProps, "menu", (typeof menuContract
       className,
       placement = "bottom",
       closeAncestors,
+      anchorRect,
+      anchorElement,
     },
     context,
   ) => {
@@ -258,6 +264,8 @@ export const Menu = defineComponent<MenuLevelProps, "menu", (typeof menuContract
         open={state}
         align={align}
         placement={placement}
+        anchorRect={anchorRect}
+        anchorElement={anchorElement}
         onOpenChange={(next) => {
           request(next);
           if (next) focusEdge();

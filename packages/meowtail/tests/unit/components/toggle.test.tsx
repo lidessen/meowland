@@ -29,6 +29,31 @@ test("toggles expose native form semantics and implicit labels without a theme",
   expect(html).not.toContain("defaultChecked");
 });
 
+test("indeterminate checkboxes expose mixed native state", () => {
+  const runtime = createRuntime();
+  installMeowUI(runtime);
+  let native: Props = {};
+  runtime.use({
+    render({ vnode }, next) {
+      if (vnode.type === "input") native = vnode.props;
+      return next(vnode);
+    },
+  });
+  const html = createWebRenderer(runtime).renderToHtml(
+    <Checkbox label="Some selected" indeterminate labelHidden />,
+  );
+  expect(html).toContain('aria-checked="mixed"');
+  expect(html).toContain("data-label-hidden");
+  const input = {
+    defaultChecked: false,
+    checked: false,
+    indeterminate: false,
+    ownerDocument: new EventTarget(),
+  };
+  (native.ref as (node: typeof input) => () => void)(input);
+  expect(input.indeterminate).toBe(true);
+});
+
 test("controlled toggles accept or reject changes through the caller; uncontrolled input stays native", () => {
   for (const Component of [Checkbox, Switch]) {
     for (const controlled of [false, true]) {

@@ -7,6 +7,7 @@ import {
   type MaybeSignal,
   type Props,
 } from "meowjsx";
+import { Progress } from "../components/progress";
 import { StatusDot } from "../components/status-dot";
 import {
   executionStateLabel,
@@ -147,11 +148,16 @@ export const ChatTask = defineComponent<
           null,
           derive(() => currentProgress.value?.label ?? ""),
         ),
-        context.part("progressBar", "progress", {
-          value: derive(() => currentProgress.value?.value ?? 0),
-          max: derive(() => currentProgress.value?.max ?? 1),
-          "aria-label": derive(() => currentProgress.value?.label ?? ""),
-        }),
+        context.part(
+          "progressBar",
+          "div",
+          null,
+          h(Progress, {
+            value: derive(() => currentProgress.value?.value ?? 0),
+            max: derive(() => currentProgress.value?.max ?? 1),
+            label: derive(() => currentProgress.value?.label ?? ""),
+          }),
+        ),
       ),
       context.part("body", "div", null, children),
       context.part("footer", "div", null, footer),

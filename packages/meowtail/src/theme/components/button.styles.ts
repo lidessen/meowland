@@ -136,8 +136,17 @@ ${partSelector(iconButtonContract, "root")} {
     min-height: ${uiTokens.buttonLarge};
   }
 }
+${partSelector(buttonContract, "root")} svg {
+  transition: transform ${uiTokens.durationSettle} ${uiTokens.ease};
+}
+${partSelector(buttonContract, "root")}[aria-expanded="true"] svg:last-child {
+  transform: rotate(180deg);
+}
 @media (prefers-reduced-motion: reduce) {
   :where(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")}) {
+    transition: none;
+  }
+  ${partSelector(buttonContract, "root")} svg {
     transition: none;
   }
 }

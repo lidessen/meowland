@@ -1,6 +1,7 @@
 import {
   batch,
   defineComponent,
+  derived,
   h,
   unwrap,
   type ComponentContract,
@@ -58,18 +59,13 @@ export const PathPicker = defineComponent<
   ) => {
     const pending = context.signal(false);
     const feedback = context.signal("");
-    const locked = context.signal(false);
-    const buttonDisabled = context.signal(false);
-    const buttonLabel = context.signal(messages[kind]);
+    const locked = derived(() => unwrap(readOnly) || pending.value);
+    const buttonDisabled = derived(() => unwrap(disabled) || unwrap(readOnly) || pending.value);
+    const buttonLabel = derived(() => (pending.value ? messages.pending : messages[kind]));
     let disposed = false;
     let button: HTMLButtonElement | undefined;
     context.onCleanup(() => {
       disposed = true;
-    });
-    context.effect(() => {
-      locked.value = unwrap(readOnly) || pending.value;
-      buttonDisabled.value = unwrap(disabled) || unwrap(readOnly) || pending.value;
-      buttonLabel.value = pending.value ? messages.pending : messages[kind];
     });
     const choose = async () => {
       if (!onChoose || disposed || buttonDisabled.value) return;
@@ -90,7 +86,7 @@ export const PathPicker = defineComponent<
         if (!disposed) feedback.value = messages.failed;
       } finally {
         if (!disposed) {
-          // Flush derived disabled state before returning focus to the native button.
+          // The button's disabled property updates in the signal subscriber, so flush it before focus.
           batch(() => {
             pending.value = false;
           });

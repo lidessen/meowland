@@ -71,7 +71,7 @@ export const Menu = defineComponent<MenuLevelProps, "menu", (typeof menuContract
     context,
   ) => {
     const local = context.signal(false);
-    const state = open ?? local;
+    const state = open !== undefined ? open : local;
     let root: HTMLElement | undefined;
     let search = "";
     let searchTime = 0;

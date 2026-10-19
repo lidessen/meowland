@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   unwrap,
   type Child,
   type ComponentContract,
@@ -25,10 +26,7 @@ export const NavItem = defineComponent<
   typeof navItemContract.name,
   (typeof navItemContract.parts)[number]
 >(navItemContract, ({ label, icon, badge, active = false, className, ...props }, context) => {
-  const current = context.signal<string | undefined>(unwrap(active) ? "page" : undefined);
-  context.effect(() => {
-    current.value = unwrap(active) ? "page" : undefined;
-  });
+  const current = derived(() => (unwrap(active) ? "page" : undefined));
   return context.part(
     "root",
     "button",

@@ -40,7 +40,10 @@ test("uncontrolled selection updates the form value while controlled selection r
       render({ vnode }, next) {
         if (vnode.type === "select") native = vnode.props;
         if (vnode.props.role === "option")
-          clicked.set(String(vnode.props["data-choice-index"]), vnode.props.onClick as () => void);
+          clicked.set(
+            String(unwrap(vnode.props["data-choice-index"])),
+            vnode.props.onClick as () => void,
+          );
         return next(vnode);
       },
     });

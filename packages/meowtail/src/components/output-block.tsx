@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   h,
   type Child,
   type ComponentContract,
@@ -43,13 +44,6 @@ export const OutputBlock = defineComponent<
     { title, rows, copyText, maxLines, wrap = false, emptyText = "No content", onCopy, ...props },
     context,
   ) => {
-    const derived = <T,>(read: () => T) => {
-      const value = context.signal(read());
-      context.effect(() => {
-        value.value = read();
-      });
-      return value;
-    };
     const feedback = context.signal("");
     const busy = context.signal(false);
     let disposed = false;

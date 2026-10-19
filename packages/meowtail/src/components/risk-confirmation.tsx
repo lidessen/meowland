@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   h,
   isSignal,
   unwrap,
@@ -50,10 +51,7 @@ export const RiskConfirmation = defineComponent<RiskConfirmationProps, "risk-con
     },
     context,
   ) => {
-    const blocked = context.signal(unwrap(disabled) || !unwrap(acknowledged));
-    context.effect(() => {
-      blocked.value = unwrap(disabled) || !unwrap(acknowledged);
-    });
+    const blocked = derived(() => unwrap(disabled) || !unwrap(acknowledged));
     return context.part(
       "root",
       "div",

@@ -32,7 +32,7 @@ export const ContextMenu = defineComponent<
   contextMenuContract,
   ({ id, items, open, onOpenChange, className, children, ...props }, context) => {
     const local = context.signal(false);
-    const state = open ?? local;
+    const state = open !== undefined ? open : local;
     let point = { x: 0, y: 0 };
     const request = (next: boolean) => {
       if (open === undefined) local.value = next;

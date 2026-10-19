@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   unwrap,
   type Child,
   type ComponentContract,
@@ -31,32 +32,26 @@ export interface TabsProps extends Props {
   className?: string;
 }
 
-/** Horizontal tabs with automatic keyboard activation. Panels remain mounted to preserve drafts. */
+/** Horizontal tabs with automatic keyboard activation. Items are fixed for the mount, and panels stay mounted to preserve drafts. */
 export const Tabs = defineComponent<TabsProps, "tabs", (typeof tabsContract.parts)[number]>(
   tabsContract,
   ({ id, label, items, value, defaultValue, onValueChange, className, ...props }, context) => {
     const enabled = items.flatMap((item, index) => (item.disabled ? [] : [index]));
     const local = context.signal(defaultValue ?? items[enabled[0] ?? -1]?.value ?? "");
     const focus = context.signal(enabled[0] ?? -1);
-    const selected = items.map(() => context.signal("false"));
-    const hidden = items.map(() => context.signal(true));
-    const tabIndex = items.map(() => context.signal(-1));
-    const indicatorIndex = context.signal(0);
-    const indicatorHidden = context.signal(true);
+    const current = value !== undefined ? value : local;
+    const activeIndex = derived(() =>
+      items.findIndex((item) => item.value === unwrap(current) && !item.disabled),
+    );
+    const indicatorIndex = derived(() => Math.max(0, activeIndex.value));
+    const indicatorHidden = derived(() => activeIndex.value < 0);
+    const selected = items.map((_, index) => derived(() => String(index === activeIndex.value)));
+    const hidden = items.map((_, index) => derived(() => index !== activeIndex.value));
+    const tabIndex = items.map((_, index) => derived(() => (index === focus.value ? 0 : -1)));
+    // Arrow keys set focus themselves. A host-driven value still moves the roving tabindex.
     context.effect(() => {
-      const current = unwrap(value === undefined ? local : value);
-      const active = items.findIndex((item) => item.value === current && !item.disabled);
-      indicatorIndex.value = Math.max(0, active);
-      indicatorHidden.value = active < 0;
+      const active = activeIndex.value;
       focus.value = active >= 0 ? active : (enabled[0] ?? -1);
-      for (const [index] of items.entries()) {
-        selected[index]!.value = String(index === active);
-        hidden[index]!.value = index !== active;
-      }
-    });
-    context.effect(() => {
-      const focused = focus.value;
-      for (const [index] of items.entries()) tabIndex[index]!.value = index === focused ? 0 : -1;
     });
     const choose = (index: number) => {
       const item = items[index];

@@ -1,6 +1,8 @@
 import {
   defineComponent,
+  derived,
   h,
+  keyed,
   unwrap,
   type ComponentContract,
   type MaybeSignal,
@@ -34,7 +36,9 @@ export const choiceSelectContract = {
 } as const satisfies ComponentContract;
 
 export interface ChoiceSelectProps extends Props {
-  options: readonly ChoiceOption[];
+  /** Plain arrays are fixed for the mount. A signal keeps the open list mounted. */
+  options: MaybeSignal<readonly ChoiceOption[]>;
+  hidden?: MaybeSignal<boolean>;
   value?: MaybeSignal<string>;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
@@ -64,6 +68,7 @@ export const ChoiceSelect = defineComponent<
   (
     {
       options,
+      hidden,
       value,
       defaultValue = "",
       onValueChange,
@@ -83,13 +88,14 @@ export const ChoiceSelect = defineComponent<
     },
     context,
   ) => {
-    const selected = context.signal(value === undefined ? defaultValue : unwrap(value));
+    const local = context.signal(defaultValue);
+    const current = value !== undefined ? value : local;
+    const readValue = () => unwrap(current);
+    const readOptions = () => unwrap(options);
     const open = context.signal(false);
-    const caption = context.signal(placeholder);
     const invalid = context.signal<string | undefined>(undefined);
     const validation = context.signal("");
     const query = context.signal("");
-    const hasResults = context.signal(true);
     let searchElement: HTMLInputElement | null = null;
     let triggerElement: HTMLButtonElement | null = null;
     let nativeElement: HTMLSelectElement | null = null;
@@ -101,20 +107,14 @@ export const ChoiceSelect = defineComponent<
       `${option.label} ${option.value}`
         .toLocaleLowerCase()
         .includes(query.value.trim().toLocaleLowerCase());
+    const hasResults = derived(() => readOptions().some(matches));
+    const caption = derived(
+      () => readOptions().find((option) => option.value === readValue())?.label ?? placeholder,
+    );
     const enabledOptions = () =>
-      options
+      readOptions()
         .map((option, index) => (option.disabled || !matches(option) ? -1 : index))
         .filter((index) => index >= 0);
-    context.effect(() => {
-      hasResults.value = options.some(matches);
-    });
-    context.effect(() => {
-      if (value !== undefined) selected.value = unwrap(value);
-    });
-    context.effect(() => {
-      caption.value =
-        options.find((option) => option.value === selected.value)?.label ?? placeholder;
-    });
     const trigger = () => triggerElement;
     const panel = () => (triggerElement ? elementByIdInRoot(triggerElement, panelId) : null);
     const focusOption = (index: number) => {
@@ -125,8 +125,8 @@ export const ChoiceSelect = defineComponent<
     };
     const initialIndex = (last = false) => {
       const enabled = enabledOptions();
-      const index = options.findIndex(
-        (option) => option.value === selected.value && !option.disabled,
+      const index = readOptions().findIndex(
+        (option) => option.value === readValue() && !option.disabled,
       );
       return index >= 0 ? index : (enabled[last ? enabled.length - 1 : 0] ?? -1);
     };
@@ -136,13 +136,13 @@ export const ChoiceSelect = defineComponent<
       if (restore) trigger()?.focus();
     };
     const choose = (index: number) => {
-      const option = options[index];
+      const option = readOptions()[index];
       if (disabled || !option || option.disabled) return;
-      if (value === undefined) selected.value = option.value;
+      if (value === undefined) local.value = option.value;
       invalid.value = undefined;
       validation.value = "";
       onValueChange?.(option.value);
-      if (nativeElement) nativeElement.value = selected.value;
+      if (nativeElement) nativeElement.value = readValue();
       close();
     };
     const search = (key: string, active: number) => {
@@ -154,7 +154,7 @@ export const ChoiceSelect = defineComponent<
       const start = enabled.indexOf(active);
       for (let step = 1; step <= enabled.length; step++) {
         const index = enabled[(start + step) % enabled.length]!;
-        if (options[index]!.label.toLocaleLowerCase().startsWith(query.toLocaleLowerCase())) {
+        if (readOptions()[index]!.label.toLocaleLowerCase().startsWith(query.toLocaleLowerCase())) {
           focusOption(index);
           break;
         }
@@ -253,7 +253,7 @@ export const ChoiceSelect = defineComponent<
         if (disposed || !native.isConnected) return;
         // Native reset restores defaultSelected, not the live value property.
         for (const option of native.options) option.defaultSelected = option.value === defaultValue;
-        native.value = selected.value;
+        native.value = readValue();
         const form = native?.form;
         if (!form) return;
         let resetTimer: ReturnType<typeof setTimeout> | undefined;
@@ -263,8 +263,8 @@ export const ChoiceSelect = defineComponent<
           // default reset action. Reconcile only after that action completes.
           resetTimer = setTimeout(() => {
             if (disposed || event.defaultPrevented) return;
-            if (value === undefined) selected.value = defaultValue;
-            native.value = selected.value;
+            if (value === undefined) local.value = defaultValue;
+            native.value = readValue();
             invalid.value = undefined;
             validation.value = "";
             open.value = false;
@@ -281,10 +281,23 @@ export const ChoiceSelect = defineComponent<
       disposed = true;
     });
 
+    type ChoiceRow =
+      | { kind: "group"; key: string; label: string }
+      | { kind: "option"; key: string; option: ChoiceOption; index: number };
+    const rows = derived(() => {
+      const items = readOptions();
+      const next: ChoiceRow[] = [];
+      items.forEach((option, index) => {
+        if (option.group && option.group !== items[index - 1]?.group)
+          next.push({ kind: "group", key: `group:${option.group}:${index}`, label: option.group });
+        next.push({ kind: "option", key: `option:${option.value}`, option, index });
+      });
+      return next;
+    });
     return context.part(
       "root",
       "div",
-      { className },
+      { className, hidden },
       h(Popover, {
         id: `${id}-panel`,
         triggerId: id,
@@ -364,47 +377,56 @@ export const ChoiceSelect = defineComponent<
               role: searchable ? "listbox" : undefined,
               "aria-labelledby": searchable ? id : undefined,
             },
-            ...options.flatMap((option, index) => {
-              const isSelected = context.signal("false");
-              const hidden = context.signal(false);
-              context.effect(() => {
-                isSelected.value = String(selected.value === option.value);
-                hidden.value = !matches(option);
-              });
-              const item = context.part(
-                "option",
-                "button",
-                {
-                  type: "button",
-                  role: "option",
-                  tabIndex: -1,
-                  disabled: option.disabled,
-                  hidden,
-                  "aria-disabled": option.disabled ? "true" : undefined,
-                  "aria-selected": isSelected,
-                  "data-choice-index": index,
-                  onClick: () => choose(index),
-                },
-                option.label,
-              );
-              const groupHidden = context.signal(false);
-              context.effect(() => {
-                groupHidden.value = !options.some(
-                  (candidate) => candidate.group === option.group && matches(candidate),
-                );
-              });
-              return option.group && option.group !== options[index - 1]?.group
-                ? [
-                    context.part(
-                      "group",
-                      "div",
-                      { role: "presentation", hidden: groupHidden },
-                      option.group,
+            keyed(
+              rows,
+              (row) => row.key,
+              (row) => {
+                if (row.value.kind === "group") {
+                  return context.part(
+                    "group",
+                    "div",
+                    {
+                      role: "presentation",
+                      hidden: derived(() => {
+                        const label = row.value.kind === "group" ? row.value.label : "";
+                        return !readOptions().some(
+                          (candidate) => candidate.group === label && matches(candidate),
+                        );
+                      }),
+                    },
+                    derived(() => (row.value.kind === "group" ? row.value.label : "")),
+                  );
+                }
+                return context.part(
+                  "option",
+                  "button",
+                  {
+                    type: "button",
+                    role: "option",
+                    tabIndex: -1,
+                    disabled: derived(
+                      () => row.value.kind === "option" && Boolean(row.value.option.disabled),
                     ),
-                    item,
-                  ]
-                : [item];
-            }),
+                    hidden: derived(() =>
+                      row.value.kind === "option" ? !matches(row.value.option) : true,
+                    ),
+                    "aria-disabled": derived(() =>
+                      row.value.kind === "option" && row.value.option.disabled ? "true" : undefined,
+                    ),
+                    "aria-selected": derived(() =>
+                      String(row.value.kind === "option" && readValue() === row.value.option.value),
+                    ),
+                    "data-choice-index": derived(() =>
+                      row.value.kind === "option" ? row.value.index : -1,
+                    ),
+                    onClick: () => {
+                      if (row.value.kind === "option") choose(row.value.index);
+                    },
+                  },
+                  derived(() => (row.value.kind === "option" ? row.value.option.label : "")),
+                );
+              },
+            ),
           ),
           searchable
             ? context.part("empty", "p", { hidden: hasResults, role: "status" }, emptyMessage)
@@ -418,7 +440,7 @@ export const ChoiceSelect = defineComponent<
           id: `${id}-native`,
           name,
           form: props.form,
-          value: selected,
+          value: derived(() => readValue()),
           required,
           disabled,
           tabIndex: -1,
@@ -427,7 +449,7 @@ export const ChoiceSelect = defineComponent<
           "aria-labelledby": id,
           onChange: (event: Event) => {
             const next = (event.currentTarget as HTMLSelectElement).value;
-            choose(options.findIndex((option) => option.value === next));
+            choose(readOptions().findIndex((option) => option.value === next));
           },
           onInvalid: (event: Event) => {
             event.preventDefault();
@@ -437,8 +459,19 @@ export const ChoiceSelect = defineComponent<
           },
         },
         h("option", { value: "" }, placeholder),
-        ...options.map((option) =>
-          h("option", { value: option.value, disabled: option.disabled }, option.label),
+        keyed(
+          derived(() => readOptions()),
+          (option) => option.value,
+          (option) =>
+            h(
+              "option",
+              {
+                value: derived(() => option.value.value),
+                disabled: derived(() => Boolean(option.value.disabled)),
+                defaultSelected: option.value.value === defaultValue,
+              },
+              derived(() => option.value.label),
+            ),
         ),
       ),
       context.part("validation", "span", { id: `${id}-validation`, role: "alert" }, validation),

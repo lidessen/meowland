@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   h,
   unwrap,
   type Child,
@@ -95,14 +96,7 @@ export const ChatTask = defineComponent<
     },
     context,
   ) => {
-    const derive = <T,>(read: () => T) => {
-      const result = context.signal(read());
-      context.effect(() => {
-        result.value = read();
-      });
-      return result;
-    };
-    const currentProgress = derive(() => checkedProgress(unwrap(progress)));
+    const currentProgress = derived(() => checkedProgress(unwrap(progress)));
     const text = (
       part: "description" | "execution" | "reply",
       value: MaybeSignal<string | undefined> | undefined,
@@ -110,8 +104,8 @@ export const ChatTask = defineComponent<
       context.part(
         part,
         "p",
-        { hidden: derive(() => !unwrap(value)) },
-        derive(() => unwrap(value) ?? ""),
+        { hidden: derived(() => !unwrap(value)) },
+        derived(() => unwrap(value) ?? ""),
       );
     return context.part(
       "root",
@@ -131,8 +125,8 @@ export const ChatTask = defineComponent<
           "status",
           "span",
           null,
-          h(StatusDot, { state: derive(() => executionStateTone(unwrap(state))) }),
-          derive(() => unwrap(statusLabel) ?? executionStateLabel(unwrap(state))),
+          h(StatusDot, { state: derived(() => executionStateTone(unwrap(state))) }),
+          derived(() => unwrap(statusLabel) ?? executionStateLabel(unwrap(state))),
         ),
       ),
       text("description", description),
@@ -141,21 +135,21 @@ export const ChatTask = defineComponent<
       context.part(
         "progress",
         "div",
-        { hidden: derive(() => currentProgress.value === undefined) },
+        { hidden: derived(() => currentProgress.value === undefined) },
         context.part(
           "progressLabel",
           "span",
           null,
-          derive(() => currentProgress.value?.label ?? ""),
+          derived(() => currentProgress.value?.label ?? ""),
         ),
         context.part(
           "progressBar",
           "div",
           null,
           h(Progress, {
-            value: derive(() => currentProgress.value?.value ?? 0),
-            max: derive(() => currentProgress.value?.max ?? 1),
-            label: derive(() => currentProgress.value?.label ?? ""),
+            value: derived(() => currentProgress.value?.value ?? 0),
+            max: derived(() => currentProgress.value?.max ?? 1),
+            label: derived(() => currentProgress.value?.label ?? ""),
           }),
         ),
       ),

@@ -22,7 +22,7 @@ interface NativeToggleProps extends Props {
 }
 
 export interface CheckboxProps extends NativeToggleProps {
-  label: string;
+  label: MaybeSignal<string>;
   /** Keep the accessible name while hiding the visible label, for compact tables. */
   labelHidden?: boolean;
   className?: string;
@@ -57,7 +57,7 @@ export function nativeToggleBindings({
   return {
     ...props,
     type: "checkbox",
-    checked: checked ?? defaultChecked,
+    checked: checked !== undefined ? checked : defaultChecked,
     "aria-checked": mixedAttr,
     ref: (input: HTMLInputElement) => {
       apply(input);

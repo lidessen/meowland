@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   unwrap,
   type ComponentContract,
   type MaybeSignal,
@@ -26,9 +27,9 @@ export const SkeletonBoundary = defineComponent<
 >(skeletonBoundaryContract, ({ active, label, children, ...props }, context) => {
   const observation = useWebObservation();
   const mounted = context.signal<HTMLElement | null>(null);
-  const busy = context.signal(false);
-  const busyAttribute = context.signal("false");
-  const announcement = context.signal("");
+  const busy = derived(() => unwrap(active));
+  const busyAttribute = derived(() => String(unwrap(active)));
+  const announcement = derived(() => (unwrap(active) ? label : ""));
   let controller: ReturnType<typeof createSkeletonController> | undefined;
   const clear = () => {
     controller?.dispose();
@@ -36,9 +37,6 @@ export const SkeletonBoundary = defineComponent<
   };
   context.effect(() => {
     const loading = unwrap(active);
-    busy.value = loading;
-    busyAttribute.value = String(loading);
-    announcement.value = loading ? label : "";
     const element = mounted.value;
     if (!element) return;
     if (!loading) {

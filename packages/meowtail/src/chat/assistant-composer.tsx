@@ -1,10 +1,9 @@
-import { defineComponent, h, unwrap } from "meowjsx";
+import { defineComponent, derived, h, isSignal, unwrap } from "meowjsx";
 import { ChatComposer } from "./composer";
 import { ChatAttachments } from "./attachments";
 import { IconButton } from "../components/icon-button";
 import { ChoiceSelect } from "../components/choice-select";
 import { Icon } from "../icons/icon";
-import { assistantDerived } from "./assistant-content";
 import { consumeAssistantDraft, snapshotAssistantDraft } from "./assistant-draft";
 import {
   assistantCopy as defaultAssistantCopy,
@@ -28,19 +27,13 @@ export const AssistantComposer = defineComponent<
   const local = context.signal<AssistantDraft>(
     options.defaultDraft ?? { text: "", attachments: [] },
   );
-  const draft = assistantDerived(context, () =>
-    controlled ? unwrap(options.draft!) : local.value,
-  );
-  const text = assistantDerived(context, () => draft.value.text);
+  const draft = derived(() => (controlled ? unwrap(options.draft!) : local.value));
+  const text = derived(() => draft.value.text);
   const pending = context.signal(false);
   const attaching = context.signal(false);
   const feedback = context.signal("");
-  const disabled = assistantDerived(
-    context,
-    () => options.readOnly || unwrap(options.disabled ?? false),
-  );
-  const submitDisabled = assistantDerived(
-    context,
+  const disabled = derived(() => options.readOnly || unwrap(options.disabled ?? false));
+  const submitDisabled = derived(
     () =>
       disabled.value ||
       pending.value ||
@@ -50,7 +43,6 @@ export const AssistantComposer = defineComponent<
   let textVersion = 0;
   let previousText = draft.value.text;
   let disposed = false;
-  let textarea: HTMLTextAreaElement | undefined;
   let fileInput: HTMLInputElement | undefined;
   const urls = new Set<string>();
   context.effect(() => {
@@ -63,11 +55,6 @@ export const AssistantComposer = defineComponent<
     if (!accepted && disabled.value) return;
     if (!controlled) local.value = next;
     options.onDraftChange?.(next);
-  };
-  const resize = () => {
-    if (!textarea) return;
-    textarea.style.height = "auto";
-    textarea.style.height = `${textarea.scrollHeight}px`;
   };
   const send = async (event: Event) => {
     event.preventDefault();
@@ -85,10 +72,7 @@ export const AssistantComposer = defineComponent<
     } catch {
       if (!disposed) feedback.value = assistantCopy.submitError;
     } finally {
-      if (!disposed) {
-        pending.value = false;
-        resize();
-      }
+      if (!disposed) pending.value = false;
     }
   };
   const attach = async (event: Event) => {
@@ -126,42 +110,43 @@ export const AssistantComposer = defineComponent<
   });
   const localModel = context.signal(unwrap(options.models ?? [])[0]?.value ?? "");
   const localReasoning = context.signal(unwrap(options.reasoningOptions ?? [])[0]?.value ?? "");
+  const modelsLive =
+    options.models !== undefined && (isSignal(options.models) || options.models.length > 0);
+  const reasoningLive =
+    options.reasoningOptions !== undefined &&
+    (isSignal(options.reasoningOptions) || options.reasoningOptions.length > 0);
   const choices = context.part(
     "choices",
     "div",
     null,
-    assistantDerived(context, () => {
-      const models = unwrap(options.models ?? []);
-      return models.length
-        ? h(ChoiceSelect, {
-            options: models,
-            value: options.model ?? localModel,
-            "aria-label": assistantCopy.model,
-            onValueChange: (value: string) => {
-              if (options.model === undefined) localModel.value = value;
-              options.onModelChange?.(value);
-            },
-            placement: "top",
-            matchTriggerWidth: false,
-          })
-        : null;
-    }),
-    assistantDerived(context, () => {
-      const reasoning = unwrap(options.reasoningOptions ?? []);
-      return reasoning.length
-        ? h(ChoiceSelect, {
-            options: reasoning,
-            value: options.reasoning ?? localReasoning,
-            "aria-label": assistantCopy.reasoning,
-            onValueChange: (value: string) => {
-              if (options.reasoning === undefined) localReasoning.value = value;
-              options.onReasoningChange?.(value);
-            },
-            placement: "top",
-            matchTriggerWidth: false,
-          })
-        : null;
-    }),
+    modelsLive
+      ? h(ChoiceSelect, {
+          hidden: derived(() => unwrap(options.models ?? []).length === 0),
+          options: derived(() => unwrap(options.models ?? [])),
+          value: options.model ?? localModel,
+          "aria-label": assistantCopy.model,
+          onValueChange: (value: string) => {
+            if (options.model === undefined) localModel.value = value;
+            options.onModelChange?.(value);
+          },
+          placement: "top",
+          matchTriggerWidth: false,
+        })
+      : null,
+    reasoningLive
+      ? h(ChoiceSelect, {
+          hidden: derived(() => unwrap(options.reasoningOptions ?? []).length === 0),
+          options: derived(() => unwrap(options.reasoningOptions ?? [])),
+          value: options.reasoning ?? localReasoning,
+          "aria-label": assistantCopy.reasoning,
+          onValueChange: (value: string) => {
+            if (options.reasoning === undefined) localReasoning.value = value;
+            options.onReasoningChange?.(value);
+          },
+          placement: "top",
+          matchTriggerWidth: false,
+        })
+      : null,
     options.composerTrailing,
   );
   return context.part(
@@ -173,34 +158,38 @@ export const AssistantComposer = defineComponent<
       placeholder: assistantCopy.placeholder,
       inputLabel: assistantCopy.composer,
       submitLabel: assistantCopy.send,
+      disabled,
+      readOnly: Boolean(options.readOnly),
       submitDisabled,
       trailing: choices,
-      attachments: assistantDerived(context, () =>
-        draft.value.attachments.length
-          ? h(ChatAttachments, {
-              items: draft.value.attachments.map((attachment) => ({
-                ...attachment,
-                onRemove: disabled.value
-                  ? undefined
-                  : () =>
-                      change({
-                        ...draft.value,
-                        attachments: draft.value.attachments.filter((item) => item !== attachment),
-                      }),
-              })),
-            })
-          : null,
-      ),
-      hint: assistantDerived(context, () => unwrap(options.disabledReason ?? "")),
+      attachments: h(ChatAttachments, {
+        hidden: derived(() => draft.value.attachments.length === 0),
+        items: derived(() =>
+          draft.value.attachments.map((attachment) => ({
+            ...attachment,
+            onRemove: disabled.value
+              ? undefined
+              : () =>
+                  change({
+                    ...draft.value,
+                    attachments: draft.value.attachments.filter(
+                      (item) => item.id !== attachment.id,
+                    ),
+                  }),
+          })),
+        ),
+      }),
+      hint: derived(() => unwrap(options.disabledReason ?? "")),
       onSubmit: send,
       onInput: (event: Event) => {
         textVersion++;
         change({ ...draft.value, text: (event.target as HTMLTextAreaElement).value });
-        resize();
       },
       onKeyDown: (event: KeyboardEvent) => {
+        const target = event.target;
         if (
-          event.target === textarea &&
+          target instanceof HTMLTextAreaElement &&
+          target.dataset.chatInput !== undefined &&
           event.key === "Enter" &&
           !event.shiftKey &&
           !event.isComposing &&
@@ -208,42 +197,13 @@ export const AssistantComposer = defineComponent<
         )
           void send(event);
       },
-      ref: (form: HTMLFormElement) => {
-        let active = true;
-        let stop: (() => void) | undefined;
-        const observer = new ResizeObserver(resize);
-        observer.observe(form);
-        // Host refs run before children mount; find the native input after this tree is mounted.
-        queueMicrotask(() => {
-          if (!active || disposed || !form.isConnected) return;
-          textarea = form.querySelector("textarea")!;
-          stop = context.effect(() => {
-            const value = text.value;
-            textarea!.disabled = !!disabled.value;
-            textarea!.readOnly = !!options.readOnly;
-            queueMicrotask(() => {
-              if (!disposed && textarea) {
-                if (textarea.value !== value) textarea.value = value;
-                resize();
-              }
-            });
-          });
-          resize();
-        });
-        return () => {
-          active = false;
-          stop?.();
-          observer.disconnect();
-          textarea = undefined;
-        };
-      },
       children:
         options.allowAttachments === false
           ? []
           : [
               h(IconButton, {
                 label: assistantCopy.attach,
-                disabled: assistantDerived(context, () => disabled.value || attaching.value),
+                disabled: derived(() => disabled.value || attaching.value),
                 onClick: () => fileInput?.click(),
                 children: h(Icon, { name: "paperclip" }),
               }),
@@ -261,7 +221,7 @@ export const AssistantComposer = defineComponent<
     context.part(
       "feedback",
       "p",
-      { role: "status", hidden: assistantDerived(context, () => !feedback.value) },
+      { role: "status", hidden: derived(() => !feedback.value) },
       feedback,
     ),
   );

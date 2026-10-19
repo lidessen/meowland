@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   unwrap,
   type ComponentContract,
   type MaybeSignal,
@@ -19,6 +20,7 @@ export const choiceGroupContract = {
 } as const satisfies ComponentContract;
 
 export interface ChoiceGroupProps extends Props {
+  /** Options are fixed for the mount. */
   options: readonly ChoiceGroupOption[];
   label: string;
   hideLabel?: boolean;
@@ -60,16 +62,16 @@ export const ChoiceGroup = defineComponent<
     },
     context,
   ) => {
-    const selected = context.signal(value === undefined ? defaultValue : unwrap(value));
+    const local = context.signal(defaultValue);
+    const current = value !== undefined ? value : local;
+    const readValue = () => unwrap(current);
     const inputs = new Map<string, HTMLInputElement>();
     let disposed = false;
+    // A rejected change and form reset flip the native radio before the owner signal does.
     const reconcile = () => {
-      for (const [optionValue, input] of inputs) input.checked = selected.value === optionValue;
+      const selected = readValue();
+      for (const [optionValue, input] of inputs) input.checked = selected === optionValue;
     };
-    context.effect(() => {
-      if (value !== undefined) selected.value = unwrap(value);
-      reconcile();
-    });
     context.onCleanup(() => {
       disposed = true;
     });
@@ -83,7 +85,7 @@ export const ChoiceGroup = defineComponent<
           clearTimeout(timer);
           timer = setTimeout(() => {
             if (disposed || event.defaultPrevented) return;
-            selected.value = value === undefined ? defaultValue : unwrap(value);
+            if (value === undefined) local.value = defaultValue;
             reconcile();
           }, 0);
         };
@@ -104,10 +106,7 @@ export const ChoiceGroup = defineComponent<
         "div",
         null,
         ...options.map((option, index) => {
-          const checked = context.signal(selected.value === option.value);
-          context.effect(() => {
-            checked.value = selected.value === option.value;
-          });
+          const checked = derived(() => readValue() === option.value);
           const descriptionId = option.description ? `${id}-description-${index}` : undefined;
           return context.part(
             "option",
@@ -125,16 +124,15 @@ export const ChoiceGroup = defineComponent<
               ref: (input: HTMLInputElement) => {
                 inputs.set(option.value, input);
                 input.defaultChecked = defaultValue === option.value;
-                input.checked = selected.value === option.value;
+                input.checked = readValue() === option.value;
               },
               onChange: (event: Event) => {
                 const input = event.currentTarget as HTMLInputElement;
                 if (disabled || option.disabled || !input.checked) return;
-                if (value === undefined) selected.value = option.value;
+                if (value === undefined) local.value = option.value;
                 onValueChange?.(option.value);
                 // Native selection happens before change. Controlled callers retain
                 // ownership even when they reject the proposed value.
-                if (value !== undefined) selected.value = unwrap(value);
                 reconcile();
               },
             }),

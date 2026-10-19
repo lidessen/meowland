@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   unwrap,
   type ComponentContract,
   type MaybeSignal,
@@ -35,11 +36,11 @@ export const SegmentedControl = defineComponent<
   segmentedControlContract,
   ({ id, name = id, form, label, value, options, onValueChange, disabled, className }, context) => {
     const inputs = new Map<string, HTMLInputElement>();
+    // Form reset and a rejected change flip the native radio before the signal does.
     const reconcile = () => {
       const selected = unwrap(value);
       for (const [key, input] of inputs) input.checked = selected === key;
     };
-    context.effect(reconcile);
     return context.part(
       "root",
       "fieldset",
@@ -82,7 +83,7 @@ export const SegmentedControl = defineComponent<
               name,
               form,
               value: option.value,
-              checked: unwrap(value) === option.value,
+              checked: derived(() => unwrap(value) === option.value),
               disabled: option.disabled,
               ref: (input: HTMLInputElement) => {
                 inputs.set(option.value, input);

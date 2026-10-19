@@ -1,5 +1,6 @@
 import {
   defineComponent,
+  derived,
   unwrap,
   type ComponentContract,
   type MaybeSignal,
@@ -16,10 +17,7 @@ export interface PillProps extends Props {
 export const Pill = defineComponent<PillProps, "pill", "root">(
   pillContract,
   ({ active = false, onClick, children, ...props }, context) => {
-    const selected = context.signal("false");
-    context.effect(() => {
-      selected.value = String(unwrap(active));
-    });
+    const selected = derived(() => String(unwrap(active)));
     return context.part(
       "root",
       onClick ? "button" : "span",

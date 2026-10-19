@@ -215,10 +215,12 @@ test("short choices retain exact trigger matching without splitting short option
     })
     .toBe(true);
   const option = page.getByRole("option", { name: "First option", exact: true });
+  await expect(option).toHaveText("First option");
   expect(
     await option.evaluate((node) => {
       const range = document.createRange();
-      range.selectNodeContents(node.firstChild!);
+      // Reactive labels include comment anchors; measure the rendered label contents.
+      range.selectNodeContents(node);
       return range.getClientRects().length;
     }),
   ).toBe(1);

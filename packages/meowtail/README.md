@@ -10,6 +10,12 @@ This package's npm name is `meowtail`; existing APIs such as `createMeowUI`, `in
 
 See [Assistant](ASSISTANT.md) for the usage contract of the complete composition and [JSON catalog](JSON.md) for the finite JSON entry point. Implementation and independent acceptance of both are still in progress; the API descriptions and early artifact verification on this page do not equal a same-source acceptance pass for all current source code.
 
+## Runtime compatibility
+
+The current alpha requires `meowjsx@^0.1.1-alpha.1`: live component props use its public
+`derived` signal primitive. Earlier JSX stable and alpha builds do not provide that export.
+The existing MeowCSS peer range remains compatible.
+
 ## Minimal browser integration
 
 In a browser entry point containing `<main id="app"></main>`, first complete component registration on the same runtime, full CSS loading, and theme root binding, then render content.

@@ -59,7 +59,7 @@
     "marked": "18.0.12"
   },
   "peerDependencies": {
-    "meowjsx": "^0.1.0 || ^0.1.1-alpha.0",
+    "meowjsx": "^0.1.1-alpha.1",
     "meowcss": "^0.1.0 || ^0.1.1-alpha.0"
   },
   "devDependencies": {

@@ -1,6 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { accentTokens, layerTokens } from "../palette";
+import { accentTokens, lineTokens } from "../palette";
 import { sliderContract } from "../../components/slider";
 
 const root = partSelector(sliderContract, "root");
@@ -10,6 +10,8 @@ const thumb = partSelector(sliderContract, "thumb");
 const value = partSelector(sliderContract, "value");
 const fill = `linear-gradient(to right, ${accentTokens.base} 0%, ${accentTokens.base} var(--slider-fill, 0%), ${uiTokens.surfaceMuted} var(--slider-fill, 0%), ${uiTokens.surfaceMuted} 100%)`;
 const mutedFill = `linear-gradient(to right, ${uiTokens.mutedForeground} 0%, ${uiTokens.mutedForeground} var(--slider-fill, 0%), ${uiTokens.surfaceMuted} var(--slider-fill, 0%), ${uiTokens.surfaceMuted} 100%)`;
+const thumbShadow = "0 1px 2px rgb(0 0 0 / 16%)";
+const thumbShadowHover = "0 1px 3px rgb(0 0 0 / 22%)";
 
 export const sliderStyles = css`
   ${root} {
@@ -21,7 +23,7 @@ export const sliderStyles = css`
     max-width: 100%;
     min-width: 0;
     color: ${uiTokens.foreground};
-    font: ${uiTokens.fontCaption}/20px ${uiTokens.font};
+    font: ${uiTokens.fontCaption}/1 ${uiTokens.font};
   }
   ${control} {
     grid-column: 1;
@@ -42,24 +44,25 @@ export const sliderStyles = css`
     grid-row: 1;
     position: relative;
     height: 6px;
+    overflow: visible;
     border-radius: 999px;
     corner-shape: round;
     background: ${fill};
     pointer-events: none;
   }
   ${thumb} {
+    box-sizing: border-box;
     position: absolute;
     top: 50%;
     left: clamp(0px, calc(var(--slider-fill, 0%) - 8px), calc(100% - 16px));
     width: 16px;
     height: 16px;
     margin-top: -8px;
+    border: ${lineTokens.width} solid ${lineTokens.edge};
     border-radius: 50%;
     corner-shape: round;
-    background: ${layerTokens.raised};
-    box-shadow:
-      0 0 0 1.5px ${uiTokens.primary},
-      0 1px 2px rgb(0 0 0 / 12%);
+    background: ${uiTokens.switchThumb};
+    box-shadow: ${thumbShadow};
     transition: box-shadow ${uiTokens.durationResponse} ${uiTokens.ease};
   }
   ${control}:focus-visible {
@@ -71,13 +74,11 @@ export const sliderStyles = css`
   }
   @media (hover: hover) {
     ${root}:has(${control}:hover:not(:disabled)) ${thumb} {
-      box-shadow:
-        0 0 0 1.5px ${uiTokens.primary},
-        0 2px 6px rgb(0 0 0 / 16%);
+      box-shadow: ${thumbShadowHover};
     }
   }
   ${root}:has(${control}:active:not(:disabled)) ${thumb} {
-    box-shadow: 0 0 0 1.5px ${uiTokens.primary};
+    box-shadow: 0 1px 1px rgb(0 0 0 / 14%);
   }
   ${root}:has(${control}:disabled) {
     color: ${uiTokens.subtleForeground};
@@ -86,18 +87,25 @@ export const sliderStyles = css`
     background: ${mutedFill};
   }
   ${root}:has(${control}:disabled) ${thumb} {
-    background: ${uiTokens.surfaceMuted};
-    box-shadow: 0 0 0 1.5px ${uiTokens.mutedForeground};
+    box-shadow: none;
   }
   ${control}:disabled {
     cursor: not-allowed;
   }
   ${value} {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
     grid-column: 2;
     grid-row: 1;
+    box-sizing: border-box;
+    height: ${uiTokens.controlHeight};
+    margin: 0;
+    padding: 0;
     min-width: 2.5ch;
     color: ${uiTokens.mutedForeground};
     font-variant-numeric: tabular-nums;
+    line-height: 1;
     text-align: end;
   }
   @media (prefers-reduced-motion: reduce) {

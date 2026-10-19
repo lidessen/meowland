@@ -449,23 +449,22 @@ export const chatComposerStyles = css`
   }
 
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "hint")} {
-    position: absolute;
-    right: 58px;
-    bottom: 19px;
+    /* Hint and model state must each own space, including when either wraps. */
+    position: static;
+    grid-column: 1 / -1;
+    grid-row: 3;
+    min-width: 0;
     width: auto;
     height: auto;
+    padding-inline: 6px;
     overflow: visible;
     clip-path: none;
+    white-space: normal;
+    overflow-wrap: anywhere;
     color: ${layerTokens.faint};
     font-size: 12px;
     line-height: 18px;
-    pointer-events: none;
-  }
-
-  @media (max-width: 680px) {
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "hint")} {
-      display: none;
-    }
+    pointer-events: auto;
   }
 
   /* A phone writes on one row: attach, text, send. The model choice keeps a quiet row beneath. */
@@ -514,6 +513,7 @@ export const chatComposerStyles = css`
     ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(chatComposerContract, "trailing")} {
       grid-column: 2 / -1;
       grid-row: 3;
+      margin-left: 0;
       max-width: none;
       padding-top: 2px;
       justify-content: flex-start;
@@ -528,6 +528,11 @@ export const chatComposerStyles = css`
       min-height: 36px;
       margin-left: 0;
       border-radius: 50%;
+    }
+
+    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "hint")} {
+      grid-row: 4;
+      padding: 4px 4px 0;
     }
   }
 

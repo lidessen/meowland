@@ -367,7 +367,7 @@ the Composer inside uses its natural width within that container and is no longe
 Request state, submitted snapshots, and the latest draft are managed by the caller. `attachments` holds materials to send, and `inputLabel` provides the input name.
 The standard theme organizes attachments, input, supporting actions, and submission on one writing surface.
 `surface="none"` removes ChatComposer's own surface chrome and padding so a parent such as `ComposerPanel` can own the writing surface; the default keeps the standard surface.
-`layout="inline"` puts short drafts and actions on the same row, and long drafts keep growing; hints appear on focus, and the default `stacked` keeps a separate tool row.
+`layout="inline"` puts short drafts and actions on the same row, and long drafts keep growing; hints appear on focus. The default `stacked` keeps a separate tool row, with the hint in its own normal-flow row so model state, shortcuts and submission never share an overlay. On narrow screens the model row and hint remain below the writing row; long hints wrap instead of being hidden.
 `layout="hero"` uses the input height of the desktop master blank conversation. `trailing` composes selection entry points such as provider and model to the left of the send button;
 a controlled `ChoiceSelect` can be passed, expanding grouped options upward with `placement="top"`, `align="end"`, and `matchTriggerWidth={false}`.
 Option sources, current values, and the actual switching of runtime configuration are still the host's responsibility.

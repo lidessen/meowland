@@ -19,12 +19,18 @@ comments and JSDoc, user-visible strings (labels, placeholders, empty/error/stat
 copy, test titles and fixtures, console output and commit messages. Do not add Chinese prose, comments,
 labels, fixtures or mixed-language sections.
 
-- The only non-English text allowed is third-party license/attribution kept verbatim, plus deliberate
+- Apart from the upstream-skill exception below, the only non-English text allowed is third-party license/attribution kept verbatim, plus deliberate
   Unicode test payloads that must be non-ASCII to prove the behavior. Such a payload needs a short
   English comment explaining why it is intentional. Current approved files are
   [presentation-text.test.tsx](packages/meowslides/tests/unit/presentation/presentation-text.test.tsx)
   and [compiler.test.ts](packages/meowslides/tests/build/compiler.test.ts); any new exception is a
   review decision and must be reported, not added silently.
+- User-authorized skill installation exception (2026-10-20): upstream content in only
+  `.agents/skills/architecture/`, `.agents/skills/doc-writing/`, `.agents/skills/concept-naming/`
+  and `.agents/skills/research-synthesis/` keeps its original language. These four directories are
+  managed by the official Skills CLI from public [lidessen/skills](https://github.com/lidessen/skills),
+  with their source recorded in `skills-lock.json`; do not translate or customize the installed copies.
+  The five project-owned skills and all other project content remain subject to the English-only rule.
 - Language changes preserve behavior and contracts: never rename APIs, identifiers, package names,
   exports, story `id`s or `data-*` names/values, and keep numbers, dates, versions, commands, links and
   the strength of claims unchanged.
@@ -37,7 +43,7 @@ labels, fixtures or mixed-language sections.
   reconcile cross-file anchors in the same change. Historical records may change language only, not
   chronology, scope or evidence.
 - Before handoff, run the sweep and report its result when a change touches language-visible content:
-  `rg -n '[\p{Han}]' --hidden -g '!.git' -g '!node_modules'`. It must print only the approved files
+  `rg -n '[\p{Han}]' --hidden -g '!.git' -g '!node_modules' -g '!.agents/skills/architecture/**' -g '!.agents/skills/doc-writing/**' -g '!.agents/skills/concept-naming/**' -g '!.agents/skills/research-synthesis/**'`. It must print only the approved test files
   above; anything else fails the change.
 
 ## Work by risk

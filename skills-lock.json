@@ -1,0 +1,29 @@
+{
+  "version": 1,
+  "skills": {
+    "architecture": {
+      "source": "lidessen/skills",
+      "sourceType": "github",
+      "skillPath": "skills/architecture/SKILL.md",
+      "computedHash": "20f4934fea190ed09b753dc888265e7b2a6b21f0da7b90f2b0381ab144a093e0"
+    },
+    "concept-naming": {
+      "source": "lidessen/skills",
+      "sourceType": "github",
+      "skillPath": "skills/concept-naming/SKILL.md",
+      "computedHash": "c710d1fb6cd77fbf27adbc588959267a1f53d53e8d5e17668099f60b90f58031"
+    },
+    "doc-writing": {
+      "source": "lidessen/skills",
+      "sourceType": "github",
+      "skillPath": "skills/doc-writing/SKILL.md",
+      "computedHash": "14d9f862f76b8918326ac732d197c984bee27d216ef95ce0ffef6f31ef58280c"
+    },
+    "research-synthesis": {
+      "source": "lidessen/skills",
+      "sourceType": "github",
+      "skillPath": "skills/research-synthesis/SKILL.md",
+      "computedHash": "00db7fc332cf3da06bdac9d8bab96b317fa6ec9160a30893511fe94023e748ca"
+    }
+  }
+}

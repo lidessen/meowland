@@ -10,12 +10,15 @@ export const Alerts = defineStory({
   groupOrder: 30,
   description:
     "Color conveys semantics; the announced urgency is set independently with role. These are all local demo messages.",
-  covers: ["Alert", "bar", "status", "error"],
+  covers: ["Alert", "bar", "neutral", "marker", "status", "error"],
   render: () => (
     <Container width="content">
       <Stack>
         <Alert title="Saved on this device only">
           The current draft has not been published yet; you can keep editing.
+        </Alert>
+        <Alert layout="bar" tone="neutral" marker="none">
+          Kept locally. Nothing is waiting on you.
         </Alert>
         <Alert
           layout="bar"

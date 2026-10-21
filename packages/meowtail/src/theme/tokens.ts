@@ -135,6 +135,7 @@ export const logoTokens = { ink: tokenRef("meowland", "logo", "ink") } as const;
 
 export const alertTokens = defineTokens("alert", {
   accent: alertOptions.by.tone({
+    neutral: `${uiTokens.mutedForeground}`,
     info: `${uiTokens.primary}`,
     success: `${uiTokens.success}`,
     warning: `${uiTokens.warning}`,

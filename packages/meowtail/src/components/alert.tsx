@@ -3,15 +3,17 @@ import { defineOptions } from "meowcss";
 import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
 
 export const alertOptions = defineOptions("alert", {
-  tone: ["info", "success", "warning", "danger"],
+  tone: ["neutral", "info", "success", "warning", "danger"],
   layout: ["block", "bar"],
+  /** The bar's leading status dot. Block layout has no dot. */
+  marker: ["dot", "none"],
 });
 
 export const alertContract = {
   name: "alert",
   parts: ["root", "title", "body", "actions"],
   styleProps: defineStyleProps(alertOptions, {
-    defaults: { tone: "info", layout: "block" },
+    defaults: { tone: "info", layout: "block", marker: "dot" },
     parts: ["root", "title"],
   }),
 } as const satisfies StyledComponentContract;

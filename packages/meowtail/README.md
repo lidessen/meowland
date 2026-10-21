@@ -348,9 +348,16 @@ import { Bell } from "meowtail/icons/lucide";
 Before adding a component, confirm it can be reused in more than two applications or scenes; page components used once by an application should not be moved
 here just to "extract" them.
 
-When `Field` has a single control child and can resolve association from `htmlFor`, `descriptionId`, or `errorId`, it
-connects the description and error node ids to the control's `aria-describedby` and sets
-`aria-invalid` when there is an error. Multiple control children or custom compositions still require the caller to pass association attributes explicitly.
+`Field` associates its label through `htmlFor`; the caller supplies the matching control `id`.
+For a single control child, it merges visible description and error ids from `htmlFor`, `descriptionId`, or `errorId`
+with the child's original `aria-describedby`, including a host Signal. It manages only its own ids.
+Multiple control children and custom compositions require the caller to pass association attributes explicitly.
+Top-level `description` and `error` Signals keep their message parts mounted and update content, `hidden`, and
+associations without remounting the control, preserving drafts and focus. `null`, `undefined`, `false`, and `""`
+are empty messages; `0` is content. Field does not inspect arbitrary VNodes, Promises, or nested Signals for DOM visibility.
+Explicit `invalid`, including `false` or a boolean Signal, takes precedence; otherwise a provided error derives the
+live invalid state, clearing `aria-invalid` to `"false"` when the message empties. Without either input, the child's
+original `aria-invalid` is preserved. Field supplies no validation, submission, focus management, or automatic announcement.
 
 `Dialog` handles only the native `<dialog>` structure, label association, and panel/header/actions partitioning; opening, closing,
 Escape, focus return, and submission results are still controlled by the application. It has no Radix-like context, portal, or focus trap;
@@ -455,6 +462,73 @@ visual class names. See TypeScript tokens and parameterized configuration (histo
 Style files use `<responsibility>.styles.ts`; the standard theme groups them by component and conversation responsibility, and application styles are maintained with application modules.
 See the style file organization (historical reference in the original product repository) for naming, component family boundaries, and cascade organization.
 Existing styles have been migrated to this specification, and historical conversation overrides have been merged back into the files owned by messages and the composer.
+
+### Design language
+
+Compose pages from the roles below. Their current values live in [theme tokens](src/theme/tokens.ts)
+and the [semantic palette](src/theme/palette.ts); component styles apply them to named parts.
+Meowbook's [`design-language` panorama](stories/language.stories.tsx) puts typography, actions,
+navigation, fields, execution states, and conversation on one board. The
+[`settings-workflow` scene](stories/settings-workflow.stories.tsx) shows a complete local edit,
+validation, correction, and save sequence. These are composition references, not backend integrations.
+
+| Text role       | Current standard theme                           | Use                                                                                |
+| --------------- | ------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| UI body         | `uiTokens.fontBody`, 14px                        | Settings, control labels, and ordinary interface content                           |
+| Conversation    | `chatTokens.fontBody`, 15px with 1.7 line height | Chat prose; this scale does not enlarge settings                                   |
+| Supporting text | `uiTokens.fontCaption`, 12px                     | Descriptions, timestamps, and state labels                                         |
+| Headings        | `fontTitle`, 16px; `fontPageTitle`, 24px         | Component titles and page titles, with heading levels chosen by document structure |
+
+The main action uses `Button`'s default `primary` variant: a near-black fill in light mode and a near-white fill in
+dark mode, paired with `onPrimary`. Use `outline` for a secondary action and `quiet` for dismissal
+or a less prominent action. Accent marks current activity and location: processing, active navigation,
+and soft selected surfaces. An accent action belongs to that activity rather than replacing the main
+action everywhere. Use `stop` to interrupt running work and `danger` for a destructive action; the
+latter has its own filled-action foreground/background pair.
+
+Status includes visible words. `Status` pairs a decorative marker with the caller's label; the host
+decides which state its evidence supports.
+
+| State                | Marker             | Meaning                                                           |
+| -------------------- | ------------------ | ----------------------------------------------------------------- |
+| `processing`         | Pulsing accent     | Work is happening now                                             |
+| `success`            | Solid green        | Connected, enabled, or confirmed complete, as stated by the label |
+| `returned`           | Hollow green       | Execution returned; goal completion still needs checking          |
+| `warning` / `danger` | Solid orange / red | Needs attention / failed or unreadable                            |
+| `unknown`            | Hollow gray        | Current state has not been verified                               |
+| `idle`               | Quiet solid gray   | Known to be standing by                                           |
+
+Choose space by relationship and region. `Stack`, `Inline`, and `Grid` map compact/normal/relaxed
+gaps to group/section/panel tokens: 8/20/24px. A `Field` uses the 8px group gap between its label,
+description, control, and error; `FieldGroup` uses 20px between fields. Separate setting groups with
+a relaxed Stack, as in the workflow scene. Page edges have their own scale: `Container width="page"`
+uses 36px block and 48px inline insets, changing to 20px and 16px at widths up to 768px. Do not add
+that inset again inside a shell that already provides it. A narrow Container limits width to 480px
+without supplying page gutters.
+
+Density follows the activity. Navigation and metadata can stay compact; form groups need clear
+boundaries; conversation uses a maximum reading width of 720px and 28px between messages. Use the existing
+layout and content roles to make these differences. The standard theme has no global density axis.
+
+For settings that are being read, `DescriptionList` aligns terms and values and stacks them when its
+local container narrows. For continuous editing, compose `FieldGroup`, `Field`, native controls,
+and one explicit save action. In the workflow scene, edits remain in a local draft; an invalid submit
+keeps the draft, focuses the email field, and shows a correction beside it. A valid correction clears
+the error, and a successful local save updates feedback beside the action. The host owns validation,
+focus, announcements, and persistence. `Field` binds live description/error Signals without remounting
+the control; its full association and invalid-state contract is [above](#current-components).
+
+Light and dark are explicit schemes; `auto` follows the system preference and is the default.
+Change root configuration to switch scheme while retaining mounted controls, drafts, and expanded
+content. Shared role names, spacing, and hierarchy stay the same across schemes; use the theme's
+foreground/background pairs rather than copying a light-mode color into a dark surface. See
+[root configuration](#root-configuration-and-local-overrides) for local scheme inheritance.
+
+The composition work also drew on Mobbin references for [regional density in Mixpanel](https://mobbin.com/screens/68f21e8a-40d7-4ea0-8c18-c35f9163b566),
+[grouped settings in Ghost](https://mobbin.com/screens/15e989a8-cee4-4822-acce-be522e08caf0),
+[continuous editing in HubSpot](https://mobbin.com/screens/9808b928-3000-4bb1-b001-8f4b9f5793b8), and
+[field-local correction in Melio](https://mobbin.com/screens/b542daad-cc71-4d22-8622-ffe080d82e31).
+These relationships inform composition; theme values and component behavior are defined by this package.
 
 ### Component installation and style delivery
 

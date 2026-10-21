@@ -27,10 +27,11 @@ import {
   NavItem,
   Select,
   Separator,
+  Status,
   Toolbar,
 } from "meowtail";
 import { Icon } from "meowtail/icons";
-import { uiTokens } from "meowtail/theme";
+import { accentTokens, chatTokens, uiTokens } from "meowtail/theme";
 
 export const DesignLanguageStory = defineStory({
   id: "design-language",
@@ -39,7 +40,7 @@ export const DesignLanguageStory = defineStory({
   groupOrder: 70,
   variant: "Design overview",
   description:
-    "See color, typography, scale and component composition on one board. Switch design and appearance to compare the whole language; input and interaction states stay unchanged.",
+    "One standard theme: light and dark are explicit schemes; auto follows the system preference. Compare action hierarchy, current activity and readable states without losing input.",
   covers: [
     "theme switching",
     "retained input",
@@ -55,12 +56,14 @@ export const DesignLanguageStory = defineStory({
         <div>
           <span className="language-eyebrow">MEOWUI / DESIGN LANGUAGE</span>
           <h1>Design language</h1>
-          <p>From foundations to complete interfaces, see how they relate on one board.</p>
+          <p>
+            One standard theme, from quiet structure to clear actions and readable conversation.
+          </p>
         </div>
         <span className="language-edition">
           Foundations · Components · Composition
           <br />
-          One set of components, two expressions
+          Light · Dark · Auto follows your system
         </span>
       </header>
       <section className="language-band" aria-labelledby="language-foundations">
@@ -77,19 +80,19 @@ export const DesignLanguageStory = defineStory({
                 [
                   [uiTokens.background, "Canvas"],
                   [uiTokens.surface, "Surface"],
-                  [uiTokens.surfaceMuted, "Muted surface"],
                   [uiTokens.foreground, "Body text"],
                   [uiTokens.mutedForeground, "Secondary"],
                   [uiTokens.border, "Border"],
-                  [uiTokens.primary, "Accent"],
-                  [uiTokens.primarySoft, "Selected"],
+                  [uiTokens.primary, "Main action"],
+                  [accentTokens.base, "Current activity"],
+                  [accentTokens.selected, "Current location"],
                   [uiTokens.focus, "Focus"],
                 ] as const
               ).map(([token, label]) => (
                 <div className="language-swatch">
                   <span style={{ background: String(token) }} />
                   <strong>{label}</strong>
-                  <code>{token.name.replace("--ui-", "")}</code>
+                  <code>{token.name.replace(/^--(?:ui-)?/, "")}</code>
                 </div>
               ))}
             </div>
@@ -101,6 +104,10 @@ export const DesignLanguageStory = defineStory({
                 </span>
               ))}
             </div>
+            <p className="language-note">
+              Primary is black or white. Accent marks current activity and location; status colors
+              explain what happened.
+            </p>
           </section>
           <section className="language-sheet" aria-label="Typography">
             <h3>
@@ -116,14 +123,22 @@ export const DesignLanguageStory = defineStory({
               </strong>
             </div>
             <div className="language-type-row">
-              <code>body</code>
+              <code>UI</code>
               <span style={{ fontSize: `${uiTokens.fontBody}` }}>
-                Say it clearly, and leave room to think.
+                14px · Project settings and action labels
               </span>
             </div>
             <div className="language-type-row">
-              <code>caption</code>
-              <span style={{ fontSize: `${uiTokens.fontCaption}` }}>Updated today · 09:41</span>
+              <code>chat</code>
+              <span style={{ fontSize: `${chatTokens.fontBody}` }}>
+                15px · Give conversation room to read.
+              </span>
+            </div>
+            <div className="language-type-row">
+              <code>meta</code>
+              <span style={{ fontSize: `${uiTokens.fontCaption}` }}>
+                12px · Updated today · 09:41
+              </span>
             </div>
             <div className="language-type-row">
               <code>mono</code>
@@ -162,7 +177,9 @@ export const DesignLanguageStory = defineStory({
                 </div>
               ))}
             </div>
-            <p className="language-note">Spacing, type and radius change with the theme.</p>
+            <p className="language-note">
+              Shared spacing and shape keep the same roles in light, dark and auto schemes.
+            </p>
           </section>
         </div>
       </section>
@@ -176,18 +193,55 @@ export const DesignLanguageStory = defineStory({
               Actions <small>Actions</small>
             </h3>
             <div className="language-samples">
+              <p className="language-note">
+                Edit a project · Main action, alternative, then dismissal
+              </p>
               <div className="workshop-row">
-                <Button>Save changes</Button>
-                <Button variant="outline">View diff</Button>
-                <Button variant="quiet">Cancel</Button>
-              </div>
-              <div className="workshop-row">
-                <Button variant="danger">Delete</Button>
-                <Button disabled>Unavailable</Button>
-                <Button variant="outline" disabled>
-                  Unavailable
+                <Button data-language-action="Changes saved in this local example.">Save</Button>
+                <Button variant="outline" data-language-action="The local diff is ready to review.">
+                  View diff
+                </Button>
+                <Button
+                  variant="quiet"
+                  data-language-action="Editing dismissed in this local example."
+                >
+                  Cancel
                 </Button>
               </div>
+              <p className="language-note">
+                Running work · Interrupt execution or inspect its activity
+              </p>
+              <div className="workshop-row">
+                <Button
+                  variant="stop"
+                  data-language-action="The example run was stopped; saved work is retained."
+                >
+                  Stop run
+                </Button>
+                <Button
+                  variant="accent"
+                  data-language-action="Showing the current activity in this local example."
+                >
+                  View activity
+                </Button>
+              </div>
+              <p className="language-note">
+                Destructive confirmation · Remove the selected project
+              </p>
+              <div className="workshop-row">
+                <Button
+                  variant="danger"
+                  data-language-action="Deletion confirmed in this local example; no project was removed."
+                >
+                  Delete project
+                </Button>
+                <Button variant="quiet" data-language-action="The example project was kept.">
+                  Keep project
+                </Button>
+              </div>
+              <p className="language-note" role="status" data-language-feedback>
+                Local examples · Choose an action to see its receipt.
+              </p>
               <div className="workshop-row">
                 <Button size="small" variant="outline">
                   Small
@@ -260,8 +314,19 @@ export const DesignLanguageStory = defineStory({
               <Badge tone="warning">Waiting for review</Badge>
               <Badge tone="danger">Failed</Badge>
             </div>
+            <div className="language-samples" aria-label="Execution state meanings">
+              <Status state="processing" label="Processing · Work is happening now" />
+              <Status state="success" label="Success · The goal is confirmed complete" />
+              <Status
+                state="returned"
+                label="Returned · Execution ended; the goal needs checking"
+              />
+              <Status state="unknown" label="Unknown · Current state has not been verified" />
+              <Status state="idle" label="Idle · Known to be standing by" />
+            </div>
             <Alert tone="info" title="Keep the current work">
-              Input and expanded states stay unchanged after switching themes.
+              Light and dark choose an appearance. Auto follows the system. Changing scheme keeps
+              input and expanded process in place.
             </Alert>
           </section>
         </div>
@@ -280,7 +345,7 @@ export const DesignLanguageStory = defineStory({
               />
               <ChatMessageList>
                 <ChatMessage role="user" author="You">
-                  Component structure stays stable; different designs are expressed through themes.
+                  Make the next action clear, and keep the current work easy to find.
                 </ChatMessage>
                 <ChatMessage
                   role="assistant"
@@ -294,8 +359,8 @@ export const DesignLanguageStory = defineStory({
                   }
                 >
                   <p>
-                    First calibrate the proportion of reading and actions, then check both languages
-                    with the same components.
+                    Save leads the action group. The accent marks current activity, while
+                    conversation uses a little more reading space than the surrounding controls.
                   </p>
                   <ChatProcess label="Checked 3 kinds of components">
                     <ChatToolCall
@@ -352,6 +417,13 @@ export const DesignLanguageStory = defineStory({
     </div>
   ),
   setup({ root, report, onCleanup }) {
+    const action = (event: Event) => {
+      const button = (event.target as Element).closest<HTMLElement>("[data-language-action]");
+      if (!button || !root.contains(button)) return;
+      const feedback = root.querySelector<HTMLElement>("[data-language-feedback]")!;
+      feedback.textContent = button.dataset.languageAction!;
+      report(feedback.textContent);
+    };
     const submit = (event: Event) => {
       event.preventDefault();
       const input = root.querySelector<HTMLTextAreaElement>("textarea")!;
@@ -364,8 +436,10 @@ export const DesignLanguageStory = defineStory({
       feedback.textContent = `Component submit callback: ${input.value}. Input retained.`;
       report(feedback.textContent);
     };
+    root.addEventListener("click", action);
     root.addEventListener("submit", submit);
     onCleanup(() => {
+      root.removeEventListener("click", action);
       root.removeEventListener("submit", submit);
     });
   },
@@ -430,7 +504,7 @@ export const ContentCarriersStory = defineStory({
           <article className="workshop-document">
             <h3>Keep content in the foreground</h3>
             <p>Components own semantics and actions; themes organize size, color and feedback.</p>
-            <p>When switching expression, work in progress stays in place.</p>
+            <p>When changing scheme, work in progress stays in place.</p>
           </article>
           <DialogActions>
             <Button data-close-preview>Back to attachments</Button>

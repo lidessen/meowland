@@ -1,11 +1,7 @@
-import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
+import { defineComponent, h, type Child, type Props } from "meowjsx";
 import { OutputBlock } from "./output-block";
+import { readBlockContract } from "./read-block.contract";
 import { highlightCode, type HighlightSpan } from "../syntax-highlight";
-
-export const readBlockContract = {
-  name: "read-block",
-  parts: ["root", "number", "text"],
-} as const satisfies ComponentContract;
 export interface ReadBlockLine {
   number: number;
   text: string;

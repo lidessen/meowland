@@ -104,6 +104,7 @@ cross-module contracts and shared use between built-ins and extensions.
 The original product's wiring and UI acceptance are historical evidence and cannot replace independent verification after this library's migration.
 
 `CodeBlock` accepts raw `code` and an optional `language`, loads Shiki highlighting on demand for known syntaxes, and provides independent copy and soft-wrap toggles.
+Shiki is reached only from the `CodeBlock` and `ReadBlock` modules. `JsonBlock` and `AssistantView` render a code surface, so importing either one pulls the same highlighter. Importing `standardTheme`, `createMeowUI`, or any other component does not. The package declares `sideEffects: false`, which lets a bundler drop those modules when their exports are unused. The highlighter stays on demand for a mounted code surface; it is not registered as a side effect of the theme.
 Wrapping changes only the display; copying preserves the original whitespace. When the browser clipboard fails, it shows feedback. The host can bind `onCopy` to another
 clipboard implementation, and the component does not execute code. With no language it shows "Code", and `defaultWrap` sets the initial wrap state.
 Unknown languages or failed highlight loads keep a plain-text display.
@@ -445,7 +446,7 @@ the parts are `root/summary/icon/content`. `Accordion` groups several Disclosure
 
 ## Standard theme (meowtail/theme)
 
-The standard theme exports `standardTheme`, `standardOptions`, and typed `uiTokens`. The read-only `standardThemeTokens` and `standardThemeStyles` are theme assembly primitives that let extended themes such as MeowSlides reuse the same token/fragment objects; they do not install components or touch the DOM. Tokens and styles
+The standard theme exports `standardTheme`, `standardOptions`, and typed `uiTokens`. The read-only `standardThemeTokens` and `standardThemeStyles` are theme assembly primitives that let extended themes such as MeowSlides reuse the same token/fragment objects; they do not install components or touch the DOM. `standardTheme.cssText` is one complete stylesheet. A second theme built by copying token objects would break that shared identity, and the theme entry lists every fragment, so unused rules are not dropped from this binding. Hosts mount the full sheet. Tokens and styles
 are both defined in TypeScript; components match CSS through stable part markers and style options, and theme plugins no longer generate
 visual class names. See TypeScript tokens and parameterized configuration (historical reference in the original product repository) for the complete design.
 

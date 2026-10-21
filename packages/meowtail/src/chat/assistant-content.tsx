@@ -7,17 +7,13 @@ import { ProcessGroup } from "../components/process-group";
 import { CodeBlock } from "../components/code-block";
 import { StatusDot } from "../components/status-dot";
 import { AssistantMarkdown } from "./assistant-markdown";
+import { assistantStepsContract } from "./assistant-steps.contract";
 import type {
   AssistantMessage,
   AssistantMessagePart,
   AssistantProcessStep,
   AssistantViewProps,
 } from "./assistant-types";
-
-export const assistantStepsContract = {
-  name: "assistant-steps",
-  parts: ["root", "step", "label", "description", "status"],
-} as const;
 const AssistantStep = defineComponent<
   { value: Signal<AssistantProcessStep> },
   "assistant-steps",

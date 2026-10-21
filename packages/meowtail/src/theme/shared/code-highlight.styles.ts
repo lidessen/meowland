@@ -1,7 +1,7 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { codeBlockContract } from "../../components/code-block";
-import { readBlockContract } from "../../components/read-block";
+import { codeBlockContract } from "../../components/code-block.contract";
+import { readBlockContract } from "../../components/read-block.contract";
 import { codeHighlightTokens } from "./code-highlight.tokens";
 
 export const codeHighlightStyles = css`

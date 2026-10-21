@@ -159,7 +159,8 @@ export {
   type ChoiceGroupProps,
   type ChoiceGroupOption,
 } from "./choice-group";
-export { CodeBlock, codeBlockContract, type CodeBlockProps } from "./code-block";
+export { codeBlockContract } from "./code-block.contract";
+export { CodeBlock, type CodeBlockProps } from "./code-block";
 
 export { layoutOptions } from "./layout-types";
 export {
@@ -176,7 +177,8 @@ export {
 } from "./risk-confirmation";
 export { WebBlock, webBlockContract, type WebBlockProps, type WebSourceView } from "./web-block";
 export { JsonTree, jsonTreeContract, type JsonTreeProps, type JsonValue } from "./json-tree";
-export { JsonBlock, jsonBlockContract, type JsonBlockProps } from "./json-block";
+export { jsonBlockContract } from "./json-block.contract";
+export { JsonBlock, type JsonBlockProps } from "./json-block";
 export { ImageLightbox, imageLightboxContract, type ImageLightboxProps } from "./image-lightbox";
 export { ShortcutKeys, shortcutKeysContract } from "./shortcut-keys";
 export { PathLabel, pathLabelContract } from "./path-label";
@@ -194,12 +196,8 @@ export { MenuButton, type MenuButtonProps } from "./menu-button";
 export { ContextMenu, type ContextMenuProps, contextMenuContract } from "./context-menu";
 export { Toast, toastContract, type ToastProps } from "./toast";
 export { TerminalBlock, terminalBlockContract, type TerminalBlockProps } from "./terminal-block";
-export {
-  ReadBlock,
-  readBlockContract,
-  type ReadBlockProps,
-  type ReadBlockLine,
-} from "./read-block";
+export { readBlockContract } from "./read-block.contract";
+export { ReadBlock, type ReadBlockProps, type ReadBlockLine } from "./read-block";
 export {
   DiffBlock,
   diffBlockContract,

@@ -14,9 +14,9 @@ export {
 } from "./composer";
 export { ComposerPanel, type ComposerPanelProps, composerPanelContract } from "./composer-panel";
 export { ChatFrame, type ChatFrameProps, chatFrameContract } from "./frame";
+export { assistantViewContract } from "./assistant.contract";
 export {
   AssistantView,
-  assistantViewContract,
   assistantCopy,
   type AssistantViewProps,
   type AssistantDraft,

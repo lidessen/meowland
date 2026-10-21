@@ -1,10 +1,6 @@
-import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
+import { defineComponent, h, type Child, type Props } from "meowjsx";
 import { CodeBlock } from "./code-block";
-
-export const jsonBlockContract = {
-  name: "json-block",
-  parts: ["root", "summary", "body", "error"],
-} as const satisfies ComponentContract;
+import { jsonBlockContract } from "./json-block.contract";
 export type JsonBlockProps = Props & {
   label?: string;
   defaultOpen?: boolean;

@@ -1,7 +1,7 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens, chatTokens } from "../tokens";
-import { assistantViewContract } from "../../chat/assistant";
-import { assistantStepsContract } from "../../chat/assistant-content";
+import { assistantViewContract } from "../../chat/assistant.contract";
+import { assistantStepsContract } from "../../chat/assistant-steps.contract";
 import { assistantMarkdownContract } from "../../chat/assistant-markdown";
 import { assistantComposerContract } from "../../chat/assistant-composer";
 import { assistantQuestionContract } from "../../chat/assistant-question";

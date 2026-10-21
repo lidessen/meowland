@@ -1,7 +1,7 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { jsonTreeContract as json } from "../../components/json-tree";
-import { jsonBlockContract as block } from "../../components/json-block";
+import { jsonBlockContract as block } from "../../components/json-block.contract";
 
 export const jsonStyles = css`
   ${partSelector(json, "root")} {

@@ -127,7 +127,7 @@ import {
   chatStatusContract,
   chatToolCallContract,
 } from "../chat";
-import { assistantStepsContract } from "../chat/assistant-content";
+import { assistantStepsContract } from "../chat/assistant-steps.contract";
 import { assistantMarkdownContract } from "../chat/assistant-markdown";
 import { assistantComposerContract } from "../chat/assistant-composer";
 import { assistantQuestionContract } from "../chat/assistant-question";

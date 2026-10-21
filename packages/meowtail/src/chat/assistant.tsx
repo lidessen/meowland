@@ -11,32 +11,12 @@ import { AssistantMessageView, AssistantSteps } from "./assistant-content";
 import { AssistantQuestionView } from "./assistant-question";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { assistantScroll } from "./assistant-scroll";
+import { assistantViewContract } from "./assistant.contract";
 import {
   assistantCopy as defaultAssistantCopy,
   type AssistantViewProps,
   type AssistantWork,
 } from "./assistant-types";
-
-export const assistantViewContract = {
-  name: "assistant-view",
-  parts: [
-    "root",
-    "layout",
-    "messages",
-    "viewport",
-    "content",
-    "latest",
-    "composer",
-    "feedback",
-    "empty",
-    "activity",
-    "activityHeader",
-    "activityBody",
-    "section",
-    "workDetail",
-    "status",
-  ],
-} as const;
 
 const AssistantWorkRow = defineComponent<
   {

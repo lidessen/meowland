@@ -1,7 +1,7 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { outputBlockContract as block } from "../../components/output-block";
-import { readBlockContract as read } from "../../components/read-block";
+import { readBlockContract as read } from "../../components/read-block.contract";
 import { diffBlockContract as diff } from "../../components/diff-block";
 import { searchBlockContract as search } from "../../components/search-block";
 import { terminalBlockContract as terminal } from "../../components/terminal-block";

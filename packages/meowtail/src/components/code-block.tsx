@@ -4,28 +4,15 @@ import {
   h,
   unwrap,
   type Child,
-  type ComponentContract,
   type MaybeSignal,
   type Props,
 } from "meowjsx";
 import { Button } from "./button";
 import { copyTextToClipboard } from "../clipboard";
+import { codeBlockContract } from "./code-block.contract";
+// The highlighter stays in this module. Theme styles and the registry import
+// the contract module instead, so unused code surfaces drop out of the bundle.
 import { highlightCode } from "../syntax-highlight";
-
-export const codeBlockContract = {
-  name: "code-block",
-  parts: [
-    "root",
-    "header",
-    "title",
-    "caption",
-    "language",
-    "actions",
-    "content",
-    "code",
-    "feedback",
-  ],
-} as const satisfies ComponentContract;
 
 /** A header part appears only when its prop has content; a Signal counts as provided. */
 function provided(value: MaybeSignal<Child> | undefined): boolean {

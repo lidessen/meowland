@@ -1,6 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { codeBlockContract } from "../../components/code-block";
+import { codeBlockContract } from "../../components/code-block.contract";
 
 export const codeBlockStyles = css`
   ${partSelector(codeBlockContract, "root")} {

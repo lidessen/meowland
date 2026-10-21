@@ -329,6 +329,7 @@ package. Import typed part composition from `meowcss/meowjsx` and DOM theme bind
 `partSelector(contract, part)`, and use options.when for component option conditions; do not hand-write
 generated variable names or build another visual class-name mapping.
 Components declare style options and defaults through contracts, wired by the `createMeowUI` adapter.
+A contract that theme styles or the registry import lives in a module that does not load an optional engine. The syntax highlighter stays in the code-surface components; those components import their contracts and do not re-export them. Importing the theme or installing the registry therefore does not bundle Shiki. `sideEffects: false` lets a bundler drop the unused component modules from the package barrel.
 `standardTheme.cssText` is handed to the host for explicit composition: static builds generate CSS
 assets, dynamic documents use `mountStyles` and clean up; root configuration uses `Theme`,
 `applyTheme`, or `themeAttributes`.

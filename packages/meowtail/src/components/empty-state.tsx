@@ -15,6 +15,11 @@ export interface EmptyStateProps extends Props, ThemedProps<typeof emptyStateOpt
   title: string;
   copy?: string;
   action?: Child;
+  /**
+   * Artwork above the title. Omitted uses `DoodleCat`. `null` and `false` leave
+   * the illustration part out. Presence is fixed for the mount.
+   */
+  illustration?: Child;
   className?: string;
 }
 
@@ -22,14 +27,15 @@ export const EmptyState = defineComponent<
   EmptyStateProps,
   typeof emptyStateContract.name,
   (typeof emptyStateContract.parts)[number]
->(emptyStateContract, ({ title, copy, action, className, ...props }, context) =>
-  context.part(
+>(emptyStateContract, ({ title, copy, action, illustration, className, ...props }, context) => {
+  const art = illustration === undefined ? <DoodleCat /> : illustration;
+  return context.part(
     "root",
     "div",
     { ...props, className },
-    context.part("illustration", "div", null, <DoodleCat />),
+    art !== null && art !== false ? context.part("illustration", "div", null, art) : null,
     context.part("title", "strong", null, title),
     copy ? context.part("description", "span", null, copy) : null,
     action ? context.part("action", "div", null, action) : null,
-  ),
-);
+  );
+});

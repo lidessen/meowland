@@ -263,3 +263,19 @@ test("empty states preserve caller status semantics and identity", () => {
   expect(html).toContain('data-option-empty-state-size="compact"');
   expect(html).not.toContain(' size="compact"');
 });
+
+test("empty states keep the doodle cat unless the caller supplies artwork", () => {
+  const app = web();
+  const cat = app.renderToHtml(<EmptyState title="Empty" />);
+  expect(cat).toContain("meow-doodle-cat");
+  expect(cat).toContain('data-meowui-part="empty-state/illustration"');
+  const custom = app.renderToHtml(
+    <EmptyState title="Empty" illustration={<span data-mark>Mark</span>} />,
+  );
+  expect(custom).toContain("data-mark");
+  expect(custom).toContain('data-meowui-part="empty-state/illustration"');
+  expect(custom).not.toContain("meow-doodle-cat");
+  const quiet = app.renderToHtml(<EmptyState title="Empty" illustration={false} />);
+  expect(quiet).not.toContain('data-meowui-part="empty-state/illustration"');
+  expect(quiet).toContain('data-meowui-part="empty-state/title"');
+});

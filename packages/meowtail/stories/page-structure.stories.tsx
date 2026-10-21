@@ -26,6 +26,7 @@ export const PageStructureStory = defineStory({
       <PageHeader
         title="Example page header"
         description="Component description slot"
+        leading={<Icon name="folder" />}
         actions={<Button size="small">Action</Button>}
       />
       <ResourceCard

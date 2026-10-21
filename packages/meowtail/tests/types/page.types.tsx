@@ -1,5 +1,5 @@
 import { h } from "meowjsx";
-import { Button, Page, Section } from "../../src/components";
+import { Button, Page, PageHeader, Section } from "../../src/components";
 
 const page: JSX.Element = (
   <Page
@@ -7,6 +7,7 @@ const page: JSX.Element = (
     description="One line of purpose."
     eyebrow="Guide"
     actions={<Button>Copy page link</Button>}
+    leading={<span>M</span>}
     toolbar={<Button size="small">Filter</Button>}
     notice="The draft is read-only."
     width="wide"
@@ -23,6 +24,10 @@ const contentOnly: JSX.Element = (
   </Page>
 );
 const fullWidth: JSX.Element = <Page title="Full width column" width="full" />;
+const markedHeader: JSX.Element = (
+  <PageHeader title="Library" leading={<span>M</span>} description="Local notes" />
+);
+void markedHeader;
 void page;
 void escapedHeader;
 void contentOnly;

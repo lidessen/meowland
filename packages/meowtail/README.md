@@ -142,7 +142,7 @@ focus into a 256px drawer over the content, and a collapsed group folds into one
 `Button`'s `outline` is the secondary level, plus `accent` (a soft background related to current activity) and `stop` (to interrupt running work).
 Details and page structures added in the second stage: `DetailSection` (a block with a hairline; its title is a small label rather than a page title), `Timeline` and
 `TimelineItem` (events threaded on one line, with markers following `StatusDot` semantics), `ResourceLink` (a whole-row reference to an openable object:
-a link when href is present, otherwise a button); `PageHeader` (page name, one-sentence purpose, and page-level actions), `ListGroup` and `ListRow` (sibling entries share one
+a link when href is present, otherwise a button); `PageHeader` (page name, one-sentence purpose, an optional `leading` mark before the title, and page-level actions; `Page` forwards `leading` into that header), `ListGroup` and `ListRow` (sibling entries share one
 outline, an editing area can expand below a row, and a standalone row with `tone="accent"` is a summary row), `ResourceCard` (a capability on an overview page, with a dashed
 low-contrast disabled state); `Drawer` is a narrow-screen native modal panel that slides in from the start edge, with backdrop clicks and Escape handed to the host to update `open`. `SegmentedControl`
 tightens its track and selected state to match the design draft. The narrow-screen `ChatComposer` stacked layout puts "add, input, send" on one row and keeps model selection below.

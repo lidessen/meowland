@@ -1,9 +1,15 @@
 # Authoring components implementation plan
 
-Status: active. Round 1 (Page, Section, CodeBlock enhancement) is starting. This plan turns the
-[authoring component catalog](2026-10-21-authoring-component-catalog.md) into implementation
-slices with acceptance gates. The catalog decides _what_ and _in what order_; this plan decides
-_how the work is split, checked and accepted_.
+Status: authoring components and docs/meowbook adoption accepted in
+[rounds 1–4](../records/2026-10-21-authoring-components-round-4.md). The Form family remains
+deferred until the product migration trigger. The meowpress dependency decision is resolved:
+meowpress keeps its existing independent boundary, as recorded in the
+[original authoring catalog](2026-10-21-authoring-component-catalog.md#open-decisions).
+
+The [component catalog](../../packages/meowtail/COMPONENTS.md) owns the current component list,
+grouping and status. This plan retains the implementation slices and acceptance method for the
+original authoring additions and any remaining work; the original sequence is recorded in the
+[authoring component catalog](2026-10-21-authoring-component-catalog.md).
 
 ## Goal
 

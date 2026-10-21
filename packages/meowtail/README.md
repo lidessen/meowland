@@ -2,6 +2,10 @@
 
 `meowtail` provides cross-application components, semantic layout, the standard theme, and the complete Assistant composition. Networking, execution, permissions, and persistence are adapted by the host; the library carries no Rossovia business state or backend.
 
+The [component catalog](COMPONENTS.md) owns the complete component list, grouping and status.
+The usage notes below explain selected contracts; detailed Agent, Assistant and JSON contracts
+remain in their linked guides.
+
 ## Presentation package
 
 The presentation player, Reveal, media lifecycle, presentation content layouts, and themes have moved into the separate [MeowSlides](../meowslides/README.md). Meowtail does not depend on the presentation package in reverse, and the old `meowtail/presentation` and root presentation exports are removed; shared UI and layout are still provided by this package.

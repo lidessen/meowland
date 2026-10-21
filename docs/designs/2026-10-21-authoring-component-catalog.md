@@ -1,9 +1,12 @@
 # Authoring component catalog
 
-Status: proposal. This is the concrete list and grouping that follows from the
-[authoring-surface design](2026-10-20-authoring-surface.md). That document keeps the reasoning and
-the rejected alternatives; this one decides **which components to build, how they are grouped, who
-uses them first, and in what order**.
+Status: original authoring additions design and adoption sequence. The maintained component list,
+grouping and current status now belong to the
+[Meowtail component catalog](../../packages/meowtail/COMPONENTS.md). This document retains the
+scope, priorities and decisions derived from the
+[authoring-surface design](2026-10-20-authoring-surface.md); its original tables are not the current
+inventory. Implementation progress belongs to the
+[implementation plan](2026-10-21-authoring-implementation-plan.md).
 
 Scope decisions carried in:
 

@@ -1,7 +1,13 @@
 # A smaller authoring surface for meowtail
 
-Status: design proposal, not implemented. This document is about what applications write when they
-assemble screens with meowtail. It deliberately does not decide value ownership or bindings; that
+Status: design rationale with partially adopted proposals. The Page, Section, CodeBlock enhancement,
+NavList and Modal work and docs/meowbook adoption have been accepted in
+[rounds 1–4](../records/2026-10-21-authoring-components-round-4.md). The
+[component catalog](../../packages/meowtail/COMPONENTS.md) owns the current list and status;
+the [implementation plan](2026-10-21-authoring-implementation-plan.md) owns remaining work.
+
+This document is about what applications write when they assemble screens with meowtail.
+It deliberately does not decide value ownership or bindings; that
 question is parked in [value bindings](2026-10-20-value-bindings.md). It also does not change how
 component implementations are written.
 

@@ -63,6 +63,9 @@ dist/
 - The app never edits a story or a component. A story that changes changes the site with it.
 - The package pages are the app's own MDX; the component pages are generated. When both would cover
   the same ground, the generated page wins.
+- The [Meowtail component catalog](../../packages/meowtail/COMPONENTS.md) owns the maintained
+  component list and planned additions. This app generates the current reference from stories and
+  registry contracts; it does not maintain another planning inventory.
 - The delivery is local. Publishing the site, or a deployment workflow, is a separate decision.
 
 ## The look

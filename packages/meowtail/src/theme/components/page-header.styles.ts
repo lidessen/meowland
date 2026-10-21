@@ -22,6 +22,8 @@ export const pageHeaderStyles = css`
   }
   ${header("title")} {
     margin: 0;
+    min-width: 0;
+    font-family: ${uiTokens.fontDisplay};
     font-size: ${uiTokens.fontPageTitle};
     font-weight: 600;
     letter-spacing: -0.015em;

@@ -13,6 +13,9 @@ const mutedForeground = ["#61666b", "#adb2b8"] as const;
 
 export const uiTokens = defineTokens("ui", {
   font: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif',
+  /** Serif stack for page and section titles. Hosts override `--ui-font-display`. */
+  fontDisplay:
+    '"Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Songti SC", "Songti TC", "Noto Serif SC", serif',
   mono: '"SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, "PingFang SC", "Microsoft YaHei"',
   fontBody: "14px",
   fontCaption: "12px",

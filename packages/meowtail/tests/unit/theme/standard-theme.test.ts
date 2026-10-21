@@ -12,6 +12,15 @@ test("standard theme is generated from token definitions and typed part contract
   expect(standardTheme.cssText).not.toContain("@import");
 });
 
+test("page and section titles use the display font token", () => {
+  expect(uiTokens.fontDisplay.name).toBe("--ui-font-display");
+  expect(standardTheme.cssText).toContain(`${uiTokens.fontDisplay.name}:`);
+  expect(standardTheme.cssText).toContain("Iowan Old Style");
+  expect(standardTheme.cssText).toContain(`font-family: ${uiTokens.fontDisplay}`);
+  expect(standardTheme.cssText).toContain('data-meowui-part="page-header/title"');
+  expect(standardTheme.cssText).toContain('data-meowui-part="section/title"');
+});
+
 test("shared layout options bind every real instance carrier", () => {
   expect(standardTheme.cssText).toContain('data-meowui-part="stack/root"');
   expect(standardTheme.cssText).toContain('data-meowui-part="inline/root"');

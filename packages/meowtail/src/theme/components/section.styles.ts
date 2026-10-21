@@ -29,6 +29,7 @@ export const sectionStyles = css`
     flex: 1 1 var(${uiTokens.gridColumnCompact.name}, 160px);
     min-width: 0;
     margin: 0;
+    font-family: ${uiTokens.fontDisplay};
     font-size: ${uiTokens.fontTitle};
     font-weight: 600;
     line-height: 1.4;

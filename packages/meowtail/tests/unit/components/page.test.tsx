@@ -19,6 +19,7 @@ test("Page arranges the identity block, toolbar, notice and content column", () 
       eyebrow="Guide · Composition"
       description="Page arranges the identity block and the page content rhythm."
       actions={<Button>Copy page link</Button>}
+      leading={<span data-mark>M</span>}
       toolbar={
         <Toolbar label="Page tools">
           <Button size="small" variant="quiet">
@@ -37,6 +38,8 @@ test("Page arranges the identity block, toolbar, notice and content column", () 
   expect(html).toContain('<h1 data-meowui-part="page-header/title">Build a page from regions</h1>');
   expect(html).toContain('data-meowui-part="page-header/description"');
   expect(html).toContain('data-meowui-part="page-header/actions"');
+  expect(html).toContain('data-meowui-part="page-header/leading"');
+  expect(html).toContain("data-mark");
   expect(html).toContain('data-meowui-part="toolbar/root"');
   expect(html).toContain('role="status"');
   // The identity comes first, then the page tools and status, then the content.

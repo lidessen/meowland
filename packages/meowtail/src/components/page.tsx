@@ -24,9 +24,14 @@ export interface PageProps extends Props {
   /** Page-level actions, placed in the header. Ignored without a title or header. */
   actions?: Child;
   /**
+   * A mark before the title, forwarded to `PageHeader`. Ignored without a title
+   * or when `header` replaces the identity block. Presence is fixed for the mount.
+   */
+  leading?: Child;
+  /**
    * Escape hatch: replaces the eyebrow and the `PageHeader` identity block with
-   * host chrome, and needs no `title`. `title`, `description`, `eyebrow` and
-   * `actions` are then unused.
+   * host chrome, and needs no `title`. `title`, `description`, `eyebrow`,
+   * `leading` and `actions` are then unused.
    */
   header?: Child;
   /** Optional bar below the header for filters or view controls. */
@@ -68,6 +73,7 @@ export const Page = defineComponent<
       description,
       eyebrow,
       actions,
+      leading,
       header,
       toolbar,
       notice,
@@ -86,7 +92,7 @@ export const Page = defineComponent<
             "div",
             null,
             hasSlot(eyebrow) ? context.part("eyebrow", "p", null, eyebrow) : null,
-            h(PageHeader, { title, description, actions }),
+            h(PageHeader, { title, description, actions, leading }),
           )
         : null;
     return context.part(

@@ -67,6 +67,23 @@ test("page headers name the page and carry page-level actions", () => {
   expect(html).toContain('<h1 id="t"');
   expect(html).toContain("Description");
   expect(html).toContain("Refresh");
+  expect(html).not.toContain('data-meowui-part="page-header/leading"');
+  expect(html).not.toContain('data-meowui-part="page-header/heading"');
+});
+
+test("a page header can lead the title with a mark", () => {
+  const html = renderToHtml(
+    <PageHeader title="Library" leading={<span data-mark>M</span>} description="Local notes" />,
+  );
+  expect(html).toContain('data-meowui-part="page-header/leading"');
+  expect(html).toContain('data-meowui-part="page-header/heading"');
+  expect(html).toContain("data-mark");
+  expect(html.indexOf('data-meowui-part="page-header/leading"')).toBeLessThan(
+    html.indexOf('data-meowui-part="page-header/title"'),
+  );
+  expect(html.indexOf('data-meowui-part="page-header/title"')).toBeLessThan(
+    html.indexOf('data-meowui-part="page-header/description"'),
+  );
 });
 
 test("list rows open their editor only when expanded", () => {

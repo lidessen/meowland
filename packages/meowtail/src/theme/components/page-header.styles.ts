@@ -20,6 +20,26 @@ export const pageHeaderStyles = css`
     gap: ${uiTokens.spaceGroup};
     min-width: 0;
   }
+  ${header("heading")} {
+    display: flex;
+    align-items: center;
+    gap: ${uiTokens.spaceGroup};
+    min-width: 0;
+  }
+  ${header("leading")} {
+    display: flex;
+    flex: none;
+    align-items: center;
+    justify-content: center;
+    width: ${uiTokens.fontPageTitle};
+    height: ${uiTokens.fontPageTitle};
+    color: ${uiTokens.foreground};
+  }
+  ${header("leading")} > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
   ${header("title")} {
     margin: 0;
     min-width: 0;

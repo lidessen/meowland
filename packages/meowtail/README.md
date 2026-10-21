@@ -363,6 +363,7 @@ DialogPanel distributes standard whitespace inside its direct header and body, e
 
 `EmptyState size="compact"` is for a local empty list or an unselected content region, keeping the title, description, and actions while removing decorative artwork.
 The default `size="default"` keeps the full-page empty state; loading and failure still use their existing feedback and do not become empty states.
+`illustration` replaces the default `DoodleCat`. `null` and `false` leave the illustration part out. Presence is fixed for the mount, and compact size still hides that part when it is present.
 
 `ChatAttachments` accepts `items: readonly ChatAttachmentItem[]`, where each item has
 `id`, `name`, `url`, `mediaType`, and an optional `sizeBytes`; `label` defaults to "Message attachments".

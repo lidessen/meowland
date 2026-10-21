@@ -365,7 +365,7 @@ export const EmptyStateStory = defineStory({
   variant: "Description and next step",
   description:
     "The real empty-state component and its action entry. The button only records the action locally; no real work is created.",
-  covers: ["EmptyState", "title / copy / action"],
+  covers: ["EmptyState", "title / copy / action", "illustration"],
   render: () => (
     <div className="workshop-foundation-empty-grid">
       <section className="workshop-foundation-empty-sample">
@@ -380,6 +380,23 @@ export const EmptyStateStory = defineStory({
       <section className="workshop-foundation-empty-sample">
         <h2 className="workshop-section-title">All handled · No action needed</h2>
         <EmptyState title="No changes are awaiting review" />
+      </section>
+      <section className="workshop-foundation-empty-sample">
+        <h2 className="workshop-section-title">Custom mark · Caller artwork</h2>
+        <EmptyState
+          title="Nothing in this folder"
+          copy="Choose another place, or add the first file."
+          illustration={
+            <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+              <path
+                d="M4 8h6l2 2h8v8H4z"
+                fill="none"
+                stroke="currentColor"
+                stroke-linejoin="round"
+              />
+            </svg>
+          }
+        />
       </section>
     </div>
   ),

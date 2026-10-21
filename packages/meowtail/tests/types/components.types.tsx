@@ -52,6 +52,12 @@ void alert;
 const invalidAlert: JSX.Element = <Alert tone="quiet">No</Alert>;
 void invalidAlert;
 const emptyState: JSX.Element = <EmptyState title="Empty" action={addButton} />;
+const illustratedEmptyState: JSX.Element = (
+  <EmptyState title="Empty" illustration={<span>Mark</span>} />
+);
+const quietEmptyState: JSX.Element = <EmptyState title="Empty" illustration={null} />;
+void illustratedEmptyState;
+void quietEmptyState;
 const compactEmptyState: JSX.Element = <EmptyState title="Empty" size="compact" />;
 // @ts-expect-error Empty-state sizes describe two supported presentation roles.
 const invalidEmptyState: JSX.Element = <EmptyState title="Empty" size="tiny" />;

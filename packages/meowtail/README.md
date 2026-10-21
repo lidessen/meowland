@@ -479,6 +479,10 @@ validation, correction, and save sequence. These are composition references, not
 | Supporting text | `uiTokens.fontCaption`, 12px                     | Descriptions, timestamps, and state labels                                         |
 | Headings        | `fontTitle`, 16px; `fontPageTitle`, 24px         | Component titles and page titles, with heading levels chosen by document structure |
 
+`PageHeader` and `Section` titles use the serif `uiTokens.fontDisplay` stack at their existing
+24px and 16px sizes. Body text and controls keep `uiTokens.font`; other component titles retain
+their own font rules. Heading levels still follow document structure.
+
 The main action uses `Button`'s default `primary` variant: a near-black fill in light mode and a near-white fill in
 dark mode, paired with `onPrimary`. Use `outline` for a secondary action and `quiet` for dismissal
 or a less prominent action. Accent marks current activity and location: processing, active navigation,

@@ -47,7 +47,8 @@ export const languageStyles = css`
     letter-spacing: 0.08em;
   }
   .language-heading h1 {
-    font-size: 1.5em;
+    font-family: ${uiTokens.fontDisplay};
+    font-size: ${uiTokens.fontPageTitle};
     line-height: 1.4;
     letter-spacing: -0.02em;
     margin-block: ${languageTokens.halfLine};
@@ -148,7 +149,14 @@ export const languageStyles = css`
     letter-spacing: -0.04em;
   }
   .language-type-specimen > span {
+    font-family: ${uiTokens.fontDisplay};
     color: ${uiTokens.mutedForeground};
+  }
+  .language-display-specimen {
+    font-family: ${uiTokens.fontDisplay};
+    font-size: ${uiTokens.fontPageTitle};
+    font-weight: 600;
+    line-height: 1.4;
   }
   .language-type-row {
     display: grid;

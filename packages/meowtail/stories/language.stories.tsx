@@ -114,13 +114,11 @@ export const DesignLanguageStory = defineStory({
               Typography <small>Typography</small>
             </h3>
             <div className="language-type-specimen">
-              Aa <span>A</span>
+              Aa <span>Aa</span>
             </div>
             <div className="language-type-row">
-              <code>title</code>
-              <strong style={{ fontSize: `${uiTokens.fontTitle}` }}>
-                Let work continue naturally
-              </strong>
+              <code>display</code>
+              <strong className="language-display-specimen">A place to think</strong>
             </div>
             <div className="language-type-row">
               <code>UI</code>
@@ -144,6 +142,10 @@ export const DesignLanguageStory = defineStory({
               <code>mono</code>
               <span style={{ fontFamily: `${uiTokens.mono}` }}>Aa 0123456789</span>
             </div>
+            <p className="language-note">
+              Display serif gives page and section titles a voice. UI and conversation keep the
+              familiar sans serif for controls and continuous reading.
+            </p>
           </section>
           <section className="language-sheet" aria-label="Scale and shape">
             <h3>

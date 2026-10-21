@@ -4,6 +4,7 @@ import { Fragment, h, type Child } from "meowjsx/runtime";
 import { renderToHtml } from "meowjsx/web";
 import { withoutLeadingHeading, type ContentItem } from "./content";
 import { DEFAULT_SITE, type SiteIdentity } from "./identity";
+import { sitePageUrl, type SitePage } from "./pages";
 import type { Skill, SkillFile } from "./skills";
 import { layoutSkillGraph, type SkillGraphNode } from "./skill-graph";
 
@@ -15,6 +16,19 @@ interface DocumentProps {
   activePath?: string;
   styleHref: string;
   children: Child;
+}
+
+/** The name of the theme stylesheet the package writes by default. */
+export const DEFAULT_THEME_STYLESHEET = "blog-theme.css";
+
+/** The href of the theme stylesheet for a page at a given depth. */
+function styleHref(depth: number, stylesheet: string): string {
+  return `${"../".repeat(depth)}${stylesheet}`;
+}
+
+/** The number of directories a slug puts a page below its section. */
+function slugDepth(slug: string): number {
+  return slug.split("/").filter(Boolean).length;
 }
 
 function SiteHeader({ activePath, site }: { activePath?: string; site: SiteIdentity }): Child {
@@ -376,12 +390,13 @@ export function homePage(
   items: ContentItem[],
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
+  stylesheet: string = DEFAULT_THEME_STYLESHEET,
 ): string {
   return pageHtml({
     site,
     theme,
     title: site.name,
-    styleHref: "./blog-theme.css",
+    styleHref: styleHref(0, stylesheet),
     children: (
       <Fragment>
         <Hero image={site.images?.hero ? `./${site.images.hero}` : undefined} />
@@ -401,6 +416,7 @@ export function listPage(
   items: ContentItem[],
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
+  stylesheet: string = DEFAULT_THEME_STYLESHEET,
 ): string {
   const isPost = kind === "post";
   return pageHtml({
@@ -408,7 +424,7 @@ export function listPage(
     theme,
     title: isPost ? "Posts" : "Thoughts",
     activePath: isPost ? "/posts/" : "/thoughts/",
-    styleHref: "../blog-theme.css",
+    styleHref: styleHref(1, stylesheet),
     children: (
       <main className="listing">
         <header className="listing-head">
@@ -487,6 +503,7 @@ export function postPage(
   thoughts: ContentItem[],
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
+  stylesheet: string = DEFAULT_THEME_STYLESHEET,
 ): string {
   const category = typeof item.metadata.category === "string" ? item.metadata.category : "Post";
   return pageHtml({
@@ -495,7 +512,7 @@ export function postPage(
     title: item.title,
     description: item.excerpt,
     activePath: "/posts/",
-    styleHref: "../../blog-theme.css",
+    styleHref: styleHref(1 + slugDepth(item.slug), stylesheet),
     children: (
       <main>
         <article>
@@ -519,6 +536,7 @@ export function thoughtPage(
   item: ContentItem,
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
+  stylesheet: string = DEFAULT_THEME_STYLESHEET,
 ): string {
   return pageHtml({
     site,
@@ -526,7 +544,7 @@ export function thoughtPage(
     title: item.title,
     description: item.excerpt,
     activePath: "/thoughts/",
-    styleHref: "../../blog-theme.css",
+    styleHref: styleHref(1 + slugDepth(item.slug), stylesheet),
     children: (
       <main>
         <article>
@@ -548,6 +566,7 @@ export function thoughtPage(
 export function aboutPage(
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
+  stylesheet: string = DEFAULT_THEME_STYLESHEET,
 ): string {
   const about = site.about;
   return pageHtml({
@@ -555,7 +574,7 @@ export function aboutPage(
     theme,
     title: "About",
     activePath: "/about/",
-    styleHref: "../blog-theme.css",
+    styleHref: styleHref(1, stylesheet),
     children: (
       <main className="about">
         <div className="avatar" aria-hidden="true">
@@ -980,6 +999,7 @@ export function skillsIndexPage(
   skills: Skill[],
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
+  stylesheet: string = DEFAULT_THEME_STYLESHEET,
 ): string {
   const publicSkills = skills.filter((skill) => skill.scope === "public");
   const projectSkills = skills.filter((skill) => skill.scope === "project");
@@ -989,7 +1009,7 @@ export function skillsIndexPage(
     title: "Skills",
     description: "Methods and working conventions that can be handed to an Agent.",
     activePath: "/skills/",
-    styleHref: "../blog-theme.css",
+    styleHref: styleHref(1, stylesheet),
     children: (
       <main className="skills-index">
         <header className="skills-head">
@@ -1041,6 +1061,7 @@ export function skillPage(
   skill: Skill,
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
+  stylesheet: string = DEFAULT_THEME_STYLESHEET,
 ): string {
   const firstFile = skill.files[0];
   const command =
@@ -1051,7 +1072,10 @@ export function skillPage(
     title: skill.name,
     description: skill.description,
     activePath: "/skills/",
-    styleHref: skill.scope === "public" ? "../../blog-theme.css" : "../../../blog-theme.css",
+    styleHref:
+      skill.scope === "public"
+        ? styleHref(1 + slugDepth(skill.slug), stylesheet)
+        : styleHref(2 + slugDepth(skill.slug), stylesheet),
     children: (
       <main className="skill-page">
         <a className="skill-back" href="/skills/">
@@ -1119,7 +1143,17 @@ export function agentMarkdown(
   posts: ContentItem[],
   thoughts: ContentItem[],
   site: SiteIdentity = DEFAULT_SITE,
+  pages?: readonly SitePage[],
 ): string {
+  const siteMap = pages
+    ? pages.map((page) => `- [${page.title}](${sitePageUrl(page.path)})`)
+    : [
+        "- [Home](/)",
+        "- [Posts](/posts/)",
+        "- [Thoughts](/thoughts/)",
+        "- [Skills](/skills/) (browse files and the auto-generated Markdown reference graph)",
+        "- [About](/about/)",
+      ];
   const lines = [
     `# ${site.name}`,
     "",
@@ -1127,11 +1161,7 @@ export function agentMarkdown(
     "",
     "## Site map",
     "",
-    "- [Home](/)",
-    "- [Posts](/posts/)",
-    "- [Thoughts](/thoughts/)",
-    "- [Skills](/skills/) (browse files and the auto-generated Markdown reference graph)",
-    "- [About](/about/)",
+    ...siteMap,
     "",
     "## Content model",
     "",
@@ -1140,19 +1170,26 @@ export function agentMarkdown(
     "- Content files support `.md` and `.mdx`, and may start with YAML frontmatter.",
     "- Frontmatter currently has no required fields; `title`, `date`, `created_at`, `category` and `tags` are recognized by the site.",
     "",
-    "## Public content",
-    "",
-    `Public posts: ${posts.length}.`,
-    `Public thoughts: ${thoughts.length}.`,
-    "",
-    "### Posts",
-    "",
-    ...posts.map((post) => `- [${post.title}](${itemUrl(post)}) — ${post.dateKey}`),
-    "",
-    "### Thoughts",
-    "",
-    ...thoughts.map((thought) => `- [${thought.title}](${itemUrl(thought)}) — ${thought.dateKey}`),
-    "",
+    // A consumer that owns the site map owns the routes of its content too.
+    ...(pages
+      ? []
+      : [
+          "## Public content",
+          "",
+          `Public posts: ${posts.length}.`,
+          `Public thoughts: ${thoughts.length}.`,
+          "",
+          "### Posts",
+          "",
+          ...posts.map((post) => `- [${post.title}](${itemUrl(post)}) — ${post.dateKey}`),
+          "",
+          "### Thoughts",
+          "",
+          ...thoughts.map(
+            (thought) => `- [${thought.title}](${itemUrl(thought)}) — ${thought.dateKey}`,
+          ),
+          "",
+        ]),
   ];
   return lines.join("\n");
 }
@@ -1161,25 +1198,37 @@ export function llmText(
   posts: ContentItem[],
   thoughts: ContentItem[],
   site: SiteIdentity = DEFAULT_SITE,
+  pages?: readonly SitePage[],
 ): string {
+  const routes = pages
+    ? pages.map((page) => `- ${page.title}: ${sitePageUrl(page.path)}`)
+    : [
+        "- Home: /",
+        "- Posts: /posts/",
+        "- Thoughts: /thoughts/",
+        "- Skills: /skills/",
+        "- About: /about/",
+      ];
   return [
     `# ${site.name}`,
     `> ${site.description}`,
     "",
     "## Pages",
-    "- Home: /",
-    "- Posts: /posts/",
-    "- Thoughts: /thoughts/",
-    "- Skills: /skills/",
-    "- About: /about/",
+    ...routes,
     "- Agent Markdown: /agents.md",
     "",
-    "## Posts",
-    ...posts.map((post) => `- ${post.title}: ${itemUrl(post)}`),
-    "",
-    "## Thoughts",
-    ...thoughts.map((thought) => `- ${thought.title}: ${itemUrl(thought)}`),
-    "",
+    // A consumer that owns the site map owns the routes of its content too;
+    // listing the content under routes the site does not publish would be wrong.
+    ...(pages
+      ? []
+      : [
+          "## Posts",
+          ...posts.map((post) => `- ${post.title}: ${itemUrl(post)}`),
+          "",
+          "## Thoughts",
+          ...thoughts.map((thought) => `- ${thought.title}: ${itemUrl(thought)}`),
+          "",
+        ]),
     "## Rules",
     "- Only the public build output is considered presentable content.",
     "- Drafts whose names start with _ under posts are not published or rendered.",

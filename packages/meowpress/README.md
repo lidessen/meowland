@@ -25,6 +25,37 @@ export default meowSite({
 });
 ```
 
+## Pages a consumer owns
+
+A consumer that supplies `pages` owns the whole site map. The provider receives the content that was
+already loaded and returns complete documents; the package writes them at their paths, adds them to
+the agent-facing indexes, and does not publish its own blog routes next to them. One site map, one
+owner.
+
+```ts
+import { meowSite, type SitePage } from "meowpress/build";
+
+export default meowSite({
+  content: [{ directory: "/path/to/content" }],
+  outputDirectory: "/path/to/dist",
+  themeStylesheet: "site-theme.css",
+  pages: ({ posts, theme }): SitePage[] =>
+    posts.map((post) => ({
+      path: post.slug,
+      title: post.title,
+      html: renderDocument(post, theme),
+    })),
+});
+```
+
+- `pages` is a provider of complete HTML documents. A path that resolves above the site root is
+  refused rather than clamped.
+- `mdxComponents` adds named components to the MDX content pages; the built-in `Callout` stays
+  available.
+- `themeStylesheet` names the theme stylesheet the build writes, so a consumer page can link it. It
+  applies to the built-in pages as well, so a renamed stylesheet never leaves a page linking a file
+  that was not written.
+
 Directories in the configuration are provided explicitly by the application; the default theme resolves from this package and does not depend on the startup directory.
 The whole theme can be replaced with `theme: defineTheme(...)`; all static pages output that theme's root attributes and default options.
 The build writes `theme.cssText` to a temporary CSS file, then lets Bun handle fonts and other assets, and finally delivers through a stylesheet link,

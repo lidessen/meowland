@@ -1,0 +1,60 @@
+# Meowtail
+
+Meowtail is the component library the rest of Meowland is built from. It owns the cross-application
+components, the semantic layout, the standard theme and the complete Assistant composition.
+Networking, execution, permissions and persistence stay with the host.
+
+## A component declares, the theme paints
+
+A component names its parts and its style axes. It does not carry CSS.
+
+```tsx
+import { defineComponent, type Props } from "meowjsx";
+import { defineOptions } from "meowcss";
+import { defineStyleProps, type StyledComponentContract } from "meowcss/meowjsx";
+
+export const calloutOptions = defineOptions("callout", {
+  tone: ["neutral", "accent"],
+});
+
+export const calloutContract = {
+  name: "callout",
+  parts: ["root", "title"],
+  styleProps: defineStyleProps(calloutOptions, { defaults: { tone: "neutral" } }),
+} as const satisfies StyledComponentContract;
+
+export const Callout = defineComponent<Props, "callout", "root" | "title">(
+  calloutContract,
+  ({ title, children, ...props }, context) =>
+    context.part("root", "aside", props, context.part("title", "strong", null, title), children),
+);
+```
+
+The theme file paints those parts. The component never writes a `data-meowui-part` or a
+`data-option-tone` attribute by hand: the style plugin writes them when the component is registered.
+
+## Three steps to a working page
+
+Importing components is not enough. A page needs the component registry installed on its runtime,
+the theme stylesheet mounted, and the theme root bound to the document.
+
+```tsx
+import { createRuntime, h } from "meowjsx";
+import { createWebRenderer } from "meowjsx/web";
+import { Button, createMeowUI } from "meowtail";
+import { standardTheme } from "meowtail/theme";
+import { applyTheme, mountStyles } from "meowcss/web";
+
+const runtime = createRuntime({ plugins: [createMeowUI()] });
+const renderer = createWebRenderer(runtime);
+const document = globalThis.document;
+
+mountStyles(document, standardTheme.cssText);
+applyTheme(document.documentElement, standardTheme);
+renderer.render(h(Button, null, "Save"), document.querySelector("#app"));
+```
+
+## This site is made of it
+
+Every frame, table, badge and link on this site is a Meowtail component, painted by a theme that
+extends the standard theme. The site does not carry a second palette or a second radius scale.

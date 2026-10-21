@@ -1,9 +1,59 @@
-import { h, createRuntime } from "meowjsx";
+import { h, createRuntime, type MountResult } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { installMeowUI, Button, SearchInput, Select, Disclosure, Toolbar } from "meowtail";
+import {
+  installMeowUI,
+  Button,
+  NavList,
+  SearchInput,
+  Select,
+  Disclosure,
+  Toolbar,
+  type NavListGroup,
+} from "meowtail";
 import { Icon } from "meowtail/icons";
 import { standardTheme } from "meowtail/theme";
 import { applyTheme } from "meowcss/web";
+
+/** The catalog rebuilds on search/selection, so it keeps its own long-lived runtime. */
+const catalogRuntime = createRuntime();
+installMeowUI(catalogRuntime);
+const catalogRenderer = createWebRenderer(catalogRuntime);
+let mountedCatalog: MountResult | undefined;
+
+/** One rendered catalog state: the visible groups, the current component and the empty copy. */
+export interface CatalogView {
+  groups: readonly NavListGroup[];
+  /** Component key of the current story; empty when nothing is current. */
+  activeId: string;
+  /** Shown instead of the lists when no story matches the search. */
+  emptyMessage: string;
+}
+
+/**
+ * Mount or replace the catalog inside the existing `#catalog` scroll container.
+ * The host owns the manifest data and rebuilds it on search/selection; each new
+ * state disposes the previous tree so ids, focus targets and `aria-current` never
+ * come from two catalog generations.
+ */
+export function mountCatalog({ groups, activeId, emptyMessage }: CatalogView) {
+  const container = document.getElementById("catalog");
+  if (!container) return;
+  mountedCatalog?.unmount();
+  container.replaceChildren();
+  mountedCatalog = catalogRenderer.render(
+    groups.length ? (
+      <NavList
+        className="workshop-catalog"
+        label="Component samples"
+        groups={groups}
+        activeId={activeId}
+      />
+    ) : (
+      <p className="catalog-empty">{emptyMessage}</p>
+    ),
+    container,
+  );
+}
 
 /** Only tool composition lives here; controls, icons and theme are Meowtail. */
 export function mountGallery() {
@@ -13,7 +63,7 @@ export function mountGallery() {
   createWebRenderer(runtime).render(
     <div className="workshop-shell">
       <aside className="workshop-sidebar" id="sidebar">
-        <a className="workshop-brand" href="/">
+        <a className="workshop-brand" href="./">
           <Icon name="notebook-tabs" size={21} />
           <strong>Meowbook</strong>
           <span>UI</span>
@@ -27,9 +77,9 @@ export function mountGallery() {
         <div className="catalog-label">
           Component catalog <span id="story-count" />
         </div>
-        <nav id="catalog" aria-label="Component samples">
+        <div id="catalog">
           <p>Loading samples…</p>
-        </nav>
+        </div>
         <div className="workshop-local">
           <label className="workshop-appearance">
             Tool appearance
@@ -62,7 +112,7 @@ export function mountGallery() {
           <span id="breadcrumb-component">Meowbook</span>
           <a
             id="standalone"
-            href="/canvas.html"
+            href="./canvas.html"
             target="_blank"
             rel="noopener"
             aria-label="Standalone preview"

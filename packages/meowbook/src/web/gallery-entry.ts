@@ -1,5 +1,6 @@
+import type { NavListGroup } from "meowtail";
 import type { StoryEntry } from "../types";
-import { mountGallery } from "./gallery-shell";
+import { mountCatalog, mountGallery } from "./gallery-shell";
 mountGallery();
 type StoryInfo = StoryEntry & {
   id: string;
@@ -62,8 +63,9 @@ let batch: AbortController | undefined;
 const initialWidth = new URL(location.href).searchParams.get("width");
 if (["fluid", "390", "768", "1100"].includes(initialWidth ?? "")) width = initialWidth!;
 
+/** The canvas and the manifest sit next to the gallery, whatever path it is served from. */
 function canvasURL() {
-  return `/canvas.html${active ? `?story=${encodeURIComponent(active)}` : ""}`;
+  return `./canvas.html${active ? `?story=${encodeURIComponent(active)}` : ""}`;
 }
 function updateURL(replace = false) {
   const url = new URL(location.href);
@@ -125,7 +127,6 @@ function storyLink(story: StoryInfo, label: string) {
   return link;
 }
 function showCatalog() {
-  const fragment = document.createDocumentFragment();
   const query = search.value.trim().toLocaleLowerCase();
   const matches = stories.filter((story) =>
     [story.group, story.component, story.variant, story.title, ...story.covers]
@@ -150,32 +151,31 @@ function showCatalog() {
   }
   const groups = [...new Set(matches.map((story) => story.group))];
   groups.sort((a, b) => (groupOrders.get(a) ?? Infinity) - (groupOrders.get(b) ?? Infinity));
-  for (const group of groups) {
-    const heading = document.createElement("h2");
-    const label = document.createElement("span");
-    label.textContent = group;
-    heading.append(label);
-    fragment.append(heading);
+  const current = stories.find((story) => story.id === active);
+  const catalog: NavListGroup[] = groups.map((group) => {
     const entries = [...components.values()].filter((items) => items[0]!.group === group);
     entries.sort((a, b) =>
       (a[0]!.component ?? a[0]!.title).localeCompare(b[0]!.component ?? b[0]!.title),
     );
-    for (const items of entries) {
-      const story = items.find((item) => item.id === active) ?? items[0]!;
-      const link = storyLink(story, story.component ?? story.title);
-      const current = stories.find((item) => item.id === active);
-      if (current && componentKey(current) === componentKey(story))
-        link.setAttribute("aria-current", "page");
-      fragment.append(link);
-    }
-  }
-  if (!matches.length) {
-    const empty = document.createElement("p");
-    empty.textContent = `No results for "${search.value.trim()}". Try a component name or clear the search.`;
-    empty.className = "catalog-empty";
-    fragment.append(empty);
-  }
-  get("catalog").replaceChildren(fragment);
+    return {
+      label: group,
+      items: entries.map((items) => {
+        // The row keeps pointing at the active scenario when it belongs to the component;
+        // otherwise it opens the component's first scenario.
+        const story = items.find((item) => item.id === active) ?? items[0]!;
+        return {
+          id: componentKey(items[0]!),
+          label: story.component ?? story.title,
+          href: `?story=${encodeURIComponent(story.id)}&width=${width}`,
+        };
+      }),
+    };
+  });
+  mountCatalog({
+    groups: catalog,
+    activeId: current ? componentKey(current) : "",
+    emptyMessage: `No results for "${search.value.trim()}". Try a component name or clear the search.`,
+  });
 }
 function log(message: string) {
   const list = get("events");
@@ -233,8 +233,17 @@ window.addEventListener("message", (event) => {
   }
   if (data.type === "ready") syncMeasurements();
   if (data.type === "metadata" && data.entry) {
+    // The canvas metadata is the story module's own metadata; keep the manifest's
+    // group fallback so a story without an explicit group stays in its catalog group.
     stories = stories.map((entry) =>
-      entry.id === active ? { ...entry, ...data.entry, covers: data.entry.covers ?? [] } : entry,
+      entry.id === active
+        ? {
+            ...entry,
+            ...data.entry,
+            group: data.entry.group ?? entry.group,
+            covers: data.entry.covers ?? [],
+          }
+        : entry,
     );
     get<HTMLButtonElement>("inspect-all").disabled = !!batch || stories.length === 0;
     if (!active && typeof data.active === "string") {
@@ -300,7 +309,7 @@ function inspectStory(
     };
     window.addEventListener("message", receive);
     signal.addEventListener("abort", cancel, { once: true });
-    probe.src = `/canvas.html?story=${encodeURIComponent(story.id)}`;
+    probe.src = `./canvas.html?story=${encodeURIComponent(story.id)}`;
     if (signal.aborted) {
       cancel();
       return;
@@ -360,6 +369,22 @@ get("inspect-all").addEventListener("click", () => void inspectAll());
 get("cancel-inspection").addEventListener("click", () => batch?.abort());
 window.addEventListener("pagehide", () => batch?.abort());
 search.addEventListener("input", showCatalog);
+// One delegated handler keeps plain catalog clicks inside the workbench; modified
+// clicks keep the anchor's own navigation to the scenario URL.
+get("catalog").addEventListener("click", (event) => {
+  const target = event.target;
+  const anchor = target instanceof Element ? target.closest<HTMLAnchorElement>("a") : null;
+  if (!anchor) return;
+  if (event.ctrlKey || event.metaKey || event.shiftKey || event.altKey) return;
+  const story = stories.find((item) => item.id === new URL(anchor.href).searchParams.get("story"));
+  if (!story) return;
+  event.preventDefault();
+  active = story.id;
+  updateURL();
+  load();
+  setCatalogOpen(false);
+  get("title").focus({ preventScroll: true });
+});
 for (const button of viewportButtons)
   button.addEventListener("click", () => {
     if (button.dataset.width === width) return;
@@ -418,7 +443,7 @@ window.addEventListener("popstate", () => {
 });
 applyWidth();
 try {
-  const response = await fetch("/manifest.json");
+  const response = await fetch("./manifest.json");
   if (!response.ok) throw new Error("Failed to load the scenario manifest");
   const entries: StoryEntry[] = await response.json();
   stories = entries.map((entry) => ({

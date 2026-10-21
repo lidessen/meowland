@@ -8,6 +8,14 @@ import { applyTheme, mountStyles } from "meowcss/web";
 import type { PreviewEnvironment } from "meowbook";
 
 installMeowUI(defaultRuntime);
+/**
+ * An embedded canvas is a frame inside a page that already carries its own
+ * chrome. The theme toolbar would repeat in every frame, so an embedded canvas
+ * leaves it out and follows the reader's system scheme.
+ */
+function isEmbedded(): boolean {
+  return new URLSearchParams(location.search).has("embedded");
+}
 const preview: PreviewEnvironment = ({ root, onCleanup }) => {
   root.classList.add("meowui-story");
   const scope = document.documentElement;
@@ -30,6 +38,10 @@ const preview: PreviewEnvironment = ({ root, onCleanup }) => {
       root.classList.remove("meowui-story");
       delete scope.dataset.meowuiColorScheme;
     });
+    return defaultRuntime;
+  }
+  if (isEmbedded()) {
+    onCleanup(() => root.classList.remove("meowui-story"));
     return defaultRuntime;
   }
   const toolbar = document.createElement("nav");

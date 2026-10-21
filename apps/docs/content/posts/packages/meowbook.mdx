@@ -1,0 +1,46 @@
+# Meowbook
+
+Meowbook is the component workbench. It reads the stories a package declares, builds a catalog from
+them, and runs each story in an isolated canvas. It does not depend on Storybook.
+
+## A story is data
+
+A story declares what to show, in which group, and which component it belongs to.
+
+```tsx
+import { h } from "meowjsx/runtime";
+import { defineStory } from "meowbook";
+import { Button } from "meowtail";
+
+export const ButtonStory = defineStory({
+  id: "button",
+  title: "Button · Actions",
+  group: "Basic controls",
+  groupOrder: 10,
+  component: "Button",
+  description: "The action control. It carries the variant and size axes.",
+  render: () => h(Button, null, "Save"),
+});
+```
+
+Discovery reads the file with a parser and never executes it, so a broken story cannot run during
+the build.
+
+## The canvas is a separate document
+
+Every example runs in its own document, with its own runtime and its own theme root. That is what
+makes a story safe to embed: the page that shows the example never shares a render graph with it.
+
+<StoryCanvas story="buttons" title="Button" />
+
+## The commands
+
+```sh
+bunx --no-install meowbook list --config meowbook.config.ts --json
+bunx --no-install meowbook check --config meowbook.config.ts
+bunx --no-install meowbook serve --config meowbook.config.ts --port 13003
+bunx --no-install meowbook capture --config meowbook.config.ts --story buttons --depth all
+```
+
+The server only listens on loopback and runs in the foreground. There is no hot reload yet; restart
+the server after a source change.

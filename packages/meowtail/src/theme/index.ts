@@ -75,6 +75,10 @@ import { detailSectionStyles } from "./components/detail-section.styles";
 import { timelineStyles } from "./components/timeline.styles";
 import { resourceLinkStyles } from "./components/resource-link.styles";
 import { pageHeaderStyles } from "./components/page-header.styles";
+import { pageStyles } from "./components/page.styles";
+import { sectionStyles } from "./components/section.styles";
+import { navListStyles } from "./components/nav-list.styles";
+import { modalStyles } from "./components/modal.styles";
 import { listGroupStyles } from "./components/list-group.styles";
 import { resourceCardStyles } from "./components/resource-card.styles";
 import { resourceCardTokens } from "./components/resource-card.tokens";
@@ -118,6 +122,10 @@ export const standardThemeStyles = [
   timelineStyles,
   resourceLinkStyles,
   pageHeaderStyles,
+  pageStyles,
+  sectionStyles,
+  navListStyles,
+  modalStyles,
   listGroupStyles,
   resourceCardStyles,
   drawerStyles,

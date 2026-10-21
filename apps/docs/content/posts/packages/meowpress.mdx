@@ -1,0 +1,60 @@
+# Meowpress
+
+Meowpress is the site generator. It reads content, renders it, writes the pages, mounts the theme,
+stages the assets and publishes the agent-facing indexes. The consumer owns the configuration, the
+content and the output directory.
+
+## The configuration
+
+```ts
+import { meowSite } from "meowpress/build";
+
+export default meowSite({
+  content: [{ directory: "/path/to/content" }],
+  skillsDirectory: "/path/to/workspace",
+  outputDirectory: "/path/to/dist",
+});
+```
+
+`meowSite()` returns the resolved configuration and `buildSite()` performs the build. The build
+writes the theme stylesheet, stages the content assets, bundles the pages, and writes `llm.txt`,
+`llms.txt` and `agents.md` next to them.
+
+## Content
+
+A content directory holds `posts/` and `thoughts/`. A post is a Markdown or MDX file with optional
+frontmatter; the first heading becomes its title when there is no frontmatter title.
+
+```md
+---
+title: A note about the runtime
+---
+
+The body of the note.
+```
+
+MDX pages may use the components the consumer supplies, which is how this site embeds a live story
+in a package page.
+
+## Pages a consumer owns
+
+A consumer that supplies its own pages owns the whole site map. The provider receives the content
+that was already loaded and returns complete documents; the package writes them at their paths and
+adds them to the agent-facing indexes.
+
+```ts
+meowSite({
+  // ...
+  pages: ({ posts }) =>
+    posts.map((post) => ({
+      path: post.slug,
+      title: post.title,
+      html: renderDocument(post),
+    })),
+});
+```
+
+<Callout tone="note">
+  The package's own blog routes are not published alongside a consumer's pages. One site map, one
+  owner.
+</Callout>

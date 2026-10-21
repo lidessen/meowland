@@ -18,11 +18,24 @@ export const codeBlockStyles = css`
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    justify-content: space-between;
+    /* Host actions take the free space, so the original language/actions row is unchanged. */
+    justify-content: flex-start;
     gap: 12px;
     padding: 9px 14px;
     border-bottom: 0;
     background: ${uiTokens.codeBanner};
+  }
+  ${partSelector(codeBlockContract, "title")} {
+    min-width: 0;
+    color: ${uiTokens.foreground};
+    font: 500 ${uiTokens.fontCaption}/${uiTokens.leading} ${uiTokens.font};
+    overflow-wrap: anywhere;
+  }
+  ${partSelector(codeBlockContract, "caption")} {
+    min-width: 0;
+    color: ${uiTokens.captionForeground};
+    font: 400 ${uiTokens.fontCaption}/${uiTokens.leading} ${uiTokens.font};
+    overflow-wrap: anywhere;
   }
   ${partSelector(codeBlockContract, "language")} {
     font: 11px/18px ${uiTokens.mono};
@@ -34,8 +47,11 @@ export const codeBlockStyles = css`
   ${partSelector(codeBlockContract, "actions")} {
     display: flex;
     flex-wrap: wrap;
+    justify-content: flex-end;
     gap: ${uiTokens.spaceGroup};
-    flex-shrink: 0;
+    min-width: 0;
+    flex-shrink: 1;
+    margin-inline-start: auto;
     font: 11px/18px ${uiTokens.font};
   }
   ${partSelector(codeBlockContract, "actions")} [aria-pressed="true"] {

@@ -1,0 +1,47 @@
+# MeowCSS
+
+MeowCSS is a token, option and CSS generation mechanism. It owns no component and no layout: it
+turns declared tokens, options and style fragments into one stylesheet that a document mounts once.
+
+## Tokens, options, styles
+
+A theme is three things: the options that name the axes, the tokens that hold the values, and the
+style fragments that use them.
+
+```ts
+import { css, defineOptions, defineTokens } from "meowcss";
+import { defineTheme } from "meowcss/meowjsx";
+
+const options = defineOptions("reader", { tone: ["quiet", "loud"] });
+const tokens = defineTokens("reader", {
+  ink: ["#111111", "#f5f5f5"],
+  measure: "68ch",
+});
+
+export const readerTheme = defineTheme({
+  options,
+  defaults: { scheme: "auto", tone: "quiet" },
+  tokens: [tokens],
+  styles: css`
+    body {
+      color: ${tokens.ink};
+      max-width: ${tokens.measure};
+    }
+  `,
+});
+```
+
+The token path is checked at compile time, so a renamed token is a type error rather than a silent
+blank value. Interpolating a token emits a CSS variable, and a token that holds a light and a dark
+value resolves per scheme.
+
+## Options are axes
+
+An option set declares the axes a component may vary along and the choices each axis allows. The
+component declares the axis on its contract; the theme decides what a choice looks like. A component
+never writes a `data-option` attribute by hand.
+
+<Callout tone="note">
+  The root entry depends on neither JSX, nor UI, nor the DOM. The component adapter is
+  `meowcss/meowjsx` and the DOM theme lifecycle is `meowcss/web`.
+</Callout>

@@ -1,0 +1,52 @@
+# MeowJSX
+
+MeowJSX is the rendering runtime the rest of the library sits on. It renders a tree of nodes, and it
+lets a component bind a signal to an attribute or a text node, so a later change reaches the DOM
+without re-rendering the tree.
+
+## Setup runs once
+
+A component body is setup, not a render function. It runs once for that mount, and nothing runs it
+again. There is no re-render, no hook order and no `useState`. A later change reaches the DOM only
+through a signal that setup bound to a prop, an attribute, a text node or a child.
+
+```tsx
+import { defineComponent, mapSignal, type MaybeSignal, type Props } from "meowjsx";
+
+export interface ToggleProps extends Props {
+  /** Controlled when provided; a signal keeps it live. */
+  pressed?: MaybeSignal<boolean>;
+  onPressedChange?: (pressed: boolean) => void;
+}
+
+export const Toggle = defineComponent<ToggleProps, "toggle", "root">(
+  { name: "toggle", parts: ["root"] },
+  ({ pressed = false, onPressedChange, children, ...props }, context) =>
+    context.part(
+      "root",
+      "button",
+      {
+        ...props,
+        type: "button",
+        "aria-pressed": mapSignal(pressed, (value) => String(value)),
+        onClick: () => onPressedChange?.(!pressed),
+      },
+      children,
+    ),
+);
+```
+
+## The pieces
+
+- `createRuntime` builds an isolated runtime with its own component registry, plugins and shadow
+  registry. A runtime is a real boundary: two runtimes never share a context, a registry entry or a
+  symbol.
+- `createWebRenderer(runtime).renderToHtml(node)` produces static HTML from a tree, and
+  `createWebRenderer(runtime).render(node, host)` mounts a live tree into the DOM.
+- `h`, `Fragment` and the `Props` and `Child` types are the JSX surface. The root entry does not
+  depend on the DOM; the web entry does.
+
+<Callout tone="note">
+  The runtime entry never touches the DOM. Anything that needs a document imports from
+  `meowjsx/web`.
+</Callout>

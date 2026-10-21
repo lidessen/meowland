@@ -98,7 +98,11 @@ import {
   timelineContract,
   timelineItemContract,
   resourceLinkContract,
+  pageContract,
   pageHeaderContract,
+  sectionContract,
+  navListContract,
+  modalContract,
   windowTitleBarContract,
   listGroupContract,
   listRowContract,
@@ -239,7 +243,11 @@ export const MeowUIComponent = {
   Timeline: timelineContract.name,
   TimelineItem: timelineItemContract.name,
   ResourceLink: resourceLinkContract.name,
+  Page: pageContract.name,
   PageHeader: pageHeaderContract.name,
+  Section: sectionContract.name,
+  NavList: navListContract.name,
+  Modal: modalContract.name,
   WindowTitleBar: windowTitleBarContract.name,
   ListGroup: listGroupContract.name,
   ListRow: listRowContract.name,
@@ -363,7 +371,11 @@ export const meowUIComponents = [
   timelineContract,
   timelineItemContract,
   resourceLinkContract,
+  pageContract,
   pageHeaderContract,
+  sectionContract,
+  navListContract,
+  modalContract,
   windowTitleBarContract,
   listGroupContract,
   listRowContract,
@@ -497,6 +509,10 @@ declare module "meowjsx" {
     "timeline-item": { parts: (typeof timelineItemContract.parts)[number] };
     "resource-link": { parts: (typeof resourceLinkContract.parts)[number] };
     "page-header": { parts: (typeof pageHeaderContract.parts)[number] };
+    page: { parts: (typeof pageContract.parts)[number] };
+    section: { parts: (typeof sectionContract.parts)[number] };
+    "nav-list": { parts: (typeof navListContract.parts)[number] };
+    modal: { parts: (typeof modalContract.parts)[number] };
     "window-title-bar": { parts: (typeof windowTitleBarContract.parts)[number] };
     "list-group": { parts: (typeof listGroupContract.parts)[number] };
     "list-row": { parts: (typeof listRowContract.parts)[number] };

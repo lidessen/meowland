@@ -234,7 +234,17 @@ export { DetailSection, type DetailSectionProps, detailSectionContract } from ".
 export { Timeline, type TimelineProps, timelineContract } from "./timeline";
 export { TimelineItem, type TimelineItemProps, timelineItemContract } from "./timeline";
 export { ResourceLink, type ResourceLinkProps, resourceLinkContract } from "./resource-link";
+export { Page, type PageProps, type PageWidth, pageContract } from "./page";
 export { PageHeader, type PageHeaderProps, pageHeaderContract } from "./page-header";
+export { Section, type SectionProps, type SectionVariant, sectionContract } from "./section";
+export {
+  NavList,
+  type NavListGroup,
+  type NavListItem,
+  type NavListProps,
+  navListContract,
+} from "./nav-list";
+export { Modal, type ModalProps, modalContract } from "./modal";
 export {
   WindowTitleBar,
   type WindowTitleBarProps,

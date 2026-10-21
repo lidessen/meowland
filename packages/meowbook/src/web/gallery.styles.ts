@@ -104,59 +104,6 @@ a {
 .workshop-observations > summary > strong {
   flex-shrink: 0;
 }
-#catalog h2 {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin: 20px 10px 8px;
-  font-size: 11px;
-  font-weight: 500;
-  color: ${uiTokens.mutedForeground};
-}
-.catalog-group-count {
-  font-size: 10px;
-  font-variant-numeric: tabular-nums;
-  opacity: 0.75;
-}
-#catalog h2:first-child {
-  margin-top: 7px;
-}
-#catalog a {
-  display: block;
-  min-height: 32px;
-  padding: 6px 10px;
-  margin: 1px 0;
-  border-radius: 6px;
-  font-size: 12px;
-  line-height: 1.5;
-  color: ${uiTokens.foreground};
-  position: relative;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-#catalog a::before {
-  content: none;
-  position: absolute;
-  width: 2px;
-  height: 12px;
-  left: 8px;
-  top: calc(50% - 6px);
-  background: transparent;
-  border-radius: 2px;
-}
-#catalog a:hover {
-  background: ${uiTokens.surfaceMuted};
-  color: ${uiTokens.foreground};
-}
-#catalog a[aria-current="page"] {
-  background: ${uiTokens.primarySoft};
-  color: ${uiTokens.foreground};
-  font-weight: 550;
-}
-#catalog a[aria-current="page"]::before {
-  background: ${uiTokens.primary};
-}
 .workshop-local {
   border-top: 1px solid ${uiTokens.border};
   display: grid;
@@ -567,7 +514,6 @@ a {
   }
 }
 @media (pointer: coarse) {
-  #catalog a,
   #variants a,
   #standalone,
   #toggle-sidebar {

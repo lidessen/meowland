@@ -1,0 +1,40 @@
+# MeowSlides
+
+MeowSlides is the presentation package. It owns the player, pages and steps, the reveal mechanism,
+the media lifecycle, the presentation layouts and themes, and the trusted local MDX authoring entry
+point. It depends on Meowtail, MeowJSX and MeowCSS in one direction only; Meowtail does not depend
+on it.
+
+## What a slide is
+
+A slide is data: a title, some content and the elements that reveal in a step.
+
+```tsx
+import { Presentation, Reveal, type SlideDefinition } from "meowslides";
+
+const deck: SlideDefinition[] = [
+  {
+    id: "opening",
+    layout: "title",
+    content: [{ type: "text", text: "One render graph" }],
+  },
+  {
+    id: "detail",
+    layout: "default",
+    content: [
+      { type: "text", text: "The next point" },
+      { type: "reveal", content: [{ type: "text", text: "arrives on a step" }] },
+    ],
+  },
+];
+```
+
+## Trust boundary
+
+MDX slides are trusted local code: the authoring entry point compiles a file the author already
+owns. Arbitrary uploaded or generated text is not executed; it is rendered as data.
+
+<Callout tone="note">
+  The presentation player, the reveal mechanism and the presentation themes used to live in
+  Meowtail. They moved here, and the old `meowtail/presentation` exports are gone.
+</Callout>

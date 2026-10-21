@@ -1,5 +1,5 @@
 import { h } from "meowjsx";
-import { CodeBlock, Stack } from "meowtail";
+import { Button, CodeBlock, Stack } from "meowtail";
 import { defineStory } from "meowbook";
 
 export const CodeBlockStory = defineStory({
@@ -24,6 +24,52 @@ export const CodeBlockStory = defineStory({
         onCopy={async () => {
           throw new Error("denied");
         }}
+      />
+    </Stack>
+  ),
+});
+
+export const CodeBlockHeaderStory = defineStory({
+  id: "code-block-header",
+  title: "Code block · Title, caption, and host actions",
+  group: "Content",
+  description:
+    "A named code surface keeps its language, soft-wrap, and copy controls; the title and quiet caption share the header, and host actions sit before the built-in ones.",
+  covers: ["title", "caption", "host actions", "soft wrap", "copy feedback"],
+  render: () => (
+    <Stack>
+      <CodeBlock
+        language="typescript"
+        title="connection.ts"
+        caption="examples/authoring · TypeScript"
+        actions={[
+          <Button variant="quiet" size="small">
+            Open in workbench
+          </Button>,
+          <Button variant="quiet" size="small">
+            View source
+          </Button>,
+        ]}
+        code={`import { signal } from "meowjsx";
+
+const connection = signal<"idle" | "connecting" | "ready">("idle");
+
+export async function connect(endpoint: string) {
+  connection.value = "connecting";
+  await fetch(endpoint, { method: "HEAD" });
+  connection.value = "ready";
+}`}
+      />
+      <CodeBlock
+        language="shell"
+        title="Install the package"
+        caption="Run once in the workspace root."
+        actions={
+          <Button variant="quiet" size="small">
+            Package reference
+          </Button>
+        }
+        code="bun add meowtail"
       />
     </Stack>
   ),

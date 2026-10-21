@@ -23,7 +23,12 @@ export type DuplicateContentPolicy = "first-wins" | "error";
 export interface LoadSectionOptions {
   /** The first source wins by default, so the source order is an explicit overlay order. */
   duplicate?: DuplicateContentPolicy;
+  /** Extra components available to MDX content pages. */
+  components?: Record<string, MdxComponent>;
 }
+
+/** A component an MDX content page may use by name. */
+export type MdxComponent = (props: Props) => Child;
 
 export interface ContentItem {
   kind: ContentKind;
@@ -171,7 +176,10 @@ const MDX_COMPONENTS = {
   Callout,
 };
 
-async function renderMdx(source: string): Promise<string> {
+async function renderMdx(
+  source: string,
+  components: Record<string, MdxComponent>,
+): Promise<string> {
   const compiled = await compile(
     { value: source },
     {
@@ -185,16 +193,20 @@ async function renderMdx(source: string): Promise<string> {
     jsxs: h,
   });
   const component = module.default as (props: Props) => Child;
-  return renderToHtml(component({ components: MDX_COMPONENTS }));
+  return renderToHtml(component({ components: { ...MDX_COMPONENTS, ...components } }));
 }
 
-async function renderSource(source: string, sourcePath: string): Promise<string> {
+async function renderSource(
+  source: string,
+  sourcePath: string,
+  components: Record<string, MdxComponent>,
+): Promise<string> {
   if (sourcePath.endsWith(".md")) {
     return Bun.markdown.html(source, {
       tagFilter: true,
     });
   }
-  return renderMdx(source);
+  return renderMdx(source, components);
 }
 
 async function collectFiles(directory: string): Promise<string[]> {
@@ -262,6 +274,7 @@ function duplicateContentError(kind: ContentKind, slug: string): Error {
 async function loadSectionFromSource(
   source: ContentSource,
   kind: ContentKind,
+  options: LoadSectionOptions,
 ): Promise<ContentItem[]> {
   const sectionDirectory = resolve(source.directory, `${kind}s`);
   let sourceFiles: string[];
@@ -292,7 +305,9 @@ async function loadSectionFromSource(
     const bodyWithoutLeadingHeading = document.body.replace(/^\s*#\s+.+?(?:\r?\n|$)+/, "");
     const plainText = stripMarkdown(bodyWithoutLeadingHeading);
     const title = asText(document.metadata.title) ?? titleFromBody(document.body, slug);
-    const html = withoutLeadingHeading(await renderSource(document.body, sourcePath));
+    const html = withoutLeadingHeading(
+      await renderSource(document.body, sourcePath, options.components ?? {}),
+    );
 
     items.push({
       kind,
@@ -323,7 +338,7 @@ export async function loadSection(
   const merged = new Map<string, ContentItem>();
   const duplicatePolicy = options.duplicate ?? "first-wins";
   for (const source of normalizeContentSources(sources)) {
-    const items = await loadSectionFromSource(source, kind);
+    const items = await loadSectionFromSource(source, kind, options);
     for (const item of items) {
       if (merged.has(item.slug)) {
         if (duplicatePolicy === "error") throw duplicateContentError(kind, item.slug);

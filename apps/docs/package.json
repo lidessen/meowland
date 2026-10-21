@@ -1,0 +1,20 @@
+{
+  "name": "@meowland/docs",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "bun build.ts",
+    "dev": "bun build.ts && bun serve.ts",
+    "check": "meowbook check --config meowbook.config.ts",
+    "check:slides": "meowbook check --config slides.meowbook.config.ts",
+    "test": "bun test tests"
+  },
+  "devDependencies": {
+    "meowbook": "workspace:*",
+    "meowcss": "workspace:*",
+    "meowjsx": "workspace:*",
+    "meowpress": "workspace:*",
+    "meowslides": "workspace:*",
+    "meowtail": "workspace:*"
+  }
+}

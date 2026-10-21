@@ -175,7 +175,8 @@ Default buttons are 36px high, compact buttons 28px, and input controls 32px. In
 Local spacing tokens are not the ceiling for page whitespace, and not every level is uniformly compressed.
 
 Use `uiTokens.fontBody` for interface body text, `uiTokens.fontCaption` for supporting descriptions, `uiTokens.fontReading` for long-form and conversation body text,
-`uiTokens.fontTitle` for local titles, and `uiTokens.fontPageTitle` for complete page titles; do not use the page-title scale for field labels. The horizontal padding of ordinary controls comes from
+`uiTokens.fontTitle` for local titles, and `uiTokens.fontPageTitle` for complete page titles; do not use the page-title scale for field labels.
+`uiTokens.fontDisplay` (`--ui-font-display`) is the serif stack for page and section titles. The default is Iowan Old Style, Palatino, Georgia, Times New Roman, Songti SC, Songti TC, Noto Serif SC, then `serif`. Body text stays on `uiTokens.font`. A host overrides the variable on an ancestor; it does not need a second theme. The horizontal padding of ordinary controls comes from
 `uiTokens.controlPaddingInline`; group, section, and panel express whitespace within a group, between areas, and at container edges respectively.
 Relative indentation in reading paragraphs, media sizes, graph coordinates, and touch targets still follow real usage and do not adopt control scales.
 

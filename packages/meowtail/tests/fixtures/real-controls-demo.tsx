@@ -38,6 +38,7 @@ const buttonTokens = defineTokens("controls-button", {
 });
 const alertTokens = defineTokens("controls-alert", {
   accent: alertOptions.by.tone({
+    neutral: `${ui.muted}`,
     info: `${ui.info}`,
     success: `${ui.success}`,
     warning: `${ui.warning}`,

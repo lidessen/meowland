@@ -47,6 +47,9 @@ export const alertStyles = css`
     border-radius: 50%;
     background: ${alertTokens.accent};
   }
+  ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"][${alertOptions.attribute("marker")}="none"]::before {
+    content: none;
+  }
   ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"] ${partSelector(alertContract, "title")} {
     flex: none;
   }

@@ -292,8 +292,8 @@ it supports arrow keys, Home/End, a controlled value Signal, and defaultValue. P
 `Breadcrumb items` is an array of label/href, and the last item marks the current location.
 `Tooltip` uses `trigger(bindings)` to add text descriptions to named focusable controls; it appears after a mouse delay, appears immediately on keyboard focus,
 and closes on Escape; do not put necessary information or interactive content only in a Tooltip—use Popover for the latter.
-`Alert tone` expresses visual state, and `role` explicitly chooses status/alert; urgency is not inferred from color.
-`Alert layout="bar"` is the compact page-notice form: one line with a status dot, body text and a trailing action; the default `layout="block"` keeps title/body/actions for outcomes that need reading. Use `bar` in `PageFrame`'s notice slot; it is a semantic notice shape, not a device variant.
+`Alert tone` expresses visual state, and `role` explicitly chooses status/alert; urgency is not inferred from color. `tone="neutral"` is the quiet notice: the same structure, tinted with the muted ink instead of a status color.
+`Alert layout="bar"` is the compact page-notice form: one line with a status dot, body text and a trailing action. `marker="none"` removes that dot; the default `marker="dot"` keeps it. The default `layout="block"` keeps title/body/actions for outcomes that need reading and draws no dot. Use `bar` in `PageFrame`'s notice slot; it is a semantic notice shape, not a device variant.
 
 `Skeleton` is an aria-hidden placeholder; the caller provides the content region's aria-busy and loading copy.
 `SkeletonBoundary active={loading} label="Updating details"` applies skeleton presentation to already mounted content;

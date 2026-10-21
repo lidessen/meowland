@@ -8,6 +8,7 @@ import {
   DialogActions,
   DialogHeader,
   DialogPanel,
+  Alert,
   EmptyState,
   Field,
   IconButton,
@@ -41,6 +42,15 @@ const iconButton: JSX.Element = (
   </IconButton>
 );
 const addButton: JSX.Element = <AddButton className="toolbar-add" />;
+const alert: JSX.Element = (
+  <Alert tone="neutral" marker="none" layout="bar">
+    Kept locally.
+  </Alert>
+);
+void alert;
+// @ts-expect-error Alert tones are neutral, info, success, warning, and danger.
+const invalidAlert: JSX.Element = <Alert tone="quiet">No</Alert>;
+void invalidAlert;
 const emptyState: JSX.Element = <EmptyState title="Empty" action={addButton} />;
 const compactEmptyState: JSX.Element = <EmptyState title="Empty" size="compact" />;
 // @ts-expect-error Empty-state sizes describe two supported presentation roles.

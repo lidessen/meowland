@@ -29,7 +29,7 @@ export interface DocumentOptions {
   theme: ThemeDefinition;
   /** The component reference, used by the sidebar. */
   catalog: Catalog;
-  /** The published packages, used by the sidebar. */
+  /** The workspace packages, used by the sidebar. */
   packages: DocsPackage[];
   /** Site path of the current page, without a leading slash. */
   path: string;
@@ -85,12 +85,46 @@ const CATALOG_FILTER = `(() => {
   });
 })();`;
 
+/** Enhance the one navigation rail into an inline disclosure on narrow screens. */
+const NAVIGATION_DISCLOSURE = `(() => {
+  const button = document.getElementById("docs-navigation-toggle");
+  const navigation = document.getElementById("docs-navigation");
+  if (!button || !navigation || !window.matchMedia) return;
+  const narrow = window.matchMedia("(max-width: 900px)");
+  let open = false;
+  const update = () => {
+    navigation.hidden = narrow.matches && !open;
+    button.setAttribute("aria-expanded", String(!narrow.matches || open));
+    document.body.setAttribute("data-docs-navigation-open", String(open));
+  };
+  button.addEventListener("click", () => {
+    open = !open;
+    update();
+  });
+  const escape = (event) => {
+    if (event.key !== "Escape" || !narrow.matches || !open) return;
+    event.preventDefault();
+    open = false;
+    update();
+    button.focus();
+  };
+  navigation.addEventListener("keydown", escape);
+  button.addEventListener("keydown", escape);
+  narrow.addEventListener("change", () => {
+    open = narrow.matches && navigation.contains(document.activeElement);
+    update();
+  });
+  update();
+  document.body.setAttribute("data-docs-navigation-enhanced", "true");
+  button.hidden = false;
+})();`;
+
 /** The sidebar groups, in the order the rail shows them. The home item id is the empty path. */
 function sidebarGroups(catalog: Catalog, packages: DocsPackage[]): NavListGroup[] {
   const groups: NavigationGroup[] = catalog.navigation;
   return [
     {
-      label: "Overview",
+      label: "Start here",
       items: [
         { id: "", href: "/", label: "Home" },
         { id: "gallery", href: "/gallery/", label: "Component workbench" },
@@ -124,22 +158,23 @@ function Sidebar({
   packages: DocsPackage[];
   path: string;
 }): Child {
-  const referenceCount = catalog.components.length + catalog.examples.length;
   return (
-    <aside className="docs-sidebar">
+    <aside className="docs-sidebar" id="docs-navigation" aria-label="Documentation navigation">
       <a className="docs-brand" href="/">
         <MeowlandMark />
         <strong>Meowland</strong>
         <span>docs</span>
       </a>
-      <SearchInput className="docs-search" label="Find components" placeholder="Find components…" />
-      <div className="docs-catalog-label">
-        Component reference <span>{referenceCount}</span>
-      </div>
+      <SearchInput
+        className="docs-search"
+        label="Filter navigation"
+        placeholder="Filter navigation…"
+      />
+      <div className="docs-catalog-label">Documentation</div>
       <div className="docs-catalog" id="docs-catalog">
         <NavList label="Documentation" activeId={path} groups={sidebarGroups(catalog, packages)} />
         <p className="docs-catalog-empty" id="docs-catalog-empty" hidden>
-          No component matches that name.
+          No navigation entries match that filter.
         </p>
       </div>
     </aside>
@@ -170,6 +205,22 @@ function Document({
       </head>
       <body>
         <div className="docs-shell">
+          <div className="docs-mobile-bar">
+            <a className="docs-mobile-brand" href="/">
+              Meowland <span>docs</span>
+            </a>
+            <button
+              className="docs-navigation-toggle"
+              id="docs-navigation-toggle"
+              type="button"
+              aria-controls="docs-navigation"
+              aria-expanded="false"
+              hidden
+            >
+              <Icon name="menu" size={16} />
+              Navigation
+            </button>
+          </div>
           <Sidebar catalog={catalog} packages={packages} path={path} />
           <div className="docs-main">
             <header className="docs-header">
@@ -183,7 +234,7 @@ function Document({
                 <Icon name="external-link" size={16} />
               </a>
             </header>
-            <main className="docs-content">
+            <main className={path === "" ? "docs-content docs-content-home" : "docs-content"}>
               <article className="docs-article">{children}</article>
               <footer className="docs-footer">
                 <span>Meowland documentation</span>
@@ -195,6 +246,7 @@ function Document({
           </div>
         </div>
         <script dangerouslySetInnerHTML={{ __html: CATALOG_FILTER }} />
+        <script dangerouslySetInnerHTML={{ __html: NAVIGATION_DISCLOSURE }} />
       </body>
     </html>
   );

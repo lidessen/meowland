@@ -1,6 +1,6 @@
 import { h, type Child } from "meowjsx";
 import type { ThemeDefinition } from "meowcss";
-import { Badge, Inline, Link, Page, ResourceCard, ResourceLink, Section, Stack } from "meowtail";
+import { Badge, Inline, Link, Page, PageHeader, ResourceLink, Section, Stack } from "meowtail";
 import type { ContentItem, SitePage } from "meowpress/build";
 import type { StoryEntry } from "meowbook";
 import type { Catalog, CatalogComponent, CatalogExample } from "./catalog";
@@ -87,18 +87,40 @@ function trailFor(path: string, state: DocsState): TrailItem[] {
   return [{ label: example?.group ?? "Example" }, { label: example?.title ?? "Example" }];
 }
 
-function PackageCard({ entry }: { entry: DocsPackage }): Child {
+interface ReadingSection {
+  id: string;
+  title: string;
+  description?: string;
+  children: Child;
+}
+
+/** The same sections supply both the reading column and its static table of contents. */
+function ReadingSections({ sections }: { sections: ReadingSection[] }): Child {
+  const links = () => (
+    <nav aria-label="On this page">
+      {sections.map((section) => (
+        <a href={`#${section.id}`}>{section.title}</a>
+      ))}
+    </nav>
+  );
   return (
-    <ResourceCard
-      title={
-        <a className="docs-card-link" href={`/${entry.path}/`}>
-          {entry.title}
-        </a>
-      }
-      subtitle={<code>bun add {entry.name}</code>}
-      description={entry.summary}
-      identity={`v${entry.version}`}
-    />
+    <div className="docs-reading-layout">
+      <aside className="docs-toc">
+        <div className="docs-toc-desktop">
+          <p className="docs-toc-title">On this page</p>
+          {links()}
+        </div>
+        <details className="docs-toc-disclosure">
+          <summary>On this page</summary>
+          {links()}
+        </details>
+      </aside>
+      <div className="docs-sections">
+        {sections.map(({ children, ...section }) => (
+          <Section {...section}>{children}</Section>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -106,22 +128,82 @@ function HomePage({ state }: { state: DocsState }): Child {
   const componentCount = state.catalog.components.length;
   return (
     <Page
-      eyebrow={SITE_NAME}
-      title="A small UI capability library"
-      description={SITE_DESCRIPTION}
+      className="docs-home-page"
+      header={
+        <div className="docs-home-hero">
+          <div className="docs-home-intro">
+            <p className="docs-home-eyebrow">{SITE_NAME}</p>
+            <PageHeader
+              title="Build interfaces with Meowland"
+              description="Build interfaces with a signal-driven runtime, a shared style system and components that fit together."
+            />
+            <div className="docs-home-actions">
+              <Link className="docs-home-primary" href="/packages/meowtail/">
+                Start with Meowtail
+              </Link>
+              <Link href="/packages/meowtail/#components">Browse components</Link>
+            </div>
+          </div>
+          <aside className="docs-home-route" aria-label="Start building">
+            <p className="docs-home-route-label">Start building</p>
+            <h2>From a component to your interface</h2>
+            <InstallLine name={COMPONENT_PACKAGE} />
+            <ol>
+              <li>
+                <a href="/packages/meowtail/">
+                  <span className="docs-route-step">01</span>
+                  <span>
+                    <strong>Set up Meowtail</strong>
+                    <span>Install the library and connect its theme.</span>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="/components/button/">
+                  <span className="docs-route-step">02</span>
+                  <span>
+                    <strong>Explore a component</strong>
+                    <span>See its live preview, source and API.</span>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a href="/gallery/">
+                  <span className="docs-route-step">03</span>
+                  <span>
+                    <strong>Open the workbench</strong>
+                    <span>Try the stories and composed interfaces.</span>
+                  </span>
+                </a>
+              </li>
+            </ol>
+          </aside>
+        </div>
+      }
       width={PAGE_WIDTH}
     >
       <Section
-        title="Packages"
-        description="Six published packages. Each one is useful on its own and they are built to be used together."
+        id="packages"
+        title="Six packages"
+        description="Start with the component library, or use the pieces your project needs."
       >
-        <div className="docs-grid">
-          {state.packages.map((entry) => (
-            <PackageCard entry={entry} />
+        <div className="docs-package-grid">
+          {state.packages.map((entry, index) => (
+            <a className="docs-package-link" href={`/${entry.path}/`}>
+              <span className="docs-package-number">{String(index + 1).padStart(2, "0")}</span>
+              <div>
+                <strong>{entry.title}</strong>
+                <p>{entry.summary}</p>
+                <span className="docs-package-version">
+                  {entry.version === "unpublished" ? "Unpublished" : `v${entry.version}`}
+                </span>
+              </div>
+            </a>
           ))}
         </div>
       </Section>
       <Section
+        id="components"
         title="Components"
         description={`${componentCount} components. Each one lists its style axes and DOM parts; the ones the stories cover also show a live example and the code behind it.`}
       >
@@ -137,6 +219,7 @@ function HomePage({ state }: { state: DocsState }): Child {
         </Stack>
       </Section>
       <Section
+        id="architecture"
         title="How the pieces fit"
         description="One rendering graph, one theme assembly, one set of contracts."
       >
@@ -192,58 +275,58 @@ function PackagePage({
   content?: ContentItem;
   state: DocsState;
 }): Child {
+  const sections: ReadingSection[] = [
+    { id: "install", title: "Install", children: <InstallLine name={entry.name} /> },
+  ];
+  if (content) {
+    sections.push({
+      id: "overview",
+      title: "Overview",
+      children: <div className="docs-prose" dangerouslySetInnerHTML={{ __html: content.html }} />,
+    });
+  }
+  if (entry.name === COMPONENT_PACKAGE) {
+    sections.push({
+      id: "components",
+      title: "Components",
+      description:
+        "Every component the library publishes, with its live example and its style axes.",
+      children: <ComponentList state={state} />,
+    });
+  }
+  if (entry.name === "meowbook" || entry.name === "meowslides") {
+    const slides = entry.name === "meowslides";
+    sections.push({
+      id: "workbench",
+      title: slides ? "Presentation workbench" : "Workbench",
+      children: (
+        <Stack gap="compact">
+          <Link href={slides ? "/gallery/slides/" : "/gallery/"}>
+            {slides ? "Open the presentation workbench" : "Open the component workbench"}
+          </Link>
+          <Note>
+            {slides
+              ? "The presentation workbench runs the stories the slides package declares, in the presentation theme."
+              : "The workbench lists every story the library declares, grouped the way the component reference groups them."}
+          </Note>
+        </Stack>
+      ),
+    });
+  }
   return (
-    <Page title={entry.title} description={entry.summary} width={PAGE_WIDTH}>
-      <Inline gap="compact" wrap>
+    <Page
+      className="docs-reference-page"
+      eyebrow="Package guide"
+      title={entry.title}
+      description={entry.summary}
+      actions={
         <Badge tone="outline" size="small">
-          v{entry.version}
+          {entry.version === "unpublished" ? "Unpublished" : `v${entry.version}`}
         </Badge>
-        <Badge tone="quiet" size="small">
-          {entry.name}
-        </Badge>
-      </Inline>
-      <Section title="Install">
-        <InstallLine name={entry.name} />
-      </Section>
-      {content ? (
-        <Section title="Overview">
-          <div className="docs-prose" dangerouslySetInnerHTML={{ __html: content.html }} />
-        </Section>
-      ) : null}
-      {entry.name === COMPONENT_PACKAGE ? (
-        <Section
-          title="Components"
-          description="Every component the library publishes, with its live example and its style axes."
-        >
-          <ComponentList state={state} />
-        </Section>
-      ) : null}
-      {entry.name === "meowbook" ? (
-        <Section title="Workbench">
-          <Stack gap="compact">
-            <Inline gap="compact" wrap>
-              <Link href="/gallery/">Open the component workbench</Link>
-            </Inline>
-            <Note>
-              The workbench lists every story the library declares, grouped the way the component
-              reference groups them.
-            </Note>
-          </Stack>
-        </Section>
-      ) : null}
-      {entry.name === "meowslides" ? (
-        <Section title="Presentation workbench">
-          <Stack gap="compact">
-            <Inline gap="compact" wrap>
-              <Link href="/gallery/slides/">Open the presentation workbench</Link>
-            </Inline>
-            <Note>
-              The presentation workbench runs the stories the slides package declares, in the
-              presentation theme.
-            </Note>
-          </Stack>
-        </Section>
-      ) : null}
+      }
+      width={PAGE_WIDTH}
+    >
+      <ReadingSections sections={sections} />
     </Page>
   );
 }
@@ -256,8 +339,83 @@ function ComponentPage({
   state: DocsState;
 }): Child {
   const [primary, ...rest] = component.stories;
+  const sections: ReadingSection[] = [];
+  if (primary) {
+    sections.push({
+      id: "preview",
+      title: "Preview",
+      description: "The first story that shows this component.",
+      children: (
+        <StoryExample
+          storyId={primary.id}
+          title={storyLabel(primary)}
+          description={component.summary === primary.description ? undefined : primary.description}
+          tall={isTallStory(primary)}
+          {...sourceFor(state, primary)}
+        />
+      ),
+    });
+  }
+  sections.push({
+    id: "install",
+    title: "Install",
+    children: <InstallLine name={COMPONENT_PACKAGE} />,
+  });
+  if (rest.length > 0) {
+    sections.push({
+      id: "examples",
+      title: "Examples",
+      description: "The other stories that show this component.",
+      children: (
+        <Stack gap="relaxed">
+          {rest.map((story) => (
+            <StoryExample
+              storyId={story.id}
+              title={storyLabel(story)}
+              description={story.description}
+              tall={isTallStory(story)}
+              {...sourceFor(state, story)}
+            />
+          ))}
+        </Stack>
+      ),
+    });
+  }
+  sections.push({
+    id: "api-reference",
+    title: "API reference",
+    description: "The style axes and the DOM parts of this component.",
+    children: (
+      <Stack gap="relaxed">
+        <div>
+          <h3 className="docs-example-title">Style axes</h3>
+          <StyleAxesTable contract={component.contract} />
+        </div>
+        <div>
+          <h3 className="docs-example-title">DOM parts</h3>
+          <PartList contract={component.contract} />
+        </div>
+        <div>
+          <h3 className="docs-example-title">Registry</h3>
+          {component.contract ? (
+            <Note>
+              The component is registered as <code>{component.contract.name}</code> in the meowtail
+              component registry.
+            </Note>
+          ) : (
+            <Note>
+              This component has no registry contract. It is a story that shows several components
+              together.
+            </Note>
+          )}
+        </div>
+      </Stack>
+    ),
+  });
   return (
     <Page
+      className="docs-reference-page"
+      eyebrow="Component reference"
       title={component.title}
       description={
         component.summary ??
@@ -265,66 +423,7 @@ function ComponentPage({
       }
       width={PAGE_WIDTH}
     >
-      {primary ? (
-        <Section title="Preview" description="The first story that shows this component.">
-          <StoryExample
-            storyId={primary.id}
-            title={storyLabel(primary)}
-            description={
-              component.summary === primary.description ? undefined : primary.description
-            }
-            tall={isTallStory(primary)}
-            {...sourceFor(state, primary)}
-          />
-        </Section>
-      ) : null}
-      <Section title="Install">
-        <InstallLine name={COMPONENT_PACKAGE} />
-      </Section>
-      {rest.length > 0 ? (
-        <Section title="Examples" description="The other stories that show this component.">
-          <Stack gap="relaxed">
-            {rest.map((story) => (
-              <StoryExample
-                storyId={story.id}
-                title={storyLabel(story)}
-                description={story.description}
-                tall={isTallStory(story)}
-                {...sourceFor(state, story)}
-              />
-            ))}
-          </Stack>
-        </Section>
-      ) : null}
-      <Section
-        title="API reference"
-        description="The style axes and the DOM parts of this component."
-      >
-        <Stack gap="relaxed">
-          <div>
-            <h3 className="docs-example-title">Style axes</h3>
-            <StyleAxesTable contract={component.contract} />
-          </div>
-          <div>
-            <h3 className="docs-example-title">DOM parts</h3>
-            <PartList contract={component.contract} />
-          </div>
-          <div>
-            <h3 className="docs-example-title">Registry</h3>
-            {component.contract ? (
-              <Note>
-                The component is registered as <code>{component.contract.name}</code> in the
-                meowtail component registry.
-              </Note>
-            ) : (
-              <Note>
-                This component has no registry contract. It is a story that shows several components
-                together.
-              </Note>
-            )}
-          </div>
-        </Stack>
-      </Section>
+      <ReadingSections sections={sections} />
     </Page>
   );
 }
@@ -332,17 +431,31 @@ function ComponentPage({
 function ExamplePage({ example, state }: { example: CatalogExample; state: DocsState }): Child {
   const { source, file, line } = sourceFor(state, example.story);
   return (
-    <Page title={example.title} description={example.story.description} width={PAGE_WIDTH}>
-      <Section title="Preview">
-        <Preview storyId={example.story.id} title={example.title} tall />
-      </Section>
-      <Section title="Code">
-        {source ? (
-          <CodeSample source={source} file={file} line={line} />
-        ) : (
-          <Note>The source of this story is not available.</Note>
-        )}
-      </Section>
+    <Page
+      className="docs-reference-page"
+      eyebrow="Composition example"
+      title={example.title}
+      description={example.story.description}
+      width={PAGE_WIDTH}
+    >
+      <ReadingSections
+        sections={[
+          {
+            id: "preview",
+            title: "Preview",
+            children: <Preview storyId={example.story.id} title={example.title} tall />,
+          },
+          {
+            id: "code",
+            title: "Code",
+            children: source ? (
+              <CodeSample source={source} file={file} line={line} />
+            ) : (
+              <Note>The source of this story is not available.</Note>
+            ),
+          },
+        ]}
+      />
     </Page>
   );
 }

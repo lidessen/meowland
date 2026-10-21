@@ -83,11 +83,11 @@ function page(path: string): string {
 }
 
 describe("the page document", () => {
-  test("the catalog rail carries a search field and the reference count", () => {
+  test("the catalog rail labels the full documentation navigation", () => {
     const html = document("components/button");
     expect(html).toContain('data-meowui-part="search-input/root"');
-    expect(html).toContain("Find components");
-    expect(html).toContain("Component reference");
+    expect(html).toContain("Filter navigation");
+    expect(html).toContain('<div class="docs-catalog-label">Documentation</div>');
   });
 
   test("the rail is one NavList landmark with labelled groups", () => {
@@ -95,7 +95,7 @@ describe("the page document", () => {
     expect(html).toContain('data-meowui-part="nav-list/root"');
     expect(html).toContain('aria-label="Documentation"');
     expect(html).toContain('data-meowui-part="nav-list/groupTitle"');
-    expect(html).toContain("Overview");
+    expect(html).toContain("Start here");
     expect(html).toContain("Packages");
     expect(html).toContain("Basic controls");
     expect(html).toContain('data-meowui-part="nav-list/item"');
@@ -122,6 +122,14 @@ describe("the page document", () => {
     expect(html).toMatch(/<script>[\s\S]*nav-list\/item[\s\S]*<\/script>/);
     expect(html).toMatch(/<script>[\s\S]*nav-list\/group[\s\S]*<\/script>/);
   });
+
+  test("navigation stays reachable without JavaScript and has one disclosure control", () => {
+    const html = document("components/button");
+    expect(html).toMatch(/<aside[^>]*id="docs-navigation"[^>]*>/);
+    expect(html).not.toMatch(/<aside[^>]*\shidden/);
+    expect(html).toMatch(/<button[^>]*aria-controls="docs-navigation"[^>]*hidden/);
+    expect([...html.matchAll(/data-meowui-part="nav-list\/root"/g)]).toHaveLength(1);
+  });
 });
 
 describe("the docs pages", () => {
@@ -129,9 +137,8 @@ describe("the docs pages", () => {
     const html = page("");
     expect(html).toContain('data-meowui-part="page/root"');
     expect(html).toContain('data-meowui-part="page/header"');
-    expect(html).toContain('data-meowui-part="page/eyebrow"');
     expect(html).toContain('data-meowui-part="page-header/title"');
-    expect(html).toContain("A small UI capability library");
+    expect(html).toContain("Build interfaces with Meowland");
     expect(html).toContain('data-meowui-part="section/root"');
     expect(html).toContain('data-meowui-part="section/title"');
     expect(html).not.toContain("docs-eyebrow");
@@ -148,8 +155,7 @@ describe("the docs pages", () => {
     expect(html).toContain('data-meowui-part="section/title"');
     expect(html).toContain("API reference");
     expect(html).toContain("docs-preview-frame");
-    // The breadcrumb names the group; the page does not repeat it as an eyebrow.
-    expect(html).not.toContain('data-meowui-part="page/eyebrow"');
+    expect(html).toContain("Component reference");
   });
 
   test("an example page shows the code through the library code surface", () => {
@@ -162,8 +168,50 @@ describe("the docs pages", () => {
     expect(html).toContain("packages/meowtail/stories/workspace.stories.tsx");
     expect(html).toContain("line 2");
     expect(html).toContain("const story = 1;");
-    expect(html).not.toContain('data-meowui-part="page/eyebrow"');
+    expect(html).toContain("Composition example");
     expect(html).not.toContain("docs-code-panel");
     expect(html).not.toContain("docs-code-head");
+  });
+
+  test("the home page offers a starting route before its package directory", () => {
+    const html = page("");
+    expect(html).toContain("Start with Meowtail");
+    expect(html).toContain("Browse components");
+    expect(html).toContain("bun add meowtail");
+    expect(html.indexOf("Start building")).toBeLessThan(html.indexOf("Six packages"));
+    expect(html).not.toContain("Six published packages");
+  });
+
+  test("a component table of contents only links to sections that exist", () => {
+    const html = page("components/button");
+    const toc = html.match(/<nav aria-label="On this page">([\s\S]*?)<\/nav>/)?.[1] ?? "";
+    expect(toc).toContain('href="#preview"');
+    expect(toc).toContain('href="#install"');
+    expect(toc).toContain('href="#api-reference"');
+    expect(toc).not.toContain('href="#examples"');
+    for (const [, id] of toc.matchAll(/href="#([^"]+)"/g)) {
+      expect(html).toMatch(new RegExp(`<section[^>]*id="${id}"`));
+    }
+    expect(html).toMatch(/<details class="docs-toc-disclosure"><summary>On this page<\/summary>/);
+  });
+
+  test("the desktop and disclosure contents share links with unique section targets", () => {
+    const html = page("components/button");
+    const contents = [...html.matchAll(/<nav aria-label="On this page">([\s\S]*?)<\/nav>/g)];
+    expect(contents).toHaveLength(2);
+    expect(contents[0]?.[1]).toBe(contents[1]?.[1]);
+    expect(html).toMatch(/<div class="docs-toc-desktop">[\s\S]*?<nav aria-label="On this page">/);
+    for (const [, id] of contents[0]?.[1]?.matchAll(/href="#([^"]+)"/g) ?? []) {
+      expect([...html.matchAll(new RegExp(`<section[^>]*id="${id}"`, "g"))]).toHaveLength(1);
+    }
+  });
+
+  test("a package without authored content omits the overview from its table of contents", () => {
+    const html = page("packages/meowtail");
+    const toc = html.match(/<nav aria-label="On this page">([\s\S]*?)<\/nav>/)?.[1] ?? "";
+    expect(toc).toContain('href="#install"');
+    expect(toc).toContain('href="#components"');
+    expect(toc).not.toContain('href="#overview"');
+    expect(html).toContain("Package guide");
   });
 });

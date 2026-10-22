@@ -1,6 +1,7 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
 import { Button, Stack } from "meowtail";
+import { Note } from "./specimen";
 import { SegmentedControl } from "../src/components/segmented-control";
 import { TextShimmer } from "../src/components/text-shimmer";
 import { RiskConfirmation } from "../src/components/risk-confirmation";
@@ -135,7 +136,7 @@ export const SelectionFeedbackStory = defineStory({
             feedback.value = "Removed the local example.";
           }}
         />
-        <p role="status">{feedback}</p>
+        <Note role="status">{feedback}</Note>
       </Stack>
     );
   },

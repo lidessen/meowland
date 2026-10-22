@@ -1,6 +1,7 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
-import { ChoiceSelect, Stack, Field, Container } from "meowtail";
+import { ChoiceSelect, Field } from "meowtail";
+import { Specimen, Specimens } from "./specimen";
 
 export const GroupedChoiceSelectStory = defineStory({
   id: "choice-select-grouped",
@@ -35,25 +36,31 @@ export const ChoiceWidthStory = defineStory({
     "A matching trigger keeps its exact width; the natural popover and wide form follow their existing contracts.",
   render() {
     return (
-      <Stack align="start">
-        <ChoiceSelect
-          id="short-choice"
-          aria-label="Short trigger choice"
-          options={[
-            { value: "one", label: "First option" },
-            { value: "two", label: "Second option" },
-          ]}
-        />
-        <ChoiceSelect
-          id="natural-choice"
-          aria-label="Natural width choice"
-          matchTriggerWidth={false}
-          options={[
-            { value: "one", label: "First option" },
-            { value: "two", label: "Second option" },
-          ]}
-        />
-        <Container width="narrow">
+      <Specimens>
+        <Specimen
+          label="Trigger width"
+          note="The first list matches its trigger; the second takes its natural width."
+          align="start"
+        >
+          <ChoiceSelect
+            id="short-choice"
+            aria-label="Short trigger choice"
+            options={[
+              { value: "one", label: "First option" },
+              { value: "two", label: "Second option" },
+            ]}
+          />
+          <ChoiceSelect
+            id="natural-choice"
+            aria-label="Natural width choice"
+            matchTriggerWidth={false}
+            options={[
+              { value: "one", label: "First option" },
+              { value: "two", label: "Second option" },
+            ]}
+          />
+        </Specimen>
+        <Specimen label="Long option names" width="narrow">
           <Field label="Full option name" htmlFor="long-choice">
             <ChoiceSelect
               id="long-choice"
@@ -70,8 +77,8 @@ export const ChoiceWidthStory = defineStory({
               ]}
             />
           </Field>
-        </Container>
-      </Stack>
+        </Specimen>
+      </Specimens>
     );
   },
 });

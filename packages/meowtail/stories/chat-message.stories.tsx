@@ -14,10 +14,10 @@ import {
   ChatProcess,
   ChatSources,
   ChatToolCall,
-  Container,
   Icon,
   Stack,
 } from "meowtail";
+import { Measure, Note } from "./specimen";
 
 const reference = {
   title: "AbortController",
@@ -34,7 +34,7 @@ export const ChatToolSequenceStory = defineStory({
   description:
     "Tool actions and their target stay on one row; results expand on demand, and non-complete states always show clearly. The static example runs no tools.",
   render: () => (
-    <Container>
+    <Measure>
       <ChatFrame>
         <ChatMessageList ariaLabel="Tool call sequence">
           <ChatMessage role="user" author="You" surface="none">
@@ -111,7 +111,7 @@ export const ChatToolSequenceStory = defineStory({
           </ChatMessage>
         </ChatMessageList>
       </ChatFrame>
-    </Container>
+    </Measure>
   ),
 });
 
@@ -128,7 +128,7 @@ export const ChatToolCallActionStory = defineStory({
   render: () => {
     const feedback = signal("Not activated yet");
     return (
-      <Container>
+      <Measure>
         <Stack>
           <ChatFrame>
             <ChatMessageList ariaLabel="The two interactions of a tool row">
@@ -157,11 +157,11 @@ export const ChatToolCallActionStory = defineStory({
               />
             </ChatMessageList>
           </ChatFrame>
-          <p className="workshop-feedback" role="status" data-tool-action-result>
+          <Note role="status" data-tool-action-result>
             {feedback}
-          </p>
+          </Note>
         </Stack>
-      </Container>
+      </Measure>
     );
   },
 });
@@ -182,7 +182,7 @@ export const ChatMessageCompositionStory = defineStory({
     "mixed content",
   ],
   render: () => (
-    <Container>
+    <Measure>
       <Stack>
         <ChatFrame>
           <ChatMessageList ariaLabel="Message composition example">
@@ -307,11 +307,11 @@ export const ChatMessageCompositionStory = defineStory({
             </ChatMessage>
           </ChatMessageList>
         </ChatFrame>
-        <p className="workshop-feedback" role="status" data-message-result>
+        <Note role="status" data-message-result>
           Actions only report back to the local example.
-        </p>
+        </Note>
       </Stack>
-    </Container>
+    </Measure>
   ),
   setup({ root, onCleanup }) {
     const click = (event: Event) => {
@@ -334,7 +334,7 @@ export const ChatProcessDetailStory = defineStory({
   description:
     "The process summary keeps its position and execution details expand on demand; expansion and collapse come from native details.",
   render: () => (
-    <Container>
+    <Measure>
       <Stack>
         <ChatProcess label="Check request order · Completed">
           <p>Queries are sent in input order, but responses return in network completion order.</p>
@@ -348,7 +348,7 @@ export const ChatProcessDetailStory = defineStory({
           />
         </ChatProcess>
       </Stack>
-    </Container>
+    </Measure>
   ),
 });
 
@@ -362,7 +362,7 @@ export const ChatSourcesDetailStory = defineStory({
   description:
     "Sources are layered away from the answer; the title locates the source and the description helps judge why to open it.",
   render: () => (
-    <Container>
+    <Measure>
       <Stack>
         <p>
           When checking request cancellation and response handling, you can open the references
@@ -380,7 +380,7 @@ export const ChatSourcesDetailStory = defineStory({
           ]}
         />
       </Stack>
-    </Container>
+    </Measure>
   ),
 });
 
@@ -453,7 +453,7 @@ export const ChatMessageRowsStory = defineStory({
     "layout-neutral wrapper",
   ],
   render: () => (
-    <Container>
+    <Measure>
       <Stack>
         <ChatFrame>
           <ChatMessageList ariaLabel="Message list with direct children">
@@ -466,6 +466,6 @@ export const ChatMessageRowsStory = defineStory({
           </ChatMessageList>
         </ChatFrame>
       </Stack>
-    </Container>
+    </Measure>
   ),
 });

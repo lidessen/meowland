@@ -1,6 +1,7 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
 import { Icon, MenuButton, Stack } from "meowtail";
+import { Note } from "./specimen";
 
 export const MenuButtonStory = defineStory({
   id: "menu-button",
@@ -44,7 +45,7 @@ export const MenuButtonStory = defineStory({
         >
           Export
         </MenuButton>
-        <p role="status">{feedback}</p>
+        <Note role="status">{feedback}</Note>
       </Stack>
     );
   },

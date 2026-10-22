@@ -34,6 +34,10 @@ export const uiTokens = defineTokens("ui", {
   spaceGroup: "8px",
   spaceSection: "20px",
   spacePanel: "24px",
+  /** Between blocks of reading content: paragraphs, lists, code and quotes. */
+  proseGap: "16px",
+  /** The longest comfortable reading line for Prose. */
+  measure: "70ch",
   pageInsetBlock: "36px",
   pageInsetInline: "48px",
   pageInsetCompactBlock: "20px",

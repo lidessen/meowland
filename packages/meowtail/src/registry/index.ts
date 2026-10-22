@@ -73,6 +73,8 @@ import {
   progressContract,
   avatarContract,
   linkContract,
+  textContract,
+  proseContract,
   accordionContract,
   tableContract,
   selectContract,
@@ -196,6 +198,8 @@ export const MeowUIComponent = {
   Progress: progressContract.name,
   Avatar: avatarContract.name,
   Link: linkContract.name,
+  Text: textContract.name,
+  Prose: proseContract.name,
   Select: selectContract.name,
   ChoiceSelect: choiceSelectContract.name,
   ChoiceGroup: choiceGroupContract.name,
@@ -286,6 +290,8 @@ export const meowUIComponents = [
   progressContract,
   avatarContract,
   linkContract,
+  textContract,
+  proseContract,
   accordionContract,
   tableContract,
   numberInputContract,
@@ -449,6 +455,8 @@ declare module "meowjsx" {
     progress: { parts: (typeof progressContract.parts)[number] };
     avatar: { parts: (typeof avatarContract.parts)[number] };
     link: { parts: (typeof linkContract.parts)[number] };
+    text: { parts: "root" };
+    prose: { parts: "root" };
     select: { parts: "root" };
     "choice-select": { parts: (typeof choiceSelectContract.parts)[number] };
     "choice-group": { parts: (typeof choiceGroupContract.parts)[number] };

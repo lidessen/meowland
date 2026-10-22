@@ -1,6 +1,6 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Breadcrumb, Stack } from "meowtail";
+import { Breadcrumb, Section, Stack } from "meowtail";
 export const Breadcrumbs = defineStory({
   id: "breadcrumb",
   title: "Breadcrumb · Current location",
@@ -12,7 +12,7 @@ export const Breadcrumbs = defineStory({
     "Earlier levels keep their links and the last item marks the current location; narrow screens may wrap long paths. These links jump to the example levels on this page.",
   covers: ["Breadcrumb", "navigation", "long-label"],
   render: () => (
-    <Stack>
+    <Stack gap="relaxed">
       <Breadcrumb
         items={[
           { label: "Workspace", href: "#breadcrumb-workspace" },
@@ -20,8 +20,9 @@ export const Breadcrumbs = defineStory({
           { label: "Stage one component and interaction design notes" },
         ]}
       />
-      <h3 id="breadcrumb-workspace">Workspace</h3>
-      <p id="breadcrumb-project">Website redesign · Stage one</p>
+      <Section id="breadcrumb-workspace" title="Workspace">
+        <p id="breadcrumb-project">Website redesign · Stage one</p>
+      </Section>
     </Stack>
   ),
 });

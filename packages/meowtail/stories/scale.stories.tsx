@@ -11,13 +11,13 @@ import {
   ChatQuestion,
   ChoiceGroup,
   ChoiceSelect,
-  Container,
   Field,
   Inline,
   Input,
   Select,
   Stack,
 } from "meowtail";
+import { Measure } from "./specimen";
 
 export const ScaleStory = defineStory({
   id: "scale-reference",
@@ -34,7 +34,7 @@ export const ScaleStory = defineStory({
     "narrow layout",
   ],
   render: () => (
-    <Container width="content">
+    <Measure width="content">
       <Stack gap="relaxed">
         <Stack gap="compact">
           <strong>Start with the basic controls, then check the composed scale</strong>
@@ -104,6 +104,6 @@ export const ScaleStory = defineStory({
           />
         </ChatQuestion>
       </Stack>
-    </Container>
+    </Measure>
   ),
 });

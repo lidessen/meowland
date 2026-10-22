@@ -1,6 +1,7 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Alert, Button, Stack, Container } from "meowtail";
+import { Alert, Button, Stack } from "meowtail";
+import { Measure } from "./specimen";
 export const Alerts = defineStory({
   id: "alert",
   title: "Alert · Outcome and next step",
@@ -12,7 +13,7 @@ export const Alerts = defineStory({
     "Color conveys semantics; the announced urgency is set independently with role. These are all local demo messages.",
   covers: ["Alert", "bar", "neutral", "marker", "status", "error"],
   render: () => (
-    <Container width="content">
+    <Measure width="content">
       <Stack>
         <Alert title="Saved on this device only">
           The current draft has not been published yet; you can keep editing.
@@ -41,6 +42,6 @@ export const Alerts = defineStory({
           The file may have moved. Select the file again and try again.
         </Alert>
       </Stack>
-    </Container>
+    </Measure>
   ),
 });

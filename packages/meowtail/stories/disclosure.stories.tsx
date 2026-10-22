@@ -1,6 +1,7 @@
 import { h } from "meowjsx/runtime";
 import { defineStory } from "meowbook";
 import { Disclosure } from "meowtail";
+import { Note } from "./specimen";
 
 export const DisclosureStory = defineStory({
   id: "disclosure",
@@ -60,9 +61,9 @@ export const DisclosureStory = defineStory({
           </p>
         </Disclosure>
       </div>
-      <p className="workshop-feedback" data-disclosure-status role="status">
+      <Note data-disclosure-status role="status">
         Execution details collapsed
-      </p>
+      </Note>
     </div>
   ),
 });

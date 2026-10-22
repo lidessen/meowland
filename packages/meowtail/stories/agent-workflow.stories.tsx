@@ -2,7 +2,6 @@ import { h, signal, type Child } from "meowjsx";
 import { defineStory } from "meowbook";
 import {
   Button,
-  Container,
   DescriptionItem,
   DescriptionList,
   DiffBlock,
@@ -11,6 +10,7 @@ import {
   ResourceLink,
   Stack,
 } from "meowtail";
+import { Measure } from "./specimen";
 import {
   AssistantView,
   ChatAttachments,
@@ -73,7 +73,7 @@ export function agentWorkflowDemo(narrow = false): Child {
     timers.add(timer);
   };
   return (
-    <Container width="wide">
+    <Measure width="wide">
       <Stack
         gap="relaxed"
         style={narrow ? { maxWidth: "320px", width: "100%" } : undefined}
@@ -290,7 +290,7 @@ export function agentWorkflowDemo(narrow = false): Child {
         </ChatProcess>
         <span role="status">{feedback}</span>
       </Stack>
-    </Container>
+    </Measure>
   );
 }
 

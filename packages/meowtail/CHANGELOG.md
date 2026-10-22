@@ -13,8 +13,13 @@ Candidate for the next alpha publish. This version is not on npm until the manua
 - `EmptyState` `illustration`. Omitting it keeps `DoodleCat`. `null` and `false` leave the illustration part out. Presence is fixed for the mount.
 - `uiTokens.fontDisplay` (`--ui-font-display`), a serif stack for page and section titles. Hosts override the variable. Body text stays on `uiTokens.font`.
 - `PageHeader` `leading`, a mark before the title. Omitting it keeps the title as a direct child of the copy block. `Page` forwards `leading` into that header.
+- `Text` with `variant` `body | secondary | caption | eyebrow` and `as` `p | span | div`: copy between components in a theme text role. `eyebrow` is the small-caps group label.
+- `Prose` with `measure` `reading | fill` and `as` `div | article | section`: long-form reading content. Tokens `uiTokens.proseGap` and `uiTokens.measure`.
 
 ### Changed
+
+- One reading rhythm (`src/theme/shared/prose.styles.ts`) for Prose, chat message content, chat bubbles and rendered assistant markdown. Chat h2/h3 are 1.15em/1.05em with an 8px lead instead of 1.08em with 24px; rendered markdown spaces blocks by `proseGap` instead of browser margins, its code blocks use the recessed CodeBlock surface, table rows use divider hairlines, and links use the accent ink of `Link`.
+- Content layout conventions (AGENTS.md): text roles, one header unit, one start edge per region, Prose for reading, labeled groups. Stories follow them through `stories/specimen.tsx`: component stories start on the canvas edge instead of centering, every group of variants carries a small-caps label, and receipts share the caption role.
 
 - `standardTheme` and `createMeowUI` no longer load the code-block highlighter. The package sets `sideEffects` to `false`, and the contracts those entries need live in modules that do not import Shiki. Importing `CodeBlock`, `ReadBlock`, `JsonBlock`, or `AssistantView` still loads Shiki. `standardTheme.cssText` stays one complete stylesheet.
 - Page and section titles use `uiTokens.fontDisplay`. Their size and weight are unchanged.

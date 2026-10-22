@@ -10,10 +10,12 @@ import {
   IconButton,
   Input,
   Stack,
+  Inline,
   PageFrame,
   PageHeader,
   SegmentedControl,
 } from "meowtail";
+import { Specimen } from "./specimen";
 
 export const DialogLayoutStory = defineStory({
   id: "dialog-layout",
@@ -27,92 +29,98 @@ export const DialogLayoutStory = defineStory({
   covers: ["fixed header", "layout scroll owner", "intrinsic height", "host height", "native form"],
   render() {
     return (
-      <Stack align="start">
-        {(["short", "long", "limited", "workspace"] as const).map((kind) => {
-          let dialog: HTMLDialogElement | undefined;
-          const name = {
-            short: "Short form",
-            long: "Long body",
-            limited: "Limited height",
-            workspace: "Full workspace",
-          }[kind];
-          return (
-            <div>
-              <Button
-                size={kind === "limited" ? "small" : "default"}
-                onClick={() => {
-                  dialog?.showModal();
-                }}
-              >
-                Open {name}
-              </Button>
-              <Dialog
-                labelledBy={`${kind}-title`}
-                style={
-                  kind === "limited"
-                    ? { maxHeight: "40svh" }
-                    : kind === "workspace"
-                      ? { height: "100dvh", maxHeight: "none" }
-                      : undefined
-                }
-                ref={(element: HTMLDialogElement) => {
-                  dialog = element;
-                }}
-              >
-                <DialogPanel
-                  as="form"
-                  method="dialog"
-                  header={
-                    <DialogHeader
-                      title={`${name} · Current item and close action`}
-                      titleId={`${kind}-title`}
-                      actions={
-                        <IconButton
-                          label={`Close ${name}`}
-                          onClick={() => {
-                            dialog?.close("cancel");
-                          }}
-                        >
-                          <Icon name="x" />
-                        </IconButton>
-                      }
-                    />
-                  }
+      <Specimen
+        label="Open a dialog"
+        note="Each dialog keeps its title and close action fixed while the body scrolls."
+      >
+        <Inline gap="compact">
+          {(["short", "long", "limited", "workspace"] as const).map((kind) => {
+            let dialog: HTMLDialogElement | undefined;
+            const name = {
+              short: "Short form",
+              long: "Long body",
+              limited: "Limited height",
+              workspace: "Full workspace",
+            }[kind];
+            return (
+              <div>
+                <Button
+                  variant="outline"
+                  size={kind === "limited" ? "small" : "default"}
+                  onClick={() => {
+                    dialog?.showModal();
+                  }}
                 >
-                  <Stack gap="compact">
-                    <Field label={`${name} draft`} htmlFor={`${kind}-draft`}>
-                      <Input
-                        id={`${kind}-draft`}
-                        name="draft"
-                        value="Keep the current input"
-                        required
+                  Open {name}
+                </Button>
+                <Dialog
+                  labelledBy={`${kind}-title`}
+                  style={
+                    kind === "limited"
+                      ? { maxHeight: "40svh" }
+                      : kind === "workspace"
+                        ? { height: "100dvh", maxHeight: "none" }
+                        : undefined
+                  }
+                  ref={(element: HTMLDialogElement) => {
+                    dialog = element;
+                  }}
+                >
+                  <DialogPanel
+                    as="form"
+                    method="dialog"
+                    header={
+                      <DialogHeader
+                        title={`${name} · Current item and close action`}
+                        titleId={`${kind}-title`}
+                        actions={
+                          <IconButton
+                            label={`Close ${name}`}
+                            onClick={() => {
+                              dialog?.close("cancel");
+                            }}
+                          >
+                            <Icon name="x" />
+                          </IconButton>
+                        }
                       />
-                    </Field>
-                    {kind !== "short" ? (
-                      Array.from({ length: 24 }, (_, i) => (
-                        <p>
-                          Body {i + 1}: Reading content, editing the draft, and closing the window
-                          stay independent; the title and close entry always belong to the same top
-                          region.
-                        </p>
-                      ))
-                    ) : (
-                      <p>A short form uses only the height its content needs.</p>
-                    )}
-                  </Stack>
-                  <Button
-                    type="submit"
-                    value="save"
-                    size={kind === "limited" ? "small" : "default"}
+                    }
                   >
-                    Save {name}
-                  </Button>
-                </DialogPanel>
-              </Dialog>
-            </div>
-          );
-        })}
-      </Stack>
+                    <Stack gap="compact">
+                      <Field label={`${name} draft`} htmlFor={`${kind}-draft`}>
+                        <Input
+                          id={`${kind}-draft`}
+                          name="draft"
+                          value="Keep the current input"
+                          required
+                        />
+                      </Field>
+                      {kind !== "short" ? (
+                        Array.from({ length: 24 }, (_, i) => (
+                          <p>
+                            Body {i + 1}: Reading content, editing the draft, and closing the window
+                            stay independent; the title and close entry always belong to the same
+                            top region.
+                          </p>
+                        ))
+                      ) : (
+                        <p>A short form uses only the height its content needs.</p>
+                      )}
+                    </Stack>
+                    <Button
+                      type="submit"
+                      value="save"
+                      size={kind === "limited" ? "small" : "default"}
+                    >
+                      Save {name}
+                    </Button>
+                  </DialogPanel>
+                </Dialog>
+              </div>
+            );
+          })}
+        </Inline>
+      </Specimen>
     );
   },
 });

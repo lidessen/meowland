@@ -1,6 +1,7 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Tabs, Input, Stack, Container } from "meowtail";
+import { Tabs, Input, Stack } from "meowtail";
+import { Measure } from "./specimen";
 
 export const ProjectTabs = defineStory({
   id: "tabs",
@@ -15,7 +16,7 @@ export const ProjectTabs = defineStory({
   render: () => {
     const selected = signal("overview");
     return (
-      <Container width="content">
+      <Measure width="content">
         <Stack gap="relaxed">
           <Tabs
             id="project-tabs"
@@ -60,7 +61,7 @@ export const ProjectTabs = defineStory({
             ]}
           />
         </Stack>
-      </Container>
+      </Measure>
     );
   },
 });

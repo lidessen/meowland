@@ -1,15 +1,7 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
-import {
-  Badge,
-  Button,
-  ComposerPanel,
-  Container,
-  Icon,
-  IconButton,
-  MetaRow,
-  Stack,
-} from "meowtail";
+import { Badge, Button, ComposerPanel, Icon, IconButton, MetaRow, Stack } from "meowtail";
+import { Measure } from "./specimen";
 
 export const ComposerPanelStory = defineStory({
   id: "composer-panel",
@@ -22,7 +14,7 @@ export const ComposerPanelStory = defineStory({
     "ComposerPanel refines ChatComposer's single writing surface. The keyboard hint and optional page-level facts follow outside the rounded editor and its bottom action row.",
   covers: ["ComposerPanel default", "ComposerPanel external hint", "ComposerPanel meta row"],
   render: () => (
-    <Container width="content">
+    <Measure width="content">
       <Stack gap="relaxed">
         <Stack gap="compact">
           <strong>Default panel</strong>
@@ -64,6 +56,6 @@ export const ComposerPanelStory = defineStory({
           </IconButton>
         </ComposerPanel>
       </Stack>
-    </Container>
+    </Measure>
   ),
 });

@@ -8,12 +8,12 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-  Container,
   Field,
   Inline,
   Input,
   Stack,
 } from "meowtail";
+import { Measure } from "./specimen";
 
 export const CardResponsiveHeaderStory = defineStory({
   id: "card-responsive-header",
@@ -25,7 +25,7 @@ export const CardResponsiveHeaderStory = defineStory({
     "A wide card and a narrow sidebar in the same window share the title layout; nested cards, intrinsic button cards, and optional descriptions keep their native structure.",
   covers: ["narrow card", "sidebar", "intrinsic card", "action first", "optional description"],
   render: () => (
-    <Container width="wide">
+    <Measure width="wide">
       <Stack gap="relaxed">
         <Card data-card-responsive="wide">
           <CardHeader>
@@ -93,6 +93,6 @@ export const CardResponsiveHeaderStory = defineStory({
           </CardHeader>
         </Card>
       </Stack>
-    </Container>
+    </Measure>
   ),
 });

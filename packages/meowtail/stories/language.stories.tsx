@@ -30,6 +30,7 @@ import {
   Status,
   Toolbar,
 } from "meowtail";
+import { Note } from "./specimen";
 import { Icon } from "meowtail/icons";
 import { accentTokens, chatTokens, uiTokens } from "meowtail/theme";
 
@@ -383,9 +384,9 @@ export const DesignLanguageStory = defineStory({
                 </AddButton>
               </ChatComposer>
             </div>
-            <p className="workshop-feedback" role="status" data-feedback>
+            <Note role="status" data-feedback>
               A local receipt appears after sending; no model is called.
-            </p>
+            </Note>
           </div>
           <aside className="language-context">
             <Card as="section">

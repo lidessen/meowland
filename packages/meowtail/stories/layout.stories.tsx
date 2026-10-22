@@ -12,6 +12,7 @@ import {
   PageHeader,
   Stack,
 } from "meowtail";
+import { Measure } from "./specimen";
 
 export const LayoutCompositionStory = defineStory({
   id: "layout-composition",
@@ -24,7 +25,7 @@ export const LayoutCompositionStory = defineStory({
     "Related text sits close along the baseline; the body can shrink while actions keep their natural width; wrap line spacing is independent of group spacing.",
   covers: ["LayoutItem grow/shrink", "Inline baseline", "rowGap", "columnGap", "long content"],
   render: () => (
-    <Container width="content">
+    <Measure width="content">
       <Stack gap="relaxed">
         <Inline as="header" gap="compact" align="baseline" data-layout-summary>
           <small>Default connection</small>
@@ -58,7 +59,7 @@ export const LayoutCompositionStory = defineStory({
           <span>gpt-6-luna</span>
         </Grid>
       </Stack>
-    </Container>
+    </Measure>
   ),
 });
 
@@ -73,7 +74,7 @@ export const StackStory = defineStory({
     "The title, description, and actions of one piece of work stay close; the next block of work uses a wider rhythm.",
   covers: ["Stack", "semantic gap", "Inline wrap"],
   render: () => (
-    <Container width="content">
+    <Measure width="content">
       <Stack gap="relaxed">
         <Stack gap="compact">
           <strong>Check the update order of search results</strong>
@@ -91,7 +92,7 @@ export const StackStory = defineStory({
           <Button variant="quiet">Handle later</Button>
         </Inline>
       </Stack>
-    </Container>
+    </Measure>
   ),
 });
 
@@ -106,7 +107,7 @@ export const InlineStory = defineStory({
     "Status and actions share one line; when space runs out they wrap as whole units without compressing button text.",
   covers: ["Inline", "wrap", "align", "justify"],
   render: () => (
-    <Container width="content">
+    <Measure width="content">
       <Stack gap="relaxed">
         <Inline justify="between" align="baseline">
           <strong>Work awaiting review</strong>
@@ -125,7 +126,7 @@ export const InlineStory = defineStory({
           </Stack>
         </Inline>
       </Stack>
-    </Container>
+    </Measure>
   ),
 });
 
@@ -140,7 +141,7 @@ export const GridStory = defineStory({
     "Parallel items arrange by available width; narrow containers fall back to a single column without hiding long titles.",
   covers: ["Grid", "auto columns", "Container", "long content"],
   render: () => (
-    <Container width="wide">
+    <Measure width="wide">
       <Grid gap="relaxed">
         <Stack gap="compact" align="start">
           <Badge tone="success">Completed</Badge>
@@ -155,7 +156,7 @@ export const GridStory = defineStory({
           <Button variant="outline">View record</Button>
         </Stack>
       </Grid>
-    </Container>
+    </Measure>
   ),
 });
 
@@ -254,7 +255,7 @@ export const NestedLayoutScrollStory = defineStory({
   render: () => {
     const count = signal(24);
     return (
-      <Container width="wide">
+      <Measure width="wide">
         <Stack
           gap="compact"
           style={{ height: "clamp(240px, calc(100dvh - 170px), 540px)" }}
@@ -320,7 +321,7 @@ export const NestedLayoutScrollStory = defineStory({
             </Inline>
           </LayoutItem>
         </Stack>
-      </Container>
+      </Measure>
     );
   },
 });

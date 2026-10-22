@@ -1,6 +1,7 @@
 import { h, signal, mapSignal } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Skeleton, Button, Stack, Container } from "meowtail";
+import { Skeleton, Button, Stack } from "meowtail";
+import { Measure } from "./specimen";
 export const Skeletons = defineStory({
   id: "skeleton",
   title: "Loading placeholder · Preserve content structure",
@@ -14,7 +15,7 @@ export const Skeletons = defineStory({
   render: () => {
     const loading = signal(true);
     return (
-      <Container width="content">
+      <Measure width="content">
         <Stack>
           <section aria-label="Project summary" aria-busy={loading}>
             {mapSignal(loading, (value) =>
@@ -43,7 +44,7 @@ export const Skeletons = defineStory({
             {mapSignal(loading, (value) => (value ? "Simulate load completion" : "Replay loading"))}
           </Button>
         </Stack>
-      </Container>
+      </Measure>
     );
   },
 });

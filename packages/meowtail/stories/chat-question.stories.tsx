@@ -1,6 +1,7 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
 import { Button, ChatQuestion, ChoiceGroup, Textarea } from "meowtail";
+import { Note } from "./specimen";
 
 export const ChatQuestionStory = defineStory({
   id: "chat-question",
@@ -69,7 +70,7 @@ export const ChatQuestionStory = defineStory({
             disabled
           />
         </div>
-        <p data-question-feedback role="status" hidden />
+        <Note data-question-feedback role="status" hidden />
       </ChatQuestion>
     </form>
   ),

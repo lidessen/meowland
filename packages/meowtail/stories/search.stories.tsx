@@ -1,6 +1,7 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
 import { Field, SearchInput } from "meowtail";
+import { Note } from "./specimen";
 
 export const SearchStory = defineStory({
   id: "search-input",
@@ -41,9 +42,9 @@ export const SearchStory = defineStory({
           No matching titles; try a shorter word.
         </p>
       </section>
-      <p className="workshop-feedback" role="status" data-search-count>
+      <Note role="status" data-search-count>
         3 local results
-      </p>
+      </Note>
       <section className="workshop-stack" aria-label="Other search states">
         <Field
           label="Scope locked"

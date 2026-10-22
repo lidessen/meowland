@@ -1,6 +1,7 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Field, Slider, Stack } from "meowtail";
+import { Field, Slider } from "meowtail";
+import { Specimen, Specimens } from "./specimen";
 
 export const SliderStory = defineStory({
   id: "slider",
@@ -14,22 +15,26 @@ export const SliderStory = defineStory({
   render: () => {
     const volume = signal(40);
     return (
-      <Stack align="start">
-        <Field label="Volume" htmlFor="story-volume">
-          <Slider
-            id="story-volume"
-            label="Volume"
-            min={0}
-            max={100}
-            step={5}
-            value={volume}
-            onValueChange={(next) => {
-              volume.value = next;
-            }}
-          />
-        </Field>
-        <Slider label="Unavailable" defaultValue={20} disabled />
-      </Stack>
+      <Specimens>
+        <Specimen label="Adjustable" align="start">
+          <Field label="Volume" htmlFor="story-volume">
+            <Slider
+              id="story-volume"
+              label="Volume"
+              min={0}
+              max={100}
+              step={5}
+              value={volume}
+              onValueChange={(next) => {
+                volume.value = next;
+              }}
+            />
+          </Field>
+        </Specimen>
+        <Specimen label="Disabled" align="start">
+          <Slider label="Unavailable" defaultValue={20} disabled />
+        </Specimen>
+      </Specimens>
     );
   },
 });

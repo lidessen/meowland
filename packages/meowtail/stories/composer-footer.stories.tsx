@@ -6,12 +6,12 @@ import {
   ChatComposer,
   ChatStatus,
   ChoiceSelect,
-  Container,
   Icon,
   IconButton,
   Inline,
   Stack,
 } from "meowtail";
+import { Measure } from "./specimen";
 
 export const ComposerFooterStory = defineStory({
   id: "composer-footer",
@@ -30,7 +30,7 @@ export const ComposerFooterStory = defineStory({
     const helpCount = signal(0);
     const sentCount = signal(0);
     return (
-      <Container width="content">
+      <Measure width="content">
         <Stack gap="relaxed">
           <h2>Stacked composer footer</h2>
           <Inline wrap gap="compact">
@@ -133,7 +133,7 @@ export const ComposerFooterStory = defineStory({
             Help opened: {helpCount}. Submissions: {sentCount}.
           </p>
         </Stack>
-      </Container>
+      </Measure>
     );
   },
 });

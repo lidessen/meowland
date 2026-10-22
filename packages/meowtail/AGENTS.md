@@ -289,6 +289,31 @@ File names, registration, and `mountStyles` / `applyTheme` / `Theme` stay in
   a real composition; do not handle it with global scaling, uniform shrinking, or a separate density
   switch on every component.
 
+### Content layout
+
+Composed screens read as one system when every region follows the same relationships. These are
+relationships, not numbers; values come from `uiTokens`.
+
+- **Text has a role.** Copy between components is `Text` (`body`, `secondary`, `caption`, or the
+  small-caps `eyebrow` group label). Titles belong to `PageHeader`, `Page` and `Section`; field labels
+  to `Field`; code to the code components. Long-form reading content (articles, notes, rendered
+  markdown) goes in `Prose`, which shares one rhythm with chat messages through
+  `src/theme/shared/prose.styles.ts`. Hosts and stories do not hand-style `p`, `h*` or `small`.
+- **One header unit.** Eyebrow, then title, then description, then actions or content. The unit is
+  tight inside (`spaceGroup`) and a section step from what follows. Receipts and status lines are
+  `caption` directly under the thing they report on.
+- **One start edge per region.** Labels, titles, controls and notes in a region share a start edge.
+  Components do not center themselves; only a page column (`Container`, `Page`) or an `EmptyState`
+  centers.
+- **Arrange with layout, read with Prose.** Stack, Inline and Grid arrange controls and cards; Prose
+  arranges reading content and caps it at the reading measure (`uiTokens.measure`).
+- **Label every group.** When a region shows more than one group of things (variants, states,
+  settings), each group gets an eyebrow label; groups sit a panel step apart.
+
+In stories, `stories/specimen.tsx` applies these rules: `Specimens` / `Specimen` label each group,
+`Note` is the caption receipt, and `Measure` holds a host width on the canvas start edge. Component
+stories never center on the canvas; page compositions keep their centered `Container` column.
+
 ## Basic quality checks
 
 Shared component or theme changes pass through this set of relationships first; they are not aesthetic

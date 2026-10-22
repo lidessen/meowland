@@ -1,6 +1,7 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
 import { AddButton, Button, Icon, IconButton } from "meowtail";
+import { Note, Specimen } from "./specimen";
 
 export const ActionMatrixStory = defineStory({
   id: "actions-matrix",
@@ -31,14 +32,14 @@ export const ActionMatrixStory = defineStory({
     return (
       <div className="workshop-stack workshop-constrained">
         {(["small", "default", "large"] as const).map((size) => (
-          <section className="workshop-stack">
-            <h2 className="workshop-section-title">
-              {
-                { small: "Compact toolbar", default: "Regular actions", large: "Priority actions" }[
-                  size
-                ]
-              }
-            </h2>
+          <Specimen
+            label={
+              { small: "Compact toolbar", default: "Regular actions", large: "Priority actions" }[
+                size
+              ]
+            }
+            align="start"
+          >
             <div className="workshop-foundation-action-grid">
               {actions.map(([variant, label]) => (
                 <Button
@@ -71,10 +72,9 @@ export const ActionMatrixStory = defineStory({
                 <Icon name="search" />
               </IconButton>
             </div>
-          </section>
+          </Specimen>
         ))}
-        <section className="workshop-stack">
-          <h2 className="workshop-section-title">Add entries</h2>
+        <Specimen label="Add entries" align="start">
           <div className="workshop-row">
             <AddButton
               onClick={() => {
@@ -94,10 +94,8 @@ export const ActionMatrixStory = defineStory({
               Add after the work completes
             </AddButton>
           </div>
-        </section>
-        <p role="status" className="workshop-feedback">
-          {feedback}
-        </p>
+        </Specimen>
+        <Note role="status">{feedback}</Note>
       </div>
     );
   },

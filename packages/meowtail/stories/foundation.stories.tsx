@@ -3,6 +3,7 @@ import { signal } from "meowjsx";
 import { uiTokens } from "meowtail/theme";
 import {
   Badge,
+  Section,
   Button,
   Dialog,
   DialogActions,
@@ -18,10 +19,10 @@ import {
   Card,
   Stack,
   Grid,
-  Container,
   Inline,
   LayoutItem,
 } from "meowtail";
+import { Measure, Note, Specimen, Specimens } from "./specimen";
 import { defineStory } from "meowbook";
 
 export const ButtonsStory = defineStory({
@@ -35,7 +36,7 @@ export const ButtonsStory = defineStory({
     "Four real button variants plus the disabled state. Use Tab to see focus; disabled buttons cannot trigger actions.",
   covers: ["Button", "primary / quiet / outline / danger", "disabled", "keyboard focus"],
   render: () => (
-    <Container width="narrow">
+    <Measure width="narrow">
       <Stack data-button-composition>
         <Stack as="header" gap="compact">
           <h2 style={{ margin: 0, fontSize: uiTokens.fontTitle, fontWeight: 600 }}>
@@ -100,7 +101,7 @@ export const ButtonsStory = defineStory({
           </LayoutItem>
         </Inline>
       </Stack>
-    </Container>
+    </Measure>
   ),
   setup({ root, report, onCleanup }) {
     const clicked = (event: Event) => {
@@ -129,10 +130,10 @@ export const ButtonSizesStory = defineStory({
   render: () => (
     <div className="workshop-stack workshop-constrained">
       {(["small", "default", "large"] as const).map((size, index) => (
-        <section className="workshop-stack">
-          <h2 className="workshop-section-title">
-            {["Compact toolbar", "Regular actions", "Primary entry"][index]}
-          </h2>
+        <Specimen
+          label={["Compact toolbar", "Regular actions", "Primary entry"][index]}
+          align="start"
+        >
           <div className="workshop-row">
             <Button size={size}>Save changes</Button>
             <Button size={size} variant="outline">
@@ -145,7 +146,7 @@ export const ButtonSizesStory = defineStory({
               <Icon name="x" />
             </IconButton>
           </div>
-        </section>
+        </Specimen>
       ))}
       <Button size="large" variant="quiet">
         View all work outcomes awaiting review in the current project
@@ -222,9 +223,9 @@ export const FieldsStory = defineStory({
             Restore initial values
           </Button>
         </div>
-        <p className="workshop-feedback" id="project-feedback" role="status">
+        <Note id="project-feedback" role="status">
           Change the name and save; leave it empty to see validation feedback.
-        </p>
+        </Note>
       </form>
     );
   },
@@ -326,33 +327,35 @@ export const BadgesStory = defineStory({
     "long label",
   ],
   render: () => (
-    <div className="workshop-stack">
-      <h2 className="workshop-section-title">Regular badges</h2>
-      <div className="workshop-row">
-        <Badge tone="neutral">Not started</Badge>
-        <Badge tone="accent">In progress</Badge>
-        <Badge tone="success">Completed</Badge>
-        <Badge tone="warning">Waiting for input</Badge>
-        <Badge tone="danger">Failed</Badge>
-        <Badge>A longer status description to check on a narrow screen</Badge>
-      </div>
-      <h2 className="workshop-section-title">Compact badges</h2>
-      <div className="workshop-row">
-        <Badge size="small">Not started</Badge>
-        <Badge size="small" tone="accent">
-          In progress
-        </Badge>
-        <Badge size="small" tone="success">
-          Completed
-        </Badge>
-        <Badge size="small" tone="warning">
-          Waiting for input
-        </Badge>
-        <Badge size="small" tone="danger">
-          Failed
-        </Badge>
-      </div>
-    </div>
+    <Specimens>
+      <Specimen label="Regular badges" note="Text carries the status; color only supports it.">
+        <Inline gap="compact">
+          <Badge tone="neutral">Not started</Badge>
+          <Badge tone="accent">In progress</Badge>
+          <Badge tone="success">Completed</Badge>
+          <Badge tone="warning">Waiting for input</Badge>
+          <Badge tone="danger">Failed</Badge>
+          <Badge>A longer status description to check on a narrow screen</Badge>
+        </Inline>
+      </Specimen>
+      <Specimen label="Compact badges">
+        <Inline gap="compact">
+          <Badge size="small">Not started</Badge>
+          <Badge size="small" tone="accent">
+            In progress
+          </Badge>
+          <Badge size="small" tone="success">
+            Completed
+          </Badge>
+          <Badge size="small" tone="warning">
+            Waiting for input
+          </Badge>
+          <Badge size="small" tone="danger">
+            Failed
+          </Badge>
+        </Inline>
+      </Specimen>
+    </Specimens>
   ),
 });
 
@@ -375,7 +378,7 @@ export const EmptyStateStory = defineStory({
           copy="Tell Assistant what you want to move forward; completed outcomes appear here."
           action={<Button data-empty-start>Start a conversation</Button>}
         />
-        <p className="workshop-feedback" data-feedback role="status" />
+        <Note data-feedback role="status" />
       </section>
       <section className="workshop-foundation-empty-sample">
         <h2 className="workshop-section-title">All handled · No action needed</h2>
@@ -465,16 +468,14 @@ export const DialogStory = defineStory({
   covers: ["Dialog", "DialogPanel / Header / Actions", "showModal", "Escape", "focus return"],
   render: () => (
     <div className="workshop-stack workshop-constrained">
-      <header className="workshop-composition-header">
-        <h2>One confirmation before finishing</h2>
-        <p className="workshop-note">
-          Use Escape or cancel to return; the dangerous action keeps explicit text.
-        </p>
-      </header>
+      <Section
+        title="One confirmation before finishing"
+        description="Use Escape or cancel to return; the dangerous action keeps explicit text."
+      />
       <Button data-open-dialog>Open confirmation dialog</Button>
-      <p className="workshop-feedback" data-feedback role="status">
+      <Note data-feedback role="status">
         The current work is still in progress.
-      </p>
+      </Note>
       <Dialog labelledBy="workshop-dialog-title" describedBy="workshop-dialog-description">
         <DialogPanel
           header={

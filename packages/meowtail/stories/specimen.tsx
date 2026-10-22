@@ -16,8 +16,8 @@ export function Specimens(props: { children?: Child; className?: string }): Chil
 }
 
 const widths = {
-  narrow: String(uiTokens.containerNarrow),
-  content: String(uiTokens.containerContent),
+  narrow: String(uiTokens.layout.containerNarrow),
+  content: String(uiTokens.layout.containerContent),
   fill: "none",
 } as const;
 
@@ -58,10 +58,10 @@ export function Note(props: { children?: Child; [attribute: string]: unknown }):
 }
 
 const measures = {
-  narrow: String(uiTokens.containerNarrow),
-  content: String(uiTokens.containerContent),
-  wide: String(uiTokens.containerWide),
-  page: String(uiTokens.containerWide),
+  narrow: String(uiTokens.layout.containerNarrow),
+  content: String(uiTokens.layout.containerContent),
+  wide: String(uiTokens.layout.containerWide),
+  page: String(uiTokens.layout.containerWide),
 } as const;
 
 /**

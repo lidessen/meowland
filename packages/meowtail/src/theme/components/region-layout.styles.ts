@@ -41,18 +41,18 @@ export const regionLayoutStyles = css`
   ${partSelector(regionLayoutContract, "back")} {
     align-self: start;
     flex-shrink: 0;
-    min-height: ${uiTokens.buttonHeight};
-    margin-bottom: ${uiTokens.spaceGroup};
-    padding: 0 ${uiTokens.controlPaddingInline};
-    color: ${uiTokens.foreground};
+    min-height: ${uiTokens.control.regular};
+    margin-bottom: ${uiTokens.space.group};
+    padding: 0 ${uiTokens.control.inset};
+    color: ${uiTokens.ink.primary};
     background: transparent;
     border: 0;
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radius.lg};
     font: inherit;
     cursor: pointer;
   }
   ${partSelector(regionLayoutContract, "back")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: -2px;
   }
 `;

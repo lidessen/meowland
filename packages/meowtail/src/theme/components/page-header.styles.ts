@@ -12,19 +12,19 @@ export const pageHeaderStyles = css`
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: ${uiTokens.spaceSection} ${uiTokens.spacePanel};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
-    color: ${uiTokens.foreground};
+    gap: ${uiTokens.space.section} ${uiTokens.space.panel};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    color: ${uiTokens.ink.primary};
   }
   ${header("copy")} {
     display: grid;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
   }
   ${header("heading")} {
     display: flex;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
   }
   ${header("leading")} {
@@ -32,9 +32,9 @@ export const pageHeaderStyles = css`
     flex: none;
     align-items: center;
     justify-content: center;
-    width: ${uiTokens.fontPageTitle};
-    height: ${uiTokens.fontPageTitle};
-    color: ${uiTokens.foreground};
+    width: ${uiTokens.type.pageTitle};
+    height: ${uiTokens.type.pageTitle};
+    color: ${uiTokens.ink.primary};
   }
   ${header("leading")} > svg {
     display: block;
@@ -44,8 +44,8 @@ export const pageHeaderStyles = css`
   ${header("title")} {
     margin: 0;
     min-width: 0;
-    font-family: ${uiTokens.fontDisplay};
-    font-size: ${uiTokens.fontPageTitle};
+    font-family: ${uiTokens.type.display};
+    font-size: ${uiTokens.type.pageTitle};
     font-weight: 600;
     letter-spacing: -0.015em;
     line-height: 1.3;
@@ -53,14 +53,14 @@ export const pageHeaderStyles = css`
   }
   ${header("description")} {
     margin: 0;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
     overflow-wrap: anywhere;
   }
   ${header("actions")} {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
   }
 
   @media (pointer: coarse) {

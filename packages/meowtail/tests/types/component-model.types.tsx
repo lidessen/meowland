@@ -99,20 +99,20 @@ export const Callout = defineComponent<
 export const calloutStyles = css`
   ${partSelector(calloutContract, "root")} {
     display: grid;
-    gap: ${uiTokens.spaceGroup};
-    padding: ${uiTokens.spaceGroup};
-    color: ${uiTokens.foreground};
-    font: 400 ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
-    background: ${uiTokens.surfaceMuted};
-    border-radius: ${uiTokens.controlRadius};
+    gap: ${uiTokens.space.group};
+    padding: ${uiTokens.space.group};
+    color: ${uiTokens.ink.primary};
+    font: 400 ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    background: ${uiTokens.surface.fill};
+    border-radius: ${uiTokens.radius.lg};
   }
   ${partSelector(calloutContract, "title")} {
     font-weight: 500;
   }
   ${partSelector(calloutContract, "root")} {
     ${calloutOptions.when({ tone: "accent" })} {
-      color: ${uiTokens.primary};
-      background: ${uiTokens.primarySoft};
+      color: ${uiTokens.action.primary};
+      background: ${uiTokens.action.soft};
     }
   }
 `;

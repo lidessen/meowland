@@ -1,7 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { resourceCardContract } from "../../components/resource-card";
-import { accentTokens, layerTokens, lineTokens, radiusTokens } from "../palette";
 import { resourceCardTokens } from "./resource-card.tokens";
 
 const card = (part: (typeof resourceCardContract.parts)[number]) =>
@@ -15,23 +14,23 @@ export const resourceCardStyles = css`
     align-content: start;
     min-width: 0;
     padding: ${resourceCardTokens.inset};
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: ${radiusTokens.card};
-    background: ${layerTokens.raised};
-    box-shadow: ${uiTokens.shadowRaised};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
-    color: ${uiTokens.foreground};
-    transition: border-color ${uiTokens.durationResponse} ${uiTokens.ease};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.raised};
+    box-shadow: ${uiTokens.shadow.raised};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    color: ${uiTokens.ink.primary};
+    transition: border-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   @media (hover: hover) {
     ${card("root")}:hover {
-      border-color: color-mix(in srgb, ${uiTokens.foreground} 22%, transparent);
+      border-color: color-mix(in srgb, ${uiTokens.ink.primary} 22%, transparent);
     }
   }
   ${card("root")}[data-tone="muted"] {
     border-style: dashed;
-    background: ${layerTokens.sunken};
-    color: ${uiTokens.mutedForeground};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.secondary};
   }
   ${card("head")} {
     display: flex;
@@ -46,13 +45,13 @@ export const resourceCardStyles = css`
     flex: 0 0 40px;
     width: 40px;
     height: 40px;
-    border-radius: ${uiTokens.controlRadius};
-    background: ${accentTokens.selected};
-    color: ${accentTokens.base};
+    border-radius: ${uiTokens.radius.lg};
+    background: ${uiTokens.accent.selected};
+    color: ${uiTokens.accent.base};
   }
   ${card("root")}[data-tone="muted"] ${card("icon")} {
-    background: ${layerTokens.chip};
-    color: ${layerTokens.faint};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.tertiary};
   }
   ${card("icon")} svg {
     width: 18px;
@@ -60,20 +59,20 @@ export const resourceCardStyles = css`
   }
   ${card("copy")} {
     display: grid;
-    flex: 1 1 ${uiTokens.gridColumnCompact};
+    flex: 1 1 ${uiTokens.layout.gridCompact};
     gap: 1px;
     min-width: 0;
   }
   ${card("title")} {
     margin: 0;
-    font-size: ${uiTokens.fontTitle};
+    font-size: ${uiTokens.type.title};
     font-weight: 600;
     letter-spacing: -0.01em;
     overflow-wrap: anywhere;
   }
   ${card("subtitle")} {
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     overflow-wrap: anywhere;
   }
   ${card("status")} {
@@ -83,28 +82,28 @@ export const resourceCardStyles = css`
     min-width: 0;
     gap: 6px;
     margin-left: auto;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     overflow-wrap: anywhere;
   }
   ${card("description")} {
     margin: 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontBody};
-    line-height: ${uiTokens.leading};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.body};
+    line-height: ${uiTokens.type.leading};
     overflow-wrap: anywhere;
   }
   ${card("actions")} {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
   }
   ${card("identity")} {
     margin-left: auto;
-    color: ${uiTokens.mutedForeground};
-    font-family: ${uiTokens.mono};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-family: ${uiTokens.type.mono};
+    font-size: ${uiTokens.type.caption};
     overflow-wrap: anywhere;
   }
   @media (prefers-reduced-motion: reduce) {

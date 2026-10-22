@@ -1,7 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { resourceLinkContract } from "../../components/resource-link";
-import { layerTokens, lineTokens } from "../palette";
 
 const link = (part: (typeof resourceLinkContract.parts)[number]) =>
   partSelector(resourceLinkContract, part);
@@ -15,22 +14,22 @@ export const resourceLinkStyles = css`
     box-sizing: border-box;
     width: 100%;
     padding: 12px;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: ${uiTokens.radiusLarge};
-    background: ${layerTokens.raised};
-    box-shadow: ${uiTokens.shadowRaised};
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/1.5 ${uiTokens.font};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.raised};
+    box-shadow: ${uiTokens.shadow.raised};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/1.5 ${uiTokens.type.sans};
     text-align: left;
     text-decoration: none;
     cursor: pointer;
-    transition: border-color ${uiTokens.durationResponse} ${uiTokens.ease};
+    transition: border-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${link("root")}:hover {
-    border-color: color-mix(in srgb, ${uiTokens.foreground} 24%, transparent);
+    border-color: color-mix(in srgb, ${uiTokens.ink.primary} 24%, transparent);
   }
   ${link("root")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
   ${link("icon")} {
@@ -38,8 +37,8 @@ export const resourceLinkStyles = css`
     place-items: center;
     width: 32px;
     height: 32px;
-    border-radius: ${uiTokens.radiusSmall};
-    background: ${layerTokens.chip};
+    border-radius: ${uiTokens.radius.md};
+    background: ${uiTokens.surface.fill};
   }
   ${link("icon")} svg {
     width: 16px;
@@ -52,22 +51,22 @@ export const resourceLinkStyles = css`
   }
   ${link("title")} {
     overflow: hidden;
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
     font-weight: 500;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   ${link("detail")} {
     overflow: hidden;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     text-overflow: ellipsis;
     white-space: nowrap;
   }
   ${link("trailing")} {
     display: grid;
     place-items: center;
-    color: ${layerTokens.faint};
+    color: ${uiTokens.ink.tertiary};
   }
   @media (pointer: coarse) {
     ${link("root")} {

@@ -26,10 +26,10 @@ function gapValue(gap: string | undefined) {
     ? "0px"
     : String(
         gap === "compact"
-          ? uiTokens.spaceGroup
+          ? uiTokens.space.group
           : gap === "relaxed"
-            ? uiTokens.spacePanel
-            : uiTokens.spaceSection,
+            ? uiTokens.space.panel
+            : uiTokens.space.section,
       );
 }
 function deepFocus(document: Document): Element | null {
@@ -180,8 +180,8 @@ export function mountRegionLayout(
   function track(value: string, axis: "inline" | "block") {
     if (value === "fill") return "minmax(0, 1fr)";
     if (axis === "block") return "minmax(0, max-content)";
-    if (value === "compact") return `minmax(0, ${uiTokens.gridColumnNormal})`;
-    return `fit-content(${uiTokens.gridColumnWide})`;
+    if (value === "compact") return `minmax(0, ${uiTokens.layout.gridNormal})`;
+    return `fit-content(${uiTokens.layout.gridWide})`;
   }
   function paint() {
     grid.style.gap = gapValue(layout.gap);
@@ -248,7 +248,7 @@ export function mountRegionLayout(
       (total, column) =>
         total +
         dimension(
-          column === "fill" ? uiTokens.gridColumnWide.name : uiTokens.gridColumnCompact.name,
+          column === "fill" ? uiTokens.layout.gridWide.name : uiTokens.layout.gridCompact.name,
           column === "fill" ? 320 : 160,
         ),
       0,
@@ -258,10 +258,10 @@ export function mountRegionLayout(
         ? 0
         : dimension(
             layout.gap === "compact"
-              ? uiTokens.spaceGroup.name
+              ? uiTokens.space.group.name
               : layout.gap === "relaxed"
-                ? uiTokens.spacePanel.name
-                : uiTokens.spaceSection.name,
+                ? uiTokens.space.panel.name
+                : uiTokens.space.section.name,
             20,
           );
     const next = columns.length > 1 && root.clientWidth < minimum + gap * (columns.length - 1);

@@ -38,37 +38,37 @@ export const numberInputStyles = css`
     align-items: center;
     justify-content: center;
     flex: 0 0 auto;
-    width: ${uiTokens.controlSmall};
-    height: ${uiTokens.controlSmall};
+    width: ${uiTokens.control.small};
+    height: ${uiTokens.control.small};
     margin: 0;
     padding: 0;
     border: 0;
-    border-radius: ${uiTokens.radiusSmall};
+    border-radius: ${uiTokens.radius.md};
     background: transparent;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
     font: inherit;
     line-height: 0;
     cursor: pointer;
     transition:
-      color ${uiTokens.durationResponse} ${uiTokens.ease},
-      background-color ${uiTokens.durationResponse} ${uiTokens.ease};
+      color ${uiTokens.motion.response} ${uiTokens.motion.ease},
+      background-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${stepper} svg {
     display: block;
-    width: ${uiTokens.iconSize};
-    height: ${uiTokens.iconSize};
+    width: ${uiTokens.icon.size};
+    height: ${uiTokens.icon.size};
   }
   @media (hover: hover) {
     ${stepper}:hover:not(:disabled) {
-      color: ${uiTokens.foreground};
-      background: ${uiTokens.hover};
+      color: ${uiTokens.ink.primary};
+      background: ${uiTokens.state.hover};
     }
   }
   ${stepper}:active:not(:disabled) {
-    background: ${uiTokens.active};
+    background: ${uiTokens.state.active};
   }
   ${stepper}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
   ${root}:has(${control}:disabled) ${stepper},

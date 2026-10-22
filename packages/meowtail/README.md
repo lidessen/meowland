@@ -150,8 +150,7 @@ a link when href is present, otherwise a button); `PageHeader` (page name, one-s
 outline, an editing area can expand below a row, and a standalone row with `tone="accent"` is a summary row), `ResourceCard` (a capability on an overview page, with a dashed
 low-contrast disabled state); `Drawer` is a narrow-screen native modal panel that slides in from the start edge, with backdrop clicks and Escape handed to the host to update `open`. `SegmentedControl`
 tightens its track and selected state to match the design draft. The narrow-screen `ChatComposer` stacked layout puts "add, input, send" on one row and keeps model selection below.
-The palette and layers live only in `theme/palette.ts`: `accentTokens`, `statusTokens`, `radiusTokens` (8/10/14/22), `lineTokens`
-(0.5px hairlines), and `layerTokens`; accent expresses only "happening now" and "where you are", while primary stays black and white.
+Every color, size, radius, shadow and duration is a role in one tree, `uiTokens` in `theme/tokens.ts` (surface, inverse, line, ink, state, action, control, accent, status, type, space, icon, radius, shadow, motion, layout, glyph; CSS names `--ui-<group>-<key>`). Accent expresses only "happening now" and "where you are", while the main action stays black and white. The rules for each group are in [AGENTS.md](AGENTS.md#design-system).
 
 `ChatToolCall` uses `label` for the action and `summary` for the short target still visible when collapsed; input/output are reactive lazy text,
 and overlong results collapse through the shared `OutputBlock` and copy in full. queued/running/waiting/success/error/cancelled/unknown
@@ -180,10 +179,10 @@ first, then integrate them into applications; the theme's font sizes, control he
 Buttons and single-line fields share one ladder: 36px by default, 28px compact, 44px large, so they line up in one row. Information blocks are tight inside; page edges, standalone blocks, and reading areas should have generous whitespace.
 Local spacing tokens are not the ceiling for page whitespace, and not every level is uniformly compressed.
 
-Use `uiTokens.fontBody` for interface body text, `uiTokens.fontCaption` for supporting descriptions, `uiTokens.fontReading` for long-form and conversation body text,
-`uiTokens.fontTitle` for local titles, and `uiTokens.fontPageTitle` for complete page titles; do not use the page-title scale for field labels.
-`uiTokens.fontDisplay` (`--ui-font-display`) is the serif stack for page and section titles. The default is Iowan Old Style, Palatino, Georgia, Times New Roman, Songti SC, Songti TC, Noto Serif SC, then `serif`. Body text stays on `uiTokens.font`. A host overrides the variable on an ancestor; it does not need a second theme. The horizontal padding of ordinary controls comes from
-`uiTokens.controlPaddingInline` (text inside field surfaces uses `uiTokens.fieldPaddingInline`); group, section, and panel express whitespace within a group, between areas, and at container edges respectively.
+Use `uiTokens.type.body` for interface body text, `uiTokens.type.caption` for supporting descriptions, `uiTokens.type.body` for long-form and conversation body text,
+`uiTokens.type.title` for local titles, and `uiTokens.type.pageTitle` for complete page titles; do not use the page-title scale for field labels.
+`uiTokens.type.display` (`--ui-type-display`) is the serif stack for page and section titles. The default is Iowan Old Style, Palatino, Georgia, Times New Roman, Songti SC, Songti TC, Noto Serif SC, then `serif`. Body text stays on `uiTokens.type.sans`. A host overrides the variable on an ancestor; it does not need a second theme. The horizontal padding of ordinary controls comes from
+`uiTokens.control.inset` (text inside field surfaces uses `uiTokens.control.fieldInset`); group, section, and panel express whitespace within a group, between areas, and at container edges respectively.
 Relative indentation in reading paragraphs, media sizes, graph coordinates, and touch targets still follow real usage and do not adopt control scales.
 
 `PageFrame`'s page edge uses `pageInsetBlock` / `pageInsetInline`, and narrow windows use the corresponding
@@ -260,7 +259,7 @@ Meowbook's "Layout composition · Text baseline and fixed actions" covers these 
 
 `Text` is one run of copy in a theme text role: `variant` is `body` (default), `secondary`, `caption`, or `eyebrow` (the small-caps group label used by menus, navigation groups and specimen labels), and `as` is `p` (default), `span`, or `div`. Emphasis and fine print keep their native `strong`, `em` and `small` inside it. Headings stay with `PageHeader`, `Page` and `Section`, field labels with `Field`, and code with the code components; Text has no tone, because state color belongs to `Status`, `Badge` and `Alert`, which carry non-color cues.
 
-`Prose` holds long-form reading content: native `h2`–`h4`, paragraphs, lists, quotes, `pre`/`code`, rules, tables, links and images inside it take one reading rhythm, shared with chat message content and rendered assistant markdown. `measure="reading"` (default) caps lines at `uiTokens.measure`; `measure="fill"` takes the parent's width; `as` is `div`, `article`, or `section`. Arranging controls and cards stays with Stack, Inline and Grid. Neither component joins the JSON catalog, and Meowslides keeps its own presentation typography.
+`Prose` holds long-form reading content: native `h2`–`h4`, paragraphs, lists, quotes, `pre`/`code`, rules, tables, links and images inside it take one reading rhythm, shared with chat message content and rendered assistant markdown. `measure="reading"` (default) caps lines at `uiTokens.layout.measure`; `measure="fill"` takes the parent's width; `as` is `div`, `article`, or `section`. Arranging controls and cards stays with Stack, Inline and Grid. Neither component joins the JSON catalog, and Meowslides keeps its own presentation typography.
 
 `DescriptionList` / `DescriptionItem term={...}` organize related labels and values with native `dl` / `dt` / `dd`.
 Labels in the same group take their natural width up to a cap, and values share a column start; when the local container is too narrow, each item stacks label above value
@@ -477,8 +476,8 @@ Existing styles have been migrated to this specification, and historical convers
 
 ### Design language
 
-Compose pages from the roles below. Their current values live in [theme tokens](src/theme/tokens.ts)
-and the [semantic palette](src/theme/palette.ts); component styles apply them to named parts.
+Compose pages from the roles below. Their current values live in the role tree in
+[theme tokens](src/theme/tokens.ts); component styles apply them to named parts.
 Meowbook's [`design-language` panorama](stories/language.stories.tsx) puts typography, actions,
 navigation, fields, execution states, and conversation on one board. The
 [`settings-workflow` scene](stories/settings-workflow.stories.tsx) shows a complete local edit,
@@ -486,15 +485,15 @@ validation, correction, and save sequence. These are composition references, not
 
 | Text role       | Current standard theme                           | Use                                                                                |
 | --------------- | ------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| UI body         | `uiTokens.fontBody`, 14px                        | Settings, control labels, and ordinary interface content                           |
+| UI body         | `uiTokens.type.body`, 14px                       | Settings, control labels, and ordinary interface content                           |
 | Conversation    | `chatTokens.fontBody`, 15px with 1.7 line height | Chat prose; this scale does not enlarge settings                                   |
-| Supporting text | `uiTokens.fontCaption`, 12px                     | Descriptions, timestamps, and state labels                                         |
+| Supporting text | `uiTokens.type.caption`, 12px                    | Descriptions, timestamps, and state labels                                         |
 | Headings        | `fontTitle`, 16px; `fontPageTitle`, 24px         | Component titles and page titles, with heading levels chosen by document structure |
 
-`PageHeader` and `Section` titles use the serif `uiTokens.fontDisplay` stack at their existing
+`PageHeader` and `Section` titles use the serif `uiTokens.type.display` stack at their existing
 24px and 16px sizes. A nested `Section` title (h3 and below) is a 14px subheading and keeps
-`uiTokens.font`, because a bold serif at body size loses its shapes. Body text and controls keep
-`uiTokens.font`; other component titles retain their own font rules. Heading levels still follow
+`uiTokens.type.sans`, because a bold serif at body size loses its shapes. Body text and controls keep
+`uiTokens.type.sans`; other component titles retain their own font rules. Heading levels still follow
 document structure.
 
 The main action uses `Button`'s default `primary` variant: a near-black fill in light mode and a near-white fill in
@@ -622,9 +621,9 @@ import { uiTokens } from "meowtail/theme";
 
 const applicationStyles = css`
   .toolbar ${partSelector(buttonContract, "root")} {
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radius.lg};
     ${buttonOptions.when({ variant: "quiet" })} {
-      color: ${uiTokens.info};
+      color: ${uiTokens.status.info};
     }
   }
 `;
@@ -683,7 +682,7 @@ renderToHtml + innerHTML instead of browser mounting that needs a lifecycle.
 ### Files and verification
 
 - `meowcss`: shared token/option/CSS generation; `meowcss/meowjsx` handles typed parts and automatic carriers; `meowcss/web` handles the DOM theme lifecycle. See [MeowCSS](../meowcss/README.md).
-- `src/theme/tokens.ts`, `palette.ts`: shared parameters and semantic palettes.
+- `src/theme/tokens.ts`: the design system's role tree (`uiTokens`) and the chat, alert and logo sets.
 - `src/theme/base.styles.ts` and the `*.styles.ts` files under `components/chat/icons/shared`: CSS templates written by responsibility;
   highlight-specific tokens live in `shared/code-highlight.tokens.ts`.
 - `src/theme/index.ts`: explicit assembly and public exports of the standard theme.

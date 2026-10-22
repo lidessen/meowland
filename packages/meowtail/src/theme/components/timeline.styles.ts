@@ -1,7 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { timelineContract, timelineItemContract } from "../../components/timeline";
-import { accentTokens, lineTokens, statusTokens } from "../palette";
 
 const timeline = partSelector(timelineContract, "root");
 const entry = (part: (typeof timelineItemContract.parts)[number]) =>
@@ -29,10 +28,10 @@ export const timelineStyles = css`
   /* One hairline joins the markers; the last event ends it. */
   ${entry("marker")}::after {
     content: "";
-    width: ${lineTokens.width};
+    width: ${uiTokens.line.width};
     flex: 1;
     margin-top: 6px;
-    background: ${lineTokens.edge};
+    background: ${uiTokens.line.edge};
   }
   ${entry("root")}:last-child ${entry("marker")}::after {
     display: none;
@@ -58,26 +57,26 @@ export const timelineStyles = css`
     overflow-wrap: anywhere;
   }
   ${entry("state")} {
-    font-size: ${uiTokens.fontCaption};
-    color: ${uiTokens.mutedForeground};
+    font-size: ${uiTokens.type.caption};
+    color: ${uiTokens.ink.secondary};
   }
   ${entry("root")}[data-state="processing"] ${entry("state")} {
-    color: ${accentTokens.base};
+    color: ${uiTokens.accent.base};
   }
   ${entry("root")}[data-state="returned"] ${entry("state")},
   ${entry("root")}[data-state="success"] ${entry("state")} {
-    color: ${statusTokens.successInk};
+    color: ${uiTokens.status.success};
   }
   ${entry("root")}[data-state="warning"] ${entry("state")} {
-    color: ${statusTokens.warning};
+    color: ${uiTokens.status.warning};
   }
   ${entry("root")}[data-state="danger"] ${entry("state")} {
-    color: ${statusTokens.danger};
+    color: ${uiTokens.status.danger};
   }
   ${entry("description")} {
     margin: 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontLabel};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.label};
     line-height: 1.5;
     overflow-wrap: anywhere;
   }

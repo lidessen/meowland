@@ -13,12 +13,12 @@ export const patternStyles = css`
     height: 100%;
     margin: 0;
     overflow: hidden;
-    background: ${uiTokens.background};
+    background: ${uiTokens.surface.canvas};
   }
   body {
     -webkit-text-size-adjust: 100%;
-    font-family: ${uiTokens.font};
-    color: ${uiTokens.foreground};
+    font-family: ${uiTokens.type.sans};
+    color: ${uiTokens.ink.primary};
   }
   *,
   *::before,
@@ -32,7 +32,7 @@ export const patternStyles = css`
     justify-content: center;
     align-items: flex-start;
     padding: 40px 24px;
-    background: ${uiTokens.background};
+    background: ${uiTokens.surface.canvas};
   }
   .pl-stage > * {
     width: 100%;

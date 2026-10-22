@@ -8,10 +8,10 @@ export const codeBlockStyles = css`
     max-width: 100%;
     margin: 0;
     border: 0;
-    border-radius: ${uiTokens.radiusLarge};
-    background: ${uiTokens.codeSurface};
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
     overflow: hidden;
   }
   ${partSelector(codeBlockContract, "header")} {
@@ -23,22 +23,22 @@ export const codeBlockStyles = css`
     gap: 12px;
     padding: 9px 14px;
     border-bottom: 0;
-    background: ${uiTokens.codeBanner};
+    background: ${uiTokens.surface.fill};
   }
   ${partSelector(codeBlockContract, "title")} {
     min-width: 0;
-    color: ${uiTokens.foreground};
-    font: 500 ${uiTokens.fontCaption}/${uiTokens.leading} ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: 500 ${uiTokens.type.caption}/${uiTokens.type.leading} ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
   ${partSelector(codeBlockContract, "caption")} {
     min-width: 0;
-    color: ${uiTokens.captionForeground};
-    font: 400 ${uiTokens.fontCaption}/${uiTokens.leading} ${uiTokens.font};
+    color: ${uiTokens.ink.tertiary};
+    font: 400 ${uiTokens.type.caption}/${uiTokens.type.leading} ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
   ${partSelector(codeBlockContract, "language")} {
-    font: ${uiTokens.fontCode}/18px ${uiTokens.mono};
+    font: ${uiTokens.type.code}/18px ${uiTokens.type.mono};
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -48,15 +48,15 @@ export const codeBlockStyles = css`
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
     flex-shrink: 1;
     margin-inline-start: auto;
-    font: ${uiTokens.fontMicro}/18px ${uiTokens.font};
+    font: ${uiTokens.type.micro}/18px ${uiTokens.type.sans};
   }
   ${partSelector(codeBlockContract, "actions")} [aria-pressed="true"] {
-    background: ${uiTokens.primarySoft};
-    color: ${uiTokens.primary};
+    background: ${uiTokens.action.soft};
+    color: ${uiTokens.action.primary};
   }
   ${partSelector(codeBlockContract, "root")} ${partSelector(codeBlockContract, "content")} {
     margin: 0;
@@ -65,7 +65,7 @@ export const codeBlockStyles = css`
     border: 0;
     border-radius: 0;
     background: transparent;
-    font: ${uiTokens.fontCode}/19px ${uiTokens.mono};
+    font: ${uiTokens.type.code}/19px ${uiTokens.type.mono};
     white-space: pre;
     overflow-wrap: normal;
   }
@@ -81,14 +81,14 @@ export const codeBlockStyles = css`
   }
   ${partSelector(codeBlockContract, "feedback")} {
     display: block;
-    padding: ${uiTokens.spaceGroup} ${uiTokens.spaceSection};
-    font-size: ${uiTokens.fontCaption};
+    padding: ${uiTokens.space.group} ${uiTokens.space.section};
+    font-size: ${uiTokens.type.caption};
   }
   ${partSelector(codeBlockContract, "feedback")}:empty {
     display: none;
   }
   ${partSelector(codeBlockContract, "content")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: -2px;
   }
 

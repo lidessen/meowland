@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { accentTokens } from "../palette";
 import { progressContract } from "../../components/progress";
 
 const root = partSelector(progressContract, "root");
@@ -18,7 +17,7 @@ export const progressStyles = css`
     overflow: hidden;
     border-radius: 999px;
     corner-shape: round;
-    background: ${uiTokens.surfaceMuted};
+    background: ${uiTokens.surface.fill};
   }
   ${bar} {
     display: block;
@@ -28,19 +27,19 @@ export const progressStyles = css`
     border: 0;
     border-radius: inherit;
     background: transparent;
-    accent-color: ${accentTokens.base};
+    accent-color: ${uiTokens.accent.base};
     vertical-align: middle;
   }
   ${native}::-webkit-progress-bar {
-    background: ${uiTokens.surfaceMuted};
+    background: ${uiTokens.surface.fill};
     border-radius: inherit;
   }
   ${native}::-webkit-progress-value {
-    background: ${accentTokens.base};
+    background: ${uiTokens.accent.base};
     border-radius: inherit;
   }
   ${native}::-moz-progress-bar {
-    background: ${accentTokens.base};
+    background: ${uiTokens.accent.base};
     border-radius: inherit;
   }
   ${native}:not([value]) {
@@ -53,8 +52,8 @@ export const progressStyles = css`
     inset-inline-start: 0;
     width: 36%;
     border-radius: inherit;
-    background: ${accentTokens.base};
-    animation: ui-progress-indeterminate 1.2s ${uiTokens.ease} infinite;
+    background: ${uiTokens.accent.base};
+    animation: ui-progress-indeterminate 1.2s ${uiTokens.motion.ease} infinite;
   }
   @keyframes ui-progress-indeterminate {
     0% {

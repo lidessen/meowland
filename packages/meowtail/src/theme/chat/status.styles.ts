@@ -1,15 +1,14 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { accentTokens } from "../palette";
 import { chatStatusContract, chatStatusOptions } from "../../chat/status";
 
 export const chatStatusStyles = css`
   ${partSelector(chatStatusContract, "root")} {
     display: inline-flex;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    gap: ${uiTokens.space.group};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
   }
 
   ${partSelector(chatStatusContract, "dot")} {
@@ -18,48 +17,48 @@ export const chatStatusStyles = css`
     height: 7px;
     border-radius: 50%;
     corner-shape: round;
-    background: ${uiTokens.subtleForeground};
+    background: ${uiTokens.ink.tertiary};
   }
 
   ${partSelector(chatStatusContract, "root")} {
     ${chatStatusOptions.when({ tone: "online" })} {
-      color: ${uiTokens.success};
+      color: ${uiTokens.status.success};
     }
   }
 
   ${partSelector(chatStatusContract, "root")}[${chatStatusOptions.attribute("tone")}="online"] ${partSelector(chatStatusContract, "dot")} {
-    background: ${uiTokens.success};
+    background: ${uiTokens.status.success};
   }
 
   ${partSelector(chatStatusContract, "root")} {
     ${chatStatusOptions.when({ tone: "busy" })} {
-      color: ${accentTokens.base};
+      color: ${uiTokens.accent.base};
     }
   }
 
   ${partSelector(chatStatusContract, "root")}[${chatStatusOptions.attribute("tone")}="busy"] ${partSelector(chatStatusContract, "dot")} {
-    background: ${accentTokens.base};
+    background: ${uiTokens.accent.base};
     animation: meowui-pulse 1.1s infinite ease-in-out;
   }
 
   ${partSelector(chatStatusContract, "root")} {
     ${chatStatusOptions.when({ tone: "waiting" })} {
-      color: ${uiTokens.warning};
+      color: ${uiTokens.status.warning};
     }
   }
 
   ${partSelector(chatStatusContract, "root")}[${chatStatusOptions.attribute("tone")}="waiting"] ${partSelector(chatStatusContract, "dot")} {
-    background: ${uiTokens.warning};
+    background: ${uiTokens.status.warning};
   }
 
   ${partSelector(chatStatusContract, "root")} {
     ${chatStatusOptions.when({ tone: "error" })} {
-      color: ${uiTokens.danger};
+      color: ${uiTokens.status.danger};
     }
   }
 
   ${partSelector(chatStatusContract, "root")}[${chatStatusOptions.attribute("tone")}="error"] ${partSelector(chatStatusContract, "dot")} {
-    background: ${uiTokens.danger};
+    background: ${uiTokens.status.danger};
   }
 
   @keyframes meowui-pulse {

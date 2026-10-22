@@ -1,7 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { workCardContract } from "../../components/work-card";
 import { uiTokens } from "../tokens";
-import { accentTokens, layerTokens, lineTokens, radiusTokens } from "../palette";
 
 const part = (name: (typeof workCardContract.parts)[number]) =>
   partSelector(workCardContract, name);
@@ -15,24 +14,24 @@ export const workCardStyles = css`
     box-sizing: border-box;
     width: min(100%, 460px);
     padding: 14px 16px;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: ${radiusTokens.card};
-    background: ${layerTokens.raised};
-    box-shadow: ${uiTokens.shadowRaised};
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/1.5 ${uiTokens.font};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.raised};
+    box-shadow: ${uiTokens.shadow.raised};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/1.5 ${uiTokens.type.sans};
     text-align: left;
     cursor: pointer;
     transition:
-      border-color ${uiTokens.durationResponse} ${uiTokens.ease},
-      box-shadow ${uiTokens.durationSettle} ${uiTokens.ease};
+      border-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
+      box-shadow ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${part("root")}:hover {
-    border-color: color-mix(in srgb, ${accentTokens.base} 50%, transparent);
+    border-color: color-mix(in srgb, ${uiTokens.accent.base} 50%, transparent);
     box-shadow: 0 2px 12px rgb(0 0 0 / 5%);
   }
   ${part("root")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
   ${part("icon")} {
@@ -40,9 +39,9 @@ export const workCardStyles = css`
     place-items: center;
     width: 36px;
     height: 36px;
-    border-radius: ${radiusTokens.control};
-    background: ${accentTokens.soft};
-    color: ${accentTokens.base};
+    border-radius: ${uiTokens.radius.lg};
+    background: ${uiTokens.accent.soft};
+    color: ${uiTokens.accent.base};
   }
   ${part("icon")} svg {
     width: 18px;
@@ -62,21 +61,21 @@ export const workCardStyles = css`
     align-items: center;
     flex-wrap: wrap;
     gap: 6px;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontLabel};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.label};
     line-height: 1.5;
   }
   ${part("detail")}::before {
     content: "·";
     margin-inline-end: 6px;
-    color: ${layerTokens.faint};
+    color: ${uiTokens.ink.tertiary};
   }
   ${part("action")} {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    color: ${accentTokens.base};
-    font-size: ${uiTokens.fontLabel};
+    color: ${uiTokens.accent.base};
+    font-size: ${uiTokens.type.label};
     white-space: nowrap;
   }
 `;

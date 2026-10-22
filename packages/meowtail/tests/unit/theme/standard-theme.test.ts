@@ -4,7 +4,7 @@ import { standardTheme, standardOptions, uiTokens } from "../../../src/theme/ind
 test("standard theme is generated from token definitions and typed part contracts", () => {
   expect(standardTheme.name).toBe(standardOptions.name);
   expect(standardTheme.defaults.attributes).toEqual({ "data-meowui-color-scheme": "auto" });
-  expect(standardTheme.cssText).toContain(`${uiTokens.background.name}:`);
+  expect(standardTheme.cssText).toContain(`${uiTokens.surface.canvas.name}:`);
   expect(standardTheme.cssText).toContain('data-meowui-part="button/root"');
   expect(standardTheme.cssText).toContain('data-meowui-part="alert/title"');
   // `--app-region` is the desktop shell's drag-area property, not a theme token.
@@ -13,10 +13,10 @@ test("standard theme is generated from token definitions and typed part contract
 });
 
 test("page and section titles use the display font token", () => {
-  expect(uiTokens.fontDisplay.name).toBe("--ui-font-display");
-  expect(standardTheme.cssText).toContain(`${uiTokens.fontDisplay.name}:`);
+  expect(uiTokens.type.display.name).toBe("--ui-type-display");
+  expect(standardTheme.cssText).toContain(`${uiTokens.type.display.name}:`);
   expect(standardTheme.cssText).toContain("Iowan Old Style");
-  expect(standardTheme.cssText).toContain(`font-family: ${uiTokens.fontDisplay}`);
+  expect(standardTheme.cssText).toContain(`font-family: ${uiTokens.type.display}`);
   expect(standardTheme.cssText).toContain('data-meowui-part="page-header/title"');
   expect(standardTheme.cssText).toContain('data-meowui-part="section/title"');
 });

@@ -61,7 +61,7 @@ export const WorkCardStory = defineStory({
               action="View work"
               onClick={open("registration")}
             />
-            <p style={{ margin: 0, fontSize: "12.5px", color: "var(--ui-subtle-foreground)" }}>
+            <p style={{ margin: 0, fontSize: "12.5px", color: "var(--ui-ink-tertiary)" }}>
               {opened}
             </p>
           </div>

@@ -1,4 +1,3 @@
-import { layerTokens } from "../palette";
 import { css, partSelector } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
 import { chatFrameContract } from "../../chat/frame";
@@ -13,27 +12,27 @@ export const chatFrameStyles = css`
   ${partSelector(chatFrameContract, "root")} {
     ${chatTokens.readingInset.name}: 24px;
     /* Resolved here so a nested light/dark scope re-resolves the reference to its own background. */
-    ${chatTokens.paper.name}: ${layerTokens.reading};
+    ${uiTokens.surface.reading.name}: ${uiTokens.surface.reading};
     min-width: 0;
-    color: ${uiTokens.foreground};
-    background: ${chatTokens.paper};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    background: ${uiTokens.surface.reading};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
   }
 
   ${partSelector(chatMessageListContract, "root")} {
     flex: 1 1 auto;
     display: grid;
     align-content: start;
-    gap: ${chatTokens.messageListGap};
+    gap: ${chatTokens.listGap};
     min-width: 0;
     min-height: 0;
     overflow: auto;
     overscroll-behavior: contain;
     scrollbar-gutter: stable both-edges;
     padding: 24px ${chatTokens.readingInset} 24px;
-    background: ${chatTokens.paper};
+    background: ${uiTokens.surface.reading};
     scroll-padding-block: 18px;
-    scrollbar-color: ${uiTokens.border} transparent;
+    scrollbar-color: ${uiTokens.line.control} transparent;
     scrollbar-width: thin;
   }
 
@@ -41,7 +40,7 @@ export const chatFrameStyles = css`
     display: grid;
     align-content: start;
     width: 100%;
-    max-width: ${chatTokens.messageListMaxWidth};
+    max-width: ${chatTokens.listMaxWidth};
     margin: 0 auto;
   }
 
@@ -49,20 +48,20 @@ export const chatFrameStyles = css`
   children, so a host that mounts rows one at a time may interpose a layout-neutral
   container (display: contents) without hiding the pitch from the item it wraps. */
   ${partSelector(chatMessageListContract, "content")} > :not(:first-child) {
-    ${rowPitch}: ${chatTokens.messageListGap};
+    ${rowPitch}: ${chatTokens.listGap};
     margin-block-start: var(${rowPitch});
   }
 
   ${partSelector(chatMessageListContract, "date")} {
     display: flex;
     align-items: center;
-    gap: ${uiTokens.spaceSection};
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    gap: ${uiTokens.space.section};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     line-height: 32px;
     white-space: nowrap;
     justify-content: center;
-    margin-bottom: ${uiTokens.spaceSection};
+    margin-bottom: ${uiTokens.space.section};
   }
 
   ${partSelector(chatMessageListContract, "item")} {
@@ -88,13 +87,13 @@ export const chatFrameStyles = css`
 
   @media (max-width: 760px) {
     ${partSelector(chatFrameContract, "root")} {
-      ${chatTokens.readingInset.name}: ${uiTokens.spaceSection};
+      ${chatTokens.readingInset.name}: ${uiTokens.space.section};
     }
 
     ${partSelector(chatMessageListContract, "root")} {
       scrollbar-width: none;
       scrollbar-gutter: auto;
-      padding: ${uiTokens.spaceSection} ${chatTokens.readingInset} 24px;
+      padding: ${uiTokens.space.section} ${chatTokens.readingInset} 24px;
     }
 
     ${partSelector(chatMessageListContract, "content")} {
@@ -104,7 +103,7 @@ export const chatFrameStyles = css`
 
   @media (max-width: 360px) and (max-height: 700px) {
     ${partSelector(chatMessageListContract, "root")} {
-      padding: ${uiTokens.spaceGroup} ${uiTokens.spaceSection} ${uiTokens.spacePanel};
+      padding: ${uiTokens.space.group} ${uiTokens.space.section} ${uiTokens.space.panel};
     }
   }
 `;

@@ -7,39 +7,39 @@ export const breadcrumbStyles = css`
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: 0 ${uiTokens.spaceGroup};
+    gap: 0 ${uiTokens.space.group};
     list-style: none;
     padding: 0;
     margin: 0;
-    font-family: ${uiTokens.font};
-    font-size: ${uiTokens.fontCaption};
+    font-family: ${uiTokens.type.sans};
+    font-size: ${uiTokens.type.caption};
   }
   ${partSelector(breadcrumbContract, "item")} {
     display: inline-flex;
     align-items: baseline;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
     overflow-wrap: anywhere;
   }
   ${partSelector(breadcrumbContract, "link")} {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
     text-decoration: none;
-    padding-block: ${uiTokens.spaceGroup};
+    padding-block: ${uiTokens.space.group};
   }
   ${partSelector(breadcrumbContract, "link")}:hover {
     text-decoration: underline;
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
   ${partSelector(breadcrumbContract, "link")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 3px;
   }
   ${partSelector(breadcrumbContract, "current")} {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
     font-weight: 500;
   }
   ${partSelector(breadcrumbContract, "separator")} {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
     opacity: 0.6;
   }
 `;

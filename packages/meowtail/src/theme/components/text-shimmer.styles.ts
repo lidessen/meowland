@@ -20,7 +20,7 @@ export const textShimmerStyles = css`
     overflow: hidden;
     pointer-events: none;
     user-select: none;
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
     /* A band of full ink about 112px wide crosses text that rests in muted ink. */
     mask-image: linear-gradient(
       90deg,

@@ -3,7 +3,6 @@ import { iconRailContract } from "../../components/icon-rail";
 import { railItemContract } from "../../components/rail-item";
 import { railSectionContract } from "../../components/rail-section";
 import { uiTokens } from "../tokens";
-import { accentTokens, layerTokens, lineTokens, statusTokens, radiusTokens } from "../palette";
 
 const rail = (part: (typeof iconRailContract.parts)[number]) =>
   partSelector(iconRailContract, part);
@@ -36,12 +35,12 @@ export const iconRailStyles = css`
     width: 56px;
     padding: 10px 8px 12px;
     overflow: hidden;
-    border-right: ${lineTokens.width} solid ${uiTokens.borderSoft};
-    background: ${uiTokens.sidebarSurface};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    border-right: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+    background: ${uiTokens.surface.canvas};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
     transition:
-      width ${uiTokens.durationSettle} ${uiTokens.ease},
-      box-shadow ${uiTokens.durationSettle} ${uiTokens.ease};
+      width ${uiTokens.motion.settle} ${uiTokens.motion.ease},
+      box-shadow ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${open} {
     width: 256px;
@@ -73,7 +72,7 @@ export const iconRailStyles = css`
   /* Brand text and other reveal-only content stay out of the collapsed column. */
   ${rail("brand")} [data-rail-reveal] {
     opacity: 0;
-    transition: opacity ${uiTokens.durationResponse} ${uiTokens.ease};
+    transition: opacity ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${openWithin(`${rail("brand")} [data-rail-reveal]`)} {
     opacity: 1;
@@ -89,30 +88,30 @@ export const iconRailStyles = css`
     height: 40px;
     padding: 0 11px;
     border: 0;
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radius.lg};
     background: transparent;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
     font: inherit;
     text-align: left;
     text-decoration: none;
     white-space: nowrap;
     cursor: pointer;
     transition:
-      background-color ${uiTokens.durationResponse} ${uiTokens.ease},
-      color ${uiTokens.durationResponse} ${uiTokens.ease};
+      background-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
+      color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${item("root")}:hover {
-    background: ${uiTokens.hover};
-    color: ${uiTokens.foreground};
+    background: ${uiTokens.state.hover};
+    color: ${uiTokens.ink.primary};
   }
   ${item("root")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: -2px;
   }
   ${item("root")}[aria-current="page"],
   ${section("root")}:has(${section("items")} ${item("root")}[aria-current="page"]) ${section("shortcut")} ${item("root")} {
-    background: ${accentTokens.selected};
-    color: ${accentTokens.base};
+    background: ${uiTokens.accent.selected};
+    color: ${uiTokens.accent.base};
   }
   /* The accent bar marks the current location while only icons are visible. */
   ${item("root")}[aria-current="page"]::before,
@@ -123,18 +122,18 @@ export const iconRailStyles = css`
     top: 12px;
     width: 3px;
     height: 16px;
-    border-radius: ${radiusTokens.mark};
-    background: ${accentTokens.base};
+    border-radius: ${uiTokens.radius.xs};
+    background: ${uiTokens.accent.base};
   }
   ${openWithin(`${item("root")}[aria-current="page"]::before`)} {
     display: none;
   }
   ${openWithin(`${item("root")}[aria-current="page"]`)} {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
     font-weight: 500;
   }
   ${openWithin(`${item("root")}[aria-current="page"] ${item("icon")}`)} {
-    color: ${accentTokens.base};
+    color: ${uiTokens.accent.base};
   }
   ${item("icon")} {
     display: grid;
@@ -157,18 +156,18 @@ export const iconRailStyles = css`
     height: 7px;
     border-radius: 50%;
     corner-shape: round;
-    background: ${statusTokens.warning};
-    box-shadow: 0 0 0 2px ${uiTokens.sidebarSurface};
+    background: ${uiTokens.status.warning};
+    box-shadow: 0 0 0 2px ${uiTokens.surface.canvas};
   }
   ${item("root")}[data-dot] ${item("dot")},
   ${section("root")}:has(${section("items")} ${item("root")}[data-dot]) ${section("shortcut")} ${item("dot")} {
     display: block;
   }
   ${item("root")}[data-dot="accent"] ${item("dot")} {
-    background: ${accentTokens.base};
+    background: ${uiTokens.accent.base};
   }
   ${section("root")}:has(${section("items")} ${item("root")}[data-dot="warning"]) ${section("shortcut")} ${item("dot")} {
-    background: ${statusTokens.warning};
+    background: ${uiTokens.status.warning};
   }
   ${openWithin(item("dot").toString())} {
     display: none;
@@ -178,19 +177,19 @@ export const iconRailStyles = css`
     overflow: hidden;
     text-overflow: ellipsis;
     opacity: 0;
-    transition: opacity ${uiTokens.durationResponse} ${uiTokens.ease};
+    transition: opacity ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${item("meta")} {
     margin-left: auto;
-    color: ${layerTokens.faint};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
     font-variant-numeric: tabular-nums;
     opacity: 0;
-    transition: opacity ${uiTokens.durationResponse} ${uiTokens.ease};
+    transition: opacity ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${item("root")}[data-meta-tone="accent"] ${item("meta")} {
-    color: ${accentTokens.base};
-    font-size: ${uiTokens.fontMicro};
+    color: ${uiTokens.accent.base};
+    font-size: ${uiTokens.type.micro};
     font-weight: 600;
   }
   ${openWithin(item("label").toString())},
@@ -210,8 +209,8 @@ export const iconRailStyles = css`
   ${section("heading")} {
     display: none;
     margin: 14px 10px 6px;
-    color: ${layerTokens.faint};
-    font-size: ${uiTokens.fontMicro};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.micro};
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;

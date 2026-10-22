@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { accentTokens, layerTokens, lineTokens } from "../palette";
 import { taskListContract } from "../../components/task-list";
 
 const part = (name: (typeof taskListContract.parts)[number]) =>
@@ -17,8 +16,8 @@ const header = (state: string) =>
 
 /* Finished and waiting ink is the foreground at reduced strength, not a second grey,
    so every state stays one hue and only steps back. */
-const doneInk = `color-mix(in srgb, ${uiTokens.foreground} 45%, transparent)`;
-const pendingInk = `color-mix(in srgb, ${uiTokens.mutedForeground} 60%, transparent)`;
+const doneInk = `color-mix(in srgb, ${uiTokens.ink.primary} 45%, transparent)`;
+const pendingInk = `color-mix(in srgb, ${uiTokens.ink.secondary} 60%, transparent)`;
 
 export const taskListStyles = css`
   /* A flat in-flow card: the raised layer on a crisp edge. */
@@ -26,12 +25,12 @@ export const taskListStyles = css`
     display: grid;
     min-width: 0;
     overflow: hidden;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: ${uiTokens.radiusLarge};
-    background: ${layerTokens.raised};
-    box-shadow: ${uiTokens.shadowRaised};
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/20px ${uiTokens.font};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.raised};
+    box-shadow: ${uiTokens.shadow.raised};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/20px ${uiTokens.type.sans};
   }
   ${part("summary")} {
     display: flex;
@@ -46,9 +45,9 @@ export const taskListStyles = css`
     display: none;
   }
   ${part("summary")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: -2px;
-    border-radius: ${uiTokens.radiusLarge};
+    border-radius: ${uiTokens.radius.xl};
   }
   ${part("title")} {
     min-width: 0;
@@ -56,15 +55,15 @@ export const taskListStyles = css`
     font-weight: 600;
   }
   ${part("count")} {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
     font-variant-numeric: tabular-nums;
   }
   ${part("chevron")} {
     display: grid;
     place-items: center;
     margin-inline-start: -8px;
-    color: ${uiTokens.mutedForeground};
-    transition: transform ${uiTokens.durationSettle} ${uiTokens.ease};
+    color: ${uiTokens.ink.secondary};
+    transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${part("chevron")} svg {
     width: 14px;
@@ -92,11 +91,11 @@ export const taskListStyles = css`
     flex: 0 1 auto;
     margin-inline-end: auto;
     overflow-wrap: anywhere;
-    color: ${uiTokens.mutedForeground};
-    transition: color ${uiTokens.durationSettle} ${uiTokens.ease};
+    color: ${uiTokens.ink.secondary};
+    transition: color ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${row("running waiting error")} > ${part("label")} {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
   ${struck} > ${part("label")} {
     color: ${doneInk};
@@ -110,7 +109,7 @@ export const taskListStyles = css`
     width: 0;
     height: 1px;
     background: currentColor;
-    transition: width 360ms ${uiTokens.ease};
+    transition: width 360ms ${uiTokens.motion.ease};
   }
   ${struck} > ${part("label")}::after {
     width: 100%;
@@ -142,8 +141,8 @@ export const taskListStyles = css`
     border-radius: 50%;
     corner-shape: round;
     transition:
-      background-color ${uiTokens.durationSettle} ${uiTokens.ease},
-      border-color ${uiTokens.durationSettle} ${uiTokens.ease};
+      background-color ${uiTokens.motion.settle} ${uiTokens.motion.ease},
+      border-color ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${part("marker")} {
     margin-top: 0;
@@ -158,13 +157,13 @@ export const taskListStyles = css`
     mask: none center / contain no-repeat;
   }
   ${row("running")} > ${part("itemMarker")} {
-    border: 1.5px solid ${uiTokens.foreground};
+    border: 1.5px solid ${uiTokens.ink.primary};
   }
   ${row("running")} > ${part("itemMarker")}::after {
     width: 8px;
     height: 8px;
-    background: ${uiTokens.foreground};
-    mask-image: ${uiTokens.arrowMask};
+    background: ${uiTokens.ink.primary};
+    mask-image: ${uiTokens.glyph.arrow};
   }
   ${finished} > ${part("itemMarker")} {
     border: 0;
@@ -172,29 +171,29 @@ export const taskListStyles = css`
   }
   ${finished} > ${part("itemMarker")}::after,
   ${header("success")}::after {
-    background: ${layerTokens.raised};
-    mask-image: ${uiTokens.checkMask};
+    background: ${uiTokens.surface.raised};
+    mask-image: ${uiTokens.glyph.check};
   }
   ${row("error")} > ${part("itemMarker")},
   ${header("error")} {
     border: 0;
-    background: ${uiTokens.danger};
+    background: ${uiTokens.status.danger};
   }
   ${row("error")} > ${part("itemMarker")}::after,
   ${header("error")}::after {
-    background: ${layerTokens.raised};
-    mask-image: ${uiTokens.crossMask};
+    background: ${uiTokens.surface.raised};
+    mask-image: ${uiTokens.glyph.cross};
   }
   ${row("waiting")} > ${part("itemMarker")},
   ${header("waiting")} {
-    border: 1.5px solid ${uiTokens.warning};
+    border: 1.5px solid ${uiTokens.status.warning};
   }
   ${row("waiting")} > ${part("itemMarker")}::after,
   ${header("waiting")}::after {
     width: 5px;
     height: 5px;
     border-radius: 50%;
-    background: ${uiTokens.warning};
+    background: ${uiTokens.status.warning};
   }
   ${row("cancelled")} > ${part("itemMarker")} {
     border-style: solid;
@@ -211,14 +210,14 @@ export const taskListStyles = css`
   :is(${header("running")}, ${header("queued")}) {
     border: 0;
     background: conic-gradient(
-      ${uiTokens.foreground} var(--task-list-done, 0%),
-      color-mix(in srgb, ${uiTokens.foreground} 14%, transparent) 0
+      ${uiTokens.ink.primary} var(--task-list-done, 0%),
+      color-mix(in srgb, ${uiTokens.ink.primary} 14%, transparent) 0
     );
     mask: radial-gradient(circle, transparent 4.5px, black 5px);
   }
   ${header("success")} {
     border: 0;
-    background: ${accentTokens.base};
+    background: ${uiTokens.accent.base};
   }
   @media (prefers-reduced-motion: reduce) {
     ${part("root")} * {

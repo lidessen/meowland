@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
-import { lineTokens, layerTokens } from "../palette";
 import { chatQuestionContract } from "../../chat/question";
 
 export const chatQuestionStyles = css`
@@ -9,43 +8,43 @@ export const chatQuestionStyles = css`
     width: 100%;
     max-width: 38rem;
     padding: 16px 20px;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    box-shadow: ${uiTokens.shadowRaised};
-    border-radius: ${uiTokens.radiusLarge};
-    background: ${layerTokens.raised};
-    color: ${uiTokens.foreground};
-    font: ${chatTokens.fontBody}/24px ${uiTokens.font};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    box-shadow: ${uiTokens.shadow.raised};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.raised};
+    color: ${uiTokens.ink.primary};
+    font: ${chatTokens.fontBody}/24px ${uiTokens.type.sans};
   }
   ${partSelector(chatQuestionContract, "root")}[hidden] {
     display: none;
   }
   ${partSelector(chatQuestionContract, "eyebrow")} {
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     font-weight: 500;
-    margin-bottom: ${uiTokens.spaceGroup};
+    margin-bottom: ${uiTokens.space.group};
   }
   ${partSelector(chatQuestionContract, "title")} {
     margin: 0;
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
     font-weight: 500;
     line-height: 24px;
     overflow-wrap: anywhere;
   }
   ${partSelector(chatQuestionContract, "description")} {
-    margin: ${uiTokens.spaceGroup} 0 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontBody};
-    line-height: ${uiTokens.leading};
+    margin: ${uiTokens.space.group} 0 0;
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.body};
+    line-height: ${uiTokens.type.leading};
   }
   ${partSelector(chatQuestionContract, "content")} {
     margin-top: 16px;
     min-width: 0;
   }
   ${partSelector(chatQuestionContract, "feedback")} {
-    margin-top: ${uiTokens.spaceSection};
-    font-size: ${uiTokens.fontBody};
-    line-height: ${uiTokens.leading};
+    margin-top: ${uiTokens.space.section};
+    font-size: ${uiTokens.type.body};
+    line-height: ${uiTokens.type.leading};
   }
   ${partSelector(chatQuestionContract, "feedback")}:has(> [hidden]:only-child) {
     display: none;
@@ -54,7 +53,7 @@ export const chatQuestionStyles = css`
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
-    margin-top: ${uiTokens.spaceSection};
+    gap: ${uiTokens.space.group};
+    margin-top: ${uiTokens.space.section};
   }
 `;

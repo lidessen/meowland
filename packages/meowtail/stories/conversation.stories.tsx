@@ -49,8 +49,8 @@ export const ConversationReading = defineStory({
         ariaLabel="Example conversation reading area"
         style={{
           height: "360px",
-          border: `1px solid ${uiTokens.border}`,
-          borderRadius: `${uiTokens.controlRadius}`,
+          border: `1px solid ${uiTokens.line.control}`,
+          borderRadius: `${uiTokens.radius.lg}`,
         }}
       >
         <ChatMessageList>

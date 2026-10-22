@@ -11,17 +11,17 @@ export const outputBlockStyles = css`
   ${partSelector(block, "root")} {
     min-width: 0;
     overflow: hidden;
-    border-radius: ${uiTokens.radiusLarge};
-    background: ${uiTokens.codeSurface};
-    color: ${uiTokens.foreground};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.primary};
   }
   ${partSelector(block, "header")} {
     display: flex;
     align-items: start;
     gap: 12px;
     padding: 9px 14px;
-    background: ${uiTokens.codeBanner};
-    font: ${uiTokens.fontMicro}/18px ${uiTokens.font};
+    background: ${uiTokens.surface.fill};
+    font: ${uiTokens.type.micro}/18px ${uiTokens.type.sans};
   }
   ${partSelector(block, "title")} {
     min-width: 0;
@@ -31,7 +31,7 @@ export const outputBlockStyles = css`
   ${partSelector(block, "actions")}, ${partSelector(block, "toggle")} {
     border: 0;
     background: transparent;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
     font: inherit;
     cursor: pointer;
     padding: 0;
@@ -39,7 +39,7 @@ export const outputBlockStyles = css`
   ${partSelector(block, "body")} {
     padding: 12px 14px;
     overflow: auto;
-    font: ${uiTokens.fontCode}/22px ${uiTokens.mono};
+    font: ${uiTokens.type.code}/22px ${uiTokens.type.mono};
   }
   ${partSelector(block, "line")} {
     min-height: 22px;
@@ -62,13 +62,13 @@ export const outputBlockStyles = css`
   ${partSelector(block, "feedback")} {
     display: block;
     padding: 4px 14px;
-    font: ${uiTokens.fontCaption}/18px ${uiTokens.font};
+    font: ${uiTokens.type.caption}/18px ${uiTokens.type.sans};
   }
   ${partSelector(block, "feedback")}:empty {
     display: none;
   }
   ${partSelector(block, "actions")}:focus-visible, ${partSelector(block, "toggle")}:focus-visible, ${partSelector(block, "body")}:focus-visible {
-    outline: 1.5px solid ${uiTokens.focus};
+    outline: 1.5px solid ${uiTokens.state.focus};
     outline-offset: -1px;
   }
   ${partSelector(read, "number")} {
@@ -76,33 +76,33 @@ export const outputBlockStyles = css`
     min-width: 4ch;
     margin-right: 12px;
     text-align: right;
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
     user-select: none;
   }
   ${partSelector(read, "root")} [data-read-highlight="true"] {
-    background: ${uiTokens.hover};
-    box-shadow: inset 3px 0 ${uiTokens.info};
+    background: ${uiTokens.state.hover};
+    box-shadow: inset 3px 0 ${uiTokens.status.info};
   }
   ${partSelector(diff, "line")}[data-diff-kind="added"] {
-    color: ${uiTokens.success};
-    background: color-mix(in srgb, ${uiTokens.success} 10%, transparent);
-    box-shadow: inset 3px 0 ${uiTokens.success};
+    color: ${uiTokens.status.success};
+    background: color-mix(in srgb, ${uiTokens.status.success} 10%, transparent);
+    box-shadow: inset 3px 0 ${uiTokens.status.success};
   }
   ${partSelector(diff, "line")}[data-diff-kind="removed"] {
-    color: ${uiTokens.danger};
-    background: color-mix(in srgb, ${uiTokens.danger} 10%, transparent);
-    box-shadow: inset 3px 0 ${uiTokens.danger};
+    color: ${uiTokens.status.danger};
+    background: color-mix(in srgb, ${uiTokens.status.danger} 10%, transparent);
+    box-shadow: inset 3px 0 ${uiTokens.status.danger};
   }
   ${partSelector(diff, "path")}, ${partSelector(search, "path")} {
     font-weight: 500;
   }
   :where(${partSelector(read, "root")}, ${partSelector(diff, "root")}) ${partSelector(block, "header")} {
     padding: 10px 18px 8px 22px;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   :where(${partSelector(read, "root")}, ${partSelector(diff, "root")}) ${partSelector(block, "body")} {
     padding: 6px 22px 20px;
-    font: ${uiTokens.fontCode}/19px ${uiTokens.mono};
+    font: ${uiTokens.type.code}/19px ${uiTokens.type.mono};
   }
   :where(${partSelector(read, "root")}, ${partSelector(diff, "root")}) ${partSelector(block, "line")} {
     min-height: 19px;
@@ -116,12 +116,12 @@ export const outputBlockStyles = css`
     padding-inline: 22px;
   }
   ${partSelector(diff, "line")}[data-diff-kind="context"] {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   ${partSelector(search, "root")} ${partSelector(block, "header")} {
     align-items: center;
-    font: ${uiTokens.fontLabel}/20px ${uiTokens.font};
-    color: ${uiTokens.mutedForeground};
+    font: ${uiTokens.type.label}/20px ${uiTokens.type.sans};
+    color: ${uiTokens.ink.secondary};
   }
   ${partSelector(search, "root")} ${partSelector(block, "title")} {
     overflow: hidden;
@@ -130,7 +130,7 @@ export const outputBlockStyles = css`
   }
   ${partSelector(search, "root")} ${partSelector(block, "body")} {
     padding: 8px 14px 12px 0;
-    font: ${uiTokens.fontCode}/19px ${uiTokens.mono};
+    font: ${uiTokens.type.code}/19px ${uiTokens.type.mono};
   }
   ${partSelector(search, "root")} ${partSelector(block, "line")} {
     padding-left: 14px;
@@ -139,7 +139,7 @@ export const outputBlockStyles = css`
     cursor: pointer;
   }
   ${partSelector(search, "number")} {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
   ${partSelector(terminal, "command")} {
     margin: 0;
@@ -147,13 +147,13 @@ export const outputBlockStyles = css`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: pre;
-    font: ${uiTokens.fontCode}/22px ${uiTokens.mono};
+    font: ${uiTokens.type.code}/22px ${uiTokens.type.mono};
   }
   ${partSelector(terminal, "root")} ${partSelector(block, "header")} {
     padding-left: 30px;
     max-height: 150px;
     overflow-y: auto;
-    background: ${uiTokens.codeSurface};
+    background: ${uiTokens.surface.fill};
   }
   ${partSelector(terminal, "root")} ${partSelector(block, "title")} > div {
     display: flex;
@@ -162,7 +162,7 @@ export const outputBlockStyles = css`
     min-width: 0;
   }
   ${partSelector(terminal, "root")}[data-terminal-body="true"] ${partSelector(block, "header")} {
-    border-bottom: 1px solid ${uiTokens.borderSoft};
+    border-bottom: 1px solid ${uiTokens.line.divider};
   }
   ${partSelector(terminal, "root")} ${partSelector(block, "body")} {
     padding-left: 30px;
@@ -183,11 +183,11 @@ export const outputBlockStyles = css`
     align-items: baseline;
     gap: 8px;
     min-width: 0;
-    font: ${uiTokens.fontCode}/22px ${uiTokens.mono};
+    font: ${uiTokens.type.code}/22px ${uiTokens.type.mono};
   }
   ${partSelector(terminal, "cwd")} {
     flex: none;
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
   ${partSelector(terminal, "runState")} {
     position: absolute;
@@ -206,32 +206,32 @@ export const outputBlockStyles = css`
   }
   ${partSelector(terminal, "status")} {
     flex: none;
-    font: ${uiTokens.fontMicro}/22px ${uiTokens.font};
-    color: ${uiTokens.subtleForeground};
+    font: ${uiTokens.type.micro}/22px ${uiTokens.type.sans};
+    color: ${uiTokens.ink.tertiary};
   }
   ${partSelector(terminal, "status")}[data-terminal-error="true"] {
-    color: ${uiTokens.danger};
+    color: ${uiTokens.status.danger};
   }
   ${partSelector(terminal, "span")}[data-ansi-bold="true"] {
     font-weight: 700;
   }
   ${partSelector(terminal, "span")}:is([data-ansi-color="31"], [data-ansi-color="91"]) {
-    color: ${uiTokens.danger};
+    color: ${uiTokens.status.danger};
   }
   ${partSelector(terminal, "span")}:is([data-ansi-color="32"], [data-ansi-color="92"]) {
-    color: ${uiTokens.success};
+    color: ${uiTokens.status.success};
   }
   ${partSelector(terminal, "span")}:is([data-ansi-color="33"], [data-ansi-color="93"]) {
-    color: ${uiTokens.warning};
+    color: ${uiTokens.status.warning};
   }
   ${partSelector(terminal, "span")}:is([data-ansi-color="34"], [data-ansi-color="94"], [data-ansi-color="36"], [data-ansi-color="96"]) {
-    color: ${uiTokens.info};
+    color: ${uiTokens.status.info};
   }
   ${partSelector(terminal, "span")}:is([data-ansi-color="35"], [data-ansi-color="95"]) {
     color: ${codeHighlightTokens.function};
   }
   ${partSelector(terminal, "span")}[data-ansi-color="90"] {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
 
   @media (pointer: coarse) {
@@ -259,8 +259,8 @@ export const outputBlockStyles = css`
     width: 14px;
     height: 14px;
     background: currentColor;
-    mask: ${uiTokens.chevronMask} center / 14px 14px no-repeat;
-    transition: transform ${uiTokens.durationSettle} ${uiTokens.ease};
+    mask: ${uiTokens.glyph.chevron} center / 14px 14px no-repeat;
+    transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   :where(details[open] > ${partSelector(block, "toggle")})::before {
     transform: rotate(90deg);

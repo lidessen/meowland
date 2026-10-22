@@ -7,14 +7,14 @@ export const pageFrameStyles = css`
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    gap: ${uiTokens.spaceSection};
+    gap: ${uiTokens.space.section};
     width: 100%;
-    max-width: calc(${uiTokens.containerPage} + ${uiTokens.pageInsetInline} * 2);
+    max-width: calc(${uiTokens.layout.containerPage} + ${uiTokens.space.pageInline} * 2);
     height: 100%;
     min-width: 0;
     min-height: 0;
     margin-inline: auto;
-    padding: ${uiTokens.pageInsetBlock} ${uiTokens.pageInsetInline};
+    padding: ${uiTokens.space.pageBlock} ${uiTokens.space.pageInline};
     overflow: hidden;
   }
   :where(${partSelector(pageFrameContract, "toolbar")}, ${partSelector(pageFrameContract, "header")}, ${partSelector(pageFrameContract, "notice")}, ${partSelector(pageFrameContract, "footer")}) {
@@ -58,7 +58,7 @@ export const pageFrameStyles = css`
   }
   @media (max-width: 768px) {
     ${partSelector(pageFrameContract, "root")} {
-      padding: ${uiTokens.pageInsetCompactBlock} ${uiTokens.pageInsetCompactInline};
+      padding: ${uiTokens.space.pageBlockCompact} ${uiTokens.space.pageInlineCompact};
     }
   }
   ${partSelector(pageFrameContract, "root")} {

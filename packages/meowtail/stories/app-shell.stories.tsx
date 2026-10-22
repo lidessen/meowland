@@ -38,7 +38,7 @@ export const AppShellStory = defineStory({
         width: "min(100%, 430px)",
         margin: "0 auto",
         overflow: "hidden",
-        border: "0.5px solid var(--ui-border)",
+        border: "1px solid var(--ui-line-control)",
         borderRadius: "14px",
       }}
     >

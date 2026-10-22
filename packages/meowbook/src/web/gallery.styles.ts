@@ -1,15 +1,15 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { tokenRef } from "meowcss";
-import { layerTokens, lineTokens, radiusTokens, uiTokens } from "meowtail/theme";
+import { uiTokens } from "meowtail/theme";
 import { buttonContract, buttonOptions, disclosureContract } from "meowtail";
 export const inspectionHeight = tokenRef("workshop", "inspection", "height");
 
 export const galleryStyles = css`
 :root {
-  font-family: ${uiTokens.font};
-  font-size: ${uiTokens.fontLabel};
-  color: ${uiTokens.foreground};
-  background: ${uiTokens.background};
+  font-family: ${uiTokens.type.sans};
+  font-size: ${uiTokens.type.label};
+  color: ${uiTokens.ink.primary};
+  background: ${uiTokens.surface.canvas};
 }
 * {
   box-sizing: border-box;
@@ -27,7 +27,7 @@ a {
   text-decoration: none;
 }
 :focus-visible {
-  outline: 2px solid ${uiTokens.focus};
+  outline: 2px solid ${uiTokens.state.focus};
   outline-offset: 3px;
 }
 [hidden] {
@@ -40,8 +40,8 @@ a {
   overflow: hidden;
 }
 .workshop-sidebar {
-  background: ${uiTokens.sidebarSurface};
-  border-right: ${lineTokens.width} solid ${lineTokens.edge};
+  background: ${uiTokens.surface.canvas};
+  border-right: ${uiTokens.line.width} solid ${uiTokens.line.edge};
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -54,28 +54,28 @@ a {
   height: 66px;
   flex-shrink: 0;
   padding: 0 10px;
-  font-size: ${uiTokens.fontTitle};
+  font-size: ${uiTokens.type.title};
   font-weight: 600;
   letter-spacing: -0.02em;
 }
 .workshop-brand > svg {
-  color: ${uiTokens.mutedForeground};
+  color: ${uiTokens.ink.secondary};
 }
 .workshop-brand > span {
   margin-left: auto;
-  font: ${uiTokens.fontMicro}/1.5 ${uiTokens.mono};
-  color: ${uiTokens.subtleForeground};
-  border: ${lineTokens.width} solid ${lineTokens.edge};
+  font: ${uiTokens.type.micro}/1.5 ${uiTokens.type.mono};
+  color: ${uiTokens.ink.tertiary};
+  border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
   padding: 1px 5px;
-  border-radius: ${radiusTokens.mark};
+  border-radius: ${uiTokens.radius.xs};
 }
 /* One small-caps label role, shared with the docs sidebar and story specimens. */
 .catalog-label {
   display: flex;
   justify-content: space-between;
   padding: 20px 10px 8px;
-  color: ${uiTokens.subtleForeground};
-  font-size: ${uiTokens.fontMicro};
+  color: ${uiTokens.ink.tertiary};
+  font-size: ${uiTokens.type.micro};
   font-weight: 500;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -89,9 +89,9 @@ a {
 }
 .catalog-empty {
   margin: 12px 10px;
-  font-size: ${uiTokens.fontCaption};
+  font-size: ${uiTokens.type.caption};
   line-height: 1.7;
-  color: ${uiTokens.mutedForeground};
+  color: ${uiTokens.ink.secondary};
   overflow-wrap: anywhere;
 }
 #catalog-backdrop {
@@ -102,18 +102,18 @@ a {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  color: ${uiTokens.foreground};
+  color: ${uiTokens.ink.primary};
 }
 .workshop-observations > summary > strong {
   flex-shrink: 0;
 }
 .workshop-local {
-  border-top: ${lineTokens.width} solid ${lineTokens.divider};
+  border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
   display: grid;
   gap: 12px;
   padding: 15px 10px;
-  color: ${uiTokens.mutedForeground};
-  font-size: ${uiTokens.fontMicro};
+  color: ${uiTokens.ink.secondary};
+  font-size: ${uiTokens.type.micro};
 }
 .workshop-local-note {
   display: flex;
@@ -127,14 +127,14 @@ a {
 }
 .workshop-appearance select {
   width: 100%;
-  min-height: ${uiTokens.controlSmall};
-  border-radius: ${uiTokens.radiusSmall};
-  font-size: ${uiTokens.fontLabel};
+  min-height: ${uiTokens.control.small};
+  border-radius: ${uiTokens.radius.md};
+  font-size: ${uiTokens.type.label};
 }
 .status-dot {
   width: 5px;
   height: 5px;
-  background: ${uiTokens.success};
+  background: ${uiTokens.status.success};
   border-radius: 50%;
 }
 .workshop-main {
@@ -150,19 +150,19 @@ a {
   gap: 12px;
   align-items: center;
   padding: 0 24px;
-  border-bottom: ${lineTokens.width} solid ${lineTokens.edge};
+  border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.edge};
   min-width: 0;
 }
 #group {
-  font-size: ${uiTokens.fontCaption};
-  color: ${uiTokens.mutedForeground};
+  font-size: ${uiTokens.type.caption};
+  color: ${uiTokens.ink.secondary};
   white-space: nowrap;
 }
 .breadcrumb-separator {
-  color: ${uiTokens.border};
+  color: ${uiTokens.line.control};
 }
 #breadcrumb-component {
-  font-size: ${uiTokens.fontLabel};
+  font-size: ${uiTokens.type.label};
   font-weight: 500;
   margin: 0;
   min-width: 0;
@@ -176,12 +176,12 @@ a {
   place-items: center;
   min-width: 30px;
   min-height: 30px;
-  color: ${uiTokens.mutedForeground};
-  border-radius: ${uiTokens.radiusSmall};
+  color: ${uiTokens.ink.secondary};
+  border-radius: ${uiTokens.radius.md};
 }
 #standalone:hover {
-  background: ${uiTokens.surfaceMuted};
-  color: ${uiTokens.foreground};
+  background: ${uiTokens.surface.fill};
+  color: ${uiTokens.ink.primary};
 }
 #toggle-sidebar {
   display: none;
@@ -192,7 +192,7 @@ a {
 }
 #title {
   margin: 0;
-  font-size: ${uiTokens.fontPageTitle};
+  font-size: ${uiTokens.type.pageTitle};
   line-height: 1.3;
   font-weight: 600;
   letter-spacing: -0.02em;
@@ -200,15 +200,15 @@ a {
 #scenario-description {
   margin: 6px 0 16px;
   max-width: 76ch;
-  font-size: ${uiTokens.fontCaption};
+  font-size: ${uiTokens.type.caption};
   line-height: 1.7;
-  color: ${uiTokens.mutedForeground};
+  color: ${uiTokens.ink.secondary};
 }
 #variants {
   display: flex;
   gap: 20px;
   overflow-x: auto;
-  border-bottom: ${lineTokens.width} solid ${lineTokens.divider};
+  border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
   scrollbar-width: thin;
 }
 #variants a {
@@ -217,15 +217,15 @@ a {
   align-items: center;
   min-height: 34px;
   border-bottom: 2px solid transparent;
-  color: ${uiTokens.mutedForeground};
-  font-size: ${uiTokens.fontCaption};
+  color: ${uiTokens.ink.secondary};
+  font-size: ${uiTokens.type.caption};
 }
 #variants a:hover,
 #variants a[aria-current="page"] {
-  color: ${uiTokens.foreground};
+  color: ${uiTokens.ink.primary};
 }
 #variants a[aria-current="page"] {
-  border-bottom-color: ${uiTokens.foreground};
+  border-bottom-color: ${uiTokens.ink.primary};
 }
 .workshop-toolbar {
   display: flex;
@@ -238,41 +238,41 @@ a {
   display: flex;
   align-items: center;
   gap: 7px;
-  color: ${uiTokens.mutedForeground};
-  font-size: ${uiTokens.fontMicro};
+  color: ${uiTokens.ink.secondary};
+  font-size: ${uiTokens.type.micro};
   margin-right: auto;
 }
 /* The viewport switch is the library's track: same inset, concentric radii and thumb. */
 .workshop-viewport {
   display: flex;
   gap: 2px;
-  padding: ${uiTokens.trackInset};
-  border-radius: calc(${uiTokens.radiusSmall} + ${uiTokens.trackInset});
-  background: ${uiTokens.surfaceMuted};
+  padding: ${uiTokens.control.trackInset};
+  border-radius: calc(${uiTokens.radius.md} + ${uiTokens.control.trackInset});
+  background: ${uiTokens.surface.fill};
 }
 .workshop-viewport ${partSelector(buttonContract, "root")}:where([${buttonOptions.attribute("variant")}="quiet"]) {
-  color: ${uiTokens.mutedForeground};
+  color: ${uiTokens.ink.secondary};
 }
 .workshop-viewport button[aria-pressed="true"] {
-  background: ${uiTokens.thumbSurface};
-  color: ${uiTokens.foreground};
-  box-shadow: ${uiTokens.shadowThumb};
+  background: ${uiTokens.control.thumb};
+  color: ${uiTokens.ink.primary};
+  box-shadow: ${uiTokens.shadow.thumb};
 }
 /* Toolbar controls share the compact 28px line the small buttons use. */
 .workshop-toolbar select {
-  min-height: ${uiTokens.controlSmall};
-  border-radius: ${uiTokens.radiusSmall};
-  font-size: ${uiTokens.fontLabel};
+  min-height: ${uiTokens.control.small};
+  border-radius: ${uiTokens.radius.md};
+  font-size: ${uiTokens.type.label};
 }
 .viewport-size {
-  font-size: ${uiTokens.fontMicro};
-  font-family: ${uiTokens.mono};
-  color: ${uiTokens.mutedForeground};
+  font-size: ${uiTokens.type.micro};
+  font-family: ${uiTokens.type.mono};
+  color: ${uiTokens.ink.secondary};
   min-width: 48px;
   text-align: center;
 }
 #reset {
-  border-left: ${lineTokens.width} solid ${lineTokens.divider};
+  border-left: ${uiTokens.line.width} solid ${uiTokens.line.divider};
   border-radius: 0;
   padding-left: 14px;
 }
@@ -281,9 +281,9 @@ a {
   min-height: 0;
   overflow: auto;
   padding: 24px;
-  background-color: ${layerTokens.fill};
-  border-top: ${lineTokens.width} solid ${lineTokens.edge};
-  border-bottom: ${lineTokens.width} solid ${lineTokens.edge};
+  background-color: ${uiTokens.surface.fill};
+  border-top: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+  border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.edge};
 }
 #canvas {
   display: block;
@@ -291,15 +291,15 @@ a {
   min-height: 180px;
   margin: 0 auto;
   border: 0;
-  border-radius: ${uiTokens.radiusLarge};
+  border-radius: ${uiTokens.radius.xl};
   /* The specimen frame is a host page (canvas) set into the recessed stage. */
-  background: ${uiTokens.background};
+  background: ${uiTokens.surface.canvas};
   box-shadow:
-    0 0 0 ${lineTokens.width} ${lineTokens.edge},
-    ${uiTokens.shadowRaised};
+    0 0 0 ${uiTokens.line.width} ${uiTokens.line.edge},
+    ${uiTokens.shadow.raised};
 }
 .workshop-observations {
-  background: ${uiTokens.background};
+  background: ${uiTokens.surface.canvas};
   min-height: 0;
 }
 .workshop-observations > summary {
@@ -310,15 +310,15 @@ a {
   padding: 0 24px;
   cursor: pointer;
   list-style: none;
-  color: ${uiTokens.mutedForeground};
-  font-size: ${uiTokens.fontMicro};
+  color: ${uiTokens.ink.secondary};
+  font-size: ${uiTokens.type.micro};
 }
 .workshop-observations > summary::-webkit-details-marker {
   display: none;
 }
 .workshop-observations > summary > strong {
   font-weight: 500;
-  color: ${uiTokens.foreground};
+  color: ${uiTokens.ink.primary};
 }
 .workshop-observations > summary > ${partSelector(disclosureContract, "icon")} {
   margin-left: auto;
@@ -329,26 +329,26 @@ a {
   overflow: hidden;
   white-space: nowrap;
   text-overflow: ellipsis;
-  color: ${uiTokens.mutedForeground};
-  font-size: ${uiTokens.fontMicro};
+  color: ${uiTokens.ink.secondary};
+  font-size: ${uiTokens.type.micro};
   margin-left: 12px;
 }
 #inspection[data-warning="true"] {
-  color: ${uiTokens.danger};
+  color: ${uiTokens.status.danger};
 }
 .inspection-body {
   padding: 8px 24px 12px;
   max-height: 260px;
   overflow: auto;
-  border-top: ${lineTokens.width} solid ${lineTokens.divider};
+  border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
 }
 .workshop-description {
   margin-bottom: 18px;
 }
 #description {
   margin: 0 0 8px;
-  color: ${uiTokens.mutedForeground};
-  font-size: ${uiTokens.fontCaption};
+  color: ${uiTokens.ink.secondary};
+  font-size: ${uiTokens.type.caption};
   line-height: 1.7;
 }
 #covers {
@@ -357,14 +357,14 @@ a {
   flex-wrap: wrap;
 }
 #covers span {
-  font-size: ${uiTokens.fontMicro};
-  color: ${uiTokens.mutedForeground};
+  font-size: ${uiTokens.type.micro};
+  color: ${uiTokens.ink.secondary};
   padding: 2px 0;
 }
 #covers span + span::before {
   content: "·";
   margin-right: 6px;
-  color: ${uiTokens.mutedForeground};
+  color: ${uiTokens.ink.secondary};
 }
 .workshop-observation-head {
   display: flex;
@@ -373,15 +373,15 @@ a {
   flex-wrap: wrap;
 }
 .workshop-observation-head > strong {
-  font-size: ${uiTokens.fontMicro};
+  font-size: ${uiTokens.type.micro};
   font-weight: 500;
   margin-right: auto;
 }
 #events {
   max-height: 80px;
   overflow: auto;
-  font: ${uiTokens.fontCode}/1.8 ${uiTokens.mono};
-  color: ${uiTokens.mutedForeground};
+  font: ${uiTokens.type.code}/1.8 ${uiTokens.type.mono};
+  color: ${uiTokens.ink.secondary};
   padding-left: 18px;
 }
 #events:empty {
@@ -390,27 +390,27 @@ a {
 .workshop-batch {
   margin-top: 14px;
   padding-top: 12px;
-  border-top: ${lineTokens.width} solid ${lineTokens.divider};
+  border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
 }
 #batch-status,
 .workshop-limits {
-  color: ${uiTokens.mutedForeground};
-  font-size: ${uiTokens.fontMicro};
+  color: ${uiTokens.ink.secondary};
+  font-size: ${uiTokens.type.micro};
 }
 .workshop-limits {
   margin: 12px 0 0;
 }
 #batch-results {
   padding-left: 18px;
-  font-size: ${uiTokens.fontCaption};
+  font-size: ${uiTokens.type.caption};
 }
 #batch-results:empty {
   display: none;
 }
 #batch-results span {
   display: block;
-  color: ${uiTokens.danger};
-  font-size: ${uiTokens.fontMicro};
+  color: ${uiTokens.status.danger};
+  font-size: ${uiTokens.type.micro};
   overflow-wrap: anywhere;
 }
 .workshop-batch-canvas {
@@ -460,7 +460,7 @@ a {
     z-index: 4;
     border: 0;
     border-radius: 0;
-    background: ${uiTokens.backdrop};
+    background: ${uiTokens.surface.scrim};
   }
   .workshop-shell {
     grid-template-columns: minmax(0, 1fr);
@@ -473,7 +473,7 @@ a {
     left: 0;
     width: 240px;
     z-index: 5;
-    box-shadow: ${uiTokens.shadowFloat};
+    box-shadow: ${uiTokens.shadow.float};
   }
   .catalog-open .workshop-sidebar {
     display: flex;
@@ -495,7 +495,7 @@ a {
   }
   .viewport-size {
     min-width: 42px;
-    font-size: ${uiTokens.fontMicro};
+    font-size: ${uiTokens.type.micro};
   }
   .workshop-stage {
     padding: 12px 0;
@@ -509,7 +509,7 @@ a {
   }
   #inspection {
     margin-left: 0;
-    font-size: ${uiTokens.fontMicro};
+    font-size: ${uiTokens.type.micro};
   }
   .inspection-body {
     padding: 12px 16px;
@@ -568,8 +568,8 @@ a {
     inset: auto 0 0;
     z-index: 3;
     max-height: var(${inspectionHeight.name});
-    border-top: ${lineTokens.width} solid ${lineTokens.divider};
-    box-shadow: ${uiTokens.shadowFloat};
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+    box-shadow: ${uiTokens.shadow.float};
   }
   .workshop-observations[open] > .inspection-body {
     min-height: 0;
@@ -590,7 +590,7 @@ a {
     padding-top: 8px;
   }
   #title {
-    font-size: ${uiTokens.fontHeading};
+    font-size: ${uiTokens.type.heading};
   }
   #scenario-description {
     margin: 3px 0 6px;
@@ -615,20 +615,20 @@ a {
   width: auto;
 }
 #text-placeholder[aria-pressed="true"] {
-  background: ${uiTokens.surfaceMuted};
-  box-shadow: inset 0 0 0 1px ${uiTokens.border};
+  background: ${uiTokens.surface.fill};
+  box-shadow: inset 0 0 0 1px ${uiTokens.line.control};
 }
 #measurement-detail {
   grid-row: 5;
   padding: 8px 16px;
   max-height: 150px;
   overflow: auto;
-  border-top: ${lineTokens.width} solid ${lineTokens.divider};
-  font-size: ${uiTokens.fontMicro};
+  border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+  font-size: ${uiTokens.type.micro};
 }
 #measurement-help {
   margin: 0;
-  color: ${uiTokens.mutedForeground};
+  color: ${uiTokens.ink.secondary};
 }
 #measurement-values {
   display: grid;

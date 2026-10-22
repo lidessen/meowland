@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { lineTokens, layerTokens } from "../palette";
 import { itemContract, itemOptions } from "../../components/item";
 
 export const itemStyles = css`
@@ -14,11 +13,11 @@ export const itemStyles = css`
     min-height: 40px;
     padding: 8px 12px;
     border: 1px solid transparent;
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radius.lg};
     background: transparent;
-    color: ${uiTokens.foreground};
-    font-family: ${uiTokens.font};
-    font-size: ${uiTokens.fontBody};
+    color: ${uiTokens.ink.primary};
+    font-family: ${uiTokens.type.sans};
+    font-size: ${uiTokens.type.body};
     line-height: 1.5;
     text-align: start;
   }
@@ -26,31 +25,31 @@ export const itemStyles = css`
     ${itemOptions.when({ size: "small" })} {
       min-height: 34px;
       padding: 6px 8px;
-      font-size: ${uiTokens.fontLabel};
+      font-size: ${uiTokens.type.label};
       line-height: 20px;
     }
   }
   ${partSelector(itemContract, "root")} {
     ${itemOptions.when({ variant: "outline" })} {
-      border-color: ${lineTokens.edge};
-      background: ${layerTokens.raised};
+      border-color: ${uiTokens.line.edge};
+      background: ${uiTokens.surface.raised};
     }
   }
   button${partSelector(itemContract, "root")} {
     cursor: pointer;
     transition:
-      background-color ${uiTokens.durationResponse} ${uiTokens.ease},
-      border-color ${uiTokens.durationResponse} ${uiTokens.ease};
+      background-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
+      border-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   button${partSelector(itemContract, "root")}:hover:not(:disabled) {
-    background: ${uiTokens.hover};
+    background: ${uiTokens.state.hover};
   }
   ${partSelector(itemContract, "root")}[data-selected="true"],
   button${partSelector(itemContract, "root")}[aria-expanded="true"] {
-    background: ${uiTokens.hover};
+    background: ${uiTokens.state.hover};
   }
   button${partSelector(itemContract, "root")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
   button${partSelector(itemContract, "root")}:disabled {
@@ -61,9 +60,9 @@ export const itemStyles = css`
   ${partSelector(itemContract, "trailing")} {
     display: inline-flex;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     flex: 0 0 auto;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   ${partSelector(itemContract, "leading")} {
     align-self: flex-start;
@@ -82,8 +81,8 @@ export const itemStyles = css`
   ${partSelector(itemContract, "meta")},
   ${partSelector(itemContract, "description")},
   ${partSelector(itemContract, "trailing")} {
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
   }
   ${partSelector(itemContract, "meta")} {
     font-weight: 500;

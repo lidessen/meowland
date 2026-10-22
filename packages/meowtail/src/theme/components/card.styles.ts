@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { lineTokens, layerTokens } from "../palette";
 import { cardContract, cardOptions } from "../../components/card";
 import { cardActionContract } from "../../components/card-action";
 import { cardContentContract } from "../../components/card-content";
@@ -13,20 +12,20 @@ export const cardStyles = css`
 ${partSelector(cardContract, "root")} {
   box-sizing: border-box;
   min-width: 0;
-  padding: ${uiTokens.spacePanel};
+  padding: ${uiTokens.space.panel};
   /* The in-flow surface every bordered container shares: raised layer on the edge hairline. */
-  border: ${lineTokens.width} solid ${lineTokens.edge};
-  border-radius: ${uiTokens.panelRadius};
-  background: ${layerTokens.raised};
-  box-shadow: ${uiTokens.shadowRaised};
-  --meowui-focus-halo: ${layerTokens.raised};
-  color: ${uiTokens.foreground};
-  font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+  border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+  border-radius: ${uiTokens.radius.xl};
+  background: ${uiTokens.surface.raised};
+  box-shadow: ${uiTokens.shadow.raised};
+  --meowui-focus-halo: ${uiTokens.surface.raised};
+  color: ${uiTokens.ink.primary};
+  font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
 }
 
 /* Embedded groups share their parent's surface; callers choose the relationship. */
 button${partSelector(cardContract, "root")}:focus-visible {
-  outline: 2px solid ${uiTokens.focus};
+  outline: 2px solid ${uiTokens.state.focus};
   outline-offset: 2px;
 }
 
@@ -41,13 +40,13 @@ button${partSelector(cardContract, "root")}:focus-visible {
 ${partSelector(cardHeaderContract, "root")} {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: ${uiTokens.spaceGroup} ${uiTokens.spaceSection};
+  gap: ${uiTokens.space.group} ${uiTokens.space.section};
   align-items: start;
   min-width: 0;
 }
 :where(${partSelector(cardHeaderContract, "root")}:has(> ${partSelector(cardActionContract, "root")})) {
   /* Tracks collapse at the card's own width without size containment affecting intrinsic cards. */
-  grid-template-columns: repeat(auto-fit, minmax(min(100%, ${uiTokens.gridColumnNormal}), max-content));
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, ${uiTokens.layout.gridNormal}), max-content));
   grid-auto-flow: row dense;
   justify-content: space-between;
 }
@@ -56,8 +55,8 @@ ${partSelector(cardHeaderContract, "root")} {
 }
 ${partSelector(cardTitleContract, "root")} {
   margin: 0;
-  color: ${uiTokens.foreground};
-  font-size: ${uiTokens.fontTitle};
+  color: ${uiTokens.ink.primary};
+  font-size: ${uiTokens.type.title};
   font-weight: 600;
   line-height: 1.4;
   letter-spacing: -0.01em;
@@ -65,15 +64,15 @@ ${partSelector(cardTitleContract, "root")} {
 }
 ${partSelector(cardDescriptionContract, "root")} {
   margin: 0;
-  color: ${uiTokens.mutedForeground};
-  font-size: ${uiTokens.fontBody};
-  line-height: ${uiTokens.leading};
+  color: ${uiTokens.ink.secondary};
+  font-size: ${uiTokens.type.body};
+  line-height: ${uiTokens.type.leading};
   overflow-wrap: anywhere;
 }
 ${partSelector(cardActionContract, "root")} {
   display: flex;
   flex-wrap: wrap;
-  gap: ${uiTokens.spaceGroup};
+  gap: ${uiTokens.space.group};
   align-items: center;
 }
 :where(${partSelector(cardHeaderContract, "root")} > ${partSelector(cardActionContract, "root")}) {
@@ -86,7 +85,7 @@ ${partSelector(cardActionContract, "root")} {
 }
 ${partSelector(cardContentContract, "root")} {
   display: grid;
-  gap: ${uiTokens.spaceSection};
+  gap: ${uiTokens.space.section};
   min-width: 0;
 }
 :where(${partSelector(cardContentContract, "root")} > p) {
@@ -97,25 +96,25 @@ ${partSelector(cardContentContract, "root")} {
   ${partSelector(cardContract, "root")} > ${partSelector(cardContentContract, "root")}:not(:first-child),
   ${partSelector(cardContract, "root")} > ${partSelector(cardFooterContract, "root")}:not(:first-child)
 ) {
-  margin-top: ${uiTokens.spaceSection};
+  margin-top: ${uiTokens.space.section};
 }
 ${partSelector(cardFooterContract, "root")} {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: ${uiTokens.spaceGroup};
+  gap: ${uiTokens.space.group};
 }
 :where(${partSelector(cardContract, "root")}:is([${cardOptions.attribute("variant")}="embedded"], [${cardOptions.attribute("variant")}="auto"]:not([data-card-depth="0"])) > ${partSelector(cardHeaderContract, "root")} > ${partSelector(cardTitleContract, "root")}) {
-  font-size: ${uiTokens.fontBody};
+  font-size: ${uiTokens.type.body};
 }
 :where(
   ${partSelector(cardContract, "root")}:is([${cardOptions.attribute("variant")}="embedded"], [${cardOptions.attribute("variant")}="auto"]:not([data-card-depth="0"])) > ${partSelector(cardContentContract, "root")}:not(:first-child),
   ${partSelector(cardContract, "root")}:is([${cardOptions.attribute("variant")}="embedded"], [${cardOptions.attribute("variant")}="auto"]:not([data-card-depth="0"])) > ${partSelector(cardFooterContract, "root")}:not(:first-child)
 ) {
-  margin-top: ${uiTokens.spaceGroup};
+  margin-top: ${uiTokens.space.group};
 }
 :where(${partSelector(cardContentContract, "root")} > ${partSelector(cardContract, "root")}:is([${cardOptions.attribute("variant")}="embedded"], [${cardOptions.attribute("variant")}="auto"]:not([data-card-depth="0"])) + ${partSelector(cardContract, "root")}:is([${cardOptions.attribute("variant")}="embedded"], [${cardOptions.attribute("variant")}="auto"]:not([data-card-depth="0"]))) {
-  padding-top: ${uiTokens.spaceSection};
-  border-top: ${lineTokens.width} solid ${lineTokens.divider};
+  padding-top: ${uiTokens.space.section};
+  border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
 }
 `;

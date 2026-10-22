@@ -25,9 +25,9 @@ export const baseStyles = css`
   /* Establish UI typography at an entry root without resetting an author's
      typography when a nested region changes its theme or appearance. */
   :where([data-meowui-theme-root="meowui"]:not([data-meowui-theme-root] *)) {
-    font-family: ${uiTokens.font};
-    font-size: ${uiTokens.fontBody};
-    line-height: ${uiTokens.leading};
+    font-family: ${uiTokens.type.sans};
+    font-size: ${uiTokens.type.body};
+    line-height: ${uiTokens.type.leading};
   }
   /* Unlike typography, ink must resolve again at a local appearance boundary. */
   :where(
@@ -35,7 +35,7 @@ export const baseStyles = css`
     [data-meowui-theme-root="meowui"]
       [data-meowui-scope]:not([data-meowui-theme-root]:not([data-meowui-theme-root="meowui"]))
   ) {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
   :where([data-meowui-theme-root="meowui"]) {
     -webkit-font-smoothing: antialiased;
@@ -45,7 +45,7 @@ export const baseStyles = css`
   .meow-icon {
     flex-shrink: 0;
     vertical-align: middle;
-    stroke-width: ${uiTokens.iconStroke};
+    stroke-width: ${uiTokens.icon.stroke};
   }
   .meowland-mark-silhouette {
     fill: var(${logoTokens.ink.name}, currentColor);

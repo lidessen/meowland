@@ -119,73 +119,84 @@ contract it has registered. Declaring the contract does not register it: a new f
 those attribute strings. Importing the styles module does not insert CSS. The host mounts
 `standardTheme.cssText`.
 
-Color, type, radius, motion, and the shared lengths come from `uiTokens` in `src/theme/tokens.ts`,
-plus `accentTokens`, `statusTokens`, `radiusTokens`, `lineTokens`, and `layerTokens` in
-`src/theme/palette.ts`. Interpolating a token emits `var(--…)`, including a light/dark pair. The
-spacing steps are `spaceGroup` (8px), `spaceSection` (20px), and `spacePanel` (24px). Control
-heights are one ladder: `controlSmall` / `controlHeight` / `controlLarge` (28 / 36 / 44px), equal to
-`buttonSmall` / `buttonHeight` / `buttonLarge`, so a field, a select and a button in one row share a
-height and center line. Field surfaces (Input, Textarea, Select, ChoiceSelect, SearchInput,
-NumberInput) take their box and their hover, focus, read-only, invalid and disabled states from
-`src/theme/shared/field-surface.styles.ts`; a field family's own file adds layout only. Type sizes
-come from the `uiTokens` ramp (`fontMicro` 11, `fontCaption`/`fontCode` 12, `fontLabel` 13,
-`fontBody` 14, `fontTitle` 16, `fontHeading` 20, `fontPageTitle` 24) and radii from `radiusTokens`
-chosen by element size; do not write a literal size or radius beside them.
+### Design system
+
+Every value a theme file paints with is a role in one tree, `uiTokens` in `src/theme/tokens.ts`
+(CSS names `--ui-<group>-<key>`). A theme file never writes a literal color, type size, radius,
+shadow or duration; a length that belongs to one part's geometry stays beside that part's selector.
+Colors are literal `[light, dark]` pairs and never reference another token, so a nested scheme
+region resolves its own value. Chat-only measures live in `chatTokens`; option-driven values
+(`alertTokens`), syntax colors (`codeHighlightTokens`) and one component's rhythm
+(`resourceCardTokens`) are the only other sets. There are no aliases: one role, one name.
+
+| Group     | Keys                                                                                       | Rule                                                                       |
+| --------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
+| `surface` | canvas, reading, raised, overlay, fill, field · tint, knockout, scrim                      | the surface ladder below; the last three are not rungs                     |
+| `inverse` | surface, ink, action                                                                       | Tooltip and Toast, dark in both schemes                                    |
+| `line`    | width, edge, divider, control, controlHover                                                | three jobs, all 1px                                                        |
+| `ink`     | primary, secondary, tertiary, chip                                                         | content, supporting copy and placeholders, captions, text on a chip        |
+| `state`   | hover, active, focus, focusRing                                                            | translucent overlays that work on any rung                                 |
+| `action`  | primary, primaryHover, onPrimary, soft, danger, onDanger                                   | filled actions; each "on" color sits with its fill                         |
+| `control` | small, regular, large, inset, fieldInset, trackInset, thumb, knob                          | the 28 / 36 / 44 ladder every single-line control shares                   |
+| `accent`  | base, soft, selected, ink, line, halo                                                      | what is happening now and where the reader is                              |
+| `status`  | info, success, warning, danger, unknown                                                    | one text-safe color per status, also used for markers; halos derive by mix |
+| `type`    | sans, display, mono, micro, caption, code, label, body, title, heading, pageTitle, leading | the ramp 11 / 12 / 12 / 13 / 14 / 16 / 20 / 24                             |
+| `space`   | group, section, panel, prose, page insets                                                  | spacing by relationship                                                    |
+| `icon`    | size, stroke                                                                               |                                                                            |
+| `radius`  | xs, sm, md, lg, xl, xxl                                                                    | by element size: marks, tags, small elements, controls, surfaces, dialogs  |
+| `shadow`  | raised, field, action, filled, thumb, float                                                | one shadow per role                                                        |
+| `motion`  | response, settle, ease                                                                     |                                                                            |
+| `layout`  | grid columns, containers, measure                                                          |                                                                            |
+| `glyph`   | chevron, check, arrow, cross, selectChevron                                                | mask glyphs colored by ink                                                 |
+
+Field surfaces (Input, Textarea, Select, ChoiceSelect, SearchInput, NumberInput) take their box and
+their hover, focus, read-only, invalid and disabled states from
+`src/theme/shared/field-surface.styles.ts`; a field family's own file adds layout only.
 
 #### Surface ladder
 
-Every background is one rung of one ladder, defined once in `src/theme/palette.ts`
-(`layerTokens`). Each rung has exactly one edge rule, and a layer differs from what it sits on by
-one cue: a fill step or an edge. A new component picks a rung; it never mixes a fresh grey.
+Every background is one rung. Each rung has exactly one edge rule, and a layer differs from what it
+sits on by one cue: a fill step or an edge. A new component picks a rung; it never mixes a grey.
 
-| Rung    | Background (light / dark)              | Edge                                                 | Used by                                                                                       |
-| ------- | -------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| canvas  | `layerTokens.canvas` #fafafa / #121212 | regions split by `edge`, no new fill                 | page ground, sidebars, headers, AppBar (`uiTokens.background`)                                |
-| reading | `layerTokens.reading` #fff / #121212   | none                                                 | full-bleed transcript (`chatTokens.paper`)                                                    |
-| raised  | `layerTokens.raised` #fff / #1a1a1a    | `edge`; no shadow in light                           | Card, ListGroup, Table, TaskList, ChatQuestion, docs install line                             |
-| overlay | `layerTokens.overlay` #fff / #202020   | ring + `shadowFloat`                                 | Dialog, Modal, Popover, Menu, HoverCard (`uiTokens.surface`)                                  |
-| fill    | `layerTokens.fill` #f2f2f2 / #242424   | none (the composer is the exception: it is operated) | code, chips, tracks, avatars, bubbles, ProcessGroup, composer (`surfaceMuted`, `codeSurface`) |
-| field   | `layerTokens.field` #fff / #161616     | `control`, `controlHover` on hover                   | Input, Select, ChoiceSelect, SearchInput (`inputSurface`)                                     |
+| Rung      | Light / dark      | Edge                                                 | Used by                                                       |
+| --------- | ----------------- | ---------------------------------------------------- | ------------------------------------------------------------- |
+| `canvas`  | #fafafa / #121212 | regions split by `line.edge`, no new fill            | page ground, sidebars, headers, AppBar                        |
+| `reading` | #fff / #121212    | none                                                 | the full-bleed chat transcript                                |
+| `raised`  | #fff / #1a1a1a    | `line.edge`; `shadow.raised` (none in light)         | Card, ListGroup, Table, TaskList, ChatQuestion                |
+| `overlay` | #fff / #202020    | `shadow.float` (ring + drop)                         | Dialog, Modal, Popover, Menu, HoverCard, Toast                |
+| `fill`    | #f2f2f2 / #242424 | none (the composer is the exception: it is operated) | code, chips, tracks, avatars, bubbles, ProcessGroup, composer |
+| `field`   | #fff / #161616    | `line.control`, `line.controlHover` on hover         | Input, Select, ChoiceSelect, SearchInput                      |
 
 Dark lightness steps up with elevation (canvas < raised < overlay); a field is recessed, so in dark
-it is darker than raised. Do not "fix" that.
+it is darker than raised. Do not "fix" that. `surface.knockout` is the color behind a halo, mix or
+cutout (it defaults to raised; a host overrides it per surface), `surface.tint` a translucent mark
+that works on any rung, and `surface.scrim` the page dimmer under a modal.
 
-Lines have three jobs: `edge` outlines a raised or overlay surface and splits regions on the
-canvas; `divider` separates rows inside one surface; `control` bounds what the reader operates
-(fields, outline actions, checkboxes), with `controlHover` under the pointer. `uiTokens.border`,
-`borderSubtle`, `borderSoft`, `borderFaint`, `borderStrong` and `lineTokens.quiet` are aliases of
-these; new code names the role.
+Lines have three jobs: `line.edge` outlines a raised or overlay surface and splits regions on the
+canvas; `line.divider` separates rows inside one surface; `line.control` bounds what the reader
+operates (fields, outline actions, checkboxes), `line.controlHover` under the pointer.
 
-Not surfaces, so never a new grey either: `layerTokens.knockout` (the color behind a halo, mix or
-cutout; defaults to raised, a host overrides it per surface), the translucent state overlays
-`uiTokens.hover` / `active` and `accentTokens.selected` (they work on any rung), the inverse
-`tooltipSurface` / `toastSurface`, and `uiTokens.backdrop`.
+Fields, actions, tracks and thumbs are rounded rectangles (`radius.lg`, `radius.md` at the small
+size); tracks and thumbs are concentric (track radius is the thumb radius plus
+`control.trackInset`); surfaces use `radius.xl`, and items inside a floating panel use `radius.md`
+(the panel radius minus its 6px inset). Do not introduce pills for actions or fields.
 
-Fields, actions, tracks and thumbs are rounded rectangles (`controlRadius`, `radiusSmall` at the
-small size); tracks and thumbs are concentric (track radius is the thumb radius plus `trackInset`);
-surfaces use `radiusLarge`, and items inside a floating panel use `radiusSmall` (the panel radius minus
-its 6px inset). Do not introduce pills for actions or fields.
+Depth is a material, not decoration. Each role takes one shadow and nothing else: `shadow.raised`
+for in-flow surfaces (flat in light, where the edge carries the card; a faint top-edge highlight in
+dark), `shadow.field` for fields at rest, `shadow.action` for outline actions, `shadow.filled` for
+primary and danger fills, `shadow.thumb` for selected thumbs and `shadow.float` for anything
+floating. Disabled controls drop their shadow. Pressed actions settle by half a pixel. Every grey is
+a true neutral. Edges are 1px, never half-pixel lines, which blur on ordinary screens. A quieter
+state of the same thing (a finished step, a waiting step) fades its ink with `color-mix` instead of
+switching to another grey. Activity is a band of full ink sweeping across muted text (TextShimmer),
+not a color. Button labels are 500 weight; titles at `type.title` and above use -0.01em tracking.
 
-Depth is a material, not decoration. Each role takes one shadow token and nothing else:
-`shadowRaised` for in-flow surfaces (flat in light, where the 1px edge carries the card; a faint
-top-edge highlight in dark),
-`shadowField` for fields at rest, `shadowAction` for outline actions, `shadowFilled` for primary and
-danger fills (an inner top highlight over a tight drop), `shadowThumb` for selected thumbs and
-`shadowFloat` for floating panels. Disabled controls drop their shadow. Pressed actions settle by
-half a pixel. Every grey is a true neutral with no blue cast: ink, secondary ink, edges and fills.
-Edges are 1px (`lineTokens.width`), never half-pixel lines, which blur on ordinary screens.
-Secondary states of the same thing (a finished step, a waiting step) fade the foreground with
-`color-mix` instead of switching to another grey. Activity is a band of full ink sweeping across
-muted text (TextShimmer), not a color. Button labels are 500 weight; titles at `fontTitle` and above use -0.01em tracking.
+Group labels share one small-caps role: `type.micro`, weight 500, 0.04em tracking, uppercase,
+`ink.tertiary` (the `eyebrow` Text role). Menu headings, ChoiceSelect groups, NavList group titles,
+and the docs, gallery and story sidebars use it; do not invent another label style. The docs app
+and the Meowbook gallery use the same tokens and roles as the library.
 
-Group labels share one small-caps role: `fontMicro`, weight 500, 0.04em tracking, uppercase,
-`subtleForeground`. Menu headings, ChoiceSelect groups, NavList group titles, and the docs, gallery
-and story sidebars use it; do not invent another label style. The docs app and the Meowbook gallery
-use the same tokens and roles as the library, so a specimen there looks like the component in a host.
-
-Syntax colors come from `codeHighlightTokens`, and inverse surfaces (Tooltip, HoverCard, Toast) from
-`tooltipSurface`/`toastSurface` with `toastForeground`. Do not use `light-dark()` or a literal hex in a
-theme file: `light-dark()` follows CSS `color-scheme`, not the theme's own scheme boundary.
+Do not use `light-dark()`: it follows CSS `color-scheme`, not the theme's own scheme boundary.
 
 Arrange siblings with `Stack`, `Inline`, or `Grid` and a `gap` of `none`, `compact`,
 `normal`, or `relaxed` (0, group, section, panel). Judgment for departing from that scale is in
@@ -195,7 +206,7 @@ Arrange siblings with `Stack`, `Inline`, or `Grid` and a `gap` of `none`, `compa
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Style each part from its contract with `partSelector`, in the theme file for that family.                                                                                                                   | Add a `.css` file, a CSS module, styled-components, Emotion, or Tailwind utilities.                                                                                                 |
 | Put variant axes on the contract (`defineOptions`, `defineStyleProps`) and branch with `options.when` or `options.attribute`.                                                                               | Hand-write `data-meowui-part` or `data-option-*`, or select a raw prop name such as `[variant="accent"]`. The style plugin removes the option prop and writes the option attribute. |
-| Take color, type, radius, and the spacing steps from `uiTokens` and the palette tokens. A length that belongs to one part stays next to that part's selector in the theme file.                             | Hardcode a hex color or a second spacing ramp in the component.                                                                                                                     |
+| Take every color, type size, radius, shadow, duration and spacing step from a `uiTokens` role. A length that belongs to one part stays next to that part's selector in the theme file.                      | Hardcode a hex color or a second spacing ramp in the component.                                                                                                                     |
 | Forward a host `className` on the root part. The component looks finished without it.                                                                                                                       | Build the look from a variant class string, or from story-only CSS.                                                                                                                 |
 | Compose siblings with `Stack`, `Inline`, or `Grid`. Those primitives set structural layout (`display`, flex, or grid) through `layoutStyle`; their gap still comes from style props and `layout.styles.ts`. | Copy that inline `style` object onto a visual component for color, font, radius, or padding.                                                                                        |
 | Send an instance measurement the stylesheet cannot know as a custom property: `tokenRef` on `style`, read back by the theme. `tabsCount` and `tabsIndex` are that channel.                                  | Use a `style` object as the theme.                                                                                                                                                  |
@@ -254,20 +265,20 @@ import { uiTokens } from "../tokens";
 export const calloutStyles = css`
   ${partSelector(calloutContract, "root")} {
     display: grid;
-    gap: ${uiTokens.spaceGroup};
-    padding: ${uiTokens.spaceGroup};
-    color: ${uiTokens.foreground};
-    font: 400 ${uiTokens.fontBody} / ${uiTokens.leading} ${uiTokens.font};
-    background: ${uiTokens.surfaceMuted};
-    border-radius: ${uiTokens.controlRadius};
+    gap: ${uiTokens.space.group};
+    padding: ${uiTokens.space.group};
+    color: ${uiTokens.ink.primary};
+    font: 400 ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
+    background: ${uiTokens.surface.fill};
+    border-radius: ${uiTokens.radius.lg};
   }
   ${partSelector(calloutContract, "title")} {
     font-weight: 500;
   }
   ${partSelector(calloutContract, "root")} {
     ${calloutOptions.when({ tone: "accent" })} {
-      color: ${uiTokens.primary};
-      background: ${uiTokens.primarySoft};
+      color: ${uiTokens.action.primary};
+      background: ${uiTokens.action.soft};
     }
   }
 `;
@@ -327,7 +338,7 @@ relationships, not numbers; values come from `uiTokens`.
   Components do not center themselves; only a page column (`Container`, `Page`) or an `EmptyState`
   centers.
 - **Arrange with layout, read with Prose.** Stack, Inline and Grid arrange controls and cards; Prose
-  arranges reading content and caps it at the reading measure (`uiTokens.measure`).
+  arranges reading content and caps it at the reading measure (`uiTokens.layout.measure`).
 - **Label every group.** When a region shows more than one group of things (variants, states,
   settings), each group gets an eyebrow label; groups sit a panel step apart.
 

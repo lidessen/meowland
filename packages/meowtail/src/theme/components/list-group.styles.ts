@@ -1,7 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { listGroupContract, listRowContract } from "../../components/list-group";
-import { accentTokens, layerTokens, lineTokens, radiusTokens } from "../palette";
 
 const group = partSelector(listGroupContract, "root");
 const row = (part: (typeof listRowContract.parts)[number]) => partSelector(listRowContract, part);
@@ -10,20 +9,20 @@ export const listGroupStyles = css`
   ${group} {
     display: grid;
     overflow: hidden;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: ${radiusTokens.card};
-    background: ${layerTokens.raised};
-    box-shadow: ${uiTokens.shadowRaised};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.raised};
+    box-shadow: ${uiTokens.shadow.raised};
   }
   ${row("root")} {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     min-width: 0;
-    font: ${uiTokens.fontBody}/1.5 ${uiTokens.font};
-    color: ${uiTokens.foreground};
+    font: ${uiTokens.type.body}/1.5 ${uiTokens.type.sans};
+    color: ${uiTokens.ink.primary};
   }
   ${group} > ${row("root")} + ${row("root")} {
-    border-top: ${lineTokens.width} solid ${lineTokens.divider};
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
   }
   ${row("line")} {
     display: flex;
@@ -35,13 +34,13 @@ export const listGroupStyles = css`
   }
   @media (hover: hover) {
     ${group} > ${row("root")}:not([data-expanded]) > ${row("line")}:hover {
-      background: ${layerTokens.sunken};
+      background: ${uiTokens.surface.fill};
     }
   }
   ${row("copy")} {
     display: grid;
     gap: 1px;
-    flex: 1 1 ${uiTokens.gridColumnCompact};
+    flex: 1 1 ${uiTokens.layout.gridCompact};
     min-width: 0;
   }
   ${row("heading")} {
@@ -61,8 +60,8 @@ export const listGroupStyles = css`
     gap: 6px;
   }
   ${row("description")} {
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontLabel};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.label};
     overflow-wrap: anywhere;
   }
   ${row("status")} {
@@ -71,8 +70,8 @@ export const listGroupStyles = css`
     flex: 0 1 auto;
     min-width: 0;
     gap: 6px;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     overflow-wrap: anywhere;
   }
   ${row("actions")} {
@@ -85,16 +84,16 @@ export const listGroupStyles = css`
   }
   ${row("panel")} {
     padding: 12px 16px;
-    border-top: ${lineTokens.width} solid ${lineTokens.divider};
-    background: ${layerTokens.sunken};
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+    background: ${uiTokens.surface.fill};
   }
   ${row("root")}[data-expanded="true"] {
-    background: ${layerTokens.sunken};
+    background: ${uiTokens.surface.fill};
   }
   /* A row standing alone is a summary: it carries its own outline. */
   ${row("root")}[data-tone="accent"] {
-    border: ${lineTokens.width} solid ${accentTokens.line};
-    border-radius: ${radiusTokens.card};
-    background: ${accentTokens.soft};
+    border: ${uiTokens.line.width} solid ${uiTokens.accent.line};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.accent.soft};
   }
 `;

@@ -1,16 +1,15 @@
-import { layerTokens } from "../palette";
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { imageLightboxContract as image } from "../../components/image-lightbox";
 
 export const imageLightboxStyles = css`
   ${partSelector(image, "trigger")} {
-    border: 1px solid ${uiTokens.border};
-    border-radius: ${uiTokens.controlRadius};
+    border: 1px solid ${uiTokens.line.control};
+    border-radius: ${uiTokens.radius.lg};
     padding: 6px 12px;
-    background: ${uiTokens.surface};
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/22px ${uiTokens.font};
+    background: ${uiTokens.surface.overlay};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/22px ${uiTokens.type.sans};
     cursor: pointer;
   }
   ${partSelector(image, "dialog")} {
@@ -32,18 +31,18 @@ export const imageLightboxStyles = css`
     justify-content: center;
   }
   ${partSelector(image, "dialog")}::backdrop {
-    background: ${uiTokens.backdrop};
+    background: ${uiTokens.surface.scrim};
   }
   ${partSelector(image, "image")} {
     max-width: min(100%, 1600px);
     max-height: calc(100dvh - 140px);
     object-fit: contain;
-    border-radius: ${uiTokens.radiusLarge};
-    background: ${layerTokens.raised};
-    box-shadow: ${uiTokens.shadowPanel};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.raised};
+    box-shadow: ${uiTokens.shadow.float};
   }
   ${partSelector(image, "caption")} {
-    font: ${uiTokens.fontBody}/22px ${uiTokens.font};
+    font: ${uiTokens.type.body}/22px ${uiTokens.type.sans};
     text-align: center;
   }
   ${partSelector(image, "close")} {
@@ -54,16 +53,16 @@ export const imageLightboxStyles = css`
     place-items: center;
     width: 36px;
     height: 36px;
-    border: 1px solid ${uiTokens.borderSoft};
+    border: 1px solid ${uiTokens.line.divider};
     border-radius: 50%;
     corner-shape: round;
-    background: ${layerTokens.raised};
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontPageTitle}/1 ${uiTokens.font};
+    background: ${uiTokens.surface.raised};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.pageTitle}/1 ${uiTokens.type.sans};
     cursor: pointer;
   }
   ${partSelector(image, "close")}:focus-visible, ${partSelector(image, "trigger")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
 `;

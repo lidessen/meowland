@@ -164,5 +164,5 @@ test("Section can keep its plain variant inside an existing Card without a secon
 test("the standard theme paints every section part with the shared spacing step", () => {
   for (const part of ["root", "header", "title", "description", "actions", "content", "footer"])
     expect(standardTheme.cssText).toContain(`data-meowui-part="section/${part}"`);
-  expect(standardTheme.cssText).toContain(uiTokens.spaceGroup.name);
+  expect(standardTheme.cssText).toContain(uiTokens.space.group.name);
 });

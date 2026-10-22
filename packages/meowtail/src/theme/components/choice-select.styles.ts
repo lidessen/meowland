@@ -15,7 +15,7 @@ export const choiceSelectStyles = css`
     gap: 6px;
     width: 100%;
     /* The chevron sits where the native Select draws its own. */
-    padding: 0 10px 0 ${uiTokens.fieldPaddingInline};
+    padding: 0 10px 0 ${uiTokens.control.fieldInset};
     text-align: start;
     cursor: pointer;
   }
@@ -28,7 +28,7 @@ export const choiceSelectStyles = css`
   }
   ${partSelector(choiceSelectContract, "indicator")} {
     display: flex;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   ${partSelector(choiceSelectContract, "indicator")} svg {
     width: 14px;
@@ -47,23 +47,23 @@ export const choiceSelectStyles = css`
     min-height: 32px;
     padding: 5px 7px;
     margin-bottom: 3px;
-    border: 1px solid ${uiTokens.border};
-    border-radius: ${uiTokens.controlRadius};
-    background: ${uiTokens.inputSurface};
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/22px ${uiTokens.font};
+    border: 1px solid ${uiTokens.line.control};
+    border-radius: ${uiTokens.radius.lg};
+    background: ${uiTokens.surface.field};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/22px ${uiTokens.type.sans};
   }
   ${partSelector(choiceSelectContract, "search")}:focus-visible {
-    border-color: ${uiTokens.focus};
+    border-color: ${uiTokens.state.focus};
     outline: none;
   }
   ${partSelector(choiceSelectContract, "search")}::placeholder {
-    color: ${uiTokens.placeholder};
+    color: ${uiTokens.ink.secondary};
   }
   ${partSelector(choiceSelectContract, "empty")} {
     margin: 0;
-    padding: ${uiTokens.spaceSection} ${uiTokens.controlPaddingInline};
-    color: ${uiTokens.mutedForeground};
+    padding: ${uiTokens.space.section} ${uiTokens.control.inset};
+    color: ${uiTokens.ink.secondary};
   }
   ${partSelector(choiceSelectContract, "option")}[hidden],
   ${partSelector(choiceSelectContract, "group")}[hidden],
@@ -73,14 +73,14 @@ export const choiceSelectStyles = css`
   /* Group labels and separators match Menu: small uppercase heading, full-bleed band. */
   ${partSelector(choiceSelectContract, "group")} {
     padding: 8px 10px 4px;
-    color: ${uiTokens.subtleForeground};
-    font-size: ${uiTokens.fontMicro};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.micro};
     font-weight: 500;
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
   ${partSelector(choiceSelectContract, "group")}:not(:first-child) {
-    border-top: 1px solid ${uiTokens.borderSoft};
+    border-top: 1px solid ${uiTokens.line.divider};
     margin: 5px -6px 0;
     padding-inline: 16px;
   }
@@ -94,10 +94,10 @@ export const choiceSelectStyles = css`
     min-height: 32px;
     padding: 6px 10px;
     border: 0;
-    border-radius: ${uiTokens.radiusSmall};
+    border-radius: ${uiTokens.radius.md};
     background: transparent;
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/20px ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/20px ${uiTokens.type.sans};
     text-align: start;
     cursor: pointer;
     overflow-wrap: anywhere;
@@ -114,11 +114,11 @@ export const choiceSelectStyles = css`
     font-weight: 400;
   }
   ${partSelector(choiceSelectContract, "option")}:focus {
-    background: ${uiTokens.hover};
+    background: ${uiTokens.state.hover};
     outline: none;
   }
   ${partSelector(choiceSelectContract, "option")}:disabled {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
     cursor: not-allowed;
   }
   ${partSelector(choiceSelectContract, "native")} {
@@ -133,19 +133,19 @@ export const choiceSelectStyles = css`
   }
   ${partSelector(choiceSelectContract, "validation")} {
     display: block;
-    margin-top: ${uiTokens.spaceGroup};
-    color: ${uiTokens.danger};
-    font-size: ${uiTokens.fontCaption};
+    margin-top: ${uiTokens.space.group};
+    color: ${uiTokens.status.danger};
+    font-size: ${uiTokens.type.caption};
   }
   ${partSelector(choiceSelectContract, "validation")}:empty {
     display: none;
   }
   @media (hover: hover) {
     ${partSelector(choiceSelectContract, "trigger")}:hover:not(:disabled):not([aria-invalid="true"]) {
-      border-color: ${uiTokens.mutedForeground};
+      border-color: ${uiTokens.ink.secondary};
     }
     ${partSelector(choiceSelectContract, "option")}:hover:not(:disabled) {
-      background: ${uiTokens.hover};
+      background: ${uiTokens.state.hover};
     }
   }
   @media (pointer: coarse) {

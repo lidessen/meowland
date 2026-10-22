@@ -7,7 +7,7 @@ export const actionRailStyles = css`
   ${partSelector(actionRailContract, "root")} {
     display: flex;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
   }
   ${partSelector(actionRailContract, "leading")} {

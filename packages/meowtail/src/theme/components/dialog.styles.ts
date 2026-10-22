@@ -11,13 +11,13 @@ import { pageFrameContract } from "../../components/page-frame";
 export const dialogStyles = css`
   :where(${partSelector(dialogContract, "root")}) {
     box-sizing: border-box;
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
   }
   ${partSelector(dialogContract, "root")} {
-    background: ${uiTokens.surface};
+    background: ${uiTokens.surface.overlay};
     border: 0;
-    border-radius: ${uiTokens.dialogRadius};
+    border-radius: ${uiTokens.radius.xxl};
   }
   ${partSelector(dialogPanelContract, "root")} {
     box-sizing: border-box;
@@ -35,46 +35,46 @@ export const dialogStyles = css`
   }
   /* Keep panel insets inside the body scrollport so edge controls retain their focus ink. */
   ${partSelector(dialogPanelContract, "root")} > ${partSelector(pageFrameContract, "root")} > ${partSelector(pageFrameContract, "header")} {
-    padding: ${uiTokens.spacePanel} ${uiTokens.spacePanel} 0;
+    padding: ${uiTokens.space.panel} ${uiTokens.space.panel} 0;
   }
   ${partSelector(dialogPanelContract, "root")} > ${partSelector(pageFrameContract, "root")} > ${partSelector(pageFrameContract, "body")} {
-    padding: ${uiTokens.spacePanel};
+    padding: ${uiTokens.space.panel};
   }
   ${partSelector(dialogPanelContract, "root")} > ${partSelector(pageFrameContract, "root")} > ${partSelector(pageFrameContract, "header")} + ${partSelector(pageFrameContract, "body")} {
-    padding-top: ${uiTokens.spaceSection};
+    padding-top: ${uiTokens.space.section};
   }
   ${partSelector(dialogContract, "root")} {
     width: min(380px, calc(100vw - 48px));
     max-height: calc(100dvh - 48px);
     padding: 0;
     overflow: hidden;
-    box-shadow: ${uiTokens.shadowFloat};
+    box-shadow: ${uiTokens.shadow.float};
   }
   ${partSelector(dialogContract, "root")}::backdrop {
-    background: ${uiTokens.backdrop};
+    background: ${uiTokens.surface.scrim};
   }
   :where(${partSelector(dialogHeaderContract, "root")}, ${partSelector(dialogActionsContract, "root")}) {
     display: flex;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
   }
   ${partSelector(dialogHeaderContract, "root")} {
     justify-content: space-between;
     align-items: flex-start;
     min-width: 0;
-    margin-bottom: ${uiTokens.spaceSection};
+    margin-bottom: ${uiTokens.space.section};
   }
   ${partSelector(dialogPanelContract, "root")} > ${partSelector(pageFrameContract, "root")} > ${partSelector(pageFrameContract, "header")} > ${partSelector(dialogHeaderContract, "root")} {
     margin-bottom: 0;
   }
   ${partSelector(dialogActionsContract, "root")} {
     justify-content: flex-end;
-    margin-top: ${uiTokens.spaceSection};
+    margin-top: ${uiTokens.space.section};
     flex-wrap: wrap;
   }
   ${partSelector(dialogHeaderContract, "title")} {
     margin: 0;
-    font-size: ${uiTokens.fontTitle};
+    font-size: ${uiTokens.type.title};
     /* Same title role as Card, Section and EmptyState. */
     font-weight: 600;
     letter-spacing: -0.01em;
@@ -88,13 +88,13 @@ export const dialogStyles = css`
     flex-shrink: 0;
   }
   ${partSelector(dialogHeaderContract, "eyebrow")} {
-    margin: 0 0 ${uiTokens.spaceGroup};
-    font-size: ${uiTokens.fontCaption};
-    color: ${uiTokens.mutedForeground};
+    margin: 0 0 ${uiTokens.space.group};
+    font-size: ${uiTokens.type.caption};
+    color: ${uiTokens.ink.secondary};
   }
   ${partSelector(dialogHeaderContract, "description")} {
-    margin: ${uiTokens.spaceGroup} 0 0;
-    color: ${uiTokens.mutedForeground};
+    margin: ${uiTokens.space.group} 0 0;
+    color: ${uiTokens.ink.secondary};
   }
 
   @media (pointer: coarse) {

@@ -1,7 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { tagContract, tagOptions } from "../../components/tag";
 import { uiTokens } from "../tokens";
-import { accentTokens, layerTokens, radiusTokens } from "../palette";
 
 const root = partSelector(tagContract, "root");
 
@@ -12,22 +11,22 @@ export const tagStyles = css`
     justify-content: center;
     box-sizing: border-box;
     padding: 2px 8px;
-    border-radius: ${radiusTokens.tag};
-    background: ${layerTokens.chip};
-    color: ${layerTokens.chipInk};
-    font: ${uiTokens.fontCaption}/18px ${uiTokens.font};
+    border-radius: ${uiTokens.radius.sm};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.chip};
+    font: ${uiTokens.type.caption}/18px ${uiTokens.type.sans};
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
   ${root} {
     ${tagOptions.when({ tone: "accent" })} {
-      background: ${accentTokens.selected};
-      color: ${accentTokens.ink};
+      background: ${uiTokens.accent.selected};
+      color: ${uiTokens.accent.ink};
       font-weight: 600;
     }
     ${tagOptions.when({ tone: "warning" })} {
-      background: ${uiTokens.warning};
-      color: ${uiTokens.onPrimary};
+      background: ${uiTokens.status.warning};
+      color: ${uiTokens.action.onPrimary};
       font-weight: 600;
     }
     ${tagOptions.when({ kind: "count" })} {
@@ -36,7 +35,7 @@ export const tagStyles = css`
       padding: 0 5px;
       border-radius: 999px;
       corner-shape: round;
-      font-size: ${uiTokens.fontMicro};
+      font-size: ${uiTokens.type.micro};
       line-height: 1;
       font-weight: 600;
     }
@@ -47,10 +46,10 @@ export const tagStyles = css`
       text-overflow: ellipsis;
       vertical-align: baseline;
       padding: 1px 5px;
-      border-radius: ${radiusTokens.mark};
-      background: ${layerTokens.code};
-      color: ${uiTokens.foreground};
-      font-family: ${uiTokens.mono};
+      border-radius: ${uiTokens.radius.xs};
+      background: ${uiTokens.surface.tint};
+      color: ${uiTokens.ink.primary};
+      font-family: ${uiTokens.type.mono};
       font-weight: 400;
     }
   }

@@ -1,4 +1,3 @@
-import { layerTokens } from "../palette";
 import { css, partSelector } from "meowcss/meowjsx";
 import { alertTokens, uiTokens } from "../tokens";
 import { alertContract, alertOptions } from "../../components/alert";
@@ -12,12 +11,12 @@ export const alertStyles = css`
     /* A tinted hairline over transparency stays light on any surface, instead
        of stacking the tone on top of the general border ink. */
     border: 1px solid color-mix(in srgb, ${alertTokens.accent} 20%, transparent);
-    border-radius: ${uiTokens.radiusLarge};
-    background: color-mix(in srgb, ${alertTokens.accent} 6%, ${layerTokens.knockout});
-    color: ${uiTokens.foreground};
+    border-radius: ${uiTokens.radius.xl};
+    background: color-mix(in srgb, ${alertTokens.accent} 6%, ${uiTokens.surface.knockout});
+    color: ${uiTokens.ink.primary};
     overflow-wrap: anywhere;
-    font-family: ${uiTokens.font};
-    font-size: ${uiTokens.fontBody};
+    font-family: ${uiTokens.type.sans};
+    font-size: ${uiTokens.type.body};
   }
   ${partSelector(alertContract, "title")} {
     font-weight: 600;
@@ -28,7 +27,7 @@ export const alertStyles = css`
   ${partSelector(alertContract, "actions")} {
     display: flex;
     flex-wrap: wrap;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     margin-top: 4px;
   }
 
@@ -37,11 +36,11 @@ export const alertStyles = css`
   ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"] {
     display: flex;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-height: 36px;
     padding: 6px 8px 6px 12px;
-    border-radius: ${uiTokens.radiusSmall};
-    font-size: ${uiTokens.fontLabel};
+    border-radius: ${uiTokens.radius.md};
+    font-size: ${uiTokens.type.label};
     line-height: 20px;
   }
   ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"]::before {

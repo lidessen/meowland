@@ -1,7 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { detailSectionContract } from "../../components/detail-section";
-import { layerTokens, lineTokens } from "../palette";
 
 const section = (part: (typeof detailSectionContract.parts)[number]) =>
   partSelector(detailSectionContract, part);
@@ -11,9 +10,9 @@ export const detailSectionStyles = css`
     display: grid;
     gap: 10px;
     padding: 16px 0;
-    border-bottom: ${lineTokens.width} solid ${lineTokens.divider};
-    font: ${uiTokens.fontBody}/1.6 ${uiTokens.font};
-    color: ${uiTokens.foreground};
+    border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+    font: ${uiTokens.type.body}/1.6 ${uiTokens.type.sans};
+    color: ${uiTokens.ink.primary};
   }
   ${section("root")}:last-child {
     border-bottom: 0;
@@ -26,14 +25,14 @@ export const detailSectionStyles = css`
   }
   ${section("title")} {
     margin: 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     font-weight: 600;
     line-height: 1.5;
   }
   ${section("aside")} {
-    color: ${layerTokens.faint};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
   }
   ${section("body")} {
     display: grid;

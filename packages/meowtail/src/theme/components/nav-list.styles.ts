@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { accentTokens } from "../palette";
 import { navListContract } from "../../components/nav-list";
 
 const list = (part: (typeof navListContract.parts)[number]) => partSelector(navListContract, part);
@@ -9,25 +8,25 @@ export const navListStyles = css`
   ${list("root")} {
     box-sizing: border-box;
     display: grid;
-    gap: ${uiTokens.spaceSection};
+    gap: ${uiTokens.space.section};
     min-width: 0;
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
   }
 
   /* A group is one heading and its rows; the group headings carry the sidebar rhythm. */
   ${list("group")} {
     display: grid;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
   }
   ${list("groupTitle")} {
     margin: 0;
     min-width: 0;
-    padding-inline: ${uiTokens.spaceGroup};
+    padding-inline: ${uiTokens.space.group};
     /* The shared small-caps label role: Menu and ChoiceSelect groups use it too. */
-    color: ${uiTokens.subtleForeground};
-    font-size: ${uiTokens.fontMicro};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.micro};
     font-weight: 500;
     line-height: 1.5;
     letter-spacing: 0.04em;
@@ -58,11 +57,11 @@ export const navListStyles = css`
     align-items: center;
     align-content: center;
     width: 100%;
-    min-height: ${uiTokens.controlHeight};
-    padding: 5px ${uiTokens.spaceGroup};
+    min-height: ${uiTokens.control.regular};
+    padding: 5px ${uiTokens.space.group};
     border: 0;
-    border-radius: ${uiTokens.controlRadius};
-    color: ${uiTokens.foreground};
+    border-radius: ${uiTokens.radius.lg};
+    color: ${uiTokens.ink.primary};
     background: transparent;
     font: inherit;
     line-height: inherit;
@@ -71,21 +70,21 @@ export const navListStyles = css`
     cursor: pointer;
   }
   ${list("item")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
   ${list("item")}[aria-current="page"] {
-    color: ${uiTokens.foreground};
-    background: ${accentTokens.selected};
+    color: ${uiTokens.ink.primary};
+    background: ${uiTokens.accent.selected};
     font-weight: 500;
   }
   @media (hover: hover) {
     ${list("item")}:hover:not(:disabled):not([aria-disabled="true"]):not([aria-current="page"]) {
-      background: ${uiTokens.hover};
+      background: ${uiTokens.state.hover};
     }
   }
   ${list("item")}:is(:disabled, [aria-disabled="true"]) {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
     cursor: not-allowed;
   }
   ${list("item")}:is(:disabled, [aria-disabled="true"]) ${list("description")} {
@@ -100,15 +99,15 @@ export const navListStyles = css`
     /* Center on the label's line box, not on a label plus description. */
     align-self: start;
     flex: none;
-    width: ${uiTokens.iconSize};
-    height: calc(${uiTokens.fontBody} * ${uiTokens.leading});
-    margin-inline-end: ${uiTokens.spaceGroup};
+    width: ${uiTokens.icon.size};
+    height: calc(${uiTokens.type.body} * ${uiTokens.type.leading});
+    margin-inline-end: ${uiTokens.space.group};
     color: inherit;
   }
   ${list("icon")} svg {
     display: block;
-    width: ${uiTokens.iconSize};
-    height: ${uiTokens.iconSize};
+    width: ${uiTokens.icon.size};
+    height: ${uiTokens.icon.size};
   }
   ${list("label")} {
     grid-area: label;
@@ -121,8 +120,8 @@ export const navListStyles = css`
     align-self: start;
     min-width: 0;
     margin-top: 2px;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     line-height: 1.5;
     overflow-wrap: anywhere;
   }
@@ -131,9 +130,9 @@ export const navListStyles = css`
     align-self: center;
     justify-self: end;
     max-width: 100%;
-    margin-inline-start: ${uiTokens.spaceGroup};
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    margin-inline-start: ${uiTokens.space.group};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     line-height: 1.5;
     overflow-wrap: anywhere;
   }
@@ -142,9 +141,9 @@ export const navListStyles = css`
     align-self: center;
     justify-self: end;
     max-width: 100%;
-    margin-inline-start: ${uiTokens.spaceGroup};
-    color: ${uiTokens.subtleForeground};
-    font-size: ${uiTokens.fontCaption};
+    margin-inline-start: ${uiTokens.space.group};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
     line-height: 1.5;
     font-variant-numeric: tabular-nums;
     overflow-wrap: anywhere;

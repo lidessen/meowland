@@ -19,11 +19,11 @@ export const presentationStyles = css`
     height: 100%;
     min-width: 0;
     min-height: min(480px, 100dvh);
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     color: ${tokens.chromeInk};
-    font-family: ${uiTokens.font};
+    font-family: ${uiTokens.type.sans};
     background: ${tokens.chromeBackdrop};
-    padding: ${uiTokens.spaceGroup} ${uiTokens.spacePanel};
+    padding: ${uiTokens.space.group} ${uiTokens.space.panel};
   }
   ${part("header")} {
     display: flex;
@@ -70,7 +70,7 @@ export const presentationStyles = css`
   ${part("stage")} {
     position: relative;
     flex: 0 0 auto;
-    box-shadow: ${uiTokens.shadowPanel};
+    box-shadow: ${uiTokens.shadow.float};
   }
   ${part("slide")} {
     position: absolute;
@@ -142,16 +142,16 @@ export const presentationStyles = css`
     flex: 0 0 auto;
     container-type: inline-size;
     width: 100%;
-    max-width: ${uiTokens.containerContent};
+    max-width: ${uiTokens.layout.containerContent};
     min-width: 0;
     margin-inline: auto;
-    padding: ${uiTokens.spaceGroup};
+    padding: ${uiTokens.space.group};
     border: 1px solid ${tokens.chromeLine};
     border-radius: 20px;
     background: ${tokens.chromeSurface};
     color: ${tokens.chromeInk};
     box-shadow: 0 8px 24px rgb(0 0 0 / 4%);
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
   }
   :where(${part("navigation")}, ${part("tools")}) {
     flex: 0 0 auto;
@@ -160,18 +160,18 @@ export const presentationStyles = css`
   }
   ${part("navigation")} button${partSelector(buttonContract, "root")},
   ${part("tools")} > ${partSelector(popoverContract, "root")} > button${partSelector(buttonContract, "root")} {
-    width: ${uiTokens.buttonLarge};
+    width: ${uiTokens.control.large};
     padding-inline: 0;
   }
   ${part("controls")} button${partSelector(buttonContract, "root")} {
     flex: 0 0 auto;
-    min-height: ${uiTokens.buttonLarge};
+    min-height: ${uiTokens.control.large};
     border: 0;
     border-radius: 12px;
     background: transparent;
     color: ${tokens.chromeInk};
     box-shadow: none;
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
   }
   ${part("controls")} button${partSelector(buttonContract, "root")}:hover:not(:disabled) {
     background: color-mix(in srgb, ${tokens.chromeInk} 7%, transparent);
@@ -216,23 +216,23 @@ export const presentationStyles = css`
   ${part("slide-picker")} {
     flex: 1 1 12rem;
     min-width: 0;
-    min-height: ${uiTokens.buttonLarge};
-    padding-inline: ${uiTokens.spaceGroup};
+    min-height: ${uiTokens.control.large};
+    padding-inline: ${uiTokens.space.group};
     border-inline: 1px solid ${tokens.chromeLine};
     color: ${tokens.chromeMuted};
-    font-size: ${uiTokens.fontCaption};
+    font-size: ${uiTokens.type.caption};
   }
   ${part("slide-picker")} select {
     width: 100%;
     min-width: 0;
-    min-height: ${uiTokens.buttonLarge};
+    min-height: ${uiTokens.control.large};
     max-width: 100%;
     padding-inline: 0;
     border: 0;
     border-radius: 6px;
     background: transparent;
     color: ${tokens.chromeInk};
-    font: 400 ${uiTokens.fontBody}/20px ${uiTokens.font};
+    font: 400 ${uiTokens.type.body}/20px ${uiTokens.type.sans};
     text-overflow: ellipsis;
     cursor: pointer;
   }
@@ -250,11 +250,11 @@ export const presentationStyles = css`
     background: ${tokens.chromeSurface};
     color: ${tokens.chromeInk};
     border: 1px solid ${tokens.chromeLine};
-    padding: ${uiTokens.spaceGroup};
+    padding: ${uiTokens.space.group};
   }
   ${part("tools")} ${partSelector(popoverContract, "panel")} button {
     justify-content: flex-start;
-    padding-inline: ${uiTokens.spaceGroup};
+    padding-inline: ${uiTokens.space.group};
   }
   @container (max-width: 480px) {
     ${part("navigation")} {
@@ -264,15 +264,15 @@ export const presentationStyles = css`
       order: 1;
       flex-basis: 100%;
       padding-inline: 0;
-      padding-top: ${uiTokens.spaceGroup};
+      padding-top: ${uiTokens.space.group};
       border-inline: 0;
       border-top: 1px solid ${tokens.chromeLine};
     }
   }
   ${part("diagnostic")} {
     margin: 0;
-    font-size: ${uiTokens.fontCaption};
-    color: ${uiTokens.warning};
+    font-size: ${uiTokens.type.caption};
+    color: ${uiTokens.status.warning};
   }
   ${part("soundtrack")} {
     padding: 4px;
@@ -313,7 +313,7 @@ export const presentationStyles = css`
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
     flex: none;
   }
   :where(${partSelector(presentationVideoContract, "status")}, ${partSelector(presentationAudioContract, "status")}) > [hidden] {
@@ -328,8 +328,8 @@ export const presentationStyles = css`
     align-items: center;
   }
   ${part("soundtrack")} ${partSelector(presentationAudioContract, "status")} {
-    font-size: ${uiTokens.fontCaption};
-    color: ${uiTokens.mutedForeground};
+    font-size: ${uiTokens.type.caption};
+    color: ${uiTokens.ink.secondary};
   }
   ${part("soundtrack")} ${partSelector(presentationAudioContract, "actions")} {
     min-width: 0;
@@ -342,7 +342,7 @@ export const presentationStyles = css`
   }
   @media (max-height: 520px), (max-width: 700px) {
     ${part("root")} {
-      padding: ${uiTokens.spaceGroup};
+      padding: ${uiTokens.space.group};
     }
   }
 `;

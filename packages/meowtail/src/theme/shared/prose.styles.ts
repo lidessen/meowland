@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { accentTokens, lineTokens, radiusTokens } from "../palette";
 import { proseContract, proseOptions } from "../../components/prose";
 import { chatMessageContract } from "../../chat/message";
 import { chatBubbleContract } from "../../chat/bubble";
@@ -19,19 +18,19 @@ const scope = `:where(${prose}, ${partSelector(chatMessageContract, "content")},
 export const proseStyles = css`
   ${prose} {
     min-width: 0;
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontReading}/${uiTokens.leading} ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
   ${prose} {
     ${proseOptions.when({ measure: "reading" })} {
-      max-inline-size: ${uiTokens.measure};
+      max-inline-size: ${uiTokens.layout.measure};
     }
   }
   :where(${prose}, ${markdown}) {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: ${uiTokens.proseGap};
+    gap: ${uiTokens.space.prose};
   }
 
   ${scope} > :where(p, ul, ol, pre, blockquote, h2, h3, h4, hr, table, figure) {
@@ -39,10 +38,10 @@ export const proseStyles = css`
   }
   /* Chat bubbles are not grids, so their blocks space by margin. */
   ${partSelector(chatBubbleContract, "root")} > * + * {
-    margin-top: ${uiTokens.proseGap};
+    margin-top: ${uiTokens.space.prose};
   }
   ${scope} > :where(h2, h3, h4) {
-    margin-top: ${uiTokens.spaceGroup};
+    margin-top: ${uiTokens.space.group};
     font-weight: 600;
     line-height: 1.45;
     letter-spacing: -0.01em;
@@ -77,9 +76,9 @@ export const proseStyles = css`
   }
   ${scope} :where(:not(pre) > code) {
     padding: 2px 6px;
-    border-radius: ${radiusTokens.inline};
-    background: ${uiTokens.surfaceMuted};
-    font-family: ${uiTokens.mono};
+    border-radius: ${uiTokens.radius.md};
+    background: ${uiTokens.surface.fill};
+    font-family: ${uiTokens.type.mono};
     font-size: 0.93em;
   }
   /* The same recessed surface CodeBlock and output views use. */
@@ -88,27 +87,27 @@ export const proseStyles = css`
     overflow-x: auto;
     padding: 14px 16px;
     border: 0;
-    border-radius: ${uiTokens.radiusLarge};
-    background: ${uiTokens.codeSurface};
-    font-family: ${uiTokens.mono};
-    font-size: ${uiTokens.fontCode};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.fill};
+    font-family: ${uiTokens.type.mono};
+    font-size: ${uiTokens.type.code};
     line-height: 1.65;
     white-space: pre;
     overflow-wrap: normal;
   }
   ${scope} > :where(pre:focus-visible) {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
   ${scope} > :where(blockquote) {
-    padding-inline-start: ${uiTokens.spaceSection};
-    border-inline-start: 2px solid ${lineTokens.edge};
-    color: ${uiTokens.mutedForeground};
+    padding-inline-start: ${uiTokens.space.section};
+    border-inline-start: 2px solid ${uiTokens.line.edge};
+    color: ${uiTokens.ink.secondary};
   }
   ${scope} > :where(hr) {
     height: 0;
     border: 0;
-    border-top: ${lineTokens.width} solid ${lineTokens.divider};
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
   }
   ${scope} > :where(table) {
     display: block;
@@ -117,25 +116,25 @@ export const proseStyles = css`
     border-collapse: collapse;
   }
   ${scope} :where(th, td) {
-    padding: 6px ${uiTokens.spaceGroup};
-    border-bottom: ${lineTokens.width} solid ${lineTokens.divider};
+    padding: 6px ${uiTokens.space.group};
+    border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
     text-align: start;
     vertical-align: top;
   }
   ${scope} :where(th) {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
     font-weight: 500;
   }
   ${scope} :where(a) {
-    color: ${accentTokens.ink};
+    color: ${uiTokens.accent.ink};
     text-decoration: underline;
     text-decoration-thickness: 1px;
-    text-decoration-color: color-mix(in srgb, ${accentTokens.ink} 55%, transparent);
+    text-decoration-color: color-mix(in srgb, ${uiTokens.accent.ink} 55%, transparent);
     text-underline-offset: 3px;
   }
   ${scope} :where(a:hover) {
-    color: ${uiTokens.foreground};
-    text-decoration-color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
+    text-decoration-color: ${uiTokens.ink.primary};
   }
   ${scope} :where(img) {
     max-width: 100%;

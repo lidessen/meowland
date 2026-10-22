@@ -1,6 +1,6 @@
+import { uiTokens } from "../tokens";
 import { css, partSelector } from "meowcss/meowjsx";
 import { statusDotContract, statusDotOptions } from "../../components/status-dot";
-import { accentTokens, statusTokens } from "../palette";
 
 const root = partSelector(statusDotContract, "root");
 
@@ -15,32 +15,32 @@ export const statusDotStyles = css`
     border-radius: 50%;
     corner-shape: round;
     background: transparent;
-    border: 1.5px solid ${statusTokens.unknown};
+    border: 1.5px solid ${uiTokens.status.unknown};
   }
   ${root} {
     ${statusDotOptions.when({ state: "processing" })} {
       border: 0;
-      background: ${statusTokens.processing};
+      background: ${uiTokens.accent.base};
       animation: meow-status-pulse 1.2s infinite ease-in-out;
     }
     ${statusDotOptions.when({ state: "success" })} {
       border: 0;
-      background: ${statusTokens.success};
+      background: ${uiTokens.status.success};
     }
     ${statusDotOptions.when({ state: "returned" })} {
-      border-color: ${statusTokens.success};
+      border-color: ${uiTokens.status.success};
     }
     ${statusDotOptions.when({ state: "warning" })} {
       border: 0;
-      background: ${statusTokens.warning};
+      background: ${uiTokens.status.warning};
     }
     ${statusDotOptions.when({ state: "danger" })} {
       border: 0;
-      background: ${statusTokens.danger};
+      background: ${uiTokens.status.danger};
     }
     ${statusDotOptions.when({ state: "idle" })} {
       border: 0;
-      background: ${statusTokens.unknown};
+      background: ${uiTokens.status.unknown};
       opacity: 0.6;
     }
   }
@@ -51,14 +51,14 @@ export const statusDotStyles = css`
     inset: -3px;
     border-radius: 50%;
     corner-shape: round;
-    background: ${accentTokens.halo};
+    background: ${uiTokens.accent.halo};
     animation: meow-status-pulse 1.2s infinite ease-in-out;
   }
   ${root}[data-halo="true"][${statusDotOptions.attribute("state")}="processing"] {
     animation: none;
   }
   ${root}[data-halo="true"][${statusDotOptions.attribute("state")}="success"] {
-    box-shadow: 0 0 0 3px ${statusTokens.successHalo};
+    box-shadow: 0 0 0 3px color-mix(in srgb, ${uiTokens.status.success} 18%, transparent);
   }
   @keyframes meow-status-pulse {
     50% {

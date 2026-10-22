@@ -1,211 +1,233 @@
 import { alertOptions } from "../components/alert";
 import { defineOptions, defineTokens, tokenRef } from "meowcss";
-import { layerTokens, lineTokens, radiusTokens } from "./palette";
 
 /** Shared standard-theme parameters; scheme is built in, no fixed density axis. */
 export const standardOptions = defineOptions("meowui", {});
 
-/** Re-evaluate color aliases at a local scheme instead of inheriting resolved parent colors. */
-const schemeAlias = (value: string) => standardOptions.by.scheme([value, value]);
-
-/** Secondary ink that remains readable on input and page surfaces in both schemes. */
-const mutedForeground = ["#636363", "#a3a3a3"] as const;
-
+/**
+ * The design system in one tree. Every value a theme file paints with is one of
+ * these roles; a theme file never writes a literal color, size or duration.
+ * Colors are literal [light, dark] pairs and never reference another token, so a
+ * nested scheme region resolves its own value. CSS names are `--ui-<group>-<key>`.
+ * The rules for each group live in packages/meowtail/AGENTS.md ("Design system").
+ */
 export const uiTokens = defineTokens("ui", {
-  font: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif',
-  /** Serif stack for page and section titles. Hosts override `--ui-font-display`. */
-  fontDisplay:
-    '"Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Songti SC", "Songti TC", "Noto Serif SC", serif',
-  mono: '"SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, "PingFang SC", "Microsoft YaHei"',
-  /* Type ramp. Every size in the theme is one of these roles. */
-  /** Key caps, compact counts, group labels in menus and code banners. */
-  fontMicro: "11px",
-  fontCaption: "12px",
-  /** Monospace text in code, output and JSON views. */
-  fontCode: "12px",
-  /** Compact UI text: menus, tooltips, small rows, bar notices. */
-  fontLabel: "13px",
-  fontBody: "14px",
-  fontReading: "14px",
-  fontTitle: "16px",
-  fontHeading: "20px",
-  fontPageTitle: "24px",
-  leading: "1.5714285714",
-  spaceGroup: "8px",
-  spaceSection: "20px",
-  spacePanel: "24px",
-  /** Between blocks of reading content: paragraphs, lists, code and quotes. */
-  proseGap: "12px",
-  /** The longest comfortable reading line for Prose. */
-  measure: "70ch",
-  pageInsetBlock: "36px",
-  pageInsetInline: "48px",
-  pageInsetCompactBlock: "20px",
-  pageInsetCompactInline: "16px",
-  /* One size ladder for every single-line control, so a field, a select and a
-     button placed in one row share a height and a center line. */
-  controlSmall: "28px",
-  controlHeight: "36px",
-  controlPaddingInline: "8px",
-  /** Text inset inside field surfaces (input, select, search, choice trigger). */
-  fieldPaddingInline: "12px",
-  controlLarge: "44px",
-  buttonSmall: "28px",
-  buttonHeight: "36px",
-  buttonLarge: "44px",
-  controlRadius: `${radiusTokens.control}`,
-  radiusSmall: `${radiusTokens.inline}`,
-  radiusLarge: `${radiusTokens.card}`,
-  panelRadius: `${radiusTokens.card}`,
-  dialogRadius: "24px",
-  messageRadius: `${radiusTokens.bubble}`,
-  iconSize: "16px",
-  iconStroke: "1.75",
-  switchThumb: ["#ffffff", "#a3a3a3"],
-  // DeepSeek Harness ui-theme: design-platform aliases, resolved per scheme.
-  /* Surfaces alias the ladder in palette.ts; do not add a new grey here. */
-  background: schemeAlias(`${layerTokens.canvas}`),
-  inputSurface: schemeAlias(`${layerTokens.field}`),
-  surface: schemeAlias(`${layerTokens.overlay}`),
-  /* Fills are true neutrals: a blue cast in light greys reads as default
-     framework chrome; neutral greys let type and content carry the color. */
-  surfaceMuted: schemeAlias(`${layerTokens.fill}`),
-  sidebarSurface: schemeAlias(`${layerTokens.canvas}`),
-  codeSurface: schemeAlias(`${layerTokens.fill}`),
-  codeBanner: schemeAlias(`${layerTokens.fill}`),
-  menuSurface: schemeAlias(`${layerTokens.overlay}`),
-  menuBlur: "blur(40px) saturate(150%)",
-  tooltipSurface: ["#262626", "#404040"],
-  foreground: ["#0a0a0a", "#fafafa"],
-  toastSurface: ["#262626", "#404040"],
-  toastForeground: "#ffffff",
-  /** Action text on the inverse Toast/Tooltip surface, which is dark in both schemes. */
-  inverseAction: "#93c5fd",
-  mutedForeground,
-  // Metadata ink stays above the normal-text floor in both schemes; it is still
-  // lighter than the primary muted text so hierarchy survives.
-  subtleForeground: ["#6e6e6e", "#8f8f8f"],
-  captionForeground: ["#6e6e6e", "#8f8f8f"],
-  shimmer: ["rgb(0 0 0 / 30%)", "rgb(255 255 255 / 45%)"],
-  // Placeholder is text the reader must scan before typing; reuse the readable
-  // secondary ink instead of a near-white tint that only works as decoration.
-  placeholder: mutedForeground,
-  /* Lines alias the three line roles in palette.ts. */
-  border: schemeAlias(`${lineTokens.control}`),
-  borderSubtle: schemeAlias(`${lineTokens.edge}`),
-  borderSoft: schemeAlias(`${lineTokens.divider}`),
-  borderFaint: schemeAlias(`${lineTokens.divider}`),
-  /** Native Select chevron: the Lucide chevron-down the ChoiceSelect trigger draws, in muted ink. */
-  selectChevron: [
-    `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23636363' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
-    `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
-  ],
   /**
-   * Lucide chevron-right as a mask, for a native summary that cannot hold an
-   * Icon. Painted with currentColor, so it follows the text in both schemes.
+   * The surface ladder. Every background is one rung; each rung has one edge rule.
+   * Dark lightness steps up with elevation; a field is recessed, so it is darker
+   * than raised. `tint` is a translucent fill for marks on any rung; `knockout` is
+   * the color behind a halo or cutout (a host overrides it per surface); `scrim`
+   * dims the page under a modal. The last three are not rungs.
    */
-  chevronMask: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E")`,
-  /** Marker glyphs drawn by mask, so the theme's ink colors them. */
-  checkMask: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")`,
-  arrowMask: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E")`,
-  crossMask: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E")`,
-  /** Field border under the pointer: one step above the resting border. */
-  borderStrong: schemeAlias(`${lineTokens.controlHover}`),
-  hover: ["rgb(0 0 0 / 4.5%)", "rgb(255 255 255 / 7%)"],
-  active: ["rgb(0 0 0 / 8%)", "rgb(255 255 255 / 12%)"],
-  primary: ["#0a0a0a", "#fafafa"],
-  /* Hover moves the main action a step, not to a washed-out grey. */
-  primaryHover: ["#262626", "#e5e5e5"],
-  onPrimary: ["#ffffff", "#0a0a0a"],
-  primarySoft: ["#f0f0f0", "#333333"],
-  info: ["#2563eb", "#60a5fa"],
-  warning: ["#a85c00", "#f0a04b"],
-  success: ["#15803d", "#4ade80"],
-  danger: ["#d51d1d", "#f25a5a"],
-  // Filled destructive actions are a Meowland extension: state red alone does
-  // not provide readable small labels, especially with white ink in dark mode.
-  dangerAction: ["#b91c1c", "#f25a5a"],
-  onDanger: ["#ffffff", "#0a0a0a"],
-  focus: ["#2563eb", "#60a5fa"],
-  /** Soft halo around a focused field; the border carries the focus color. */
-  focusRing: ["rgb(37 99 235 / 20%)", "rgb(96 165 250 / 28%)"],
-  shadowControl: "none",
-  /** The one-pixel drop under an outline action; in dark, a top edge catches the light instead. */
-  shadowAction: [
-    "0 1px 2px rgb(0 0 0 / 5%)",
-    "inset 0 1px 0 rgb(255 255 255 / 5%), 0 1px 2px rgb(0 0 0 / 30%)",
-  ],
+  surface: {
+    canvas: ["#fafafa", "#121212"],
+    reading: ["#ffffff", "#121212"],
+    raised: ["#ffffff", "#1a1a1a"],
+    overlay: ["#ffffff", "#202020"],
+    fill: ["#f2f2f2", "#242424"],
+    field: ["#ffffff", "#161616"],
+    tint: ["rgb(0 0 0 / 5%)", "rgb(255 255 255 / 8%)"],
+    knockout: ["#ffffff", "#1a1a1a"],
+    scrim: ["rgb(0 0 0 / 24%)", "rgb(0 0 0 / 50%)"],
+  },
+  /** Tooltip and toast: a dark surface in both schemes. */
+  inverse: {
+    surface: ["#262626", "#404040"],
+    ink: "#ffffff",
+    action: "#93c5fd",
+  },
   /**
-   * In-flow raised surfaces (cards, lists, tables) are flat: a crisp 1px edge
-   * carries them in light; in dark a faint top highlight separates the layer.
+   * Lines have three jobs: `edge` outlines a raised or overlay surface and splits
+   * regions on the canvas; `divider` separates rows inside one surface; `control`
+   * bounds what the reader operates, `controlHover` under the pointer.
    */
-  shadowRaised: ["none", "inset 0 1px 0 rgb(255 255 255 / 3%)"],
-  /** Fields at rest sit very slightly into the page. */
-  shadowField: ["0 1px 1px rgb(0 0 0 / 2.5%)", "none"],
+  line: {
+    width: "1px",
+    edge: ["rgb(0 0 0 / 8%)", "rgb(255 255 255 / 9%)"],
+    divider: ["rgb(0 0 0 / 6%)", "rgb(255 255 255 / 6%)"],
+    control: ["rgb(0 0 0 / 13%)", "rgb(255 255 255 / 14%)"],
+    controlHover: ["rgb(0 0 0 / 24%)", "rgb(255 255 255 / 28%)"],
+  },
   /**
-   * Filled actions (primary, danger): a top highlight and a short drop give
-   * the fill a material edge instead of a flat block.
+   * Text: primary for content, secondary for supporting copy and placeholders,
+   * tertiary for captions and metadata (still 4.5:1 on fill), chip for text on a
+   * neutral chip. A quieter state of the same thing fades its ink with color-mix
+   * instead of switching role.
    */
-  shadowFilled: [
-    "inset 0 1px 0 rgb(255 255 255 / 12%), 0 1px 2px rgb(0 0 0 / 18%)",
-    "inset 0 1px 0 rgb(255 255 255 / 70%), 0 1px 2px rgb(0 0 0 / 40%)",
-  ],
-  /** The raised thumb inside a Tabs or SegmentedControl track. */
-  shadowThumb: [
-    "0 0 0 1px rgb(0 0 0 / 6%), 0 1px 2px rgb(0 0 0 / 8%)",
-    "0 0 0 1px rgb(255 255 255 / 8%), 0 1px 2px rgb(0 0 0 / 32%)",
-  ],
-  /** The thumb itself: lighter than its track in both schemes, so it reads as raised. */
-  thumbSurface: ["#ffffff", "#4a4a4a"],
-  /** Inset between a Tabs or SegmentedControl track and its thumb. */
-  trackInset: "3px",
-  shadowPanel: [
-    "0 0 0 1px rgb(0 0 0 / 8%), 0 3px 8px rgb(0 0 0 / 4%), 0 0 20px rgb(0 0 0 / 5%)",
-    "0 0 0 1px rgb(255 255 255 / 10%), 0 3px 8px rgb(0 0 0 / 4%), 0 0 20px rgb(0 0 0 / 5%)",
-  ],
-  /** Floating surfaces (menus, popovers, dialogs): a hairline plus a deep, soft drop. */
-  shadowFloat: [
-    "0 0 0 1px rgb(0 0 0 / 7%), 0 4px 10px -4px rgb(0 0 0 / 8%), 0 16px 36px -8px rgb(0 0 0 / 14%)",
-    "0 0 0 1px rgb(255 255 255 / 9%), 0 4px 10px -4px rgb(0 0 0 / 40%), 0 16px 36px -8px rgb(0 0 0 / 60%)",
-  ],
-  backdrop: ["rgb(0 0 0 / 24%)", "rgb(0 0 0 / 50%)"],
-  durationResponse: "100ms",
-  durationSettle: "200ms",
-  ease: "cubic-bezier(0.4, 0, 0.2, 1)",
-  gridColumnCompact: "160px",
-  gridColumnNormal: "240px",
-  gridColumnWide: "320px",
-  containerNarrow: "480px",
-  containerContent: "720px",
-  containerWide: "1120px",
-  containerPage: "1040px",
+  ink: {
+    primary: ["#0a0a0a", "#fafafa"],
+    secondary: ["#636363", "#a3a3a3"],
+    tertiary: ["#6e6e6e", "#8f8f8f"],
+    chip: ["#636363", "#d4d4d4"],
+  },
+  /** Translucent overlays that work on any rung, plus focus. */
+  state: {
+    hover: ["rgb(0 0 0 / 4.5%)", "rgb(255 255 255 / 7%)"],
+    active: ["rgb(0 0 0 / 8%)", "rgb(255 255 255 / 12%)"],
+    focus: ["#2563eb", "#60a5fa"],
+    focusRing: ["rgb(37 99 235 / 20%)", "rgb(96 165 250 / 28%)"],
+  },
+  /** Filled actions: the main action is black or white; danger carries a white label. */
+  action: {
+    primary: ["#0a0a0a", "#fafafa"],
+    primaryHover: ["#262626", "#e5e5e5"],
+    onPrimary: ["#ffffff", "#0a0a0a"],
+    soft: ["#f0f0f0", "#333333"],
+    danger: ["#b91c1c", "#f25a5a"],
+    onDanger: ["#ffffff", "#0a0a0a"],
+  },
+  /**
+   * One size ladder for every single-line control, so a field, a select and a
+   * button in one row share a height and a center line. `inset` pads ordinary
+   * controls, `fieldInset` the text inside field surfaces; `thumb` is the raised
+   * segment in a Tabs or SegmentedControl track and `knob` a switch handle.
+   */
+  control: {
+    small: "28px",
+    regular: "36px",
+    large: "44px",
+    inset: "8px",
+    fieldInset: "12px",
+    trackInset: "3px",
+    thumb: ["#ffffff", "#4a4a4a"],
+    knob: ["#ffffff", "#a3a3a3"],
+  },
+  /** Accent marks what is happening now and where the reader is. */
+  accent: {
+    base: ["#2563eb", "#60a5fa"],
+    soft: ["#eff4ff", "rgb(96 165 250 / 14%)"],
+    selected: ["#ebf1fe", "rgb(96 165 250 / 15%)"],
+    ink: ["#1d4ed8", "#93c5fd"],
+    line: ["rgb(37 99 235 / 28%)", "rgb(96 165 250 / 30%)"],
+    halo: ["rgb(37 99 235 / 28%)", "rgb(96 165 250 / 30%)"],
+  },
+  /**
+   * One color per status, readable as text and used for markers too; halos and
+   * tints derive from it with color-mix. `unknown` is the hollow marker for states
+   * nobody verified.
+   */
+  status: {
+    info: ["#2563eb", "#60a5fa"],
+    success: ["#15803d", "#4ade80"],
+    warning: ["#a85c00", "#f0a04b"],
+    danger: ["#c81e1e", "#f25a5a"],
+    unknown: ["#a3a3a3", "#737373"],
+  },
+  /** The type ramp. Every size in the theme is one of these roles. */
+  type: {
+    sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif',
+    /** Serif stack for page and section titles; hosts override `--ui-type-display`. */
+    display:
+      '"Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Songti SC", "Songti TC", "Noto Serif SC", serif',
+    mono: '"SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, "PingFang SC", "Microsoft YaHei"',
+    /** Key caps, compact counts and small-caps group labels. */
+    micro: "11px",
+    caption: "12px",
+    /** Monospace text in code, output and JSON views. */
+    code: "12px",
+    /** Compact UI text: menus, tooltips, small rows, bar notices. */
+    label: "13px",
+    body: "14px",
+    title: "16px",
+    heading: "20px",
+    pageTitle: "24px",
+    leading: "1.5714285714",
+  },
+  /** Spacing by relationship: within a group, between related areas, at a container edge. */
+  space: {
+    group: "8px",
+    section: "20px",
+    panel: "24px",
+    /** Between blocks of reading content. */
+    prose: "12px",
+    pageBlock: "36px",
+    pageInline: "48px",
+    pageBlockCompact: "20px",
+    pageInlineCompact: "16px",
+  },
+  icon: {
+    size: "16px",
+    stroke: "1.75",
+  },
+  /**
+   * Radii by element size: xs marks and key caps, sm tags, md 24-32px elements and
+   * items in floating panels, lg 36-44px controls, xl surfaces, xxl dialogs and
+   * large floating sheets.
+   */
+  radius: {
+    xs: "4px",
+    sm: "6px",
+    md: "8px",
+    lg: "10px",
+    xl: "14px",
+    xxl: "22px",
+  },
+  /** Depth by role; each role takes one shadow and nothing else. */
+  shadow: {
+    /** In-flow surfaces are flat in light; a faint top highlight separates them in dark. */
+    raised: ["none", "inset 0 1px 0 rgb(255 255 255 / 3%)"],
+    field: ["0 1px 1px rgb(0 0 0 / 2.5%)", "none"],
+    action: [
+      "0 1px 2px rgb(0 0 0 / 5%)",
+      "inset 0 1px 0 rgb(255 255 255 / 5%), 0 1px 2px rgb(0 0 0 / 30%)",
+    ],
+    filled: [
+      "inset 0 1px 0 rgb(255 255 255 / 12%), 0 1px 2px rgb(0 0 0 / 18%)",
+      "inset 0 1px 0 rgb(255 255 255 / 70%), 0 1px 2px rgb(0 0 0 / 40%)",
+    ],
+    thumb: [
+      "0 0 0 1px rgb(0 0 0 / 6%), 0 1px 2px rgb(0 0 0 / 8%)",
+      "0 0 0 1px rgb(255 255 255 / 8%), 0 1px 2px rgb(0 0 0 / 32%)",
+    ],
+    /** Floating surfaces: a ring plus a deep, soft drop. */
+    float: [
+      "0 0 0 1px rgb(0 0 0 / 7%), 0 4px 10px -4px rgb(0 0 0 / 8%), 0 16px 36px -8px rgb(0 0 0 / 14%)",
+      "0 0 0 1px rgb(255 255 255 / 9%), 0 4px 10px -4px rgb(0 0 0 / 40%), 0 16px 36px -8px rgb(0 0 0 / 60%)",
+    ],
+  },
+  motion: {
+    response: "100ms",
+    settle: "200ms",
+    ease: "cubic-bezier(0.4, 0, 0.2, 1)",
+  },
+  layout: {
+    gridCompact: "160px",
+    gridNormal: "240px",
+    gridWide: "320px",
+    containerNarrow: "480px",
+    containerContent: "720px",
+    containerWide: "1120px",
+    containerPage: "1040px",
+    /** The longest comfortable reading line for Prose. */
+    measure: "70ch",
+  },
+  /** Glyphs drawn by mask, so the theme's ink colors them; selectChevron is a background image. */
+  glyph: {
+    chevron: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E")`,
+    check: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")`,
+    arrow: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E")`,
+    cross: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E")`,
+    selectChevron: [
+      `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23636363' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+      `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+    ],
+  },
 });
 
-/** Chat-specific parameters; shared colors reference uiTokens directly. */
+/** Chat-only measures; colors and surfaces come from uiTokens. */
 export const chatTokens = defineTokens("chat", {
-  paper: schemeAlias(`${layerTokens.reading}`),
-  /* Reading size for chat prose. Deliberately chat-local rather than
-     uiTokens.fontReading so enlarging the conversation does not resize the
-     settings and other shared reading surfaces. */
+  /* Deliberately chat-local so enlarging the conversation does not resize other reading surfaces. */
   fontBody: "14px",
-  messageLeading: "1.7142857143",
-  /* The composer is a filled bar on a 1px edge, not a floating card: it belongs to the page. */
-  composerSurface: schemeAlias(`${uiTokens.surfaceMuted}`),
-  composerShadow: schemeAlias(`0 0 0 1px ${lineTokens.edge}`),
-  /* Neutral, as in Grok: the reader's words are set apart by shape, not by a tint. */
-  userSurface: schemeAlias(`${uiTokens.surfaceMuted}`),
-  userInk: schemeAlias(`${uiTokens.foreground}`),
-  submitSurface: schemeAlias(`${uiTokens.primary}`),
-  messageListGap: "24px",
-  messageListMaxWidth: "720px",
+  leading: "1.7142857143",
+  listGap: "24px",
+  listMaxWidth: "720px",
   readingInset: "24px",
   /** Between a row's leading glyph and its label; expanded bodies indent by the same pair. */
   leadingGap: "6px",
   /** The line box of a process row; the list measures its own rows by it. */
   rowLine: "24px",
-  messageRadius: `${radiusTokens.bubble}`,
-  messageCornerRadius: `${radiusTokens.bubble}`,
-  messageUserMaxWidth: "70.2%",
+  userMaxWidth: "70.2%",
+  bubbleRadius: "18px",
 });
 
 /** Optional brand ink; absence uses the surrounding currentColor. */
@@ -213,10 +235,10 @@ export const logoTokens = { ink: tokenRef("meowland", "logo", "ink") } as const;
 
 export const alertTokens = defineTokens("alert", {
   accent: alertOptions.by.tone({
-    neutral: `${uiTokens.mutedForeground}`,
-    info: `${uiTokens.info}`,
-    success: `${uiTokens.success}`,
-    warning: `${uiTokens.warning}`,
-    danger: `${uiTokens.danger}`,
+    neutral: `${uiTokens.ink.secondary}`,
+    info: `${uiTokens.status.info}`,
+    success: `${uiTokens.status.success}`,
+    warning: `${uiTokens.status.warning}`,
+    danger: `${uiTokens.status.danger}`,
   }),
 });

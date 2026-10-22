@@ -64,20 +64,20 @@ export const mdxSlideStyles = css`
   ${part("flow")} :where(blockquote) {
     margin-inline: 0;
     padding-inline-start: ${tokens.spaceGroup};
-    border-inline-start: 2px solid ${uiTokens.borderSoft};
+    border-inline-start: 2px solid ${uiTokens.line.divider};
     color: ${tokens.muted};
   }
   ${part("flow")} :where(pre) {
     overflow: auto;
     white-space: pre;
     padding: ${tokens.spaceGroup};
-    border-radius: ${uiTokens.radiusSmall};
-    background: ${uiTokens.surfaceMuted};
+    border-radius: ${uiTokens.radius.md};
+    background: ${uiTokens.surface.fill};
     font-size: ${tokens.fontCaption};
     line-height: ${tokens.lineHeight};
   }
   ${part("flow")} :where(code) {
-    font-family: ${uiTokens.mono};
+    font-family: ${uiTokens.type.mono};
   }
   ${part("flow")} :where(table) {
     width: 100%;
@@ -86,7 +86,7 @@ export const mdxSlideStyles = css`
   }
   ${part("flow")} :where(th, td) {
     padding: ${tokens.spaceGroup};
-    border-bottom: 1px solid ${uiTokens.borderSoft};
+    border-bottom: 1px solid ${uiTokens.line.divider};
     text-align: start;
     overflow-wrap: anywhere;
   }

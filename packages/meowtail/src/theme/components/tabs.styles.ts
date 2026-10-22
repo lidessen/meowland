@@ -5,27 +5,27 @@ import { tabsContract, tabsCount, tabsIndex } from "../../components/tabs";
 export const tabsStyles = css`
   ${partSelector(tabsContract, "root")} {
     min-width: 0;
-    font-family: ${uiTokens.font};
-    font-size: ${uiTokens.fontBody};
+    font-family: ${uiTokens.type.sans};
+    font-size: ${uiTokens.type.body};
   }
   ${partSelector(tabsContract, "list")} {
     position: relative;
     display: grid;
     grid-template-columns: repeat(${tabsCount}, minmax(0, 1fr));
     /* Same track as SegmentedControl: one control height, concentric radii. */
-    padding: ${uiTokens.trackInset};
-    border-radius: calc(${uiTokens.radiusSmall} + ${uiTokens.trackInset});
-    background: ${uiTokens.surfaceMuted};
+    padding: ${uiTokens.control.trackInset};
+    border-radius: calc(${uiTokens.radius.md} + ${uiTokens.control.trackInset});
+    background: ${uiTokens.surface.fill};
   }
   ${partSelector(tabsContract, "indicator")} {
     position: absolute;
-    inset-block: ${uiTokens.trackInset};
-    inset-inline-start: ${uiTokens.trackInset};
-    width: calc((100% - 2 * ${uiTokens.trackInset}) / ${tabsCount});
+    inset-block: ${uiTokens.control.trackInset};
+    inset-inline-start: ${uiTokens.control.trackInset};
+    width: calc((100% - 2 * ${uiTokens.control.trackInset}) / ${tabsCount});
     box-sizing: border-box;
-    border-radius: ${uiTokens.radiusSmall};
-    background: ${uiTokens.thumbSurface};
-    box-shadow: ${uiTokens.shadowThumb};
+    border-radius: ${uiTokens.radius.md};
+    background: ${uiTokens.control.thumb};
+    box-shadow: ${uiTokens.shadow.thumb};
     transform: translateX(calc(${tabsIndex} * 100%));
     transition: transform 180ms ease;
     pointer-events: none;
@@ -40,12 +40,12 @@ export const tabsStyles = css`
     position: relative;
     min-width: 0;
     box-sizing: border-box;
-    min-height: calc(${uiTokens.controlHeight} - 2 * ${uiTokens.trackInset});
+    min-height: calc(${uiTokens.control.regular} - 2 * ${uiTokens.control.trackInset});
     padding: 0 12px;
     border: 0;
-    border-radius: ${uiTokens.radiusSmall};
+    border-radius: ${uiTokens.radius.md};
     background: transparent;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
     font: inherit;
     font-weight: 500;
     white-space: nowrap;
@@ -55,25 +55,25 @@ export const tabsStyles = css`
     transition: color 180ms ease;
   }
   ${partSelector(tabsContract, "tab")}[aria-selected="true"] {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
   ${partSelector(tabsContract, "tab")}:hover:not(:disabled) {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
   ${partSelector(tabsContract, "tab")}:disabled {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
     cursor: default;
   }
   ${partSelector(tabsContract, "tab")}:focus-visible,
   ${partSelector(tabsContract, "panel")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: -2px;
   }
   ${partSelector(tabsContract, "tab")}:focus-visible {
     outline-offset: -2px;
   }
   ${partSelector(tabsContract, "panel")} {
-    padding-block: ${uiTokens.spaceSection};
+    padding-block: ${uiTokens.space.section};
     overflow-wrap: anywhere;
   }
   ${partSelector(tabsContract, "panel")}[hidden] {

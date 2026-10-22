@@ -1,7 +1,7 @@
 import { css } from "meowcss/meowjsx";
 import { defineTokens, compileTokens } from "meowcss";
 import { uiTokens } from "meowtail/theme";
-const languageLine = `calc(${uiTokens.fontBody} * ${uiTokens.leading})`;
+const languageLine = `calc(${uiTokens.type.body} * ${uiTokens.type.leading})`;
 const languageTokens = defineTokens("language", {
   line: languageLine,
   halfLine: `calc(${languageLine} / 2)`,
@@ -15,8 +15,8 @@ export const languageStyles = css`
   ${languageDeclarations}
   /* The specimen board arranges real components; their appearance belongs to the theme. */
   .language-board {
-    font-size: ${uiTokens.fontBody};
-    line-height: ${uiTokens.leading};
+    font-size: ${uiTokens.type.body};
+    line-height: ${uiTokens.type.leading};
     max-width: 1440px;
     margin-inline: auto;
     display: grid;
@@ -34,21 +34,21 @@ export const languageStyles = css`
     align-items: end;
     gap: ${languageTokens.line};
     padding-block: 0 ${languageTokens.line};
-    border-bottom: 1px solid ${uiTokens.border};
+    border-bottom: 1px solid ${uiTokens.line.control};
   }
   .language-eyebrow,
   .language-board code {
-    font-family: ${uiTokens.mono};
-    font-size: ${uiTokens.fontCaption};
+    font-family: ${uiTokens.type.mono};
+    font-size: ${uiTokens.type.caption};
     font-weight: 400;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   .language-eyebrow {
     letter-spacing: 0.08em;
   }
   .language-heading h1 {
-    font-family: ${uiTokens.fontDisplay};
-    font-size: ${uiTokens.fontPageTitle};
+    font-family: ${uiTokens.type.display};
+    font-size: ${uiTokens.type.pageTitle};
     line-height: 1.4;
     letter-spacing: -0.02em;
     margin-block: ${languageTokens.halfLine};
@@ -56,13 +56,13 @@ export const languageStyles = css`
   .language-heading p,
   .language-edition,
   .language-note {
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontBody};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.body};
   }
   .language-edition {
     text-align: right;
     flex-shrink: 0;
-    line-height: ${uiTokens.leading};
+    line-height: ${uiTokens.type.leading};
   }
   .language-band {
     display: grid;
@@ -76,27 +76,27 @@ export const languageStyles = css`
     font-weight: 600;
   }
   .language-band > h2 > span {
-    font: ${uiTokens.fontCaption}/${uiTokens.leading} ${uiTokens.mono};
-    color: ${uiTokens.mutedForeground};
+    font: ${uiTokens.type.caption}/${uiTokens.type.leading} ${uiTokens.type.mono};
+    color: ${uiTokens.ink.secondary};
   }
   .language-board small {
-    font-size: ${uiTokens.fontCaption};
-    color: ${uiTokens.mutedForeground};
+    font-size: ${uiTokens.type.caption};
+    color: ${uiTokens.ink.secondary};
     font-weight: 400;
   }
   .language-grid {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: ${uiTokens.spacePanel};
+    gap: ${uiTokens.space.panel};
     align-items: start;
   }
   .language-sheet {
     min-width: 0;
-    background: ${uiTokens.surface};
-    padding: ${uiTokens.spacePanel};
+    background: ${uiTokens.surface.overlay};
+    padding: ${uiTokens.space.panel};
     display: flex;
     flex-direction: column;
-    gap: ${uiTokens.spaceSection};
+    gap: ${uiTokens.space.section};
   }
   .language-sheet h3 {
     font-size: 1em;
@@ -115,16 +115,16 @@ export const languageStyles = css`
     min-width: 0;
   }
   .language-swatch > span {
-    height: ${uiTokens.controlHeight};
+    height: ${uiTokens.control.regular};
     margin-bottom: calc(${languageTokens.halfLine} / 2);
-    border: 1px solid ${uiTokens.border};
+    border: 1px solid ${uiTokens.line.control};
   }
   .language-swatch strong {
     font-size: 1em;
     font-weight: 500;
   }
   .language-swatch code {
-    font-size: ${uiTokens.fontCaption};
+    font-size: ${uiTokens.type.caption};
     overflow-wrap: anywhere;
   }
   .language-semantic-colors {
@@ -149,12 +149,12 @@ export const languageStyles = css`
     letter-spacing: -0.04em;
   }
   .language-type-specimen > span {
-    font-family: ${uiTokens.fontDisplay};
-    color: ${uiTokens.mutedForeground};
+    font-family: ${uiTokens.type.display};
+    color: ${uiTokens.ink.secondary};
   }
   .language-display-specimen {
-    font-family: ${uiTokens.fontDisplay};
-    font-size: ${uiTokens.fontPageTitle};
+    font-family: ${uiTokens.type.display};
+    font-size: ${uiTokens.type.pageTitle};
     font-weight: 600;
     line-height: 1.4;
   }
@@ -178,7 +178,7 @@ export const languageStyles = css`
   }
   .language-spacing span {
     height: 1em;
-    background: ${uiTokens.primary};
+    background: ${uiTokens.action.primary};
   }
   .language-shapes {
     display: grid;
@@ -192,17 +192,17 @@ export const languageStyles = css`
   .language-shapes span {
     width: 100%;
     height: calc(${languageTokens.line} * 2);
-    background: ${uiTokens.primarySoft};
-    border: 1px solid ${uiTokens.border};
+    background: ${uiTokens.action.soft};
+    border: 1px solid ${uiTokens.line.control};
   }
   .language-samples {
     display: grid;
-    gap: ${uiTokens.spaceSection};
+    gap: ${uiTokens.space.section};
   }
   .language-input-pair {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, ${uiTokens.gridColumnNormal}), 1fr));
-    gap: ${uiTokens.spaceSection};
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, ${uiTokens.layout.gridNormal}), 1fr));
+    gap: ${uiTokens.space.section};
   }
   .language-input-pair > * {
     min-width: 0;
@@ -220,17 +220,17 @@ export const languageStyles = css`
     gap: ${languageTokens.line};
   }
   .language-context h3 {
-    font-size: ${uiTokens.fontTitle};
+    font-size: ${uiTokens.type.title};
   }
   .language-context p {
-    line-height: ${uiTokens.leading};
+    line-height: ${uiTokens.type.leading};
   }
   .language-icon-strip {
     display: flex;
     justify-content: space-between;
     gap: ${languageTokens.halfLine};
     padding: ${languageTokens.line};
-    background: ${uiTokens.surface};
+    background: ${uiTokens.surface.overlay};
   }
   @media (max-width: 1000px) {
     .language-grid {

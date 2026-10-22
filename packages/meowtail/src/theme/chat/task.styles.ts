@@ -10,18 +10,18 @@ export const chatTaskStyles = css`
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     align-content: start;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
     max-width: 100%;
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
   ${part("header")} {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: ${uiTokens.spaceGroup} ${uiTokens.spaceSection};
+    gap: ${uiTokens.space.group} ${uiTokens.space.section};
     min-width: 0;
   }
   ${part("title")} {
@@ -32,11 +32,11 @@ export const chatTaskStyles = css`
   ${part("status")} {
     display: inline-flex;
     align-items: baseline;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
     max-width: 100%;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
   }
   ${part("status")} > :first-child {
     flex: 0 0 auto;
@@ -45,14 +45,14 @@ export const chatTaskStyles = css`
     min-width: 0;
     margin: 0;
     white-space: pre-wrap;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   ${part("progress")} {
     display: grid;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
   }
   ${part("progressLabel")} {
     min-width: 0;
@@ -64,11 +64,11 @@ export const chatTaskStyles = css`
   ${part("body")} {
     display: grid;
     align-content: start;
-    gap: ${uiTokens.spaceSection};
+    gap: ${uiTokens.space.section};
     box-sizing: border-box;
     min-width: 0;
-    padding-inline-start: ${uiTokens.spaceSection};
-    border-inline-start: 1px solid ${uiTokens.borderSoft};
+    padding-inline-start: ${uiTokens.space.section};
+    border-inline-start: 1px solid ${uiTokens.line.divider};
   }
   ${part("body")} > :first-child {
     margin-block-start: 0;
@@ -80,7 +80,7 @@ export const chatTaskStyles = css`
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
   }
   ${part("root")} > [hidden], ${part("body")}:empty, ${part("footer")}:empty {

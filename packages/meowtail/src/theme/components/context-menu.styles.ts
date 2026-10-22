@@ -8,8 +8,8 @@ export const contextMenuStyles = css`
     cursor: context-menu;
   }
   ${partSelector(contextMenuContract, "root")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radius.lg};
   }
 `;

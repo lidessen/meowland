@@ -9,8 +9,8 @@ export const chatConversationStyles = css`
     flex-direction: column;
     min-height: 0;
     min-width: 0;
-    font-family: ${uiTokens.font};
-    font-size: ${uiTokens.fontBody};
+    font-family: ${uiTokens.type.sans};
+    font-size: ${uiTokens.type.body};
   }
   ${partSelector(chatConversationContract, "viewport")} {
     flex: 1 1 0;
@@ -20,7 +20,7 @@ export const chatConversationStyles = css`
     overscroll-behavior-y: contain;
   }
   ${partSelector(chatConversationContract, "viewport")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: -2px;
   }
   ${partSelector(chatConversationContract, "latest")} {
@@ -32,35 +32,35 @@ export const chatConversationStyles = css`
     justify-self: end;
     width: fit-content;
     min-width: 0;
-    max-width: calc(100% - 2 * ${uiTokens.spaceSection});
-    margin: ${uiTokens.spaceGroup} ${uiTokens.spaceSection};
+    max-width: calc(100% - 2 * ${uiTokens.space.section});
+    margin: ${uiTokens.space.group} ${uiTokens.space.section};
     white-space: normal;
     overflow-wrap: anywhere;
     min-height: 34px;
-    padding: 0 ${uiTokens.controlPaddingInline};
+    padding: 0 ${uiTokens.control.inset};
     box-sizing: border-box;
     border: 0;
     border-radius: 999px;
     corner-shape: round;
-    background: ${uiTokens.surface};
-    color: ${uiTokens.foreground};
+    background: ${uiTokens.surface.overlay};
+    color: ${uiTokens.ink.primary};
     font: inherit;
-    box-shadow: ${uiTokens.shadowPanel};
+    box-shadow: ${uiTokens.shadow.float};
     cursor: pointer;
   }
   ${partSelector(chatConversationContract, "latest")}[hidden] {
     display: none;
   }
   ${partSelector(chatConversationContract, "latest")}:hover {
-    background: ${uiTokens.hover};
+    background: ${uiTokens.state.hover};
   }
   ${partSelector(chatConversationContract, "latest")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
   @media (pointer: coarse) {
     ${partSelector(chatConversationContract, "latest")} {
-      min-height: ${uiTokens.controlHeight};
+      min-height: ${uiTokens.control.regular};
     }
   }
 `;

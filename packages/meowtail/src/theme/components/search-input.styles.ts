@@ -7,31 +7,31 @@ export const searchInputStyles = css`
   ${partSelector(searchInputContract, "root")} {
     display: flex;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
-    padding-inline: ${uiTokens.fieldPaddingInline};
+    gap: ${uiTokens.space.group};
+    padding-inline: ${uiTokens.control.fieldInset};
   }
   ${partSelector(searchInputContract, "icon")} {
     display: flex;
     flex: none;
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
   ${partSelector(searchInputContract, "control")} {
     box-sizing: border-box;
     min-width: 0;
     width: 100%;
     /* The wrapper's hairlines render as whole pixels. */
-    min-height: calc(${uiTokens.controlHeight} - 2px);
+    min-height: calc(${uiTokens.control.regular} - 2px);
     padding: 0;
     border: 0;
     border-radius: 0;
     background: transparent;
     color: inherit;
-    font: ${uiTokens.fontBody}/22px ${uiTokens.font};
+    font: ${uiTokens.type.body}/22px ${uiTokens.type.sans};
     outline: none;
     box-shadow: none;
   }
   ${partSelector(searchInputContract, "control")}::placeholder {
-    color: ${uiTokens.placeholder};
+    color: ${uiTokens.ink.secondary};
   }
   ${partSelector(searchInputContract, "control")}:focus-visible {
     outline: none;

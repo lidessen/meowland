@@ -5,19 +5,19 @@ import { emptyStateContract, emptyStateOptions } from "../../components/empty-st
 export const emptyStateStyles = css`
   :where(${partSelector(emptyStateContract, "root")}) {
     box-sizing: border-box;
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
   }
   ${partSelector(emptyStateContract, "root")} {
     display: grid;
     justify-items: center;
-    gap: ${uiTokens.spaceSection};
-    padding: 40px ${uiTokens.spacePanel};
+    gap: ${uiTokens.space.section};
+    padding: 40px ${uiTokens.space.panel};
     text-align: center;
   }
   ${partSelector(emptyStateContract, "illustration")} {
     width: 72px;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   ${partSelector(emptyStateContract, "illustration")} > svg {
     display: block;
@@ -27,19 +27,19 @@ export const emptyStateStyles = css`
   }
   ${partSelector(emptyStateContract, "title")} {
     margin: 0;
-    font-size: ${uiTokens.fontTitle};
+    font-size: ${uiTokens.type.title};
     font-weight: 600;
     letter-spacing: -0.01em;
   }
   ${partSelector(emptyStateContract, "description")} {
     max-width: 38ch;
     margin: 0;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   ${partSelector(emptyStateContract, "root")} {
     ${emptyStateOptions.when({ size: "compact" })} {
-      gap: ${uiTokens.spaceGroup};
-      padding: ${uiTokens.spaceSection};
+      gap: ${uiTokens.space.group};
+      padding: ${uiTokens.space.section};
     }
   }
   ${partSelector(emptyStateContract, "root")}[${emptyStateOptions.attribute("size")}="compact"]
@@ -48,6 +48,6 @@ export const emptyStateStyles = css`
   }
   ${partSelector(emptyStateContract, "root")}[${emptyStateOptions.attribute("size")}="compact"]
   ${partSelector(emptyStateContract, "title")} {
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
   }
 `;

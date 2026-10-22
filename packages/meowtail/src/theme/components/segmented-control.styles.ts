@@ -20,9 +20,9 @@ export const segmentedControlStyles = css`
     display: flex;
     gap: 2px;
     /* Same track as Tabs: one control height, concentric radii. */
-    padding: ${uiTokens.trackInset};
-    border-radius: calc(${uiTokens.radiusSmall} + ${uiTokens.trackInset});
-    background: ${uiTokens.surfaceMuted};
+    padding: ${uiTokens.control.trackInset};
+    border-radius: calc(${uiTokens.radius.md} + ${uiTokens.control.trackInset});
+    background: ${uiTokens.surface.fill};
   }
   ${partSelector(segmented, "option")} {
     position: relative;
@@ -43,20 +43,20 @@ export const segmentedControlStyles = css`
   ${partSelector(segmented, "label")} {
     display: block;
     box-sizing: border-box;
-    min-height: calc(${uiTokens.controlHeight} - 2 * ${uiTokens.trackInset});
+    min-height: calc(${uiTokens.control.regular} - 2 * ${uiTokens.control.trackInset});
     padding: 4px 12px;
-    border-radius: ${uiTokens.radiusSmall};
+    border-radius: ${uiTokens.radius.md};
     text-align: center;
-    font: 500 ${uiTokens.fontBody}/22px ${uiTokens.font};
-    color: ${uiTokens.mutedForeground};
+    font: 500 ${uiTokens.type.body}/22px ${uiTokens.type.sans};
+    color: ${uiTokens.ink.secondary};
   }
   ${partSelector(segmented, "input")}:checked + ${partSelector(segmented, "label")} {
-    background: ${uiTokens.thumbSurface};
-    color: ${uiTokens.foreground};
-    box-shadow: ${uiTokens.shadowThumb};
+    background: ${uiTokens.control.thumb};
+    color: ${uiTokens.ink.primary};
+    box-shadow: ${uiTokens.shadow.thumb};
   }
   ${partSelector(segmented, "input")}:focus-visible + ${partSelector(segmented, "label")} {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: -2px;
   }
   ${partSelector(segmented, "input")}:disabled + ${partSelector(segmented, "label")} {

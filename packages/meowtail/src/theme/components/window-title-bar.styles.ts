@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { windowTitleBarContract } from "../../components/window-title-bar";
-import { lineTokens } from "../palette";
 import { uiTokens } from "../tokens";
 
 const bar = (part: (typeof windowTitleBarContract.parts)[number]) =>
@@ -26,10 +25,10 @@ export const windowTitleBarStyles = css`
       calc(var(--mygo-titlebar-inset-right, 0px) + 8px);
     overflow: hidden;
     /* An inset hairline instead of a border, so a 0px bar (full screen) leaves nothing behind. */
-    box-shadow: inset 0 calc(-1 * ${lineTokens.width}) 0 ${uiTokens.borderSoft};
-    background: ${uiTokens.background};
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontCaption}/1.25 ${uiTokens.font};
+    box-shadow: inset 0 calc(-1 * ${uiTokens.line.width}) 0 ${uiTokens.line.divider};
+    background: ${uiTokens.surface.canvas};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.caption}/1.25 ${uiTokens.type.sans};
     user-select: none;
     -webkit-user-select: none;
     cursor: default;
@@ -52,7 +51,7 @@ export const windowTitleBarStyles = css`
     flex: 0 1 auto;
     min-width: 0;
     overflow: hidden;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
     font-weight: 500;
     text-align: center;
     text-overflow: ellipsis;

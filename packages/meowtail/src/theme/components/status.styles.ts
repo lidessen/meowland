@@ -12,9 +12,9 @@ export const statusStyles = css`
     display: inline-flex;
     align-items: center;
     min-width: 0;
-    gap: ${uiTokens.spaceGroup};
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    gap: ${uiTokens.space.group};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
   }
   ${root} > ${dot} {
     width: 7px;

@@ -10,10 +10,10 @@ export const sectionStyles = css`
     box-sizing: border-box;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
   }
 
   /* The title row: description stays under the heading while actions sit on the
@@ -22,15 +22,15 @@ export const sectionStyles = css`
     display: flex;
     align-items: flex-start;
     flex-wrap: wrap;
-    gap: ${uiTokens.spaceGroup} ${uiTokens.spaceSection};
+    gap: ${uiTokens.space.group} ${uiTokens.space.section};
     min-width: 0;
   }
   ${section("title")} {
-    flex: 1 1 var(${uiTokens.gridColumnCompact.name}, 160px);
+    flex: 1 1 var(${uiTokens.layout.gridCompact.name}, 160px);
     min-width: 0;
     margin: 0;
-    font-family: ${uiTokens.fontDisplay};
-    font-size: ${uiTokens.fontTitle};
+    font-family: ${uiTokens.type.display};
+    font-size: ${uiTokens.type.title};
     font-weight: 600;
     line-height: 1.4;
     letter-spacing: -0.01em;
@@ -39,16 +39,16 @@ export const sectionStyles = css`
   /* A nested section reads as a subheading under the section that contains it.
      At body size a bold serif loses its shapes, so subheadings use the UI face. */
   ${section("title")}:is(h3, h4, h5, h6) {
-    font-family: ${uiTokens.font};
-    font-size: ${uiTokens.fontBody};
+    font-family: ${uiTokens.type.sans};
+    font-size: ${uiTokens.type.body};
   }
   ${section("description")} {
     order: 2;
     flex: 1 1 100%;
     margin: 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontBody};
-    line-height: ${uiTokens.leading};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.body};
+    line-height: ${uiTokens.type.leading};
     overflow-wrap: anywhere;
   }
   ${section("actions")} {
@@ -57,7 +57,7 @@ export const sectionStyles = css`
     align-items: center;
     justify-content: flex-end;
     flex-wrap: wrap;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     margin-inline-start: auto;
     min-width: 0;
     max-width: 100%;
@@ -68,7 +68,7 @@ export const sectionStyles = css`
      lines and blocks inside one section keep the compact step. */
   ${section("content")} {
     display: grid;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
   }
   ${section("content")} > p {
@@ -81,11 +81,11 @@ export const sectionStyles = css`
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     margin: 0;
     min-width: 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     line-height: 1.5;
     overflow-wrap: anywhere;
   }

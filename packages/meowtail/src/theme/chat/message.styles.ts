@@ -5,7 +5,6 @@ import { chatMessageContract } from "../../chat/message";
 import { chatMessageActionsContract } from "../../chat/message-actions";
 import { buttonContract } from "../../components/button";
 import { iconButtonContract } from "../../components/icon-button";
-import { layerTokens, radiusTokens, lineTokens } from "../palette";
 
 export const chatMessageStyles = css`
   ${partSelector(chatMessageContract, "root")}[data-chat-role="tool"] {
@@ -22,7 +21,7 @@ export const chatMessageStyles = css`
 
   ${partSelector(chatMessageContract, "root")}[data-chat-role="user"] {
     width: fit-content;
-    max-width: ${chatTokens.messageUserMaxWidth};
+    max-width: ${chatTokens.userMaxWidth};
     margin-left: auto;
   }
 
@@ -50,18 +49,18 @@ export const chatMessageStyles = css`
     height: 28px;
     overflow: hidden;
     margin-top: 2px;
-    border-radius: ${uiTokens.radiusSmall};
+    border-radius: ${uiTokens.radius.md};
     /* Same glyph tile as Avatar: a quiet identity mark beside the author name. */
     box-sizing: border-box;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    background: ${layerTokens.chip};
-    color: ${uiTokens.foreground};
-    ${logoTokens.ink.name}: ${uiTokens.foreground};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.primary};
+    ${logoTokens.ink.name}: ${uiTokens.ink.primary};
   }
 
   ${partSelector(chatMessageContract, "avatar")} svg {
-    width: ${uiTokens.iconSize};
-    height: ${uiTokens.iconSize};
+    width: ${uiTokens.icon.size};
+    height: ${uiTokens.icon.size};
   }
 
   ${partSelector(chatMessageContract, "avatar")} img {
@@ -92,7 +91,7 @@ export const chatMessageStyles = css`
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-height: 0;
   }
 
@@ -106,15 +105,15 @@ export const chatMessageStyles = css`
   /* Speaker and time are the message's own identity, not hover-only chrome, so a
   reader can tell who said what and when without inspecting a tooltip. */
   ${partSelector(chatMessageContract, "author")} {
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     font-weight: 600;
     line-height: 1.4;
     white-space: nowrap;
   }
 
   ${partSelector(chatMessageContract, "root")}[data-chat-role="user"] ${partSelector(chatMessageContract, "author")} {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
     position: absolute;
     width: 1px;
     height: 1px;
@@ -125,8 +124,8 @@ export const chatMessageStyles = css`
   ${partSelector(chatMessageContract, "time")},
   ${partSelector(chatMessageContract, "status")} {
     flex-shrink: 0;
-    color: ${uiTokens.subtleForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
     font-variant-numeric: tabular-nums;
   }
 
@@ -138,14 +137,14 @@ export const chatMessageStyles = css`
   ${partSelector(chatBubbleContract, "root")} {
     min-width: 0;
     overflow-wrap: anywhere;
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
     font-size: ${chatTokens.fontBody};
-    line-height: ${chatTokens.messageLeading};
+    line-height: ${chatTokens.leading};
   }
 
   ${partSelector(chatMessageContract, "content")} {
     display: grid;
-    gap: ${uiTokens.proseGap};
+    gap: ${uiTokens.space.prose};
   }
 
   ${partSelector(chatBubbleContract, "root")}:not(:is([${chatBubbleOptions.attribute("variant")}="filled"], [${chatBubbleOptions.attribute("variant")}="auto"][data-chat-role="user"])) {
@@ -155,16 +154,16 @@ export const chatMessageStyles = css`
   ${partSelector(chatBubbleContract, "root")}:is([${chatBubbleOptions.attribute("variant")}="filled"], [${chatBubbleOptions.attribute("variant")}="auto"][data-chat-role="user"]) {
     padding: 8px 14px;
     border-color: transparent;
-    border-radius: ${chatTokens.messageRadius};
+    border-radius: ${chatTokens.bubbleRadius};
     line-height: 22px;
-    background: ${uiTokens.surfaceMuted};
+    background: ${uiTokens.surface.fill};
   }
 
   ${partSelector(chatMessageContract, "root")}[data-chat-role="user"] ${partSelector(chatBubbleContract, "root")}:is([${chatBubbleOptions.attribute("variant")}="filled"], [${chatBubbleOptions.attribute("variant")}="auto"][data-chat-role="user"]) {
-    background: ${chatTokens.userSurface};
-    box-shadow: inset 0 0 0 ${lineTokens.width} ${lineTokens.quiet};
-    color: ${chatTokens.userInk};
-    border-radius: ${radiusTokens.bubble} ${radiusTokens.bubble} 4px ${radiusTokens.bubble};
+    background: ${uiTokens.surface.fill};
+    box-shadow: inset 0 0 0 ${uiTokens.line.width} ${uiTokens.line.divider};
+    color: ${uiTokens.ink.primary};
+    border-radius: ${chatTokens.bubbleRadius} ${chatTokens.bubbleRadius} 4px ${chatTokens.bubbleRadius};
   }
 
   ${partSelector(chatMessageContract, "content")} p,
@@ -181,13 +180,13 @@ export const chatMessageStyles = css`
     display: flex;
     align-items: baseline;
     flex-wrap: wrap;
-    gap: ${uiTokens.spaceGroup} ${uiTokens.spaceSection};
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    gap: ${uiTokens.space.group} ${uiTokens.space.section};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
   }
 
   ${partSelector(chatMessageContract, "footer")} {
-    margin-top: ${uiTokens.spaceGroup};
+    margin-top: ${uiTokens.space.group};
   }
 
   ${partSelector(chatMessageContract, "root")}[data-chat-role="user"] ${partSelector(chatMessageContract, "footer")} {
@@ -197,7 +196,7 @@ export const chatMessageStyles = css`
   }
 
   ${partSelector(chatMessageContract, "root")}[data-chat-status="error"] ${partSelector(chatMessageContract, "status")} {
-    color: ${uiTokens.danger};
+    color: ${uiTokens.status.danger};
   }
 
   /* Message actions keep a fixed, normal-flow placeholder so copy/expand never
@@ -206,7 +205,7 @@ export const chatMessageStyles = css`
   ${partSelector(chatMessageContract, "actions")} {
     margin-top: 6px;
     opacity: 0;
-    transition: opacity ${uiTokens.durationResponse} ${uiTokens.ease};
+    transition: opacity ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
 
   ${partSelector(chatMessageContract, "root")}[data-chat-role="assistant"] ${partSelector(chatMessageContract, "actions")} {
@@ -235,22 +234,22 @@ export const chatMessageStyles = css`
   :where(${partSelector(chatMessageActionsContract, "root")} button:not(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")})) {
     display: inline-flex;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     box-sizing: border-box;
-    min-height: ${uiTokens.controlSmall};
-    padding: 0 ${uiTokens.spaceGroup};
+    min-height: ${uiTokens.control.small};
+    padding: 0 ${uiTokens.space.group};
     border: 0;
-    border-radius: ${uiTokens.radiusSmall};
+    border-radius: ${uiTokens.radius.md};
     background: transparent;
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
     cursor: pointer;
-    font-family: ${uiTokens.font};
-    font-size: ${uiTokens.fontCaption};
+    font-family: ${uiTokens.type.sans};
+    font-size: ${uiTokens.type.caption};
   }
 
   :where(${partSelector(chatMessageActionsContract, "root")} button:not(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")})):hover:not(:disabled) {
-    background: ${uiTokens.hover};
-    color: ${uiTokens.mutedForeground};
+    background: ${uiTokens.state.hover};
+    color: ${uiTokens.ink.secondary};
   }
 
   ${partSelector(chatMessageActionsContract, "root")} ${partSelector(iconButtonContract, "root")},
@@ -262,9 +261,9 @@ export const chatMessageStyles = css`
     min-height: 28px;
     padding: 6px;
     justify-content: center;
-    border-radius: ${uiTokens.radiusSmall};
+    border-radius: ${uiTokens.radius.md};
     background: transparent;
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
 
   ${partSelector(chatMessageActionsContract, "root")} button[aria-label]:has(> svg) > span {
@@ -288,15 +287,15 @@ export const chatMessageStyles = css`
 
   ${partSelector(chatMessageActionsContract, "root")} button[aria-label]:has(> svg):hover:not(:disabled),
   ${partSelector(chatMessageActionsContract, "root")} ${partSelector(iconButtonContract, "root")}:hover:not(:disabled) {
-    background: ${uiTokens.hover};
-    color: ${uiTokens.mutedForeground};
+    background: ${uiTokens.state.hover};
+    color: ${uiTokens.ink.secondary};
   }
 
   /* A continued message groups under its turn through spacing alone. Its author
   and time stay visible so a run of consecutive replies never loses who is
   speaking; dropping the author made later deliveries read as anonymous. */
   :where(${partSelector(chatMessageActionsContract, "root")} button:not(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")})):focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
 
@@ -307,8 +306,8 @@ export const chatMessageStyles = css`
   }
 
   ${partSelector(chatMessageContract, "time")} {
-    font-family: ${uiTokens.font};
-    font-size: ${uiTokens.fontCaption};
+    font-family: ${uiTokens.type.sans};
+    font-size: ${uiTokens.type.caption};
   }
 
   @media (max-width: 760px) {
@@ -330,7 +329,7 @@ export const chatMessageStyles = css`
   }
 
   ${partSelector(chatMessageContract, "root")}[data-chat-role="assistant"] ${partSelector(chatMessageContract, "author")} {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
 
   ${partSelector(chatMessageContract, "root")}[data-chat-role="assistant"] ${partSelector(chatMessageContract, "body")} {
@@ -360,6 +359,6 @@ export const chatMessageStyles = css`
   }
 
   ${partSelector(chatMessageContract, "root")}[data-chat-role="user"] ${partSelector(chatMessageContract, "time")} {
-    color: ${layerTokens.faint};
+    color: ${uiTokens.ink.tertiary};
   }
 `;

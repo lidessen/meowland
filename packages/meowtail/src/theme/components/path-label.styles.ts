@@ -10,7 +10,7 @@ export const pathLabelStyles = css`
     min-width: 0;
     overflow: hidden;
     white-space: nowrap;
-    font-size: ${uiTokens.fontCaption};
+    font-size: ${uiTokens.type.caption};
   }
   ${partSelector(pathLabelContract, "root")}[data-path-clipped] {
     mask-image: linear-gradient(to right, transparent, black 28px);
@@ -20,9 +20,9 @@ export const pathLabelStyles = css`
     margin-right: auto;
   }
   ${partSelector(pathLabelContract, "directory")} {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
   ${partSelector(pathLabelContract, "name")} {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
 `;

@@ -19,13 +19,13 @@ export const drawerStyles = css`
     padding: 0;
     border: 0;
     background: transparent;
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
     overflow: hidden;
   }
   ${root}::backdrop {
     background: rgb(15 17 21 / 32%);
     opacity: 0;
-    transition: opacity ${uiTokens.durationSettle} ${uiTokens.ease};
+    transition: opacity ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${root}[open]::backdrop {
     opacity: 1;
@@ -40,11 +40,11 @@ export const drawerStyles = css`
     width: min(300px, 86vw);
     padding: max(24px, env(safe-area-inset-top)) 12px max(24px, env(safe-area-inset-bottom));
     overflow: hidden;
-    background: ${uiTokens.sidebarSurface};
+    background: ${uiTokens.surface.canvas};
     box-shadow: 12px 0 40px rgb(0 0 0 / 12%);
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
     transform: translateX(-100%);
-    transition: transform ${uiTokens.durationSettle} ${uiTokens.ease};
+    transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${panel} > ${partSelector(pageFrameContract, "root")} {
     flex: 1;

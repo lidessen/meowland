@@ -13,13 +13,13 @@ export const descriptionListStyles = css`
   ${list} {
     display: grid;
     grid-template-columns: fit-content(35%) minmax(0, 1fr);
-    column-gap: ${uiTokens.spaceSection};
-    row-gap: ${uiTokens.spaceGroup};
+    column-gap: ${uiTokens.space.section};
+    row-gap: ${uiTokens.space.group};
     min-width: 0;
     margin: 0;
     container: meowui-description-list / inline-size;
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
-    color: ${uiTokens.foreground};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    color: ${uiTokens.ink.primary};
   }
   ${item("root")} {
     display: grid;
@@ -34,12 +34,12 @@ export const descriptionListStyles = css`
     overflow-wrap: anywhere;
   }
   ${item("term")} {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   @container meowui-description-list (max-width: 28rem) {
     ${item("root")} {
       grid-template-columns: minmax(0, 1fr);
-      row-gap: ${uiTokens.spaceGroup};
+      row-gap: ${uiTokens.space.group};
     }
   }
 `;

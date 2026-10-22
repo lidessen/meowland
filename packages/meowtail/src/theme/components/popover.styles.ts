@@ -12,12 +12,12 @@ export const popoverStyles = css`
     width: 300px;
     padding: 8px;
     border: 0;
-    border-radius: ${uiTokens.radiusLarge};
-    color: ${uiTokens.foreground};
+    border-radius: ${uiTokens.radius.xl};
+    color: ${uiTokens.ink.primary};
     /* Solid, as in Grok and Mobbin: depth comes from the shadow, not translucency. */
-    background: ${uiTokens.surface};
-    box-shadow: ${uiTokens.shadowFloat};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    background: ${uiTokens.surface.overlay};
+    box-shadow: ${uiTokens.shadow.float};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
     transform-origin: top center;
   }
   ${partSelector(popoverContract, "panel")}:has(> ${partSelector(menuContract, "root")}) {
@@ -30,7 +30,7 @@ export const popoverStyles = css`
     transform-origin: bottom center;
   }
   ${partSelector(popoverContract, "panel")}:popover-open {
-    animation: ui-popover-enter 140ms ${uiTokens.ease};
+    animation: ui-popover-enter 140ms ${uiTokens.motion.ease};
   }
   @keyframes ui-popover-enter {
     from {

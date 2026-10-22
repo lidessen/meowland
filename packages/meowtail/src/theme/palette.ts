@@ -58,7 +58,8 @@ export const lineTokens = defineTokens("line", {
 /** Layers used by redesign components: raised cards, sunken groups, neutral chips. */
 export const layerTokens = defineTokens("layer", {
   raised: ["#ffffff", "#232324"],
-  sunken: ["#fafbfc", "#1b1b1c"],
+  /** Recessed regions: code, table headers, nested panels. Same tone as uiTokens.codeSurface. */
+  sunken: ["#f9fafb", "#1b1b1c"],
   chip: ["#f1f3f5", "rgb(255 255 255 / 8%)"],
   chipInk: ["#61666b", "#cfd3d6"],
   code: ["rgb(0 0 0 / 5%)", "rgb(255 255 255 / 8%)"],

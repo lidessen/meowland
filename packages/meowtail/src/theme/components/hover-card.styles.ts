@@ -11,8 +11,8 @@ export const hoverCardStyles = css`
   ${partSelector(popoverContract, "panel")}:has(> ${partSelector(hoverCardContract, "content")}) {
     padding: 0;
     width: 244px;
-    background: #2c2c2e;
-    color: #fff;
+    background: ${uiTokens.tooltipSurface};
+    color: ${uiTokens.toastForeground};
     backdrop-filter: none;
   }
   ${partSelector(popoverContract, "panel")}:has(> ${partSelector(hoverCardContract, "content")}[data-variant="preview"]) {
@@ -49,9 +49,9 @@ export const hoverCardStyles = css`
     place-items: center;
     padding: 8px;
     border-radius: inherit;
-    background: #2c2c2e;
+    background: ${uiTokens.tooltipSurface};
     pointer-events: none;
-    color: #fff;
+    color: ${uiTokens.toastForeground};
     font: ${uiTokens.fontBody}/20px ${uiTokens.font};
   }
   ${partSelector(hoverCardContract, "feedback")}:empty {

@@ -24,7 +24,7 @@ export const tabsStyles = css`
     width: calc((100% - 2 * ${uiTokens.trackInset}) / ${tabsCount});
     box-sizing: border-box;
     border-radius: ${uiTokens.radiusSmall};
-    background: ${uiTokens.surface};
+    background: ${uiTokens.thumbSurface};
     box-shadow: ${uiTokens.shadowThumb};
     transform: translateX(calc(${tabsIndex} * 100%));
     transition: transform 180ms ease;

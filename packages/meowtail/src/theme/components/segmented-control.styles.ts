@@ -51,7 +51,7 @@ export const segmentedControlStyles = css`
     color: ${uiTokens.mutedForeground};
   }
   ${partSelector(segmented, "input")}:checked + ${partSelector(segmented, "label")} {
-    background: ${uiTokens.surface};
+    background: ${uiTokens.thumbSurface};
     color: ${uiTokens.foreground};
     box-shadow: ${uiTokens.shadowThumb};
   }

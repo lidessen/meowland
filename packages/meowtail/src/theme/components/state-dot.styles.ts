@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { statusTokens } from "../palette";
 import { stateDotContract } from "../../components/state-dot";
 
 export const stateDotStyles = css`
@@ -23,7 +24,7 @@ export const stateDotStyles = css`
     background: currentColor;
   }
   ${partSelector(stateDotContract, "root")}[data-state="idle"] {
-    color: light-dark(#d4d4d4, #545557);
+    color: ${statusTokens.unknown};
   }
   ${partSelector(stateDotContract, "root")}[data-state="done"] {
     color: ${uiTokens.success};

@@ -39,7 +39,7 @@ export const menuStyles = css`
     color: ${uiTokens.danger};
   }
   ${partSelector(menuContract, "item")}[data-danger="true"]:is(:hover, :focus-visible):not(:disabled) {
-    background: light-dark(rgb(236 19 19 / 5%), rgb(242 90 90 / 15%));
+    background: color-mix(in srgb, ${uiTokens.danger} 10%, transparent);
   }
   ${partSelector(menuContract, "label")} {
     flex: 1;

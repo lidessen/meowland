@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { codeHighlightTokens } from "../shared/code-highlight.tokens";
 import { outputBlockContract as block } from "../../components/output-block";
 import { readBlockContract as read } from "../../components/read-block.contract";
 import { diffBlockContract as diff } from "../../components/diff-block";
@@ -227,7 +228,7 @@ export const outputBlockStyles = css`
     color: ${uiTokens.info};
   }
   ${partSelector(terminal, "span")}:is([data-ansi-color="35"], [data-ansi-color="95"]) {
-    color: #b16bd2;
+    color: ${codeHighlightTokens.function};
   }
   ${partSelector(terminal, "span")}[data-ansi-color="90"] {
     color: ${uiTokens.subtleForeground};
@@ -239,6 +240,34 @@ export const outputBlockStyles = css`
       min-width: 44px;
       min-height: 44px;
       padding: 0 6px;
+    }
+  }
+
+  /* Native summaries draw the same rotating chevron as Disclosure. */
+  :where(${partSelector(block, "toggle")}) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    list-style: none;
+  }
+  :where(${partSelector(block, "toggle")})::-webkit-details-marker {
+    display: none;
+  }
+  :where(${partSelector(block, "toggle")})::before {
+    content: "";
+    flex: none;
+    width: 14px;
+    height: 14px;
+    background: currentColor;
+    mask: ${uiTokens.chevronMask} center / 14px 14px no-repeat;
+    transition: transform ${uiTokens.durationSettle} ${uiTokens.ease};
+  }
+  :where(details[open] > ${partSelector(block, "toggle")})::before {
+    transform: rotate(90deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :where(${partSelector(block, "toggle")})::before {
+      transition: none;
     }
   }
 `;

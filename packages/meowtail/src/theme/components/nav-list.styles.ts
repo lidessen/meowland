@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { accentTokens } from "../palette";
 import { navListContract } from "../../components/nav-list";
 
 const list = (part: (typeof navListContract.parts)[number]) => partSelector(navListContract, part);
@@ -73,7 +74,7 @@ export const navListStyles = css`
   }
   ${list("item")}[aria-current="page"] {
     color: ${uiTokens.foreground};
-    background: ${uiTokens.primarySoft};
+    background: ${accentTokens.selected};
     font-weight: 500;
   }
   @media (hover: hover) {

@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { accentTokens } from "../palette";
 import { navItemContract } from "../../components/nav-item";
 
 export const navItemStyles = css`
@@ -29,7 +30,7 @@ export const navItemStyles = css`
   }
   :where(${partSelector(navItemContract, "root")}[aria-current="page"]) {
     color: ${uiTokens.foreground};
-    background: ${uiTokens.primarySoft};
+    background: ${accentTokens.selected};
     font-weight: 500;
   }
   @media (hover: hover) {

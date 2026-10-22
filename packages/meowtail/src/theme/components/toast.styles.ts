@@ -36,7 +36,7 @@ export const toastStyles = css`
     margin-inline: 3px;
     border: 0;
     background: transparent;
-    color: #7aaaff;
+    color: ${uiTokens.inverseAction};
     font: inherit;
     text-decoration: none;
     cursor: pointer;

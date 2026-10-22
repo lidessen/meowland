@@ -5,7 +5,7 @@ import { chatMessageContract } from "../../chat/message";
 import { chatMessageActionsContract } from "../../chat/message-actions";
 import { buttonContract } from "../../components/button";
 import { iconButtonContract } from "../../components/icon-button";
-import { layerTokens, radiusTokens } from "../palette";
+import { layerTokens, radiusTokens, lineTokens } from "../palette";
 
 export const chatMessageStyles = css`
   ${partSelector(chatMessageContract, "root")}[data-chat-role="tool"] {
@@ -51,9 +51,12 @@ export const chatMessageStyles = css`
     overflow: hidden;
     margin-top: 2px;
     border-radius: ${uiTokens.radiusSmall};
-    background: ${uiTokens.primary};
-    color: ${uiTokens.onPrimary};
-    ${logoTokens.ink.name}: ${uiTokens.onPrimary};
+    /* Same glyph tile as Avatar: a quiet identity mark beside the author name. */
+    box-sizing: border-box;
+    border: ${lineTokens.width} solid ${lineTokens.edge};
+    background: ${layerTokens.chip};
+    color: ${uiTokens.foreground};
+    ${logoTokens.ink.name}: ${uiTokens.foreground};
   }
 
   ${partSelector(chatMessageContract, "avatar")} svg {
@@ -213,12 +216,13 @@ export const chatMessageStyles = css`
   :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) > pre {
     max-width: 100%;
     overflow-x: auto;
-    padding: ${uiTokens.spaceSection};
-    border: 1px solid ${uiTokens.border};
-    border-radius: ${uiTokens.controlRadius};
-    background: ${uiTokens.surfaceMuted};
+    /* The same recessed surface CodeBlock and output views use. */
+    padding: 14px 16px;
+    border: 0;
+    border-radius: ${uiTokens.radiusLarge};
+    background: ${uiTokens.codeSurface};
     font-family: ${uiTokens.mono};
-    font-size: 0.92em;
+    font-size: ${uiTokens.fontCode};
     line-height: 1.65;
     white-space: pre;
     overflow-wrap: normal;
@@ -231,7 +235,7 @@ export const chatMessageStyles = css`
 
   :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) > blockquote {
     padding-inline-start: ${uiTokens.spaceSection};
-    border-inline-start: 2px solid ${uiTokens.border};
+    border-inline-start: 2px solid ${lineTokens.edge};
     color: ${uiTokens.mutedForeground};
   }
 

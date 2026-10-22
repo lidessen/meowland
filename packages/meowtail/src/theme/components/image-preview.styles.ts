@@ -3,6 +3,7 @@ import { imagePreviewContract as preview } from "../../components/image-preview"
 import { chatAttachmentsContract as attachments } from "../../chat/attachments";
 import { imageLightboxContract as lightbox } from "../../components/image-lightbox";
 import { uiTokens } from "../tokens";
+import { layerTokens, lineTokens } from "../palette";
 
 export const imagePreviewStyles = css`
   ${partSelector(preview, "root")} {
@@ -13,8 +14,13 @@ export const imagePreviewStyles = css`
     height: 180px;
     min-width: 0;
     overflow: hidden;
-    border-radius: ${uiTokens.radiusSmall};
-    background: ${uiTokens.background};
+    border-radius: ${uiTokens.controlRadius};
+    /* A recessed frame, so loading, failure and letterboxing read as one
+       bounded media slot instead of loose text on the page. */
+    background: ${layerTokens.sunken};
+  }
+  ${partSelector(preview, "root")}[data-image-state="failed"] {
+    box-shadow: inset 0 0 0 ${lineTokens.width} ${lineTokens.edge};
   }
   ${partSelector(preview, "image")} {
     width: 100%;

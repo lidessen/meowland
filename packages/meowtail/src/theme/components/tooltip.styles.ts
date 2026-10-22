@@ -14,7 +14,7 @@ export const tooltipStyles = css`
     max-width: min(50vw, calc(100vw - 16px));
     border-radius: ${uiTokens.radiusSmall};
     background: ${uiTokens.tooltipSurface};
-    color: #fff;
+    color: ${uiTokens.toastForeground};
     box-shadow: none;
     backdrop-filter: none;
     font: ${uiTokens.fontLabel}/20px ${uiTokens.font};

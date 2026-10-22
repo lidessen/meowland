@@ -20,6 +20,7 @@ Candidate for the next alpha publish. This version is not on npm until the manua
 
 - One reading rhythm (`src/theme/shared/prose.styles.ts`) for Prose, chat message content, chat bubbles and rendered assistant markdown. Chat h2/h3 are 1.15em/1.05em with an 8px lead instead of 1.08em with 24px; rendered markdown spaces blocks by `proseGap` instead of browser margins, its code blocks use the recessed CodeBlock surface, table rows use divider hairlines, and links use the accent ink of `Link`.
 - Content layout conventions (AGENTS.md): text roles, one header unit, one start edge per region, Prose for reading, labeled groups. Stories follow them through `stories/specimen.tsx`: component stories start on the canvas edge instead of centering, every group of variants carries a small-caps label, and receipts share the caption role.
+- The docs app renders package overviews and page copy with `Prose` instead of its own `.docs-prose` rules; the site keeps only its reading size, heading scroll offset and MDX callout styling.
 
 - `standardTheme` and `createMeowUI` no longer load the code-block highlighter. The package sets `sideEffects` to `false`, and the contracts those entries need live in modules that do not import Shiki. Importing `CodeBlock`, `ReadBlock`, `JsonBlock`, or `AssistantView` still loads Shiki. `standardTheme.cssText` stays one complete stylesheet.
 - Page and section titles use `uiTokens.fontDisplay`. Their size and weight are unchanged.

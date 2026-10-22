@@ -7,6 +7,7 @@ import {
   navListContract,
   pageContract,
   pageHeaderContract,
+  proseContract,
   searchInputContract,
   sectionContract,
   tableContract,
@@ -14,7 +15,6 @@ import {
 import {
   layerTokens,
   lineTokens,
-  radiusTokens,
   standardOptions,
   standardThemeStyles,
   standardThemeTokens,
@@ -52,7 +52,7 @@ export const docsStyles = css`
   * {
     box-sizing: border-box;
   }
-  .docs-shell a:not(:where([data-meowui-part="link/root"])) {
+  .docs-shell a:not(:where([data-meowui-part="link/root"], ${partSelector(proseContract, "root")} a)) {
     color: inherit;
     text-decoration: none;
   }
@@ -558,69 +558,30 @@ export const docsStyles = css`
     gap: 8px;
   }
 
-  /* Prose, examples and technical tables keep distinct scales and clear pauses. */
-  .docs-prose {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 18px;
-    min-width: 0;
+  /* Reading content uses the library's Prose rhythm; the docs only set their
+     reading size and keep headings clear of the sticky header. */
+  .docs-article ${partSelector(proseContract, "root")} {
     font-size: 15px;
-    line-height: 1.85;
-    overflow-wrap: break-word;
+    line-height: 1.75;
   }
-  .docs-prose p {
-    margin: 0;
-  }
-  .docs-prose h2,
-  .docs-prose h3 {
-    margin: 24px 0 0;
-    color: ${uiTokens.foreground};
-    line-height: 1.35;
+  .docs-article ${partSelector(proseContract, "root")} > :where(h2, h3, h4) {
     scroll-margin-top: 88px;
   }
-  .docs-prose h2 {
-    font: 500 25px/1.35 ${uiTokens.fontDisplay};
-    letter-spacing: -0.02em;
-  }
-  .docs-prose h3 {
-    font-size: ${uiTokens.fontTitle};
-    font-weight: 600;
-  }
-  .docs-prose > :first-child {
-    margin-top: 0;
-  }
-  .docs-prose ul,
-  .docs-prose ol {
+  /* MDX callouts are recessed notes inside the reading flow. */
+  .docs-article .mdx-callout {
     display: grid;
-    gap: 8px;
-    margin: 0;
-    padding-left: 24px;
-  }
-  .docs-prose code {
-    padding: 2px 5px;
-    border: ${lineTokens.width} solid ${lineTokens.divider};
-    border-radius: ${radiusTokens.mark};
-    background: ${uiTokens.codeSurface};
-    font-family: ${uiTokens.mono};
-    font-size: 0.82em;
-  }
-  .docs-prose pre {
-    min-width: 0;
-    max-width: 100%;
-    overflow: auto;
-    margin: 4px 0;
-    padding: 16px;
-    border: 0;
+    gap: ${uiTokens.spaceGroup};
+    padding: 12px 16px;
     border-radius: ${uiTokens.radiusLarge};
-    background: ${uiTokens.codeSurface};
-    font: ${uiTokens.fontCode}/1.75 ${uiTokens.mono};
-    scrollbar-width: thin;
+    background: ${layerTokens.sunken};
+    color: ${uiTokens.mutedForeground};
   }
-  .docs-prose pre code {
-    padding: 0;
-    border: 0;
-    background: none;
-    font-size: inherit;
+  .docs-article .mdx-callout > * {
+    margin: 0;
+  }
+  .docs-article .mdx-callout-warning {
+    background: color-mix(in srgb, ${uiTokens.warning} 9%, transparent);
+    color: ${uiTokens.foreground};
   }
   .docs-article ${partSelector(tableContract, "root")} {
     max-width: 100%;
@@ -635,26 +596,6 @@ export const docsStyles = css`
   }
   .docs-article ${partSelector(tableContract, "heading")}, .docs-article ${partSelector(tableContract, "cell")} {
     padding: 12px 16px;
-  }
-  .docs-prose table {
-    display: block;
-    max-width: 100%;
-    overflow-x: auto;
-    border-collapse: collapse;
-    font-size: ${uiTokens.fontLabel};
-  }
-  .docs-prose th,
-  .docs-prose td {
-    padding: 12px 16px;
-    border-bottom: ${lineTokens.width} solid ${lineTokens.edge};
-    text-align: left;
-    vertical-align: top;
-    min-width: 120px;
-  }
-  .docs-prose th {
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
-    font-weight: 500;
   }
   .docs-footer {
     display: flex;
@@ -850,7 +791,6 @@ export const docsStyles = css`
     .docs-package-link {
       padding-block: 20px;
     }
-    .docs-prose pre,
     .docs-article ${partSelector(codeBlockContract, "content")} {
       padding: 16px;
     }

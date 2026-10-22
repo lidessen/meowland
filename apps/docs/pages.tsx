@@ -1,6 +1,16 @@
 import { h, type Child } from "meowjsx";
 import type { ThemeDefinition } from "meowcss";
-import { Badge, Inline, Link, Page, PageHeader, ResourceLink, Section, Stack } from "meowtail";
+import {
+  Badge,
+  Inline,
+  Link,
+  Page,
+  PageHeader,
+  Prose,
+  ResourceLink,
+  Section,
+  Stack,
+} from "meowtail";
 import type { ContentItem, SitePage } from "meowpress/build";
 import type { StoryEntry } from "meowbook";
 import type { Catalog, CatalogComponent, CatalogExample } from "./catalog";
@@ -223,7 +233,7 @@ function HomePage({ state }: { state: DocsState }): Child {
         title="How the pieces fit"
         description="One rendering graph, one theme assembly, one set of contracts."
       >
-        <div className="docs-prose">
+        <Prose measure="fill">
           <p>
             <code>meowjsx</code> renders a tree of nodes and lets a component bind a signal to an
             attribute, so a later change reaches the DOM without re-rendering the tree.
@@ -236,7 +246,7 @@ function HomePage({ state }: { state: DocsState }): Child {
             canvas. <code>meowslides</code> is the presentation engine on top of the same
             components. <code>meowpress</code> is the site generator that writes this page.
           </p>
-        </div>
+        </Prose>
       </Section>
     </Page>
   );
@@ -282,7 +292,7 @@ function PackagePage({
     sections.push({
       id: "overview",
       title: "Overview",
-      children: <div className="docs-prose" dangerouslySetInnerHTML={{ __html: content.html }} />,
+      children: <Prose measure="fill" dangerouslySetInnerHTML={{ __html: content.html }} />,
     });
   }
   if (entry.name === COMPONENT_PACKAGE) {

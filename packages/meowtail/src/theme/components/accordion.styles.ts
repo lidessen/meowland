@@ -19,6 +19,7 @@ export const accordionStyles = css`
     border: ${lineTokens.width} solid ${lineTokens.edge};
     border-radius: ${radiusTokens.card};
     background: ${layerTokens.raised};
+    box-shadow: ${uiTokens.shadowRaised};
     color: ${uiTokens.foreground};
   }
   ${item} + ${item} {

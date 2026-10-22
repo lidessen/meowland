@@ -18,6 +18,7 @@ export const resourceLinkStyles = css`
     border: ${lineTokens.width} solid ${lineTokens.edge};
     border-radius: ${uiTokens.radiusLarge};
     background: ${layerTokens.raised};
+    box-shadow: ${uiTokens.shadowRaised};
     color: ${uiTokens.foreground};
     font: ${uiTokens.fontBody}/1.5 ${uiTokens.font};
     text-align: left;

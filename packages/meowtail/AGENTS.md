@@ -144,11 +144,23 @@ Materials have one role each, so a new component reuses one instead of mixing a 
 | Current selection        | `accentTokens.selected`, with `accentTokens.line` when bordered         | NavList, NavItem, ChoiceGroup, Table rows, Pill, Tag  |
 | Divider                  | `lineTokens.divider`                                                    | rows, card footers                                    |
 
-Shape follows role, after Grok and Mobbin: actions are pills (`radiusTokens.action`) and icon buttons
-circles; SearchInput is a filled pill; Tabs and SegmentedControl are a pill track with a pill thumb;
-fields stay rounded rectangles (`controlRadius`); surfaces use `radiusLarge`, and items inside a
-floating panel use `radiusSmall` (the panel radius minus its 6px inset). Outline actions add
-`shadowAction`, and button labels are 500 weight.
+Fields, actions, tracks and thumbs are rounded rectangles (`controlRadius`, `radiusSmall` at the
+small size); tracks and thumbs are concentric (track radius is the thumb radius plus `trackInset`);
+surfaces use `radiusLarge`, and items inside a floating panel use `radiusSmall` (the panel radius minus
+its 6px inset). Do not introduce pills for actions or fields.
+
+Depth is a material, not decoration. Each role takes one shadow token and nothing else:
+`shadowRaised` for in-flow surfaces (a soft lift in light, a top-edge highlight in dark),
+`shadowField` for fields at rest, `shadowAction` for outline actions, `shadowFilled` for primary and
+danger fills (an inner top highlight over a tight drop), `shadowThumb` for selected thumbs and
+`shadowFloat` for floating panels. Disabled controls drop their shadow. Pressed actions settle by
+half a pixel. Neutral fills (`surfaceMuted`, `hover`, `active`, `primarySoft`) are true greys with
+no blue cast. Button labels are 500 weight; titles at `fontTitle` and above use -0.01em tracking.
+
+Group labels share one small-caps role: `fontMicro`, weight 500, 0.04em tracking, uppercase,
+`subtleForeground`. Menu headings, ChoiceSelect groups, NavList group titles, and the docs, gallery
+and story sidebars use it; do not invent another label style. The docs app and the Meowbook gallery
+use the same tokens and roles as the library, so a specimen there looks like the component in a host.
 
 Syntax colors come from `codeHighlightTokens`, and inverse surfaces (Tooltip, HoverCard, Toast) from
 `tooltipSurface`/`toastSurface` with `toastForeground`. Do not use `light-dark()` or a literal hex in a
@@ -224,7 +236,7 @@ export const calloutStyles = css`
     gap: ${uiTokens.spaceGroup};
     padding: ${uiTokens.spaceGroup};
     color: ${uiTokens.foreground};
-    font: 400 ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    font: 400 ${uiTokens.fontBody} / ${uiTokens.leading} ${uiTokens.font};
     background: ${uiTokens.surfaceMuted};
     border-radius: ${uiTokens.controlRadius};
   }

@@ -44,8 +44,6 @@ export const radiusTokens = defineTokens("radius", {
   control: "10px",
   card: "14px",
   float: "22px",
-  /** Actions (buttons, icon buttons, filters, search) are pills; icon buttons become circles. */
-  action: "999px",
   bubble: "18px",
 });
 
@@ -61,8 +59,8 @@ export const lineTokens = defineTokens("line", {
 export const layerTokens = defineTokens("layer", {
   raised: ["#ffffff", "#232324"],
   /** Recessed regions: code, table headers, nested panels. Same tone as uiTokens.codeSurface. */
-  sunken: ["#f9fafb", "#1b1b1c"],
-  chip: ["#f1f3f5", "rgb(255 255 255 / 8%)"],
+  sunken: ["#fafafa", "#1b1b1c"],
+  chip: ["#f2f2f3", "rgb(255 255 255 / 8%)"],
   chipInk: ["#61666b", "#cfd3d6"],
   code: ["rgb(0 0 0 / 5%)", "rgb(255 255 255 / 8%)"],
   faint: ["#656a71", "#9aa0a7"],

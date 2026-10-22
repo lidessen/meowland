@@ -16,6 +16,7 @@ export const tableStyles = css`
     border: ${lineTokens.width} solid ${lineTokens.edge};
     border-radius: ${radiusTokens.card};
     background: ${layerTokens.raised};
+    box-shadow: ${uiTokens.shadowRaised};
   }
   ${part("table")} {
     width: 100%;

@@ -13,6 +13,7 @@ export const listGroupStyles = css`
     border: ${lineTokens.width} solid ${lineTokens.edge};
     border-radius: ${radiusTokens.card};
     background: ${layerTokens.raised};
+    box-shadow: ${uiTokens.shadowRaised};
   }
   ${row("root")} {
     display: grid;

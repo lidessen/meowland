@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { radiusTokens } from "../palette";
 import { tabsContract, tabsCount, tabsIndex } from "../../components/tabs";
 
 export const tabsStyles = css`
@@ -13,10 +12,9 @@ export const tabsStyles = css`
     position: relative;
     display: grid;
     grid-template-columns: repeat(${tabsCount}, minmax(0, 1fr));
-    /* Same pill track as SegmentedControl: one control height, pill thumb. */
+    /* Same track as SegmentedControl: one control height, concentric radii. */
     padding: ${uiTokens.trackInset};
-    border-radius: ${radiusTokens.action};
-    corner-shape: round;
+    border-radius: calc(${uiTokens.radiusSmall} + ${uiTokens.trackInset});
     background: ${uiTokens.surfaceMuted};
   }
   ${partSelector(tabsContract, "indicator")} {
@@ -25,7 +23,7 @@ export const tabsStyles = css`
     inset-inline-start: ${uiTokens.trackInset};
     width: calc((100% - 2 * ${uiTokens.trackInset}) / ${tabsCount});
     box-sizing: border-box;
-    border-radius: ${radiusTokens.action};
+    border-radius: ${uiTokens.radiusSmall};
     background: ${uiTokens.thumbSurface};
     box-shadow: ${uiTokens.shadowThumb};
     transform: translateX(calc(${tabsIndex} * 100%));
@@ -45,7 +43,7 @@ export const tabsStyles = css`
     min-height: calc(${uiTokens.controlHeight} - 2 * ${uiTokens.trackInset});
     padding: 0 12px;
     border: 0;
-    border-radius: ${radiusTokens.action};
+    border-radius: ${uiTokens.radiusSmall};
     background: transparent;
     color: ${uiTokens.mutedForeground};
     font: inherit;

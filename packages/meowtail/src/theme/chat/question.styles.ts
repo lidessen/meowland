@@ -10,6 +10,7 @@ export const chatQuestionStyles = css`
     max-width: 38rem;
     padding: 16px 20px;
     border: ${lineTokens.width} solid ${lineTokens.edge};
+    box-shadow: ${uiTokens.shadowRaised};
     border-radius: ${uiTokens.radiusLarge};
     background: ${uiTokens.background};
     color: ${uiTokens.foreground};

@@ -18,6 +18,7 @@ export const workCardStyles = css`
     border: ${lineTokens.width} solid ${lineTokens.edge};
     border-radius: ${radiusTokens.card};
     background: ${layerTokens.raised};
+    box-shadow: ${uiTokens.shadowRaised};
     color: ${uiTokens.foreground};
     font: ${uiTokens.fontBody}/1.5 ${uiTokens.font};
     text-align: left;

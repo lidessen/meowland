@@ -29,6 +29,7 @@ export const emptyStateStyles = css`
     margin: 0;
     font-size: ${uiTokens.fontTitle};
     font-weight: 600;
+    letter-spacing: -0.01em;
   }
   ${partSelector(emptyStateContract, "description")} {
     max-width: 38ch;

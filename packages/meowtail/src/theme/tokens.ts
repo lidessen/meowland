@@ -62,10 +62,12 @@ export const uiTokens = defineTokens("ui", {
   background: ["#ffffff", "#151517"],
   inputSurface: ["#ffffff", "#232324"],
   surface: ["#ffffff", "#2c2c2e"],
-  surfaceMuted: ["#f1f3f5", "#353638"],
-  sidebarSurface: ["#f9fafb", "#1b1b1c"],
-  codeSurface: ["#f9fafb", "#1b1b1c"],
-  codeBanner: ["#f9fafb", "#2c2c2e"],
+  /* Fills are true neutrals: a blue cast in light greys reads as default
+     framework chrome; neutral greys let type and content carry the color. */
+  surfaceMuted: ["#f2f2f3", "#353638"],
+  sidebarSurface: ["#fafafa", "#1b1b1c"],
+  codeSurface: ["#fafafa", "#1b1b1c"],
+  codeBanner: ["#fafafa", "#2c2c2e"],
   /* Opaque enough to read on its own: the blur is a refinement, and text under
      a menu must not compete with the menu's items where it is unavailable. */
   menuSurface: ["rgb(250 250 251 / 90%)", "rgb(44 45 48 / 90%)"],
@@ -101,12 +103,13 @@ export const uiTokens = defineTokens("ui", {
   chevronMask: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E")`,
   /** Field border under the pointer: one step above the resting border. */
   borderStrong: ["rgb(0 0 0 / 28%)", "rgb(255 255 255 / 32%)"],
-  hover: ["rgb(38 49 72 / 6%)", "rgb(255 255 255 / 8%)"],
-  active: ["rgb(38 49 72 / 10%)", "rgb(255 255 255 / 14%)"],
+  hover: ["rgb(0 0 0 / 4.5%)", "rgb(255 255 255 / 7%)"],
+  active: ["rgb(0 0 0 / 8%)", "rgb(255 255 255 / 12%)"],
   primary: ["#0f1115", "#f9fafb"],
-  primaryHover: ["#43454a", "#ebeef2"],
+  /* Hover moves the main action a step, not to a washed-out grey. */
+  primaryHover: ["#2a2b2f", "#e4e5e7"],
   onPrimary: ["#ffffff", "#0f1115"],
-  primarySoft: ["#ebeef2", "#43454a"],
+  primarySoft: ["#ececed", "#43454a"],
   info: ["#2f5fce", "#7aaaff"],
   warning: ["#a85c00", "#f0a04b"],
   success: ["#15803d", "#4ade80"],
@@ -119,8 +122,29 @@ export const uiTokens = defineTokens("ui", {
   /** Soft halo around a focused field; the border carries the focus color. */
   focusRing: ["rgb(65 118 230 / 22%)", "rgb(122 170 255 / 28%)"],
   shadowControl: "none",
-  /** The one-pixel drop under an outline action. */
-  shadowAction: ["0 1px 2px rgb(0 0 0 / 5%)", "0 1px 2px rgb(0 0 0 / 30%)"],
+  /** The one-pixel drop under an outline action; in dark, a top edge catches the light instead. */
+  shadowAction: [
+    "0 1px 2px rgb(0 0 0 / 5%)",
+    "inset 0 1px 0 rgb(255 255 255 / 5%), 0 1px 2px rgb(0 0 0 / 30%)",
+  ],
+  /**
+   * In-flow raised surfaces (cards, lists, tables): ambient depth under the
+   * hairline in light, a faint top highlight in dark, where shadows vanish.
+   */
+  shadowRaised: [
+    "0 1px 2px rgb(0 0 0 / 3%), 0 2px 8px -2px rgb(0 0 0 / 4%)",
+    "inset 0 1px 0 rgb(255 255 255 / 4%)",
+  ],
+  /** Fields at rest sit very slightly into the page. */
+  shadowField: ["0 1px 1px rgb(0 0 0 / 2.5%)", "none"],
+  /**
+   * Filled actions (primary, danger): a top highlight and a short drop give
+   * the fill a material edge instead of a flat block.
+   */
+  shadowFilled: [
+    "inset 0 1px 0 rgb(255 255 255 / 12%), 0 1px 2px rgb(0 0 0 / 18%)",
+    "inset 0 1px 0 rgb(255 255 255 / 70%), 0 1px 2px rgb(0 0 0 / 40%)",
+  ],
   /** The raised thumb inside a Tabs or SegmentedControl track. */
   shadowThumb: [
     "0 0 0 0.5px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 8%)",

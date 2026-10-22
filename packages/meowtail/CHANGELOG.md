@@ -30,4 +30,10 @@ Candidate for the next alpha publish. This version is not on npm until the manua
 - Tabs and SegmentedControl share one track: 3px inset, concentric radii, the same thumb shadow and 14px/500 labels.
 - Type ramp tokens `fontMicro` (11px), `fontCode` (12px), `fontLabel` (13px) and `fontHeading` (20px); every theme size maps to the ramp (12.5px and 13.5px become 13px and 14px, code text 11px becomes 12px). Library controls inherit typography instead of the browser's 13.33px default.
 - `radiusTokens.mark` (4px) for small marks; off-scale radii (3, 5, 9, 11, 12 and 16px) map to the scale by element size.
+- One material per role (documented in AGENTS.md): Card moves onto `layerTokens.raised` and the `lineTokens.edge` hairline like its siblings (its dark surface was lighter than theirs); Chat Question, attachments and outline Item use the same hairline; `layerTokens.sunken` and `codeSurface` share one tone; markdown code in messages uses the recessed CodeBlock surface.
+- Current selection uses `accentTokens.selected` everywhere: NavList, NavItem, ChoiceGroup and multi-row Select now match Table, IconRail, Pill and Tag.
+- Avatar initials and the chat message mark use the soft glyph tile instead of a solid inverse block.
+- Tabs and SegmentedControl thumbs use `thumbSurface`, lighter than the track in dark mode.
+- JsonBlock and OutputBlock summaries draw Disclosure's rotating chevron (`chevronMask`) instead of the native triangle. JSON colors come from `codeHighlightTokens` and `uiTokens`; Menu, StateDot, Tooltip, HoverCard and ANSI magenta no longer hardcode `light-dark()` or hex colors.
+- ImagePreview loading and failure states sit in a recessed, bounded frame.
 - `PageFrame` reserves symmetric scrollbar gutters, so centered content stays aligned with the header when the platform draws classic scrollbars. `PageHeader` centers its actions on the identity block.

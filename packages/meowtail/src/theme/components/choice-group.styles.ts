@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { accentTokens } from "../palette";
 import { choiceGroupContract } from "../../components/choice-group";
 
 export const choiceGroupStyles = css`
@@ -48,9 +49,10 @@ export const choiceGroupStyles = css`
   :where(${partSelector(choiceGroupContract, "option")}:hover:not(:has(input:disabled))) {
     background: ${uiTokens.hover};
   }
+  /* The chosen option is the current selection, so it takes the accent. */
   :where(${partSelector(choiceGroupContract, "option")}:has(input:checked)) {
-    border-color: ${uiTokens.border};
-    background: ${uiTokens.hover};
+    border-color: ${accentTokens.line};
+    background: ${accentTokens.selected};
   }
   :where(${partSelector(choiceGroupContract, "option")}:has(input:focus-visible)) {
     outline: 2px solid ${uiTokens.focus};

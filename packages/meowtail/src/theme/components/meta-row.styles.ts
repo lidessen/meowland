@@ -55,8 +55,8 @@ export const metaRowStyles = css`
       ${uiTokens.subtleForeground} var(--meta-progress, 0%),
       ${uiTokens.border} var(--meta-progress, 0%)
     );
-    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 0);
-    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), #000 0);
+    -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black 0);
+    mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black 0);
   }
   ${partSelector(metaRowContract, "root")}[${metaRowOptions.attribute("progressTone")}="accent"] ${partSelector(metaRowContract, "progress")}::before {
     background: conic-gradient(

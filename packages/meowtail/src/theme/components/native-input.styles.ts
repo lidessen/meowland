@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { accentTokens } from "../palette";
 import { inputContract } from "../../components/input";
 import { textareaContract } from "../../components/textarea";
 import { selectContract } from "../../components/select";
@@ -50,7 +51,7 @@ export const nativeInputStyles = css`
   }
   :where(${partSelector(selectContract, "root")}:is([multiple], [size]:not([size="0"]):not([size="1"]))) option:checked {
     color: ${uiTokens.foreground};
-    background: ${uiTokens.primarySoft};
+    background: ${accentTokens.selected};
     font-weight: 600;
   }
   ${partSelector(selectContract, "root")} option:disabled {

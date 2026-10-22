@@ -74,6 +74,8 @@ export const uiTokens = defineTokens("ui", {
   foreground: ["#0f1115", "#f9fafb"],
   toastSurface: ["#353638", "#43454a"],
   toastForeground: "#ffffff",
+  /** Action text on the inverse Toast/Tooltip surface, which is dark in both schemes. */
+  inverseAction: "#7aaaff",
   mutedForeground,
   // Metadata ink stays above the normal-text floor in both schemes; it is still
   // lighter than the primary muted text so hierarchy survives.
@@ -92,6 +94,11 @@ export const uiTokens = defineTokens("ui", {
     `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2361666b' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
     `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23adb2b8' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
   ],
+  /**
+   * Lucide chevron-right as a mask, for a native summary that cannot hold an
+   * Icon. Painted with currentColor, so it follows the text in both schemes.
+   */
+  chevronMask: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E")`,
   /** Field border under the pointer: one step above the resting border. */
   borderStrong: ["rgb(0 0 0 / 28%)", "rgb(255 255 255 / 32%)"],
   hover: ["rgb(38 49 72 / 6%)", "rgb(255 255 255 / 8%)"],
@@ -117,6 +124,8 @@ export const uiTokens = defineTokens("ui", {
     "0 0 0 0.5px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 8%)",
     "0 0 0 0.5px rgb(255 255 255 / 14%), 0 1px 2px rgb(0 0 0 / 32%)",
   ],
+  /** The thumb itself: lighter than its track in both schemes, so it reads as raised. */
+  thumbSurface: ["#ffffff", "#505156"],
   /** Inset between a Tabs or SegmentedControl track and its thumb. */
   trackInset: "3px",
   shadowPanel: [

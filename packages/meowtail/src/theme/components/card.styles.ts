@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { lineTokens, layerTokens } from "../palette";
 import { cardContract, cardOptions } from "../../components/card";
 import { cardActionContract } from "../../components/card-action";
 import { cardContentContract } from "../../components/card-content";
@@ -13,10 +14,11 @@ ${partSelector(cardContract, "root")} {
   box-sizing: border-box;
   min-width: 0;
   padding: ${uiTokens.spacePanel};
-  border: 0.5px solid ${uiTokens.border};
+  /* The in-flow surface every bordered container shares: raised layer on the edge hairline. */
+  border: ${lineTokens.width} solid ${lineTokens.edge};
   border-radius: ${uiTokens.panelRadius};
-  background: ${uiTokens.surface};
-  --meowui-focus-halo: ${uiTokens.surface};
+  background: ${layerTokens.raised};
+  --meowui-focus-halo: ${layerTokens.raised};
   color: ${uiTokens.foreground};
   font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
 }
@@ -112,6 +114,6 @@ ${partSelector(cardFooterContract, "root")} {
 }
 :where(${partSelector(cardContentContract, "root")} > ${partSelector(cardContract, "root")}:is([${cardOptions.attribute("variant")}="embedded"], [${cardOptions.attribute("variant")}="auto"]:not([data-card-depth="0"])) + ${partSelector(cardContract, "root")}:is([${cardOptions.attribute("variant")}="embedded"], [${cardOptions.attribute("variant")}="auto"]:not([data-card-depth="0"]))) {
   padding-top: ${uiTokens.spaceSection};
-  border-top: 1px solid ${uiTokens.border};
+  border-top: ${lineTokens.width} solid ${lineTokens.divider};
 }
 `;

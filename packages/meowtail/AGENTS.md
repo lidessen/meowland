@@ -130,7 +130,25 @@ NumberInput) take their box and their hover, focus, read-only, invalid and disab
 `src/theme/shared/field-surface.styles.ts`; a field family's own file adds layout only. Type sizes
 come from the `uiTokens` ramp (`fontMicro` 11, `fontCaption`/`fontCode` 12, `fontLabel` 13,
 `fontBody` 14, `fontTitle` 16, `fontHeading` 20, `fontPageTitle` 24) and radii from `radiusTokens`
-chosen by element size; do not write a literal size or radius beside them. Arrange siblings with `Stack`, `Inline`, or `Grid` and a `gap` of `none`, `compact`,
+chosen by element size; do not write a literal size or radius beside them.
+
+Materials have one role each, so a new component reuses one instead of mixing a fresh grey:
+
+| Role                     | Tokens                                                                  | Used by                                               |
+| ------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------- |
+| In-flow surface          | `layerTokens.raised` on a `lineTokens.width` `lineTokens.edge` hairline | Card, ListGroup, ResourceCard, WorkCard, Table        |
+| Floating surface         | `uiTokens.surface` + `shadowPanel`, or `menuSurface`                    | Dialog, Modal, Popover, Menu                          |
+| Recessed region          | `layerTokens.sunken` (same tone as `codeSurface`), no border            | CodeBlock, output views, markdown code, media frames  |
+| Fill (track, chip, tile) | `uiTokens.surfaceMuted` / `layerTokens.chip` with `chipInk`             | Tabs/Segmented tracks, Badge, Avatar, glyph tiles     |
+| Field                    | the shared field surface (`uiTokens.border`, `inputSurface`)            | Input, Select, ChoiceSelect, SearchInput, NumberInput |
+| Current selection        | `accentTokens.selected`, with `accentTokens.line` when bordered         | NavList, NavItem, ChoiceGroup, Table rows, Pill, Tag  |
+| Divider                  | `lineTokens.divider`                                                    | rows, card footers                                    |
+
+Syntax colors come from `codeHighlightTokens`, and inverse surfaces (Tooltip, HoverCard, Toast) from
+`tooltipSurface`/`toastSurface` with `toastForeground`. Do not use `light-dark()` or a literal hex in a
+theme file: `light-dark()` follows CSS `color-scheme`, not the theme's own scheme boundary.
+
+Arrange siblings with `Stack`, `Inline`, or `Grid` and a `gap` of `none`, `compact`,
 `normal`, or `relaxed` (0, group, section, panel). Judgment for departing from that scale is in
 [Default scale and composition](#default-scale-and-composition).
 

@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
+import { lineTokens } from "../palette";
 import { chatAttachmentsContract } from "../../chat/attachments";
 import { chatComposerContract } from "../../chat/composer";
 
@@ -19,7 +20,7 @@ export const chatAttachmentsStyles = css`
     width: fit-content;
     max-width: min(220px, 100%);
     overflow: hidden;
-    border: 0.5px solid ${uiTokens.borderSoft};
+    border: ${lineTokens.width} solid ${lineTokens.edge};
     border-radius: ${uiTokens.messageRadius};
     min-width: 44px;
     min-height: 44px;
@@ -47,7 +48,7 @@ export const chatAttachmentsStyles = css`
     align-items: center;
     gap: 10px;
     padding: 8px 12px;
-    border: 0.5px solid ${uiTokens.borderSoft};
+    border: ${lineTokens.width} solid ${lineTokens.edge};
     border-radius: ${uiTokens.messageRadius};
     background: ${chatTokens.composerSurface};
     color: ${uiTokens.foreground};

@@ -1,6 +1,7 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { radiusTokens } from "../palette";
+import { codeHighlightTokens } from "../shared/code-highlight.tokens";
 import { jsonTreeContract as json } from "../../components/json-tree";
 import { jsonBlockContract as block } from "../../components/json-block.contract";
 
@@ -29,20 +30,20 @@ export const jsonStyles = css`
   }
   ${partSelector(json, "summary")}:hover,
   ${partSelector(json, "summary")}:focus-visible {
-    background: light-dark(rgb(60 64 67 / 4%), rgb(232 234 237 / 5%));
+    background: ${uiTokens.hover};
   }
   ${partSelector(json, "property")} {
-    color: light-dark(#881391, #5db0d7);
+    color: ${codeHighlightTokens.function};
   }
   ${partSelector(json, "punctuation")} {
-    color: light-dark(#202124, #e8eaed);
+    color: ${uiTokens.foreground};
   }
   ${partSelector(json, "expander")} {
     position: absolute;
     inset-inline-start: 0;
     top: 2px;
     display: inline-flex;
-    color: light-dark(#5f6368, #9aa0a6);
+    color: ${uiTokens.mutedForeground};
   }
   details[open] > ${partSelector(json, "summary")} > ${partSelector(json, "expander")} {
     transform: rotate(90deg);
@@ -58,10 +59,10 @@ export const jsonStyles = css`
     overflow-wrap: anywhere;
   }
   ${partSelector(json, "value")}[data-json-type="string"] {
-    color: light-dark(#c41a16, #f28b82);
+    color: ${codeHighlightTokens.string};
   }
   ${partSelector(json, "value")}:is([data-json-type="number"], [data-json-type="boolean"], [data-json-type="null"]) {
-    color: light-dark(#1c00cf, #99c8ff);
+    color: ${codeHighlightTokens.constant};
   }
   ${partSelector(json, "copy")} {
     position: absolute;
@@ -75,7 +76,7 @@ export const jsonStyles = css`
     border: 0;
     padding: 0;
     border-radius: ${radiusTokens.mark};
-    color: light-dark(#5f6368, #9aa0a6);
+    color: ${uiTokens.mutedForeground};
     background: transparent;
     opacity: 0;
     pointer-events: none;
@@ -92,7 +93,7 @@ export const jsonStyles = css`
     pointer-events: auto;
   }
   ${partSelector(json, "copy")}:hover {
-    background: light-dark(rgb(60 64 67 / 8%), rgb(232 234 237 / 10%));
+    background: ${uiTokens.active};
   }
   @media (hover: none) {
     ${partSelector(json, "copy")} {
@@ -125,5 +126,33 @@ export const jsonStyles = css`
   ${partSelector(json, "copy")}:focus-visible, ${partSelector(json, "summary")}:focus-visible {
     outline: 2px solid ${uiTokens.focus};
     outline-offset: 2px;
+  }
+
+  /* Native summaries draw the same rotating chevron as Disclosure. */
+  :where(${partSelector(block, "summary")}) {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    list-style: none;
+  }
+  :where(${partSelector(block, "summary")})::-webkit-details-marker {
+    display: none;
+  }
+  :where(${partSelector(block, "summary")})::before {
+    content: "";
+    flex: none;
+    width: 14px;
+    height: 14px;
+    background: currentColor;
+    mask: ${uiTokens.chevronMask} center / 14px 14px no-repeat;
+    transition: transform ${uiTokens.durationSettle} ${uiTokens.ease};
+  }
+  :where(details[open] > ${partSelector(block, "summary")})::before {
+    transform: rotate(90deg);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    :where(${partSelector(block, "summary")})::before {
+      transition: none;
+    }
   }
 `;

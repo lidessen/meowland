@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { radiusTokens } from "../palette";
 import { segmentedControlContract as segmented } from "../../components/segmented-control";
 
 export const segmentedControlStyles = css`
@@ -19,9 +20,10 @@ export const segmentedControlStyles = css`
   ${partSelector(segmented, "options")} {
     display: flex;
     gap: 2px;
-    /* Same track as Tabs: one control height, concentric radii. */
+    /* Same pill track as Tabs: one control height, pill thumb. */
     padding: ${uiTokens.trackInset};
-    border-radius: calc(${uiTokens.radiusSmall} + ${uiTokens.trackInset});
+    border-radius: ${radiusTokens.action};
+    corner-shape: round;
     background: ${uiTokens.surfaceMuted};
   }
   ${partSelector(segmented, "option")} {
@@ -45,7 +47,7 @@ export const segmentedControlStyles = css`
     box-sizing: border-box;
     min-height: calc(${uiTokens.controlHeight} - 2 * ${uiTokens.trackInset});
     padding: 4px 12px;
-    border-radius: ${uiTokens.radiusSmall};
+    border-radius: ${radiusTokens.action};
     text-align: center;
     font: 500 ${uiTokens.fontBody}/22px ${uiTokens.font};
     color: ${uiTokens.mutedForeground};

@@ -1,6 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { accentTokens, layerTokens, lineTokens, statusTokens } from "../palette";
+import { accentTokens, layerTokens, lineTokens, statusTokens, radiusTokens } from "../palette";
 import { buttonContract, buttonOptions } from "../../components/button";
 import { iconButtonContract, iconButtonOptions } from "../../components/icon-button";
 
@@ -13,12 +13,14 @@ export const buttonStyles = css`
   justify-content: center;
   gap: 4px;
   min-height: ${uiTokens.buttonHeight};
-  padding: 0 14px;
+  /* A pill wants more side room than a rounded rectangle to keep its label centered. */
+  padding: 0 16px;
   border: 0;
-  border-radius: ${uiTokens.controlRadius};
+  border-radius: ${radiusTokens.action};
+  corner-shape: round;
   background: transparent;
   color: ${uiTokens.foreground};
-  font: 400 ${uiTokens.fontBody}/22px ${uiTokens.font};
+  font: 500 ${uiTokens.fontBody}/22px ${uiTokens.font};
   text-decoration: none;
   cursor: pointer;
   transition:
@@ -57,6 +59,8 @@ ${partSelector(buttonContract, "root")} {
   ${buttonOptions.when({ variant: "outline" })} {
     border: ${lineTokens.width} solid ${lineTokens.edge};
     background: ${layerTokens.raised};
+    /* A one-pixel drop lifts the outline action off the page without a heavier border. */
+    box-shadow: ${uiTokens.shadowAction};
   }
 }
 ${partSelector(buttonContract, "root")} {
@@ -107,8 +111,7 @@ ${partSelector(buttonContract, "root")} {
 ${partSelector(buttonContract, "root")} {
   ${buttonOptions.when({ size: "small" })} {
     min-height: ${uiTokens.buttonSmall};
-    padding-inline: 10px;
-    border-radius: ${uiTokens.radiusSmall};
+    padding-inline: 12px;
     font-size: ${uiTokens.fontCaption};
     line-height: 18px;
   }
@@ -116,7 +119,7 @@ ${partSelector(buttonContract, "root")} {
 ${partSelector(buttonContract, "root")} {
   ${buttonOptions.when({ size: "large" })} {
     min-height: ${uiTokens.buttonLarge};
-    padding-inline: 20px;
+    padding-inline: 22px;
   }
 }
 ${partSelector(iconButtonContract, "root")} {
@@ -125,7 +128,6 @@ ${partSelector(iconButtonContract, "root")} {
     min-width: ${uiTokens.buttonSmall};
     height: ${uiTokens.buttonSmall};
     min-height: ${uiTokens.buttonSmall};
-    border-radius: ${uiTokens.radiusSmall};
   }
 }
 ${partSelector(iconButtonContract, "root")} {

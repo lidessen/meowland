@@ -162,6 +162,7 @@ export const chatMessageStyles = css`
 
   ${partSelector(chatMessageContract, "root")}[data-chat-role="user"] ${partSelector(chatBubbleContract, "root")}:is([${chatBubbleOptions.attribute("variant")}="filled"], [${chatBubbleOptions.attribute("variant")}="auto"][data-chat-role="user"]) {
     background: ${chatTokens.userSurface};
+    box-shadow: inset 0 0 0 ${lineTokens.width} ${lineTokens.quiet};
     color: ${chatTokens.userInk};
     border-radius: ${radiusTokens.bubble} ${radiusTokens.bubble} 4px ${radiusTokens.bubble};
   }

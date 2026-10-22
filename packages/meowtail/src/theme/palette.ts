@@ -7,7 +7,7 @@ import { defineTokens } from "meowcss";
  */
 export const accentTokens = defineTokens("accent", {
   base: ["#4b6ea6", "#9db4dc"],
-  /** User bubble, selected soft surfaces, accent-soft controls. */
+  /** Selected soft surfaces and accent-soft controls. */
   soft: ["#eef2f8", "rgb(157 180 220 / 14%)"],
   /** Current location (navigation selection, default tag). */
   selected: ["#e9eef6", "rgb(157 180 220 / 14%)"],
@@ -44,6 +44,8 @@ export const radiusTokens = defineTokens("radius", {
   control: "10px",
   card: "14px",
   float: "22px",
+  /** Actions (buttons, icon buttons, filters, search) are pills; icon buttons become circles. */
+  action: "999px",
   bubble: "18px",
 });
 

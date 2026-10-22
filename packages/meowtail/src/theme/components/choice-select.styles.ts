@@ -35,7 +35,7 @@ export const choiceSelectStyles = css`
     height: 14px;
   }
   ${partSelector(popoverContract, "panel")}:has(> ${partSelector(choiceSelectContract, "list")}) {
-    padding: 4px;
+    padding: 6px;
   }
   ${partSelector(choiceSelectContract, "list")} {
     display: grid;
@@ -70,14 +70,19 @@ export const choiceSelectStyles = css`
   ${partSelector(choiceSelectContract, "empty")}[hidden] {
     display: none;
   }
+  /* Group labels and separators match Menu: small uppercase heading, full-bleed band. */
   ${partSelector(choiceSelectContract, "group")} {
-    padding: 6px 8px;
-    color: ${uiTokens.mutedForeground};
+    padding: 8px 10px 4px;
+    color: ${uiTokens.subtleForeground};
     font-size: ${uiTokens.fontMicro};
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
   ${partSelector(choiceSelectContract, "group")}:not(:first-child) {
-    border-top: 0.5px solid ${uiTokens.border};
-    margin-top: 3px;
+    border-top: 0.5px solid ${uiTokens.borderSoft};
+    margin: 5px -6px 0;
+    padding-inline: 16px;
   }
   ${partSelector(choiceSelectContract, "option")} {
     box-sizing: border-box;
@@ -86,13 +91,13 @@ export const choiceSelectStyles = css`
     justify-content: space-between;
     gap: 6px;
     width: 100%;
-    min-height: 34px;
-    padding: 6px calc(${uiTokens.controlPaddingInline} / 2);
+    min-height: 32px;
+    padding: 6px 10px;
     border: 0;
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radiusSmall};
     background: transparent;
     color: ${uiTokens.foreground};
-    font: ${uiTokens.fontLabel}/20px ${uiTokens.font};
+    font: ${uiTokens.fontBody}/20px ${uiTokens.font};
     text-align: start;
     cursor: pointer;
     overflow-wrap: anywhere;

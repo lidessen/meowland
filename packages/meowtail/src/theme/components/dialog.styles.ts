@@ -48,7 +48,7 @@ export const dialogStyles = css`
     max-height: calc(100dvh - 48px);
     padding: 0;
     overflow: hidden;
-    box-shadow: ${uiTokens.shadowPanel};
+    box-shadow: ${uiTokens.shadowFloat};
   }
   ${partSelector(dialogContract, "root")}::backdrop {
     background: ${uiTokens.backdrop};

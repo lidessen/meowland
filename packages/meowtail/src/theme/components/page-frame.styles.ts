@@ -47,8 +47,13 @@ export const pageFrameStyles = css`
     display: block;
     overflow: auto;
     overscroll-behavior: contain;
-    /* A classic scrollbar takes width from one side only; reserving both
-       gutters keeps centered content on the header's center line. */
+  }
+  /* A page centers its content under the header. A classic scrollbar takes
+     width from one side only, so the page reserves both gutters to keep that
+     center line. Workspace frames (Dialog, Drawer) start content at the
+     header's edge, where a leading gutter would push the body off it. */
+  ${partSelector(pageFrameContract, "root")}[${pageFrameOptions.attribute("variant")}="page"][${pageFrameOptions.attribute("scrollOwner")}="layout"] >
+  ${partSelector(pageFrameContract, "body")} {
     scrollbar-gutter: stable both-edges;
   }
   @media (max-width: 768px) {

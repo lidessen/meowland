@@ -8,18 +8,19 @@ export const menuStyles = css`
   ${partSelector(menuContract, "root")} {
     min-width: 144px;
     max-width: min(360px, 100%);
-    font: ${uiTokens.fontLabel}/20px ${uiTokens.font};
+    font: ${uiTokens.fontBody}/20px ${uiTokens.font};
     color: ${uiTokens.foreground};
   }
   ${partSelector(menuContract, "item")} {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: ${uiTokens.spaceGroup};
     width: 100%;
     min-height: 32px;
-    padding: 6px 12px;
+    padding: 6px 10px;
     border: 0;
-    border-radius: ${uiTokens.controlRadius};
+    /* Concentric with the panel: card radius minus the panel's 6px inset. */
+    border-radius: ${uiTokens.radiusSmall};
     background: transparent;
     color: inherit;
     font: inherit;
@@ -50,13 +51,14 @@ export const menuStyles = css`
   }
   ${partSelector(menuContract, "icon")} {
     display: flex;
-    width: 14px;
-    height: 14px;
+    width: ${uiTokens.iconSize};
+    height: ${uiTokens.iconSize};
     flex: none;
+    color: ${uiTokens.mutedForeground};
   }
   ${partSelector(menuContract, "icon")} svg {
-    width: 14px;
-    height: 14px;
+    width: ${uiTokens.iconSize};
+    height: ${uiTokens.iconSize};
   }
   ${partSelector(menuContract, "shortcut")} {
     color: ${uiTokens.captionForeground};
@@ -65,15 +67,19 @@ export const menuStyles = css`
     white-space: nowrap;
   }
   ${partSelector(menuContract, "heading")} {
-    padding: 6px 12px;
+    padding: 8px 10px 4px;
     font-size: ${uiTokens.fontMicro};
+    font-weight: 500;
     line-height: 15px;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     color: ${uiTokens.subtleForeground};
   }
+  /* Separators run to the panel edges, so groups read as bands. */
   ${partSelector(menuContract, "separator")} {
     height: 0.5px;
     background: ${uiTokens.borderSoft};
-    margin: 3px 2px;
+    margin: 5px -6px;
   }
   @media (prefers-reduced-motion: reduce) {
     ${partSelector(menuContract, "item")} {

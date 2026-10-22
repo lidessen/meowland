@@ -1,6 +1,6 @@
 import { alertOptions } from "../components/alert";
 import { defineOptions, defineTokens, tokenRef } from "meowcss";
-import { accentTokens, layerTokens, lineTokens, radiusTokens } from "./palette";
+import { layerTokens, lineTokens, radiusTokens } from "./palette";
 
 /** Shared standard-theme parameters; scheme is built in, no fixed density axis. */
 export const standardOptions = defineOptions("meowui", {});
@@ -119,6 +119,8 @@ export const uiTokens = defineTokens("ui", {
   /** Soft halo around a focused field; the border carries the focus color. */
   focusRing: ["rgb(65 118 230 / 22%)", "rgb(122 170 255 / 28%)"],
   shadowControl: "none",
+  /** The one-pixel drop under an outline action. */
+  shadowAction: ["0 1px 2px rgb(0 0 0 / 5%)", "0 1px 2px rgb(0 0 0 / 30%)"],
   /** The raised thumb inside a Tabs or SegmentedControl track. */
   shadowThumb: [
     "0 0 0 0.5px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 8%)",
@@ -131,6 +133,11 @@ export const uiTokens = defineTokens("ui", {
   shadowPanel: [
     "0 0 0 0.5px rgb(0 0 0 / 16%), 0 3px 8px rgb(0 0 0 / 4%), 0 0 20px rgb(0 0 0 / 5%)",
     "0 0 0 0.5px rgb(255 255 255 / 20%), 0 3px 8px rgb(0 0 0 / 4%), 0 0 20px rgb(0 0 0 / 5%)",
+  ],
+  /** Floating surfaces (menus, popovers, dialogs): a hairline plus a deep, soft drop. */
+  shadowFloat: [
+    "0 0 0 0.5px rgb(0 0 0 / 8%), 0 4px 10px -4px rgb(0 0 0 / 8%), 0 16px 36px -8px rgb(0 0 0 / 16%)",
+    "0 0 0 0.5px rgb(255 255 255 / 12%), 0 4px 10px -4px rgb(0 0 0 / 40%), 0 16px 36px -8px rgb(0 0 0 / 60%)",
   ],
   backdrop: ["rgb(0 0 0 / 24%)", "rgb(0 0 0 / 50%)"],
   durationResponse: "100ms",
@@ -157,7 +164,8 @@ export const chatTokens = defineTokens("chat", {
   composerShadow: schemeAlias(
     `0 0 0 0.5px ${uiTokens.borderSoft}, 0 4px 16px rgb(0 0 0 / 3%), 0 0 24px rgb(0 0 0 / 3%)`,
   ),
-  userSurface: schemeAlias(`${accentTokens.soft}`),
+  /* Neutral, as in Grok: the reader's words are set apart by shape, not by a tint. */
+  userSurface: schemeAlias(`${uiTokens.surfaceMuted}`),
   userInk: schemeAlias(`${uiTokens.foreground}`),
   submitSurface: schemeAlias(`${uiTokens.primary}`),
   messageListGap: "28px",

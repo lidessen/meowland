@@ -28,20 +28,18 @@ export const chatComposerStyles = css`
     line-height: 20px;
   }
 
-  ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "trigger")}:is(:hover, [aria-expanded="true"]):not(:disabled) {
+  ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "trigger")}:hover:not(:disabled) {
     background: ${uiTokens.hover};
+    color: ${uiTokens.foreground};
+  }
+  /* Open, the quiet trigger becomes a filled chip that anchors its menu. */
+  ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "trigger")}[aria-expanded="true"]:not(:disabled) {
+    background: ${uiTokens.surfaceMuted};
+    color: ${uiTokens.foreground};
   }
 
   ${partSelector(chatComposerContract, "trailing")} ${partSelector(popoverContract, "panel")} {
     width: 248px;
-  }
-
-  ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "group")} {
-    border: 0;
-    padding: 6px;
-    font-size: ${uiTokens.fontCaption};
-    line-height: 18px;
-    color: ${uiTokens.subtleForeground};
   }
 
   ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "group")}:not(:first-child) {

@@ -79,6 +79,13 @@ export {
 export { Link, type LinkProps, linkContract } from "./link";
 export { Text, type TextProps, textContract, textOptions } from "./text";
 export { Prose, type ProseProps, proseContract, proseOptions } from "./prose";
+export {
+  TaskList,
+  type TaskListProps,
+  type TaskListEntry,
+  type TaskListProgress,
+  taskListContract,
+} from "./task-list";
 export { Switch, type SwitchProps, switchContract } from "./switch";
 export { Select, type SelectProps, selectContract } from "./select";
 export {

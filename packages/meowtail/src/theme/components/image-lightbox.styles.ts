@@ -4,7 +4,7 @@ import { imageLightboxContract as image } from "../../components/image-lightbox"
 
 export const imageLightboxStyles = css`
   ${partSelector(image, "trigger")} {
-    border: 0.5px solid ${uiTokens.border};
+    border: 1px solid ${uiTokens.border};
     border-radius: ${uiTokens.controlRadius};
     padding: 6px 12px;
     background: ${uiTokens.surface};
@@ -53,7 +53,7 @@ export const imageLightboxStyles = css`
     place-items: center;
     width: 36px;
     height: 36px;
-    border: 0.5px solid ${uiTokens.borderSoft};
+    border: 1px solid ${uiTokens.borderSoft};
     border-radius: 50%;
     corner-shape: round;
     background: ${uiTokens.inputSurface};

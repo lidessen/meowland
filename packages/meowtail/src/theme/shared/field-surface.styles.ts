@@ -35,7 +35,7 @@ export const fieldSurfaceStyles = css`
   ${surfaces} {
     box-sizing: border-box;
     min-width: 0;
-    border: 0.5px solid ${uiTokens.border};
+    border: 1px solid ${uiTokens.border};
     border-radius: ${uiTokens.controlRadius};
     color: ${uiTokens.foreground};
     background: ${uiTokens.inputSurface};

@@ -9,7 +9,7 @@ export const chatHeaderStyles = css`
     gap: ${uiTokens.spaceSection};
     align-items: center;
     padding: 10px 28px 10px 20px;
-    border-bottom: 0.5px solid ${uiTokens.borderSubtle};
+    border-bottom: 1px solid ${uiTokens.borderSubtle};
   }
 
   ${partSelector(chatHeaderContract, "identity")} {

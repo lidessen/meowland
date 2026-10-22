@@ -146,7 +146,14 @@ export const TaskList = defineComponent<
         "summary",
         "summary",
         null,
-        context.part("marker", "span", { "aria-hidden": "true" }),
+        // The header donut fills by the share of finished steps.
+        context.part("marker", "span", {
+          "aria-hidden": "true",
+          style: derived(
+            () =>
+              `--task-list-done: ${total.value === 0 ? 0 : Math.round((done.value / total.value) * 100)}%`,
+          ),
+        }),
         context.part("title", "span", null, title),
         context.part(
           "count",

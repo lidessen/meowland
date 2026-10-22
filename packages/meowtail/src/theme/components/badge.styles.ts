@@ -51,7 +51,7 @@ export const badgeStyles = css`
   }
   ${partSelector(badgeContract, "root")} {
     ${badgeOptions.when({ tone: "outline" })} {
-      border: 0.5px solid ${uiTokens.border};
+      border: 1px solid ${uiTokens.border};
       background: transparent;
       color: ${uiTokens.subtleForeground};
     }

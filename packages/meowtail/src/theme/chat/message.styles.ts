@@ -153,7 +153,7 @@ export const chatMessageStyles = css`
   }
 
   ${partSelector(chatBubbleContract, "root")}:is([${chatBubbleOptions.attribute("variant")}="filled"], [${chatBubbleOptions.attribute("variant")}="auto"][data-chat-role="user"]) {
-    padding: 10px 16px;
+    padding: 8px 14px;
     border-color: transparent;
     border-radius: ${chatTokens.messageRadius};
     line-height: 22px;

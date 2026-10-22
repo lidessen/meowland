@@ -6,17 +6,17 @@ import { defineTokens } from "meowcss";
  * Existing `--ui-*` / `--chat-*` values the redesign changes live in `tokens.ts`, which references these.
  */
 export const accentTokens = defineTokens("accent", {
-  base: ["#4b6ea6", "#9db4dc"],
+  base: ["#2563eb", "#60a5fa"],
   /** Selected soft surfaces and accent-soft controls. */
-  soft: ["#eef2f8", "rgb(157 180 220 / 14%)"],
+  soft: ["#eff4ff", "rgb(96 165 250 / 14%)"],
   /** Current location (navigation selection, default tag). */
-  selected: ["#e9eef6", "rgb(157 180 220 / 14%)"],
+  selected: ["#ebf1fe", "rgb(96 165 250 / 15%)"],
   /** Text on soft surfaces. */
-  ink: ["#2f4d7a", "#9db4dc"],
+  ink: ["#1d4ed8", "#93c5fd"],
   /** Hairline around accent surfaces. */
-  line: ["rgb(75 110 166 / 30%)", "rgb(157 180 220 / 30%)"],
+  line: ["rgb(37 99 235 / 28%)", "rgb(96 165 250 / 30%)"],
   /** Halo behind the processing indicator. */
-  halo: ["rgb(75 110 166 / 30%)", "rgb(157 180 220 / 30%)"],
+  halo: ["rgb(37 99 235 / 28%)", "rgb(96 165 250 / 30%)"],
 });
 
 /** Status semantics: accent pulse = now, success = returned/connected, warning = needs you. */
@@ -29,7 +29,7 @@ export const statusTokens = defineTokens("status", {
   warning: ["#dd8629", "#dd8629"],
   danger: ["#b91c1c", "#f25a5a"],
   /** Hollow marker for states not verified: it does not pretend to know. */
-  unknown: ["#adb2b8", "#81858c"],
+  unknown: ["#a3a3a3", "#737373"],
 });
 
 /**
@@ -47,21 +47,21 @@ export const radiusTokens = defineTokens("radius", {
   bubble: "18px",
 });
 
-/** Hairlines: 0.5px borders; dividers at 8%. */
+/** Edges are crisp 1px neutral lines; dividers sit a step lighter. */
 export const lineTokens = defineTokens("line", {
-  width: "0.5px",
-  divider: ["rgb(0 0 0 / 8%)", "rgb(255 255 255 / 8%)"],
-  edge: ["rgb(0 0 0 / 12%)", "rgb(255 255 255 / 12%)"],
-  quiet: ["rgb(0 0 0 / 6%)", "rgb(255 255 255 / 6%)"],
+  width: "1px",
+  divider: ["rgb(0 0 0 / 7%)", "rgb(255 255 255 / 7%)"],
+  edge: ["rgb(0 0 0 / 10%)", "rgb(255 255 255 / 10%)"],
+  quiet: ["rgb(0 0 0 / 5%)", "rgb(255 255 255 / 5%)"],
 });
 
 /** Layers used by redesign components: raised cards, sunken groups, neutral chips. */
 export const layerTokens = defineTokens("layer", {
-  raised: ["#ffffff", "#232324"],
+  raised: ["#ffffff", "#1f1f1f"],
   /** Recessed regions: code, table headers, nested panels. Same tone as uiTokens.codeSurface. */
-  sunken: ["#fafafa", "#1b1b1c"],
-  chip: ["#f2f2f3", "rgb(255 255 255 / 8%)"],
-  chipInk: ["#61666b", "#cfd3d6"],
+  sunken: ["#fafafa", "#1c1c1c"],
+  chip: ["#f5f5f5", "rgb(255 255 255 / 8%)"],
+  chipInk: ["#6b6b6b", "#d4d4d4"],
   code: ["rgb(0 0 0 / 5%)", "rgb(255 255 255 / 8%)"],
-  faint: ["#656a71", "#9aa0a7"],
+  faint: ["#767676", "#8f8f8f"],
 });

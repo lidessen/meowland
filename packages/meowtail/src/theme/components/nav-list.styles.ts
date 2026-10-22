@@ -94,9 +94,11 @@ export const navListStyles = css`
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    align-self: center;
+    /* Center on the label's line box, not on a label plus description. */
+    align-self: start;
     flex: none;
     width: ${uiTokens.iconSize};
+    height: calc(${uiTokens.fontBody} * ${uiTokens.leading});
     margin-inline-end: ${uiTokens.spaceGroup};
     color: inherit;
   }

@@ -116,6 +116,31 @@ describe("Assistant public composition", () => {
     expect(html).toContain("Shared helper");
     expect(html).toContain("Latest message");
   });
+  test("a user's text sits in a bubble while the reply stays on the page", () => {
+    const html = render({
+      messages: signal([
+        {
+          id: "ask",
+          role: "user" as const,
+          author: "You",
+          parts: [{ id: "text", kind: "text" as const, text: "Question text" }],
+        },
+        {
+          id: "reply",
+          role: "assistant" as const,
+          author: "Helper",
+          parts: [{ id: "text", kind: "text" as const, text: "Reply text" }],
+        },
+      ]),
+    });
+    const bubbles = html.match(/data-meowui-part="chat-bubble\/root"/g) ?? [];
+    expect(bubbles).toHaveLength(1);
+    expect(html.indexOf('data-meowui-part="chat-bubble/root"')).toBeLessThan(
+      html.indexOf("Question text"),
+    );
+    expect(html.indexOf("Question text")).toBeLessThan(html.indexOf("Reply text"));
+  });
+
   test("normalized attachments remain usable when local file selection is unavailable", () => {
     const html = render({
       messages: [],

@@ -20,6 +20,12 @@ export const popoverStyles = css`
     font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
     transform-origin: top center;
   }
+  @media (prefers-reduced-transparency: reduce) {
+    ${partSelector(popoverContract, "panel")} {
+      background: ${uiTokens.surface};
+      backdrop-filter: none;
+    }
+  }
   ${partSelector(popoverContract, "panel")}:has(> ${partSelector(menuContract, "root")}) {
     width: max-content;
     min-width: 144px;

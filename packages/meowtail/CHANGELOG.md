@@ -18,3 +18,10 @@ Candidate for the next alpha publish. This version is not on npm until the manua
 
 - `standardTheme` and `createMeowUI` no longer load the code-block highlighter. The package sets `sideEffects` to `false`, and the contracts those entries need live in modules that do not import Shiki. Importing `CodeBlock`, `ReadBlock`, `JsonBlock`, or `AssistantView` still loads Shiki. `standardTheme.cssText` stays one complete stylesheet.
 - Page and section titles use `uiTokens.fontDisplay`. Their size and weight are unchanged.
+- Nested `Section` titles (h3 and below) keep `uiTokens.font`; the serif stays on page and top-level section titles.
+- `Table`: the last column fills the remaining width and the table keeps the sum of column widths as its minimum, so the selection column stays 44px instead of scaling with the data columns.
+- `Alert`: lighter tinted hairline and tighter title/body rhythm; tone `info` uses `uiTokens.info` instead of the near-black primary.
+- Menus and popovers use a 90% opaque surface so text underneath stays out of the way where backdrop blur is unavailable, and a solid surface under `prefers-reduced-transparency`.
+- Active `Pill` filters take the accent selection colors; `SegmentedControl` options size from their labels and the selected thumb uses a hairline shadow.
+- `NavList` icons center on the label line when a row has a description.
+- `AssistantView` wraps user text parts in `ChatBubble`, matching `ChatMessage`.

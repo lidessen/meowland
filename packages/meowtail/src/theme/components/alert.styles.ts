@@ -5,11 +5,14 @@ import { alertContract, alertOptions } from "../../components/alert";
 export const alertStyles = css`
   ${partSelector(alertContract, "root")} {
     display: grid;
-    gap: ${uiTokens.spaceGroup};
-    padding: ${uiTokens.spaceSection};
-    border: 1px solid color-mix(in srgb, ${alertTokens.accent} 25%, ${uiTokens.border});
-    border-radius: ${uiTokens.controlRadius};
-    background: color-mix(in srgb, ${alertTokens.accent} 5%, ${uiTokens.background});
+    /* Title and body read as one statement; actions keep a group gap. */
+    gap: 4px;
+    padding: 14px 16px;
+    /* A tinted hairline over transparency stays light on any surface, instead
+       of stacking the tone on top of the general border ink. */
+    border: 1px solid color-mix(in srgb, ${alertTokens.accent} 20%, transparent);
+    border-radius: ${uiTokens.radiusLarge};
+    background: color-mix(in srgb, ${alertTokens.accent} 6%, ${uiTokens.background});
     color: ${uiTokens.foreground};
     overflow-wrap: anywhere;
     font-family: ${uiTokens.font};
@@ -25,6 +28,7 @@ export const alertStyles = css`
     display: flex;
     flex-wrap: wrap;
     gap: ${uiTokens.spaceGroup};
+    margin-top: 4px;
   }
 
   /* A page notice is one compact line with an optional end action; the block
@@ -60,6 +64,7 @@ export const alertStyles = css`
   }
   ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"] ${partSelector(alertContract, "actions")} {
     flex: none;
+    margin-top: 0;
     margin-left: auto;
     flex-wrap: nowrap;
   }

@@ -229,12 +229,10 @@ export const previewStyles = css`
 
   /* Fixture composition: preserve relationships without changing component themes. */
   .workshop-foundation-action-grid {
-    display: grid;
-    width: 100%;
-    grid-template-columns: repeat(4, minmax(0, 1fr)) auto;
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     align-items: center;
-    justify-items: start;
   }
   .workshop-foundation-range {
     display: grid;
@@ -306,13 +304,6 @@ export const previewStyles = css`
     text-align: center;
   }
   @media (max-width: 600px) {
-    .workshop-foundation-action-grid {
-      grid-template-columns: repeat(2, minmax(0, 1fr)) auto;
-    }
-    .workshop-foundation-action-grid > :last-child {
-      grid-column: 3;
-      grid-row: 1;
-    }
     .workshop-foundation-empty-grid {
       grid-template-columns: minmax(0, 1fr);
     }

@@ -1,6 +1,7 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { pillContract } from "../../components/pill";
 import { uiTokens } from "../tokens";
+import { accentTokens } from "../palette";
 
 export const pillStyles = css`
   ${partSelector(pillContract, "root")} {
@@ -24,10 +25,14 @@ export const pillStyles = css`
   button${partSelector(pillContract, "root")}:hover:not(:disabled) {
     background: ${uiTokens.hover};
   }
+  /* An active filter is the current selection, so it takes the accent. */
   ${partSelector(pillContract, "root")}[data-active="true"] {
-    color: ${uiTokens.foreground};
-    background: ${uiTokens.hover};
-    box-shadow: inset 0 0 0 1px ${uiTokens.border};
+    color: ${accentTokens.ink};
+    background: ${accentTokens.selected};
+    box-shadow: inset 0 0 0 1px ${accentTokens.line};
+  }
+  button${partSelector(pillContract, "root")}[data-active="true"]:hover:not(:disabled) {
+    background: color-mix(in srgb, ${accentTokens.base} 14%, ${accentTokens.soft});
   }
   button${partSelector(pillContract, "root")}:focus-visible {
     outline: 2px solid ${uiTokens.focus};

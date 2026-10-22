@@ -1,5 +1,6 @@
 import { defineComponent, derived, h, keyed, unwrap, type Child, type Signal } from "meowjsx";
 import { ChatMessage } from "./message";
+import { ChatBubble } from "./bubble";
 import { ChatAttachments } from "./attachments";
 import { ChatToolCall } from "./tool-call";
 import { ChatTask } from "./task";
@@ -83,9 +84,12 @@ export const AssistantPartView = defineComponent<
     const custom = renderPart ? derived(() => renderPart(value.value, message.value)) : undefined;
     let fallback: Child;
     if (initial.kind === "text") {
-      fallback = h(AssistantMarkdown, {
+      const text = h(AssistantMarkdown, {
         text: derived(() => (value.value as typeof initial).text),
       });
+      // The message renders without a surface so parts can stack; a user's
+      // words still need the bubble that tells them apart from the reply.
+      fallback = message.value.role === "user" ? h(ChatBubble, { children: text }) : text;
     } else if (initial.kind === "tool") {
       const tool = () => value.value as typeof initial;
       fallback = h(ChatToolCall, {

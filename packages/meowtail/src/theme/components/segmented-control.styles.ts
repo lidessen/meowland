@@ -26,7 +26,9 @@ export const segmentedControlStyles = css`
   }
   ${partSelector(segmented, "option")} {
     position: relative;
-    flex: 1;
+    /* Grow from each label's own width so a long label keeps its padding;
+       min-width 0 still lets a narrow container wrap the text. */
+    flex: 1 1 auto;
     min-width: 0;
     cursor: pointer;
   }
@@ -51,7 +53,10 @@ export const segmentedControlStyles = css`
   ${partSelector(segmented, "input")}:checked + ${partSelector(segmented, "label")} {
     background: ${uiTokens.surface};
     color: ${uiTokens.foreground};
-    box-shadow: ${uiTokens.shadowPanel};
+    /* A raised thumb, not a floating panel: hairline plus a short drop. */
+    box-shadow:
+      0 0 0 0.5px ${uiTokens.borderSubtle},
+      0 1px 2px rgb(0 0 0 / 8%);
   }
   ${partSelector(segmented, "input")}:focus-visible + ${partSelector(segmented, "label")} {
     outline: 2px solid ${uiTokens.focus};

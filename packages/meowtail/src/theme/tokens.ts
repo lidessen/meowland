@@ -54,7 +54,9 @@ export const uiTokens = defineTokens("ui", {
   sidebarSurface: ["#f9fafb", "#1b1b1c"],
   codeSurface: ["#f9fafb", "#1b1b1c"],
   codeBanner: ["#f9fafb", "#2c2c2e"],
-  menuSurface: ["rgb(248 249 250 / 58%)", "rgb(67 69 74 / 45%)"],
+  /* Opaque enough to read on its own: the blur is a refinement, and text under
+     a menu must not compete with the menu's items where it is unavailable. */
+  menuSurface: ["rgb(250 250 251 / 90%)", "rgb(44 45 48 / 90%)"],
   menuBlur: "blur(40px) saturate(150%)",
   tooltipSurface: ["#2c2c2e", "#43454a"],
   foreground: ["#0f1115", "#f9fafb"],
@@ -139,7 +141,7 @@ export const logoTokens = { ink: tokenRef("meowland", "logo", "ink") } as const;
 export const alertTokens = defineTokens("alert", {
   accent: alertOptions.by.tone({
     neutral: `${uiTokens.mutedForeground}`,
-    info: `${uiTokens.primary}`,
+    info: `${uiTokens.info}`,
     success: `${uiTokens.success}`,
     warning: `${uiTokens.warning}`,
     danger: `${uiTokens.danger}`,

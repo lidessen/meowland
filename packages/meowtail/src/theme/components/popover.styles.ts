@@ -14,23 +14,17 @@ export const popoverStyles = css`
     border: 0;
     border-radius: ${uiTokens.radiusLarge};
     color: ${uiTokens.foreground};
-    background: ${uiTokens.menuSurface};
-    backdrop-filter: ${uiTokens.menuBlur};
-    box-shadow: ${uiTokens.shadowPanel};
+    /* Solid, as in Grok and Mobbin: depth comes from the shadow, not translucency. */
+    background: ${uiTokens.surface};
+    box-shadow: ${uiTokens.shadowFloat};
     font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
     transform-origin: top center;
-  }
-  @media (prefers-reduced-transparency: reduce) {
-    ${partSelector(popoverContract, "panel")} {
-      background: ${uiTokens.surface};
-      backdrop-filter: none;
-    }
   }
   ${partSelector(popoverContract, "panel")}:has(> ${partSelector(menuContract, "root")}) {
     width: max-content;
     min-width: 144px;
     max-width: min(360px, calc(100vw - 24px));
-    padding: 4px;
+    padding: 6px;
   }
   ${partSelector(popoverContract, "panel")}[data-side="top"] {
     transform-origin: bottom center;

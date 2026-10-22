@@ -137,12 +137,18 @@ Materials have one role each, so a new component reuses one instead of mixing a 
 | Role                     | Tokens                                                                  | Used by                                               |
 | ------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------- |
 | In-flow surface          | `layerTokens.raised` on a `lineTokens.width` `lineTokens.edge` hairline | Card, ListGroup, ResourceCard, WorkCard, Table        |
-| Floating surface         | `uiTokens.surface` + `shadowPanel`, or `menuSurface`                    | Dialog, Modal, Popover, Menu                          |
+| Floating surface         | solid `uiTokens.surface` + `shadowFloat`                                | Dialog, Modal, Popover, Menu, ChoiceSelect list       |
 | Recessed region          | `layerTokens.sunken` (same tone as `codeSurface`), no border            | CodeBlock, output views, markdown code, media frames  |
 | Fill (track, chip, tile) | `uiTokens.surfaceMuted` / `layerTokens.chip` with `chipInk`             | Tabs/Segmented tracks, Badge, Avatar, glyph tiles     |
 | Field                    | the shared field surface (`uiTokens.border`, `inputSurface`)            | Input, Select, ChoiceSelect, SearchInput, NumberInput |
 | Current selection        | `accentTokens.selected`, with `accentTokens.line` when bordered         | NavList, NavItem, ChoiceGroup, Table rows, Pill, Tag  |
 | Divider                  | `lineTokens.divider`                                                    | rows, card footers                                    |
+
+Shape follows role, after Grok and Mobbin: actions are pills (`radiusTokens.action`) and icon buttons
+circles; SearchInput is a filled pill; Tabs and SegmentedControl are a pill track with a pill thumb;
+fields stay rounded rectangles (`controlRadius`); surfaces use `radiusLarge`, and items inside a
+floating panel use `radiusSmall` (the panel radius minus its 6px inset). Outline actions add
+`shadowAction`, and button labels are 500 weight.
 
 Syntax colors come from `codeHighlightTokens`, and inverse surfaces (Tooltip, HoverCard, Toast) from
 `tooltipSurface`/`toastSurface` with `toastForeground`. Do not use `light-dark()` or a literal hex in a

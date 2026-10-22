@@ -72,6 +72,7 @@ export {
 export { ChatTask, chatTaskContract, type ChatTaskProps, type ChatTaskProgress } from "./task";
 export type { ChatExecutionState } from "../shared/execution-state";
 export { ChatProcess, chatProcessContract, type ChatProcessProps } from "./process";
+export { ChatReasoning, chatReasoningContract, type ChatReasoningProps } from "./reasoning";
 export { ChatQuestion, chatQuestionContract, type ChatQuestionProps } from "./question";
 export {
   ChatSources,

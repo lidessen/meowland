@@ -1,6 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
-import { accentTokens, radiusTokens } from "../palette";
+import { radiusTokens } from "../palette";
 import { chatProcessContract } from "../../chat/process";
 import { chatSourcesContract } from "../../chat/sources";
 import { chatToolCallContract } from "../../chat/tool-call";
@@ -123,8 +123,10 @@ export const chatRecordsStyles = css`
     color: ${uiTokens.danger};
   }
 
+  /* Color is kept for states that need the reader: waiting and errors. Running and
+     finished rows stay neutral, so a long chain reads quietly. */
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${accentTokens.base};
+    color: ${uiTokens.mutedForeground};
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="waiting"] ${partSelector(chatToolCallContract, "status")} {
@@ -171,7 +173,7 @@ export const chatRecordsStyles = css`
     max-height: 24rem;
   }
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="success"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.success};
+    color: ${uiTokens.subtleForeground};
   }
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] {
     color: ${uiTokens.subtleForeground};
@@ -358,17 +360,17 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"][data-tool-interactive="true"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${accentTokens.base};
+    color: ${uiTokens.mutedForeground};
   }
 
-  /* A row states its outcome once, in the color of both the leading glyph and the status, so a
-  chain can be read down its left edge instead of out to each row's far end. */
+  /* A row that needs the reader states it once, in the color of both the leading glyph and the
+  status, so a chain can be read down its left edge instead of out to each row's far end. */
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"] ${partSelector(chatToolCallContract, "icon")} {
     color: ${uiTokens.danger};
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "icon")} {
-    color: ${accentTokens.base};
+    color: ${uiTokens.foreground};
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="waiting"] ${partSelector(chatToolCallContract, "icon")} {

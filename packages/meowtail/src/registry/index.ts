@@ -75,6 +75,7 @@ import {
   linkContract,
   textContract,
   proseContract,
+  taskListContract,
   accordionContract,
   tableContract,
   selectContract,
@@ -117,6 +118,7 @@ import {
   chatConversationContract,
   chatAttachmentsContract,
   chatProcessContract,
+  chatReasoningContract,
   chatQuestionContract,
   chatSourcesContract,
   chatComposerContract,
@@ -200,6 +202,8 @@ export const MeowUIComponent = {
   Link: linkContract.name,
   Text: textContract.name,
   Prose: proseContract.name,
+  TaskList: taskListContract.name,
+  ChatReasoning: chatReasoningContract.name,
   Select: selectContract.name,
   ChoiceSelect: choiceSelectContract.name,
   ChoiceGroup: choiceGroupContract.name,
@@ -292,6 +296,7 @@ export const meowUIComponents = [
   linkContract,
   textContract,
   proseContract,
+  taskListContract,
   accordionContract,
   tableContract,
   numberInputContract,
@@ -354,6 +359,7 @@ export const meowUIComponents = [
   assistantQuestionContract,
   chatAttachmentsContract,
   chatProcessContract,
+  chatReasoningContract,
   chatSourcesContract,
   chatHeaderContract,
   chatStatusContract,
@@ -457,6 +463,8 @@ declare module "meowjsx" {
     link: { parts: (typeof linkContract.parts)[number] };
     text: { parts: "root" };
     prose: { parts: "root" };
+    "task-list": { parts: (typeof taskListContract.parts)[number] };
+    "chat-reasoning": { parts: (typeof chatReasoningContract.parts)[number] };
     select: { parts: "root" };
     "choice-select": { parts: (typeof choiceSelectContract.parts)[number] };
     "choice-group": { parts: (typeof choiceGroupContract.parts)[number] };

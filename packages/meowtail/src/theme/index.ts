@@ -89,6 +89,8 @@ import { progressStyles } from "./components/progress.styles";
 import { avatarStyles } from "./components/avatar.styles";
 import { linkStyles } from "./components/link.styles";
 import { textStyles } from "./components/text.styles";
+import { taskListStyles } from "./components/task-list.styles";
+import { chatReasoningStyles } from "./chat/reasoning.styles";
 import { proseStyles } from "./shared/prose.styles";
 import { tableStyles } from "./components/table.styles";
 import { sliderStyles } from "./components/slider.styles";
@@ -140,6 +142,7 @@ export const standardThemeStyles = [
   avatarStyles,
   linkStyles,
   textStyles,
+  taskListStyles,
   tableStyles,
   numberInputStyles,
   contextMenuStyles,
@@ -195,6 +198,7 @@ export const standardThemeStyles = [
   chatFrameStyles,
   chatMessageStyles,
   proseStyles,
+  chatReasoningStyles,
   chatComposerStyles,
   composerPanelStyles,
   chatRecordsStyles,

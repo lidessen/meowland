@@ -162,7 +162,7 @@ export const outputBlockStyles = css`
     min-width: 0;
   }
   ${partSelector(terminal, "root")}[data-terminal-body="true"] ${partSelector(block, "header")} {
-    border-bottom: 0.5px solid ${uiTokens.borderSoft};
+    border-bottom: 1px solid ${uiTokens.borderSoft};
   }
   ${partSelector(terminal, "root")} ${partSelector(block, "body")} {
     padding-left: 30px;

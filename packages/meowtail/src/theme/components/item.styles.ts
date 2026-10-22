@@ -13,7 +13,7 @@ export const itemStyles = css`
     box-sizing: border-box;
     min-height: 40px;
     padding: 8px 12px;
-    border: 0.5px solid transparent;
+    border: 1px solid transparent;
     border-radius: ${uiTokens.controlRadius};
     background: transparent;
     color: ${uiTokens.foreground};

@@ -10,7 +10,7 @@ export const appBarStyles = css`
     min-width: 0;
     min-height: 56px;
     padding: 10px 16px;
-    border-bottom: 0.5px solid ${uiTokens.borderSubtle};
+    border-bottom: 1px solid ${uiTokens.borderSubtle};
     background: ${uiTokens.surface};
   }
   ${partSelector(appBarContract, "identity")} {

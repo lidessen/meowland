@@ -8,7 +8,6 @@ import {
   type Props,
 } from "meowjsx";
 import { Icon } from "../icons/icon";
-import { StatusDot } from "../components/status-dot";
 import { TextShimmer } from "../components/text-shimmer";
 
 export const chatReasoningContract = {
@@ -61,8 +60,11 @@ export const ChatReasoning = defineComponent<
           "icon",
           "span",
           { "aria-hidden": "true" },
+          // A lattice of nine dots breathes while the model works; a chevron replaces it after.
           derived(() =>
-            isActive.value ? h(StatusDot, { state: "processing" }) : <Icon name="chevron-right" />,
+            isActive.value
+              ? Array.from({ length: 9 }, () => h("span", { "data-reasoning-dot": "true" }))
+              : h(Icon, { name: "chevron-right" }),
           ),
         ),
         context.part(

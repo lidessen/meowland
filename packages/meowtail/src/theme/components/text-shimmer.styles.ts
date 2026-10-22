@@ -20,9 +20,16 @@ export const textShimmerStyles = css`
     overflow: hidden;
     pointer-events: none;
     user-select: none;
-    color: ${uiTokens.shimmer};
-    mask-image: linear-gradient(105deg, transparent 35%, black 50%, transparent 65%);
-    mask-size: 300% 100%;
+    color: ${uiTokens.foreground};
+    /* A band of full ink about 112px wide crosses text that rests in muted ink. */
+    mask-image: linear-gradient(
+      90deg,
+      transparent calc(50% - 56px),
+      black 50%,
+      transparent calc(50% + 56px)
+    );
+    mask-size: calc(200% + 224px) 100%;
+    mask-repeat: no-repeat;
   }
   ${partSelector(shimmer, "decoration")} * {
     color: inherit !important;
@@ -30,31 +37,28 @@ export const textShimmerStyles = css`
   ${partSelector(shimmer, "decoration")} [data-shimmer-decoration] {
     background: currentColor;
   }
+  ${partSelector(shimmer, "root")}[data-active="true"] > ${partSelector(shimmer, "content")} {
+    color: color-mix(in srgb, currentColor 55%, transparent);
+  }
   ${partSelector(shimmer, "root")}[data-active="true"] > ${partSelector(shimmer, "decoration")} {
     display: block;
-    animation: ui-text-shimmer 1.5s linear 0.3s infinite;
+    animation: ui-text-shimmer 1.6s linear infinite;
   }
   @keyframes ui-text-shimmer {
-    0% {
+    from {
       mask-position: 100% 0;
-      opacity: 0;
     }
-    10% {
-      opacity: 0.7;
-    }
-    65% {
+    to {
       mask-position: 0 0;
-      opacity: 0.7;
-    }
-    100% {
-      mask-position: 0 0;
-      opacity: 0;
     }
   }
   @media (prefers-reduced-motion: reduce) {
     ${partSelector(shimmer, "root")}[data-active="true"] > ${partSelector(shimmer, "decoration")} {
       display: none;
       animation: none;
+    }
+    ${partSelector(shimmer, "root")}[data-active="true"] > ${partSelector(shimmer, "content")} {
+      color: inherit;
     }
   }
 `;

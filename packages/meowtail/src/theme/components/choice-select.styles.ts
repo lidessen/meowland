@@ -47,7 +47,7 @@ export const choiceSelectStyles = css`
     min-height: 32px;
     padding: 5px 7px;
     margin-bottom: 3px;
-    border: 0.5px solid ${uiTokens.border};
+    border: 1px solid ${uiTokens.border};
     border-radius: ${uiTokens.controlRadius};
     background: ${uiTokens.inputSurface};
     color: ${uiTokens.foreground};
@@ -80,7 +80,7 @@ export const choiceSelectStyles = css`
     text-transform: uppercase;
   }
   ${partSelector(choiceSelectContract, "group")}:not(:first-child) {
-    border-top: 0.5px solid ${uiTokens.borderSoft};
+    border-top: 1px solid ${uiTokens.borderSoft};
     margin: 5px -6px 0;
     padding-inline: 16px;
   }

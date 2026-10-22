@@ -65,6 +65,9 @@ export const proseStyles = css`
   ${scope} :where(li + li) {
     margin-top: 6px;
   }
+  ${scope} > :where(ul, ol) {
+    padding-inline-start: 20px;
+  }
   ${scope} :where(li > ul, li > ol) {
     margin-block: 4px 0;
     padding-inline-start: 1.3em;
@@ -73,11 +76,11 @@ export const proseStyles = css`
     margin: 0;
   }
   ${scope} :where(:not(pre) > code) {
-    padding: 1px 4px;
-    border-radius: ${radiusTokens.mark};
+    padding: 2px 6px;
+    border-radius: ${radiusTokens.inline};
     background: ${uiTokens.surfaceMuted};
     font-family: ${uiTokens.mono};
-    font-size: 0.92em;
+    font-size: 0.93em;
   }
   /* The same recessed surface CodeBlock and output views use. */
   ${scope} > :where(pre) {

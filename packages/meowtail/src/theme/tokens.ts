@@ -1,6 +1,6 @@
 import { alertOptions } from "../components/alert";
 import { defineOptions, defineTokens, tokenRef } from "meowcss";
-import { layerTokens, lineTokens, radiusTokens } from "./palette";
+import { lineTokens, radiusTokens } from "./palette";
 
 /** Shared standard-theme parameters; scheme is built in, no fixed density axis. */
 export const standardOptions = defineOptions("meowui", {});
@@ -9,7 +9,7 @@ export const standardOptions = defineOptions("meowui", {});
 const schemeAlias = (value: string) => standardOptions.by.scheme([value, value]);
 
 /** Secondary ink that remains readable on input and page surfaces in both schemes. */
-const mutedForeground = ["#61666b", "#adb2b8"] as const;
+const mutedForeground = ["#6b6b6b", "#a3a3a3"] as const;
 
 export const uiTokens = defineTokens("ui", {
   font: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -35,7 +35,7 @@ export const uiTokens = defineTokens("ui", {
   spaceSection: "20px",
   spacePanel: "24px",
   /** Between blocks of reading content: paragraphs, lists, code and quotes. */
-  proseGap: "16px",
+  proseGap: "12px",
   /** The longest comfortable reading line for Prose. */
   measure: "70ch",
   pageInsetBlock: "36px",
@@ -61,44 +61,44 @@ export const uiTokens = defineTokens("ui", {
   messageRadius: `${radiusTokens.bubble}`,
   iconSize: "16px",
   iconStroke: "1.75",
-  switchThumb: ["#ffffff", "#adb2b8"],
+  switchThumb: ["#ffffff", "#a3a3a3"],
   // DeepSeek Harness ui-theme: design-platform aliases, resolved per scheme.
-  background: ["#ffffff", "#151517"],
-  inputSurface: ["#ffffff", "#232324"],
-  surface: ["#ffffff", "#2c2c2e"],
+  background: ["#ffffff", "#161616"],
+  inputSurface: ["#ffffff", "#212121"],
+  surface: ["#ffffff", "#262626"],
   /* Fills are true neutrals: a blue cast in light greys reads as default
      framework chrome; neutral greys let type and content carry the color. */
-  surfaceMuted: ["#f2f2f3", "#353638"],
-  sidebarSurface: ["#fafafa", "#1b1b1c"],
-  codeSurface: ["#fafafa", "#1b1b1c"],
-  codeBanner: ["#fafafa", "#2c2c2e"],
+  surfaceMuted: ["#f5f5f5", "#2a2a2a"],
+  sidebarSurface: ["#fafafa", "#1a1a1a"],
+  codeSurface: ["#fafafa", "#1c1c1c"],
+  codeBanner: ["#fafafa", "#262626"],
   /* Opaque enough to read on its own: the blur is a refinement, and text under
      a menu must not compete with the menu's items where it is unavailable. */
-  menuSurface: ["rgb(250 250 251 / 90%)", "rgb(44 45 48 / 90%)"],
+  menuSurface: ["rgb(250 250 250 / 90%)", "rgb(38 38 38 / 90%)"],
   menuBlur: "blur(40px) saturate(150%)",
-  tooltipSurface: ["#2c2c2e", "#43454a"],
-  foreground: ["#0f1115", "#f9fafb"],
-  toastSurface: ["#353638", "#43454a"],
+  tooltipSurface: ["#262626", "#404040"],
+  foreground: ["#0a0a0a", "#fafafa"],
+  toastSurface: ["#262626", "#404040"],
   toastForeground: "#ffffff",
   /** Action text on the inverse Toast/Tooltip surface, which is dark in both schemes. */
-  inverseAction: "#7aaaff",
+  inverseAction: "#93c5fd",
   mutedForeground,
   // Metadata ink stays above the normal-text floor in both schemes; it is still
   // lighter than the primary muted text so hierarchy survives.
-  subtleForeground: ["#656a71", "#9aa0a7"],
-  captionForeground: ["#656a71", "#9aa0a7"],
+  subtleForeground: ["#767676", "#8f8f8f"],
+  captionForeground: ["#767676", "#8f8f8f"],
   shimmer: ["rgb(0 0 0 / 30%)", "rgb(255 255 255 / 45%)"],
   // Placeholder is text the reader must scan before typing; reuse the readable
   // secondary ink instead of a near-white tint that only works as decoration.
   placeholder: mutedForeground,
-  border: ["rgb(0 0 0 / 16%)", "rgb(255 255 255 / 20%)"],
-  borderSubtle: ["rgb(0 0 0 / 12%)", "rgb(255 255 255 / 16%)"],
+  border: ["rgb(0 0 0 / 12%)", "rgb(255 255 255 / 14%)"],
+  borderSubtle: ["rgb(0 0 0 / 10%)", "rgb(255 255 255 / 12%)"],
   borderSoft: schemeAlias(`${lineTokens.divider}`),
   borderFaint: ["rgb(0 0 0 / 4%)", "rgb(255 255 255 / 6%)"],
   /** Native Select chevron: the Lucide chevron-down the ChoiceSelect trigger draws, in muted ink. */
   selectChevron: [
-    `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2361666b' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
-    `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23adb2b8' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+    `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b6b6b' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+    `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
   ],
   /**
    * Lucide chevron-right as a mask, for a native summary that cannot hold an
@@ -113,22 +113,22 @@ export const uiTokens = defineTokens("ui", {
   borderStrong: ["rgb(0 0 0 / 28%)", "rgb(255 255 255 / 32%)"],
   hover: ["rgb(0 0 0 / 4.5%)", "rgb(255 255 255 / 7%)"],
   active: ["rgb(0 0 0 / 8%)", "rgb(255 255 255 / 12%)"],
-  primary: ["#0f1115", "#f9fafb"],
+  primary: ["#0a0a0a", "#fafafa"],
   /* Hover moves the main action a step, not to a washed-out grey. */
-  primaryHover: ["#2a2b2f", "#e4e5e7"],
-  onPrimary: ["#ffffff", "#0f1115"],
-  primarySoft: ["#ececed", "#43454a"],
-  info: ["#2f5fce", "#7aaaff"],
+  primaryHover: ["#262626", "#e5e5e5"],
+  onPrimary: ["#ffffff", "#0a0a0a"],
+  primarySoft: ["#f0f0f0", "#333333"],
+  info: ["#2563eb", "#60a5fa"],
   warning: ["#a85c00", "#f0a04b"],
   success: ["#15803d", "#4ade80"],
   danger: ["#d51d1d", "#f25a5a"],
   // Filled destructive actions are a Meowland extension: state red alone does
   // not provide readable small labels, especially with white ink in dark mode.
   dangerAction: ["#b91c1c", "#f25a5a"],
-  onDanger: ["#ffffff", "#0f1115"],
-  focus: ["#4176e6", "#7aaaff"],
+  onDanger: ["#ffffff", "#0a0a0a"],
+  focus: ["#2563eb", "#60a5fa"],
   /** Soft halo around a focused field; the border carries the focus color. */
-  focusRing: ["rgb(65 118 230 / 22%)", "rgb(122 170 255 / 28%)"],
+  focusRing: ["rgb(37 99 235 / 20%)", "rgb(96 165 250 / 28%)"],
   shadowControl: "none",
   /** The one-pixel drop under an outline action; in dark, a top edge catches the light instead. */
   shadowAction: [
@@ -136,13 +136,10 @@ export const uiTokens = defineTokens("ui", {
     "inset 0 1px 0 rgb(255 255 255 / 5%), 0 1px 2px rgb(0 0 0 / 30%)",
   ],
   /**
-   * In-flow raised surfaces (cards, lists, tables): ambient depth under the
-   * hairline in light, a faint top highlight in dark, where shadows vanish.
+   * In-flow raised surfaces (cards, lists, tables) are flat: a crisp 1px edge
+   * carries them in light; in dark a faint top highlight separates the layer.
    */
-  shadowRaised: [
-    "0 1px 2px rgb(0 0 0 / 3%), 0 2px 8px -2px rgb(0 0 0 / 4%)",
-    "inset 0 1px 0 rgb(255 255 255 / 4%)",
-  ],
+  shadowRaised: ["none", "inset 0 1px 0 rgb(255 255 255 / 3%)"],
   /** Fields at rest sit very slightly into the page. */
   shadowField: ["0 1px 1px rgb(0 0 0 / 2.5%)", "none"],
   /**
@@ -155,21 +152,21 @@ export const uiTokens = defineTokens("ui", {
   ],
   /** The raised thumb inside a Tabs or SegmentedControl track. */
   shadowThumb: [
-    "0 0 0 0.5px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 8%)",
-    "0 0 0 0.5px rgb(255 255 255 / 14%), 0 1px 2px rgb(0 0 0 / 32%)",
+    "0 0 0 1px rgb(0 0 0 / 6%), 0 1px 2px rgb(0 0 0 / 8%)",
+    "0 0 0 1px rgb(255 255 255 / 8%), 0 1px 2px rgb(0 0 0 / 32%)",
   ],
   /** The thumb itself: lighter than its track in both schemes, so it reads as raised. */
-  thumbSurface: ["#ffffff", "#505156"],
+  thumbSurface: ["#ffffff", "#4a4a4a"],
   /** Inset between a Tabs or SegmentedControl track and its thumb. */
   trackInset: "3px",
   shadowPanel: [
-    "0 0 0 0.5px rgb(0 0 0 / 16%), 0 3px 8px rgb(0 0 0 / 4%), 0 0 20px rgb(0 0 0 / 5%)",
-    "0 0 0 0.5px rgb(255 255 255 / 20%), 0 3px 8px rgb(0 0 0 / 4%), 0 0 20px rgb(0 0 0 / 5%)",
+    "0 0 0 1px rgb(0 0 0 / 8%), 0 3px 8px rgb(0 0 0 / 4%), 0 0 20px rgb(0 0 0 / 5%)",
+    "0 0 0 1px rgb(255 255 255 / 10%), 0 3px 8px rgb(0 0 0 / 4%), 0 0 20px rgb(0 0 0 / 5%)",
   ],
   /** Floating surfaces (menus, popovers, dialogs): a hairline plus a deep, soft drop. */
   shadowFloat: [
-    "0 0 0 0.5px rgb(0 0 0 / 8%), 0 4px 10px -4px rgb(0 0 0 / 8%), 0 16px 36px -8px rgb(0 0 0 / 16%)",
-    "0 0 0 0.5px rgb(255 255 255 / 12%), 0 4px 10px -4px rgb(0 0 0 / 40%), 0 16px 36px -8px rgb(0 0 0 / 60%)",
+    "0 0 0 1px rgb(0 0 0 / 7%), 0 4px 10px -4px rgb(0 0 0 / 8%), 0 16px 36px -8px rgb(0 0 0 / 14%)",
+    "0 0 0 1px rgb(255 255 255 / 9%), 0 4px 10px -4px rgb(0 0 0 / 40%), 0 16px 36px -8px rgb(0 0 0 / 60%)",
   ],
   backdrop: ["rgb(0 0 0 / 24%)", "rgb(0 0 0 / 50%)"],
   durationResponse: "100ms",
@@ -190,17 +187,16 @@ export const chatTokens = defineTokens("chat", {
   /* Reading size for chat prose. Deliberately chat-local rather than
      uiTokens.fontReading so enlarging the conversation does not resize the
      settings and other shared reading surfaces. */
-  fontBody: "15px",
-  messageLeading: "1.7",
-  composerSurface: schemeAlias(`${layerTokens.raised}`),
-  composerShadow: schemeAlias(
-    `0 0 0 0.5px ${uiTokens.borderSoft}, 0 4px 16px rgb(0 0 0 / 3%), 0 0 24px rgb(0 0 0 / 3%)`,
-  ),
+  fontBody: "14px",
+  messageLeading: "1.7142857143",
+  /* The composer is a filled bar on a 1px edge, not a floating card: it belongs to the page. */
+  composerSurface: schemeAlias(`${uiTokens.surfaceMuted}`),
+  composerShadow: schemeAlias(`0 0 0 1px ${lineTokens.edge}`),
   /* Neutral, as in Grok: the reader's words are set apart by shape, not by a tint. */
   userSurface: schemeAlias(`${uiTokens.surfaceMuted}`),
   userInk: schemeAlias(`${uiTokens.foreground}`),
   submitSurface: schemeAlias(`${uiTokens.primary}`),
-  messageListGap: "28px",
+  messageListGap: "24px",
   messageListMaxWidth: "720px",
   readingInset: "24px",
   /** Between a row's leading glyph and its label; expanded bodies indent by the same pair. */

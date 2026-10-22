@@ -1,5 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
-import { chatTokens, uiTokens } from "../tokens";
+import { uiTokens } from "../tokens";
 import { chatReasoningContract } from "../../chat/reasoning";
 
 const part = (name: (typeof chatReasoningContract.parts)[number]) =>
@@ -8,26 +8,31 @@ const part = (name: (typeof chatReasoningContract.parts)[number]) =>
 export const chatReasoningStyles = css`
   ${part("root")} {
     display: grid;
+    grid-template-columns: minmax(0, 1fr);
     min-width: 0;
+    padding-block: 4px;
     color: ${uiTokens.mutedForeground};
   }
   /* The same row as ChatProcess: a glyph box, then a one-line label. */
   ${part("summary")} {
     display: flex;
     align-items: center;
-    gap: ${chatTokens.leadingGap};
-    min-height: ${chatTokens.rowLine};
+    gap: 4px;
     width: fit-content;
     max-width: 100%;
     list-style: none;
     cursor: pointer;
-    font-size: calc(${chatTokens.fontBody} - 1px);
-    line-height: ${chatTokens.rowLine};
+    color: ${uiTokens.foreground};
+    font-size: ${uiTokens.fontBody};
+    line-height: 20px;
+  }
+  ${part("root")}:not([data-active="true"]) > ${part("summary")} {
+    color: ${uiTokens.mutedForeground};
   }
   ${part("summary")}::-webkit-details-marker {
     display: none;
   }
-  ${part("summary")}:hover {
+  ${part("root")}:not([data-active="true"]) > ${part("summary")}:hover {
     color: ${uiTokens.foreground};
   }
   ${part("summary")}:focus-visible {
@@ -39,8 +44,48 @@ export const chatReasoningStyles = css`
     display: grid;
     place-items: center;
     flex: none;
-    width: ${uiTokens.iconSize};
-    height: ${uiTokens.iconSize};
+    width: 20px;
+    height: 20px;
+  }
+  /* The thinking glyph: nine 2px dots whose opacity travels across the lattice. */
+  ${part("root")}[data-active="true"] ${part("icon")} {
+    grid-template-columns: repeat(3, 2.5px);
+    grid-auto-rows: 2.5px;
+    gap: 3px;
+    place-content: center;
+    color: ${uiTokens.mutedForeground};
+  }
+  ${part("icon")} [data-reasoning-dot] {
+    border-radius: 50%;
+    corner-shape: round;
+    background: currentColor;
+    opacity: 0.2;
+    animation: ui-reasoning-wave 1.6s ${uiTokens.ease} infinite;
+  }
+  ${part("icon")} [data-reasoning-dot]:nth-child(2),
+  ${part("icon")} [data-reasoning-dot]:nth-child(4) {
+    animation-delay: 0.15s;
+  }
+  ${part("icon")} [data-reasoning-dot]:nth-child(3),
+  ${part("icon")} [data-reasoning-dot]:nth-child(5),
+  ${part("icon")} [data-reasoning-dot]:nth-child(7) {
+    animation-delay: 0.3s;
+  }
+  ${part("icon")} [data-reasoning-dot]:nth-child(6),
+  ${part("icon")} [data-reasoning-dot]:nth-child(8) {
+    animation-delay: 0.45s;
+  }
+  ${part("icon")} [data-reasoning-dot]:nth-child(9) {
+    animation-delay: 0.6s;
+  }
+  @keyframes ui-reasoning-wave {
+    0%,
+    100% {
+      opacity: 0.2;
+    }
+    35% {
+      opacity: 0.95;
+    }
   }
   ${part("icon")} svg {
     width: 14px;
@@ -58,14 +103,15 @@ export const chatReasoningStyles = css`
   }
   ${part("body")} {
     display: grid;
+    min-width: 0;
     gap: ${uiTokens.spaceGroup};
-    padding: 4px 0 2px calc(${uiTokens.iconSize} + ${chatTokens.leadingGap});
+    padding-top: ${uiTokens.spaceGroup};
   }
   ${part("text")} {
     margin: 0;
     color: ${uiTokens.mutedForeground};
-    font-size: calc(${chatTokens.fontBody} - 1px);
-    line-height: 1.7;
+    font-size: ${uiTokens.fontBody};
+    line-height: 1.625;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
@@ -76,13 +122,24 @@ export const chatReasoningStyles = css`
     flex-direction: column;
     justify-content: flex-end;
     gap: ${uiTokens.spaceGroup};
-    max-height: calc(1.7em * 4);
+    max-height: 184px;
     overflow: hidden;
-    mask-image: linear-gradient(to bottom, transparent, black 45%);
+    padding-bottom: 12px;
+    mask-image: linear-gradient(
+      to bottom,
+      transparent,
+      black 32px,
+      black calc(100% - 20px),
+      transparent
+    );
   }
   @media (prefers-reduced-motion: reduce) {
     ${part("icon")} svg {
       transition: none;
+    }
+    ${part("icon")} [data-reasoning-dot] {
+      animation: none;
+      opacity: 0.5;
     }
   }
 `;

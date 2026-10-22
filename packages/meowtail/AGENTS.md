@@ -134,15 +134,15 @@ chosen by element size; do not write a literal size or radius beside them.
 
 Materials have one role each, so a new component reuses one instead of mixing a fresh grey:
 
-| Role                     | Tokens                                                                  | Used by                                               |
-| ------------------------ | ----------------------------------------------------------------------- | ----------------------------------------------------- |
-| In-flow surface          | `layerTokens.raised` on a `lineTokens.width` `lineTokens.edge` hairline | Card, ListGroup, ResourceCard, WorkCard, Table        |
-| Floating surface         | solid `uiTokens.surface` + `shadowFloat`                                | Dialog, Modal, Popover, Menu, ChoiceSelect list       |
-| Recessed region          | `layerTokens.sunken` (same tone as `codeSurface`), no border            | CodeBlock, output views, markdown code, media frames  |
-| Fill (track, chip, tile) | `uiTokens.surfaceMuted` / `layerTokens.chip` with `chipInk`             | Tabs/Segmented tracks, Badge, Avatar, glyph tiles     |
-| Field                    | the shared field surface (`uiTokens.border`, `inputSurface`)            | Input, Select, ChoiceSelect, SearchInput, NumberInput |
-| Current selection        | `accentTokens.selected`, with `accentTokens.line` when bordered         | NavList, NavItem, ChoiceGroup, Table rows, Pill, Tag  |
-| Divider                  | `lineTokens.divider`                                                    | rows, card footers                                    |
+| Role                     | Tokens                                                          | Used by                                               |
+| ------------------------ | --------------------------------------------------------------- | ----------------------------------------------------- |
+| In-flow surface          | `layerTokens.raised` on a crisp 1px `lineTokens.edge`           | Card, ListGroup, ResourceCard, WorkCard, Table        |
+| Floating surface         | solid `uiTokens.surface` + `shadowFloat`                        | Dialog, Modal, Popover, Menu, ChoiceSelect list       |
+| Recessed region          | `layerTokens.sunken` (same tone as `codeSurface`), no border    | CodeBlock, output views, markdown code, media frames  |
+| Fill (track, chip, tile) | `uiTokens.surfaceMuted` / `layerTokens.chip` with `chipInk`     | Tabs/Segmented tracks, Badge, Avatar, glyph tiles     |
+| Field                    | the shared field surface (`uiTokens.border`, `inputSurface`)    | Input, Select, ChoiceSelect, SearchInput, NumberInput |
+| Current selection        | `accentTokens.selected`, with `accentTokens.line` when bordered | NavList, NavItem, ChoiceGroup, Table rows, Pill, Tag  |
+| Divider                  | `lineTokens.divider`                                            | rows, card footers                                    |
 
 Fields, actions, tracks and thumbs are rounded rectangles (`controlRadius`, `radiusSmall` at the
 small size); tracks and thumbs are concentric (track radius is the thumb radius plus `trackInset`);
@@ -150,12 +150,16 @@ surfaces use `radiusLarge`, and items inside a floating panel use `radiusSmall` 
 its 6px inset). Do not introduce pills for actions or fields.
 
 Depth is a material, not decoration. Each role takes one shadow token and nothing else:
-`shadowRaised` for in-flow surfaces (a soft lift in light, a top-edge highlight in dark),
+`shadowRaised` for in-flow surfaces (flat in light, where the 1px edge carries the card; a faint
+top-edge highlight in dark),
 `shadowField` for fields at rest, `shadowAction` for outline actions, `shadowFilled` for primary and
 danger fills (an inner top highlight over a tight drop), `shadowThumb` for selected thumbs and
 `shadowFloat` for floating panels. Disabled controls drop their shadow. Pressed actions settle by
-half a pixel. Neutral fills (`surfaceMuted`, `hover`, `active`, `primarySoft`) are true greys with
-no blue cast. Button labels are 500 weight; titles at `fontTitle` and above use -0.01em tracking.
+half a pixel. Every grey is a true neutral with no blue cast: ink, secondary ink, edges and fills.
+Edges are 1px (`lineTokens.width`), never half-pixel lines, which blur on ordinary screens.
+Secondary states of the same thing (a finished step, a waiting step) fade the foreground with
+`color-mix` instead of switching to another grey. Activity is a band of full ink sweeping across
+muted text (TextShimmer), not a color. Button labels are 500 weight; titles at `fontTitle` and above use -0.01em tracking.
 
 Group labels share one small-caps role: `fontMicro`, weight 500, 0.04em tracking, uppercase,
 `subtleForeground`. Menu headings, ChoiceSelect groups, NavList group titles, and the docs, gallery

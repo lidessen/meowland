@@ -18,6 +18,7 @@ export const resourceCardStyles = css`
     border: ${lineTokens.width} solid ${lineTokens.edge};
     border-radius: ${radiusTokens.card};
     background: ${layerTokens.raised};
+    box-shadow: ${uiTokens.shadowRaised};
     font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
     color: ${uiTokens.foreground};
     transition: border-color ${uiTokens.durationResponse} ${uiTokens.ease};
@@ -67,6 +68,7 @@ export const resourceCardStyles = css`
     margin: 0;
     font-size: ${uiTokens.fontTitle};
     font-weight: 600;
+    letter-spacing: -0.01em;
     overflow-wrap: anywhere;
   }
   ${card("subtitle")} {

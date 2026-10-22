@@ -56,7 +56,7 @@ export function CodeSample({
   );
 }
 
-/** One example: the live preview, then the code behind it. */
+/** One example: the live preview, then the code behind it, framed as one specimen. */
 export function StoryExample({
   storyId,
   title,
@@ -80,8 +80,10 @@ export function StoryExample({
         <h3 className="docs-example-title">{title}</h3>
         {description ? <p className="docs-note">{description}</p> : null}
       </div>
-      <Preview storyId={storyId} title={title} tall={tall} />
-      {source ? <CodeSample source={source} file={file} line={line} /> : null}
+      <div className="docs-specimen">
+        <Preview storyId={storyId} title={title} tall={tall} />
+        {source ? <CodeSample source={source} file={file} line={line} /> : null}
+      </div>
     </Stack>
   );
 }

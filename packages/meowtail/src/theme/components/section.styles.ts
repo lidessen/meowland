@@ -33,6 +33,7 @@ export const sectionStyles = css`
     font-size: ${uiTokens.fontTitle};
     font-weight: 600;
     line-height: 1.4;
+    letter-spacing: -0.01em;
     overflow-wrap: anywhere;
   }
   /* A nested section reads as a subheading under the section that contains it.

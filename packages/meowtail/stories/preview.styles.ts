@@ -1,5 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
-import { uiTokens, logoTokens } from "meowtail/theme";
+import { uiTokens, logoTokens, lineTokens } from "meowtail/theme";
 import { fieldContract } from "meowtail";
 
 export const previewStyles = css`
@@ -20,14 +20,15 @@ export const previewStyles = css`
     font-size: ${uiTokens.fontBody};
     line-height: ${uiTokens.leading};
   }
+  /* A slim strip above the specimen, ruled by the same divider as the gallery. */
   .workshop-theme-controls {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: ${uiTokens.spacePanel};
-    padding: ${uiTokens.spaceSection} ${uiTokens.spacePanel};
-    border-bottom: 1px solid ${uiTokens.border};
-    color: ${uiTokens.mutedForeground};
+    gap: ${uiTokens.spaceSection};
+    padding: 10px ${uiTokens.spacePanel};
+    border-bottom: ${lineTokens.width} solid ${lineTokens.divider};
+    color: ${uiTokens.subtleForeground};
     font-size: ${uiTokens.fontCaption};
   }
   .workshop-theme-controls label {
@@ -38,6 +39,9 @@ export const previewStyles = css`
   .workshop-theme-controls select {
     max-width: 180px;
     width: auto;
+    min-height: ${uiTokens.controlSmall};
+    border-radius: ${uiTokens.radiusSmall};
+    font-size: ${uiTokens.fontLabel};
   }
   .workshop-composition {
     max-width: 720px;
@@ -47,7 +51,7 @@ export const previewStyles = css`
   }
   .workshop-composition h1 {
     margin: 0;
-    font-size: 22px;
+    font-size: ${uiTokens.fontHeading};
     font-weight: 600;
     letter-spacing: -0.025em;
   }
@@ -108,19 +112,24 @@ export const previewStyles = css`
   }
   .workshop-composition-header h2 {
     margin: 0;
-    font-size: 17px;
+    font-size: ${uiTokens.fontTitle};
+    letter-spacing: -0.01em;
     font-weight: 600;
   }
+  /* Specimen labels share the small-caps label role the docs and gallery use. */
   .workshop-section-title {
     margin: 0;
-    font-size: 13px;
-    font-weight: 600;
+    color: ${uiTokens.subtleForeground};
+    font-size: ${uiTokens.fontMicro};
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
   }
   .workshop-feedback {
     min-height: 20px;
     margin: 0;
     color: ${uiTokens.mutedForeground};
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     line-height: 1.6;
   }
   .workshop-disclosure-detail {
@@ -142,7 +151,7 @@ export const previewStyles = css`
   }
   .workshop-document h3 {
     margin: 0;
-    font-size: 15px;
+    font-size: ${uiTokens.fontBody};
   }
   ${partSelector(fieldContract, "root")} + .workshop-document {
     margin-top: 12px;
@@ -158,7 +167,7 @@ export const previewStyles = css`
   }
   .workshop-note {
     color: ${uiTokens.mutedForeground};
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
   }
   .workshop-brand-mark {
     width: 28px;
@@ -179,7 +188,7 @@ export const previewStyles = css`
     padding: 12px 6px;
     border: 1px solid transparent;
     border-radius: ${uiTokens.controlRadius};
-    font-size: 11px;
+    font-size: ${uiTokens.fontMicro};
     color: ${uiTokens.mutedForeground};
   }
   .workshop-icon-item[hidden] {
@@ -261,7 +270,7 @@ export const previewStyles = css`
   .workshop-search-results {
     display: grid;
     width: 100%;
-    border-block: 1px solid ${uiTokens.border};
+    border-block: ${lineTokens.width} solid ${lineTokens.divider};
   }
   .workshop-icon-state-sample {
     display: grid;
@@ -273,7 +282,7 @@ export const previewStyles = css`
     padding-block: 12px;
   }
   .workshop-search-results article:not([hidden]) ~ article:not([hidden]) {
-    border-top: 1px solid ${uiTokens.border};
+    border-top: ${lineTokens.width} solid ${lineTokens.divider};
   }
   .workshop-search-results h3 {
     margin: 0 0 3px;

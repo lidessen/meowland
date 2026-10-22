@@ -75,7 +75,9 @@ export const dialogStyles = css`
   ${partSelector(dialogHeaderContract, "title")} {
     margin: 0;
     font-size: ${uiTokens.fontTitle};
-    font-weight: 500;
+    /* Same title role as Card, Section and EmptyState. */
+    font-weight: 600;
+    letter-spacing: -0.01em;
     line-height: 24px;
     overflow-wrap: anywhere;
   }

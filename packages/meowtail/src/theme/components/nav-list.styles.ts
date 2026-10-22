@@ -25,11 +25,13 @@ export const navListStyles = css`
     margin: 0;
     min-width: 0;
     padding-inline: ${uiTokens.spaceGroup};
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    /* The shared small-caps label role: Menu and ChoiceSelect groups use it too. */
+    color: ${uiTokens.subtleForeground};
+    font-size: ${uiTokens.fontMicro};
     font-weight: 500;
     line-height: 1.5;
-    letter-spacing: 0.02em;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
     overflow-wrap: anywhere;
   }
   ${list("list")} {

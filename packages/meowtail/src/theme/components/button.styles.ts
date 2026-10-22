@@ -1,6 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { accentTokens, layerTokens, lineTokens, statusTokens, radiusTokens } from "../palette";
+import { accentTokens, layerTokens, lineTokens, statusTokens } from "../palette";
 import { buttonContract, buttonOptions } from "../../components/button";
 import { iconButtonContract, iconButtonOptions } from "../../components/icon-button";
 
@@ -13,11 +13,9 @@ export const buttonStyles = css`
   justify-content: center;
   gap: 4px;
   min-height: ${uiTokens.buttonHeight};
-  /* A pill wants more side room than a rounded rectangle to keep its label centered. */
-  padding: 0 16px;
+  padding: 0 14px;
   border: 0;
-  border-radius: ${radiusTokens.action};
-  corner-shape: round;
+  border-radius: ${uiTokens.controlRadius};
   background: transparent;
   color: ${uiTokens.foreground};
   font: 500 ${uiTokens.fontBody}/22px ${uiTokens.font};
@@ -26,8 +24,13 @@ export const buttonStyles = css`
   transition:
     background-color ${uiTokens.durationResponse} ${uiTokens.ease},
     border-color ${uiTokens.durationResponse} ${uiTokens.ease},
-    box-shadow ${uiTokens.durationSettle} ${uiTokens.ease};
+    box-shadow ${uiTokens.durationSettle} ${uiTokens.ease},
+    transform ${uiTokens.durationResponse} ${uiTokens.ease};
   -webkit-tap-highlight-color: transparent;
+}
+/* A press settles the action half a pixel, so a click is felt, not only seen. */
+:where(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")}):active:not(:disabled) {
+  transform: translateY(0.5px);
 }
 ${partSelector(iconButtonContract, "root")} {
   width: ${uiTokens.buttonHeight};
@@ -46,13 +49,14 @@ ${partSelector(buttonContract, "root")} {
   ${buttonOptions.when({ variant: "primary" })} {
     background: ${uiTokens.primary};
     color: ${uiTokens.onPrimary};
-    font-weight: 500;
+    box-shadow: ${uiTokens.shadowFilled};
   }
 }
 ${partSelector(buttonContract, "root")} {
   ${buttonOptions.when({ variant: "danger" })} {
     background: ${uiTokens.dangerAction};
     color: ${uiTokens.onDanger};
+    box-shadow: ${uiTokens.shadowFilled};
   }
 }
 ${partSelector(buttonContract, "root")} {
@@ -108,10 +112,14 @@ ${partSelector(buttonContract, "root")} {
   cursor: not-allowed;
   opacity: 0.4;
 }
+${partSelector(buttonContract, "root")}:disabled {
+  box-shadow: none;
+}
 ${partSelector(buttonContract, "root")} {
   ${buttonOptions.when({ size: "small" })} {
     min-height: ${uiTokens.buttonSmall};
-    padding-inline: 12px;
+    padding-inline: 10px;
+    border-radius: ${uiTokens.radiusSmall};
     font-size: ${uiTokens.fontCaption};
     line-height: 18px;
   }
@@ -119,7 +127,7 @@ ${partSelector(buttonContract, "root")} {
 ${partSelector(buttonContract, "root")} {
   ${buttonOptions.when({ size: "large" })} {
     min-height: ${uiTokens.buttonLarge};
-    padding-inline: 22px;
+    padding-inline: 20px;
   }
 }
 ${partSelector(iconButtonContract, "root")} {
@@ -128,6 +136,7 @@ ${partSelector(iconButtonContract, "root")} {
     min-width: ${uiTokens.buttonSmall};
     height: ${uiTokens.buttonSmall};
     min-height: ${uiTokens.buttonSmall};
+    border-radius: ${uiTokens.radiusSmall};
   }
 }
 ${partSelector(iconButtonContract, "root")} {

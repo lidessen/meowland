@@ -18,6 +18,7 @@ ${partSelector(cardContract, "root")} {
   border: ${lineTokens.width} solid ${lineTokens.edge};
   border-radius: ${uiTokens.panelRadius};
   background: ${layerTokens.raised};
+  box-shadow: ${uiTokens.shadowRaised};
   --meowui-focus-halo: ${layerTokens.raised};
   color: ${uiTokens.foreground};
   font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
@@ -59,6 +60,7 @@ ${partSelector(cardTitleContract, "root")} {
   font-size: ${uiTokens.fontTitle};
   font-weight: 600;
   line-height: 1.4;
+  letter-spacing: -0.01em;
   overflow-wrap: anywhere;
 }
 ${partSelector(cardDescriptionContract, "root")} {

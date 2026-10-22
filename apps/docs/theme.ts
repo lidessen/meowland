@@ -12,6 +12,9 @@ import {
   tableContract,
 } from "meowtail";
 import {
+  layerTokens,
+  lineTokens,
+  radiusTokens,
   standardOptions,
   standardThemeStyles,
   standardThemeTokens,
@@ -80,7 +83,7 @@ export const docsStyles = css`
     min-height: 0;
     padding: 0 12px;
     background: ${uiTokens.sidebarSurface};
-    border-right: 1px solid ${uiTokens.borderFaint};
+    border-right: ${lineTokens.width} solid ${lineTokens.divider};
   }
   .docs-brand {
     display: flex;
@@ -90,8 +93,9 @@ export const docsStyles = css`
     flex-shrink: 0;
     padding: 0 10px;
     color: ${uiTokens.foreground};
-    font-size: 16px;
-    letter-spacing: -0.5px;
+    font-size: ${uiTokens.fontTitle};
+    font-weight: 600;
+    letter-spacing: -0.02em;
   }
   .docs-brand > svg {
     width: 21px;
@@ -100,29 +104,17 @@ export const docsStyles = css`
   }
   .docs-brand > span {
     margin-left: auto;
-    color: ${uiTokens.mutedForeground};
-    font: 11px/1.5 ${uiTokens.mono};
+    color: ${uiTokens.subtleForeground};
+    font: ${uiTokens.fontMicro}/1.5 ${uiTokens.mono};
     letter-spacing: 0;
   }
   .docs-search {
     flex: none;
     margin-bottom: 4px;
   }
-  .docs-search${partSelector(searchInputContract, "root")} {
-    min-height: 36px;
-    border-color: ${uiTokens.borderSubtle};
-    background: ${uiTokens.background};
-  }
+  /* The sidebar search is the library SearchInput as-is: same surface, states and ring. */
   .docs-search ${partSelector(searchInputContract, "control")} {
-    font-size: 13px;
-  }
-  .docs-search ${partSelector(searchInputContract, "control")}:focus-visible {
-    outline: none;
-    box-shadow: none;
-  }
-  .docs-search${partSelector(searchInputContract, "root")}:focus-within {
-    border-color: ${uiTokens.focus};
-    box-shadow: 0 0 0 2px color-mix(in srgb, ${uiTokens.focus} 18%, transparent);
+    font-size: ${uiTokens.fontLabel};
   }
   .docs-catalog-label {
     display: flex;
@@ -130,9 +122,10 @@ export const docsStyles = css`
     align-items: center;
     gap: 8px;
     padding: 24px 10px 12px;
-    color: ${uiTokens.mutedForeground};
-    font-size: 10px;
-    letter-spacing: 0.07em;
+    color: ${uiTokens.subtleForeground};
+    font-size: ${uiTokens.fontMicro};
+    font-weight: 500;
+    letter-spacing: 0.04em;
     text-transform: uppercase;
   }
   .docs-catalog-label > span {
@@ -148,32 +141,29 @@ export const docsStyles = css`
     scrollbar-width: thin;
     scrollbar-color: ${uiTokens.borderSubtle} transparent;
   }
+  /* NavList keeps its own rows, group titles, radius and selection; the
+     sidebar only sets density. */
   .docs-catalog ${partSelector(navListContract, "root")} {
-    gap: 26px;
-    font-size: 13px;
+    gap: 20px;
+    font-size: ${uiTokens.fontLabel};
   }
   .docs-catalog ${partSelector(navListContract, "group")} {
-    gap: 6px;
+    gap: 2px;
   }
   .docs-catalog ${partSelector(navListContract, "groupTitle")} {
-    font-size: 11px;
-    font-weight: 550;
+    padding-block: 0 6px;
   }
   .docs-catalog ${partSelector(navListContract, "item")} {
-    min-height: 31px;
-    padding-block: 4px;
-    border-radius: 5px;
+    min-height: 32px;
     color: ${uiTokens.mutedForeground};
   }
   .docs-catalog ${partSelector(navListContract, "item")}[aria-current="page"] {
-    background: ${uiTokens.active};
     color: ${uiTokens.foreground};
-    font-weight: 600;
   }
   .docs-catalog-empty {
     margin: 12px 10px;
     color: ${uiTokens.mutedForeground};
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     line-height: 1.7;
     overflow-wrap: anywhere;
   }
@@ -193,7 +183,7 @@ export const docsStyles = css`
     height: ${docsTokens.headerHeight};
     padding: 0 40px;
     background: ${uiTokens.background};
-    border-bottom: 1px solid ${uiTokens.borderFaint};
+    border-bottom: ${lineTokens.width} solid ${lineTokens.divider};
     min-width: 0;
   }
   .docs-header-link {
@@ -202,7 +192,7 @@ export const docsStyles = css`
     min-width: 32px;
     min-height: 32px;
     margin-left: auto;
-    border-radius: 5px;
+    border-radius: ${uiTokens.radiusSmall};
     color: ${uiTokens.mutedForeground};
   }
   .docs-header-link:hover {
@@ -214,7 +204,7 @@ export const docsStyles = css`
     font-weight: 400;
   }
   .docs-header ${partSelector(breadcrumbContract, "current")} {
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     font-weight: 500;
   }
 
@@ -238,7 +228,7 @@ export const docsStyles = css`
     gap: 12px;
   }
   .docs-article ${partSelector(pageContract, "eyebrow")} {
-    font-size: 11px;
+    font-size: ${uiTokens.fontMicro};
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
@@ -253,7 +243,7 @@ export const docsStyles = css`
   }
   .docs-article ${partSelector(pageHeaderContract, "description")} {
     max-width: 62ch;
-    font-size: 16px;
+    font-size: ${uiTokens.fontTitle};
     line-height: 1.75;
   }
   .docs-article ${partSelector(pageContract, "content")}, .docs-sections {
@@ -272,7 +262,7 @@ export const docsStyles = css`
     letter-spacing: -0.02em;
   }
   .docs-article ${partSelector(sectionContract, "description")} {
-    font-size: 14px;
+    font-size: ${uiTokens.fontBody};
     line-height: 1.75;
   }
   .docs-article ${partSelector(sectionContract, "content")} {
@@ -285,7 +275,7 @@ export const docsStyles = css`
   }
   .docs-toc {
     min-width: 0;
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     line-height: 1.6;
     color: ${uiTokens.mutedForeground};
   }
@@ -293,13 +283,13 @@ export const docsStyles = css`
     display: none;
   }
   .docs-toc-disclosure {
-    border-block: 1px solid ${uiTokens.borderSubtle};
+    border-block: ${lineTokens.width} solid ${lineTokens.edge};
     padding-block: 12px;
   }
   .docs-toc-disclosure > summary {
     color: ${uiTokens.foreground};
     cursor: pointer;
-    font-weight: 550;
+    font-weight: 500;
   }
   .docs-toc nav {
     display: grid;
@@ -315,8 +305,8 @@ export const docsStyles = css`
   .docs-note {
     margin: 0;
     color: ${uiTokens.mutedForeground};
-    font-size: 13px;
-    line-height: 1.75;
+    font-size: ${uiTokens.fontLabel};
+    line-height: 1.7;
   }
   .docs-example {
     min-width: 0;
@@ -329,15 +319,27 @@ export const docsStyles = css`
   }
   .docs-example-title {
     margin: 0;
-    font-size: 15px;
+    font-size: ${uiTokens.fontBody};
     font-weight: 600;
+    letter-spacing: -0.005em;
+  }
+  /* One specimen: the live preview on the raised surface, its code recessed
+     beneath it, inside a single hairline frame. */
+  .docs-specimen {
+    min-width: 0;
+    overflow: hidden;
+    border: ${lineTokens.width} solid ${lineTokens.edge};
+    border-radius: ${uiTokens.radiusLarge};
+    background: ${layerTokens.raised};
+    box-shadow: ${uiTokens.shadowRaised};
   }
   ${partSelector(cardContract, "root")}.docs-preview-card {
     padding: 0;
     overflow: hidden;
-    border: 1px solid ${uiTokens.borderSubtle};
-    border-radius: ${uiTokens.panelRadius};
+    border: 0;
+    border-radius: 0;
     background: ${uiTokens.background};
+    box-shadow: none;
   }
   .docs-preview-frame {
     display: block;
@@ -351,12 +353,17 @@ export const docsStyles = css`
 
   /* Code scrolls locally. Static pages omit actions that require a runtime. */
   .docs-article ${partSelector(codeBlockContract, "root")} {
-    border: 1px solid ${uiTokens.borderSubtle};
-    border-radius: 9px;
+    border: ${lineTokens.width} solid ${lineTokens.edge};
+    border-radius: ${uiTokens.radiusLarge};
+  }
+  .docs-specimen ${partSelector(codeBlockContract, "root")} {
+    border: 0;
+    border-top: ${lineTokens.width} solid ${lineTokens.divider};
+    border-radius: 0;
   }
   .docs-article ${partSelector(codeBlockContract, "header")} {
-    padding: 11px 18px;
-    border-bottom: 1px solid ${uiTokens.borderFaint};
+    padding: 10px 16px;
+    border-bottom: ${lineTokens.width} solid ${lineTokens.divider};
     background: transparent;
   }
   .docs-article ${partSelector(codeBlockContract, "actions")} {
@@ -364,9 +371,9 @@ export const docsStyles = css`
   }
   .docs-article ${partSelector(codeBlockContract, "content")} {
     max-height: ${docsTokens.codeHeight};
-    padding: 20px;
-    font-size: 12px;
-    line-height: 1.8;
+    padding: 16px;
+    font-size: ${uiTokens.fontCode};
+    line-height: 1.75;
     scrollbar-width: thin;
   }
   .docs-install {
@@ -375,12 +382,12 @@ export const docsStyles = css`
     gap: 10px;
     width: 100%;
     min-width: 0;
-    padding: 13px 16px;
-    border: 1px solid ${uiTokens.borderSubtle};
-    border-radius: 8px;
+    padding: 12px 16px;
+    border: ${lineTokens.width} solid ${lineTokens.edge};
+    border-radius: ${uiTokens.controlRadius};
     background: ${uiTokens.codeSurface};
     color: ${uiTokens.foreground};
-    font: 12px/1.7 ${uiTokens.mono};
+    font: ${uiTokens.fontCode}/1.7 ${uiTokens.mono};
   }
   .docs-install > svg {
     flex: none;
@@ -408,7 +415,7 @@ export const docsStyles = css`
   .docs-home-eyebrow {
     margin: 0 0 24px;
     color: ${uiTokens.mutedForeground};
-    font-size: 11px;
+    font-size: ${uiTokens.fontMicro};
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
@@ -431,17 +438,17 @@ export const docsStyles = css`
     align-items: center;
     gap: 16px 24px;
     margin-top: 28px;
-    font-size: 13px;
+    font-size: ${uiTokens.fontLabel};
   }
   .docs-home-actions .docs-home-primary {
     display: inline-flex;
     align-items: center;
     min-height: 38px;
     padding: 7px 14px;
-    border-radius: 6px;
+    border-radius: ${uiTokens.radiusSmall};
     background: ${uiTokens.primary};
     color: ${uiTokens.onPrimary};
-    font-weight: 550;
+    font-weight: 500;
     text-decoration: none;
   }
   .docs-home-actions .docs-home-primary:hover {
@@ -455,7 +462,7 @@ export const docsStyles = css`
   .docs-home-route-label {
     margin: 0 0 12px;
     color: ${uiTokens.mutedForeground};
-    font-size: 11px;
+    font-size: ${uiTokens.fontMicro};
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
@@ -470,7 +477,7 @@ export const docsStyles = css`
     padding: 0;
   }
   .docs-home-route li + li {
-    border-top: 1px solid ${uiTokens.borderFaint};
+    border-top: ${lineTokens.width} solid ${lineTokens.divider};
   }
   .docs-home-route li > a {
     display: flex;
@@ -481,19 +488,19 @@ export const docsStyles = css`
     flex: none;
     padding-top: 2px;
     color: ${uiTokens.mutedForeground};
-    font: 11px/1.7 ${uiTokens.mono};
+    font: ${uiTokens.fontCode}/1.7 ${uiTokens.mono};
   }
   .docs-home-route li > a > span:last-child {
     display: grid;
     gap: 2px;
   }
   .docs-home-route strong {
-    font-size: 13px;
-    font-weight: 550;
+    font-size: ${uiTokens.fontLabel};
+    font-weight: 500;
   }
   .docs-home-route strong + span {
     color: ${uiTokens.mutedForeground};
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     line-height: 1.6;
   }
   .docs-home-route li > a:hover strong,
@@ -514,28 +521,28 @@ export const docsStyles = css`
     grid-template-columns: 24px minmax(0, 1fr);
     gap: 16px;
     padding-block: 24px;
-    border-top: 1px solid ${uiTokens.borderSubtle};
+    border-top: ${lineTokens.width} solid ${lineTokens.edge};
     min-width: 0;
   }
   .docs-package-number {
     padding-top: 4px;
     color: ${uiTokens.mutedForeground};
-    font: 11px/1.7 ${uiTokens.mono};
+    font: ${uiTokens.fontCode}/1.7 ${uiTokens.mono};
   }
   .docs-package-link strong {
-    font-size: 16px;
+    font-size: ${uiTokens.fontTitle};
     font-weight: 600;
     letter-spacing: -0.02em;
   }
   .docs-package-link p {
     margin: 8px 0 12px;
     color: ${uiTokens.mutedForeground};
-    font-size: 13px;
+    font-size: ${uiTokens.fontLabel};
     line-height: 1.75;
   }
   .docs-package-version {
     color: ${uiTokens.mutedForeground};
-    font: 10px/1.7 ${uiTokens.mono};
+    font: ${uiTokens.fontMicro}/1.7 ${uiTokens.mono};
   }
   .docs-grid {
     display: grid;
@@ -576,7 +583,7 @@ export const docsStyles = css`
     letter-spacing: -0.02em;
   }
   .docs-prose h3 {
-    font-size: 16px;
+    font-size: ${uiTokens.fontTitle};
     font-weight: 600;
   }
   .docs-prose > :first-child {
@@ -591,8 +598,8 @@ export const docsStyles = css`
   }
   .docs-prose code {
     padding: 2px 5px;
-    border: 1px solid ${uiTokens.borderFaint};
-    border-radius: 4px;
+    border: ${lineTokens.width} solid ${lineTokens.divider};
+    border-radius: ${radiusTokens.mark};
     background: ${uiTokens.codeSurface};
     font-family: ${uiTokens.mono};
     font-size: 0.82em;
@@ -602,11 +609,11 @@ export const docsStyles = css`
     max-width: 100%;
     overflow: auto;
     margin: 4px 0;
-    padding: 20px;
-    border: 1px solid ${uiTokens.borderSubtle};
-    border-radius: 9px;
+    padding: 16px;
+    border: 0;
+    border-radius: ${uiTokens.radiusLarge};
     background: ${uiTokens.codeSurface};
-    font: 12px/1.8 ${uiTokens.mono};
+    font: ${uiTokens.fontCode}/1.75 ${uiTokens.mono};
     scrollbar-width: thin;
   }
   .docs-prose pre code {
@@ -617,7 +624,7 @@ export const docsStyles = css`
   }
   .docs-article ${partSelector(tableContract, "root")} {
     max-width: 100%;
-    font-size: 13px;
+    font-size: ${uiTokens.fontLabel};
   }
   .docs-article ${partSelector(tableContract, "scroller")} {
     border-color: ${uiTokens.borderSubtle};
@@ -634,20 +641,20 @@ export const docsStyles = css`
     max-width: 100%;
     overflow-x: auto;
     border-collapse: collapse;
-    font-size: 13px;
+    font-size: ${uiTokens.fontLabel};
   }
   .docs-prose th,
   .docs-prose td {
     padding: 12px 16px;
-    border-bottom: 1px solid ${uiTokens.borderSubtle};
+    border-bottom: ${lineTokens.width} solid ${lineTokens.edge};
     text-align: left;
     vertical-align: top;
     min-width: 120px;
   }
   .docs-prose th {
     color: ${uiTokens.mutedForeground};
-    font-size: 12px;
-    font-weight: 550;
+    font-size: ${uiTokens.fontCaption};
+    font-weight: 500;
   }
   .docs-footer {
     display: flex;
@@ -657,9 +664,9 @@ export const docsStyles = css`
     max-width: ${docsTokens.readingWidth};
     margin: 64px auto 0;
     padding: 20px 0 28px;
-    border-top: 1px solid ${uiTokens.borderSubtle};
+    border-top: ${lineTokens.width} solid ${lineTokens.edge};
     color: ${uiTokens.mutedForeground};
-    font-size: 11px;
+    font-size: ${uiTokens.fontMicro};
   }
   .docs-content-home .docs-footer {
     max-width: ${docsTokens.homeWidth};
@@ -697,13 +704,13 @@ export const docsStyles = css`
     .docs-toc-desktop {
       display: block;
       padding-left: 16px;
-      border-left: 1px solid ${uiTokens.borderSubtle};
+      border-left: ${lineTokens.width} solid ${lineTokens.edge};
     }
     .docs-toc-title {
       margin: 0;
       color: ${uiTokens.foreground};
-      font-size: 11px;
-      font-weight: 550;
+      font-size: ${uiTokens.fontMicro};
+      font-weight: 500;
     }
     .docs-content:not(.docs-content-home) .docs-footer {
       max-width: 928px;
@@ -720,7 +727,7 @@ export const docsStyles = css`
     }
     .docs-home-route {
       padding-top: 28px;
-      border-top: 1px solid ${uiTokens.borderSubtle};
+      border-top: ${lineTokens.width} solid ${lineTokens.edge};
     }
     .docs-home-route ol {
       display: grid;
@@ -747,7 +754,7 @@ export const docsStyles = css`
       justify-content: space-between;
       min-height: 60px;
       padding: 0 20px;
-      border-bottom: 1px solid ${uiTokens.borderFaint};
+      border-bottom: ${lineTokens.width} solid ${lineTokens.divider};
       background: ${uiTokens.background};
     }
     .docs-mobile-brand {
@@ -769,8 +776,8 @@ export const docsStyles = css`
       min-width: 44px;
       min-height: 36px;
       padding: 6px 10px;
-      border: 1px solid ${uiTokens.borderSubtle};
-      border-radius: 6px;
+      border: ${lineTokens.width} solid ${lineTokens.edge};
+      border-radius: ${uiTokens.radiusSmall};
       background: ${uiTokens.background};
       color: ${uiTokens.foreground};
       font: 12px/1.5 ${uiTokens.font};
@@ -785,7 +792,7 @@ export const docsStyles = css`
       max-height: 60vh;
       padding: 16px 20px 0;
       border-right: 0;
-      border-bottom: 1px solid ${uiTokens.borderSubtle};
+      border-bottom: ${lineTokens.width} solid ${lineTokens.edge};
     }
     .docs-sidebar > .docs-brand {
       display: none;
@@ -835,7 +842,7 @@ export const docsStyles = css`
       gap: 0;
     }
     .docs-home-route li + li {
-      border-top: 1px solid ${uiTokens.borderFaint};
+      border-top: ${lineTokens.width} solid ${lineTokens.divider};
     }
     .docs-package-grid {
       grid-template-columns: minmax(0, 1fr);

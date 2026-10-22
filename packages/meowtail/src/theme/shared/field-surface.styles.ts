@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { radiusTokens } from "../palette";
 import { inputContract } from "../../components/input";
 import { textareaContract } from "../../components/textarea";
 import { selectContract } from "../../components/select";
@@ -40,7 +39,7 @@ export const fieldSurfaceStyles = css`
     border-radius: ${uiTokens.controlRadius};
     color: ${uiTokens.foreground};
     background: ${uiTokens.inputSurface};
-    box-shadow: none;
+    box-shadow: ${uiTokens.shadowField};
     font: ${uiTokens.fontBody}/22px ${uiTokens.font};
     outline: none;
     transition:
@@ -50,21 +49,10 @@ export const fieldSurfaceStyles = css`
   ${singleLine} {
     min-height: ${uiTokens.controlHeight};
   }
-  /* Search is a filled pill, as in Mobbin and Grok: it reads as a place to
-     look, not a form value. It surfaces on focus like any field. */
-  ${search} {
-    border-color: transparent;
-    border-radius: ${radiusTokens.action};
-    corner-shape: round;
-    background: ${uiTokens.surfaceMuted};
-  }
+
   @media (hover: hover) {
     :where(${surfaces}:hover) {
       border-color: ${uiTokens.borderStrong};
-    }
-    :where(${search}:hover) {
-      border-color: transparent;
-      background: ${uiTokens.active};
     }
   }
   ${readOnly} {
@@ -75,9 +63,7 @@ export const fieldSurfaceStyles = css`
     border-color: ${uiTokens.focus};
     box-shadow: 0 0 0 3px ${uiTokens.focusRing};
   }
-  :where(${search}:focus-within) {
-    background: ${uiTokens.inputSurface};
-  }
+
   ${invalid} {
     border-color: ${uiTokens.danger};
   }
@@ -88,6 +74,7 @@ export const fieldSurfaceStyles = css`
     color: ${uiTokens.subtleForeground};
     border-color: ${uiTokens.borderFaint};
     background: ${uiTokens.surfaceMuted};
+    box-shadow: none;
     cursor: not-allowed;
   }
   @media (forced-colors: active) {

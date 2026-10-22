@@ -15,6 +15,7 @@ import {
   Select,
   Switch,
 } from "meowtail";
+import { Specimen } from "./specimen";
 
 /**
  * Canonical control scene for the basic-quality audit: one-line text, icon/text
@@ -44,8 +45,7 @@ export const BasicQualityControlsStory = defineStory({
     const view = signal("list");
     return (
       <div className="workshop-stack" data-basic-quality-scene>
-        <section className="workshop-stack">
-          <h2 className="workshop-section-title">Single-line inputs and selects</h2>
+        <Specimen label="Single-line inputs and selects" align="start">
           <Input aria-label="Project name" value="Workspace" data-batch1="input" />
           <Input
             aria-label="Project name placeholder"
@@ -69,10 +69,9 @@ export const BasicQualityControlsStory = defineStory({
               { value: "fast", label: "DeepSeek-V4-Fast" },
             ]}
           />
-        </section>
+        </Specimen>
 
-        <section className="workshop-stack">
-          <h2 className="workshop-section-title">One row of every single-line control</h2>
+        <Specimen label="One row of every single-line control" align="start">
           {/* Top-aligned on purpose: the row only lines up if every height agrees. */}
           <Inline gap="compact" align="start" data-mixed-row>
             <Input aria-label="Filter name" placeholder="Name" />
@@ -111,10 +110,9 @@ export const BasicQualityControlsStory = defineStory({
               <Icon name="refresh-cw" />
             </IconButton>
           </Inline>
-        </section>
+        </Specimen>
 
-        <section className="workshop-stack">
-          <h2 className="workshop-section-title">Actions</h2>
+        <Specimen label="Actions" align="start">
           <div className="workshop-row">
             <Button data-batch1="button-text">Save changes</Button>
             <Button data-batch1="button-icon-text">
@@ -125,18 +123,16 @@ export const BasicQualityControlsStory = defineStory({
               <Icon name="search" />
             </IconButton>
           </div>
-        </section>
+        </Specimen>
 
-        <section className="workshop-stack">
-          <h2 className="workshop-section-title">Switches and checkboxes</h2>
+        <Specimen label="Switches and checkboxes" align="start">
           <div className="workshop-row">
             <Checkbox label="Keep draft" defaultChecked data-batch1="checkbox" />
             <Switch label="Notify when complete" data-batch1="switch" />
           </div>
-        </section>
+        </Specimen>
 
-        <section className="workshop-stack">
-          <h2 className="workshop-section-title">Inline input</h2>
+        <Specimen label="Inline input" align="start">
           <div style={{ width: "100%" }}>
             <ChatComposer
               layout="inline"
@@ -147,7 +143,7 @@ export const BasicQualityControlsStory = defineStory({
               data-batch1="composer"
             />
           </div>
-        </section>
+        </Specimen>
       </div>
     );
   },

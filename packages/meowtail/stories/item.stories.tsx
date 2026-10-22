@@ -1,6 +1,7 @@
 import { h } from "meowjsx/runtime";
 import { defineStory } from "meowbook";
-import { Item, Icon, Stack, Container } from "meowtail";
+import { Item, Icon, Stack } from "meowtail";
+import { Measure } from "./specimen";
 
 export const ItemStory = defineStory({
   id: "item-composition",
@@ -12,7 +13,7 @@ export const ItemStory = defineStory({
   description:
     "The same item carries files, sources, and navigation destinations. Content wraps naturally and actions use native buttons.",
   render: () => (
-    <Container>
+    <Measure>
       <Stack>
         <Item
           title="Release check"
@@ -46,6 +47,6 @@ export const ItemStory = defineStory({
         />
         <Item as="button" disabled title="Unavailable file" description="File is not synced yet" />
       </Stack>
-    </Container>
+    </Measure>
   ),
 });

@@ -1,6 +1,17 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Button, ChoiceSelect, Icon, IconButton, Input, Select, Stack, Toolbar } from "meowtail";
+import {
+  Button,
+  ChoiceSelect,
+  Icon,
+  IconButton,
+  Input,
+  Link,
+  Select,
+  Stack,
+  Toolbar,
+} from "meowtail";
+import { Specimen, Note } from "./specimen";
 
 export const IconButtonStory = defineStory({
   id: "icon-button",
@@ -28,9 +39,9 @@ export const IconButtonStory = defineStory({
           <Icon name="wrench" />
         </IconButton>
       </Toolbar>
-      <p className="workshop-note">
+      <Note>
         Pointer users see an icon; screen reader and keyboard users get an explicit action name.
-      </p>
+      </Note>
     </Stack>
   ),
 });
@@ -47,8 +58,7 @@ export const ToolbarStory = defineStory({
   covers: ["Toolbar", "role=toolbar", "horizontal", "vertical", "mixed controls", "roving actions"],
   render: () => (
     <Stack gap="relaxed" className="workshop-constrained">
-      <section className="workshop-stack">
-        <h2 className="workshop-section-title">Preview actions</h2>
+      <Specimen label="Preview actions" align="start">
         <Toolbar label="Preview actions">
           <Button size="small">Desktop</Button>
           <Button variant="quiet" size="small">
@@ -58,9 +68,8 @@ export const ToolbarStory = defineStory({
             <Icon name="refresh-cw" />
           </IconButton>
         </Toolbar>
-      </section>
-      <section className="workshop-stack">
-        <h2 className="workshop-section-title">Filter and preview</h2>
+      </Specimen>
+      <Specimen label="Filter and preview" align="start">
         <Toolbar label="Filter and preview">
           <Button size="small">Update preview</Button>
           <Input
@@ -87,14 +96,13 @@ export const ToolbarStory = defineStory({
           <Button variant="quiet" size="small">
             Restore default preview
           </Button>
-          <a href="#toolbar-help">View toolbar notes</a>
+          <Link href="#toolbar-help">View toolbar notes</Link>
         </Toolbar>
-        <p id="toolbar-help" className="workshop-note">
+        <Note id="toolbar-help">
           Actions share one Tab stop; editing controls remain independently reachable.
-        </p>
-      </section>
-      <section className="workshop-stack">
-        <h2 className="workshop-section-title">Standalone action group</h2>
+        </Note>
+      </Specimen>
+      <Specimen label="Standalone action group" align="start">
         <Toolbar label="Editing and canvas">
           <Button size="small">Save layout</Button>
           <Button size="small" tabIndex={-1}>
@@ -110,9 +118,8 @@ export const ToolbarStory = defineStory({
           </Toolbar>
           <Button size="small">Cancel editing</Button>
         </Toolbar>
-      </section>
-      <section className="workshop-stack">
-        <h2 className="workshop-section-title">Vertical toolbar</h2>
+      </Specimen>
+      <Specimen label="Vertical toolbar" align="start">
         <Toolbar label="Canvas actions" orientation="vertical">
           <IconButton size="small" label="Zoom out canvas">
             <Icon name="minus" />
@@ -121,7 +128,7 @@ export const ToolbarStory = defineStory({
             <Icon name="plus" />
           </IconButton>
         </Toolbar>
-      </section>
+      </Specimen>
     </Stack>
   ),
 });

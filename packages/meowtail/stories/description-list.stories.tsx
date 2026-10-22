@@ -2,7 +2,6 @@ import { h } from "meowjsx";
 import { defineStory } from "meowbook";
 import {
   Button,
-  Container,
   DescriptionItem,
   DescriptionList,
   Inline,
@@ -10,6 +9,7 @@ import {
   LayoutItem,
   Stack,
 } from "meowtail";
+import { Measure } from "./specimen";
 
 const copy = {
   purpose:
@@ -40,7 +40,7 @@ export const DescriptionListStory = defineStory({
     "draft continuity",
   ],
   render: () => (
-    <Container width="content">
+    <Measure width="content">
       <Stack gap="relaxed">
         <span>{copy.purpose}</span>
         <DescriptionList aria-label="Work information" data-description-wide>
@@ -73,6 +73,6 @@ export const DescriptionListStory = defineStory({
           </Stack>
         </div>
       </Stack>
-    </Container>
+    </Measure>
   ),
 });

@@ -1,6 +1,7 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Badge, Container, Icon, NavList, Stack } from "meowtail";
+import { Badge, Icon, NavList, Stack } from "meowtail";
+import { Measure } from "./specimen";
 
 export const NavListStory = defineStory({
   id: "nav-list",
@@ -23,7 +24,7 @@ export const NavListStory = defineStory({
   render() {
     const feedback = signal("Action rows report their selection here.");
     return (
-      <Container width="page">
+      <Measure width="page">
         <Stack style={{ width: "min(100%, 280px)" }} gap="normal">
           <NavList
             label="Documentation"
@@ -124,7 +125,7 @@ export const NavListStory = defineStory({
           />
           <span role="status">{feedback}</span>
         </Stack>
-      </Container>
+      </Measure>
     );
   },
 });
@@ -148,7 +149,7 @@ export const NavListLongLabelStory = defineStory({
   ],
   render() {
     return (
-      <Container width="page">
+      <Measure width="page">
         <Stack style={{ width: "min(100%, 220px)" }} gap="normal">
           <NavList
             label="Component workspaces"
@@ -192,7 +193,7 @@ export const NavListLongLabelStory = defineStory({
             ]}
           />
         </Stack>
-      </Container>
+      </Measure>
     );
   },
 });

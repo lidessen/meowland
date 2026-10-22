@@ -1,6 +1,7 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
-import { ActionRail, Button, Container, Icon, IconButton, MetaRow, Stack } from "meowtail";
+import { ActionRail, Button, Icon, IconButton, MetaRow, Stack } from "meowtail";
+import { Measure } from "./specimen";
 
 export const PatternContainersStory = defineStory({
   id: "pattern-containers",
@@ -19,7 +20,7 @@ export const PatternContainersStory = defineStory({
     "MetaRow centered facts",
   ],
   render: () => (
-    <Container width="content">
+    <Measure width="content">
       <Stack gap="relaxed">
         <Stack gap="compact">
           <strong>Action rail</strong>
@@ -108,6 +109,6 @@ export const PatternContainersStory = defineStory({
           progressLabel="Session budget"
         />
       </Stack>
-    </Container>
+    </Measure>
   ),
 });

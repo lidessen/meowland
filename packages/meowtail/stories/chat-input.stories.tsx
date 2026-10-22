@@ -4,7 +4,6 @@ import {
   Button,
   ChatAttachments,
   ChatComposer,
-  Container,
   Dialog,
   DialogHeader,
   DialogPanel,
@@ -12,6 +11,7 @@ import {
   Inline,
   Stack,
 } from "meowtail";
+import { Measure, Note } from "./specimen";
 
 const imageUrl =
   "data:image/svg+xml," +
@@ -39,7 +39,7 @@ export const InlineComposer = defineStory({
   description:
     "Short drafts sit on the same row as actions; long drafts grow naturally. Supporting instructions appear outside the writing surface on focus. Local editing only.",
   render: () => (
-    <Container width="content">
+    <Measure width="content">
       <ChatComposer
         layout="inline"
         hint="Enter for a new line · Use Send to submit"
@@ -50,7 +50,7 @@ export const InlineComposer = defineStory({
           <Icon name="plus" />
         </Button>
       </ChatComposer>
-    </Container>
+    </Measure>
   ),
 });
 
@@ -105,7 +105,7 @@ export const ComposerAttachments = defineStory({
     };
     refresh();
     return (
-      <Container width="content">
+      <Measure width="content">
         <Stack gap="relaxed">
           <Stack gap="compact">
             <strong>Check the reading order in the workspace</strong>
@@ -171,7 +171,7 @@ export const ComposerAttachments = defineStory({
                 Simulate success
               </Button>
             </Inline>
-            <p role="status">{feedback}</p>
+            <Note role="status">{feedback}</Note>
           </Stack>
           <Dialog
             ref={(element: HTMLDialogElement) => {
@@ -199,7 +199,7 @@ export const ComposerAttachments = defineStory({
             </DialogPanel>
           </Dialog>
         </Stack>
-      </Container>
+      </Measure>
     );
   },
 });
@@ -213,7 +213,7 @@ export const SentAttachments = defineStory({
   groupOrder: 50,
   description: "Sent materials keep preview and download; no draft-removal action is offered.",
   render: () => (
-    <Container width="content">
+    <Measure width="content">
       <Stack gap="compact">
         <strong>Workspace reading order</strong>
         <p>
@@ -222,6 +222,6 @@ export const SentAttachments = defineStory({
         </p>
         <ChatAttachments label="Sent materials" items={sampleFiles} />
       </Stack>
-    </Container>
+    </Measure>
   ),
 });

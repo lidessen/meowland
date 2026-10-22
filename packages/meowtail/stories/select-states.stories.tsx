@@ -1,6 +1,7 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
 import { Field, Select } from "meowtail";
+import { Note } from "./specimen";
 
 export const SelectStatesStory = defineStory({
   id: "select-states",
@@ -93,9 +94,7 @@ export const SelectStatesStory = defineStory({
             <option>This task uses the local workspace</option>
           </Select>
         </Field>
-        <p role="status" className="workshop-feedback">
-          {feedback}
-        </p>
+        <Note role="status">{feedback}</Note>
       </div>
     );
   },

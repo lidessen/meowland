@@ -145,7 +145,7 @@ export const chatMessageStyles = css`
 
   ${partSelector(chatMessageContract, "content")} {
     display: grid;
-    gap: 16px;
+    gap: ${uiTokens.proseGap};
   }
 
   ${partSelector(chatBubbleContract, "root")}:not(:is([${chatBubbleOptions.attribute("variant")}="filled"], [${chatBubbleOptions.attribute("variant")}="auto"][data-chat-role="user"])) {
@@ -173,72 +173,8 @@ export const chatMessageStyles = css`
     white-space: pre-wrap;
   }
 
-  /* Reading rhythm belongs to prose, not the caller's embedded controls. */
-  :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) > :is(p, ul, ol, pre, blockquote, h2, h3) {
-    margin: 0;
-  }
-
-  ${partSelector(chatBubbleContract, "root")} > * + * {
-    margin-top: 16px;
-  }
-
-  :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) > :is(h2, h3) {
-    margin-top: ${uiTokens.spacePanel};
-    font-size: 1.08em;
-    font-weight: 600;
-    line-height: 1.45;
-  }
-
-  :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) > :is(h2, h3):first-child {
-    margin-top: 0;
-  }
-
-  :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) > :is(ul, ol) {
-    padding-inline-start: 18px;
-  }
-
-  :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) li + li {
-    margin-top: 6px;
-  }
-
-  :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) li > :is(ul, ol) {
-    margin-block: 4px 0;
-    padding-inline-start: 20px;
-  }
-
-  :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) :not(pre) > code {
-    padding: 1px 4px;
-    border-radius: ${radiusTokens.mark};
-    background: ${uiTokens.surfaceMuted};
-    font-family: ${uiTokens.mono};
-    font-size: 0.92em;
-  }
-
-  :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) > pre {
-    max-width: 100%;
-    overflow-x: auto;
-    /* The same recessed surface CodeBlock and output views use. */
-    padding: 14px 16px;
-    border: 0;
-    border-radius: ${uiTokens.radiusLarge};
-    background: ${uiTokens.codeSurface};
-    font-family: ${uiTokens.mono};
-    font-size: ${uiTokens.fontCode};
-    line-height: 1.65;
-    white-space: pre;
-    overflow-wrap: normal;
-  }
-
-  :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) > pre:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
-    outline-offset: 2px;
-  }
-
-  :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) > blockquote {
-    padding-inline-start: ${uiTokens.spaceSection};
-    border-inline-start: 2px solid ${lineTokens.edge};
-    color: ${uiTokens.mutedForeground};
-  }
+  /* Block spacing, headings, lists, code, quotes and links inside content take
+     the shared reading rhythm from shared/prose.styles.ts. */
 
   ${partSelector(chatMessageContract, "header")},
   ${partSelector(chatMessageContract, "footer")} {

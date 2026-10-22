@@ -1,6 +1,7 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
 import { Card, ContextMenu, Icon, Stack } from "meowtail";
+import { Note } from "./specimen";
 
 export const ContextMenuStory = defineStory({
   id: "context-menu",
@@ -62,7 +63,7 @@ export const ContextMenuStory = defineStory({
             <p>Shift+F10 opens the same menu when the region is focused.</p>
           </Card>
         </ContextMenu>
-        <p role="status">{feedback}</p>
+        <Note role="status">{feedback}</Note>
       </Stack>
     );
   },

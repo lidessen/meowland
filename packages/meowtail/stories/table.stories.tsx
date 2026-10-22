@@ -1,6 +1,7 @@
 import { h, mapSignal, signal } from "meowjsx";
 import { defineStory } from "meowbook";
 import { Stack, Table, type TableRow, type TableSort } from "meowtail";
+import { Note } from "./specimen";
 
 const files = [
   { id: "alpha", name: "alpha.md", kind: "Markdown", size: 12 },
@@ -67,11 +68,11 @@ export const TableStory = defineStory({
             selected.value = ids;
           }}
         />
-        <p role="status">
+        <Note role="status">
           {mapSignal(selected, (ids) =>
             ids.length === 0 ? "No files selected." : `Selected: ${ids.join(", ")}.`,
           )}
-        </p>
+        </Note>
       </Stack>
     );
   },

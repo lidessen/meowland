@@ -8,12 +8,13 @@ import {
   Select,
   AspectRatio,
   Separator,
+  Text,
   Tooltip,
   Button,
   Stack,
   Inline,
-  Container,
 } from "meowtail";
+import { Measure, Specimen, Specimens } from "./specimen";
 
 export const FieldGroups = defineStory({
   id: "field-group",
@@ -26,7 +27,7 @@ export const FieldGroups = defineStory({
     "Uses native fieldset/legend for fields in one group; when the group is unavailable, inputs and selects follow form semantics together.",
   covers: ["FieldGroup", "Field", "fieldset", "disabled"],
   render: () => (
-    <Container width="narrow">
+    <Measure width="narrow">
       <form>
         <Stack gap="relaxed">
           <FieldGroup
@@ -61,7 +62,7 @@ export const FieldGroups = defineStory({
           </FieldGroup>
         </Stack>
       </form>
-    </Container>
+    </Measure>
   ),
 });
 export const MediaRatio = defineStory({
@@ -74,7 +75,7 @@ export const MediaRatio = defineStory({
   description:
     "The ratio controls the media placeholder and images choose their own cropping; the width follows the parent container.",
   render: () => (
-    <Container>
+    <Measure>
       <Stack gap="relaxed">
         {[16 / 9, 1].map((ratio) => (
           <AspectRatio ratio={ratio} style={{ maxWidth: ratio === 1 ? "240px" : "100%" }}>
@@ -94,7 +95,7 @@ export const MediaRatio = defineStory({
           </AspectRatio>
         ))}
       </Stack>
-    </Container>
+    </Measure>
   ),
 });
 export const Separators = defineStory({
@@ -106,18 +107,25 @@ export const Separators = defineStory({
   groupOrder: 40,
   description: "A separator expresses a content boundary and adds no focusable action by default.",
   render: () => (
-    <Container width="narrow">
-      <Stack gap="relaxed">
-        <strong>Work record</strong>
-        <p>Changes and follow-up actions are grouped separately.</p>
+    <Specimens>
+      <Specimen label="Between content groups" width="narrow">
+        <Stack gap="compact">
+          <Text>
+            <strong>Work record</strong>
+          </Text>
+          <Text variant="secondary">Changes and follow-up actions are grouped separately.</Text>
+        </Stack>
         <Separator />
-        <Inline>
+        <Text variant="secondary">Follow-up actions start below the rule.</Text>
+      </Specimen>
+      <Specimen label="Between tools" align="start">
+        <Inline gap="compact" align="center" wrap={false}>
           <Button variant="quiet">View changes</Button>
           <Separator orientation="vertical" style={{ height: "20px" }} />
           <Button variant="quiet">Copy link</Button>
         </Inline>
-      </Stack>
-    </Container>
+      </Specimen>
+    </Specimens>
   ),
 });
 export const Tooltips = defineStory({
@@ -130,7 +138,7 @@ export const Tooltips = defineStory({
   description:
     "Hovering briefly adds a description and keyboard focus shows it immediately; Escape closes it and keeps focus. Necessary information always stays on the page.",
   render: () => (
-    <Container width="narrow">
+    <Measure width="narrow">
       <Stack gap="relaxed" align="start">
         <p>The standalone preview keeps the current work page.</p>
         <Tooltip
@@ -144,6 +152,6 @@ export const Tooltips = defineStory({
         />
         <Input aria-label="Next item" placeholder="Tabbing here closes the tooltip" />
       </Stack>
-    </Container>
+    </Measure>
   ),
 });

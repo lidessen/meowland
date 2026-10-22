@@ -1,6 +1,7 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
 import { Button, Icon, Stack } from "meowtail";
+import { Note } from "./specimen";
 import { Menu } from "../src/components/menu";
 export const MenuStory = defineStory({
   id: "menu-actions",
@@ -59,7 +60,7 @@ export const MenuStory = defineStory({
             },
           ]}
         />
-        <p role="status">{feedback}</p>
+        <Note role="status">{feedback}</Note>
       </Stack>
     );
   },
@@ -127,7 +128,7 @@ export const NestedMenuStory = defineStory({
             },
           ]}
         />
-        <p role="status">{feedback}</p>
+        <Note role="status">{feedback}</Note>
       </Stack>
     );
   },

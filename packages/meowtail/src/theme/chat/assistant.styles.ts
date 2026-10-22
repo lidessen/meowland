@@ -99,33 +99,6 @@ export const assistantStyles = css`
     line-height: ${chatTokens.messageLeading};
     overflow-wrap: anywhere;
   }
-  ${root} ${partSelector(assistantMarkdownContract, "root")} > :first-child {
-    margin-top: 0;
-  }
-  ${root} ${partSelector(assistantMarkdownContract, "root")} > :last-child {
-    margin-bottom: 0;
-  }
-  ${root} ${partSelector(assistantMarkdownContract, "root")} pre {
-    overflow-x: auto;
-    padding: ${uiTokens.spaceGroup};
-    background: ${uiTokens.codeSurface};
-    border-radius: ${uiTokens.radiusSmall};
-    font: ${uiTokens.fontCaption}/1.6 ${uiTokens.mono};
-  }
-  ${root} ${partSelector(assistantMarkdownContract, "root")} table {
-    border-collapse: collapse;
-    display: block;
-    max-width: 100%;
-    overflow-x: auto;
-  }
-  ${root} ${partSelector(assistantMarkdownContract, "root")} :is(th, td) {
-    padding: ${uiTokens.spaceGroup};
-    border: 1px solid ${uiTokens.borderSoft};
-    text-align: start;
-  }
-  ${root} ${partSelector(assistantMarkdownContract, "root")} a {
-    color: ${uiTokens.info};
-  }
   ${partSelector(assistantViewContract, "latest")} {
     display: flex;
     justify-content: flex-end;

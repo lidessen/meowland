@@ -13,8 +13,8 @@ import {
   Icon,
   IconButton,
   Stack,
-  Container,
 } from "meowtail";
+import { Measure, Note } from "./specimen";
 
 export const CardCompositionStory = defineStory({
   id: "card-composition",
@@ -33,7 +33,7 @@ export const CardCompositionStory = defineStory({
     "long title",
   ],
   render: () => (
-    <Container>
+    <Measure>
       <Stack gap="relaxed" data-card-example>
         <Card as="article" aria-labelledby="card-project-title">
           <CardHeader>
@@ -129,11 +129,11 @@ export const CardCompositionStory = defineStory({
             </p>
           </CardContent>
         </Card>
-        <p className="workshop-feedback" role="status" data-card-feedback>
+        <Note role="status" data-card-feedback>
           Actions only report back to the local example.
-        </p>
+        </Note>
       </Stack>
-    </Container>
+    </Measure>
   ),
   setup({ root, onCleanup }) {
     const handleClick = (event: Event) => {

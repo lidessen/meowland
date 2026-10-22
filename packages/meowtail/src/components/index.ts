@@ -77,6 +77,8 @@ export {
   initialsFromName,
 } from "./avatar";
 export { Link, type LinkProps, linkContract } from "./link";
+export { Text, type TextProps, textContract, textOptions } from "./text";
+export { Prose, type ProseProps, proseContract, proseOptions } from "./prose";
 export { Switch, type SwitchProps, switchContract } from "./switch";
 export { Select, type SelectProps, selectContract } from "./select";
 export {

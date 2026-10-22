@@ -16,6 +16,7 @@ import {
   Icon,
   IconButton,
 } from "meowtail";
+import { Note } from "./specimen";
 
 export const MessagePartsStory = defineStory({
   id: "message-parts",
@@ -122,9 +123,9 @@ export const MessagePartsStory = defineStory({
         </ChatMessageList>
       </ChatFrame>
       <ChatHeader title="Compact conversation with a title only" />
-      <p className="workshop-feedback" role="status" data-message-feedback>
+      <Note role="status" data-message-feedback>
         Actions only report back to the local sample.
-      </p>
+      </Note>
     </div>
   ),
   setup({ root, onCleanup }) {
@@ -169,9 +170,7 @@ export const ComposerRecoveryStory = defineStory({
           <Icon name="plus" />
         </IconButton>
       </ChatComposer>
-      <p className="workshop-feedback" data-composer-submitted>
-        No content submitted yet.
-      </p>
+      <Note data-composer-submitted>No content submitted yet.</Note>
       <div className="workshop-row">
         <Button variant="outline" data-composer-result="failure" disabled>
           Simulate failure
@@ -183,9 +182,9 @@ export const ComposerRecoveryStory = defineStory({
           Recover and keep editing
         </Button>
       </div>
-      <p className="workshop-feedback" role="status" data-composer-feedback>
+      <Note role="status" data-composer-feedback>
         Waiting for submission. Local demo only.
-      </p>
+      </Note>
     </div>
   ),
   setup({ root, onCleanup }) {
@@ -500,10 +499,10 @@ export const AttachmentScaleStory = defineStory({
             },
           ]}
         />
-        <p className="workshop-note">
+        <Note>
           File sizes are fixed display data and do not claim to match the actual byte count of the
           downloaded content.
-        </p>
+        </Note>
         <ChatAttachments
           label="Host download callback sample"
           items={[
@@ -517,9 +516,9 @@ export const AttachmentScaleStory = defineStory({
             },
           ]}
         />
-        <p className="workshop-feedback" role="status" data-attachment-download-feedback>
+        <Note role="status" data-attachment-download-feedback>
           {downloadFeedback}
-        </p>
+        </Note>
         <ChatAttachments label="No attachments" items={[]} />
       </div>
     );

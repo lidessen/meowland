@@ -1,6 +1,7 @@
 import { h, signal, mapSignal } from "meowjsx";
 import { defineStory } from "meowbook";
 import { Spinner, Button, Stack } from "meowtail";
+import { Note } from "./specimen";
 export const Spinners = defineStory({
   id: "spinner",
   title: "In progress · A readable wait",
@@ -19,7 +20,7 @@ export const Spinners = defineStory({
           value ? (
             <Spinner label="Organizing the file list…" />
           ) : (
-            <p role="status">The file list is ready.</p>
+            <Note role="status">The file list is ready.</Note>
           ),
         )}
         <Button

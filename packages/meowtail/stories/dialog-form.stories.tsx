@@ -11,6 +11,7 @@ import {
   IconButton,
   Input,
 } from "meowtail";
+import { Note } from "./specimen";
 
 export const DialogFormStory = defineStory({
   id: "dialog-form",
@@ -32,9 +33,9 @@ export const DialogFormStory = defineStory({
   render: () => (
     <div className="workshop-stack workshop-constrained">
       <Button data-edit-open>Edit delivery notes</Button>
-      <p role="status" data-edit-feedback className="workshop-feedback">
+      <Note role="status" data-edit-feedback>
         The local sample has not been modified yet.
-      </p>
+      </Note>
       <Dialog labelledBy="edit-title" describedBy="edit-description">
         <DialogPanel
           as="form"

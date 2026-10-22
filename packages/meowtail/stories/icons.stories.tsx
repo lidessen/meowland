@@ -1,6 +1,8 @@
 import { h } from "meowjsx/runtime";
 import {
   Button,
+  Inline,
+  Stack,
   DoodleCat,
   ExternalArrowIcon,
   Field,
@@ -16,6 +18,7 @@ import {
   SearchIcon,
   TasksIcon,
 } from "meowtail";
+import { Note, Specimen, Specimens } from "./specimen";
 import { defineStory } from "meowbook";
 import { Bell, Camera, Rocket } from "meowtail/icons/lucide";
 
@@ -30,7 +33,7 @@ export const IconsStory = defineStory({
     "Find and choose a semantic icon. Names are the stable call keys used by components and JSON; application-only icons use IconSource with the pinned Lucide pass-through.",
   covers: ["Icon", "iconNames", "all functional icons", "search", "selection", "keyboard"],
   render: () => (
-    <div className="workshop-stack">
+    <Stack gap="normal">
       <Field htmlFor="icon-search" label="Find an icon" className="workshop-constrained">
         <SearchInput
           id="icon-search"
@@ -38,9 +41,9 @@ export const IconsStory = defineStory({
           placeholder="For example: search, file, arrow…"
         />
       </Field>
-      <p className="workshop-feedback" role="status" data-icon-feedback>
+      <Note role="status" data-icon-feedback>
         {iconNames.length} icons · select one to see its name
-      </p>
+      </Note>
       <div className="workshop-icon-grid" aria-label="Functional icons">
         {iconNames.map((name) => (
           <Button
@@ -54,10 +57,10 @@ export const IconsStory = defineStory({
           </Button>
         ))}
       </div>
-      <p className="workshop-note" data-icon-empty hidden>
+      <Note data-icon-empty hidden>
         No matching icons; try a shorter name.
-      </p>
-    </div>
+      </Note>
+    </Stack>
   ),
   setup({ root, report, onCleanup }) {
     const search = root.querySelector<HTMLInputElement>("#icon-search")!;
@@ -104,9 +107,12 @@ export const IconSizesStory = defineStory({
     "accessible labels",
   ],
   render: () => (
-    <div className="workshop-stack">
-      <section className="workshop-stack" aria-label="Size reference">
-        <h2 className="workshop-section-title">Same outline, different reading distance</h2>
+    <Specimens>
+      <Specimen
+        label="Same outline, different reading distance"
+        aria-label="Size reference"
+        align="start"
+      >
         {[undefined, 16, 20, 24].map((size) => (
           <div className="workshop-row workshop-icon-scale">
             <span className="workshop-note">{size === undefined ? "Default" : `${size}px`}</span>
@@ -121,9 +127,12 @@ export const IconSizesStory = defineStory({
             </span>
           </div>
         ))}
-      </section>
-      <section className="workshop-stack" aria-label="Theme stroke reference">
-        <h2 className="workshop-section-title">The theme decides stroke and feel</h2>
+      </Specimen>
+      <Specimen
+        label="The theme decides stroke and feel"
+        aria-label="Theme stroke reference"
+        align="start"
+      >
         <div className="workshop-row">
           <span className="workshop-note">MeowUI standard theme</span>
           <span className="workshop-icon-state-sample">
@@ -139,18 +148,24 @@ export const IconSizesStory = defineStory({
             <span className="workshop-note">Unavailable</span>
           </span>
         </div>
-      </section>
-      <section className="workshop-row" aria-label="Standalone graphic names">
-        <Icon name="folder" size={24} label="Project folder" />
-        <span className="workshop-note">
-          Standalone graphics can be named; decorative icons inside a button take their action from
-          the button.
-        </span>
-      </section>
-      <p className="workshop-feedback" role="status" data-feedback>
+      </Specimen>
+      <Specimen
+        label="Standalone graphic names"
+        aria-label="Standalone graphic names"
+        align="start"
+      >
+        <Inline gap="compact" align="center">
+          <Icon name="folder" size={24} label="Project folder" />
+          <span className="workshop-note">
+            Standalone graphics can be named; decorative icons inside a button take their action
+            from the button.
+          </span>
+        </Inline>
+      </Specimen>
+      <Note role="status" data-feedback>
         Use Tab and Enter to operate the icon buttons.
-      </p>
-    </div>
+      </Note>
+    </Specimens>
   ),
   setup({ root, report, onCleanup }) {
     const onClick = (event: Event) => {
@@ -185,7 +200,7 @@ export const BrandIconsStory = defineStory({
     "ExternalArrowIcon",
   ],
   render: () => (
-    <div className="workshop-stack">
+    <Specimens>
       <section className="workshop-brand-grid" aria-label="Brand and illustration">
         <figure>
           <MeowlandMark />
@@ -200,18 +215,27 @@ export const BrandIconsStory = defineStory({
           <figcaption>GithubIcon</figcaption>
         </figure>
       </section>
-      <section className="workshop-row" aria-label="Meowland brand at small sizes">
-        {[16, 24, 32].map((size) => (
-          <span className="workshop-row">
-            <span style={`display:inline-flex;width:${size}px;height:${size}px`}>
-              <MeowlandMark />
+      <Specimen
+        label="Meowland brand at small sizes"
+        aria-label="Meowland brand at small sizes"
+        align="start"
+      >
+        <Inline gap="compact" align="center">
+          {[16, 24, 32].map((size) => (
+            <span className="workshop-row">
+              <span style={`display:inline-flex;width:${size}px;height:${size}px`}>
+                <MeowlandMark />
+              </span>
+              <span>Meowland · {size}px</span>
             </span>
-            <span>Meowland · {size}px</span>
-          </span>
-        ))}
-      </section>
-      <section className="workshop-stack" aria-label="Functional icon convenience entries">
-        <h2 className="workshop-section-title">Convenience entries share the Icon outline</h2>
+          ))}
+        </Inline>
+      </Specimen>
+      <Specimen
+        label="Convenience entries share the Icon outline"
+        aria-label="Functional icon convenience entries"
+        align="start"
+      >
         <div className="workshop-icon-grid">
           {(
             [
@@ -228,8 +252,8 @@ export const BrandIconsStory = defineStory({
             </div>
           ))}
         </div>
-      </section>
-    </div>
+      </Specimen>
+    </Specimens>
   ),
 });
 
@@ -244,9 +268,8 @@ export const IconSourceStory = defineStory({
     "Render application icons outside the semantic set through IconSource. The pinned meowtail/icons/lucide pass-through supplies Lucide data; the shared frame keeps theme stroke, sizing, and accessible naming.",
   covers: ["IconSource", "IconNode", "meowtail/icons/lucide", "theme stroke", "accessible labels"],
   render: () => (
-    <div className="workshop-stack">
-      <section className="workshop-stack" aria-label="Application icons">
-        <h2 className="workshop-section-title">Icons outside the semantic set</h2>
+    <Specimens>
+      <Specimen label="Icons outside the semantic set" aria-label="Application icons" align="start">
         <div className="workshop-row">
           {(
             [
@@ -261,13 +284,15 @@ export const IconSourceStory = defineStory({
             </span>
           ))}
         </div>
-      </section>
-      <section className="workshop-row" aria-label="Named standalone icon">
-        <IconSource source={Bell} size={24} label="Notifications" />
-        <span className="workshop-note">
-          Pass label when the icon carries meaning on its own; otherwise it stays decorative.
-        </span>
-      </section>
-    </div>
+      </Specimen>
+      <Specimen label="Named standalone icon" aria-label="Named standalone icon" align="start">
+        <Inline gap="compact" align="center">
+          <IconSource source={Bell} size={24} label="Notifications" />
+          <span className="workshop-note">
+            Pass label when the icon carries meaning on its own; otherwise it stays decorative.
+          </span>
+        </Inline>
+      </Specimen>
+    </Specimens>
   ),
 });

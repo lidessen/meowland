@@ -11,6 +11,7 @@ import {
   DialogHeader,
   Stack,
 } from "meowtail";
+import { Note } from "./specimen";
 
 export const PopoverEscapeStory = defineStory({
   id: "popover-escape",
@@ -186,9 +187,7 @@ export const PopoverStory = defineStory({
                   <h3 id="nested-title" className="workshop-section-title">
                     Reading width
                   </h3>
-                  <p className="workshop-note">
-                    Keep space for the body and let supporting actions step aside.
-                  </p>
+                  <Note>Keep space for the body and let supporting actions step aside.</Note>
                   <Input aria-label="Width note" placeholder="Write down your preference…" />
                 </div>
               </Popover>
@@ -212,7 +211,7 @@ export const PopoverStory = defineStory({
               <h3 id="controlled-title" className="workshop-section-title">
                 Open and close managed by the host
               </h3>
-              <p className="workshop-note">Focus returns to the trigger after closing.</p>
+              <Note>Focus returns to the trigger after closing.</Note>
               <Button
                 onClick={() => {
                   controlled.value = false;
@@ -415,9 +414,7 @@ export const ChoiceSelectStory = defineStory({
             Restore defaults
           </Button>
         </div>
-        <p role="status" className="workshop-feedback">
-          {feedback}
-        </p>
+        <Note role="status">{feedback}</Note>
       </form>
     );
   },

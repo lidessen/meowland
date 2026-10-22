@@ -27,13 +27,13 @@ export const detailSectionStyles = css`
   ${section("title")} {
     margin: 0;
     color: ${uiTokens.mutedForeground};
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     font-weight: 600;
     line-height: 1.5;
   }
   ${section("aside")} {
     color: ${layerTokens.faint};
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
   }
   ${section("body")} {
     display: grid;

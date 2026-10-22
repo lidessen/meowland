@@ -25,3 +25,9 @@ Candidate for the next alpha publish. This version is not on npm until the manua
 - Active `Pill` filters take the accent selection colors; `SegmentedControl` options size from their labels and the selected thumb uses a hairline shadow.
 - `NavList` icons center on the label line when a row has a description.
 - `AssistantView` wraps user text parts in `ChatBubble`, matching `ChatMessage`.
+- One control ladder: `uiTokens.controlHeight` is 36px and `controlLarge` 44px, equal to the button sizes. Input, Select, ChoiceSelect, SearchInput, NumberInput, Tabs and SegmentedControl are 36px by default (Input was 33px, Select/ChoiceSelect/SearchInput 32px, Tabs 42px, SegmentedControl 38px), so mixed rows line up. The chat composer keeps its own lengths.
+- Field surfaces share one definition of rest, hover, read-only, focus (focus border plus a soft `focusRing` halo), invalid and disabled; native Select draws the same chevron as ChoiceSelect. New tokens: `fieldPaddingInline`, `borderStrong`, `focusRing`, `selectChevron`, `shadowThumb`, `trackInset`.
+- Tabs and SegmentedControl share one track: 3px inset, concentric radii, the same thumb shadow and 14px/500 labels.
+- Type ramp tokens `fontMicro` (11px), `fontCode` (12px), `fontLabel` (13px) and `fontHeading` (20px); every theme size maps to the ramp (12.5px and 13.5px become 13px and 14px, code text 11px becomes 12px). Library controls inherit typography instead of the browser's 13.33px default.
+- `radiusTokens.mark` (4px) for small marks; off-scale radii (3, 5, 9, 11, 12 and 16px) map to the scale by element size.
+- `PageFrame` reserves symmetric scrollbar gutters, so centered content stays aligned with the header when the platform draws classic scrollbars. `PageHeader` centers its actions on the identity block.

@@ -15,7 +15,7 @@ export const tagStyles = css`
     border-radius: ${radiusTokens.tag};
     background: ${layerTokens.chip};
     color: ${layerTokens.chipInk};
-    font: 12px/18px ${uiTokens.font};
+    font: ${uiTokens.fontCaption}/18px ${uiTokens.font};
     font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
@@ -34,9 +34,9 @@ export const tagStyles = css`
       min-width: 18px;
       height: 18px;
       padding: 0 5px;
-      border-radius: 9px;
+      border-radius: 999px;
       corner-shape: round;
-      font-size: 11px;
+      font-size: ${uiTokens.fontMicro};
       line-height: 1;
       font-weight: 600;
     }
@@ -47,7 +47,7 @@ export const tagStyles = css`
       text-overflow: ellipsis;
       vertical-align: baseline;
       padding: 1px 5px;
-      border-radius: 4px;
+      border-radius: ${radiusTokens.mark};
       background: ${layerTokens.code};
       color: ${uiTokens.foreground};
       font-family: ${uiTokens.mono};

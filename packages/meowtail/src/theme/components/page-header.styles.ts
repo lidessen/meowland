@@ -8,7 +8,8 @@ const header = (part: (typeof pageHeaderContract.parts)[number]) =>
 export const pageHeaderStyles = css`
   ${header("root")} {
     display: flex;
-    align-items: flex-end;
+    /* Page actions sit level with the identity block, not under its last line. */
+    align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
     gap: ${uiTokens.spaceSection} ${uiTokens.spacePanel};

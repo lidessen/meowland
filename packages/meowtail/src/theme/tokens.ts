@@ -17,10 +17,18 @@ export const uiTokens = defineTokens("ui", {
   fontDisplay:
     '"Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Songti SC", "Songti TC", "Noto Serif SC", serif',
   mono: '"SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, "PingFang SC", "Microsoft YaHei"',
-  fontBody: "14px",
+  /* Type ramp. Every size in the theme is one of these roles. */
+  /** Key caps, compact counts, group labels in menus and code banners. */
+  fontMicro: "11px",
   fontCaption: "12px",
+  /** Monospace text in code, output and JSON views. */
+  fontCode: "12px",
+  /** Compact UI text: menus, tooltips, small rows, bar notices. */
+  fontLabel: "13px",
+  fontBody: "14px",
   fontReading: "14px",
   fontTitle: "16px",
+  fontHeading: "20px",
   fontPageTitle: "24px",
   leading: "1.5714285714",
   spaceGroup: "8px",
@@ -30,10 +38,14 @@ export const uiTokens = defineTokens("ui", {
   pageInsetInline: "48px",
   pageInsetCompactBlock: "20px",
   pageInsetCompactInline: "16px",
+  /* One size ladder for every single-line control, so a field, a select and a
+     button placed in one row share a height and a center line. */
   controlSmall: "28px",
-  controlHeight: "32px",
+  controlHeight: "36px",
   controlPaddingInline: "8px",
-  controlLarge: "40px",
+  /** Text inset inside field surfaces (input, select, search, choice trigger). */
+  fieldPaddingInline: "12px",
+  controlLarge: "44px",
   buttonSmall: "28px",
   buttonHeight: "36px",
   buttonLarge: "44px",
@@ -75,6 +87,13 @@ export const uiTokens = defineTokens("ui", {
   borderSubtle: ["rgb(0 0 0 / 12%)", "rgb(255 255 255 / 16%)"],
   borderSoft: schemeAlias(`${lineTokens.divider}`),
   borderFaint: ["rgb(0 0 0 / 4%)", "rgb(255 255 255 / 6%)"],
+  /** Native Select chevron: the Lucide chevron-down the ChoiceSelect trigger draws, in muted ink. */
+  selectChevron: [
+    `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2361666b' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+    `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23adb2b8' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+  ],
+  /** Field border under the pointer: one step above the resting border. */
+  borderStrong: ["rgb(0 0 0 / 28%)", "rgb(255 255 255 / 32%)"],
   hover: ["rgb(38 49 72 / 6%)", "rgb(255 255 255 / 8%)"],
   active: ["rgb(38 49 72 / 10%)", "rgb(255 255 255 / 14%)"],
   primary: ["#0f1115", "#f9fafb"],
@@ -90,7 +109,16 @@ export const uiTokens = defineTokens("ui", {
   dangerAction: ["#b91c1c", "#f25a5a"],
   onDanger: ["#ffffff", "#0f1115"],
   focus: ["#4176e6", "#7aaaff"],
+  /** Soft halo around a focused field; the border carries the focus color. */
+  focusRing: ["rgb(65 118 230 / 22%)", "rgb(122 170 255 / 28%)"],
   shadowControl: "none",
+  /** The raised thumb inside a Tabs or SegmentedControl track. */
+  shadowThumb: [
+    "0 0 0 0.5px rgb(0 0 0 / 12%), 0 1px 2px rgb(0 0 0 / 8%)",
+    "0 0 0 0.5px rgb(255 255 255 / 14%), 0 1px 2px rgb(0 0 0 / 32%)",
+  ],
+  /** Inset between a Tabs or SegmentedControl track and its thumb. */
+  trackInset: "3px",
   shadowPanel: [
     "0 0 0 0.5px rgb(0 0 0 / 16%), 0 3px 8px rgb(0 0 0 / 4%), 0 0 20px rgb(0 0 0 / 5%)",
     "0 0 0 0.5px rgb(255 255 255 / 20%), 0 3px 8px rgb(0 0 0 / 4%), 0 0 20px rgb(0 0 0 / 5%)",

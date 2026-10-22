@@ -1,7 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { segmentedControlContract as segmented } from "../../components/segmented-control";
-import { layerTokens } from "../palette";
 
 export const segmentedControlStyles = css`
   ${partSelector(segmented, "root")} {
@@ -20,9 +19,10 @@ export const segmentedControlStyles = css`
   ${partSelector(segmented, "options")} {
     display: flex;
     gap: 2px;
-    padding: 3px;
-    border-radius: 12px;
-    background: ${layerTokens.chip};
+    /* Same track as Tabs: one control height, concentric radii. */
+    padding: ${uiTokens.trackInset};
+    border-radius: calc(${uiTokens.radiusSmall} + ${uiTokens.trackInset});
+    background: ${uiTokens.surfaceMuted};
   }
   ${partSelector(segmented, "option")} {
     position: relative;
@@ -43,24 +43,21 @@ export const segmentedControlStyles = css`
   ${partSelector(segmented, "label")} {
     display: block;
     box-sizing: border-box;
-    min-height: 32px;
-    padding: 6px 14px;
-    border-radius: 9px;
+    min-height: calc(${uiTokens.controlHeight} - 2 * ${uiTokens.trackInset});
+    padding: 4px 12px;
+    border-radius: ${uiTokens.radiusSmall};
     text-align: center;
-    font: 500 13px/20px ${uiTokens.font};
+    font: 500 ${uiTokens.fontBody}/22px ${uiTokens.font};
     color: ${uiTokens.mutedForeground};
   }
   ${partSelector(segmented, "input")}:checked + ${partSelector(segmented, "label")} {
     background: ${uiTokens.surface};
     color: ${uiTokens.foreground};
-    /* A raised thumb, not a floating panel: hairline plus a short drop. */
-    box-shadow:
-      0 0 0 0.5px ${uiTokens.borderSubtle},
-      0 1px 2px rgb(0 0 0 / 8%);
+    box-shadow: ${uiTokens.shadowThumb};
   }
   ${partSelector(segmented, "input")}:focus-visible + ${partSelector(segmented, "label")} {
     outline: 2px solid ${uiTokens.focus};
-    outline-offset: 2px;
+    outline-offset: -2px;
   }
   ${partSelector(segmented, "input")}:disabled + ${partSelector(segmented, "label")} {
     opacity: 0.4;

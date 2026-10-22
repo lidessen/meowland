@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { radiusTokens } from "../palette";
 import { jsonTreeContract as json } from "../../components/json-tree";
 import { jsonBlockContract as block } from "../../components/json-block.contract";
 
@@ -10,7 +11,7 @@ export const jsonStyles = css`
     padding: 6px 8px 8px;
     color: ${uiTokens.foreground};
     background: ${uiTokens.inputSurface};
-    font: 12px/16px ${uiTokens.mono};
+    font: ${uiTokens.fontCode}/16px ${uiTokens.mono};
   }
   ${partSelector(json, "summary")} {
     position: relative;
@@ -73,7 +74,7 @@ export const jsonStyles = css`
     height: 16px;
     border: 0;
     padding: 0;
-    border-radius: 3px;
+    border-radius: ${radiusTokens.mark};
     color: light-dark(#5f6368, #9aa0a6);
     background: transparent;
     opacity: 0;
@@ -100,7 +101,7 @@ export const jsonStyles = css`
     }
   }
   ${partSelector(json, "feedback")} {
-    font: 11px/18px ${uiTokens.font};
+    font: ${uiTokens.fontMicro}/18px ${uiTokens.font};
     color: ${uiTokens.mutedForeground};
   }
   ${partSelector(block, "root")} {
@@ -111,7 +112,7 @@ export const jsonStyles = css`
   ${partSelector(block, "summary")} {
     cursor: pointer;
     color: ${uiTokens.mutedForeground};
-    font: 13px/24px ${uiTokens.font};
+    font: ${uiTokens.fontLabel}/24px ${uiTokens.font};
   }
   ${partSelector(block, "body")} {
     max-height: 420px;
@@ -119,7 +120,7 @@ export const jsonStyles = css`
   }
   ${partSelector(block, "error")} {
     color: ${uiTokens.danger};
-    font: 13px/20px ${uiTokens.font};
+    font: ${uiTokens.fontLabel}/20px ${uiTokens.font};
   }
   ${partSelector(json, "copy")}:focus-visible, ${partSelector(json, "summary")}:focus-visible {
     outline: 2px solid ${uiTokens.focus};

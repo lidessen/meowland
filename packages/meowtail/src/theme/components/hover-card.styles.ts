@@ -52,7 +52,7 @@ export const hoverCardStyles = css`
     background: #2c2c2e;
     pointer-events: none;
     color: #fff;
-    font: 14px/20px ${uiTokens.font};
+    font: ${uiTokens.fontBody}/20px ${uiTokens.font};
   }
   ${partSelector(hoverCardContract, "feedback")}:empty {
     display: none;

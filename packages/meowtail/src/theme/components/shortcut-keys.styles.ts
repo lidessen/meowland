@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { radiusTokens } from "../palette";
 import { shortcutKeysContract } from "../../components/shortcut-keys";
 
 export const shortcutKeysStyles = css`
@@ -8,7 +9,7 @@ export const shortcutKeysStyles = css`
     align-items: center;
     gap: 3px;
     color: ${uiTokens.subtleForeground};
-    font: 12px/16px ${uiTokens.font};
+    font: ${uiTokens.fontCaption}/16px ${uiTokens.font};
     white-space: nowrap;
     flex: none;
   }
@@ -21,7 +22,7 @@ export const shortcutKeysStyles = css`
   }
   ${partSelector(shortcutKeysContract, "root")}[data-variant="tooltip"] {
     color: inherit;
-    font-size: 11px;
+    font-size: ${uiTokens.fontMicro};
     line-height: 14px;
     gap: 2px;
   }
@@ -29,7 +30,7 @@ export const shortcutKeysStyles = css`
     min-width: 16px;
     height: 16px;
     padding: 0 2px;
-    border-radius: 4px;
+    border-radius: ${radiusTokens.mark};
     background: color-mix(in srgb, ${uiTokens.tooltipSurface}, white 18%);
   }
 `;

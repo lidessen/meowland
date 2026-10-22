@@ -7,7 +7,7 @@ export const disclosureStyles = css`
     min-width: 0;
     color: ${uiTokens.foreground};
     font-family: ${uiTokens.font};
-    font-size: 13px;
+    font-size: ${uiTokens.fontLabel};
   }
 
   ${partSelector(disclosureContract, "summary")} {

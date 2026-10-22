@@ -175,13 +175,13 @@ Consecutive replies pass the same avatar with `continuation`, and the theme keep
 
 See [Component development conventions](AGENTS.md) for the default scale and component development order. Calibrate new components on the same screen as existing controls in Meowbook
 first, then integrate them into applications; the theme's font sizes, control heights, and three-level spacing form one set of relationships, and each component does not get its own new sizes.
-Default buttons are 36px high, compact buttons 28px, and input controls 32px. Information blocks are tight inside; page edges, standalone blocks, and reading areas should have generous whitespace.
+Buttons and single-line fields share one ladder: 36px by default, 28px compact, 44px large, so they line up in one row. Information blocks are tight inside; page edges, standalone blocks, and reading areas should have generous whitespace.
 Local spacing tokens are not the ceiling for page whitespace, and not every level is uniformly compressed.
 
 Use `uiTokens.fontBody` for interface body text, `uiTokens.fontCaption` for supporting descriptions, `uiTokens.fontReading` for long-form and conversation body text,
 `uiTokens.fontTitle` for local titles, and `uiTokens.fontPageTitle` for complete page titles; do not use the page-title scale for field labels.
 `uiTokens.fontDisplay` (`--ui-font-display`) is the serif stack for page and section titles. The default is Iowan Old Style, Palatino, Georgia, Times New Roman, Songti SC, Songti TC, Noto Serif SC, then `serif`. Body text stays on `uiTokens.font`. A host overrides the variable on an ancestor; it does not need a second theme. The horizontal padding of ordinary controls comes from
-`uiTokens.controlPaddingInline`; group, section, and panel express whitespace within a group, between areas, and at container edges respectively.
+`uiTokens.controlPaddingInline` (text inside field surfaces uses `uiTokens.fieldPaddingInline`); group, section, and panel express whitespace within a group, between areas, and at container edges respectively.
 Relative indentation in reading paragraphs, media sizes, graph coordinates, and touch targets still follow real usage and do not adopt control scales.
 
 `PageFrame`'s page edge uses `pageInsetBlock` / `pageInsetInline`, and narrow windows use the corresponding
@@ -584,7 +584,7 @@ Source code maintains no `.css` files, and generated CSS is still a browser asse
 
 `standardOptions` has a built-in scheme; the current standard theme defaults to `auto` and supports light/dark/auto.
 The standard visuals use DeepSeek Harness as their baseline: system fonts, 14px body, 12px supporting text, and 16px titles; buttons
-use 28/36/44px for small/default/large, and inputs default to 32px. Controls, menus, and large panels use their corresponding
+and single-line fields use 28/36/44px for small/default/large. Controls, menus, and large panels use their corresponding
 radii and materials, and applications compose pages from the same language. See [third-party notices](THIRD_PARTY_NOTICES.md) for reference sources and licenses,
 and the migration record (historical reference in the original product repository) for the implementation scope and verification not yet finished.
 

@@ -95,7 +95,7 @@ export const chatAttachmentsStyles = css`
 
   ${partSelector(chatAttachmentsContract, "size")} {
     color: ${uiTokens.subtleForeground};
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     line-height: 15px;
   }
   ${partSelector(chatAttachmentsContract, "entry")} {

@@ -1,6 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
-import { accentTokens } from "../palette";
+import { accentTokens, radiusTokens } from "../palette";
 import { chatProcessContract } from "../../chat/process";
 import { chatSourcesContract } from "../../chat/sources";
 import { chatToolCallContract } from "../../chat/tool-call";
@@ -89,7 +89,7 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatToolCallContract, "icon")} {
-    border-radius: 5px;
+    border-radius: ${radiusTokens.mark};
     color: inherit;
     background: transparent;
     font-size: ${uiTokens.fontBody};
@@ -527,7 +527,7 @@ export const chatRecordsStyles = css`
   ${partSelector(chatToolCallContract, "header")}:focus-visible > ${partSelector(chatToolCallContract, "chevron")} {
     outline: 2px solid ${uiTokens.focus};
     outline-offset: 2px;
-    border-radius: 3px;
+    border-radius: ${radiusTokens.mark};
   }
 
   ${partSelector(chatSourcesContract, "root")} {
@@ -583,7 +583,7 @@ export const chatRecordsStyles = css`
 
   ${partSelector(chatSourcesContract, "description")} {
     color: ${uiTokens.mutedForeground};
-    font-size: 13px;
+    font-size: ${uiTokens.fontLabel};
     line-height: 19px;
     overflow-wrap: anywhere;
   }

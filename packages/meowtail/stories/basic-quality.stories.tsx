@@ -7,7 +7,11 @@ import {
   ChoiceSelect,
   Icon,
   IconButton,
+  Inline,
   Input,
+  NumberInput,
+  SearchInput,
+  SegmentedControl,
   Select,
   Switch,
 } from "meowtail";
@@ -32,9 +36,12 @@ export const BasicQualityControlsStory = defineStory({
     "IconButton center",
     "ChoiceSelect trigger center",
     "inline composer center",
+    "mixed single-line row height",
   ],
   render() {
     const choice = signal("current");
+    const rowChoice = signal("current");
+    const view = signal("list");
     return (
       <div className="workshop-stack" data-basic-quality-scene>
         <section className="workshop-stack">
@@ -62,6 +69,48 @@ export const BasicQualityControlsStory = defineStory({
               { value: "fast", label: "DeepSeek-V4-Fast" },
             ]}
           />
+        </section>
+
+        <section className="workshop-stack">
+          <h2 className="workshop-section-title">One row of every single-line control</h2>
+          {/* Top-aligned on purpose: the row only lines up if every height agrees. */}
+          <Inline gap="compact" align="start" data-mixed-row>
+            <Input aria-label="Filter name" placeholder="Name" />
+            <SearchInput label="Search files" placeholder="Search" />
+            <Select aria-label="Status">
+              <option>Any status</option>
+            </Select>
+            <ChoiceSelect
+              id="basic-quality-row-choice"
+              aria-label="Owner"
+              value={rowChoice}
+              onValueChange={(value) => {
+                rowChoice.value = value;
+              }}
+              options={[
+                { value: "current", label: "Anyone" },
+                { value: "me", label: "Me" },
+              ]}
+            />
+            <NumberInput defaultValue={10} aria-label="Limit" />
+            <SegmentedControl
+              id="basic-quality-row-view"
+              label="View"
+              value={view}
+              onValueChange={(value) => {
+                view.value = value;
+              }}
+              options={[
+                { value: "list", label: "List" },
+                { value: "grid", label: "Grid" },
+              ]}
+            />
+            <Button variant="outline">Reset</Button>
+            <Button>Apply</Button>
+            <IconButton label="Refresh">
+              <Icon name="refresh-cw" />
+            </IconButton>
+          </Inline>
         </section>
 
         <section className="workshop-stack">

@@ -21,7 +21,7 @@ export const processGroupStyles = css`
     border-radius: ${radiusTokens.card};
     background: ${layerTokens.sunken};
     color: ${uiTokens.mutedForeground};
-    font: 13px/20px ${uiTokens.font};
+    font: ${uiTokens.fontLabel}/20px ${uiTokens.font};
   }
   ${group("summary")} {
     display: flex;
@@ -132,14 +132,14 @@ export const processGroupStyles = css`
   }
   ${step("label")} code {
     padding: 1px 5px;
-    border-radius: 4px;
+    border-radius: ${radiusTokens.mark};
     background: ${layerTokens.code};
     color: ${uiTokens.foreground};
-    font: 12px ${uiTokens.mono};
+    font: ${uiTokens.fontCode} ${uiTokens.mono};
   }
   ${step("meta")} {
     color: ${layerTokens.faint};
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     font-variant-numeric: tabular-nums;
   }
 `;

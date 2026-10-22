@@ -3,7 +3,7 @@ import { iconRailContract } from "../../components/icon-rail";
 import { railItemContract } from "../../components/rail-item";
 import { railSectionContract } from "../../components/rail-section";
 import { uiTokens } from "../tokens";
-import { accentTokens, layerTokens, lineTokens, statusTokens } from "../palette";
+import { accentTokens, layerTokens, lineTokens, statusTokens, radiusTokens } from "../palette";
 
 const rail = (part: (typeof iconRailContract.parts)[number]) =>
   partSelector(iconRailContract, part);
@@ -89,7 +89,7 @@ export const iconRailStyles = css`
     height: 40px;
     padding: 0 11px;
     border: 0;
-    border-radius: 12px;
+    border-radius: ${uiTokens.controlRadius};
     background: transparent;
     color: ${uiTokens.mutedForeground};
     font: inherit;
@@ -123,7 +123,7 @@ export const iconRailStyles = css`
     top: 12px;
     width: 3px;
     height: 16px;
-    border-radius: 3px;
+    border-radius: ${radiusTokens.mark};
     background: ${accentTokens.base};
   }
   ${openWithin(`${item("root")}[aria-current="page"]::before`)} {
@@ -183,14 +183,14 @@ export const iconRailStyles = css`
   ${item("meta")} {
     margin-left: auto;
     color: ${layerTokens.faint};
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     font-variant-numeric: tabular-nums;
     opacity: 0;
     transition: opacity ${uiTokens.durationResponse} ${uiTokens.ease};
   }
   ${item("root")}[data-meta-tone="accent"] ${item("meta")} {
     color: ${accentTokens.base};
-    font-size: 11px;
+    font-size: ${uiTokens.fontMicro};
     font-weight: 600;
   }
   ${openWithin(item("label").toString())},
@@ -211,7 +211,7 @@ export const iconRailStyles = css`
     display: none;
     margin: 14px 10px 6px;
     color: ${layerTokens.faint};
-    font-size: 11px;
+    font-size: ${uiTokens.fontMicro};
     font-weight: 600;
     letter-spacing: 0.06em;
     text-transform: uppercase;

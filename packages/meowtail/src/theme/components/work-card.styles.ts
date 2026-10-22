@@ -62,7 +62,7 @@ export const workCardStyles = css`
     flex-wrap: wrap;
     gap: 6px;
     color: ${uiTokens.mutedForeground};
-    font-size: 12.5px;
+    font-size: ${uiTokens.fontLabel};
     line-height: 1.5;
   }
   ${part("detail")}::before {
@@ -75,7 +75,7 @@ export const workCardStyles = css`
     align-items: center;
     gap: 4px;
     color: ${accentTokens.base};
-    font-size: 12.5px;
+    font-size: ${uiTokens.fontLabel};
     white-space: nowrap;
   }
 `;

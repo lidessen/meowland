@@ -13,8 +13,6 @@ import {
   tableContract,
 } from "meowtail";
 import {
-  layerTokens,
-  lineTokens,
   standardOptions,
   standardThemeStyles,
   standardThemeTokens,
@@ -43,9 +41,9 @@ export const docsStyles = css`
     scroll-padding-top: 88px;
   }
   body {
-    background: ${uiTokens.background};
-    color: ${uiTokens.foreground};
-    font: 15px/1.7 ${uiTokens.font};
+    background: ${uiTokens.surface.canvas};
+    color: ${uiTokens.ink.primary};
+    font: 15px/1.7 ${uiTokens.type.sans};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -57,7 +55,7 @@ export const docsStyles = css`
     text-decoration: none;
   }
   :focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 3px;
   }
   [hidden] {
@@ -82,8 +80,8 @@ export const docsStyles = css`
     height: 100vh;
     min-height: 0;
     padding: 0 12px;
-    background: ${uiTokens.sidebarSurface};
-    border-right: ${lineTokens.width} solid ${lineTokens.edge};
+    background: ${uiTokens.surface.canvas};
+    border-right: ${uiTokens.line.width} solid ${uiTokens.line.edge};
   }
   .docs-brand {
     display: flex;
@@ -92,20 +90,20 @@ export const docsStyles = css`
     height: 76px;
     flex-shrink: 0;
     padding: 0 10px;
-    color: ${uiTokens.foreground};
-    font-size: ${uiTokens.fontTitle};
+    color: ${uiTokens.ink.primary};
+    font-size: ${uiTokens.type.title};
     font-weight: 600;
     letter-spacing: -0.02em;
   }
   .docs-brand > svg {
     width: 21px;
     height: 21px;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   .docs-brand > span {
     margin-left: auto;
-    color: ${uiTokens.subtleForeground};
-    font: ${uiTokens.fontMicro}/1.5 ${uiTokens.mono};
+    color: ${uiTokens.ink.tertiary};
+    font: ${uiTokens.type.micro}/1.5 ${uiTokens.type.mono};
     letter-spacing: 0;
   }
   .docs-search {
@@ -114,7 +112,7 @@ export const docsStyles = css`
   }
   /* The sidebar search is the library SearchInput as-is: same surface, states and ring. */
   .docs-search ${partSelector(searchInputContract, "control")} {
-    font-size: ${uiTokens.fontLabel};
+    font-size: ${uiTokens.type.label};
   }
   .docs-catalog-label {
     display: flex;
@@ -122,14 +120,14 @@ export const docsStyles = css`
     align-items: center;
     gap: 8px;
     padding: 24px 10px 12px;
-    color: ${uiTokens.subtleForeground};
-    font-size: ${uiTokens.fontMicro};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.micro};
     font-weight: 500;
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
   .docs-catalog-label > span {
-    font-family: ${uiTokens.mono};
+    font-family: ${uiTokens.type.mono};
     font-variant-numeric: tabular-nums;
     letter-spacing: 0;
   }
@@ -139,13 +137,13 @@ export const docsStyles = css`
     min-height: 0;
     padding: 0 0 24px;
     scrollbar-width: thin;
-    scrollbar-color: ${uiTokens.borderSubtle} transparent;
+    scrollbar-color: ${uiTokens.line.edge} transparent;
   }
   /* NavList keeps its own rows, group titles, radius and selection; the
      sidebar only sets density. */
   .docs-catalog ${partSelector(navListContract, "root")} {
     gap: 20px;
-    font-size: ${uiTokens.fontLabel};
+    font-size: ${uiTokens.type.label};
   }
   .docs-catalog ${partSelector(navListContract, "group")} {
     gap: 2px;
@@ -155,15 +153,15 @@ export const docsStyles = css`
   }
   .docs-catalog ${partSelector(navListContract, "item")} {
     min-height: 32px;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   .docs-catalog ${partSelector(navListContract, "item")}[aria-current="page"] {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
   .docs-catalog-empty {
     margin: 12px 10px;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     line-height: 1.7;
     overflow-wrap: anywhere;
   }
@@ -182,8 +180,8 @@ export const docsStyles = css`
     gap: 12px;
     height: ${docsTokens.headerHeight};
     padding: 0 40px;
-    background: ${uiTokens.background};
-    border-bottom: ${lineTokens.width} solid ${lineTokens.edge};
+    background: ${uiTokens.surface.canvas};
+    border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     min-width: 0;
   }
   .docs-header-link {
@@ -192,19 +190,19 @@ export const docsStyles = css`
     min-width: 32px;
     min-height: 32px;
     margin-left: auto;
-    border-radius: ${uiTokens.radiusSmall};
-    color: ${uiTokens.mutedForeground};
+    border-radius: ${uiTokens.radius.md};
+    color: ${uiTokens.ink.secondary};
   }
   .docs-header-link:hover {
-    background: ${uiTokens.surfaceMuted};
-    color: ${uiTokens.foreground};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.primary};
   }
   .docs-header ${partSelector(breadcrumbContract, "item")}:not(:last-child) ${partSelector(breadcrumbContract, "current")} {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
     font-weight: 400;
   }
   .docs-header ${partSelector(breadcrumbContract, "current")} {
-    font-size: ${uiTokens.fontCaption};
+    font-size: ${uiTokens.type.caption};
     font-weight: 500;
   }
 
@@ -228,7 +226,7 @@ export const docsStyles = css`
     gap: 12px;
   }
   .docs-article ${partSelector(pageContract, "eyebrow")} {
-    font-size: ${uiTokens.fontMicro};
+    font-size: ${uiTokens.type.micro};
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
@@ -243,7 +241,7 @@ export const docsStyles = css`
   }
   .docs-article ${partSelector(pageHeaderContract, "description")} {
     max-width: 62ch;
-    font-size: ${uiTokens.fontTitle};
+    font-size: ${uiTokens.type.title};
     line-height: 1.75;
   }
   .docs-article ${partSelector(pageContract, "content")}, .docs-sections {
@@ -262,7 +260,7 @@ export const docsStyles = css`
     letter-spacing: -0.02em;
   }
   .docs-article ${partSelector(sectionContract, "description")} {
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
     line-height: 1.75;
   }
   .docs-article ${partSelector(sectionContract, "content")} {
@@ -275,19 +273,19 @@ export const docsStyles = css`
   }
   .docs-toc {
     min-width: 0;
-    font-size: ${uiTokens.fontCaption};
+    font-size: ${uiTokens.type.caption};
     line-height: 1.6;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   .docs-toc-desktop {
     display: none;
   }
   .docs-toc-disclosure {
-    border-block: ${lineTokens.width} solid ${lineTokens.edge};
+    border-block: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     padding-block: 12px;
   }
   .docs-toc-disclosure > summary {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
     cursor: pointer;
     font-weight: 500;
   }
@@ -300,12 +298,12 @@ export const docsStyles = css`
     display: block;
   }
   .docs-toc a:hover {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
   .docs-note {
     margin: 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontLabel};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.label};
     line-height: 1.7;
   }
   .docs-example {
@@ -319,7 +317,7 @@ export const docsStyles = css`
   }
   .docs-example-title {
     margin: 0;
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
     font-weight: 600;
     letter-spacing: -0.005em;
   }
@@ -328,17 +326,17 @@ export const docsStyles = css`
   .docs-specimen {
     min-width: 0;
     overflow: hidden;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: ${uiTokens.radiusLarge};
-    background: ${layerTokens.raised};
-    box-shadow: ${uiTokens.shadowRaised};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.raised};
+    box-shadow: ${uiTokens.shadow.raised};
   }
   ${partSelector(cardContract, "root")}.docs-preview-card {
     padding: 0;
     overflow: hidden;
     border: 0;
     border-radius: 0;
-    background: ${uiTokens.background};
+    background: ${uiTokens.surface.canvas};
     box-shadow: none;
   }
   .docs-preview-frame {
@@ -353,17 +351,17 @@ export const docsStyles = css`
 
   /* Code scrolls locally. Static pages omit actions that require a runtime. */
   .docs-article ${partSelector(codeBlockContract, "root")} {
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: ${uiTokens.radiusLarge};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.xl};
   }
   .docs-specimen ${partSelector(codeBlockContract, "root")} {
     border: 0;
-    border-top: ${lineTokens.width} solid ${lineTokens.divider};
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
     border-radius: 0;
   }
   .docs-article ${partSelector(codeBlockContract, "header")} {
     padding: 10px 16px;
-    border-bottom: ${lineTokens.width} solid ${lineTokens.divider};
+    border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
     background: transparent;
   }
   .docs-article ${partSelector(codeBlockContract, "actions")} {
@@ -372,7 +370,7 @@ export const docsStyles = css`
   .docs-article ${partSelector(codeBlockContract, "content")} {
     max-height: ${docsTokens.codeHeight};
     padding: 16px;
-    font-size: ${uiTokens.fontCode};
+    font-size: ${uiTokens.type.code};
     line-height: 1.75;
     scrollbar-width: thin;
   }
@@ -383,15 +381,15 @@ export const docsStyles = css`
     width: 100%;
     min-width: 0;
     padding: 12px 16px;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: ${uiTokens.controlRadius};
-    background: ${layerTokens.raised};
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontCode}/1.7 ${uiTokens.mono};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.lg};
+    background: ${uiTokens.surface.raised};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.code}/1.7 ${uiTokens.type.mono};
   }
   .docs-install > svg {
     flex: none;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   .docs-install > span {
     min-width: 0;
@@ -414,8 +412,8 @@ export const docsStyles = css`
   }
   .docs-home-eyebrow {
     margin: 0 0 24px;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontMicro};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.micro};
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
@@ -438,22 +436,22 @@ export const docsStyles = css`
     align-items: center;
     gap: 16px 24px;
     margin-top: 28px;
-    font-size: ${uiTokens.fontLabel};
+    font-size: ${uiTokens.type.label};
   }
   .docs-home-actions .docs-home-primary {
     display: inline-flex;
     align-items: center;
     min-height: 38px;
     padding: 7px 14px;
-    border-radius: ${uiTokens.radiusSmall};
-    background: ${uiTokens.primary};
-    color: ${uiTokens.onPrimary};
+    border-radius: ${uiTokens.radius.md};
+    background: ${uiTokens.action.primary};
+    color: ${uiTokens.action.onPrimary};
     font-weight: 500;
     text-decoration: none;
   }
   .docs-home-actions .docs-home-primary:hover {
-    background: ${uiTokens.primaryHover};
-    color: ${uiTokens.onPrimary};
+    background: ${uiTokens.action.primaryHover};
+    color: ${uiTokens.action.onPrimary};
   }
   .docs-home-route {
     min-width: 0;
@@ -461,14 +459,14 @@ export const docsStyles = css`
   }
   .docs-home-route-label {
     margin: 0 0 12px;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontMicro};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.micro};
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
   .docs-home-route h2 {
     margin: 0 0 18px;
-    font: 500 25px/1.25 ${uiTokens.fontDisplay};
+    font: 500 25px/1.25 ${uiTokens.type.display};
     letter-spacing: -0.025em;
   }
   .docs-home-route ol {
@@ -477,7 +475,7 @@ export const docsStyles = css`
     padding: 0;
   }
   .docs-home-route li + li {
-    border-top: ${lineTokens.width} solid ${lineTokens.divider};
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
   }
   .docs-home-route li > a {
     display: flex;
@@ -487,20 +485,20 @@ export const docsStyles = css`
   .docs-route-step {
     flex: none;
     padding-top: 2px;
-    color: ${uiTokens.mutedForeground};
-    font: ${uiTokens.fontCode}/1.7 ${uiTokens.mono};
+    color: ${uiTokens.ink.secondary};
+    font: ${uiTokens.type.code}/1.7 ${uiTokens.type.mono};
   }
   .docs-home-route li > a > span:last-child {
     display: grid;
     gap: 2px;
   }
   .docs-home-route strong {
-    font-size: ${uiTokens.fontLabel};
+    font-size: ${uiTokens.type.label};
     font-weight: 500;
   }
   .docs-home-route strong + span {
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     line-height: 1.6;
   }
   .docs-home-route li > a:hover strong,
@@ -521,28 +519,28 @@ export const docsStyles = css`
     grid-template-columns: 24px minmax(0, 1fr);
     gap: 16px;
     padding-block: 24px;
-    border-top: ${lineTokens.width} solid ${lineTokens.edge};
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     min-width: 0;
   }
   .docs-package-number {
     padding-top: 4px;
-    color: ${uiTokens.mutedForeground};
-    font: ${uiTokens.fontCode}/1.7 ${uiTokens.mono};
+    color: ${uiTokens.ink.secondary};
+    font: ${uiTokens.type.code}/1.7 ${uiTokens.type.mono};
   }
   .docs-package-link strong {
-    font-size: ${uiTokens.fontTitle};
+    font-size: ${uiTokens.type.title};
     font-weight: 600;
     letter-spacing: -0.02em;
   }
   .docs-package-link p {
     margin: 8px 0 12px;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontLabel};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.label};
     line-height: 1.75;
   }
   .docs-package-version {
-    color: ${uiTokens.mutedForeground};
-    font: ${uiTokens.fontMicro}/1.7 ${uiTokens.mono};
+    color: ${uiTokens.ink.secondary};
+    font: ${uiTokens.type.micro}/1.7 ${uiTokens.type.mono};
   }
   .docs-grid {
     display: grid;
@@ -570,26 +568,26 @@ export const docsStyles = css`
   /* MDX callouts are recessed notes inside the reading flow. */
   .docs-article .mdx-callout {
     display: grid;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     padding: 12px 16px;
-    border-radius: ${uiTokens.radiusLarge};
-    background: ${layerTokens.sunken};
-    color: ${uiTokens.mutedForeground};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.secondary};
   }
   .docs-article .mdx-callout > * {
     margin: 0;
   }
   .docs-article .mdx-callout-warning {
-    background: color-mix(in srgb, ${uiTokens.warning} 9%, transparent);
-    color: ${uiTokens.foreground};
+    background: color-mix(in srgb, ${uiTokens.status.warning} 9%, transparent);
+    color: ${uiTokens.ink.primary};
   }
   .docs-article ${partSelector(tableContract, "root")} {
     max-width: 100%;
-    font-size: ${uiTokens.fontLabel};
+    font-size: ${uiTokens.type.label};
   }
   .docs-article ${partSelector(tableContract, "scroller")} {
-    border-color: ${uiTokens.borderSubtle};
-    background: ${uiTokens.background};
+    border-color: ${uiTokens.line.edge};
+    background: ${uiTokens.surface.canvas};
   }
   .docs-article ${partSelector(tableContract, "table")} {
     min-width: 480px;
@@ -605,15 +603,15 @@ export const docsStyles = css`
     max-width: ${docsTokens.readingWidth};
     margin: 64px auto 0;
     padding: 20px 0 28px;
-    border-top: ${lineTokens.width} solid ${lineTokens.edge};
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontMicro};
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.micro};
   }
   .docs-content-home .docs-footer {
     max-width: ${docsTokens.homeWidth};
   }
   .docs-footer a:hover {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
     text-decoration: underline;
   }
 
@@ -645,12 +643,12 @@ export const docsStyles = css`
     .docs-toc-desktop {
       display: block;
       padding-left: 16px;
-      border-left: ${lineTokens.width} solid ${lineTokens.edge};
+      border-left: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     }
     .docs-toc-title {
       margin: 0;
-      color: ${uiTokens.foreground};
-      font-size: ${uiTokens.fontMicro};
+      color: ${uiTokens.ink.primary};
+      font-size: ${uiTokens.type.micro};
       font-weight: 500;
     }
     .docs-content:not(.docs-content-home) .docs-footer {
@@ -668,7 +666,7 @@ export const docsStyles = css`
     }
     .docs-home-route {
       padding-top: 28px;
-      border-top: ${lineTokens.width} solid ${lineTokens.edge};
+      border-top: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     }
     .docs-home-route ol {
       display: grid;
@@ -695,8 +693,8 @@ export const docsStyles = css`
       justify-content: space-between;
       min-height: 60px;
       padding: 0 20px;
-      border-bottom: ${lineTokens.width} solid ${lineTokens.divider};
-      background: ${uiTokens.background};
+      border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+      background: ${uiTokens.surface.canvas};
     }
     .docs-mobile-brand {
       display: inline-flex;
@@ -717,15 +715,15 @@ export const docsStyles = css`
       min-width: 44px;
       min-height: 36px;
       padding: 6px 10px;
-      border: ${lineTokens.width} solid ${lineTokens.edge};
-      border-radius: ${uiTokens.radiusSmall};
-      background: ${uiTokens.background};
-      color: ${uiTokens.foreground};
-      font: 12px/1.5 ${uiTokens.font};
+      border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+      border-radius: ${uiTokens.radius.md};
+      background: ${uiTokens.surface.canvas};
+      color: ${uiTokens.ink.primary};
+      font: 12px/1.5 ${uiTokens.type.sans};
       cursor: pointer;
     }
     .docs-navigation-toggle[aria-expanded="true"] {
-      background: ${uiTokens.surfaceMuted};
+      background: ${uiTokens.surface.fill};
     }
     .docs-sidebar {
       position: static;
@@ -733,7 +731,7 @@ export const docsStyles = css`
       max-height: 60vh;
       padding: 16px 20px 0;
       border-right: 0;
-      border-bottom: ${lineTokens.width} solid ${lineTokens.edge};
+      border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     }
     .docs-sidebar > .docs-brand {
       display: none;
@@ -783,7 +781,7 @@ export const docsStyles = css`
       gap: 0;
     }
     .docs-home-route li + li {
-      border-top: ${lineTokens.width} solid ${lineTokens.divider};
+      border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
     }
     .docs-package-grid {
       grid-template-columns: minmax(0, 1fr);

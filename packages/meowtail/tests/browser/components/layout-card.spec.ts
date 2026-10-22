@@ -30,12 +30,12 @@ test("page containers inherit semantic insets while retaining natural flow and t
         (node as HTMLElement).style.setProperty(property!, value!);
     },
     [
-      [uiTokens.pageInsetInline.name, "64px"],
-      [uiTokens.pageInsetBlock.name, "40px"],
-      [uiTokens.spacePanel.name, "32px"],
-      [uiTokens.pageInsetCompactInline.name, "24px"],
-      [uiTokens.pageInsetCompactBlock.name, "24px"],
-      [uiTokens.spaceSection.name, "12px"],
+      [uiTokens.space.pageInline.name, "64px"],
+      [uiTokens.space.pageBlock.name, "40px"],
+      [uiTokens.space.panel.name, "32px"],
+      [uiTokens.space.pageInlineCompact.name, "24px"],
+      [uiTokens.space.pageBlockCompact.name, "24px"],
+      [uiTokens.space.section.name, "12px"],
     ],
   );
   expect(await insets()).toEqual(["24px", "24px", "36px", "1088px"]);
@@ -75,7 +75,7 @@ test("layout composition keeps text shrinkable, actions intact and axis gaps the
     const spacing = await actions.evaluate(
       (node, properties) =>
         properties.map((property) => getComputedStyle(node).getPropertyValue(property).trim()),
-      [uiTokens.spaceGroup.name, uiTokens.spaceSection.name, uiTokens.spacePanel.name],
+      [uiTokens.space.group.name, uiTokens.space.section.name, uiTokens.space.panel.name],
     );
     await expect(actions).toHaveCSS("row-gap", spacing[1]!);
     await expect(actions).toHaveCSS("column-gap", spacing[0]!);
@@ -104,12 +104,12 @@ test("layout composition keeps text shrinkable, actions intact and axis gaps the
     .toBeGreaterThan(1);
   await actions.evaluate(
     (node, property) => (node as HTMLElement).style.setProperty(property, "18px"),
-    uiTokens.spaceSection.name,
+    uiTokens.space.section.name,
   );
   await expect(actions).toHaveCSS("row-gap", "18px");
   const group = await actions.evaluate(
     (node, property) => getComputedStyle(node).getPropertyValue(property).trim(),
-    uiTokens.spaceGroup.name,
+    uiTokens.space.group.name,
   );
   await expect(actions).toHaveCSS("column-gap", group);
 });
@@ -180,13 +180,13 @@ test("auto grid responds to its container while layout gaps follow the theme", a
     await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption(scheme);
     const panelGap = await stack.evaluate(
       (node, property) => getComputedStyle(node).getPropertyValue(property).trim(),
-      uiTokens.spacePanel.name,
+      uiTokens.space.panel.name,
     );
     await expect(stack).toHaveCSS("gap", panelGap);
   }
   await stack.evaluate(
     (node, property) => (node as HTMLElement).style.setProperty(property, "18px"),
-    uiTokens.spacePanel.name,
+    uiTokens.space.panel.name,
   );
   await expect(stack).toHaveCSS("gap", "18px");
 });

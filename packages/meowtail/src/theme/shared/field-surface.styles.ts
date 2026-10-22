@@ -35,45 +35,45 @@ export const fieldSurfaceStyles = css`
   ${surfaces} {
     box-sizing: border-box;
     min-width: 0;
-    border: 1px solid ${uiTokens.border};
-    border-radius: ${uiTokens.controlRadius};
-    color: ${uiTokens.foreground};
-    background: ${uiTokens.inputSurface};
-    box-shadow: ${uiTokens.shadowField};
-    font: ${uiTokens.fontBody}/22px ${uiTokens.font};
+    border: 1px solid ${uiTokens.line.control};
+    border-radius: ${uiTokens.radius.lg};
+    color: ${uiTokens.ink.primary};
+    background: ${uiTokens.surface.field};
+    box-shadow: ${uiTokens.shadow.field};
+    font: ${uiTokens.type.body}/22px ${uiTokens.type.sans};
     outline: none;
     transition:
-      border-color ${uiTokens.durationResponse} ${uiTokens.ease},
-      box-shadow ${uiTokens.durationResponse} ${uiTokens.ease};
+      border-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
+      box-shadow ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${singleLine} {
-    min-height: ${uiTokens.controlHeight};
+    min-height: ${uiTokens.control.regular};
   }
 
   @media (hover: hover) {
     :where(${surfaces}:hover) {
-      border-color: ${uiTokens.borderStrong};
+      border-color: ${uiTokens.line.controlHover};
     }
   }
   ${readOnly} {
-    border-color: ${uiTokens.borderSubtle};
-    background: ${uiTokens.codeSurface};
+    border-color: ${uiTokens.line.edge};
+    background: ${uiTokens.surface.fill};
   }
   ${focused} {
-    border-color: ${uiTokens.focus};
-    box-shadow: 0 0 0 3px ${uiTokens.focusRing};
+    border-color: ${uiTokens.state.focus};
+    box-shadow: 0 0 0 3px ${uiTokens.state.focusRing};
   }
 
   ${invalid} {
-    border-color: ${uiTokens.danger};
+    border-color: ${uiTokens.status.danger};
   }
   :where(${invalid}:is(:focus-visible, :focus-within, [aria-expanded="true"])) {
-    box-shadow: 0 0 0 3px color-mix(in srgb, ${uiTokens.danger} 22%, transparent);
+    box-shadow: 0 0 0 3px color-mix(in srgb, ${uiTokens.status.danger} 22%, transparent);
   }
   ${disabled} {
-    color: ${uiTokens.subtleForeground};
-    border-color: ${uiTokens.borderFaint};
-    background: ${uiTokens.surfaceMuted};
+    color: ${uiTokens.ink.tertiary};
+    border-color: ${uiTokens.line.divider};
+    background: ${uiTokens.surface.fill};
     box-shadow: none;
     cursor: not-allowed;
   }

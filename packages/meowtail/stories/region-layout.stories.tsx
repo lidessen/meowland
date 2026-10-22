@@ -242,9 +242,9 @@ export const WorkspaceRegionStory = defineStory({
                   top: "100%",
                   zIndex: 2,
                   width: "min(280px, 80vw)",
-                  padding: String(uiTokens.spaceSection),
-                  background: String(uiTokens.surface),
-                  border: `1px solid ${uiTokens.border}`,
+                  padding: String(uiTokens.space.section),
+                  background: String(uiTokens.surface.overlay),
+                  border: `1px solid ${uiTokens.line.control}`,
                 }}
               >
                 <p>Review the current work and its evidence, then close this and keep reading.</p>

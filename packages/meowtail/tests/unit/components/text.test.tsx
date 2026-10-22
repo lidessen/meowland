@@ -54,6 +54,6 @@ test("prose, chat content and assistant markdown share one reading rhythm", () =
   expect(css).toContain("prose/root");
   expect(css).toContain("chat-message/content");
   expect(css).toContain("assistant-markdown/root");
-  expect(css).toContain("--ui-measure");
-  expect(css).toContain("--ui-prose-gap");
+  expect(css).toContain("--ui-layout-measure");
+  expect(css).toContain("--ui-space-prose");
 });

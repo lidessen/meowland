@@ -11,7 +11,7 @@ export const chatReasoningStyles = css`
     grid-template-columns: minmax(0, 1fr);
     min-width: 0;
     padding-block: 4px;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   /* The same row as ChatProcess: a glyph box, then a one-line label. */
   ${part("summary")} {
@@ -22,23 +22,23 @@ export const chatReasoningStyles = css`
     max-width: 100%;
     list-style: none;
     cursor: pointer;
-    color: ${uiTokens.foreground};
-    font-size: ${uiTokens.fontBody};
+    color: ${uiTokens.ink.primary};
+    font-size: ${uiTokens.type.body};
     line-height: 20px;
   }
   ${part("root")}:not([data-active="true"]) > ${part("summary")} {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   ${part("summary")}::-webkit-details-marker {
     display: none;
   }
   ${part("root")}:not([data-active="true"]) > ${part("summary")}:hover {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
   ${part("summary")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
-    border-radius: ${uiTokens.radiusSmall};
+    border-radius: ${uiTokens.radius.md};
   }
   ${part("icon")} {
     display: grid;
@@ -53,14 +53,14 @@ export const chatReasoningStyles = css`
     grid-auto-rows: 2.5px;
     gap: 3px;
     place-content: center;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   ${part("icon")} [data-reasoning-dot] {
     border-radius: 50%;
     corner-shape: round;
     background: currentColor;
     opacity: 0.2;
-    animation: ui-reasoning-wave 1.6s ${uiTokens.ease} infinite;
+    animation: ui-reasoning-wave 1.6s ${uiTokens.motion.ease} infinite;
   }
   ${part("icon")} [data-reasoning-dot]:nth-child(2),
   ${part("icon")} [data-reasoning-dot]:nth-child(4) {
@@ -90,7 +90,7 @@ export const chatReasoningStyles = css`
   ${part("icon")} svg {
     width: 14px;
     height: 14px;
-    transition: transform ${uiTokens.durationSettle} ${uiTokens.ease};
+    transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${part("root")}[open] > ${part("summary")} ${part("icon")} svg {
     transform: rotate(90deg);
@@ -104,13 +104,13 @@ export const chatReasoningStyles = css`
   ${part("body")} {
     display: grid;
     min-width: 0;
-    gap: ${uiTokens.spaceGroup};
-    padding-top: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
+    padding-top: ${uiTokens.space.group};
   }
   ${part("text")} {
     margin: 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontBody};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.body};
     line-height: 1.625;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
@@ -121,7 +121,7 @@ export const chatReasoningStyles = css`
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     max-height: 184px;
     overflow: hidden;
     padding-bottom: 12px;

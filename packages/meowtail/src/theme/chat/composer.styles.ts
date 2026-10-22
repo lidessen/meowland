@@ -7,7 +7,6 @@ import { iconButtonContract } from "../../components/icon-button";
 import { selectContract } from "../../components/select";
 import { choiceSelectContract } from "../../components/choice-select";
 import { popoverContract } from "../../components/popover";
-import { layerTokens, lineTokens, radiusTokens } from "../palette";
 
 export const chatComposerStyles = css`
   ${partSelector(chatComposerContract, "trailing")} {
@@ -21,21 +20,21 @@ export const chatComposerStyles = css`
   ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "trigger")} {
     min-height: 28px;
     border: 0;
-    border-radius: ${uiTokens.radiusSmall};
+    border-radius: ${uiTokens.radius.md};
     background: transparent;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontLabel};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.label};
     line-height: 20px;
   }
 
   ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "trigger")}:hover:not(:disabled) {
-    background: ${uiTokens.hover};
-    color: ${uiTokens.foreground};
+    background: ${uiTokens.state.hover};
+    color: ${uiTokens.ink.primary};
   }
   /* Open, the quiet trigger becomes a filled chip that anchors its menu. */
   ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "trigger")}[aria-expanded="true"]:not(:disabled) {
-    background: ${uiTokens.surfaceMuted};
-    color: ${uiTokens.foreground};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.primary};
   }
 
   ${partSelector(chatComposerContract, "trailing")} ${partSelector(popoverContract, "panel")} {
@@ -49,7 +48,7 @@ export const chatComposerStyles = css`
 
   ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "option")} {
     padding: 6px;
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
     line-height: 22px;
   }
 
@@ -64,21 +63,21 @@ export const chatComposerStyles = css`
     min-height: 28px;
     padding: 0 20px 0 8px;
     border: 0;
-    border-radius: ${uiTokens.radiusSmall};
+    border-radius: ${uiTokens.radius.md};
     background-color: transparent;
     background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12' fill='none'%3E%3Cpath d='M3 4.5L6 7.5L9 4.5' stroke='%2381858C' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right 4px center;
     background-size: 12px 12px;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontLabel};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.label};
     line-height: 20px;
     font-weight: 500;
     cursor: pointer;
   }
 
   ${partSelector(chatComposerContract, "actions")} ${partSelector(selectContract, "root")}:hover:not(:disabled) {
-    background-color: ${uiTokens.hover};
+    background-color: ${uiTokens.state.hover};
   }
 
   /* The form groups the writing surface and its external supporting instructions. */
@@ -101,10 +100,10 @@ export const chatComposerStyles = css`
     min-width: 0;
     padding: 8px 0 0;
     border: 0;
-    background: ${chatTokens.composerSurface};
-    box-shadow: ${chatTokens.composerShadow};
-    transition: box-shadow ${uiTokens.durationResponse} ${uiTokens.ease};
-    border-radius: ${radiusTokens.float};
+    background: ${uiTokens.surface.fill};
+    box-shadow: 0 0 0 ${uiTokens.line.width} ${uiTokens.line.edge};
+    transition: box-shadow ${uiTokens.motion.response} ${uiTokens.motion.ease};
+    border-radius: ${uiTokens.radius.xxl};
   }
 
   /* The frame owns its direct writing surface; a footer or card owns its own inset. */
@@ -112,8 +111,8 @@ export const chatComposerStyles = css`
     flex: 0 0 auto;
     box-sizing: border-box;
     width: calc(100% - 2 * ${chatTokens.readingInset});
-    max-width: calc(${chatTokens.messageListMaxWidth} + 32px);
-    margin: ${uiTokens.spaceSection} auto max(${uiTokens.spaceSection}, env(safe-area-inset-bottom));
+    max-width: calc(${chatTokens.listMaxWidth} + 32px);
+    margin: ${uiTokens.space.section} auto max(${uiTokens.space.section}, env(safe-area-inset-bottom));
   }
 
   ${partSelector(chatComposerContract, "field")} {
@@ -152,8 +151,8 @@ export const chatComposerStyles = css`
   }
 
   ${partSelector(chatComposerContract, "input")} {
-    color: ${uiTokens.foreground};
-    font-family: ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font-family: ${uiTokens.type.sans};
     box-sizing: border-box;
     display: block;
     width: 100%;
@@ -166,15 +165,15 @@ export const chatComposerStyles = css`
     border-radius: 0;
     outline: 0;
     background: transparent;
-    font-size: var(${chatTokens.fontBody.name}, ${uiTokens.fontBody});
+    font-size: var(${chatTokens.fontBody.name}, ${uiTokens.type.body});
     font-weight: 400;
     line-height: 24px;
-    caret-color: ${uiTokens.focus};
+    caret-color: ${uiTokens.state.focus};
   }
 
   /* Focus paint stays inside the surface when an embedding form clips overflow. */
   ${partSelector(chatComposerContract, "surface")}:has(${partSelector(chatComposerContract, "input")}:focus:not(:disabled)) {
-    outline: 1px solid color-mix(in srgb, ${uiTokens.primary} 45%, transparent);
+    outline: 1px solid color-mix(in srgb, ${uiTokens.action.primary} 45%, transparent);
     outline-offset: -1px;
   }
 
@@ -185,7 +184,7 @@ export const chatComposerStyles = css`
   }
 
   ${partSelector(chatComposerContract, "submit")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
 
@@ -194,7 +193,7 @@ export const chatComposerStyles = css`
   }
 
   ${partSelector(chatComposerContract, "surface")}:has(${partSelector(chatComposerContract, "input")}:focus-visible) {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: -2px;
   }
 
@@ -205,17 +204,17 @@ export const chatComposerStyles = css`
   }
 
   ${partSelector(chatComposerContract, "input")}::placeholder {
-    color: ${uiTokens.placeholder};
-    font-size: ${uiTokens.fontBody};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.body};
   }
 
   ${partSelector(chatComposerContract, "input")}:disabled {
     cursor: not-allowed;
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
 
   ${partSelector(chatComposerContract, "surface")}:has(${partSelector(chatComposerContract, "input")}:disabled) {
-    background: ${uiTokens.surfaceMuted};
+    background: ${uiTokens.surface.fill};
     box-shadow: none;
   }
 
@@ -244,10 +243,10 @@ export const chatComposerStyles = css`
     place-items: center;
     margin-left: auto;
     flex: none;
-    font-family: ${uiTokens.font};
+    font-family: ${uiTokens.type.sans};
     transition:
-    background-color ${uiTokens.durationResponse} ${uiTokens.ease},
-    box-shadow ${uiTokens.durationSettle} ${uiTokens.ease};
+    background-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
+    box-shadow ${uiTokens.motion.settle} ${uiTokens.motion.ease};
     width: 34px;
     height: 34px;
     min-width: 34px;
@@ -257,11 +256,11 @@ export const chatComposerStyles = css`
     border: 1px solid transparent;
     border-radius: 999px;
     corner-shape: round;
-    background: ${chatTokens.submitSurface};
-    color: ${uiTokens.onPrimary};
+    background: ${uiTokens.action.primary};
+    color: ${uiTokens.action.onPrimary};
     transform: translateY(-2px);
     cursor: pointer;
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
     font-weight: 500;
     box-shadow: none;
   }
@@ -282,12 +281,12 @@ export const chatComposerStyles = css`
     min-height: 28px;
     border-radius: 50%;
     corner-shape: round;
-    background: ${uiTokens.surfaceMuted};
-    color: ${uiTokens.foreground};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.primary};
   }
 
   ${partSelector(chatComposerContract, "submit")}:hover:not(:disabled) {
-    background: color-mix(in srgb, ${chatTokens.submitSurface} 86%, white);
+    background: color-mix(in srgb, ${uiTokens.action.primary} 86%, white);
   }
 
   ${partSelector(chatComposerContract, "submit")}:disabled {
@@ -304,7 +303,7 @@ export const chatComposerStyles = css`
     }
 
     ${partSelector(chatComposerContract, "hint")} {
-      font-size: ${uiTokens.fontCaption};
+      font-size: ${uiTokens.type.caption};
     }
   }
 
@@ -320,7 +319,7 @@ export const chatComposerStyles = css`
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] > ${partSelector(chatComposerContract, "surface")} {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    padding: ${uiTokens.controlPaddingInline} ${uiTokens.spaceSection};
+    padding: ${uiTokens.control.inset} ${uiTokens.space.section};
   }
 
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] ${partSelector(chatComposerContract, "input")} {
@@ -354,7 +353,7 @@ export const chatComposerStyles = css`
 
   @media (pointer: coarse) {
     ${partSelector(chatComposerContract, "input")} {
-      font-size: max(16px, ${uiTokens.fontBody});
+      font-size: max(16px, ${uiTokens.type.body});
     }
   }
 
@@ -370,7 +369,7 @@ export const chatComposerStyles = css`
     position: relative;
     gap: 4px;
     padding: 12px 12px 10px;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
   }
 
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "input")} {
@@ -388,15 +387,15 @@ export const chatComposerStyles = css`
     height: 32px;
     min-width: 32px;
     min-height: 32px;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: ${radiusTokens.control};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.lg};
     background: transparent;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
 
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(iconButtonContract, "root")}:hover:not(:disabled) {
-    background: ${uiTokens.hover};
-    color: ${uiTokens.foreground};
+    background: ${uiTokens.state.hover};
+    color: ${uiTokens.ink.primary};
   }
 
   /* The model and its supporting choices stay beside send, not stranded after attach. */
@@ -420,13 +419,13 @@ export const chatComposerStyles = css`
     min-width: 34px;
     min-height: 34px;
     border-radius: 11px;
-    background: ${uiTokens.primary};
-    color: ${uiTokens.onPrimary};
+    background: ${uiTokens.action.primary};
+    color: ${uiTokens.action.onPrimary};
     transform: none;
   }
 
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "submit")}:hover:not(:disabled) {
-    background: ${uiTokens.primaryHover};
+    background: ${uiTokens.action.primaryHover};
   }
 
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "submit")}:disabled {
@@ -445,8 +444,8 @@ export const chatComposerStyles = css`
     clip-path: none;
     white-space: normal;
     overflow-wrap: anywhere;
-    color: ${layerTokens.faint};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
     line-height: 18px;
     pointer-events: auto;
   }
@@ -491,8 +490,8 @@ export const chatComposerStyles = css`
       min-height: 36px;
       border: 0;
       border-radius: 50%;
-      background: ${layerTokens.chip};
-      color: ${uiTokens.foreground};
+      background: ${uiTokens.surface.fill};
+      color: ${uiTokens.ink.primary};
     }
 
     ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(chatComposerContract, "trailing")} {

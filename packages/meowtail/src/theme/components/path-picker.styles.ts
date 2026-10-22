@@ -7,12 +7,12 @@ export const pathPickerStyles = css`
     display: flex;
     flex-direction: column;
     min-width: 0;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
   }
   ${partSelector(pathPickerContract, "row")} {
     display: flex;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
   }
   ${partSelector(pathPickerContract, "control")} {
@@ -24,9 +24,9 @@ export const pathPickerStyles = css`
     white-space: nowrap;
   }
   ${partSelector(pathPickerContract, "feedback")} {
-    color: ${uiTokens.danger};
-    font-size: ${uiTokens.fontCaption};
-    line-height: ${uiTokens.leading};
+    color: ${uiTokens.status.danger};
+    font-size: ${uiTokens.type.caption};
+    line-height: ${uiTokens.type.leading};
   }
   ${partSelector(pathPickerContract, "feedback")}:empty {
     display: none;

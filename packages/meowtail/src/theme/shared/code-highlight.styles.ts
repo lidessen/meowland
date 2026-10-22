@@ -6,8 +6,8 @@ import { codeHighlightTokens } from "./code-highlight.tokens";
 
 export const codeHighlightStyles = css`
   ${partSelector(codeBlockContract, "root")}, ${partSelector(readBlockContract, "root")} {
-    --meowui-code-foreground: ${uiTokens.foreground};
-    --meowui-code-background: ${uiTokens.codeSurface};
+    --meowui-code-foreground: ${uiTokens.ink.primary};
+    --meowui-code-background: ${uiTokens.surface.fill};
     --meowui-code-token-constant: ${codeHighlightTokens.constant};
     --meowui-code-token-string: ${codeHighlightTokens.string};
     --meowui-code-token-comment: ${codeHighlightTokens.comment};

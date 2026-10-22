@@ -9,8 +9,8 @@ export const toggleStyles = css`
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/20px ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/20px ${uiTokens.type.sans};
     cursor: pointer;
   }
   ${partSelector(checkboxContract, "input")} {
@@ -18,7 +18,7 @@ export const toggleStyles = css`
     width: 16px;
     height: 16px;
     margin: 0;
-    accent-color: ${uiTokens.primary};
+    accent-color: ${uiTokens.action.primary};
     cursor: inherit;
   }
   ${partSelector(switchContract, "input")} {
@@ -37,7 +37,7 @@ export const toggleStyles = css`
     padding: 2px;
     border-radius: 999px;
     corner-shape: round;
-    background: ${uiTokens.borderSubtle};
+    background: ${uiTokens.line.edge};
     pointer-events: none;
   }
   ${partSelector(switchContract, "thumb")} {
@@ -46,18 +46,18 @@ export const toggleStyles = css`
     height: 16px;
     border-radius: 50%;
     corner-shape: round;
-    background: ${uiTokens.switchThumb};
+    background: ${uiTokens.control.knob};
     transition: transform 120ms ease;
   }
   ${partSelector(switchContract, "input")}:checked + ${partSelector(switchContract, "track")} {
-    background: ${uiTokens.primary};
+    background: ${uiTokens.action.primary};
   }
   ${partSelector(switchContract, "input")}:checked + ${partSelector(switchContract, "track")} ${partSelector(switchContract, "thumb")} {
     transform: translateX(16px);
-    background: ${uiTokens.onPrimary};
+    background: ${uiTokens.action.onPrimary};
   }
   :where(${partSelector(checkboxContract, "input")}:focus-visible, ${partSelector(switchContract, "input")}:focus-visible + ${partSelector(switchContract, "track")}) {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
   :where(${partSelector(checkboxContract, "root")}, ${partSelector(switchContract, "root")}):has(input:disabled) {

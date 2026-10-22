@@ -12,12 +12,12 @@ export const tooltipStyles = css`
     padding: 3px 7px;
     width: max-content;
     max-width: min(50vw, calc(100vw - 16px));
-    border-radius: ${uiTokens.radiusSmall};
-    background: ${uiTokens.tooltipSurface};
-    color: ${uiTokens.toastForeground};
+    border-radius: ${uiTokens.radius.md};
+    background: ${uiTokens.inverse.surface};
+    color: ${uiTokens.inverse.ink};
     box-shadow: none;
     backdrop-filter: none;
-    font: ${uiTokens.fontLabel}/20px ${uiTokens.font};
+    font: ${uiTokens.type.label}/20px ${uiTokens.type.sans};
   }
   ${partSelector(tooltipContract, "content")} {
     display: block;

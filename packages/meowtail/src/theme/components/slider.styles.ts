@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { accentTokens, lineTokens, layerTokens } from "../palette";
 import { sliderContract } from "../../components/slider";
 
 const root = partSelector(sliderContract, "root");
@@ -8,8 +7,8 @@ const control = partSelector(sliderContract, "control");
 const track = partSelector(sliderContract, "track");
 const thumb = partSelector(sliderContract, "thumb");
 const value = partSelector(sliderContract, "value");
-const fill = `linear-gradient(to right, ${accentTokens.base} 0%, ${accentTokens.base} var(--slider-fill, 0%), ${uiTokens.surfaceMuted} var(--slider-fill, 0%), ${uiTokens.surfaceMuted} 100%)`;
-const mutedFill = `linear-gradient(to right, ${uiTokens.mutedForeground} 0%, ${uiTokens.mutedForeground} var(--slider-fill, 0%), ${uiTokens.surfaceMuted} var(--slider-fill, 0%), ${uiTokens.surfaceMuted} 100%)`;
+const fill = `linear-gradient(to right, ${uiTokens.accent.base} 0%, ${uiTokens.accent.base} var(--slider-fill, 0%), ${uiTokens.surface.fill} var(--slider-fill, 0%), ${uiTokens.surface.fill} 100%)`;
+const mutedFill = `linear-gradient(to right, ${uiTokens.ink.secondary} 0%, ${uiTokens.ink.secondary} var(--slider-fill, 0%), ${uiTokens.surface.fill} var(--slider-fill, 0%), ${uiTokens.surface.fill} 100%)`;
 const thumbShadow = "0 1px 2px rgb(0 0 0 / 16%)";
 const thumbShadowHover = "0 1px 3px rgb(0 0 0 / 22%)";
 
@@ -18,12 +17,12 @@ export const sliderStyles = css`
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
-    column-gap: ${uiTokens.spaceGroup};
+    column-gap: ${uiTokens.space.group};
     width: 16rem;
     max-width: 100%;
     min-width: 0;
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontCaption}/1 ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.caption}/1 ${uiTokens.type.sans};
   }
   ${control} {
     grid-column: 1;
@@ -31,7 +30,7 @@ export const sliderStyles = css`
     z-index: 1;
     width: 100%;
     min-width: 0;
-    height: ${uiTokens.controlHeight};
+    height: ${uiTokens.control.regular};
     margin: 0;
     opacity: 0;
     -webkit-appearance: none;
@@ -58,12 +57,12 @@ export const sliderStyles = css`
     width: 16px;
     height: 16px;
     margin-top: -8px;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     border-radius: 50%;
     corner-shape: round;
-    background: ${uiTokens.switchThumb};
+    background: ${uiTokens.control.knob};
     box-shadow: ${thumbShadow};
-    transition: box-shadow ${uiTokens.durationResponse} ${uiTokens.ease};
+    transition: box-shadow ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${control}:focus-visible {
     outline: none;
@@ -82,11 +81,11 @@ export const sliderStyles = css`
   ${root}:has(${control}:focus-visible) ${thumb} {
     outline: none;
     box-shadow:
-      0 0 0 2px var(--meowui-focus-halo, ${layerTokens.knockout}),
-      0 0 0 4px ${uiTokens.focus};
+      0 0 0 2px var(--meowui-focus-halo, ${uiTokens.surface.knockout}),
+      0 0 0 4px ${uiTokens.state.focus};
   }
   ${root}:has(${control}:disabled) {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
   ${root}:has(${control}:disabled) ${track} {
     background: ${mutedFill};
@@ -104,11 +103,11 @@ export const sliderStyles = css`
     grid-column: 2;
     grid-row: 1;
     box-sizing: border-box;
-    height: ${uiTokens.controlHeight};
+    height: ${uiTokens.control.regular};
     margin: 0;
     padding: 0;
     min-width: 2.5ch;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
     font-variant-numeric: tabular-nums;
     line-height: 1;
     text-align: end;

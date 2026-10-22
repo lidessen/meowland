@@ -25,15 +25,15 @@ export const assistantStyles = css`
     height: 100%;
     min-height: 0;
     min-width: 0;
-    color: ${uiTokens.foreground};
-    background: ${chatTokens.paper};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    background: ${uiTokens.surface.reading};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
   }
   ${root} > ${partSelector(pageFrameContract, "root")} {
     height: 100%;
   }
   ${root} ${partSelector(chatHeaderContract, "root")} {
-    padding: ${uiTokens.spaceGroup} ${uiTokens.spaceSection};
+    padding: ${uiTokens.space.group} ${uiTokens.space.section};
   }
   ${layout} {
     display: grid;
@@ -67,36 +67,36 @@ export const assistantStyles = css`
     scrollbar-gutter: stable;
   }
   ${viewport}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: -2px;
   }
   ${content} {
-    max-width: ${uiTokens.containerContent};
+    max-width: ${uiTokens.layout.containerContent};
     margin-inline: auto;
-    padding: ${uiTokens.spaceSection} ${uiTokens.spacePanel};
+    padding: ${uiTokens.space.section} ${uiTokens.space.panel};
     box-sizing: border-box;
   }
   ${content} [data-assistant-message-id] {
-    padding-block: ${uiTokens.spaceGroup};
+    padding-block: ${uiTokens.space.group};
   }
   ${content} [data-assistant-message-header] {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
-    gap: ${uiTokens.spaceGroup};
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    gap: ${uiTokens.space.group};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
   }
   ${content} [data-assistant-message-header] strong {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
   ${content} [data-assistant-part-id] {
-    margin-block: ${uiTokens.spaceGroup};
+    margin-block: ${uiTokens.space.group};
     overflow-wrap: anywhere;
   }
   ${root} ${partSelector(assistantMarkdownContract, "root")} {
     font-size: ${chatTokens.fontBody};
-    line-height: ${chatTokens.messageLeading};
+    line-height: ${chatTokens.leading};
     overflow-wrap: anywhere;
   }
   ${partSelector(assistantViewContract, "latest")} {
@@ -104,9 +104,9 @@ export const assistantStyles = css`
     justify-content: flex-end;
     flex-shrink: 0;
     width: 100%;
-    max-width: ${uiTokens.containerContent};
+    max-width: ${uiTokens.layout.containerContent};
     margin-inline: auto;
-    padding: ${uiTokens.spaceGroup} ${uiTokens.spacePanel};
+    padding: ${uiTokens.space.group} ${uiTokens.space.panel};
     box-sizing: border-box;
   }
   ${partSelector(assistantViewContract, "latest")} > ${partSelector(buttonContract, "root")} {
@@ -118,10 +118,10 @@ export const assistantStyles = css`
   ${composer} {
     grid-area: composer;
     width: 100%;
-    max-width: ${uiTokens.containerContent};
+    max-width: ${uiTokens.layout.containerContent};
     margin-inline: auto;
-    padding: ${uiTokens.spaceGroup} ${uiTokens.spacePanel}
-      max(${uiTokens.spaceSection}, env(safe-area-inset-bottom));
+    padding: ${uiTokens.space.group} ${uiTokens.space.panel}
+      max(${uiTokens.space.section}, env(safe-area-inset-bottom));
     box-sizing: border-box;
     min-width: 0;
   }
@@ -135,19 +135,19 @@ export const assistantStyles = css`
     align-items: center;
     flex-wrap: wrap;
     min-width: 0;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
   }
   ${root} ${partSelector(assistantComposerContract, "feedback")}, ${partSelector(assistantViewContract, "feedback")} {
-    margin: ${uiTokens.spaceGroup} 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    margin: ${uiTokens.space.group} 0;
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
   }
   ${partSelector(assistantViewContract, "empty")} {
-    padding-block: ${uiTokens.spacePanel};
+    padding-block: ${uiTokens.space.panel};
   }
   ${partSelector(assistantViewContract, "empty")} h2 {
-    font-size: ${uiTokens.fontPageTitle};
-    margin-block: ${uiTokens.spaceSection};
+    font-size: ${uiTokens.type.pageTitle};
+    margin-block: ${uiTokens.space.section};
   }
   ${partSelector(assistantStepsContract, "root")} {
     list-style: none;
@@ -158,18 +158,18 @@ export const assistantStyles = css`
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: baseline;
-    gap: ${uiTokens.spaceGroup};
-    padding-block: ${uiTokens.spaceGroup};
-    font-size: ${uiTokens.fontBody};
+    gap: ${uiTokens.space.group};
+    padding-block: ${uiTokens.space.group};
+    font-size: ${uiTokens.type.body};
   }
   ${partSelector(assistantStepsContract, "description")} {
     margin: 0;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
     white-space: pre-wrap;
   }
   ${partSelector(assistantStepsContract, "status")} {
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
   }
   ${panel} {
     grid-area: activity;
@@ -182,10 +182,10 @@ export const assistantStyles = css`
     padding: 0;
     box-sizing: border-box;
     border: 0;
-    border-left: 1px solid ${uiTokens.borderSoft};
+    border-left: 1px solid ${uiTokens.line.divider};
     border-radius: 0;
     color: inherit;
-    background: ${uiTokens.sidebarSurface};
+    background: ${uiTokens.surface.canvas};
     overflow: hidden;
   }
   ${panel}[open] {
@@ -196,39 +196,39 @@ export const assistantStyles = css`
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: ${uiTokens.spaceGroup};
-    padding: ${uiTokens.spaceGroup} ${uiTokens.spaceSection};
-    border-bottom: 1px solid ${uiTokens.borderSoft};
+    gap: ${uiTokens.space.group};
+    padding: ${uiTokens.space.group} ${uiTokens.space.section};
+    border-bottom: 1px solid ${uiTokens.line.divider};
     flex: 0 0 auto;
   }
   ${partSelector(assistantViewContract, "activityHeader")} h2 {
     flex: 1;
     margin: 0;
-    font-size: ${uiTokens.fontTitle};
+    font-size: ${uiTokens.type.title};
   }
   ${partSelector(assistantViewContract, "activityBody")}, ${partSelector(assistantViewContract, "workDetail")} {
     min-height: 0;
     overflow-y: auto;
-    padding: ${uiTokens.spaceSection};
+    padding: ${uiTokens.space.section};
   }
   ${partSelector(assistantViewContract, "section")} + ${partSelector(assistantViewContract, "section")} {
-    margin-top: ${uiTokens.spacePanel};
+    margin-top: ${uiTokens.space.panel};
   }
   ${partSelector(assistantViewContract, "section")} h3 {
-    font-size: ${uiTokens.fontBody};
-    margin: 0 0 ${uiTokens.spaceGroup};
+    font-size: ${uiTokens.type.body};
+    margin: 0 0 ${uiTokens.space.group};
   }
   ${partSelector(assistantViewContract, "status")} {
     display: flex;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
   }
   ${panel} ${partSelector(workCardContract, "root")} {
     width: 100%;
-    margin-block: ${uiTokens.spaceGroup};
+    margin-block: ${uiTokens.space.group};
   }
   ${root} ${partSelector(assistantQuestionContract, "root")} {
-    margin-block: ${uiTokens.spaceSection};
+    margin-block: ${uiTokens.space.section};
   }
   ${root} ${partSelector(assistantQuestionContract, "answer")} {
     box-sizing: border-box;
@@ -237,13 +237,13 @@ export const assistantStyles = css`
     min-height: 40px;
     font: inherit;
     color: inherit;
-    border: 1px solid ${uiTokens.border};
-    border-radius: ${uiTokens.controlRadius};
-    background: ${uiTokens.inputSurface};
-    padding: ${uiTokens.spaceGroup};
+    border: 1px solid ${uiTokens.line.control};
+    border-radius: ${uiTokens.radius.lg};
+    background: ${uiTokens.surface.field};
+    padding: ${uiTokens.space.group};
   }
   ${root} ${partSelector(assistantQuestionContract, "options")} {
-    margin-bottom: ${uiTokens.spaceGroup};
+    margin-bottom: ${uiTokens.space.group};
   }
   ${root} [hidden] {
     display: none !important;
@@ -261,13 +261,13 @@ export const assistantStyles = css`
       border: 0;
     }
     ${content} {
-      padding-inline: ${uiTokens.pageInsetCompactInline};
+      padding-inline: ${uiTokens.space.pageInlineCompact};
     }
     ${composer} {
-      padding-inline: ${uiTokens.pageInsetCompactInline};
+      padding-inline: ${uiTokens.space.pageInlineCompact};
     }
     ${partSelector(assistantViewContract, "latest")} {
-      padding-inline: ${uiTokens.pageInsetCompactInline};
+      padding-inline: ${uiTokens.space.pageInlineCompact};
     }
   }
   ${root} {

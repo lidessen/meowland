@@ -6,10 +6,10 @@ export const spinnerStyles = css`
   ${partSelector(spinnerContract, "root")} {
     display: inline-flex;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
-    color: ${uiTokens.mutedForeground};
-    font-family: ${uiTokens.font};
-    font-size: ${uiTokens.fontCaption};
+    gap: ${uiTokens.space.group};
+    color: ${uiTokens.ink.secondary};
+    font-family: ${uiTokens.type.sans};
+    font-size: ${uiTokens.type.caption};
   }
   ${partSelector(spinnerContract, "icon")} {
     display: inline-flex;

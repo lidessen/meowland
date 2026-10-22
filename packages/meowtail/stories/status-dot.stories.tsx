@@ -39,19 +39,19 @@ export const StatusDotStory = defineStory({
                 <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
                   <StatusDot state={state} />
                   <strong style={{ fontWeight: "500" }}>{label}</strong>
-                  <span style={{ color: "var(--ui-subtle-foreground)" }}>{note}</span>
+                  <span style={{ color: "var(--ui-ink-tertiary)" }}>{note}</span>
                 </div>
               ))}
             </div>
             <Inline align="center" gap="compact">
-              <span style={{ fontSize: "12.5px", color: "var(--ui-muted-foreground)" }}>
+              <span style={{ fontSize: "12.5px", color: "var(--ui-ink-secondary)" }}>
                 With halo (the only leading status on a page)
               </span>
               <StatusDot state="processing" halo />
               <StatusDot state="success" size={7} halo />
             </Inline>
             <Inline align="center" gap="compact">
-              <span style={{ fontSize: "12.5px", color: "var(--ui-muted-foreground)" }}>
+              <span style={{ fontSize: "12.5px", color: "var(--ui-ink-secondary)" }}>
                 Sizes 6 / 8 / 10
               </span>
               <StatusDot state="processing" size={6} />

@@ -62,8 +62,8 @@ function Window({
         maxWidth: "100%",
         overflow: "hidden",
         borderRadius: "10px",
-        border: "0.5px solid var(--line-edge)",
-        background: "var(--ui-background)",
+        border: "1px solid var(--ui-line-edge)",
+        background: "var(--ui-surface-canvas)",
         "--mygo-titlebar-height": room.height,
         "--mygo-titlebar-inset-left": room.left,
         "--mygo-titlebar-inset-right": room.right,
@@ -91,7 +91,7 @@ function Window({
         style={{
           height: "88px",
           padding: "16px",
-          color: "var(--ui-subtle-foreground)",
+          color: "var(--ui-ink-tertiary)",
           fontSize: "13px",
         }}
       >
@@ -160,7 +160,7 @@ export const WindowTitleBarRoomStory = defineStory({
           style={{
             overflow: "hidden",
             borderRadius: "10px",
-            border: "0.5px solid var(--line-edge)",
+            border: "1px solid var(--ui-line-edge)",
           }}
         >
           <WindowTitleBar

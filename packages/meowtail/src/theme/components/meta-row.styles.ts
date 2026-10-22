@@ -7,10 +7,10 @@ export const metaRowStyles = css`
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
-    color: ${uiTokens.mutedForeground};
-    font: ${uiTokens.fontCaption}/18px ${uiTokens.font};
+    color: ${uiTokens.ink.secondary};
+    font: ${uiTokens.type.caption}/18px ${uiTokens.type.sans};
   }
   ${partSelector(metaRowContract, "root")}[${metaRowOptions.attribute("align")}="center"] {
     justify-content: center;
@@ -36,7 +36,7 @@ export const metaRowStyles = css`
     overflow-wrap: anywhere;
   }
   ${partSelector(metaRowContract, "separator")} {
-    color: ${uiTokens.border};
+    color: ${uiTokens.line.control};
   }
   ${partSelector(metaRowContract, "progress")} {
     display: inline-flex;
@@ -52,16 +52,16 @@ export const metaRowStyles = css`
     flex: none;
     border-radius: 50%;
     background: conic-gradient(
-      ${uiTokens.subtleForeground} var(--meta-progress, 0%),
-      ${uiTokens.border} var(--meta-progress, 0%)
+      ${uiTokens.ink.tertiary} var(--meta-progress, 0%),
+      ${uiTokens.line.control} var(--meta-progress, 0%)
     );
     -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black 0);
     mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black 0);
   }
   ${partSelector(metaRowContract, "root")}[${metaRowOptions.attribute("progressTone")}="accent"] ${partSelector(metaRowContract, "progress")}::before {
     background: conic-gradient(
-      ${uiTokens.info} var(--meta-progress, 0%),
-      ${uiTokens.border} var(--meta-progress, 0%)
+      ${uiTokens.status.info} var(--meta-progress, 0%),
+      ${uiTokens.line.control} var(--meta-progress, 0%)
     );
   }
 `;

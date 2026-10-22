@@ -1,16 +1,16 @@
 import { css, partSelector } from "meowcss/meowjsx";
-import { chatTokens, uiTokens } from "../tokens";
+import { uiTokens } from "../tokens";
 import { composerPanelContract } from "../../chat/composer-panel";
 import { chatComposerContract } from "../../chat/composer";
 
 export const composerPanelStyles = css`
   ${partSelector(composerPanelContract, "root")} {
     display: grid;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     width: 100%;
     min-width: 0;
-    font-family: ${uiTokens.font};
-    color: ${uiTokens.foreground};
+    font-family: ${uiTokens.type.sans};
+    color: ${uiTokens.ink.primary};
   }
   ${partSelector(composerPanelContract, "surface")} {
     min-width: 0;
@@ -20,12 +20,12 @@ export const composerPanelStyles = css`
     padding: 12px 14px 10px;
     border: 0;
     border-radius: 24px;
-    background: ${chatTokens.composerSurface};
-    box-shadow: ${chatTokens.composerShadow};
-    transition: border-color ${uiTokens.durationResponse} ${uiTokens.ease};
+    background: ${uiTokens.surface.fill};
+    box-shadow: 0 0 0 ${uiTokens.line.width} ${uiTokens.line.edge};
+    transition: border-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${partSelector(composerPanelContract, "surface")}[data-meowui-part] > ${partSelector(chatComposerContract, "root")} > ${partSelector(chatComposerContract, "surface")}:focus-within {
-    border-color: ${uiTokens.border};
+    border-color: ${uiTokens.line.control};
   }
   ${partSelector(composerPanelContract, "meta")} {
     min-width: 0;

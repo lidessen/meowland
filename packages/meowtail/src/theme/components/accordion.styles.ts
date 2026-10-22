@@ -2,7 +2,6 @@ import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { accordionContract } from "../../components/accordion";
 import { disclosureContract } from "../../components/disclosure";
-import { layerTokens, lineTokens, radiusTokens } from "../palette";
 
 const root = partSelector(accordionContract, "root");
 const item = partSelector(accordionContract, "item");
@@ -16,41 +15,41 @@ export const accordionStyles = css`
     display: grid;
     min-width: 0;
     overflow: hidden;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: ${radiusTokens.card};
-    background: ${layerTokens.raised};
-    box-shadow: ${uiTokens.shadowRaised};
-    color: ${uiTokens.foreground};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.raised};
+    box-shadow: ${uiTokens.shadow.raised};
+    color: ${uiTokens.ink.primary};
   }
   ${item} + ${item} {
-    border-top: ${lineTokens.width} solid ${lineTokens.divider};
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
   }
   ${root} ${disclosure} {
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
   }
   ${root} ${summary} {
     min-height: 44px;
     padding: 12px 16px;
     font-weight: 500;
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
     border-radius: 0;
     transition:
-      color ${uiTokens.durationResponse} ${uiTokens.ease},
-      background-color ${uiTokens.durationResponse} ${uiTokens.ease};
+      color ${uiTokens.motion.response} ${uiTokens.motion.ease},
+      background-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${root} ${icon} {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   @media (hover: hover) {
     ${root} ${summary}:hover {
-      background: ${layerTokens.sunken};
-      color: ${uiTokens.foreground};
+      background: ${uiTokens.surface.fill};
+      color: ${uiTokens.ink.primary};
     }
   }
   ${root} ${content} {
     padding: 0 16px 16px 38px;
-    color: ${uiTokens.mutedForeground};
-    line-height: ${uiTokens.leading};
+    color: ${uiTokens.ink.secondary};
+    line-height: ${uiTokens.type.leading};
   }
   ${root} ${content} > :first-child {
     margin-block-start: 0;

@@ -32,7 +32,7 @@ import {
 } from "meowtail";
 import { Note } from "./specimen";
 import { Icon } from "meowtail/icons";
-import { accentTokens, chatTokens, uiTokens } from "meowtail/theme";
+import { chatTokens, uiTokens } from "meowtail/theme";
 
 export const DesignLanguageStory = defineStory({
   id: "design-language",
@@ -79,15 +79,15 @@ export const DesignLanguageStory = defineStory({
             <div className="language-palette">
               {(
                 [
-                  [uiTokens.background, "Canvas"],
-                  [uiTokens.surface, "Surface"],
-                  [uiTokens.foreground, "Body text"],
-                  [uiTokens.mutedForeground, "Secondary"],
-                  [uiTokens.border, "Border"],
-                  [uiTokens.primary, "Main action"],
-                  [accentTokens.base, "Current activity"],
-                  [accentTokens.selected, "Current location"],
-                  [uiTokens.focus, "Focus"],
+                  [uiTokens.surface.canvas, "Canvas"],
+                  [uiTokens.surface.overlay, "Surface"],
+                  [uiTokens.ink.primary, "Body text"],
+                  [uiTokens.ink.secondary, "Secondary"],
+                  [uiTokens.line.control, "Border"],
+                  [uiTokens.action.primary, "Main action"],
+                  [uiTokens.accent.base, "Current activity"],
+                  [uiTokens.accent.selected, "Current location"],
+                  [uiTokens.state.focus, "Focus"],
                 ] as const
               ).map(([token, label]) => (
                 <div className="language-swatch">
@@ -98,7 +98,12 @@ export const DesignLanguageStory = defineStory({
               ))}
             </div>
             <div className="language-semantic-colors">
-              {[uiTokens.info, uiTokens.success, uiTokens.warning, uiTokens.danger].map((token) => (
+              {[
+                uiTokens.status.info,
+                uiTokens.status.success,
+                uiTokens.status.warning,
+                uiTokens.status.danger,
+              ].map((token) => (
                 <span>
                   <i style={{ background: String(token) }} />
                   <code>{token.name.replace("--ui-", "")}</code>
@@ -123,7 +128,7 @@ export const DesignLanguageStory = defineStory({
             </div>
             <div className="language-type-row">
               <code>UI</code>
-              <span style={{ fontSize: `${uiTokens.fontBody}` }}>
+              <span style={{ fontSize: `${uiTokens.type.body}` }}>
                 14px · Project settings and action labels
               </span>
             </div>
@@ -135,13 +140,13 @@ export const DesignLanguageStory = defineStory({
             </div>
             <div className="language-type-row">
               <code>meta</code>
-              <span style={{ fontSize: `${uiTokens.fontCaption}` }}>
+              <span style={{ fontSize: `${uiTokens.type.caption}` }}>
                 12px · Updated today · 09:41
               </span>
             </div>
             <div className="language-type-row">
               <code>mono</code>
-              <span style={{ fontFamily: `${uiTokens.mono}` }}>Aa 0123456789</span>
+              <span style={{ fontFamily: `${uiTokens.type.mono}` }}>Aa 0123456789</span>
             </div>
             <p className="language-note">
               Display serif gives page and section titles a voice. UI and conversation keep the
@@ -155,9 +160,9 @@ export const DesignLanguageStory = defineStory({
             <div className="language-spacing">
               {(
                 [
-                  [uiTokens.spaceGroup, "group"],
-                  [uiTokens.spaceSection, "section"],
-                  [uiTokens.spacePanel, "panel"],
+                  [uiTokens.space.group, "group"],
+                  [uiTokens.space.section, "section"],
+                  [uiTokens.space.panel, "panel"],
                 ] as const
               ).map(([token, label]) => (
                 <div>
@@ -169,9 +174,9 @@ export const DesignLanguageStory = defineStory({
             <div className="language-shapes">
               {(
                 [
-                  [uiTokens.controlRadius, "control"],
-                  [uiTokens.panelRadius, "panel"],
-                  [uiTokens.messageRadius, "message"],
+                  [uiTokens.radius.lg, "control"],
+                  [uiTokens.radius.xl, "panel"],
+                  [chatTokens.bubbleRadius, "message"],
                 ] as const
               ).map(([token, label]) => (
                 <div>

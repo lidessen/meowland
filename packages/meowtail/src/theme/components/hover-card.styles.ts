@@ -11,13 +11,13 @@ export const hoverCardStyles = css`
   ${partSelector(popoverContract, "panel")}:has(> ${partSelector(hoverCardContract, "content")}) {
     padding: 0;
     width: 244px;
-    background: ${uiTokens.tooltipSurface};
-    color: ${uiTokens.toastForeground};
+    background: ${uiTokens.inverse.surface};
+    color: ${uiTokens.inverse.ink};
     backdrop-filter: none;
   }
   ${partSelector(popoverContract, "panel")}:has(> ${partSelector(hoverCardContract, "content")}[data-variant="preview"]) {
-    background: ${uiTokens.surface};
-    color: ${uiTokens.foreground};
+    background: ${uiTokens.surface.overlay};
+    color: ${uiTokens.ink.primary};
   }
   ${partSelector(hoverCardContract, "content")} {
     position: relative;
@@ -38,9 +38,9 @@ export const hoverCardStyles = css`
     text-underline-offset: 3px;
   }
   ${partSelector(hoverCardContract, "content")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: -2px;
-    border-radius: ${uiTokens.radiusSmall};
+    border-radius: ${uiTokens.radius.md};
   }
   ${partSelector(hoverCardContract, "feedback")} {
     position: absolute;
@@ -49,10 +49,10 @@ export const hoverCardStyles = css`
     place-items: center;
     padding: 8px;
     border-radius: inherit;
-    background: ${uiTokens.tooltipSurface};
+    background: ${uiTokens.inverse.surface};
     pointer-events: none;
-    color: ${uiTokens.toastForeground};
-    font: ${uiTokens.fontBody}/20px ${uiTokens.font};
+    color: ${uiTokens.inverse.ink};
+    font: ${uiTokens.type.body}/20px ${uiTokens.type.sans};
   }
   ${partSelector(hoverCardContract, "feedback")}:empty {
     display: none;

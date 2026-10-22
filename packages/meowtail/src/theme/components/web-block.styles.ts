@@ -6,10 +6,10 @@ export const webBlockStyles = css`
   ${partSelector(web, "root")} {
     min-width: 0;
     padding: 12px 14px;
-    border-radius: ${uiTokens.radiusLarge};
-    background: ${uiTokens.codeSurface};
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/20px ${uiTokens.font};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/20px ${uiTokens.type.sans};
   }
   ${partSelector(web, "answer")} {
     white-space: pre-wrap;
@@ -26,7 +26,7 @@ export const webBlockStyles = css`
     overflow: auto;
   }
   ${partSelector(web, "link")} {
-    color: ${uiTokens.info};
+    color: ${uiTokens.status.info};
     font-weight: 500;
     text-decoration: none;
     overflow-wrap: anywhere;
@@ -37,13 +37,13 @@ export const webBlockStyles = css`
   }
   ${partSelector(web, "snippet")} {
     margin-top: 2px;
-    color: ${uiTokens.mutedForeground};
-    font: ${uiTokens.fontLabel}/19px ${uiTokens.font};
+    color: ${uiTokens.ink.secondary};
+    font: ${uiTokens.type.label}/19px ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
   ${partSelector(web, "meta")} {
     margin-top: 4px;
-    color: ${uiTokens.subtleForeground};
-    font: ${uiTokens.fontCaption}/18px ${uiTokens.font};
+    color: ${uiTokens.ink.tertiary};
+    font: ${uiTokens.type.caption}/18px ${uiTokens.type.sans};
   }
 `;

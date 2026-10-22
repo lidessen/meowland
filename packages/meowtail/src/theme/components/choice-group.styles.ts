@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { accentTokens } from "../palette";
 import { choiceGroupContract } from "../../components/choice-group";
 
 export const choiceGroupStyles = css`
@@ -9,11 +8,11 @@ export const choiceGroupStyles = css`
     margin: 0;
     padding: 0;
     border: 0;
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/1.5 ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/1.5 ${uiTokens.type.sans};
   }
   ${partSelector(choiceGroupContract, "legend")} {
-    margin-bottom: ${uiTokens.spaceGroup};
+    margin-bottom: ${uiTokens.space.group};
     padding: 0;
     font-weight: 500;
   }
@@ -34,32 +33,32 @@ export const choiceGroupStyles = css`
   ${partSelector(choiceGroupContract, "option")} {
     display: flex;
     align-items: flex-start;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
     box-sizing: border-box;
     min-height: 40px;
     padding: 8px 12px 8px 8px;
     border: 1px solid transparent;
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radius.lg};
     cursor: pointer;
     transition:
-      background-color ${uiTokens.durationResponse} ${uiTokens.ease},
-      border-color ${uiTokens.durationResponse} ${uiTokens.ease};
+      background-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
+      border-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   :where(${partSelector(choiceGroupContract, "option")}:hover:not(:has(input:disabled))) {
-    background: ${uiTokens.hover};
+    background: ${uiTokens.state.hover};
   }
   /* The chosen option is the current selection, so it takes the accent. */
   :where(${partSelector(choiceGroupContract, "option")}:has(input:checked)) {
-    border-color: ${accentTokens.line};
-    background: ${accentTokens.selected};
+    border-color: ${uiTokens.accent.line};
+    background: ${uiTokens.accent.selected};
   }
   :where(${partSelector(choiceGroupContract, "option")}:has(input:focus-visible)) {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
   :where(${partSelector(choiceGroupContract, "option")}:has(input:disabled)) {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
     cursor: not-allowed;
   }
   ${partSelector(choiceGroupContract, "input")}:disabled {
@@ -70,7 +69,7 @@ export const choiceGroupStyles = css`
     width: 16px;
     height: 16px;
     margin: 3px 0 0;
-    accent-color: ${uiTokens.foreground};
+    accent-color: ${uiTokens.ink.primary};
   }
   ${partSelector(choiceGroupContract, "content")} {
     display: grid;
@@ -83,8 +82,8 @@ export const choiceGroupStyles = css`
     line-height: 24px;
   }
   ${partSelector(choiceGroupContract, "description")} {
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontBody};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.body};
     line-height: 24px;
   }
 `;

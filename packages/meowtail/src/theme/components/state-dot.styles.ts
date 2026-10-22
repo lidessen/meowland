@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { statusTokens } from "../palette";
 import { stateDotContract } from "../../components/state-dot";
 
 export const stateDotStyles = css`
@@ -13,7 +12,7 @@ export const stateDotStyles = css`
     border-radius: 50%;
     corner-shape: round;
     background: transparent;
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
   ${partSelector(stateDotContract, "root")}[data-appearance="dot"]:not([data-state="ongoing"])::after {
     content: "";
@@ -24,23 +23,23 @@ export const stateDotStyles = css`
     background: currentColor;
   }
   ${partSelector(stateDotContract, "root")}[data-state="idle"] {
-    color: ${statusTokens.unknown};
+    color: ${uiTokens.status.unknown};
   }
   ${partSelector(stateDotContract, "root")}[data-state="done"] {
-    color: ${uiTokens.success};
+    color: ${uiTokens.status.success};
   }
   ${partSelector(stateDotContract, "root")}[data-state="warning"] {
-    color: ${uiTokens.warning};
+    color: ${uiTokens.status.warning};
   }
   ${partSelector(stateDotContract, "root")}[data-state="error"] {
-    color: ${uiTokens.danger};
+    color: ${uiTokens.status.danger};
   }
   ${partSelector(stateDotContract, "root")}[data-state="ongoing"] {
     background: transparent;
   }
   ${partSelector(stateDotContract, "root")}[data-appearance="step"] {
     background: transparent;
-    border: 1.5px solid ${uiTokens.subtleForeground};
+    border: 1.5px solid ${uiTokens.ink.tertiary};
     box-sizing: border-box;
   }
   ${partSelector(stateDotContract, "root")}[data-appearance="step"]:is([data-state="done"], [data-state="error"]) {
@@ -51,7 +50,7 @@ export const stateDotStyles = css`
     border-color: currentColor;
   }
   ${partSelector(stateDotContract, "root")}[data-appearance="step"][data-state="done"] > svg {
-    color: ${uiTokens.onPrimary};
+    color: ${uiTokens.action.onPrimary};
   }
   ${partSelector(stateDotContract, "motion")} {
     display: flex;

@@ -27,7 +27,7 @@ export const presentationImageStyles = css`
     width: 100%;
     min-width: 0;
     min-height: 0;
-    border-radius: ${uiTokens.radiusSmall};
+    border-radius: ${uiTokens.radius.md};
     background: ${presentationTokens.paper};
   }
   ${partSelector(image, "root")}[data-sizing="ratio"] > ${partSelector(image, "frame")} {

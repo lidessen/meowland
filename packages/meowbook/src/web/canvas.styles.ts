@@ -13,8 +13,8 @@ export const canvasStyles = css`
     font:
       12px/1.5 system-ui,
       sans-serif;
-    color: var(${uiTokens.mutedForeground.name}, color-mix(in srgb, CanvasText 75%, Canvas));
-    background: var(${uiTokens.background.name}, Canvas);
+    color: var(${uiTokens.ink.secondary.name}, color-mix(in srgb, CanvasText 75%, Canvas));
+    background: var(${uiTokens.surface.canvas.name}, Canvas);
   }
   #story-state:empty {
     display: none;
@@ -23,8 +23,8 @@ export const canvasStyles = css`
     padding: 8px 16px;
   }
   #story-state[data-status="error"] {
-    color: color-mix(in srgb, CanvasText 80%, var(${uiTokens.danger.name}, #c43131));
-    background: color-mix(in srgb, Canvas 90%, var(${uiTokens.danger.name}, #c43131));
+    color: color-mix(in srgb, CanvasText 80%, var(${uiTokens.status.danger.name}, #c43131));
+    background: color-mix(in srgb, Canvas 90%, var(${uiTokens.status.danger.name}, #c43131));
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
@@ -37,20 +37,20 @@ export const canvasStyles = css`
     min-height: 32px;
     padding: 4px 10px;
     border: 1px solid currentColor;
-    border-radius: var(${uiTokens.controlRadius.name}, 6px);
+    border-radius: var(${uiTokens.radius.lg.name}, 6px);
     color: inherit;
     background: transparent;
     font: inherit;
     cursor: pointer;
   }
   #story-state[data-status="error"] button:focus-visible {
-    outline: 2px solid var(${uiTokens.focus.name}, currentColor);
+    outline: 2px solid var(${uiTokens.state.focus.name}, currentColor);
     outline-offset: 2px;
   }
   #story-replacement-details {
-    color: var(${uiTokens.mutedForeground.name}, color-mix(in srgb, CanvasText 75%, Canvas));
-    background: var(${uiTokens.background.name}, Canvas);
-    font: 12px/1.5 var(${uiTokens.font.name}, system-ui, sans-serif);
+    color: var(${uiTokens.ink.secondary.name}, color-mix(in srgb, CanvasText 75%, Canvas));
+    background: var(${uiTokens.surface.canvas.name}, Canvas);
+    font: 12px/1.5 var(${uiTokens.type.sans.name}, system-ui, sans-serif);
   }
   #story-replacement-details > summary {
     padding: 8px 16px;
@@ -58,7 +58,7 @@ export const canvasStyles = css`
     cursor: pointer;
   }
   #story-replacement-details > summary:focus-visible {
-    outline: 2px solid var(${uiTokens.focus.name}, currentColor);
+    outline: 2px solid var(${uiTokens.state.focus.name}, currentColor);
     outline-offset: -2px;
   }
   @media (pointer: coarse) {
@@ -139,8 +139,8 @@ export const canvasStyles = css`
     font: 11px/1.5 monospace;
     white-space: pre-wrap;
     padding: 8px 16px;
-    color: var(${uiTokens.mutedForeground.name}, color-mix(in srgb, CanvasText 75%, Canvas));
-    background: var(${uiTokens.background.name}, Canvas);
+    color: var(${uiTokens.ink.secondary.name}, color-mix(in srgb, CanvasText 75%, Canvas));
+    background: var(${uiTokens.surface.canvas.name}, Canvas);
     overflow-wrap: anywhere;
   }
   [data-meowbook-placeholder] {
@@ -151,10 +151,11 @@ export const canvasStyles = css`
     padding: 12px;
     overflow-wrap: anywhere;
     text-align: center;
-    border: 1px dashed var(${uiTokens.border.name}, color-mix(in srgb, CanvasText 40%, Canvas));
-    border-radius: var(${uiTokens.controlRadius.name}, 6px);
-    background: var(${uiTokens.surfaceMuted.name}, color-mix(in srgb, Canvas 94%, CanvasText));
-    color: var(${uiTokens.mutedForeground.name}, color-mix(in srgb, CanvasText 75%, Canvas));
-    font: 12px/1.5 var(${uiTokens.font.name}, system-ui, sans-serif);
+    border: 1px dashed
+      var(${uiTokens.line.control.name}, color-mix(in srgb, CanvasText 40%, Canvas));
+    border-radius: var(${uiTokens.radius.lg.name}, 6px);
+    background: var(${uiTokens.surface.fill.name}, color-mix(in srgb, Canvas 94%, CanvasText));
+    color: var(${uiTokens.ink.secondary.name}, color-mix(in srgb, CanvasText 75%, Canvas));
+    font: 12px/1.5 var(${uiTokens.type.sans.name}, system-ui, sans-serif);
   }
 `;

@@ -85,9 +85,9 @@ export const MediaRatio = defineStory({
                 height: "100%",
                 display: "grid",
                 placeItems: "center",
-                background: `${uiTokens.surfaceMuted}`,
-                borderRadius: `${uiTokens.controlRadius}`,
-                color: `${uiTokens.mutedForeground}`,
+                background: `${uiTokens.surface.fill}`,
+                borderRadius: `${uiTokens.radius.lg}`,
+                color: `${uiTokens.ink.secondary}`,
               }}
             >
               {ratio === 1 ? "1 : 1 · Project cover" : "16 : 9 · Demo preview"}

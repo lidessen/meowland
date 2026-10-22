@@ -2,7 +2,6 @@ import { css, partSelector } from "meowcss/meowjsx";
 import { processGroupContract } from "../../components/process-group";
 import { processStepContract } from "../../components/process-step";
 import { uiTokens } from "../tokens";
-import { layerTokens, lineTokens, radiusTokens } from "../palette";
 
 const group = (part: (typeof processGroupContract.parts)[number]) =>
   partSelector(processGroupContract, part);
@@ -19,10 +18,10 @@ export const processGroupStyles = css`
     overflow: hidden;
     /* A recessed fill inside the reading flow: no edge. */
     border: 0;
-    border-radius: ${radiusTokens.card};
-    background: ${layerTokens.fill};
-    color: ${uiTokens.mutedForeground};
-    font: ${uiTokens.fontLabel}/20px ${uiTokens.font};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.secondary};
+    font: ${uiTokens.type.label}/20px ${uiTokens.type.sans};
   }
   ${group("summary")} {
     display: flex;
@@ -37,17 +36,17 @@ export const processGroupStyles = css`
     display: none;
   }
   ${group("summary")}:hover {
-    background: ${uiTokens.hover};
+    background: ${uiTokens.state.hover};
   }
   ${group("summary")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: -2px;
   }
   ${group("chevron")} {
     display: grid;
     place-items: center;
     flex: 0 0 auto;
-    transition: transform ${uiTokens.durationResponse} ${uiTokens.ease};
+    transition: transform ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${group("chevron")} svg {
     width: 14px;
@@ -59,7 +58,7 @@ export const processGroupStyles = css`
   /* Names stay on one line; compact containers give the outcome its own row below. */
   ${group("title")} {
     flex: 0 0 auto;
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
     font-weight: 500;
     white-space: nowrap;
   }
@@ -79,7 +78,7 @@ export const processGroupStyles = css`
   ${group("body")} {
     display: grid;
     padding: 2px 12px 10px 14px;
-    border-top: ${lineTokens.width} solid ${lineTokens.quiet};
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
   }
   /* A compact group keeps the outcome readable below the name and step markers. */
   @container (max-width: 400px) {
@@ -119,7 +118,7 @@ export const processGroupStyles = css`
   ${step("icon")} {
     display: grid;
     place-items: center;
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
   ${step("icon")} svg {
     width: 14px;
@@ -133,14 +132,14 @@ export const processGroupStyles = css`
   }
   ${step("label")} code {
     padding: 1px 5px;
-    border-radius: ${radiusTokens.mark};
-    background: ${layerTokens.code};
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontCode} ${uiTokens.mono};
+    border-radius: ${uiTokens.radius.xs};
+    background: ${uiTokens.surface.tint};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.code} ${uiTokens.type.mono};
   }
   ${step("meta")} {
-    color: ${layerTokens.faint};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
     font-variant-numeric: tabular-nums;
   }
 `;

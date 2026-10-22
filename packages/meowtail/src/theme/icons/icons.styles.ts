@@ -1,4 +1,4 @@
-import { layerTokens } from "../palette";
+import { uiTokens } from "../tokens";
 import { css } from "meowcss/meowjsx";
 
 export const iconsStyles = css`
@@ -19,7 +19,7 @@ export const iconsStyles = css`
     stroke-linejoin: round;
   }
   .meow-doodle-cat .empty-cat-body {
-    fill: ${layerTokens.knockout};
+    fill: ${uiTokens.surface.knockout};
   }
   .meow-doodle-cat .empty-cat-face {
     stroke-width: 3;

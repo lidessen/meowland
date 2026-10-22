@@ -21,9 +21,9 @@ export function SchemePair({
         minWidth: "0",
         padding: "24px",
         borderRadius: "14px",
-        border: "0.5px solid var(--line-edge)",
-        background: "var(--ui-background)",
-        color: "var(--ui-foreground)",
+        border: "1px solid var(--ui-line-edge)",
+        background: "var(--ui-surface-canvas)",
+        color: "var(--ui-ink-primary)",
         display: "grid",
         gap: "16px",
         alignContent: "start",
@@ -31,7 +31,7 @@ export function SchemePair({
     >
       <span
         style={{
-          color: "var(--layer-faint)",
+          color: "var(--ui-ink-tertiary)",
           fontSize: "11px",
           fontWeight: "600",
           letterSpacing: "0.06em",

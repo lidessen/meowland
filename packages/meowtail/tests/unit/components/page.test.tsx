@@ -140,5 +140,5 @@ test("Page provides the level-1 section context to its content", () => {
 test("the standard theme paints every page part with the shared spacing step", () => {
   for (const part of ["root", "header", "eyebrow", "toolbar", "notice", "content"])
     expect(standardTheme.cssText).toContain(`data-meowui-part="page/${part}"`);
-  expect(standardTheme.cssText).toContain(uiTokens.spaceSection.name);
+  expect(standardTheme.cssText).toContain(uiTokens.space.section.name);
 });

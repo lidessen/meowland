@@ -1,22 +1,21 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { tableContract, tableMinWidth } from "../../components/table";
-import { accentTokens, layerTokens, lineTokens, radiusTokens } from "../palette";
 
 const part = (name: (typeof tableContract.parts)[number]) => partSelector(tableContract, name);
 
 export const tableStyles = css`
   ${part("root")} {
     min-width: 0;
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/1.5 ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/1.5 ${uiTokens.type.sans};
   }
   ${part("scroller")} {
     overflow: auto;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: ${radiusTokens.card};
-    background: ${layerTokens.raised};
-    box-shadow: ${uiTokens.shadowRaised};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.raised};
+    box-shadow: ${uiTokens.shadow.raised};
   }
   ${part("table")} {
     width: 100%;
@@ -42,12 +41,12 @@ export const tableStyles = css`
     top: 0;
     z-index: 1;
     padding-block: 8px;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     font-weight: 600;
     letter-spacing: 0.01em;
     white-space: nowrap;
-    background: ${layerTokens.sunken};
+    background: ${uiTokens.surface.fill};
   }
   ${part("heading")}:last-child ${part("resize")}::after {
     opacity: 0;
@@ -76,18 +75,18 @@ export const tableStyles = css`
     width: 12px;
     height: 12px;
     flex: none;
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
   ${part("heading")}[aria-sort="ascending"] ${part("sort")},
   ${part("heading")}[aria-sort="descending"] ${part("sort")} {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
   ${part("heading")}[aria-sort="ascending"] ${part("sort")} svg,
   ${part("heading")}[aria-sort="descending"] ${part("sort")} svg {
     color: currentColor;
   }
   ${part("sort")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
     border-radius: 2px;
   }
@@ -104,15 +103,15 @@ export const tableStyles = css`
     inset-block: 8px;
     inset-inline-end: 4px;
     width: 1px;
-    background: ${lineTokens.divider};
+    background: ${uiTokens.line.divider};
     transition:
-      background-color ${uiTokens.durationResponse} ${uiTokens.ease},
-      width ${uiTokens.durationResponse} ${uiTokens.ease};
+      background-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
+      width ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   @media (hover: hover) {
     ${part("heading")}:hover ${part("resize")}::after,
     ${part("resize")}:hover::after {
-      background: ${uiTokens.mutedForeground};
+      background: ${uiTokens.ink.secondary};
       opacity: 1;
     }
     ${part("resize")}:hover::after {
@@ -120,26 +119,26 @@ export const tableStyles = css`
     }
   }
   ${part("body")} ${part("row")} ${part("cell")} {
-    transition: background-color ${uiTokens.durationResponse} ${uiTokens.ease};
+    transition: background-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${part("row")} + ${part("row")} ${part("cell")} {
-    border-top: ${lineTokens.width} solid ${lineTokens.divider};
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
   }
   @media (hover: hover) {
     ${part("body")} ${part("row")}:hover ${part("cell")} {
-      background: ${uiTokens.hover};
+      background: ${uiTokens.state.hover};
     }
   }
   ${part("body")} ${part("row")}[data-selected="true"] ${part("cell")} {
-    background: ${accentTokens.selected};
+    background: ${uiTokens.accent.selected};
   }
   @media (hover: hover) {
     ${part("body")} ${part("row")}[data-selected="true"]:hover ${part("cell")} {
-      background: color-mix(in srgb, ${accentTokens.selected} 70%, ${uiTokens.hover});
+      background: color-mix(in srgb, ${uiTokens.accent.selected} 70%, ${uiTokens.state.hover});
     }
   }
   ${part("body")} ${part("row")}:has(input:disabled) ${part("cell")} {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
   ${part("cell")}[data-table-select],
   ${part("heading")}:has(${part("select")}) {

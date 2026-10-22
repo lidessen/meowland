@@ -6,12 +6,12 @@ export const appBarStyles = css`
   ${partSelector(appBarContract, "root")} {
     display: flex;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     min-width: 0;
     min-height: 56px;
     padding: 10px 16px;
-    border-bottom: 1px solid ${uiTokens.borderSubtle};
-    background: ${uiTokens.background};
+    border-bottom: 1px solid ${uiTokens.line.edge};
+    background: ${uiTokens.surface.canvas};
   }
   ${partSelector(appBarContract, "identity")} {
     display: grid;
@@ -22,15 +22,15 @@ export const appBarStyles = css`
   ${partSelector(appBarContract, "title")} {
     margin: 0;
     overflow-wrap: anywhere;
-    color: ${uiTokens.foreground};
-    font-size: ${uiTokens.fontHeading};
+    color: ${uiTokens.ink.primary};
+    font-size: ${uiTokens.type.heading};
     font-weight: 600;
     line-height: 1.25;
   }
   ${partSelector(appBarContract, "status")} {
     min-width: 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     line-height: 18px;
   }
   ${partSelector(appBarContract, "actions")} {

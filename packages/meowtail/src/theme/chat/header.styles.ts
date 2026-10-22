@@ -6,10 +6,10 @@ export const chatHeaderStyles = css`
   ${partSelector(chatHeaderContract, "root")} {
     display: flex;
     flex-wrap: wrap;
-    gap: ${uiTokens.spaceSection};
+    gap: ${uiTokens.space.section};
     align-items: center;
     padding: 10px 28px 10px 20px;
-    border-bottom: 1px solid ${uiTokens.borderSubtle};
+    border-bottom: 1px solid ${uiTokens.line.edge};
   }
 
   ${partSelector(chatHeaderContract, "identity")} {
@@ -22,7 +22,7 @@ export const chatHeaderStyles = css`
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     margin-inline-start: auto;
     min-width: 0;
   }
@@ -30,15 +30,15 @@ export const chatHeaderStyles = css`
   ${partSelector(chatHeaderContract, "eyebrow")} {
     display: block;
     margin-bottom: 4px;
-    color: ${uiTokens.subtleForeground};
-    font-family: ${uiTokens.font};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.tertiary};
+    font-family: ${uiTokens.type.sans};
+    font-size: ${uiTokens.type.caption};
     font-weight: 400;
   }
 
   ${partSelector(chatHeaderContract, "title")} {
     margin: 0;
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
     font-weight: 500;
     line-height: 20px;
   }
@@ -46,8 +46,8 @@ export const chatHeaderStyles = css`
   ${partSelector(chatHeaderContract, "description")} {
     max-width: 560px;
     margin: 4px 0 0;
-    color: ${uiTokens.subtleForeground};
-    font-size: ${uiTokens.fontLabel};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.label};
     line-height: 20px;
   }
 
@@ -62,8 +62,8 @@ export const chatHeaderStyles = css`
 
   @media (max-width: 680px) {
     ${partSelector(chatHeaderContract, "root")} {
-      gap: ${uiTokens.spaceGroup};
-      padding: ${uiTokens.spaceSection};
+      gap: ${uiTokens.space.group};
+      padding: ${uiTokens.space.section};
     }
 
     ${partSelector(chatHeaderContract, "controls")} {
@@ -72,22 +72,22 @@ export const chatHeaderStyles = css`
     }
 
     ${partSelector(chatHeaderContract, "description")} {
-      font-size: ${uiTokens.fontCaption};
+      font-size: ${uiTokens.type.caption};
     }
   }
 
   @media (max-width: 360px) and (max-height: 700px) {
     ${partSelector(chatHeaderContract, "root")} {
-      gap: ${uiTokens.spaceGroup};
-      padding: ${uiTokens.spaceSection};
+      gap: ${uiTokens.space.group};
+      padding: ${uiTokens.space.section};
     }
 
     ${partSelector(chatHeaderContract, "title")} {
-      font-size: ${uiTokens.fontBody};
+      font-size: ${uiTokens.type.body};
     }
 
     ${partSelector(chatHeaderContract, "description")} {
-      font-size: ${uiTokens.fontCaption};
+      font-size: ${uiTokens.type.caption};
       line-height: 1.45;
     }
   }

@@ -1,5 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
-import { uiTokens, logoTokens, lineTokens } from "meowtail/theme";
+import { uiTokens, logoTokens } from "meowtail/theme";
 import { fieldContract } from "meowtail";
 
 export const previewStyles = css`
@@ -8,28 +8,28 @@ export const previewStyles = css`
   body {
     margin: 0;
     min-width: 0;
-    background: ${uiTokens.background};
-    color: ${uiTokens.foreground};
-    font-family: ${uiTokens.font};
+    background: ${uiTokens.surface.canvas};
+    color: ${uiTokens.ink.primary};
+    font-family: ${uiTokens.type.sans};
   }
   * {
     box-sizing: border-box;
   }
   .meowui-story {
-    padding: ${uiTokens.spacePanel};
-    font-size: ${uiTokens.fontBody};
-    line-height: ${uiTokens.leading};
+    padding: ${uiTokens.space.panel};
+    font-size: ${uiTokens.type.body};
+    line-height: ${uiTokens.type.leading};
   }
   /* A slim strip above the specimen, ruled by the same divider as the gallery. */
   .workshop-theme-controls {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: ${uiTokens.spaceSection};
-    padding: 10px ${uiTokens.spacePanel};
-    border-bottom: ${lineTokens.width} solid ${lineTokens.edge};
-    color: ${uiTokens.subtleForeground};
-    font-size: ${uiTokens.fontCaption};
+    gap: ${uiTokens.space.section};
+    padding: 10px ${uiTokens.space.panel};
+    border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
   }
   .workshop-theme-controls label {
     display: flex;
@@ -39,19 +39,19 @@ export const previewStyles = css`
   .workshop-theme-controls select {
     max-width: 180px;
     width: auto;
-    min-height: ${uiTokens.controlSmall};
-    border-radius: ${uiTokens.radiusSmall};
-    font-size: ${uiTokens.fontLabel};
+    min-height: ${uiTokens.control.small};
+    border-radius: ${uiTokens.radius.md};
+    font-size: ${uiTokens.type.label};
   }
   .workshop-composition {
     max-width: 720px;
     margin-inline: auto;
     display: grid;
-    gap: ${uiTokens.spacePanel};
+    gap: ${uiTokens.space.panel};
   }
   .workshop-composition h1 {
     margin: 0;
-    font-size: ${uiTokens.fontHeading};
+    font-size: ${uiTokens.type.heading};
     font-weight: 600;
     letter-spacing: -0.025em;
   }
@@ -63,18 +63,18 @@ export const previewStyles = css`
     gap: 8px;
   }
   .workshop-composition-header p {
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontBody};
-    line-height: ${uiTokens.leading};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.body};
+    line-height: ${uiTokens.type.leading};
   }
   .workshop-composition-columns {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-    gap: ${uiTokens.spacePanel};
+    gap: ${uiTokens.space.panel};
   }
   .workshop-section {
     display: grid;
-    gap: ${uiTokens.spacePanel};
+    gap: ${uiTokens.space.panel};
     min-width: 0;
   }
   .workshop-actions {
@@ -98,7 +98,7 @@ export const previewStyles = css`
   }
   .workshop-stack {
     display: grid;
-    gap: ${uiTokens.spaceSection};
+    gap: ${uiTokens.space.section};
     min-width: 0;
     justify-items: start;
   }
@@ -112,15 +112,15 @@ export const previewStyles = css`
   }
   .workshop-composition-header h2 {
     margin: 0;
-    font-size: ${uiTokens.fontTitle};
+    font-size: ${uiTokens.type.title};
     letter-spacing: -0.01em;
     font-weight: 600;
   }
   /* Specimen labels share the small-caps label role the docs and gallery use. */
   .workshop-section-title {
     margin: 0;
-    color: ${uiTokens.subtleForeground};
-    font-size: ${uiTokens.fontMicro};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.micro};
     font-weight: 500;
     letter-spacing: 0.04em;
     text-transform: uppercase;
@@ -128,8 +128,8 @@ export const previewStyles = css`
   .workshop-feedback {
     min-height: 20px;
     margin: 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
     line-height: 1.6;
   }
   .workshop-disclosure-detail {
@@ -139,9 +139,9 @@ export const previewStyles = css`
   }
   .workshop-disclosure-path {
     display: block;
-    font-family: ${uiTokens.mono};
-    font-size: ${uiTokens.fontCaption};
-    color: ${uiTokens.mutedForeground};
+    font-family: ${uiTokens.type.mono};
+    font-size: ${uiTokens.type.caption};
+    color: ${uiTokens.ink.secondary};
     overflow-wrap: anywhere;
   }
   .workshop-document {
@@ -151,7 +151,7 @@ export const previewStyles = css`
   }
   .workshop-document h3 {
     margin: 0;
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
   }
   ${partSelector(fieldContract, "root")} + .workshop-document {
     margin-top: 12px;
@@ -166,14 +166,14 @@ export const previewStyles = css`
     width: min(100%, 560px);
   }
   .workshop-note {
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
   }
   .workshop-brand-mark {
     width: 28px;
     height: 28px;
 
-    ${logoTokens.ink.name}: ${uiTokens.foreground};
+    ${logoTokens.ink.name}: ${uiTokens.ink.primary};
   }
   .workshop-icon-grid {
     display: grid;
@@ -187,17 +187,17 @@ export const previewStyles = css`
     gap: 8px;
     padding: 12px 6px;
     border: 1px solid transparent;
-    border-radius: ${uiTokens.controlRadius};
-    font-size: ${uiTokens.fontMicro};
-    color: ${uiTokens.mutedForeground};
+    border-radius: ${uiTokens.radius.lg};
+    font-size: ${uiTokens.type.micro};
+    color: ${uiTokens.ink.secondary};
   }
   .workshop-icon-item[hidden] {
     display: none;
   }
   .workshop-icon-item[aria-pressed="true"] {
-    background: ${uiTokens.primarySoft};
-    border-color: ${uiTokens.focus};
-    color: ${uiTokens.foreground};
+    background: ${uiTokens.action.soft};
+    border-color: ${uiTokens.state.focus};
+    color: ${uiTokens.ink.primary};
   }
   .workshop-icon-scale > .workshop-note {
     min-width: 36px;
@@ -215,8 +215,8 @@ export const previewStyles = css`
     align-content: center;
     grid-template-rows: 88px auto;
     align-items: center;
-    font-size: ${uiTokens.fontCaption};
-    color: ${uiTokens.mutedForeground};
+    font-size: ${uiTokens.type.caption};
+    color: ${uiTokens.ink.secondary};
   }
   .workshop-brand-grid svg {
     width: 64px;
@@ -270,7 +270,7 @@ export const previewStyles = css`
   .workshop-search-results {
     display: grid;
     width: 100%;
-    border-block: ${lineTokens.width} solid ${lineTokens.divider};
+    border-block: ${uiTokens.line.width} solid ${uiTokens.line.divider};
   }
   .workshop-icon-state-sample {
     display: grid;
@@ -282,17 +282,17 @@ export const previewStyles = css`
     padding-block: 12px;
   }
   .workshop-search-results article:not([hidden]) ~ article:not([hidden]) {
-    border-top: ${lineTokens.width} solid ${lineTokens.divider};
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
   }
   .workshop-search-results h3 {
     margin: 0 0 3px;
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
     font-weight: 550;
   }
   .workshop-search-results p {
     margin: 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
   }
   .workshop-search-results [data-search-empty] {
     padding-block: 20px;

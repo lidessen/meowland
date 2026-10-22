@@ -9,7 +9,7 @@ export const toolbarStyles = css`
     flex-wrap: wrap;
     min-width: 0;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
   }
 
   :where(${partSelector(toolbarContract, "root")}[aria-orientation="vertical"]) {

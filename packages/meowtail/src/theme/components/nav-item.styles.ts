@@ -1,16 +1,15 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { accentTokens } from "../palette";
 import { navItemContract } from "../../components/nav-item";
 
 export const navItemStyles = css`
   :where(${partSelector(navItemContract, "root")}) {
     box-sizing: border-box;
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
   }
   :where(${partSelector(navItemContract, "root")}):focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
   ${partSelector(navItemContract, "root")} {
@@ -21,41 +20,41 @@ export const navItemStyles = css`
     min-height: 36px;
     padding: 7px 12px;
     border: 0;
-    border-radius: ${uiTokens.controlRadius};
-    color: ${uiTokens.foreground};
+    border-radius: ${uiTokens.radius.lg};
+    color: ${uiTokens.ink.primary};
     background: transparent;
     text-align: left;
     text-decoration: none;
     cursor: pointer;
   }
   :where(${partSelector(navItemContract, "root")}[aria-current="page"]) {
-    color: ${uiTokens.foreground};
-    background: ${accentTokens.selected};
+    color: ${uiTokens.ink.primary};
+    background: ${uiTokens.accent.selected};
     font-weight: 500;
   }
   @media (hover: hover) {
     ${partSelector(navItemContract, "root")}:hover:not(:disabled):not([aria-current="page"]) {
-      background: ${uiTokens.hover};
+      background: ${uiTokens.state.hover};
     }
   }
   ${partSelector(navItemContract, "root")}:disabled {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
     cursor: not-allowed;
   }
   ${partSelector(navItemContract, "icon")} {
     display: inline-flex;
-    width: ${uiTokens.iconSize};
+    width: ${uiTokens.icon.size};
     flex-shrink: 0;
   }
   ${partSelector(navItemContract, "icon")} svg {
-    width: ${uiTokens.iconSize};
-    height: ${uiTokens.iconSize};
+    width: ${uiTokens.icon.size};
+    height: ${uiTokens.icon.size};
   }
   ${partSelector(navItemContract, "badge")} {
     margin-left: auto;
     flex-shrink: 0;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
   }
   ${partSelector(navItemContract, "label")} {
     flex: 1;

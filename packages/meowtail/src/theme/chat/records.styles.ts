@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
-import { radiusTokens } from "../palette";
 import { chatProcessContract } from "../../chat/process";
 import { chatSourcesContract } from "../../chat/sources";
 import { chatToolCallContract } from "../../chat/tool-call";
@@ -26,7 +25,7 @@ export const chatRecordsStyles = css`
     /* Where a row's own label begins. What a row owns rather than sits beside — its
     description, and the rows a group holds — starts here, so a labeled group and the rows
     inside it read as one ladder instead of as peers. */
-    ${rowIndent}: calc(${uiTokens.iconSize} + var(${rowDelta}, 0px) + ${chatTokens.leadingGap});
+    ${rowIndent}: calc(${uiTokens.icon.size} + var(${rowDelta}, 0px) + ${chatTokens.leadingGap});
   }
 
   :is(
@@ -51,8 +50,8 @@ export const chatRecordsStyles = css`
   ) {
     display: grid;
     place-items: center;
-    width: calc(${uiTokens.iconSize} + var(${rowDelta}, 0px));
-    height: calc(${uiTokens.iconSize} + var(${rowDelta}, 0px));
+    width: calc(${uiTokens.icon.size} + var(${rowDelta}, 0px));
+    height: calc(${uiTokens.icon.size} + var(${rowDelta}, 0px));
     flex: 0 0 auto;
   }
 
@@ -78,10 +77,10 @@ export const chatRecordsStyles = css`
     margin-top: 0;
     padding: 0;
     border: 0;
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radius.lg};
     background: transparent;
-    color: ${uiTokens.subtleForeground};
-    font-size: ${uiTokens.fontBody};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.body};
   }
 
   ${partSelector(chatToolCallContract, "header")} {
@@ -89,10 +88,10 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatToolCallContract, "icon")} {
-    border-radius: ${radiusTokens.mark};
+    border-radius: ${uiTokens.radius.xs};
     color: inherit;
     background: transparent;
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
     line-height: 1;
   }
 
@@ -102,8 +101,8 @@ export const chatRecordsStyles = css`
     overflow-wrap: anywhere;
     min-width: 0;
     margin-left: 2px;
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
   }
 
   ${partSelector(chatToolCallContract, "label")} {
@@ -120,25 +119,25 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.danger};
+    color: ${uiTokens.status.danger};
   }
 
   /* Color is kept for states that need the reader: waiting and errors. Running and
      finished rows stay neutral, so a long chain reads quietly. */
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="waiting"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.warning};
+    color: ${uiTokens.status.warning};
   }
 
   ${partSelector(chatToolCallContract, "detail")},
   ${partSelector(chatToolCallContract, "body")} {
     min-width: 0;
     margin: 0;
-    color: ${uiTokens.mutedForeground};
-    font: ${uiTokens.fontBody}/1.65 ${uiTokens.font};
+    color: ${uiTokens.ink.secondary};
+    font: ${uiTokens.type.body}/1.65 ${uiTokens.type.sans};
   }
 
   ${partSelector(chatToolCallContract, "detail")} {
@@ -146,13 +145,13 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatToolCallContract, "body")} {
-    margin-block: ${uiTokens.spaceGroup};
+    margin-block: ${uiTokens.space.group};
     margin-inline-start: var(${rowIndent});
   }
 
   ${partSelector(chatToolCallContract, "body")} {
     display: grid;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     overflow-wrap: anywhere;
   }
   ${partSelector(chatToolCallContract, "root")} [hidden] {
@@ -160,35 +159,35 @@ export const chatRecordsStyles = css`
   }
   ${partSelector(chatToolCallContract, "outputSummary")} {
     margin: 0;
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
   ${partSelector(chatToolCallContract, "actions")} {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
   }
   ${partSelector(chatToolCallContract, "input")} ${partSelector(outputBlockContract, "body")},
   ${partSelector(chatToolCallContract, "output")} ${partSelector(outputBlockContract, "body")} {
     max-height: 24rem;
   }
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="success"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"] {
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
   }
 
   ${partSelector(chatProcessContract, "root")} {
     min-width: 0;
     border: 0;
     background: transparent;
-    color: ${uiTokens.subtleForeground};
-    font-size: ${uiTokens.fontBody};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.body};
   }
 
   ${partSelector(chatProcessContract, "summary")} {
@@ -199,7 +198,7 @@ export const chatRecordsStyles = css`
     list-style: none;
     cursor: pointer;
     user-select: none;
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radius.lg};
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -218,7 +217,7 @@ export const chatRecordsStyles = css`
   ${partSelector(chatProcessContract, "expandedIcon")},
   ${partSelector(chatSourcesContract, "icon")} {
     transform: rotate(0deg);
-    transition: transform ${uiTokens.durationSettle} ${uiTokens.ease};
+    transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
 
   ${partSelector(chatProcessContract, "root")}[open]:not([data-process-icon="custom"]) > ${partSelector(chatProcessContract, "summary")} > ${partSelector(chatProcessContract, "icon")},
@@ -239,11 +238,11 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatProcessContract, "summary")}:hover {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
 
   ${partSelector(chatProcessContract, "summary")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
 
@@ -251,8 +250,8 @@ export const chatRecordsStyles = css`
   with it; the step the summary keeps above them is the same "attached" step a row keeps
   before its own body. */
   ${partSelector(chatProcessContract, "body")} {
-    margin: 0 0 ${uiTokens.spaceGroup};
-    padding-block: ${uiTokens.spaceGroup};
+    margin: 0 0 ${uiTokens.space.group};
+    padding-block: ${uiTokens.space.group};
     padding-inline: var(${rowIndent}) 0;
     border-left: 0;
     line-height: 1.65;
@@ -267,7 +266,7 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatProcessContract, "body")} > p + p {
-    margin-top: ${uiTokens.spaceGroup};
+    margin-top: ${uiTokens.space.group};
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] {
@@ -298,7 +297,7 @@ export const chatRecordsStyles = css`
     text-align: left;
     cursor: pointer;
     list-style: none;
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radius.lg};
     -webkit-tap-highlight-color: transparent;
   }
 
@@ -311,12 +310,12 @@ export const chatRecordsStyles = css`
     margin-block: auto;
     display: grid;
     place-items: center;
-    width: calc(${uiTokens.iconSize} + var(${rowDelta}, 0px));
-    height: calc(${uiTokens.iconSize} + var(${rowDelta}, 0px));
+    width: calc(${uiTokens.icon.size} + var(${rowDelta}, 0px));
+    height: calc(${uiTokens.icon.size} + var(${rowDelta}, 0px));
     opacity: 0;
     transition:
-      opacity ${uiTokens.durationSettle} ${uiTokens.ease},
-      transform ${uiTokens.durationSettle} ${uiTokens.ease};
+      opacity ${uiTokens.motion.settle} ${uiTokens.motion.ease},
+      transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
 
   ${partSelector(chatToolCallContract, "root")}[open] ${partSelector(chatToolCallContract, "chevron")} {
@@ -339,7 +338,7 @@ export const chatRecordsStyles = css`
     border-radius: 0;
     color: inherit;
     font-size: 0;
-    transition: transform ${uiTokens.durationSettle} ${uiTokens.ease};
+    transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "label")} {
@@ -350,39 +349,39 @@ export const chatRecordsStyles = css`
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "status")} {
     margin-left: 2px;
-    font-size: ${uiTokens.fontCaption};
+    font-size: ${uiTokens.type.caption};
     white-space: normal;
     flex-shrink: 1;
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"][data-tool-interactive="true"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.danger};
+    color: ${uiTokens.status.danger};
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"][data-tool-interactive="true"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
 
   /* A row that needs the reader states it once, in the color of both the leading glyph and the
   status, so a chain can be read down its left edge instead of out to each row's far end. */
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"] ${partSelector(chatToolCallContract, "icon")} {
-    color: ${uiTokens.danger};
+    color: ${uiTokens.status.danger};
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "icon")} {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="waiting"] ${partSelector(chatToolCallContract, "icon")} {
-    color: ${uiTokens.warning};
+    color: ${uiTokens.status.warning};
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] > ${partSelector(chatToolCallContract, "header")}:hover ${partSelector(chatToolCallContract, "label")} {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] > ${partSelector(chatToolCallContract, "header")}:hover {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
 
   ${partSelector(chatToolCallContract, "summary")} {
@@ -402,7 +401,7 @@ export const chatRecordsStyles = css`
     height: 2px;
     margin: 0 8px 3px 2px;
     border-radius: 1px;
-    background: ${uiTokens.captionForeground};
+    background: ${uiTokens.ink.tertiary};
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-default-complete="true"] ${partSelector(chatToolCallContract, "status")} {
@@ -420,7 +419,7 @@ export const chatRecordsStyles = css`
   @container (max-width: 400px) {
     ${partSelector(chatToolCallContract, "header")} {
       display: grid;
-      grid-template-columns: calc(${uiTokens.iconSize} + var(${rowDelta}, 0px)) minmax(0, 1fr);
+      grid-template-columns: calc(${uiTokens.icon.size} + var(${rowDelta}, 0px)) minmax(0, 1fr);
       align-items: start;
       row-gap: 0;
     }
@@ -431,7 +430,7 @@ export const chatRecordsStyles = css`
       margin-block-start: calc(
         (
             (${chatTokens.rowLine} + var(${rowDelta}, 0px)) -
-              (${uiTokens.iconSize} + var(${rowDelta}, 0px))
+              (${uiTokens.icon.size} + var(${rowDelta}, 0px))
           ) /
           2
       );
@@ -447,7 +446,7 @@ export const chatRecordsStyles = css`
       top: calc(
         (
             (${chatTokens.rowLine} + var(${rowDelta}, 0px)) -
-              (${uiTokens.iconSize} + var(${rowDelta}, 0px))
+              (${uiTokens.icon.size} + var(${rowDelta}, 0px))
           ) /
           2
       );
@@ -461,11 +460,11 @@ export const chatRecordsStyles = css`
   @media (pointer: coarse) {
     ${partSelector(chatProcessContract, "summary")},
     ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] > ${partSelector(chatToolCallContract, "header")} {
-      min-height: ${uiTokens.controlHeight};
+      min-height: ${uiTokens.control.regular};
     }
 
     ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "status")} {
-      font-size: ${uiTokens.fontCaption};
+      font-size: ${uiTokens.type.caption};
     }
   }
 
@@ -487,38 +486,38 @@ export const chatRecordsStyles = css`
     box-sizing: border-box;
     display: grid;
     grid-template-columns: max-content minmax(0, 1fr);
-    column-gap: ${uiTokens.spaceGroup};
+    column-gap: ${uiTokens.space.group};
     align-items: baseline;
     min-width: 0;
-    padding-block: ${uiTokens.spaceGroup};
+    padding-block: ${uiTokens.space.group};
   }
 
   .chat-tool-call-sections > section + section {
-    border-top: 1px solid ${uiTokens.borderSoft};
+    border-top: 1px solid ${uiTokens.line.divider};
   }
 
   .chat-tool-call-sections h4 {
     align-self: start;
     margin: 0;
-    color: ${uiTokens.captionForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
     font-weight: 500;
-    font-family: ${uiTokens.font};
+    font-family: ${uiTokens.type.sans};
     line-height: 1.65;
   }
 
   .chat-tool-call-sections p {
     margin: 0;
-    color: ${uiTokens.mutedForeground};
-    font-family: ${uiTokens.font};
-    font-size: ${uiTokens.fontBody};
+    color: ${uiTokens.ink.secondary};
+    font-family: ${uiTokens.type.sans};
+    font-size: ${uiTokens.type.body};
     line-height: 1.65;
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
 
   ${partSelector(chatSourcesContract, "summary")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 3px;
   }
 
@@ -527,16 +526,16 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatToolCallContract, "header")}:focus-visible > ${partSelector(chatToolCallContract, "chevron")} {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
-    border-radius: ${radiusTokens.mark};
+    border-radius: ${uiTokens.radius.xs};
   }
 
   ${partSelector(chatSourcesContract, "root")} {
     margin-top: 16px;
     padding-top: 0;
     border-top: 0;
-    color: ${uiTokens.subtleForeground};
+    color: ${uiTokens.ink.tertiary};
     font-size: calc(${chatTokens.fontBody} - 1px);
   }
 
@@ -570,8 +569,8 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatSourcesContract, "link")} {
-    color: ${uiTokens.info};
-    font-size: ${uiTokens.fontBody};
+    color: ${uiTokens.status.info};
+    font-size: ${uiTokens.type.body};
     font-weight: 500;
     line-height: 20px;
     text-decoration: none;
@@ -584,8 +583,8 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatSourcesContract, "description")} {
-    color: ${uiTokens.mutedForeground};
-    font-size: ${uiTokens.fontLabel};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.label};
     line-height: 19px;
     overflow-wrap: anywhere;
   }
@@ -602,9 +601,9 @@ export const chatRecordsStyles = css`
     max-height: 260px;
     overflow: auto;
     border: 0;
-    border-radius: ${uiTokens.radiusLarge};
-    background: ${uiTokens.codeSurface};
-    font: ${uiTokens.fontCaption}/18px ${uiTokens.mono};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.fill};
+    font: ${uiTokens.type.caption}/18px ${uiTokens.type.mono};
     white-space: pre-wrap;
   }
 
@@ -616,7 +615,7 @@ export const chatRecordsStyles = css`
 
   @media (pointer: coarse) {
     ${partSelector(chatSourcesContract, "summary")} {
-      min-height: ${uiTokens.controlHeight};
+      min-height: ${uiTokens.control.regular};
     }
   }
 `;

@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { layerTokens } from "../palette";
 import { avatarContract, avatarOptions } from "../../components/avatar";
 
 const root = partSelector(avatarContract, "root");
@@ -15,27 +14,27 @@ export const avatarStyles = css`
     width: 32px;
     height: 32px;
     border: 0;
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radius.lg};
     /* The glyph-tile material WorkCard and ResourceCard use: identity, not an action.
        A fill, so it takes no edge. */
-    background: ${layerTokens.chip};
-    color: ${layerTokens.chipInk};
-    font: 600 ${uiTokens.fontCaption}/1 ${uiTokens.font};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.chip};
+    font: 600 ${uiTokens.type.caption}/1 ${uiTokens.type.sans};
     user-select: none;
   }
   ${root} {
     ${avatarOptions.when({ size: "small" })} {
       width: 24px;
       height: 24px;
-      border-radius: ${uiTokens.radiusSmall};
-      font-size: ${uiTokens.fontMicro};
+      border-radius: ${uiTokens.radius.md};
+      font-size: ${uiTokens.type.micro};
     }
   }
   ${root} {
     ${avatarOptions.when({ size: "large" })} {
       width: 40px;
       height: 40px;
-      font-size: ${uiTokens.fontBody};
+      font-size: ${uiTokens.type.body};
     }
   }
   ${partSelector(avatarContract, "initials")} {

@@ -3,7 +3,6 @@ import { imagePreviewContract as preview } from "../../components/image-preview"
 import { chatAttachmentsContract as attachments } from "../../chat/attachments";
 import { imageLightboxContract as lightbox } from "../../components/image-lightbox";
 import { uiTokens } from "../tokens";
-import { layerTokens, lineTokens } from "../palette";
 
 export const imagePreviewStyles = css`
   ${partSelector(preview, "root")} {
@@ -14,13 +13,13 @@ export const imagePreviewStyles = css`
     height: 180px;
     min-width: 0;
     overflow: hidden;
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radius.lg};
     /* A recessed frame, so loading, failure and letterboxing read as one
        bounded media slot instead of loose text on the page. */
-    background: ${layerTokens.sunken};
+    background: ${uiTokens.surface.fill};
   }
   ${partSelector(preview, "root")}[data-image-state="failed"] {
-    box-shadow: inset 0 0 0 ${lineTokens.width} ${lineTokens.edge};
+    box-shadow: inset 0 0 0 ${uiTokens.line.width} ${uiTokens.line.edge};
   }
   ${partSelector(preview, "image")} {
     width: 100%;
@@ -43,8 +42,8 @@ export const imagePreviewStyles = css`
     justify-content: center;
     gap: 8px;
     padding: 12px;
-    color: ${uiTokens.subtleForeground};
-    font: ${uiTokens.fontCaption}/18px ${uiTokens.font};
+    color: ${uiTokens.ink.tertiary};
+    font: ${uiTokens.type.caption}/18px ${uiTokens.type.sans};
   }
   ${partSelector(attachments, "preview")} > ${partSelector(preview, "root")} {
     width: 220px;

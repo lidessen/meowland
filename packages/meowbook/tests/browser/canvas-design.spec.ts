@@ -97,7 +97,7 @@ for (const scheme of ["light", "dark"] as const) {
     }, scheme);
     expect(
       await page.evaluate(() =>
-        getComputedStyle(document.documentElement).getPropertyValue("--ui-danger"),
+        getComputedStyle(document.documentElement).getPropertyValue("--ui-status-danger"),
       ),
     ).toBe("");
     const state = page.locator("#story-state");

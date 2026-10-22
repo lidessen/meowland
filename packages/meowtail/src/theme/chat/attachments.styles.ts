@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
-import { lineTokens } from "../palette";
 import { chatAttachmentsContract } from "../../chat/attachments";
 import { chatComposerContract } from "../../chat/composer";
 
@@ -12,7 +11,7 @@ export const chatAttachmentsStyles = css`
     flex-wrap: wrap;
     align-items: flex-start;
     gap: 8px;
-    margin-top: ${uiTokens.spaceSection};
+    margin-top: ${uiTokens.space.section};
   }
 
   ${partSelector(chatAttachmentsContract, "image")} {
@@ -20,11 +19,11 @@ export const chatAttachmentsStyles = css`
     width: fit-content;
     max-width: min(220px, 100%);
     overflow: hidden;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: ${uiTokens.messageRadius};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${chatTokens.bubbleRadius};
     min-width: 44px;
     min-height: 44px;
-    background: ${uiTokens.hover};
+    background: ${uiTokens.state.hover};
     padding: 0;
     cursor: zoom-in;
   }
@@ -48,15 +47,15 @@ export const chatAttachmentsStyles = css`
     align-items: center;
     gap: 10px;
     padding: 8px 12px;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: ${uiTokens.messageRadius};
-    background: ${chatTokens.composerSurface};
-    color: ${uiTokens.foreground};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${chatTokens.bubbleRadius};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.primary};
     text-decoration: none;
   }
 
   ${partSelector(chatAttachmentsContract, "file")}:hover {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
 
   ${partSelector(chatAttachmentsContract, "icon")} {
@@ -65,10 +64,10 @@ export const chatAttachmentsStyles = css`
     height: 28px;
     flex: 0 0 auto;
     place-items: center;
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radius.lg};
     background: transparent;
-    color: ${uiTokens.info};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.status.info};
+    font-size: ${uiTokens.type.caption};
   }
 
   ${partSelector(chatAttachmentsContract, "details")} {
@@ -89,14 +88,14 @@ export const chatAttachmentsStyles = css`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: ${uiTokens.fontBody};
+    font-size: ${uiTokens.type.body};
     font-weight: 500;
     line-height: 22px;
   }
 
   ${partSelector(chatAttachmentsContract, "size")} {
-    color: ${uiTokens.subtleForeground};
-    font-size: ${uiTokens.fontCaption};
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
     line-height: 15px;
   }
   ${partSelector(chatAttachmentsContract, "entry")} {
@@ -104,7 +103,7 @@ export const chatAttachmentsStyles = css`
     display: flex;
     min-width: 0;
     align-items: center;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
     max-width: 100%;
   }
   ${partSelector(chatAttachmentsContract, "remove")} {
@@ -120,10 +119,10 @@ export const chatAttachmentsStyles = css`
     border: 1px solid transparent;
     border-radius: 50%;
     corner-shape: round;
-    background: ${uiTokens.foreground};
-    color: ${uiTokens.onPrimary};
+    background: ${uiTokens.ink.primary};
+    color: ${uiTokens.action.onPrimary};
     opacity: 0;
-    transition: opacity ${uiTokens.durationResponse} ${uiTokens.ease};
+    transition: opacity ${uiTokens.motion.response} ${uiTokens.motion.ease};
     cursor: pointer;
   }
   ${partSelector(chatAttachmentsContract, "entry")}:hover ${partSelector(chatAttachmentsContract, "remove")},
@@ -134,8 +133,8 @@ export const chatAttachmentsStyles = css`
     padding-right: 18px;
   }
   ${partSelector(chatAttachmentsContract, "remove")} svg {
-    width: ${uiTokens.iconSize};
-    height: ${uiTokens.iconSize};
+    width: ${uiTokens.icon.size};
+    height: ${uiTokens.icon.size};
   }
   ${partSelector(chatAttachmentsContract, "entry")}[data-kind="image"] ${partSelector(chatAttachmentsContract, "remove")} {
     position: absolute;
@@ -145,63 +144,63 @@ export const chatAttachmentsStyles = css`
     height: 18px;
     border-radius: 50%;
     corner-shape: round;
-    background: ${uiTokens.foreground};
-    color: ${uiTokens.onPrimary};
-    box-shadow: ${uiTokens.shadowControl};
+    background: ${uiTokens.ink.primary};
+    color: ${uiTokens.action.onPrimary};
+    box-shadow: none;
   }
   ${partSelector(chatAttachmentsContract, "remove")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
   @media (hover: hover) {
     ${partSelector(chatAttachmentsContract, "remove")}:hover {
-      background: ${uiTokens.surfaceMuted};
-      color: ${uiTokens.foreground};
+      background: ${uiTokens.surface.fill};
+      color: ${uiTokens.ink.primary};
     }
   }
   ${partSelector(chatAttachmentsContract, "previewButton")} {
     flex: 0 0 auto;
     border: 0;
     background: transparent;
-    color: ${uiTokens.primary};
-    padding: 0 ${uiTokens.controlPaddingInline};
-    border-radius: ${uiTokens.controlRadius};
+    color: ${uiTokens.action.primary};
+    padding: 0 ${uiTokens.control.inset};
+    border-radius: ${uiTokens.radius.lg};
     font: inherit;
-    font-size: ${uiTokens.fontCaption};
+    font-size: ${uiTokens.type.caption};
     cursor: pointer;
-    min-height: ${uiTokens.controlHeight};
+    min-height: ${uiTokens.control.regular};
     transition:
-      background-color ${uiTokens.durationResponse} ${uiTokens.ease},
-      box-shadow ${uiTokens.durationSettle} ${uiTokens.ease};
+      background-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
+      box-shadow ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   @media (hover: hover) {
     ${partSelector(chatAttachmentsContract, "previewButton")}:hover:not(:disabled) {
-      background: ${uiTokens.surfaceMuted};
+      background: ${uiTokens.surface.fill};
     }
   }
   ${partSelector(chatAttachmentsContract, "previewButton")}:active:not(:disabled) {
-    background: ${uiTokens.surfaceMuted};
+    background: ${uiTokens.surface.fill};
     box-shadow: inset 0 1px 2px rgb(0 0 0 / 12%);
     transition-duration: 40ms;
   }
   ${partSelector(chatAttachmentsContract, "previewButton")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
   ${partSelector(chatAttachmentsContract, "root")} {
-    font-family: ${uiTokens.font};
+    font-family: ${uiTokens.type.sans};
   }
   ${partSelector(chatAttachmentsContract, "file")} {
     transition:
-      border-color ${uiTokens.durationResponse} ${uiTokens.ease},
-      background-color ${uiTokens.durationResponse} ${uiTokens.ease};
+      border-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
+      background-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${partSelector(chatAttachmentsContract, "file")}:hover {
-    background: ${chatTokens.composerSurface};
+    background: ${uiTokens.surface.fill};
   }
   ${partSelector(chatAttachmentsContract, "image")}:focus-visible,
   ${partSelector(chatAttachmentsContract, "file")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 3px;
   }
   ${partSelector(chatAttachmentsContract, "icon")} svg {
@@ -244,7 +243,7 @@ export const chatAttachmentsStyles = css`
     flex: none;
   }
   ${partSelector(chatComposerContract, "attachments")} ${partSelector(chatAttachmentsContract, "file")} {
-    border-radius: ${uiTokens.radiusLarge};
+    border-radius: ${uiTokens.radius.xl};
   }
   ${partSelector(chatComposerContract, "attachments")} ${partSelector(chatAttachmentsContract, "image")},
   ${partSelector(chatComposerContract, "attachments")} ${partSelector(chatAttachmentsContract, "preview")} {

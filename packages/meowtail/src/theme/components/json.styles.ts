@@ -1,6 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { radiusTokens } from "../palette";
 import { codeHighlightTokens } from "../shared/code-highlight.tokens";
 import { jsonTreeContract as json } from "../../components/json-tree";
 import { jsonBlockContract as block } from "../../components/json-block.contract";
@@ -10,9 +9,9 @@ export const jsonStyles = css`
     position: relative;
     min-width: 0;
     padding: 6px 8px 8px;
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
     background: transparent;
-    font: ${uiTokens.fontCode}/16px ${uiTokens.mono};
+    font: ${uiTokens.type.code}/16px ${uiTokens.type.mono};
   }
   ${partSelector(json, "summary")} {
     position: relative;
@@ -30,20 +29,20 @@ export const jsonStyles = css`
   }
   ${partSelector(json, "summary")}:hover,
   ${partSelector(json, "summary")}:focus-visible {
-    background: ${uiTokens.hover};
+    background: ${uiTokens.state.hover};
   }
   ${partSelector(json, "property")} {
     color: ${codeHighlightTokens.function};
   }
   ${partSelector(json, "punctuation")} {
-    color: ${uiTokens.foreground};
+    color: ${uiTokens.ink.primary};
   }
   ${partSelector(json, "expander")} {
     position: absolute;
     inset-inline-start: 0;
     top: 2px;
     display: inline-flex;
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   details[open] > ${partSelector(json, "summary")} > ${partSelector(json, "expander")} {
     transform: rotate(90deg);
@@ -75,8 +74,8 @@ export const jsonStyles = css`
     height: 16px;
     border: 0;
     padding: 0;
-    border-radius: ${radiusTokens.mark};
-    color: ${uiTokens.mutedForeground};
+    border-radius: ${uiTokens.radius.xs};
+    color: ${uiTokens.ink.secondary};
     background: transparent;
     opacity: 0;
     pointer-events: none;
@@ -93,7 +92,7 @@ export const jsonStyles = css`
     pointer-events: auto;
   }
   ${partSelector(json, "copy")}:hover {
-    background: ${uiTokens.active};
+    background: ${uiTokens.state.active};
   }
   @media (hover: none) {
     ${partSelector(json, "copy")} {
@@ -102,29 +101,29 @@ export const jsonStyles = css`
     }
   }
   ${partSelector(json, "feedback")} {
-    font: ${uiTokens.fontMicro}/18px ${uiTokens.font};
-    color: ${uiTokens.mutedForeground};
+    font: ${uiTokens.type.micro}/18px ${uiTokens.type.sans};
+    color: ${uiTokens.ink.secondary};
   }
   ${partSelector(block, "root")} {
     padding: 8px;
-    border-radius: ${uiTokens.radiusLarge};
-    background: ${uiTokens.codeSurface};
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.fill};
   }
   ${partSelector(block, "summary")} {
     cursor: pointer;
-    color: ${uiTokens.mutedForeground};
-    font: ${uiTokens.fontLabel}/24px ${uiTokens.font};
+    color: ${uiTokens.ink.secondary};
+    font: ${uiTokens.type.label}/24px ${uiTokens.type.sans};
   }
   ${partSelector(block, "body")} {
     max-height: 420px;
     overflow: auto;
   }
   ${partSelector(block, "error")} {
-    color: ${uiTokens.danger};
-    font: ${uiTokens.fontLabel}/20px ${uiTokens.font};
+    color: ${uiTokens.status.danger};
+    font: ${uiTokens.type.label}/20px ${uiTokens.type.sans};
   }
   ${partSelector(json, "copy")}:focus-visible, ${partSelector(json, "summary")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
+    outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
   }
 
@@ -144,8 +143,8 @@ export const jsonStyles = css`
     width: 14px;
     height: 14px;
     background: currentColor;
-    mask: ${uiTokens.chevronMask} center / 14px 14px no-repeat;
-    transition: transform ${uiTokens.durationSettle} ${uiTokens.ease};
+    mask: ${uiTokens.glyph.chevron} center / 14px 14px no-repeat;
+    transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   :where(details[open] > ${partSelector(block, "summary")})::before {
     transform: rotate(90deg);

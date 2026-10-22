@@ -31,7 +31,7 @@ test(`Studio dark attachments and dialog retain their theme surfaces`, async ({ 
     const color = getComputedStyle(probe).backgroundColor;
     probe.remove();
     return color;
-  }, String(uiTokens.surface));
+  }, String(uiTokens.surface.overlay));
   // Chat attachments inherit the chat palette; dialogs use the general UI
   // surface. Both must be opaque, but the two palettes need not be identical.
   expect(dialogSurface).toMatch(/^rgb\(/);
@@ -141,14 +141,14 @@ for (const scheme of ["light", "dark"]) {
           return results;
         },
         {
-          background: String(uiTokens.background),
-          surface: String(uiTokens.surface),
-          foreground: String(uiTokens.foreground),
-          mutedForeground: String(uiTokens.mutedForeground),
-          onPrimary: String(uiTokens.onPrimary),
-          primary: String(uiTokens.primary),
-          onDanger: String(uiTokens.onDanger),
-          danger: String(uiTokens.dangerAction),
+          background: String(uiTokens.surface.canvas),
+          surface: String(uiTokens.surface.overlay),
+          foreground: String(uiTokens.ink.primary),
+          mutedForeground: String(uiTokens.ink.secondary),
+          onPrimary: String(uiTokens.action.onPrimary),
+          primary: String(uiTokens.action.primary),
+          onDanger: String(uiTokens.action.onDanger),
+          danger: String(uiTokens.action.danger),
         },
       );
       for (const { role, ratio } of checks) expect(ratio, role).toBeGreaterThanOrEqual(4.5);

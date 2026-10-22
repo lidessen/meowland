@@ -39,10 +39,10 @@ export const ButtonsStory = defineStory({
     <Measure width="narrow">
       <Stack data-button-composition>
         <Stack as="header" gap="compact">
-          <h2 style={{ margin: 0, fontSize: uiTokens.fontTitle, fontWeight: 600 }}>
+          <h2 style={{ margin: 0, fontSize: uiTokens.type.title, fontWeight: 600 }}>
             Ready to deliver this change
           </h2>
-          <span style={{ color: uiTokens.mutedForeground }}>
+          <span style={{ color: uiTokens.ink.secondary }}>
             The primary action is clear and supporting actions step back. Every action is demoed
             locally only.
           </span>
@@ -57,7 +57,7 @@ export const ButtonsStory = defineStory({
           </Button>
         </Inline>
         <Stack as="section" gap="compact" aria-label="Actions not yet available">
-          <span style={{ color: uiTokens.mutedForeground, fontSize: uiTokens.fontCaption }}>
+          <span style={{ color: uiTokens.ink.secondary, fontSize: uiTokens.type.caption }}>
             No submission target selected yet
           </span>
           <Inline gap="compact">
@@ -74,7 +74,7 @@ export const ButtonsStory = defineStory({
           </Inline>
         </Stack>
         <span
-          style={{ color: uiTokens.mutedForeground, fontSize: uiTokens.fontCaption }}
+          style={{ color: uiTokens.ink.secondary, fontSize: uiTokens.type.caption }}
           role="status"
           data-feedback
         >
@@ -83,10 +83,10 @@ export const ButtonsStory = defineStory({
         <Inline as="section" gap="normal" aria-label="Discard draft demo">
           <LayoutItem grow>
             <Stack gap="compact">
-              <h2 style={{ margin: 0, fontSize: uiTokens.fontBody, fontWeight: 600 }}>
+              <h2 style={{ margin: 0, fontSize: uiTokens.type.body, fontWeight: 600 }}>
                 Start over
               </h2>
-              <span style={{ color: uiTokens.mutedForeground, fontSize: uiTokens.fontCaption }}>
+              <span style={{ color: uiTokens.ink.secondary, fontSize: uiTokens.type.caption }}>
                 Only demonstrates discarding; no real file is deleted.
               </span>
             </Stack>

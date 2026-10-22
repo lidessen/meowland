@@ -5,14 +5,14 @@ import { fieldContract } from "../../components/field";
 export const fieldStyles = css`
   :where(${partSelector(fieldContract, "root")}) {
     box-sizing: border-box;
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
   }
   ${partSelector(fieldContract, "root")} {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     min-width: 0;
-    gap: ${uiTokens.spaceGroup};
+    gap: ${uiTokens.space.group};
   }
   ${partSelector(fieldContract, "label")} {
     font-weight: 500;
@@ -20,15 +20,15 @@ export const fieldStyles = css`
   }
   :where(${partSelector(fieldContract, "description")}, ${partSelector(fieldContract, "error")}) {
     margin: 0;
-    font-size: ${uiTokens.fontCaption};
+    font-size: ${uiTokens.type.caption};
     line-height: 1.5;
     overflow-wrap: anywhere;
   }
   ${partSelector(fieldContract, "description")} {
-    color: ${uiTokens.mutedForeground};
+    color: ${uiTokens.ink.secondary};
   }
   ${partSelector(fieldContract, "error")} {
-    color: ${uiTokens.danger};
+    color: ${uiTokens.status.danger};
   }
   ${partSelector(fieldContract, "control")} {
     min-width: 0;

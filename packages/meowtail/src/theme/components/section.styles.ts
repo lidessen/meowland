@@ -35,8 +35,10 @@ export const sectionStyles = css`
     line-height: 1.4;
     overflow-wrap: anywhere;
   }
-  /* A nested section reads as a subheading under the section that contains it. */
+  /* A nested section reads as a subheading under the section that contains it.
+     At body size a bold serif loses its shapes, so subheadings use the UI face. */
   ${section("title")}:is(h3, h4, h5, h6) {
+    font-family: ${uiTokens.font};
     font-size: ${uiTokens.fontBody};
   }
   ${section("description")} {

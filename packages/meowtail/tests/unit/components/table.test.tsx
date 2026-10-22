@@ -62,3 +62,20 @@ test("selectable tables toggle rows and the header mixed state", () => {
   expect(html).toContain("Select alpha.md");
   expect(html).toContain('data-row-id="alpha"');
 });
+
+test("the last column fills the row while the table keeps a minimum width", () => {
+  const runtime = createRuntime();
+  installMeowUI(runtime);
+  const html = createWebRenderer(runtime).renderToHtml(
+    <Table
+      label="Files"
+      selectable
+      columns={[columns[0]!, { ...columns[1]!, width: 120 }]}
+      rows={rows}
+    />,
+  );
+  expect(html).toContain("width:160px");
+  expect(html).not.toContain("width:120px");
+  // Selection column + both preferred widths.
+  expect(html).toContain("--table-min-width:324px");
+});

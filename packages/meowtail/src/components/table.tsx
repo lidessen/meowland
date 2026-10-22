@@ -9,6 +9,7 @@ import {
   type MaybeSignal,
   type Props,
 } from "meowjsx";
+import { tokenRef } from "meowcss";
 import { Checkbox } from "./checkbox";
 import { Icon } from "../icons/icon";
 
@@ -36,9 +37,16 @@ export interface TableSort {
   direction: TableSortDirection;
 }
 
+/** Sum of the column widths, so a narrow container scrolls instead of crushing a column. */
+export const tableMinWidth = tokenRef("table", "min-width");
+
 export interface TableColumn {
   id: string;
   header: Child;
+  /**
+   * Preferred width in px. The last column fills the remaining width, so its
+   * width only counts toward the table's minimum.
+   */
   width?: number;
   minWidth?: number;
   sortable?: boolean;
@@ -69,6 +77,7 @@ export interface TableProps extends Props {
 }
 
 const defaultMinWidth = 80;
+const selectColumnWidth = 44;
 
 function sortFor(column: TableColumn, current: TableSort | undefined): TableSort | undefined {
   if (!column.sortable) return current;
@@ -149,6 +158,13 @@ export const Table = defineComponent<
       (event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId);
       resize = undefined;
     };
+    const lastColumn = columns.at(-1);
+    const columnWidth = (column: TableColumn) =>
+      widths.value[column.id] ?? column.width ?? column.minWidth ?? defaultMinWidth;
+    const minTableWidth = derived(
+      () =>
+        `${columns.reduce((sum, column) => sum + columnWidth(column), selectable ? selectColumnWidth : 0)}px`,
+    );
     const headerCell = (column: TableColumn) => {
       const heading = column.sortable
         ? context.part(
@@ -184,8 +200,10 @@ export const Table = defineComponent<
           scope: "col",
           "aria-sort": derived(() => ariaSort(column, sortState.value)),
           "data-align": column.align,
+          // The last column takes the space the fixed widths leave; otherwise
+          // a fixed layout scales every column, the selection column included.
           style: derived(() =>
-            widths.value[column.id] !== undefined
+            column !== lastColumn && widths.value[column.id] !== undefined
               ? { width: `${widths.value[column.id]}px` }
               : undefined,
           ),
@@ -226,7 +244,10 @@ export const Table = defineComponent<
         context.part(
           "table",
           "table",
-          { "aria-label": label },
+          {
+            "aria-label": label,
+            style: derived(() => ({ [tableMinWidth.name]: minTableWidth.value })),
+          },
           context.part(
             "header",
             "thead",

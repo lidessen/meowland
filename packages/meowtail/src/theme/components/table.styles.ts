@@ -1,6 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { tableContract } from "../../components/table";
+import { tableContract, tableMinWidth } from "../../components/table";
 import { accentTokens, layerTokens, lineTokens, radiusTokens } from "../palette";
 
 const part = (name: (typeof tableContract.parts)[number]) => partSelector(tableContract, name);
@@ -19,7 +19,7 @@ export const tableStyles = css`
   }
   ${part("table")} {
     width: 100%;
-    min-width: 24rem;
+    min-width: max(24rem, ${tableMinWidth});
     border-collapse: collapse;
     table-layout: fixed;
   }

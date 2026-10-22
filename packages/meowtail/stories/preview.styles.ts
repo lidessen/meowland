@@ -27,7 +27,7 @@ export const previewStyles = css`
     align-items: center;
     gap: ${uiTokens.spaceSection};
     padding: 10px ${uiTokens.spacePanel};
-    border-bottom: ${lineTokens.width} solid ${lineTokens.divider};
+    border-bottom: ${lineTokens.width} solid ${lineTokens.edge};
     color: ${uiTokens.subtleForeground};
     font-size: ${uiTokens.fontCaption};
   }

@@ -57,7 +57,7 @@ export const badgeStyles = css`
     }
     ${badgeOptions.when({ tone: "solid" })} {
       background: ${uiTokens.foreground};
-      color: ${uiTokens.surface};
+      color: ${uiTokens.onPrimary};
     }
     ${badgeOptions.when({ tone: "quiet" })} {
       background: transparent;

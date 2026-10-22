@@ -16,7 +16,7 @@ export const hoverCardStyles = css`
     backdrop-filter: none;
   }
   ${partSelector(popoverContract, "panel")}:has(> ${partSelector(hoverCardContract, "content")}[data-variant="preview"]) {
-    background: ${uiTokens.inputSurface};
+    background: ${uiTokens.surface};
     color: ${uiTokens.foreground};
   }
   ${partSelector(hoverCardContract, "content")} {

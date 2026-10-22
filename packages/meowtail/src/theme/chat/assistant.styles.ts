@@ -26,7 +26,7 @@ export const assistantStyles = css`
     min-height: 0;
     min-width: 0;
     color: ${uiTokens.foreground};
-    background: ${uiTokens.background};
+    background: ${chatTokens.paper};
     font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
   }
   ${root} > ${partSelector(pageFrameContract, "root")} {

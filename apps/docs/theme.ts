@@ -83,7 +83,7 @@ export const docsStyles = css`
     min-height: 0;
     padding: 0 12px;
     background: ${uiTokens.sidebarSurface};
-    border-right: ${lineTokens.width} solid ${lineTokens.divider};
+    border-right: ${lineTokens.width} solid ${lineTokens.edge};
   }
   .docs-brand {
     display: flex;
@@ -183,7 +183,7 @@ export const docsStyles = css`
     height: ${docsTokens.headerHeight};
     padding: 0 40px;
     background: ${uiTokens.background};
-    border-bottom: ${lineTokens.width} solid ${lineTokens.divider};
+    border-bottom: ${lineTokens.width} solid ${lineTokens.edge};
     min-width: 0;
   }
   .docs-header-link {
@@ -385,7 +385,7 @@ export const docsStyles = css`
     padding: 12px 16px;
     border: ${lineTokens.width} solid ${lineTokens.edge};
     border-radius: ${uiTokens.controlRadius};
-    background: ${uiTokens.codeSurface};
+    background: ${layerTokens.raised};
     color: ${uiTokens.foreground};
     font: ${uiTokens.fontCode}/1.7 ${uiTokens.mono};
   }

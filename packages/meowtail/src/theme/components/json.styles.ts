@@ -11,7 +11,7 @@ export const jsonStyles = css`
     min-width: 0;
     padding: 6px 8px 8px;
     color: ${uiTokens.foreground};
-    background: ${uiTokens.inputSurface};
+    background: transparent;
     font: ${uiTokens.fontCode}/16px ${uiTokens.mono};
   }
   ${partSelector(json, "summary")} {

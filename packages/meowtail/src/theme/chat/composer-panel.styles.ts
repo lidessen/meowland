@@ -1,5 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
-import { uiTokens } from "../tokens";
+import { chatTokens, uiTokens } from "../tokens";
 import { composerPanelContract } from "../../chat/composer-panel";
 import { chatComposerContract } from "../../chat/composer";
 
@@ -18,10 +18,10 @@ export const composerPanelStyles = css`
   ${partSelector(composerPanelContract, "surface")}[data-meowui-part] > ${partSelector(chatComposerContract, "root")} > ${partSelector(chatComposerContract, "surface")} {
     min-width: 0;
     padding: 12px 14px 10px;
-    border: 1px solid ${uiTokens.borderSoft};
+    border: 0;
     border-radius: 24px;
-    background: ${uiTokens.surface};
-    box-shadow: 0 1px 2px rgb(0 0 0 / 12%);
+    background: ${chatTokens.composerSurface};
+    box-shadow: ${chatTokens.composerShadow};
     transition: border-color ${uiTokens.durationResponse} ${uiTokens.ease};
   }
   ${partSelector(composerPanelContract, "surface")}[data-meowui-part] > ${partSelector(chatComposerContract, "root")} > ${partSelector(chatComposerContract, "surface")}:focus-within {

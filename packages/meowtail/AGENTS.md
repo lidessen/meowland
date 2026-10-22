@@ -132,17 +132,34 @@ come from the `uiTokens` ramp (`fontMicro` 11, `fontCaption`/`fontCode` 12, `fon
 `fontBody` 14, `fontTitle` 16, `fontHeading` 20, `fontPageTitle` 24) and radii from `radiusTokens`
 chosen by element size; do not write a literal size or radius beside them.
 
-Materials have one role each, so a new component reuses one instead of mixing a fresh grey:
+#### Surface ladder
 
-| Role                     | Tokens                                                          | Used by                                               |
-| ------------------------ | --------------------------------------------------------------- | ----------------------------------------------------- |
-| In-flow surface          | `layerTokens.raised` on a crisp 1px `lineTokens.edge`           | Card, ListGroup, ResourceCard, WorkCard, Table        |
-| Floating surface         | solid `uiTokens.surface` + `shadowFloat`                        | Dialog, Modal, Popover, Menu, ChoiceSelect list       |
-| Recessed region          | `layerTokens.sunken` (same tone as `codeSurface`), no border    | CodeBlock, output views, markdown code, media frames  |
-| Fill (track, chip, tile) | `uiTokens.surfaceMuted` / `layerTokens.chip` with `chipInk`     | Tabs/Segmented tracks, Badge, Avatar, glyph tiles     |
-| Field                    | the shared field surface (`uiTokens.border`, `inputSurface`)    | Input, Select, ChoiceSelect, SearchInput, NumberInput |
-| Current selection        | `accentTokens.selected`, with `accentTokens.line` when bordered | NavList, NavItem, ChoiceGroup, Table rows, Pill, Tag  |
-| Divider                  | `lineTokens.divider`                                            | rows, card footers                                    |
+Every background is one rung of one ladder, defined once in `src/theme/palette.ts`
+(`layerTokens`). Each rung has exactly one edge rule, and a layer differs from what it sits on by
+one cue: a fill step or an edge. A new component picks a rung; it never mixes a fresh grey.
+
+| Rung    | Background (light / dark)              | Edge                                                 | Used by                                                                                       |
+| ------- | -------------------------------------- | ---------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| canvas  | `layerTokens.canvas` #fafafa / #121212 | regions split by `edge`, no new fill                 | page ground, sidebars, headers, AppBar (`uiTokens.background`)                                |
+| reading | `layerTokens.reading` #fff / #121212   | none                                                 | full-bleed transcript (`chatTokens.paper`)                                                    |
+| raised  | `layerTokens.raised` #fff / #1a1a1a    | `edge`; no shadow in light                           | Card, ListGroup, Table, TaskList, ChatQuestion, docs install line                             |
+| overlay | `layerTokens.overlay` #fff / #202020   | ring + `shadowFloat`                                 | Dialog, Modal, Popover, Menu, HoverCard (`uiTokens.surface`)                                  |
+| fill    | `layerTokens.fill` #f2f2f2 / #242424   | none (the composer is the exception: it is operated) | code, chips, tracks, avatars, bubbles, ProcessGroup, composer (`surfaceMuted`, `codeSurface`) |
+| field   | `layerTokens.field` #fff / #161616     | `control`, `controlHover` on hover                   | Input, Select, ChoiceSelect, SearchInput (`inputSurface`)                                     |
+
+Dark lightness steps up with elevation (canvas < raised < overlay); a field is recessed, so in dark
+it is darker than raised. Do not "fix" that.
+
+Lines have three jobs: `edge` outlines a raised or overlay surface and splits regions on the
+canvas; `divider` separates rows inside one surface; `control` bounds what the reader operates
+(fields, outline actions, checkboxes), with `controlHover` under the pointer. `uiTokens.border`,
+`borderSubtle`, `borderSoft`, `borderFaint`, `borderStrong` and `lineTokens.quiet` are aliases of
+these; new code names the role.
+
+Not surfaces, so never a new grey either: `layerTokens.knockout` (the color behind a halo, mix or
+cutout; defaults to raised, a host overrides it per surface), the translucent state overlays
+`uiTokens.hover` / `active` and `accentTokens.selected` (they work on any rung), the inverse
+`tooltipSurface` / `toastSurface`, and `uiTokens.backdrop`.
 
 Fields, actions, tracks and thumbs are rounded rectangles (`controlRadius`, `radiusSmall` at the
 small size); tracks and thumbs are concentric (track radius is the thumb radius plus `trackInset`);

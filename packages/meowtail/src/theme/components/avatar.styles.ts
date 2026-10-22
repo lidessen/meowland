@@ -1,6 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { layerTokens, lineTokens } from "../palette";
+import { layerTokens } from "../palette";
 import { avatarContract, avatarOptions } from "../../components/avatar";
 
 const root = partSelector(avatarContract, "root");
@@ -14,9 +14,10 @@ export const avatarStyles = css`
     box-sizing: border-box;
     width: 32px;
     height: 32px;
-    border: ${lineTokens.width} solid ${lineTokens.edge};
+    border: 0;
     border-radius: ${uiTokens.controlRadius};
-    /* The glyph-tile material WorkCard and ResourceCard use: identity, not an action. */
+    /* The glyph-tile material WorkCard and ResourceCard use: identity, not an action.
+       A fill, so it takes no edge. */
     background: ${layerTokens.chip};
     color: ${layerTokens.chipInk};
     font: 600 ${uiTokens.fontCaption}/1 ${uiTokens.font};

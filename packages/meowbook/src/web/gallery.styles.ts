@@ -41,7 +41,7 @@ a {
 }
 .workshop-sidebar {
   background: ${uiTokens.sidebarSurface};
-  border-right: ${lineTokens.width} solid ${lineTokens.divider};
+  border-right: ${lineTokens.width} solid ${lineTokens.edge};
   display: flex;
   flex-direction: column;
   min-height: 0;
@@ -150,7 +150,7 @@ a {
   gap: 12px;
   align-items: center;
   padding: 0 24px;
-  border-bottom: ${lineTokens.width} solid ${lineTokens.divider};
+  border-bottom: ${lineTokens.width} solid ${lineTokens.edge};
   min-width: 0;
 }
 #group {
@@ -281,9 +281,9 @@ a {
   min-height: 0;
   overflow: auto;
   padding: 24px;
-  background-color: ${layerTokens.sunken};
-  border-top: ${lineTokens.width} solid ${lineTokens.divider};
-  border-bottom: ${lineTokens.width} solid ${lineTokens.divider};
+  background-color: ${layerTokens.fill};
+  border-top: ${lineTokens.width} solid ${lineTokens.edge};
+  border-bottom: ${lineTokens.width} solid ${lineTokens.edge};
 }
 #canvas {
   display: block;
@@ -292,6 +292,7 @@ a {
   margin: 0 auto;
   border: 0;
   border-radius: ${uiTokens.radiusLarge};
+  /* The specimen frame is a host page (canvas) set into the recessed stage. */
   background: ${uiTokens.background};
   box-shadow:
     0 0 0 ${lineTokens.width} ${lineTokens.edge},

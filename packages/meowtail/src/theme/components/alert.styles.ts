@@ -1,3 +1,4 @@
+import { layerTokens } from "../palette";
 import { css, partSelector } from "meowcss/meowjsx";
 import { alertTokens, uiTokens } from "../tokens";
 import { alertContract, alertOptions } from "../../components/alert";
@@ -12,7 +13,7 @@ export const alertStyles = css`
        of stacking the tone on top of the general border ink. */
     border: 1px solid color-mix(in srgb, ${alertTokens.accent} 20%, transparent);
     border-radius: ${uiTokens.radiusLarge};
-    background: color-mix(in srgb, ${alertTokens.accent} 6%, ${uiTokens.background});
+    background: color-mix(in srgb, ${alertTokens.accent} 6%, ${layerTokens.knockout});
     color: ${uiTokens.foreground};
     overflow-wrap: anywhere;
     font-family: ${uiTokens.font};

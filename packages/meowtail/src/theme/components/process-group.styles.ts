@@ -17,9 +17,10 @@ export const processGroupStyles = css`
     min-width: 0;
     box-sizing: border-box;
     overflow: hidden;
-    border: ${lineTokens.width} solid ${uiTokens.borderSoft};
+    /* A recessed fill inside the reading flow: no edge. */
+    border: 0;
     border-radius: ${radiusTokens.card};
-    background: ${layerTokens.sunken};
+    background: ${layerTokens.fill};
     color: ${uiTokens.mutedForeground};
     font: ${uiTokens.fontLabel}/20px ${uiTokens.font};
   }

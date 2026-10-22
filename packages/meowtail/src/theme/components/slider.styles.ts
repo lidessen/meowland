@@ -1,6 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { accentTokens, lineTokens } from "../palette";
+import { accentTokens, lineTokens, layerTokens } from "../palette";
 import { sliderContract } from "../../components/slider";
 
 const root = partSelector(sliderContract, "root");
@@ -82,7 +82,7 @@ export const sliderStyles = css`
   ${root}:has(${control}:focus-visible) ${thumb} {
     outline: none;
     box-shadow:
-      0 0 0 2px var(--meowui-focus-halo, ${uiTokens.background}),
+      0 0 0 2px var(--meowui-focus-halo, ${layerTokens.knockout}),
       0 0 0 4px ${uiTokens.focus};
   }
   ${root}:has(${control}:disabled) {

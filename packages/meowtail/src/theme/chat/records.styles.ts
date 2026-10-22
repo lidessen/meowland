@@ -601,7 +601,7 @@ export const chatRecordsStyles = css`
     max-width: 100%;
     max-height: 260px;
     overflow: auto;
-    border: 1px solid ${uiTokens.borderFaint};
+    border: 0;
     border-radius: ${uiTokens.radiusLarge};
     background: ${uiTokens.codeSurface};
     font: ${uiTokens.fontCaption}/18px ${uiTokens.mono};

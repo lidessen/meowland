@@ -11,7 +11,7 @@ export const appBarStyles = css`
     min-height: 56px;
     padding: 10px 16px;
     border-bottom: 1px solid ${uiTokens.borderSubtle};
-    background: ${uiTokens.surface};
+    background: ${uiTokens.background};
   }
   ${partSelector(appBarContract, "identity")} {
     display: grid;

@@ -121,7 +121,7 @@ export const chatAttachmentsStyles = css`
     border-radius: 50%;
     corner-shape: round;
     background: ${uiTokens.foreground};
-    color: ${uiTokens.background};
+    color: ${uiTokens.onPrimary};
     opacity: 0;
     transition: opacity ${uiTokens.durationResponse} ${uiTokens.ease};
     cursor: pointer;
@@ -146,7 +146,7 @@ export const chatAttachmentsStyles = css`
     border-radius: 50%;
     corner-shape: round;
     background: ${uiTokens.foreground};
-    color: ${uiTokens.background};
+    color: ${uiTokens.onPrimary};
     box-shadow: ${uiTokens.shadowControl};
   }
   ${partSelector(chatAttachmentsContract, "remove")}:focus-visible {

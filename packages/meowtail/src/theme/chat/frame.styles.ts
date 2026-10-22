@@ -1,3 +1,4 @@
+import { layerTokens } from "../palette";
 import { css, partSelector } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
 import { chatFrameContract } from "../../chat/frame";
@@ -12,7 +13,7 @@ export const chatFrameStyles = css`
   ${partSelector(chatFrameContract, "root")} {
     ${chatTokens.readingInset.name}: 24px;
     /* Resolved here so a nested light/dark scope re-resolves the reference to its own background. */
-    ${chatTokens.paper.name}: ${uiTokens.background};
+    ${chatTokens.paper.name}: ${layerTokens.reading};
     min-width: 0;
     color: ${uiTokens.foreground};
     background: ${chatTokens.paper};

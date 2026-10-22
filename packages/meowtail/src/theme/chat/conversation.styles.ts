@@ -42,7 +42,7 @@ export const chatConversationStyles = css`
     border: 0;
     border-radius: 999px;
     corner-shape: round;
-    background: ${uiTokens.background};
+    background: ${uiTokens.surface};
     color: ${uiTokens.foreground};
     font: inherit;
     box-shadow: ${uiTokens.shadowPanel};

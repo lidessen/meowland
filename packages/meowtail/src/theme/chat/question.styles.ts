@@ -1,6 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
-import { lineTokens } from "../palette";
+import { lineTokens, layerTokens } from "../palette";
 import { chatQuestionContract } from "../../chat/question";
 
 export const chatQuestionStyles = css`
@@ -12,7 +12,7 @@ export const chatQuestionStyles = css`
     border: ${lineTokens.width} solid ${lineTokens.edge};
     box-shadow: ${uiTokens.shadowRaised};
     border-radius: ${uiTokens.radiusLarge};
-    background: ${uiTokens.background};
+    background: ${layerTokens.raised};
     color: ${uiTokens.foreground};
     font: ${chatTokens.fontBody}/24px ${uiTokens.font};
   }

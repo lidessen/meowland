@@ -1,6 +1,6 @@
 import { alertOptions } from "../components/alert";
 import { defineOptions, defineTokens, tokenRef } from "meowcss";
-import { lineTokens, radiusTokens } from "./palette";
+import { layerTokens, lineTokens, radiusTokens } from "./palette";
 
 /** Shared standard-theme parameters; scheme is built in, no fixed density axis. */
 export const standardOptions = defineOptions("meowui", {});
@@ -9,7 +9,7 @@ export const standardOptions = defineOptions("meowui", {});
 const schemeAlias = (value: string) => standardOptions.by.scheme([value, value]);
 
 /** Secondary ink that remains readable on input and page surfaces in both schemes. */
-const mutedForeground = ["#6b6b6b", "#a3a3a3"] as const;
+const mutedForeground = ["#636363", "#a3a3a3"] as const;
 
 export const uiTokens = defineTokens("ui", {
   font: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif',
@@ -63,18 +63,17 @@ export const uiTokens = defineTokens("ui", {
   iconStroke: "1.75",
   switchThumb: ["#ffffff", "#a3a3a3"],
   // DeepSeek Harness ui-theme: design-platform aliases, resolved per scheme.
-  background: ["#ffffff", "#161616"],
-  inputSurface: ["#ffffff", "#212121"],
-  surface: ["#ffffff", "#262626"],
+  /* Surfaces alias the ladder in palette.ts; do not add a new grey here. */
+  background: schemeAlias(`${layerTokens.canvas}`),
+  inputSurface: schemeAlias(`${layerTokens.field}`),
+  surface: schemeAlias(`${layerTokens.overlay}`),
   /* Fills are true neutrals: a blue cast in light greys reads as default
      framework chrome; neutral greys let type and content carry the color. */
-  surfaceMuted: ["#f5f5f5", "#2a2a2a"],
-  sidebarSurface: ["#fafafa", "#1a1a1a"],
-  codeSurface: ["#fafafa", "#1c1c1c"],
-  codeBanner: ["#fafafa", "#262626"],
-  /* Opaque enough to read on its own: the blur is a refinement, and text under
-     a menu must not compete with the menu's items where it is unavailable. */
-  menuSurface: ["rgb(250 250 250 / 90%)", "rgb(38 38 38 / 90%)"],
+  surfaceMuted: schemeAlias(`${layerTokens.fill}`),
+  sidebarSurface: schemeAlias(`${layerTokens.canvas}`),
+  codeSurface: schemeAlias(`${layerTokens.fill}`),
+  codeBanner: schemeAlias(`${layerTokens.fill}`),
+  menuSurface: schemeAlias(`${layerTokens.overlay}`),
   menuBlur: "blur(40px) saturate(150%)",
   tooltipSurface: ["#262626", "#404040"],
   foreground: ["#0a0a0a", "#fafafa"],
@@ -85,19 +84,20 @@ export const uiTokens = defineTokens("ui", {
   mutedForeground,
   // Metadata ink stays above the normal-text floor in both schemes; it is still
   // lighter than the primary muted text so hierarchy survives.
-  subtleForeground: ["#767676", "#8f8f8f"],
-  captionForeground: ["#767676", "#8f8f8f"],
+  subtleForeground: ["#6e6e6e", "#8f8f8f"],
+  captionForeground: ["#6e6e6e", "#8f8f8f"],
   shimmer: ["rgb(0 0 0 / 30%)", "rgb(255 255 255 / 45%)"],
   // Placeholder is text the reader must scan before typing; reuse the readable
   // secondary ink instead of a near-white tint that only works as decoration.
   placeholder: mutedForeground,
-  border: ["rgb(0 0 0 / 12%)", "rgb(255 255 255 / 14%)"],
-  borderSubtle: ["rgb(0 0 0 / 10%)", "rgb(255 255 255 / 12%)"],
+  /* Lines alias the three line roles in palette.ts. */
+  border: schemeAlias(`${lineTokens.control}`),
+  borderSubtle: schemeAlias(`${lineTokens.edge}`),
   borderSoft: schemeAlias(`${lineTokens.divider}`),
-  borderFaint: ["rgb(0 0 0 / 4%)", "rgb(255 255 255 / 6%)"],
+  borderFaint: schemeAlias(`${lineTokens.divider}`),
   /** Native Select chevron: the Lucide chevron-down the ChoiceSelect trigger draws, in muted ink. */
   selectChevron: [
-    `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b6b6b' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
+    `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23636363' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
     `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
   ],
   /**
@@ -110,7 +110,7 @@ export const uiTokens = defineTokens("ui", {
   arrowMask: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E")`,
   crossMask: `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E")`,
   /** Field border under the pointer: one step above the resting border. */
-  borderStrong: ["rgb(0 0 0 / 28%)", "rgb(255 255 255 / 32%)"],
+  borderStrong: schemeAlias(`${lineTokens.controlHover}`),
   hover: ["rgb(0 0 0 / 4.5%)", "rgb(255 255 255 / 7%)"],
   active: ["rgb(0 0 0 / 8%)", "rgb(255 255 255 / 12%)"],
   primary: ["#0a0a0a", "#fafafa"],
@@ -183,7 +183,7 @@ export const uiTokens = defineTokens("ui", {
 
 /** Chat-specific parameters; shared colors reference uiTokens directly. */
 export const chatTokens = defineTokens("chat", {
-  paper: schemeAlias(`${uiTokens.background}`),
+  paper: schemeAlias(`${layerTokens.reading}`),
   /* Reading size for chat prose. Deliberately chat-local rather than
      uiTokens.fontReading so enlarging the conversation does not resize the
      settings and other shared reading surfaces. */

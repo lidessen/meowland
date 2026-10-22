@@ -47,21 +47,47 @@ export const radiusTokens = defineTokens("radius", {
   bubble: "18px",
 });
 
-/** Edges are crisp 1px neutral lines; dividers sit a step lighter. */
+/**
+ * Lines have three jobs and no others: `edge` outlines a raised or overlay surface
+ * and splits regions at canvas level; `divider` separates rows inside one surface;
+ * `control` bounds something the reader operates (fields, outline actions,
+ * checkboxes), with `controlHover` under the pointer. `quiet` is a legacy alias of
+ * `divider`. All are 1px.
+ */
 export const lineTokens = defineTokens("line", {
   width: "1px",
-  divider: ["rgb(0 0 0 / 7%)", "rgb(255 255 255 / 7%)"],
-  edge: ["rgb(0 0 0 / 10%)", "rgb(255 255 255 / 10%)"],
-  quiet: ["rgb(0 0 0 / 5%)", "rgb(255 255 255 / 5%)"],
+  edge: ["rgb(0 0 0 / 8%)", "rgb(255 255 255 / 9%)"],
+  divider: ["rgb(0 0 0 / 6%)", "rgb(255 255 255 / 6%)"],
+  control: ["rgb(0 0 0 / 13%)", "rgb(255 255 255 / 14%)"],
+  controlHover: ["rgb(0 0 0 / 24%)", "rgb(255 255 255 / 28%)"],
+  quiet: ["rgb(0 0 0 / 6%)", "rgb(255 255 255 / 6%)"],
 });
 
-/** Layers used by redesign components: raised cards, sunken groups, neutral chips. */
+/**
+ * The surface ladder. Every background is one of these roles, and each role has
+ * one edge rule (see packages/meowtail/AGENTS.md, "Surface ladder"):
+ * - canvas: the page ground; regions on it are split by an edge, not a new fill.
+ * - reading: a full-bleed reading surface (the chat transcript); no edge.
+ * - raised: in-flow cards, lists and tables, on an edge. Lighter than canvas.
+ * - overlay: menus, popovers, dialogs; a ring and a floating shadow.
+ * - fill: recessed or neutral fills (code, chips, tracks, bubbles, the composer); no edge.
+ * - field: where the reader types; a control line. In dark it is darker than
+ *   raised, because a field is recessed, not elevated.
+ * - knockout: the color "behind" a halo or cutout; defaults to raised.
+ * Dark lightness steps up with elevation: canvas < raised < overlay.
+ * `sunken` and `chip` are legacy aliases of `fill`.
+ */
 export const layerTokens = defineTokens("layer", {
-  raised: ["#ffffff", "#1f1f1f"],
-  /** Recessed regions: code, table headers, nested panels. Same tone as uiTokens.codeSurface. */
-  sunken: ["#fafafa", "#1c1c1c"],
-  chip: ["#f5f5f5", "rgb(255 255 255 / 8%)"],
-  chipInk: ["#6b6b6b", "#d4d4d4"],
+  canvas: ["#fafafa", "#121212"],
+  reading: ["#ffffff", "#121212"],
+  raised: ["#ffffff", "#1a1a1a"],
+  overlay: ["#ffffff", "#202020"],
+  fill: ["#f2f2f2", "#242424"],
+  field: ["#ffffff", "#161616"],
+  knockout: ["#ffffff", "#1a1a1a"],
+  sunken: ["#f2f2f2", "#242424"],
+  chip: ["#f2f2f2", "#242424"],
+  chipInk: ["#636363", "#d4d4d4"],
   code: ["rgb(0 0 0 / 5%)", "rgb(255 255 255 / 8%)"],
-  faint: ["#767676", "#8f8f8f"],
+  faint: ["#6e6e6e", "#8f8f8f"],
 });

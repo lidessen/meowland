@@ -1,3 +1,4 @@
+import { layerTokens } from "../palette";
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { imageLightboxContract as image } from "../../components/image-lightbox";
@@ -38,7 +39,7 @@ export const imageLightboxStyles = css`
     max-height: calc(100dvh - 140px);
     object-fit: contain;
     border-radius: ${uiTokens.radiusLarge};
-    background: ${uiTokens.inputSurface};
+    background: ${layerTokens.raised};
     box-shadow: ${uiTokens.shadowPanel};
   }
   ${partSelector(image, "caption")} {
@@ -56,7 +57,7 @@ export const imageLightboxStyles = css`
     border: 1px solid ${uiTokens.borderSoft};
     border-radius: 50%;
     corner-shape: round;
-    background: ${uiTokens.inputSurface};
+    background: ${layerTokens.raised};
     color: ${uiTokens.foreground};
     font: ${uiTokens.fontPageTitle}/1 ${uiTokens.font};
     cursor: pointer;

@@ -1,6 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { lineTokens } from "../palette";
+import { lineTokens, layerTokens } from "../palette";
 import { itemContract, itemOptions } from "../../components/item";
 
 export const itemStyles = css`
@@ -33,7 +33,7 @@ export const itemStyles = css`
   ${partSelector(itemContract, "root")} {
     ${itemOptions.when({ variant: "outline" })} {
       border-color: ${lineTokens.edge};
-      background: ${uiTokens.background};
+      background: ${layerTokens.raised};
     }
   }
   button${partSelector(itemContract, "root")} {

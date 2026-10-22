@@ -45,7 +45,7 @@ export const resourceCardStyles = css`
     flex: 0 0 40px;
     width: 40px;
     height: 40px;
-    border-radius: 11px;
+    border-radius: ${uiTokens.controlRadius};
     background: ${accentTokens.selected};
     color: ${accentTokens.base};
   }

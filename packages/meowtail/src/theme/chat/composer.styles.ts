@@ -24,7 +24,7 @@ export const chatComposerStyles = css`
     border-radius: ${uiTokens.radiusSmall};
     background: transparent;
     color: ${uiTokens.mutedForeground};
-    font-size: 13px;
+    font-size: ${uiTokens.fontLabel};
     line-height: 20px;
   }
 
@@ -39,7 +39,7 @@ export const chatComposerStyles = css`
   ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "group")} {
     border: 0;
     padding: 6px;
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     line-height: 18px;
     color: ${uiTokens.subtleForeground};
   }
@@ -51,7 +51,7 @@ export const chatComposerStyles = css`
 
   ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "option")} {
     padding: 6px;
-    font-size: 14px;
+    font-size: ${uiTokens.fontBody};
     line-height: 22px;
   }
 
@@ -73,7 +73,7 @@ export const chatComposerStyles = css`
     background-position: right 4px center;
     background-size: 12px 12px;
     color: ${uiTokens.mutedForeground};
-    font-size: 13px;
+    font-size: ${uiTokens.fontLabel};
     line-height: 20px;
     font-weight: 500;
     cursor: pointer;
@@ -328,7 +328,7 @@ export const chatComposerStyles = css`
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] ${partSelector(chatComposerContract, "input")} {
     grid-column: 1;
     grid-row: 1;
-    min-height: ${uiTokens.controlLarge};
+    min-height: 40px;
     padding-block: 8px;
   }
 
@@ -448,7 +448,7 @@ export const chatComposerStyles = css`
     white-space: normal;
     overflow-wrap: anywhere;
     color: ${layerTokens.faint};
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     line-height: 18px;
     pointer-events: auto;
   }
@@ -475,6 +475,7 @@ export const chatComposerStyles = css`
       grid-row: 2;
       min-height: 36px;
       padding: 6px 4px;
+      /* iOS zooms into a text control below 16px. */
       font-size: 16px;
       line-height: 24px;
     }

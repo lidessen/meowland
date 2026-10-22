@@ -9,7 +9,7 @@ export const imageLightboxStyles = css`
     padding: 6px 12px;
     background: ${uiTokens.surface};
     color: ${uiTokens.foreground};
-    font: 14px/22px ${uiTokens.font};
+    font: ${uiTokens.fontBody}/22px ${uiTokens.font};
     cursor: pointer;
   }
   ${partSelector(image, "dialog")} {
@@ -42,7 +42,7 @@ export const imageLightboxStyles = css`
     box-shadow: ${uiTokens.shadowPanel};
   }
   ${partSelector(image, "caption")} {
-    font: 14px/22px ${uiTokens.font};
+    font: ${uiTokens.fontBody}/22px ${uiTokens.font};
     text-align: center;
   }
   ${partSelector(image, "close")} {
@@ -58,7 +58,7 @@ export const imageLightboxStyles = css`
     corner-shape: round;
     background: ${uiTokens.inputSurface};
     color: ${uiTokens.foreground};
-    font: 24px/1 ${uiTokens.font};
+    font: ${uiTokens.fontPageTitle}/1 ${uiTokens.font};
     cursor: pointer;
   }
   ${partSelector(image, "close")}:focus-visible, ${partSelector(image, "trigger")}:focus-visible {

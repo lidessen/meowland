@@ -44,7 +44,7 @@ export const badgeStyles = css`
     ${badgeOptions.when({ size: "small" })} {
       padding: 1px 8px;
       min-height: 20px;
-      font-size: 11px;
+      font-size: ${uiTokens.fontMicro};
       line-height: 17px;
       font-weight: 500;
     }

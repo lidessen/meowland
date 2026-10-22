@@ -261,7 +261,7 @@ export const assistantStyles = css`
     box-sizing: border-box;
     width: 100%;
     resize: vertical;
-    min-height: ${uiTokens.controlLarge};
+    min-height: 40px;
     font: inherit;
     color: inherit;
     border: 1px solid ${uiTokens.border};

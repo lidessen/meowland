@@ -23,14 +23,14 @@ export const appBarStyles = css`
     margin: 0;
     overflow-wrap: anywhere;
     color: ${uiTokens.foreground};
-    font-size: 20px;
+    font-size: ${uiTokens.fontHeading};
     font-weight: 600;
     line-height: 1.25;
   }
   ${partSelector(appBarContract, "status")} {
     min-width: 0;
     color: ${uiTokens.mutedForeground};
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     line-height: 18px;
   }
   ${partSelector(appBarContract, "actions")} {

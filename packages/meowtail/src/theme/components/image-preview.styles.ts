@@ -38,7 +38,7 @@ export const imagePreviewStyles = css`
     gap: 8px;
     padding: 12px;
     color: ${uiTokens.subtleForeground};
-    font: 12px/18px ${uiTokens.font};
+    font: ${uiTokens.fontCaption}/18px ${uiTokens.font};
   }
   ${partSelector(attachments, "preview")} > ${partSelector(preview, "root")} {
     width: 220px;

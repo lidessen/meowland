@@ -38,7 +38,7 @@ export const codeBlockStyles = css`
     overflow-wrap: anywhere;
   }
   ${partSelector(codeBlockContract, "language")} {
-    font: 11px/18px ${uiTokens.mono};
+    font: ${uiTokens.fontCode}/18px ${uiTokens.mono};
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -52,7 +52,7 @@ export const codeBlockStyles = css`
     min-width: 0;
     flex-shrink: 1;
     margin-inline-start: auto;
-    font: 11px/18px ${uiTokens.font};
+    font: ${uiTokens.fontMicro}/18px ${uiTokens.font};
   }
   ${partSelector(codeBlockContract, "actions")} [aria-pressed="true"] {
     background: ${uiTokens.primarySoft};
@@ -65,7 +65,7 @@ export const codeBlockStyles = css`
     border: 0;
     border-radius: 0;
     background: transparent;
-    font: 11px/19px ${uiTokens.mono};
+    font: ${uiTokens.fontCode}/19px ${uiTokens.mono};
     white-space: pre;
     overflow-wrap: normal;
   }

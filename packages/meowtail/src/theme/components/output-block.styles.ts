@@ -20,7 +20,7 @@ export const outputBlockStyles = css`
     gap: 12px;
     padding: 9px 14px;
     background: ${uiTokens.codeBanner};
-    font: 11px/18px ${uiTokens.font};
+    font: ${uiTokens.fontMicro}/18px ${uiTokens.font};
   }
   ${partSelector(block, "title")} {
     min-width: 0;
@@ -38,7 +38,7 @@ export const outputBlockStyles = css`
   ${partSelector(block, "body")} {
     padding: 12px 14px;
     overflow: auto;
-    font: 11px/22px ${uiTokens.mono};
+    font: ${uiTokens.fontCode}/22px ${uiTokens.mono};
   }
   ${partSelector(block, "line")} {
     min-height: 22px;
@@ -61,7 +61,7 @@ export const outputBlockStyles = css`
   ${partSelector(block, "feedback")} {
     display: block;
     padding: 4px 14px;
-    font: 12px/18px ${uiTokens.font};
+    font: ${uiTokens.fontCaption}/18px ${uiTokens.font};
   }
   ${partSelector(block, "feedback")}:empty {
     display: none;
@@ -101,7 +101,7 @@ export const outputBlockStyles = css`
   }
   :where(${partSelector(read, "root")}, ${partSelector(diff, "root")}) ${partSelector(block, "body")} {
     padding: 6px 22px 20px;
-    font: 11px/19px ${uiTokens.mono};
+    font: ${uiTokens.fontCode}/19px ${uiTokens.mono};
   }
   :where(${partSelector(read, "root")}, ${partSelector(diff, "root")}) ${partSelector(block, "line")} {
     min-height: 19px;
@@ -119,7 +119,7 @@ export const outputBlockStyles = css`
   }
   ${partSelector(search, "root")} ${partSelector(block, "header")} {
     align-items: center;
-    font: 13px/20px ${uiTokens.font};
+    font: ${uiTokens.fontLabel}/20px ${uiTokens.font};
     color: ${uiTokens.mutedForeground};
   }
   ${partSelector(search, "root")} ${partSelector(block, "title")} {
@@ -129,7 +129,7 @@ export const outputBlockStyles = css`
   }
   ${partSelector(search, "root")} ${partSelector(block, "body")} {
     padding: 8px 14px 12px 0;
-    font: 11px/19px ${uiTokens.mono};
+    font: ${uiTokens.fontCode}/19px ${uiTokens.mono};
   }
   ${partSelector(search, "root")} ${partSelector(block, "line")} {
     padding-left: 14px;
@@ -146,7 +146,7 @@ export const outputBlockStyles = css`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: pre;
-    font: 11px/22px ${uiTokens.mono};
+    font: ${uiTokens.fontCode}/22px ${uiTokens.mono};
   }
   ${partSelector(terminal, "root")} ${partSelector(block, "header")} {
     padding-left: 30px;
@@ -182,7 +182,7 @@ export const outputBlockStyles = css`
     align-items: baseline;
     gap: 8px;
     min-width: 0;
-    font: 11px/22px ${uiTokens.mono};
+    font: ${uiTokens.fontCode}/22px ${uiTokens.mono};
   }
   ${partSelector(terminal, "cwd")} {
     flex: none;
@@ -205,7 +205,7 @@ export const outputBlockStyles = css`
   }
   ${partSelector(terminal, "status")} {
     flex: none;
-    font: 11px/22px ${uiTokens.font};
+    font: ${uiTokens.fontMicro}/22px ${uiTokens.font};
     color: ${uiTokens.subtleForeground};
   }
   ${partSelector(terminal, "status")}[data-terminal-error="true"] {

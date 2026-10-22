@@ -9,7 +9,7 @@ export const webBlockStyles = css`
     border-radius: ${uiTokens.radiusLarge};
     background: ${uiTokens.codeSurface};
     color: ${uiTokens.foreground};
-    font: 14px/20px ${uiTokens.font};
+    font: ${uiTokens.fontBody}/20px ${uiTokens.font};
   }
   ${partSelector(web, "answer")} {
     white-space: pre-wrap;
@@ -38,12 +38,12 @@ export const webBlockStyles = css`
   ${partSelector(web, "snippet")} {
     margin-top: 2px;
     color: ${uiTokens.mutedForeground};
-    font: 13px/19px ${uiTokens.font};
+    font: ${uiTokens.fontLabel}/19px ${uiTokens.font};
     overflow-wrap: anywhere;
   }
   ${partSelector(web, "meta")} {
     margin-top: 4px;
     color: ${uiTokens.subtleForeground};
-    font: 12px/18px ${uiTokens.font};
+    font: ${uiTokens.fontCaption}/18px ${uiTokens.font};
   }
 `;

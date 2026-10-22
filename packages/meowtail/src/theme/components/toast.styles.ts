@@ -10,7 +10,7 @@ export const toastStyles = css`
     max-width: 100%;
     box-sizing: border-box;
     padding: 12px 16px;
-    border-radius: 16px;
+    border-radius: ${uiTokens.radiusLarge};
     background: ${uiTokens.toastSurface};
     color: ${uiTokens.toastForeground};
     box-shadow: ${uiTokens.shadowPanel};

@@ -167,3 +167,30 @@ test("basic controls keep single-line content on the control center", async ({ p
 
   expect(findings, findings.join("\n")).toEqual([]);
 });
+
+test("every single-line control shares one height and center line in a row", async ({ page }) => {
+  for (const width of [1280, 375]) {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/canvas.html?story=basic-quality-controls");
+    const row = page.locator("[data-mixed-row]");
+    await expect(row).toBeVisible();
+
+    const boxes = await row.evaluate((element) =>
+      [...element.children].map((child) => {
+        const bounds = child.getBoundingClientRect();
+        return {
+          part: child.getAttribute("data-meowui-part") ?? child.tagName,
+          top: bounds.top,
+          height: bounds.height,
+        };
+      }),
+    );
+    expect(boxes.length).toBeGreaterThanOrEqual(9);
+
+    // The row is top-aligned, so a shared center line needs a shared height.
+    const findings = boxes
+      .filter((box) => Math.abs(box.height - boxes[0]!.height) >= 1)
+      .map((box) => `${box.part}: ${box.height}px vs ${boxes[0]!.part} ${boxes[0]!.height}px`);
+    expect(findings, `${width}px`).toEqual([]);
+  }
+});

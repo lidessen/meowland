@@ -17,7 +17,7 @@ export const tooltipStyles = css`
     color: #fff;
     box-shadow: none;
     backdrop-filter: none;
-    font: 13px/20px ${uiTokens.font};
+    font: ${uiTokens.fontLabel}/20px ${uiTokens.font};
   }
   ${partSelector(tooltipContract, "content")} {
     display: block;

@@ -25,7 +25,7 @@ export const itemStyles = css`
     ${itemOptions.when({ size: "small" })} {
       min-height: 34px;
       padding: 6px 8px;
-      font-size: 13px;
+      font-size: ${uiTokens.fontLabel};
       line-height: 20px;
     }
   }

@@ -123,8 +123,14 @@ Color, type, radius, motion, and the shared lengths come from `uiTokens` in `src
 plus `accentTokens`, `statusTokens`, `radiusTokens`, `lineTokens`, and `layerTokens` in
 `src/theme/palette.ts`. Interpolating a token emits `var(--…)`, including a light/dark pair. The
 spacing steps are `spaceGroup` (8px), `spaceSection` (20px), and `spacePanel` (24px). Control
-heights are `buttonSmall` / `buttonHeight` / `buttonLarge` (28 / 36 / 44px) and `controlHeight`
-(32px). Arrange siblings with `Stack`, `Inline`, or `Grid` and a `gap` of `none`, `compact`,
+heights are one ladder: `controlSmall` / `controlHeight` / `controlLarge` (28 / 36 / 44px), equal to
+`buttonSmall` / `buttonHeight` / `buttonLarge`, so a field, a select and a button in one row share a
+height and center line. Field surfaces (Input, Textarea, Select, ChoiceSelect, SearchInput,
+NumberInput) take their box and their hover, focus, read-only, invalid and disabled states from
+`src/theme/shared/field-surface.styles.ts`; a field family's own file adds layout only. Type sizes
+come from the `uiTokens` ramp (`fontMicro` 11, `fontCaption`/`fontCode` 12, `fontLabel` 13,
+`fontBody` 14, `fontTitle` 16, `fontHeading` 20, `fontPageTitle` 24) and radii from `radiusTokens`
+chosen by element size; do not write a literal size or radius beside them. Arrange siblings with `Stack`, `Inline`, or `Grid` and a `gap` of `none`, `compact`,
 `normal`, or `relaxed` (0, group, section, panel). Judgment for departing from that scale is in
 [Default scale and composition](#default-scale-and-composition).
 
@@ -219,8 +225,10 @@ File names, registration, and `mountStyles` / `applyTheme` / `Theme` stay in
 
 ## Default scale and composition
 
-- The default design uses DeepSeek Harness as its baseline: standard buttons are 36px high, compact
-  buttons 28px, and inputs 32px. Information blocks are tight inside; page edges, standalone blocks,
+- The default design uses DeepSeek Harness as its baseline, with one control ladder: standard
+  buttons and fields are 36px high, compact ones 28px, large ones 44px. The
+  `basic-quality-controls` mixed row and its geometry test hold every single-line family to that
+  ladder. Information blocks are tight inside; page edges, standalone blocks,
   and reading areas keep generous whitespace.
   group / section / panel are not the ceiling for page spacing; do not extend local compactness into
   whole-page compression.

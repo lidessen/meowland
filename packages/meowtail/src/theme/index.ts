@@ -1,7 +1,7 @@
 import { defineTheme } from "meowcss/meowjsx";
 import { assistantStyles } from "./chat/assistant.styles";
 import { chatTaskStyles } from "./chat/task.styles";
-import { baseStyles, cornerShapeStyles } from "./base.styles";
+import { baseStyles, controlFontStyles, cornerShapeStyles } from "./base.styles";
 import { pillStyles } from "./components/pill.styles";
 import { imagePreviewStyles } from "./components/image-preview.styles";
 import { outputBlockStyles } from "./components/output-block.styles";
@@ -63,6 +63,7 @@ import { segmentedControlStyles } from "./components/segmented-control.styles";
 import { textShimmerStyles } from "./components/text-shimmer.styles";
 import { riskConfirmationStyles } from "./components/risk-confirmation.styles";
 import { codeHighlightStyles } from "./shared/code-highlight.styles";
+import { fieldSurfaceStyles } from "./shared/field-surface.styles";
 import { codeHighlightTokens } from "./shared/code-highlight.tokens";
 import { accentTokens, statusTokens, radiusTokens, lineTokens, layerTokens } from "./palette";
 import { statusDotStyles } from "./components/status-dot.styles";
@@ -110,6 +111,9 @@ export const standardThemeTokens = [
 ] as const;
 
 export const standardThemeStyles = [
+  // Shared foundations first: each family below overrides them.
+  controlFontStyles,
+  fieldSurfaceStyles,
   assistantStyles,
   chatTaskStyles,
   statusDotStyles,

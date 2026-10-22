@@ -50,7 +50,7 @@ export const chatMessageStyles = css`
     height: 28px;
     overflow: hidden;
     margin-top: 2px;
-    border-radius: 9px;
+    border-radius: ${uiTokens.radiusSmall};
     background: ${uiTokens.primary};
     color: ${uiTokens.onPrimary};
     ${logoTokens.ink.name}: ${uiTokens.onPrimary};
@@ -181,7 +181,7 @@ export const chatMessageStyles = css`
   :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) > :is(h2, h3) {
     margin-top: ${uiTokens.spacePanel};
     font-size: 1.08em;
-    font-weight: 650;
+    font-weight: 600;
     line-height: 1.45;
   }
 
@@ -204,7 +204,7 @@ export const chatMessageStyles = css`
 
   :is(${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}) :not(pre) > code {
     padding: 1px 4px;
-    border-radius: 3px;
+    border-radius: ${radiusTokens.mark};
     background: ${uiTokens.surfaceMuted};
     font-family: ${uiTokens.mono};
     font-size: 0.92em;

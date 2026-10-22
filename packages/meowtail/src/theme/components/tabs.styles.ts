@@ -12,19 +12,20 @@ export const tabsStyles = css`
     position: relative;
     display: grid;
     grid-template-columns: repeat(${tabsCount}, minmax(0, 1fr));
-    padding: 4px;
-    border-radius: ${uiTokens.radiusLarge};
+    /* Same track as SegmentedControl: one control height, concentric radii. */
+    padding: ${uiTokens.trackInset};
+    border-radius: calc(${uiTokens.radiusSmall} + ${uiTokens.trackInset});
     background: ${uiTokens.surfaceMuted};
   }
   ${partSelector(tabsContract, "indicator")} {
     position: absolute;
-    inset-block: 4px;
-    inset-inline-start: 4px;
-    width: calc((100% - 8px) / ${tabsCount});
+    inset-block: ${uiTokens.trackInset};
+    inset-inline-start: ${uiTokens.trackInset};
+    width: calc((100% - 2 * ${uiTokens.trackInset}) / ${tabsCount});
     box-sizing: border-box;
-    border: 0.5px solid ${uiTokens.borderSubtle};
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radiusSmall};
     background: ${uiTokens.surface};
+    box-shadow: ${uiTokens.shadowThumb};
     transform: translateX(calc(${tabsIndex} * 100%));
     transition: transform 180ms ease;
     pointer-events: none;
@@ -39,13 +40,14 @@ export const tabsStyles = css`
     position: relative;
     min-width: 0;
     box-sizing: border-box;
-    min-height: 34px;
+    min-height: calc(${uiTokens.controlHeight} - 2 * ${uiTokens.trackInset});
     padding: 0 12px;
     border: 0;
-    border-radius: ${uiTokens.controlRadius};
+    border-radius: ${uiTokens.radiusSmall};
     background: transparent;
     color: ${uiTokens.mutedForeground};
     font: inherit;
+    font-weight: 500;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -54,7 +56,6 @@ export const tabsStyles = css`
   }
   ${partSelector(tabsContract, "tab")}[aria-selected="true"] {
     color: ${uiTokens.foreground};
-    font-weight: 600;
   }
   ${partSelector(tabsContract, "tab")}:hover:not(:disabled) {
     color: ${uiTokens.foreground};
@@ -69,10 +70,7 @@ export const tabsStyles = css`
     outline-offset: -2px;
   }
   ${partSelector(tabsContract, "tab")}:focus-visible {
-    outline: none;
-    text-decoration: underline;
-    text-decoration-thickness: 1px;
-    text-underline-offset: 4px;
+    outline-offset: -2px;
   }
   ${partSelector(tabsContract, "panel")} {
     padding-block: ${uiTokens.spaceSection};

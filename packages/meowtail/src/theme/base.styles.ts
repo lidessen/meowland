@@ -11,6 +11,16 @@ export const cornerShapeStyles = css`
   }
 `;
 
+/* Native controls default to the browser's own font (13.33px). A library
+   control inherits its surroundings unless its family sets a size. Zero
+   specificity and first in the theme, so every family rule overrides it. */
+export const controlFontStyles = css`
+  :where(button, input, select, textarea, optgroup):where([data-meowui-part]) {
+    font: inherit;
+    letter-spacing: inherit;
+  }
+`;
+
 export const baseStyles = css`
   /* Establish UI typography at an entry root without resetting an author's
      typography when a nested region changes its theme or appearance. */

@@ -47,6 +47,9 @@ export const pageFrameStyles = css`
     display: block;
     overflow: auto;
     overscroll-behavior: contain;
+    /* A classic scrollbar takes width from one side only; reserving both
+       gutters keeps centered content on the header's center line. */
+    scrollbar-gutter: stable both-edges;
   }
   @media (max-width: 768px) {
     ${partSelector(pageFrameContract, "root")} {

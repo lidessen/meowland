@@ -7,45 +7,22 @@ const control = partSelector(numberInputContract, "control");
 const stepper = `:where(${partSelector(numberInputContract, "decrement")}, ${partSelector(numberInputContract, "increment")})`;
 
 export const numberInputStyles = css`
+  /* Surface, height and states come from the shared field surface. The
+     steppers are compact buttons inset by the remaining height. */
   ${root} {
-    box-sizing: border-box;
     display: inline-flex;
     align-items: center;
     width: max-content;
     max-width: 100%;
-    min-width: 0;
-    min-height: calc(${uiTokens.controlHeight} + 1px);
-    padding: 2px;
-    border: 0.5px solid ${uiTokens.border};
-    border-radius: ${uiTokens.controlRadius};
-    background: ${uiTokens.inputSurface};
-    color: ${uiTokens.foreground};
-    font: ${uiTokens.fontBody}/22px ${uiTokens.font};
-    transition: border-color ${uiTokens.durationResponse} ${uiTokens.ease};
-  }
-  ${root}:focus-within {
-    border-color: ${uiTokens.focus};
-  }
-  @media (hover: hover) {
-    ${root}:hover:not(:focus-within):not(:has(${control}:disabled)):not(:has([aria-invalid="true"])) {
-      border-color: ${uiTokens.mutedForeground};
-    }
-  }
-  ${root}:has([aria-invalid="true"]) {
-    border-color: ${uiTokens.danger};
-  }
-  ${root}:has(${control}:disabled) {
-    color: ${uiTokens.subtleForeground};
-    border-color: ${uiTokens.borderFaint};
-    background: ${uiTokens.surfaceMuted};
+    padding: 0 3px;
   }
   ${control} {
     box-sizing: border-box;
     flex: 0 0 auto;
     width: 4.5rem;
     min-width: 0;
-    min-height: calc(${uiTokens.controlHeight} - 4px);
-    padding: 4px 2px;
+    align-self: stretch;
+    padding: 0 2px;
     border: 0;
     background: transparent;
     color: inherit;
@@ -100,7 +77,6 @@ export const numberInputStyles = css`
     color: inherit;
   }
   @media (prefers-reduced-motion: reduce) {
-    ${root},
     ${stepper} {
       transition: none;
     }

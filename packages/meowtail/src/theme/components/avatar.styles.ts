@@ -26,7 +26,7 @@ export const avatarStyles = css`
       width: 24px;
       height: 24px;
       border-radius: ${uiTokens.radiusSmall};
-      font-size: 10px;
+      font-size: ${uiTokens.fontMicro};
     }
   }
   ${root} {

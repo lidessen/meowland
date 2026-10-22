@@ -16,7 +16,7 @@ export const resourceLinkStyles = css`
     width: 100%;
     padding: 12px;
     border: ${lineTokens.width} solid ${lineTokens.edge};
-    border-radius: 12px;
+    border-radius: ${uiTokens.radiusLarge};
     background: ${layerTokens.raised};
     color: ${uiTokens.foreground};
     font: ${uiTokens.fontBody}/1.5 ${uiTokens.font};
@@ -37,7 +37,7 @@ export const resourceLinkStyles = css`
     place-items: center;
     width: 32px;
     height: 32px;
-    border-radius: 9px;
+    border-radius: ${uiTokens.radiusSmall};
     background: ${layerTokens.chip};
   }
   ${link("icon")} svg {
@@ -51,7 +51,7 @@ export const resourceLinkStyles = css`
   }
   ${link("title")} {
     overflow: hidden;
-    font-size: 13.5px;
+    font-size: ${uiTokens.fontBody};
     font-weight: 500;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -59,7 +59,7 @@ export const resourceLinkStyles = css`
   ${link("detail")} {
     overflow: hidden;
     color: ${uiTokens.mutedForeground};
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     text-overflow: ellipsis;
     white-space: nowrap;
   }

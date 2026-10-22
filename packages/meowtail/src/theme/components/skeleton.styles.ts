@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { radiusTokens } from "../palette";
 import { skeletonContract, skeletonOptions } from "../../components/skeleton";
 import { skeletonBoundaryContract } from "../../components/skeleton-boundary";
 
@@ -23,7 +24,7 @@ export const skeletonStyles = css`
     display: block;
     width: 100%;
     height: 1em;
-    border-radius: 4px;
+    border-radius: ${radiusTokens.mark};
     background: color-mix(in srgb, ${uiTokens.mutedForeground} 16%, ${uiTokens.background});
   }
   ${partSelector(skeletonContract, "root")} {

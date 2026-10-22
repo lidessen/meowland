@@ -58,7 +58,7 @@ export const timelineStyles = css`
     overflow-wrap: anywhere;
   }
   ${entry("state")} {
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     color: ${uiTokens.mutedForeground};
   }
   ${entry("root")}[data-state="processing"] ${entry("state")} {
@@ -77,7 +77,7 @@ export const timelineStyles = css`
   ${entry("description")} {
     margin: 0;
     color: ${uiTokens.mutedForeground};
-    font-size: 12.5px;
+    font-size: ${uiTokens.fontLabel};
     line-height: 1.5;
     overflow-wrap: anywhere;
   }

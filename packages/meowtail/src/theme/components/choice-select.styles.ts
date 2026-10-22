@@ -8,24 +8,16 @@ export const choiceSelectStyles = css`
     position: relative;
     min-width: 0;
   }
+  /* Surface, height and states come from the shared field surface. */
   ${partSelector(choiceSelectContract, "trigger")} {
-    box-sizing: border-box;
     display: flex;
     align-items: center;
     gap: 6px;
     width: 100%;
-    min-width: 0;
-    min-height: ${uiTokens.controlHeight};
-    padding: 0 ${uiTokens.controlPaddingInline};
-    border: 0.5px solid ${uiTokens.border};
-    border-radius: ${uiTokens.controlRadius};
-    background: ${uiTokens.inputSurface};
-    color: ${uiTokens.foreground};
-    box-shadow: ${uiTokens.shadowControl};
-    font: ${uiTokens.fontBody}/${uiTokens.leading} ${uiTokens.font};
+    /* The chevron sits where the native Select draws its own. */
+    padding: 0 10px 0 ${uiTokens.fieldPaddingInline};
     text-align: start;
     cursor: pointer;
-    transition: border-color ${uiTokens.durationResponse} ${uiTokens.ease};
   }
   ${partSelector(choiceSelectContract, "value")} {
     flex: 1;
@@ -41,22 +33,6 @@ export const choiceSelectStyles = css`
   ${partSelector(choiceSelectContract, "indicator")} svg {
     width: 14px;
     height: 14px;
-  }
-  ${partSelector(choiceSelectContract, "trigger")}:focus-visible {
-    outline: 2px solid ${uiTokens.focus};
-    outline-offset: 2px;
-  }
-  ${partSelector(choiceSelectContract, "trigger")}[aria-expanded="true"] {
-    border-color: ${uiTokens.focus};
-  }
-  ${partSelector(choiceSelectContract, "trigger")}[aria-invalid="true"] {
-    border-color: ${uiTokens.danger};
-  }
-  ${partSelector(choiceSelectContract, "trigger")}:disabled {
-    color: ${uiTokens.subtleForeground};
-    background: ${uiTokens.surfaceMuted};
-    box-shadow: none;
-    cursor: not-allowed;
   }
   ${partSelector(popoverContract, "panel")}:has(> ${partSelector(choiceSelectContract, "list")}) {
     padding: 4px;
@@ -75,7 +51,7 @@ export const choiceSelectStyles = css`
     border-radius: ${uiTokens.controlRadius};
     background: ${uiTokens.inputSurface};
     color: ${uiTokens.foreground};
-    font: 14px/22px ${uiTokens.font};
+    font: ${uiTokens.fontBody}/22px ${uiTokens.font};
   }
   ${partSelector(choiceSelectContract, "search")}:focus-visible {
     border-color: ${uiTokens.focus};
@@ -97,7 +73,7 @@ export const choiceSelectStyles = css`
   ${partSelector(choiceSelectContract, "group")} {
     padding: 6px 8px;
     color: ${uiTokens.mutedForeground};
-    font-size: 11px;
+    font-size: ${uiTokens.fontMicro};
   }
   ${partSelector(choiceSelectContract, "group")}:not(:first-child) {
     border-top: 0.5px solid ${uiTokens.border};
@@ -116,7 +92,7 @@ export const choiceSelectStyles = css`
     border-radius: ${uiTokens.controlRadius};
     background: transparent;
     color: ${uiTokens.foreground};
-    font: 13px/20px ${uiTokens.font};
+    font: ${uiTokens.fontLabel}/20px ${uiTokens.font};
     text-align: start;
     cursor: pointer;
     overflow-wrap: anywhere;
@@ -172,6 +148,7 @@ export const choiceSelectStyles = css`
     ${partSelector(choiceSelectContract, "search")},
     ${partSelector(choiceSelectContract, "option")} {
       min-height: 44px;
+      /* iOS zooms into a text control below 16px. */
       font-size: 16px;
     }
   }

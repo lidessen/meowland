@@ -32,8 +32,13 @@ export const statusTokens = defineTokens("status", {
   unknown: ["#adb2b8", "#81858c"],
 });
 
-/** Radii scale: inline 8, control 10, card 14, floating 22. */
+/**
+ * Radii scale, chosen by the element's size: mark 4 (key caps, skeleton lines,
+ * glyph tiles up to 20px), tag 6, inline 8 (24-32px elements), control 10
+ * (36-44px controls and tiles), card 14 (bordered surfaces), floating 22.
+ */
 export const radiusTokens = defineTokens("radius", {
+  mark: "4px",
   tag: "6px",
   inline: "8px",
   control: "10px",

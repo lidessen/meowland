@@ -40,7 +40,7 @@ export const alertStyles = css`
     min-height: 36px;
     padding: 6px 8px 6px 12px;
     border-radius: ${uiTokens.radiusSmall};
-    font-size: 13px;
+    font-size: ${uiTokens.fontLabel};
     line-height: 20px;
   }
   ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"]::before {

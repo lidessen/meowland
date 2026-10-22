@@ -47,7 +47,7 @@ export const chatHeaderStyles = css`
     max-width: 560px;
     margin: 4px 0 0;
     color: ${uiTokens.subtleForeground};
-    font-size: 13px;
+    font-size: ${uiTokens.fontLabel};
     line-height: 20px;
   }
 

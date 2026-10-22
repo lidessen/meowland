@@ -61,7 +61,7 @@ export const listGroupStyles = css`
   }
   ${row("description")} {
     color: ${uiTokens.mutedForeground};
-    font-size: 12.5px;
+    font-size: ${uiTokens.fontLabel};
     overflow-wrap: anywhere;
   }
   ${row("status")} {
@@ -71,7 +71,7 @@ export const listGroupStyles = css`
     min-width: 0;
     gap: 6px;
     color: ${uiTokens.mutedForeground};
-    font-size: 12px;
+    font-size: ${uiTokens.fontCaption};
     overflow-wrap: anywhere;
   }
   ${row("actions")} {

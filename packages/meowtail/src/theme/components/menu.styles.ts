@@ -8,7 +8,7 @@ export const menuStyles = css`
   ${partSelector(menuContract, "root")} {
     min-width: 144px;
     max-width: min(360px, 100%);
-    font: 13px/20px ${uiTokens.font};
+    font: ${uiTokens.fontLabel}/20px ${uiTokens.font};
     color: ${uiTokens.foreground};
   }
   ${partSelector(menuContract, "item")} {
@@ -60,13 +60,13 @@ export const menuStyles = css`
   }
   ${partSelector(menuContract, "shortcut")} {
     color: ${uiTokens.captionForeground};
-    font-size: 11px;
+    font-size: ${uiTokens.fontMicro};
     line-height: 16px;
     white-space: nowrap;
   }
   ${partSelector(menuContract, "heading")} {
     padding: 6px 12px;
-    font-size: 11px;
+    font-size: ${uiTokens.fontMicro};
     line-height: 15px;
     color: ${uiTokens.subtleForeground};
   }

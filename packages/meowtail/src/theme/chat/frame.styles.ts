@@ -58,7 +58,7 @@ export const chatFrameStyles = css`
     gap: ${uiTokens.spaceSection};
     color: ${uiTokens.mutedForeground};
     font-size: ${uiTokens.fontCaption};
-    line-height: ${uiTokens.controlHeight};
+    line-height: 32px;
     white-space: nowrap;
     justify-content: center;
     margin-bottom: ${uiTokens.spaceSection};

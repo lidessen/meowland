@@ -55,37 +55,77 @@ export function surface(rung: SurfaceRung): CSSFragment {
 }
 
 /** The text roles `Text` exposes, plus the two title steps for a host's own headings. */
-export type TextRole = "body" | "secondary" | "caption" | "eyebrow" | "title" | "pageTitle";
+/**
+ * The text styles of the type ramp. Each binds a size to its line box, weight, tracking and
+ * ink, so a component names a role instead of composing those four by hand.
+ */
+export type TextRole =
+  | "eyebrow"
+  | "caption"
+  | "label"
+  | "body"
+  | "secondary"
+  | "reading"
+  | "title"
+  | "heading"
+  | "pageTitle";
 
 const texts: Record<TextRole, CSSFragment> = {
-  body: css`
-    color: ${uiTokens.ink.primary};
-    font: 400 ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
-  `,
-  secondary: css`
-    color: ${uiTokens.ink.secondary};
-    font: 400 ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
-  `,
-  caption: css`
-    color: ${uiTokens.ink.secondary};
-    font: 400 ${uiTokens.type.caption} / 1.5 ${uiTokens.type.sans};
-  `,
   // The one small-caps group label: menu headings, navigation groups, specimen labels.
   eyebrow: css`
     color: ${uiTokens.ink.tertiary};
-    font: 500 ${uiTokens.type.micro} / 16px ${uiTokens.type.sans};
+    font: ${uiTokens.type.weight.medium} ${uiTokens.type.micro} / ${uiTokens.type.line.micro}
+      ${uiTokens.type.sans};
     letter-spacing: ${uiTokens.type.trackingCaps};
     text-transform: uppercase;
   `,
-  // A container's name: card, dialog, panel.
+  // Fine print: receipts, counts, timestamps.
+  caption: css`
+    color: ${uiTokens.ink.secondary};
+    font: ${uiTokens.type.weight.regular} ${uiTokens.type.caption} / ${uiTokens.type.line.caption}
+      ${uiTokens.type.sans};
+  `,
+  // A name in a compact surface: a field label, a menu item, a row title.
+  label: css`
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.weight.medium} ${uiTokens.type.label} / ${uiTokens.type.line.label}
+      ${uiTokens.type.sans};
+  `,
+  // Body copy keeps the unitless leading, so text nested at another size keeps its proportion.
+  body: css`
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.weight.regular} ${uiTokens.type.body} / ${uiTokens.type.leading}
+      ${uiTokens.type.sans};
+  `,
+  secondary: css`
+    color: ${uiTokens.ink.secondary};
+    font: ${uiTokens.type.weight.regular} ${uiTokens.type.body} / ${uiTokens.type.leading}
+      ${uiTokens.type.sans};
+  `,
+  // Long-form copy: articles, notes and rendered markdown.
+  reading: css`
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.weight.regular} ${uiTokens.type.body} / ${uiTokens.type.line.reading}
+      ${uiTokens.type.sans};
+  `,
+  // A container's name: card, dialog, panel, section.
   title: css`
     color: ${uiTokens.ink.primary};
-    font: 600 ${uiTokens.type.title} / 1.4 ${uiTokens.type.sans};
+    font: ${uiTokens.type.weight.semibold} ${uiTokens.type.title} / ${uiTokens.type.line.title}
+      ${uiTokens.type.sans};
+    letter-spacing: ${uiTokens.type.trackingTight};
+  `,
+  // A heading inside reading content, between a page title and a section title.
+  heading: css`
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.weight.semibold} ${uiTokens.type.heading} / ${uiTokens.type.line.heading}
+      ${uiTokens.type.sans};
     letter-spacing: ${uiTokens.type.trackingTight};
   `,
   pageTitle: css`
     color: ${uiTokens.ink.primary};
-    font: 600 ${uiTokens.type.pageTitle} / 1.3 ${uiTokens.type.display};
+    font: ${uiTokens.type.weight.semibold} ${uiTokens.type.pageTitle} /
+      ${uiTokens.type.line.pageTitle} ${uiTokens.type.sans};
     letter-spacing: ${uiTokens.type.trackingTight};
   `,
 };

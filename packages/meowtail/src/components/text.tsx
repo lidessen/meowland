@@ -4,12 +4,13 @@ import { defineComponent, type Props } from "meowjsx";
 
 /**
  * The text roles a host places between components. Each role is one the theme
- * already uses: body copy, secondary (supporting) copy, caption-size notes, and
- * the small-caps eyebrow that labels a group. Field labels stay with Field,
- * headings with Section and PageHeader, and code with the code components.
+ * already uses: body copy, secondary (supporting) copy, a label that names
+ * something in a compact surface, caption-size notes, and the small-caps
+ * eyebrow that labels a group. Field labels stay with Field, headings with
+ * Section and PageHeader, and code with the code components.
  */
 export const textOptions = defineOptions("text", {
-  variant: ["body", "secondary", "caption", "eyebrow"],
+  variant: ["body", "secondary", "label", "caption", "eyebrow"],
 });
 
 export const textContract = {

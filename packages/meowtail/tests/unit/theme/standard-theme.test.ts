@@ -1,5 +1,11 @@
 import { expect, test } from "bun:test";
-import { standardTheme, standardOptions, uiTokens } from "../../../src/theme/index";
+import {
+  standardTheme,
+  standardOptions,
+  text,
+  uiTokens,
+  type TextRole,
+} from "../../../src/theme/index";
 
 test("standard theme is generated from token definitions and typed part contracts", () => {
   expect(standardTheme.name).toBe(standardOptions.name);
@@ -12,13 +18,37 @@ test("standard theme is generated from token definitions and typed part contract
   expect(standardTheme.cssText).not.toContain("@import");
 });
 
-test("page and section titles use the display font token", () => {
+test("titles use the UI face; the deprecated display token stays equal to it", () => {
   expect(uiTokens.type.display.name).toBe("--ui-type-display");
-  expect(standardTheme.cssText).toContain(`${uiTokens.type.display.name}:`);
-  expect(standardTheme.cssText).toContain("Iowan Old Style");
-  expect(standardTheme.cssText).toContain(`font-family: ${uiTokens.type.display}`);
+  expect(standardTheme.cssText).not.toContain("Iowan Old Style");
+  expect(standardTheme.cssText).not.toContain(`font-family: ${uiTokens.type.display}`);
   expect(standardTheme.cssText).toContain('data-meowui-part="page-header/title"');
   expect(standardTheme.cssText).toContain('data-meowui-part="section/title"');
+});
+
+test("every text role is built from type ramp tokens alone", () => {
+  const roles: TextRole[] = [
+    "eyebrow",
+    "caption",
+    "label",
+    "body",
+    "secondary",
+    "reading",
+    "title",
+    "heading",
+    "pageTitle",
+  ];
+  for (const role of roles) {
+    const declarations = text(role)
+      .text.split(";")
+      .map((line) => line.trim())
+      .filter((line) => /^(font|letter-spacing|line-height)/.test(line));
+    expect(declarations.length).toBeGreaterThan(0);
+    for (const declaration of declarations) {
+      const literals = declaration.replace(/var\(--[\w-]+\)/g, "").replace(/^[\w-]+:/, "");
+      expect({ role, literals: literals.match(/\d/g) }).toEqual({ role, literals: null });
+    }
+  }
 });
 
 test("shared layout options bind every real instance carrier", () => {

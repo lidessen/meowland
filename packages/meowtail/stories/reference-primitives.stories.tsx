@@ -19,7 +19,20 @@ export const ReferencePrimitivesStory = defineStory({
       <Specimen label="Shortcut keys" align="start">
         <Inline>
           Save <ShortcutKeys keys={["⌘", "S"]} />
-          <ShortcutKeys keys={["Ctrl", "+", "S"]} variant="tooltip" />
+          {/* The tooltip variant is drawn for an inverse surface, so it is shown on one. */}
+          <span
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "4px 8px",
+              borderRadius: "8px",
+              background: "var(--ui-inverse-surface)",
+              color: "var(--ui-inverse-ink)",
+            }}
+          >
+            Save <ShortcutKeys keys={["Ctrl", "+", "S"]} variant="tooltip" />
+          </span>
         </Inline>
       </Specimen>
       <Specimen

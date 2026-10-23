@@ -3,6 +3,7 @@ import {
   Button,
   Inline,
   Stack,
+  AssistantMark,
   DoodleCat,
   EmptyStack,
   ExternalArrowIcon,
@@ -192,6 +193,7 @@ export const BrandIconsStory = defineStory({
     "Brand and illustration graphics keep their own shapes, while functional icon convenience entries reuse the same Lucide outline. Toggle light and dark to check readability.",
   covers: [
     "MeowlandMark",
+    "AssistantMark",
     "DoodleCat",
     "EmptyStack",
     "GithubIcon",
@@ -207,6 +209,12 @@ export const BrandIconsStory = defineStory({
         <figure>
           <MeowlandMark />
           <figcaption>MeowlandMark</figcaption>
+        </figure>
+        <figure>
+          <span style="display:block;width:40px;height:40px">
+            <AssistantMark />
+          </span>
+          <figcaption>AssistantMark</figcaption>
         </figure>
         <figure>
           <DoodleCat />

@@ -9,6 +9,18 @@ export const iconsStyles = css`
     fill: currentColor;
     vertical-align: middle;
   }
+  /* The assistant's mark: an ink disc that fills its avatar slot, the silhouette knocked out. */
+  .meow-assistant-mark {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .meow-assistant-mark .assistant-mark-disc {
+    fill: ${uiTokens.ink.primary};
+  }
+  .meow-assistant-mark .assistant-mark-glyph {
+    fill: ${uiTokens.surface.raised};
+  }
   /* EmptyState's default art: receding cards from the surface ladder, one accent spark. */
   .meow-empty-stack {
     display: block;

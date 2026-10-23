@@ -15,6 +15,7 @@ import {
   ChatToolCall,
   Icon,
   IconButton,
+  AssistantMark,
 } from "meowtail";
 import { Note } from "./specimen";
 
@@ -53,7 +54,7 @@ export const MessagePartsStory = defineStory({
             role="assistant"
             author="Assistant handling the component review"
             timestamp="09:41"
-            avatar={<Icon name="brain" />}
+            avatar={<AssistantMark />}
             actions={
               <ChatMessageActions>
                 <Button variant="quiet" size="small" data-message-action="Marked this reply.">

@@ -16,6 +16,7 @@ import {
   ChatToolCall,
   Icon,
   Stack,
+  AssistantMark,
 } from "meowtail";
 import { Measure, Note } from "./specimen";
 
@@ -409,12 +410,7 @@ const rows = (wrap: boolean): Child[] => {
     ),
     shape(
       <ChatMessageListItem>
-        <ChatMessage
-          role="assistant"
-          author="Assistant"
-          avatar={<Icon name="brain" />}
-          surface="none"
-        >
+        <ChatMessage role="assistant" author="Assistant" avatar={<AssistantMark />} surface="none">
           <ChatBubble>
             <p>Consecutive messages stay compact.</p>
           </ChatBubble>
@@ -426,7 +422,7 @@ const rows = (wrap: boolean): Child[] => {
         <ChatMessage
           role="assistant"
           author="Assistant"
-          avatar={<Icon name="brain" />}
+          avatar={<AssistantMark />}
           continuation
           surface="none"
         >

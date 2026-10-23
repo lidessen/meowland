@@ -217,3 +217,21 @@ describe("the docs pages", () => {
     expect(html).toContain("Package guide");
   });
 });
+
+describe("the page sequence", () => {
+  test("a page links the pages before and after it in sidebar order", () => {
+    const html = document("packages/meowtail");
+    const pager = html.slice(html.indexOf('class="docs-pager"'));
+    expect(pager).toContain('href="/" rel="prev"');
+    expect(pager).toContain("Home");
+    expect(pager).toContain('rel="next"');
+    expect(pager).not.toContain("/gallery/");
+  });
+
+  test("the home page has only a next link", () => {
+    const html = document("");
+    const pager = html.slice(html.indexOf('class="docs-pager"'));
+    expect(pager).not.toContain('rel="prev"');
+    expect(pager).toContain('href="/packages/meowtail/" rel="next"');
+  });
+});

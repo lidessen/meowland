@@ -134,23 +134,23 @@ function inheritedNote(extended: readonly string[]): Child | undefined {
   return (
     <Note>
       {element ? (
-        <>
+        <Fragment>
           Also takes <code>className</code>, <code>children</code> and the attributes and events of
           its root element.
-        </>
+        </Fragment>
       ) : null}
       {element && others.length ? " " : null}
       {others.length ? (
-        <>
+        <Fragment>
           {element ? "It also extends " : "Also takes the props of "}
           {others.map((entry, index) => (
-            <>
+            <Fragment>
               {index > 0 ? ", " : null}
               <code>{entry}</code>
-            </>
+            </Fragment>
           ))}
           .
-        </>
+        </Fragment>
       ) : null}
     </Note>
   );

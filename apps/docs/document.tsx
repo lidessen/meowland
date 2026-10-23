@@ -227,6 +227,24 @@ const CODE_ACTIONS = `(() => {
       setTimeout(() => { copy.textContent = label; }, 1600);
     });
   }
+  for (const button of document.querySelectorAll(".docs-install-copy")) {
+    const text = button.parentElement && button.parentElement.querySelector("span");
+    if (!text) continue;
+    button.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(text.textContent || "");
+        button.setAttribute("data-copied", "");
+        button.setAttribute("aria-label", "Copied");
+      } catch {
+        button.setAttribute("aria-label", "Copy failed");
+      }
+      setTimeout(() => {
+        button.removeAttribute("data-copied");
+        button.setAttribute("aria-label", "Copy install command");
+      }, 1600);
+    });
+    button.hidden = false;
+  }
   document.documentElement.setAttribute("data-docs-code-actions", "");
 })();`;
 

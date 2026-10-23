@@ -133,6 +133,8 @@ export const uiTokens = defineTokens("ui", {
     pageTitle: "24px",
     leading: "1.5714285714",
     /** Titles at `title` and above close up slightly. */
+    /** The smallest size iOS edits without zooming; a touch field never goes below it. */
+    touchField: "16px",
     trackingTight: "-0.01em",
     /** The small-caps group label. */
     trackingCaps: "0.04em",
@@ -197,6 +199,11 @@ export const uiTokens = defineTokens("ui", {
     sheet: ["12px 0 40px rgb(0 0 0 / 12%)", "12px 0 40px rgb(0 0 0 / 50%)"],
     /** A slider knob resting on its track. */
     knob: ["0 1px 2px rgb(0 0 0 / 16%)", "0 1px 2px rgb(0 0 0 / 40%)"],
+    /** A bar docked over scrolling content (the Assistant composer): a wide, faint drop. */
+    dock: [
+      "0 10px 15px -3px rgb(0 0 0 / 5%), 0 4px 6px -4px rgb(0 0 0 / 5%)",
+      "0 10px 24px -6px rgb(0 0 0 / 45%)",
+    ],
     /** Floating surfaces: a ring plus a deep, soft drop. */
     float: [
       "0 0 0 1px rgb(0 0 0 / 7%), 0 4px 10px -4px rgb(0 0 0 / 8%), 0 16px 36px -8px rgb(0 0 0 / 14%)",

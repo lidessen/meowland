@@ -17,5 +17,8 @@ export const assistantViewContract = {
     "section",
     "workDetail",
     "status",
+    "history",
+    "historyItem",
+    "historyTrigger",
   ],
 } as const;

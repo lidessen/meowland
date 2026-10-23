@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { navListContract } from "../../components/nav-list";
 
 const list = (part: (typeof navListContract.parts)[number]) => partSelector(navListContract, part);
@@ -70,8 +71,7 @@ export const navListStyles = css`
     cursor: pointer;
   }
   ${list("item")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
   ${list("item")}[aria-current="page"] {
     color: ${uiTokens.ink.primary};

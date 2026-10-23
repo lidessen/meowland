@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { chatReasoningContract } from "../../chat/reasoning";
 
 const part = (name: (typeof chatReasoningContract.parts)[number]) =>
@@ -36,8 +37,7 @@ export const chatReasoningStyles = css`
     color: ${uiTokens.ink.primary};
   }
   ${part("summary")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
     border-radius: ${uiTokens.radius.md};
   }
   ${part("icon")} {

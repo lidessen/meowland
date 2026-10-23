@@ -3,6 +3,7 @@ import { iconRailContract } from "../../components/icon-rail";
 import { railItemContract } from "../../components/rail-item";
 import { railSectionContract } from "../../components/rail-section";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 
 const rail = (part: (typeof iconRailContract.parts)[number]) =>
   partSelector(iconRailContract, part);
@@ -105,8 +106,7 @@ export const iconRailStyles = css`
     color: ${uiTokens.ink.primary};
   }
   ${item("root")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: -2px;
+    ${focusRing({ inset: true })}
   }
   ${item("root")}[aria-current="page"],
   ${section("root")}:has(${section("items")} ${item("root")}[aria-current="page"]) ${section("shortcut")} ${item("root")} {

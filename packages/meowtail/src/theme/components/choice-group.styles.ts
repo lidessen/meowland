@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { choiceGroupContract } from "../../components/choice-group";
 
 export const choiceGroupStyles = css`
@@ -54,8 +55,7 @@ export const choiceGroupStyles = css`
     background: ${uiTokens.accent.selected};
   }
   :where(${partSelector(choiceGroupContract, "option")}:has(input:focus-visible)) {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
   :where(${partSelector(choiceGroupContract, "option")}:has(input:disabled)) {
     color: ${uiTokens.ink.tertiary};

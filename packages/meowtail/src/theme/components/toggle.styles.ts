@@ -2,6 +2,7 @@ import { css, partSelector } from "meowcss/meowjsx";
 import { checkboxContract } from "../../components/checkbox";
 import { switchContract } from "../../components/switch";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 
 export const toggleStyles = css`
   :where(${partSelector(checkboxContract, "root")}, ${partSelector(switchContract, "root")}) {
@@ -57,8 +58,7 @@ export const toggleStyles = css`
     background: ${uiTokens.action.onPrimary};
   }
   :where(${partSelector(checkboxContract, "input")}:focus-visible, ${partSelector(switchContract, "input")}:focus-visible + ${partSelector(switchContract, "track")}) {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
   :where(${partSelector(checkboxContract, "root")}, ${partSelector(switchContract, "root")}):has(input:disabled) {
     cursor: default;

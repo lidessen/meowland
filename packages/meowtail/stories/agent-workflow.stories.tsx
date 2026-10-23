@@ -1,19 +1,8 @@
 import { h, signal, type Child } from "meowjsx";
 import { defineStory } from "meowbook";
-import {
-  Button,
-  DescriptionItem,
-  DescriptionList,
-  DiffBlock,
-  Grid,
-  Inline,
-  ResourceLink,
-  Stack,
-} from "meowtail";
-import { Measure } from "./specimen";
+import { Button, DiffBlock, Inline, ResourceLink, Stack, Text } from "meowtail";
 import {
   AssistantView,
-  ChatAttachments,
   ChatProcess,
   ChatQuestion,
   ChatSources,
@@ -43,6 +32,19 @@ const attachment = {
   url: "data:text/plain,Local%20fixture%20only.%20No%20external%20tool%20ran.",
 };
 
+const turn = (id: string, text: string): AssistantMessage => ({
+  id,
+  role: "user",
+  author: "You",
+  parts: [{ id: "text", kind: "text", text }],
+});
+const reply = (id: string, ...parts: AssistantMessage["parts"]): AssistantMessage => ({
+  id,
+  role: "assistant",
+  author: "Assistant",
+  parts,
+});
+
 /** A host fixture owns state and local scheduling; every visible surface is a public component. */
 export function agentWorkflowDemo(narrow = false): Child {
   const state = signal<ChatExecutionState>("running");
@@ -53,7 +55,7 @@ export function agentWorkflowDemo(narrow = false): Child {
     max: 5,
     label: "Checked 2 / 5 files · Host report",
   });
-  const reply = signal(
+  const publicReply = signal(
     "Public reply not received yet; execution is complete, which does not mean the reply failed.",
   );
   const answer = signal("Waiting for you to choose the check scope; no execution failed.");
@@ -72,230 +74,263 @@ export function agentWorkflowDemo(narrow = false): Child {
     }, 650);
     timers.add(timer);
   };
-  return (
-    <Measure width="wide">
-      <Stack
-        gap="relaxed"
-        style={narrow ? { maxWidth: "320px", width: "100%" } : undefined}
-        data-agent-workflow={narrow ? "narrow" : "wide"}
-        ref={() => () => {
-          alive = false;
-          timers.forEach(clearTimeout);
-        }}
+  const messages = signal<readonly AssistantMessage[]>([
+    turn("ask-layout", "Check the chat components for long content and narrow containers."),
+    reply(
+      "layout",
+      {
+        id: "intro",
+        kind: "text",
+        text: "I'll read the components first, then report what holds up in a narrow column.",
+      },
+      { id: "layout-task", kind: "text", text: "" },
+    ),
+    turn("ask-scope", "Should the review cover anything else?"),
+    reply(
+      "scope",
+      { id: "scope-intro", kind: "text", text: "One choice decides the next round." },
+      { id: "scope-task", kind: "text", text: "" },
+    ),
+    turn("ask-review", "Did the keyboard review come back?"),
+    reply(
+      "review",
+      {
+        id: "review-intro",
+        kind: "text",
+        text: "It finished executing. Its public reply has not arrived yet, which is a separate fact.",
+      },
+      { id: "review-task", kind: "text", text: "" },
+    ),
+    turn("ask-index", "And the index read that failed earlier?"),
+    reply(
+      "index",
+      {
+        id: "index-intro",
+        kind: "text",
+        text: "The read failed locally and can be retried. The extra network search was canceled before it sent anything.",
+      },
+      { id: "index-tools", kind: "text", text: "" },
+    ),
+  ]);
+  const custom: Record<string, () => Child> = {
+    "layout-task": () => (
+      <ChatTask
+        title="Check component layout"
+        state={state}
+        statusLabel={status}
+        description="Public summary: check the reading axis, long content and action reachability."
+        progress={progress}
       >
-        <Stack gap="compact">
-          <strong>Concurrent execution · Public progress</strong>
-          <span>
-            One task is progressing, one needs your answer, and one finished executing but has not
-            reported back.
-          </span>
-          <Inline>
-            <Button
-              variant="outline"
-              size="small"
-              onClick={() => {
-                state.value = "running";
-                status.value = "Checking file 3";
-                output.value = `${output.value ?? ""}\nNew result: New content arrived; the expanded state is kept by native details.`;
-                progress.value = { value: 3, max: 5, label: "Checked 3 / 5 files · Host report" };
-              }}
-            >
-              Advance the check
-            </Button>
-            <Button
-              variant="quiet"
-              size="small"
-              onClick={() => {
-                state.value = "unknown";
-                status.value = "Connection lost · Keep the last known result";
-                progress.value = undefined;
-                feedback.value =
-                  "A lost connection is not an execution failure; old output is kept and the current progress is unknown.";
-              }}
-            >
-              Simulate connection loss
-            </Button>
-          </Inline>
-        </Stack>
-        <Grid columns="auto" minColumnWidth="wide" align="stretch">
-          <ChatTask
-            title="Check component layout"
-            state={state}
-            statusLabel={status}
-            description="Public summary: check the reading axis, long content and action reachability."
-            progress={progress}
-            footer={
-              <span>Execution facts come from the host; not all checks are declared passing.</span>
-            }
-          >
-            <ChatToolCall
-              label="Read file"
-              summary="chat/agent-workflow-with-a-very-long-unbroken-file-name.tsx"
-              state={state}
-              statusLabel={status}
-              input={payload}
-              output={output}
-              outputSummary="Returned 24 records; expand all output and copy the raw text."
-              maxLines={4}
-              collapsible
-              open
-              onCancel={() => {
-                state.value = "cancelled";
-                status.value = "Canceled further checks; existing output is kept";
-                progress.value = undefined;
-              }}
-            />
-            <ChatToolCall
-              label="Generate check report"
-              summary="Waiting for the file check to finish"
-              state="queued"
-              statusLabel="Queued · Not started yet"
-              input="Summarize only confirmed findings."
-              collapsible
-            />
-          </ChatTask>
-          <ChatTask
-            title="Confirm check scope"
-            state={waiting}
-            statusLabel={answer}
-            executionText="Execution paused, waiting for the user's answer."
-            footer={
-              <span>
-                The choice only updates the example; the host decides authorization policy.
-              </span>
-            }
-          >
-            <ChatQuestion
-              question="Which areas should this round check?"
-              questionId={narrow ? "agent-scope-narrow" : "agent-scope-wide"}
-              description="This is an ordinary scope choice; it stays waiting until answered."
-              actions={
-                <Inline gap="compact">
-                  <Button
-                    size="small"
-                    onClick={() => {
-                      waiting.value = "queued";
-                      answer.value = "Scope received: Tools and tasks · Waiting for scheduling";
-                    }}
-                  >
-                    Tools and tasks
-                  </Button>
-                  <Button
-                    size="small"
-                    variant="outline"
-                    onClick={() => {
-                      waiting.value = "cancelled";
-                      answer.value = "The user canceled this scope confirmation";
-                    }}
-                  >
-                    Cancel confirmation
-                  </Button>
-                </Inline>
-              }
-            />
-          </ChatTask>
-          <ChatTask
-            title="Delegated: Independent keyboard review"
-            state="success"
-            statusLabel="Succeeded · Waiting for public reply"
-            executionText="The delegated execution returned and checked 5 interaction entry points."
-            replyText={reply}
-            footer={
+        <ChatToolCall
+          label="Read file"
+          summary="chat/agent-workflow-with-a-very-long-unbroken-file-name.tsx"
+          state={state}
+          statusLabel={status}
+          input={payload}
+          output={output}
+          outputSummary="Returned 24 records; expand all output and copy the raw text."
+          maxLines={4}
+          collapsible
+          onCancel={() => {
+            state.value = "cancelled";
+            status.value = "Canceled further checks; existing output is kept";
+            progress.value = undefined;
+          }}
+        />
+        <ChatToolCall
+          label="Generate check report"
+          summary="Waiting for the file check to finish"
+          state="queued"
+          statusLabel="Queued · Not started yet"
+          input="Summarize only confirmed findings."
+          collapsible
+        />
+      </ChatTask>
+    ),
+    "scope-task": () => (
+      <ChatTask
+        title="Confirm check scope"
+        state={waiting}
+        statusLabel={answer}
+        executionText="Execution paused, waiting for the user's answer."
+      >
+        <ChatQuestion
+          question="Which areas should this round check?"
+          questionId={narrow ? "agent-scope-narrow" : "agent-scope-wide"}
+          description="This is an ordinary scope choice; it stays waiting until answered."
+          actions={
+            <Inline gap="compact">
               <Button
-                variant="outline"
                 size="small"
                 onClick={() => {
-                  reply.value =
-                    "Public reply received: the keyboard check is complete, with the review record attached.";
+                  waiting.value = "queued";
+                  answer.value = "Scope received: Tools and tasks · Waiting for scheduling";
                 }}
               >
-                Receive public reply
+                Tools and tasks
               </Button>
-            }
+              <Button
+                size="small"
+                variant="outline"
+                onClick={() => {
+                  waiting.value = "cancelled";
+                  answer.value = "The user canceled this scope confirmation";
+                }}
+              >
+                Cancel confirmation
+              </Button>
+            </Inline>
+          }
+        />
+      </ChatTask>
+    ),
+    "review-task": () => (
+      <ChatTask
+        title="Delegated: Independent keyboard review"
+        state="success"
+        statusLabel="Succeeded · Waiting for public reply"
+        executionText="The delegated execution returned and checked 5 interaction entry points."
+        replyText={publicReply}
+        footer={
+          <Button
+            variant="outline"
+            size="small"
+            onClick={() => {
+              publicReply.value =
+                "Public reply received: the keyboard check is complete, with the review record attached.";
+            }}
           >
-            <ChatProcess label="Subtask record · 1 item">
-              <ChatTask
-                title="Check focus order"
-                state="success"
-                statusLabel="Succeeded"
-                executionText="Tab, Shift+Tab and expandable controls were checked."
-              />
-            </ChatProcess>
-          </ChatTask>
-        </Grid>
-        <ChatProcess label="Other activity · Retryable errors and explicit cancellation">
-          <Stack gap="compact">
-            <ChatToolCall
-              label="Read local index"
-              state={retryState}
-              statusLabel={retryStatus}
-              input="index.json"
-              output="Last confirmed result retained."
-              collapsible
-              onRetry={() => {
-                retryState.value = "running";
-                retryStatus.value = "Retrying the local simulation";
-                later(() => {
-                  retryState.value = "success";
-                  retryStatus.value = "Local simulation retry succeeded";
-                });
-              }}
-            />
-            <ChatToolCall
-              label="Extra network search"
-              state="cancelled"
-              statusLabel="Canceled · No network request was sent"
-              outputSummary="Cancellation is a separate fact and is not shown as an execution error."
-              collapsible
-            />
-          </Stack>
+            Receive public reply
+          </Button>
+        }
+      >
+        <ChatProcess label="Subtask record · 1 item">
+          <ChatTask
+            title="Check focus order"
+            state="success"
+            statusLabel="Succeeded"
+            executionText="Tab, Shift+Tab and expandable controls were checked."
+          />
         </ChatProcess>
-        <ChatProcess label="Plan, artifacts and optional metadata">
-          <Stack>
-            <ol aria-label="Public plan">
-              <li>Check layout and long content: In progress</li>
-              <li>
-                Collect independent keyboard review: Execution complete, waiting for public reply
-              </li>
-              <li>Organize artifacts: Queued</li>
-            </ol>
-            <DescriptionList aria-label="Host-provided metadata">
-              <DescriptionItem term="Last updated">10:42 · Fixed example time</DescriptionItem>
-              <DescriptionItem term="Usage">
-                Input 1,240 / output 320 tokens · Example data
-              </DescriptionItem>
-            </DescriptionList>
-            <ResourceLink
-              title="Component review record"
-              detail="Local example artifact · Click only shows a notice"
-              onClick={() => {
-                feedback.value =
-                  "The host received the intent to open the review record; the example loaded no file.";
-              }}
-            />
-            <ChatAttachments items={[attachment]} />
-            <DiffBlock
-              files={[
-                {
-                  path: "layout-example.tsx",
-                  lines: [
-                    { kind: "removed", text: '<div className="custom-row">' },
-                    { kind: "added", text: '<Inline gap="compact" align="baseline">' },
-                    { kind: "context", text: "  Keep content and actions on one reading axis." },
-                  ],
-                },
-              ]}
-            />
-          </Stack>
-        </ChatProcess>
-        <span role="status">{feedback}</span>
+      </ChatTask>
+    ),
+    "index-tools": () => (
+      <Stack gap="compact">
+        <ChatToolCall
+          label="Read local index"
+          state={retryState}
+          statusLabel={retryStatus}
+          input="index.json"
+          output="Last confirmed result retained."
+          collapsible
+          onRetry={() => {
+            retryState.value = "running";
+            retryStatus.value = "Retrying the local simulation";
+            later(() => {
+              retryState.value = "success";
+              retryStatus.value = "Local simulation retry succeeded";
+            });
+          }}
+        />
+        <ChatToolCall
+          label="Extra network search"
+          state="cancelled"
+          statusLabel="Canceled · No network request was sent"
+          outputSummary="Cancellation is a separate fact and is not shown as an execution error."
+          collapsible
+        />
+        <ResourceLink
+          title="Component review record"
+          detail="Local example artifact · Click only shows a notice"
+          onClick={() => {
+            feedback.value =
+              "The host received the intent to open the review record; the example loaded no file.";
+          }}
+        />
+        <DiffBlock
+          files={[
+            {
+              path: "layout-example.tsx",
+              lines: [
+                { kind: "removed", text: '<div className="custom-row">' },
+                { kind: "added", text: '<Inline gap="compact" align="baseline">' },
+                { kind: "context", text: "  Keep content and actions on one reading axis." },
+              ],
+            },
+          ]}
+        />
       </Stack>
-    </Measure>
+    ),
+  };
+  const draft = signal<AssistantDraft>({ text: "", attachments: [] });
+  return (
+    <Stack
+      gap="compact"
+      style={{
+        height: "min(900px, calc(100dvh - 104px))",
+        minHeight: "480px",
+        ...(narrow ? { maxWidth: "320px", width: "100%" } : {}),
+      }}
+      data-agent-workflow={narrow ? "narrow" : "wide"}
+      ref={() => () => {
+        alive = false;
+        timers.forEach(clearTimeout);
+      }}
+    >
+      <Inline gap="compact">
+        <Button
+          variant="outline"
+          size="small"
+          onClick={() => {
+            state.value = "running";
+            status.value = "Checking file 3";
+            output.value = `${output.value ?? ""}\nNew result: New content arrived; the expanded state is kept by native details.`;
+            progress.value = { value: 3, max: 5, label: "Checked 3 / 5 files · Host report" };
+          }}
+        >
+          Advance the check
+        </Button>
+        <Button
+          variant="quiet"
+          size="small"
+          onClick={() => {
+            state.value = "unknown";
+            status.value = "Connection lost · Keep the last known result";
+            progress.value = undefined;
+            feedback.value =
+              "A lost connection is not an execution failure; old output is kept and the current progress is unknown.";
+          }}
+        >
+          Simulate connection loss
+        </Button>
+        <Text variant="caption" as="span" role="status">
+          {feedback}
+        </Text>
+      </Inline>
+      <AssistantView
+        title="Agent workflow"
+        description="Concurrent execution and public progress · Local data"
+        messages={messages}
+        draft={draft}
+        onDraftChange={(next) => {
+          draft.value = next;
+        }}
+        onSubmit={(snapshot) => {
+          messages.value = [...messages.value, turn(`ask-${messages.value.length}`, snapshot.text)];
+          return { accepted: true };
+        }}
+        onMessageAction={(id, action) => {
+          feedback.value = `The host received "${action}" for ${id}; nothing is sent.`;
+        }}
+        renderPart={(part) => custom[part.id]?.()}
+      />
+    </Stack>
   );
 }
 
 export function agentAssistantDemo(): Child {
   const messages = signal<readonly AssistantMessage[]>([
+    turn("ask-check", "Check the shared components and tell me what still needs a decision."),
     {
       id: "agent-run",
       role: "assistant",
@@ -388,7 +423,9 @@ export function agentAssistantDemo(): Child {
           size="small"
           variant="outline"
           onClick={() => {
-            const part = messages.value[0]?.parts.find((item) => item.id === "inspect-tool");
+            const part = messages.value
+              .flatMap((message) => message.parts)
+              .find((item) => item.id === "inspect-tool");
             if (part?.kind !== "tool") return;
             patchTool("inspect-tool", {
               output: `${part.output ?? ""}\nNew output: A text update <img src=x onerror=alert(1)> stays inert.`,
@@ -460,6 +497,7 @@ export function agentAssistantDemo(): Child {
               : question,
           );
         }}
+        onMessageAction={() => {}}
         onToolAction={(_messageId, partId, action) => {
           if (action === "cancel") {
             patchTool(partId, {

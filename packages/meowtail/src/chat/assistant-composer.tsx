@@ -1,4 +1,4 @@
-import { defineComponent, derived, h, isSignal, unwrap } from "meowjsx";
+import { defineComponent, derived, h, isSignal, unwrap, type Child } from "meowjsx";
 import { ChatComposer } from "./composer";
 import { ChatAttachments } from "./attachments";
 import { IconButton } from "../components/icon-button";
@@ -16,10 +16,10 @@ export const assistantComposerContract = {
   parts: ["root", "choices", "feedback", "file"],
 } as const;
 export const AssistantComposer = defineComponent<
-  { options: AssistantViewProps },
+  { options: AssistantViewProps; trailing?: Child },
   "assistant-composer",
   (typeof assistantComposerContract.parts)[number]
->(assistantComposerContract, ({ options }, context) => {
+>(assistantComposerContract, ({ options, trailing }, context) => {
   const assistantCopy = { ...defaultAssistantCopy, ...options.labels };
   const controlled = options.draft !== undefined;
   if (controlled && !options.onDraftChange && !options.readOnly)
@@ -148,12 +148,14 @@ export const AssistantComposer = defineComponent<
         })
       : null,
     options.composerTrailing,
+    trailing,
   );
   return context.part(
     "root",
     "div",
     null,
     h(ChatComposer, {
+      layout: "bar",
       value: text,
       placeholder: assistantCopy.placeholder,
       inputLabel: assistantCopy.composer,

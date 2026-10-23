@@ -23,6 +23,7 @@ export {
   type AssistantAttachment,
   type AssistantMessage,
   type AssistantMessagePart,
+  type AssistantMessageAction,
   type AssistantToolPart,
   type AssistantTaskPart,
   type AssistantProcessStep,

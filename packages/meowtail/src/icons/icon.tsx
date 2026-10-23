@@ -11,6 +11,7 @@ import {
   ChevronDown,
   ChevronLeft,
   ChevronRight,
+  Check,
   ChevronUp,
   Copy,
   ExternalLink,
@@ -39,6 +40,8 @@ import {
   ShieldCheck,
   Square,
   Terminal,
+  ThumbsDown,
+  ThumbsUp,
   Timer,
   UserRound,
   Wrench,
@@ -108,6 +111,9 @@ const shapes = {
   timer: () => renderNodes(Timer),
   database: () => renderNodes(Database),
   history: () => renderNodes(History),
+  check: () => renderNodes(Check),
+  "thumbs-up": () => renderNodes(ThumbsUp),
+  "thumbs-down": () => renderNodes(ThumbsDown),
 };
 
 export type IconName = keyof typeof shapes;

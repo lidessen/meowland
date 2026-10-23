@@ -117,6 +117,8 @@ export interface AssistantChoice {
   disabled?: boolean;
 }
 
+export type AssistantMessageAction = "good" | "bad" | "regenerate";
+
 export interface AssistantViewProps extends Props {
   title?: string;
   description?: string;
@@ -152,6 +154,10 @@ export interface AssistantViewProps extends Props {
   onDismissQuestion?: (questionId: string) => void;
   /** An explicit host intent. The host owns availability, execution and subsequent state. */
   onToolAction?: (messageId: string, partId: string, action: "retry" | "cancel") => void;
+  /** Feedback and regeneration intents on a finished reply; supplying it shows those actions. Copy is built in. */
+  onMessageAction?: (messageId: string, action: AssistantMessageAction) => void;
+  /** The column of the reader's own messages over the transcript; on by default. */
+  history?: boolean;
   onRefreshWork?: (workId: string) => void;
   onLoadOlder?: () => void;
   loadingOlder?: MaybeSignal<boolean>;
@@ -203,6 +209,13 @@ export const assistantCopy = {
   workUnavailable: "These details are no longer available.",
   refresh: "Refresh details",
   details: "Details",
+  copy: "Copy reply",
+  copied: "Copied",
+  good: "Good response",
+  bad: "Bad response",
+  regenerate: "Regenerate",
+  history: "Your messages",
+  closeHistory: "Close your messages",
 } as const;
 
 export type AssistantLabels = { readonly [Key in keyof typeof assistantCopy]: string };

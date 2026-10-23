@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { breadcrumbContract } from "../../components/breadcrumb";
 
 export const breadcrumbStyles = css`
@@ -31,8 +32,7 @@ export const breadcrumbStyles = css`
     color: ${uiTokens.ink.primary};
   }
   ${partSelector(breadcrumbContract, "link")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
   ${partSelector(breadcrumbContract, "current")} {
     color: ${uiTokens.ink.primary};

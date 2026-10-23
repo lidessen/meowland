@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { chatAttachmentsContract } from "../../chat/attachments";
 import { chatComposerContract, chatComposerOptions } from "../../chat/composer";
 import { chatFrameContract } from "../../chat/frame";
@@ -184,8 +185,7 @@ export const chatComposerStyles = css`
   }
 
   ${partSelector(chatComposerContract, "submit")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
 
   ${partSelector(chatComposerContract, "input")}:focus-visible {
@@ -193,8 +193,7 @@ export const chatComposerStyles = css`
   }
 
   ${partSelector(chatComposerContract, "surface")}:has(${partSelector(chatComposerContract, "input")}:focus-visible) {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: -2px;
+    ${focusRing({ inset: true })}
   }
 
   @supports (field-sizing: content) {
@@ -353,7 +352,7 @@ export const chatComposerStyles = css`
 
   @media (pointer: coarse) {
     ${partSelector(chatComposerContract, "input")} {
-      font-size: max(16px, ${uiTokens.type.body});
+      font-size: max(${uiTokens.type.touchField}, ${uiTokens.type.body});
     }
   }
 
@@ -471,8 +470,7 @@ export const chatComposerStyles = css`
       grid-row: 2;
       min-height: 36px;
       padding: 6px 4px;
-      /* iOS zooms into a text control below 16px. */
-      font-size: 16px;
+      font-size: ${uiTokens.type.touchField};
       line-height: 24px;
     }
 
@@ -523,5 +521,97 @@ export const chatComposerStyles = css`
     border-radius: 0;
     background: transparent;
     box-shadow: none;
+  }
+
+  /* Bar: one rounded row (attach, text, trailing choices, send) that grows with the draft. */
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] > ${partSelector(chatComposerContract, "surface")} {
+    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    align-items: end;
+    gap: 0 ${uiTokens.space.group};
+    padding: 6px;
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${chatTokens.composerRadius};
+  }
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "attachments")} {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    padding: 4px 4px ${uiTokens.space.group};
+  }
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "input")} {
+    grid-column: 2;
+    grid-row: 2;
+    min-height: ${uiTokens.control.regular};
+    padding: 6px 4px;
+    line-height: 24px;
+  }
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "actions")} {
+    display: contents;
+  }
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(iconButtonContract, "root")},
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "trailing")} ${partSelector(iconButtonContract, "root")} {
+    width: ${uiTokens.control.regular};
+    height: ${uiTokens.control.regular};
+    min-width: ${uiTokens.control.regular};
+    min-height: ${uiTokens.control.regular};
+    border: 0;
+    border-radius: 50%;
+    corner-shape: round;
+    background: transparent;
+    color: ${uiTokens.ink.secondary};
+  }
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(iconButtonContract, "root")} {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  @media (hover: hover) {
+    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(iconButtonContract, "root")}:hover:not(:disabled),
+    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "trailing")} ${partSelector(iconButtonContract, "root")}:hover:not(:disabled) {
+      background: ${uiTokens.state.hover};
+      color: ${uiTokens.ink.primary};
+    }
+  }
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "trailing")} {
+    grid-column: 3;
+    grid-row: 2;
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    min-width: 0;
+    min-height: ${uiTokens.control.regular};
+  }
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "submit")} {
+    grid-column: 4;
+    grid-row: 2;
+    width: ${uiTokens.control.regular};
+    height: ${uiTokens.control.regular};
+    min-width: ${uiTokens.control.regular};
+    min-height: ${uiTokens.control.regular};
+    margin: 0;
+    border-radius: 50%;
+    corner-shape: round;
+    background: ${uiTokens.action.primary};
+    color: ${uiTokens.action.onPrimary};
+    transform: none;
+  }
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "submit")}:disabled {
+    opacity: 0.35;
+  }
+  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] > ${partSelector(chatComposerContract, "hint")} {
+    position: static;
+    width: auto;
+    height: auto;
+    padding-inline: ${uiTokens.space.section};
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
+  }
+  /* In a narrow container the choices take a quiet row under the text. */
+  @container (max-width: 480px) {
+    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "trailing")}:has(${partSelector(choiceSelectContract, "trigger")}:not([hidden])) {
+      grid-column: 2 / 4;
+      grid-row: 3;
+    }
   }
 `;

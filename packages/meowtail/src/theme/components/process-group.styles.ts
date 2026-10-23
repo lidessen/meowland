@@ -2,6 +2,7 @@ import { css, partSelector } from "meowcss/meowjsx";
 import { processGroupContract } from "../../components/process-group";
 import { processStepContract } from "../../components/process-step";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 
 const group = (part: (typeof processGroupContract.parts)[number]) =>
   partSelector(processGroupContract, part);
@@ -39,8 +40,7 @@ export const processGroupStyles = css`
     background: ${uiTokens.state.hover};
   }
   ${group("summary")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: -2px;
+    ${focusRing({ inset: true })}
   }
   ${group("chevron")} {
     display: grid;

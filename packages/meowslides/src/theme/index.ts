@@ -1,5 +1,10 @@
 import { defineTheme } from "meowcss/meowjsx";
-import { standardOptions, standardThemeTokens, standardThemeStyles } from "meowtail/theme";
+import {
+  standardFoundationStyles,
+  standardOptions,
+  standardThemeTokens,
+  standardThemeStyles,
+} from "meowtail/theme";
 import { mdxSlideStyles } from "./mdx.styles";
 import { presentationStyles } from "./presentation/presentation.styles";
 import { presentationLayoutStyles } from "./presentation/layout.styles";
@@ -12,12 +17,14 @@ export { presentationTokens } from "./presentation/presentation.tokens";
 /** The same options object as Meowtail's standard theme, including local scheme inheritance. */
 export const presentationOptions = standardOptions;
 export const presentationThemeTokens = [...standardThemeTokens, presentationTokens] as const;
+// The floor comes first, so presentation rules placed before the standard families still win their ties.
 export const presentationThemeStyles = [
+  standardFoundationStyles,
   presentationStyles,
   presentationLayoutStyles,
   presentationTextStyles,
   presentationListStyles,
-  ...standardThemeStyles,
+  ...standardThemeStyles.filter((fragment) => fragment !== standardFoundationStyles),
   presentationImageStyles,
   mdxSlideStyles,
 ] as const;

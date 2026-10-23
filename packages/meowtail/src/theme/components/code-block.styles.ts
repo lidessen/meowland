@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { codeBlockContract } from "../../components/code-block.contract";
 
 export const codeBlockStyles = css`
@@ -88,8 +89,7 @@ export const codeBlockStyles = css`
     display: none;
   }
   ${partSelector(codeBlockContract, "content")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: -2px;
+    ${focusRing({ inset: true })}
   }
 
   @media (pointer: coarse) {

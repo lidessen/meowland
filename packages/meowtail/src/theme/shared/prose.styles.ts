@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { proseContract, proseOptions } from "../../components/prose";
 import { chatMessageContract } from "../../chat/message";
 import { chatBubbleContract } from "../../chat/bubble";
@@ -96,8 +97,7 @@ export const proseStyles = css`
     overflow-wrap: normal;
   }
   ${scope} > :where(pre:focus-visible) {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
   ${scope} > :where(blockquote) {
     padding-inline-start: ${uiTokens.space.section};

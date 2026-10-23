@@ -86,3 +86,44 @@ test("narrow assistant keeps independent task facts, keyboard disclosure and dra
     true,
   );
 });
+
+test("your messages gather over the transcript and jump back to the chosen turn", async ({
+  page,
+}) => {
+  await page.goto("/canvas.html?story=agent-workflow");
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  // The trigger's name follows its state (Your messages / Close your messages).
+  const trigger = page.locator('[data-meowui-part="assistant-view/historyTrigger"] button');
+  const column = page.getByRole("navigation", { name: "Your messages", exact: true });
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await expect(trigger).toHaveAccessibleName("Your messages");
+  await trigger.click();
+  await expect(trigger).toHaveAttribute("aria-expanded", "true");
+  await expect(trigger).toHaveAccessibleName("Close your messages");
+  await expect(column.getByRole("button")).toHaveText([
+    "Check the chat components for long content and narrow containers.",
+    "Should the review cover anything else?",
+    "Did the keyboard review come back?",
+    "And the index read that failed earlier?",
+  ]);
+  await expect(column.getByRole("button").last()).toBeFocused();
+  await page.keyboard.press("Escape");
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await expect(trigger).toBeFocused();
+  const before = await page.evaluate(() => scrollY);
+  await trigger.click();
+  await column.getByRole("button", { name: "Should the review cover anything else?" }).click();
+  await expect(trigger).toHaveAttribute("aria-expanded", "false");
+  await expect(page.locator('[data-assistant-message-id="ask-scope"]')).toBeInViewport();
+  // Only the transcript scrolls; the host page keeps its position.
+  expect(await page.evaluate(() => scrollY)).toBe(before);
+});
+
+test("a finished reply offers copy and the host's feedback intents", async ({ page }) => {
+  await page.goto("/canvas.html?story=agent-workflow");
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  const reply = page.locator('[data-assistant-message-id="index"]');
+  await expect(reply.getByRole("button", { name: "Copy reply", exact: true })).toBeVisible();
+  await reply.getByRole("button", { name: "Good response", exact: true }).click();
+  await expect(page.getByRole("status").first()).toContainText('"good" for index');
+});

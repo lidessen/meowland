@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing, surface } from "../recipes";
 import { cardContract, cardOptions } from "../../components/card";
 import { cardActionContract } from "../../components/card-action";
 import { cardContentContract } from "../../components/card-content";
@@ -14,19 +15,13 @@ ${partSelector(cardContract, "root")} {
   min-width: 0;
   padding: ${uiTokens.space.panel};
   /* The in-flow surface every bordered container shares: raised layer on the edge hairline. */
-  border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
-  border-radius: ${uiTokens.radius.xl};
-  background: ${uiTokens.surface.raised};
-  box-shadow: ${uiTokens.shadow.raised};
-  --meowui-focus-halo: ${uiTokens.surface.raised};
-  color: ${uiTokens.ink.primary};
+  ${surface("raised")}
   font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
 }
 
 /* Embedded groups share their parent's surface; callers choose the relationship. */
 button${partSelector(cardContract, "root")}:focus-visible {
-  outline: 2px solid ${uiTokens.state.focus};
-  outline-offset: 2px;
+  ${focusRing()}
 }
 
 :where(${partSelector(cardContract, "root")}:is([${cardOptions.attribute("variant")}="embedded"], [${cardOptions.attribute("variant")}="auto"]:not([data-card-depth="0"]))) {

@@ -1,5 +1,6 @@
 import { css } from "meowcss/meowjsx";
 import { logoTokens, uiTokens } from "./tokens";
+import { focusRing } from "./recipes";
 
 export const cornerShapeStyles = css`
   @supports (corner-shape: superellipse(1.5)) {
@@ -11,13 +12,36 @@ export const cornerShapeStyles = css`
   }
 `;
 
-/* Native controls default to the browser's own font (13.33px). A library
-   control inherits its surroundings unless its family sets a size. Zero
-   specificity and first in the theme, so every family rule overrides it. */
-export const controlFontStyles = css`
-  :where(button, input, select, textarea, optgroup):where([data-meowui-part]) {
+/* The floor for anything inside a Meowland region, library part or host element:
+   border-box sizing, media that never overflows its column, code in the mono
+   face, controls in the surrounding type and one keyboard focus outline. It
+   is first in the theme and has zero specificity, so every family rule and
+   every host rule overrides it. It deliberately resets no margins, headings or
+   lists: copy and long-form reading take Text and Prose instead. */
+export const foundationStyles = css`
+  :where(
+    [data-meowui-theme-root="meowui"],
+    [data-meowui-theme-root="meowui"] *,
+    [data-meowui-theme-root="meowui"] ::before,
+    [data-meowui-theme-root="meowui"] ::after
+  ) {
+    box-sizing: border-box;
+  }
+  :where([data-meowui-theme-root="meowui"] :is(img, video)) {
+    max-width: 100%;
+  }
+  :where([data-meowui-theme-root="meowui"] :is(img, video):not([height])) {
+    height: auto;
+  }
+  :where([data-meowui-theme-root="meowui"] :is(code, kbd, samp, pre)) {
+    font-family: ${uiTokens.type.mono};
+  }
+  :where([data-meowui-theme-root="meowui"] :is(button, input, select, textarea, optgroup)) {
     font: inherit;
     letter-spacing: inherit;
+  }
+  :where([data-meowui-theme-root="meowui"] :focus-visible) {
+    ${focusRing()}
   }
 `;
 

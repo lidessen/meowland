@@ -1,6 +1,7 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { regionLayoutContract } from "../../components/region-layout";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 
 export const regionLayoutStyles = css`
   ${partSelector(regionLayoutContract, "root")} {
@@ -52,7 +53,6 @@ export const regionLayoutStyles = css`
     cursor: pointer;
   }
   ${partSelector(regionLayoutContract, "back")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: -2px;
+    ${focusRing({ inset: true })}
   }
 `;

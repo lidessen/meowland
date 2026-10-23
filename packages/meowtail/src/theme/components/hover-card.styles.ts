@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { hoverCardContract } from "../../components/hover-card";
 import { popoverContract } from "../../components/popover";
 
@@ -38,8 +39,7 @@ export const hoverCardStyles = css`
     text-underline-offset: 3px;
   }
   ${partSelector(hoverCardContract, "content")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: -2px;
+    ${focusRing({ inset: true })}
     border-radius: ${uiTokens.radius.md};
   }
   ${partSelector(hoverCardContract, "feedback")} {

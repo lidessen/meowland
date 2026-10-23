@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { codeHighlightTokens } from "../shared/code-highlight.tokens";
 import { jsonTreeContract as json } from "../../components/json-tree";
 import { jsonBlockContract as block } from "../../components/json-block.contract";
@@ -123,8 +124,7 @@ export const jsonStyles = css`
     font: ${uiTokens.type.label}/20px ${uiTokens.type.sans};
   }
   ${partSelector(json, "copy")}:focus-visible, ${partSelector(json, "summary")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
 
   /* Native summaries draw the same rotating chevron as Disclosure. */

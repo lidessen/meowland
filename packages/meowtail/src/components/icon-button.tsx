@@ -1,6 +1,6 @@
 import { defineOptions } from "meowcss";
 import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
-import { defineComponent, type Props } from "meowjsx";
+import { defineComponent, type MaybeSignal, type Props } from "meowjsx";
 
 export const iconButtonOptions = defineOptions("icon-button", {
   size: ["small", "default", "large"],
@@ -13,7 +13,8 @@ export const iconButtonContract = {
 } as const satisfies StyledComponentContract;
 
 export interface IconButtonProps extends Props, ThemedProps<typeof iconButtonOptions> {
-  label: string;
+  /** The accessible name; a Signal keeps it live (e.g. Copy → Copied). */
+  label: MaybeSignal<string>;
   className?: string;
 }
 

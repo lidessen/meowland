@@ -70,6 +70,13 @@ Importing the module itself does not touch the DOM, automatically register compo
 `data-meowui-*` is kept as the existing marker shared by CSS, static HTML and adapters; it carries no product data or permissions.
 The MeowUI standard theme and Meowpress's own theme reuse the same generation mechanism, with concrete visual parameters held by each consumer.
 
+## Auditing CSS
+
+`auditCSS(input, rules, { allow })` reads every declaration in CSS text or a fragment (nested rules
+and at-rules included, comments and custom property definitions skipped) and returns the ones an
+`AuditRule` flags, with the property, value, selector and line. The root knows no scale: a consumer
+supplies the rules (Meowtail's are `standardAuditRules`), and `allow` accepts a deliberate exception.
+
 ## Verification
 
 - `bun test packages/meowcss/tests/unit` verifies pure generation, typed parts, carriers, cross-entry token identity and theme lifecycle.

@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { codeHighlightTokens } from "../shared/code-highlight.tokens";
 import { outputBlockContract as block } from "../../components/output-block";
 import { readBlockContract as read } from "../../components/read-block.contract";
@@ -68,8 +69,7 @@ export const outputBlockStyles = css`
     display: none;
   }
   ${partSelector(block, "actions")}:focus-visible, ${partSelector(block, "toggle")}:focus-visible, ${partSelector(block, "body")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: -2px;
+    ${focusRing({ inset: true })}
   }
   ${partSelector(read, "number")} {
     display: inline-block;

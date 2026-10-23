@@ -31,17 +31,20 @@ test("the complete Assistant keeps attachment, short draft and send on one mobil
         choices: measure(element.querySelector('[data-meowui-part="chat-composer/trailing"]')!),
       };
     });
+    // One writing row at every width: attach, short draft and send share a center line.
     expect(geometry.attach.left).toBeGreaterThanOrEqual(geometry.composer.left);
     expect(geometry.send.right).toBeLessThanOrEqual(geometry.composer.right);
+    expect(Math.abs(geometry.attach.center - geometry.input.center)).toBeLessThan(1);
+    expect(Math.abs(geometry.send.center - geometry.input.center)).toBeLessThan(1);
+    expect(geometry.attach.right).toBeLessThanOrEqual(geometry.input.left);
     if (viewport.width === 390) {
-      expect(Math.abs(geometry.attach.center - geometry.input.center)).toBeLessThan(1);
-      expect(Math.abs(geometry.send.center - geometry.input.center)).toBeLessThan(1);
-      expect(geometry.attach.right).toBeLessThanOrEqual(geometry.input.left);
+      // A narrow container gives the model choices a quiet row under the text.
       expect(geometry.input.right).toBeLessThanOrEqual(geometry.send.left);
       expect(geometry.choices.top).toBeGreaterThanOrEqual(geometry.input.bottom);
     } else {
-      expect(geometry.attach.top).toBeGreaterThanOrEqual(geometry.input.bottom);
-      expect(Math.abs(geometry.attach.center - geometry.send.center)).toBeLessThan(1);
+      // A wide one keeps them on the row, between the draft and send.
+      expect(geometry.input.right).toBeLessThanOrEqual(geometry.choices.left);
+      expect(geometry.choices.right).toBeLessThanOrEqual(geometry.send.left);
     }
   }
 });

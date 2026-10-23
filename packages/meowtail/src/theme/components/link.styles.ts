@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { linkContract } from "../../components/link";
 
 const root = partSelector(linkContract, "root");
@@ -22,8 +23,7 @@ export const linkStyles = css`
     text-decoration-color: ${uiTokens.ink.primary};
   }
   ${root}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
     border-radius: ${uiTokens.radius.xs};
   }
   @media (prefers-reduced-motion: reduce) {

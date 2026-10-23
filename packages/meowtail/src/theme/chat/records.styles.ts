@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { chatProcessContract } from "../../chat/process";
 import { chatSourcesContract } from "../../chat/sources";
 import { chatToolCallContract } from "../../chat/tool-call";
@@ -242,8 +243,7 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatProcessContract, "summary")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
 
   /* A group's contents belong to its row, so they hang under its label instead of lining up
@@ -518,8 +518,7 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatSourcesContract, "summary")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] > ${partSelector(chatToolCallContract, "header")}:focus-visible {
@@ -527,8 +526,7 @@ export const chatRecordsStyles = css`
   }
 
   ${partSelector(chatToolCallContract, "header")}:focus-visible > ${partSelector(chatToolCallContract, "chevron")} {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
     border-radius: ${uiTokens.radius.xs};
   }
 

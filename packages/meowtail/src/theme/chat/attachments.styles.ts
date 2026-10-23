@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { chatAttachmentsContract } from "../../chat/attachments";
 import { chatComposerContract } from "../../chat/composer";
 
@@ -150,8 +151,7 @@ export const chatAttachmentsStyles = css`
     box-shadow: none;
   }
   ${partSelector(chatAttachmentsContract, "remove")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
   @media (hover: hover) {
     ${partSelector(chatAttachmentsContract, "remove")}:hover {
@@ -185,8 +185,7 @@ export const chatAttachmentsStyles = css`
     transition-duration: ${uiTokens.motion.instant};
   }
   ${partSelector(chatAttachmentsContract, "previewButton")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
   ${partSelector(chatAttachmentsContract, "root")} {
     font-family: ${uiTokens.type.sans};
@@ -202,8 +201,7 @@ export const chatAttachmentsStyles = css`
   }
   ${partSelector(chatAttachmentsContract, "image")}:focus-visible,
   ${partSelector(chatAttachmentsContract, "file")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
   ${partSelector(chatAttachmentsContract, "icon")} svg {
     width: 28px;

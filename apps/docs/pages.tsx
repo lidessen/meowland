@@ -11,6 +11,7 @@ import {
   Section,
   Stack,
 } from "meowtail";
+import { Icon } from "meowtail/icons";
 import type { ContentItem, SitePage } from "meowpress/build";
 import type { StoryEntry } from "meowbook";
 import type { Catalog, CatalogComponent, CatalogExample } from "./catalog";
@@ -124,7 +125,10 @@ function ReadingSections({ sections }: { sections: ReadingSection[] }): Child {
           {links()}
         </div>
         <details className="docs-toc-disclosure">
-          <summary>On this page</summary>
+          <summary>
+            On this page
+            <Icon name="chevron-down" size={14} />
+          </summary>
           {links()}
         </details>
       </aside>

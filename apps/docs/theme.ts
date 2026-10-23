@@ -184,14 +184,20 @@ export const docsStyles = css`
     border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     min-width: 0;
   }
+  /* The one way out to the workbench: a quiet labeled link, not an unnamed glyph. */
   .docs-header-link {
-    display: grid;
-    place-items: center;
-    min-width: 32px;
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 4px;
     min-height: 32px;
     margin-left: auto;
+    padding: 0 10px;
     border-radius: ${uiTokens.radius.md};
     color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.label};
+    font-weight: 500;
+    text-decoration: none;
   }
   .docs-header-link:hover {
     background: ${uiTokens.surface.fill};
@@ -285,9 +291,23 @@ export const docsStyles = css`
     padding-block: 12px;
   }
   .docs-toc-disclosure > summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    list-style: none;
     color: ${uiTokens.ink.primary};
     cursor: pointer;
     font-weight: 500;
+  }
+  .docs-toc-disclosure > summary::-webkit-details-marker {
+    display: none;
+  }
+  .docs-toc-disclosure > summary > svg {
+    color: ${uiTokens.ink.tertiary};
+    transition: transform ${uiTokens.motion.response} ${uiTokens.motion.ease};
+  }
+  .docs-toc-disclosure[open] > summary > svg {
+    transform: rotate(180deg);
   }
   .docs-toc nav {
     display: grid;
@@ -703,9 +723,20 @@ export const docsStyles = css`
       font-size: 15px;
       letter-spacing: -0.4px;
     }
+    .docs-mobile-brand {
+      color: ${uiTokens.ink.primary};
+      font-weight: 600;
+    }
     .docs-mobile-brand > svg {
       width: 20px;
       height: 20px;
+      color: ${uiTokens.ink.secondary};
+    }
+    .docs-mobile-brand > span {
+      color: ${uiTokens.ink.tertiary};
+      font: ${uiTokens.type.micro}/1.5 ${uiTokens.type.mono};
+      font-weight: 400;
+      letter-spacing: 0;
     }
     .docs-navigation-toggle {
       display: inline-flex;

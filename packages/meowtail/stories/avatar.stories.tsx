@@ -6,7 +6,7 @@ import { Specimen, Specimens } from "./specimen";
 const portrait =
   "data:image/svg+xml," +
   encodeURIComponent(
-    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect fill="#4b6ea6" width="32" height="32"/><circle cx="16" cy="12" r="6" fill="#eef2f8"/><ellipse cx="16" cy="28" rx="10" ry="8" fill="#eef2f8"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><defs><linearGradient id="b" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#fde2c8"/><stop offset="1" stop-color="#f4b8a8"/></linearGradient></defs><rect fill="url(#b)" width="32" height="32"/><circle cx="16" cy="13" r="5.5" fill="#ffffff" fill-opacity="0.85"/><path d="M5 32c1.5-6.5 6-10 11-10s9.5 3.5 11 10Z" fill="#ffffff" fill-opacity="0.85"/></svg>`,
   );
 
 export const AvatarStory = defineStory({

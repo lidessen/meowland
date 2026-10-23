@@ -9,8 +9,8 @@ import { assistantMarkdownContract } from "../../chat/assistant-markdown";
 /*
  * One reading rhythm for every place long-form text lands: Prose, chat message
  * content, chat bubbles and rendered assistant markdown. Each owner keeps its
- * own type size and line height; blocks, headings, lists, code, quotes, rules,
- * tables and links read the same everywhere.
+ * own type size and line height; blocks, lists, code, quotes, rules, tables and
+ * links read the same everywhere, and headings step down the type ramp.
  */
 const prose = partSelector(proseContract, "root");
 const markdown = partSelector(assistantMarkdownContract, "root");
@@ -20,7 +20,7 @@ export const proseStyles = css`
   ${prose} {
     min-width: 0;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.reading} ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
   ${prose} {
@@ -41,20 +41,29 @@ export const proseStyles = css`
   ${partSelector(chatBubbleContract, "root")} > * + * {
     margin-top: ${uiTokens.space.prose};
   }
+  /* Headings step down the type ramp. Inside a conversation they stay compact: h2 is a title,
+     h3 and h4 are semibold body. Standalone Prose is a reading page, so h2 is a heading and h3 a
+     title. */
   ${scope} > :where(h2, h3, h4) {
     margin-top: ${uiTokens.space.group};
-    font-weight: 600;
-    line-height: 1.45;
+    font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: ${uiTokens.type.trackingTight};
   }
   ${scope} > :where(h2) {
-    font-size: 1.15em;
+    font-size: ${uiTokens.type.title};
+    line-height: ${uiTokens.type.line.title};
   }
-  ${scope} > :where(h3) {
-    font-size: 1.05em;
+  ${scope} > :where(h3, h4) {
+    font-size: ${uiTokens.type.body};
+    line-height: ${uiTokens.type.line.body};
   }
-  ${scope} > :where(h4) {
-    font-size: 1em;
+  ${prose} > :where(h2) {
+    font-size: ${uiTokens.type.heading};
+    line-height: ${uiTokens.type.line.heading};
+  }
+  ${prose} > :where(h3) {
+    font-size: ${uiTokens.type.title};
+    line-height: ${uiTokens.type.line.title};
   }
   ${scope} > :where(h2, h3, h4):first-child {
     margin-top: 0;
@@ -92,7 +101,7 @@ export const proseStyles = css`
     background: ${uiTokens.surface.fill};
     font-family: ${uiTokens.type.mono};
     font-size: ${uiTokens.type.code};
-    line-height: 1.65;
+    line-height: ${uiTokens.type.line.code};
     white-space: pre;
     overflow-wrap: normal;
   }
@@ -123,7 +132,7 @@ export const proseStyles = css`
   }
   ${scope} :where(th) {
     color: ${uiTokens.ink.secondary};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   ${scope} :where(a) {
     color: ${uiTokens.accent.ink};

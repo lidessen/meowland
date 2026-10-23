@@ -11,7 +11,7 @@ export const toggleStyles = css`
     align-items: center;
     gap: 6px;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/20px ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.bodyCompact} ${uiTokens.type.sans};
     cursor: pointer;
   }
   ${partSelector(checkboxContract, "input")} {

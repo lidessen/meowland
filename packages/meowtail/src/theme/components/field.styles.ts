@@ -6,7 +6,7 @@ export const fieldStyles = css`
   :where(${partSelector(fieldContract, "root")}) {
     box-sizing: border-box;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
   ${partSelector(fieldContract, "root")} {
     display: grid;
@@ -15,13 +15,13 @@ export const fieldStyles = css`
     gap: ${uiTokens.space.group};
   }
   ${partSelector(fieldContract, "label")} {
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     overflow-wrap: anywhere;
   }
   :where(${partSelector(fieldContract, "description")}, ${partSelector(fieldContract, "error")}) {
     margin: 0;
     font-size: ${uiTokens.type.caption};
-    line-height: 1.5;
+    line-height: ${uiTokens.type.line.caption};
     overflow-wrap: anywhere;
   }
   ${partSelector(fieldContract, "description")} {

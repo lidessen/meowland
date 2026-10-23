@@ -18,7 +18,7 @@ export const descriptionListStyles = css`
     min-width: 0;
     margin: 0;
     container: meowui-description-list / inline-size;
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     color: ${uiTokens.ink.primary};
   }
   ${item("root")} {

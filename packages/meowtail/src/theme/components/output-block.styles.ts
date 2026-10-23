@@ -22,7 +22,7 @@ export const outputBlockStyles = css`
     gap: 12px;
     padding: 8px 14px;
     background: ${uiTokens.surface.fill};
-    font: ${uiTokens.type.micro}/18px ${uiTokens.type.sans};
+    font: ${uiTokens.type.micro} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
   }
   ${partSelector(block, "title")} {
     min-width: 0;
@@ -40,7 +40,7 @@ export const outputBlockStyles = css`
   ${partSelector(block, "body")} {
     padding: 12px 14px;
     overflow: auto;
-    font: ${uiTokens.type.code}/22px ${uiTokens.type.mono};
+    font: ${uiTokens.type.code} / ${uiTokens.type.line.body} ${uiTokens.type.mono};
   }
   ${partSelector(block, "line")} {
     min-height: 22px;
@@ -63,7 +63,7 @@ export const outputBlockStyles = css`
   ${partSelector(block, "feedback")} {
     display: block;
     padding: 4px 14px;
-    font: ${uiTokens.type.caption}/18px ${uiTokens.type.sans};
+    font: ${uiTokens.type.caption} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
   }
   ${partSelector(block, "feedback")}:empty {
     display: none;
@@ -94,7 +94,7 @@ export const outputBlockStyles = css`
     box-shadow: inset 3px 0 ${uiTokens.status.danger};
   }
   ${partSelector(diff, "path")}, ${partSelector(search, "path")} {
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   :where(${partSelector(read, "root")}, ${partSelector(diff, "root")}) ${partSelector(block, "header")} {
     padding: 10px 18px 8px 22px;
@@ -102,7 +102,7 @@ export const outputBlockStyles = css`
   }
   :where(${partSelector(read, "root")}, ${partSelector(diff, "root")}) ${partSelector(block, "body")} {
     padding: 6px 22px 20px;
-    font: ${uiTokens.type.code}/19px ${uiTokens.type.mono};
+    font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
   }
   :where(${partSelector(read, "root")}, ${partSelector(diff, "root")}) ${partSelector(block, "line")} {
     min-height: 19px;
@@ -120,7 +120,7 @@ export const outputBlockStyles = css`
   }
   ${partSelector(search, "root")} ${partSelector(block, "header")} {
     align-items: center;
-    font: ${uiTokens.type.label}/20px ${uiTokens.type.sans};
+    font: ${uiTokens.type.label} / ${uiTokens.type.line.label} ${uiTokens.type.sans};
     color: ${uiTokens.ink.secondary};
   }
   ${partSelector(search, "root")} ${partSelector(block, "title")} {
@@ -130,7 +130,7 @@ export const outputBlockStyles = css`
   }
   ${partSelector(search, "root")} ${partSelector(block, "body")} {
     padding: 8px 14px 12px 0;
-    font: ${uiTokens.type.code}/19px ${uiTokens.type.mono};
+    font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
   }
   ${partSelector(search, "root")} ${partSelector(block, "line")} {
     padding-left: 14px;
@@ -147,7 +147,7 @@ export const outputBlockStyles = css`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: pre;
-    font: ${uiTokens.type.code}/22px ${uiTokens.type.mono};
+    font: ${uiTokens.type.code} / ${uiTokens.type.line.body} ${uiTokens.type.mono};
   }
   ${partSelector(terminal, "root")} ${partSelector(block, "header")} {
     padding-left: 30px;
@@ -183,7 +183,7 @@ export const outputBlockStyles = css`
     align-items: baseline;
     gap: 8px;
     min-width: 0;
-    font: ${uiTokens.type.code}/22px ${uiTokens.type.mono};
+    font: ${uiTokens.type.code} / ${uiTokens.type.line.body} ${uiTokens.type.mono};
   }
   ${partSelector(terminal, "cwd")} {
     flex: none;
@@ -209,7 +209,7 @@ export const outputBlockStyles = css`
     display: none;
   }
   ${partSelector(terminal, "span")}[data-ansi-bold="true"] {
-    font-weight: 700;
+    font-weight: ${uiTokens.type.weight.semibold};
   }
   ${partSelector(terminal, "span")}:is([data-ansi-color="31"], [data-ansi-color="91"]) {
     color: ${uiTokens.status.danger};

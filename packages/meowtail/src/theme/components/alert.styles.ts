@@ -19,10 +19,10 @@ export const alertStyles = css`
     font-size: ${uiTokens.type.body};
   }
   ${partSelector(alertContract, "title")} {
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
   }
   ${partSelector(alertContract, "body")} {
-    line-height: 1.6;
+    line-height: ${uiTokens.type.leading};
   }
   ${partSelector(alertContract, "actions")} {
     display: flex;
@@ -41,7 +41,7 @@ export const alertStyles = css`
     padding: 6px 8px 6px 12px;
     border-radius: ${uiTokens.radius.md};
     font-size: ${uiTokens.type.label};
-    line-height: 20px;
+    line-height: ${uiTokens.type.line.label};
   }
   ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"]::before {
     content: "";
@@ -60,7 +60,7 @@ export const alertStyles = css`
   ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"] ${partSelector(alertContract, "body")} {
     flex: 1;
     min-width: 0;
-    line-height: 20px;
+    line-height: ${uiTokens.type.line.label};
   }
   ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"] ${partSelector(alertContract, "actions")} {
     flex: none;

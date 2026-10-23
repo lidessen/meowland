@@ -12,7 +12,7 @@ export const codeBlockStyles = css`
     border-radius: ${uiTokens.radius.xl};
     background: ${uiTokens.surface.fill};
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     overflow: hidden;
   }
   ${partSelector(codeBlockContract, "header")} {
@@ -29,17 +29,19 @@ export const codeBlockStyles = css`
   ${partSelector(codeBlockContract, "title")} {
     min-width: 0;
     color: ${uiTokens.ink.primary};
-    font: 500 ${uiTokens.type.caption}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.weight.medium} ${uiTokens.type.caption} / ${uiTokens.type.leading}
+      ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
   ${partSelector(codeBlockContract, "caption")} {
     min-width: 0;
     color: ${uiTokens.ink.tertiary};
-    font: 400 ${uiTokens.type.caption}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.weight.regular} ${uiTokens.type.caption} / ${uiTokens.type.leading}
+      ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
   ${partSelector(codeBlockContract, "language")} {
-    font: ${uiTokens.type.code}/18px ${uiTokens.type.mono};
+    font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -53,7 +55,7 @@ export const codeBlockStyles = css`
     min-width: 0;
     flex-shrink: 1;
     margin-inline-start: auto;
-    font: ${uiTokens.type.micro}/18px ${uiTokens.type.sans};
+    font: ${uiTokens.type.micro} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
   }
   ${partSelector(codeBlockContract, "actions")} [aria-pressed="true"] {
     background: ${uiTokens.action.soft};
@@ -66,7 +68,7 @@ export const codeBlockStyles = css`
     border: 0;
     border-radius: 0;
     background: transparent;
-    font: ${uiTokens.type.code}/19px ${uiTokens.type.mono};
+    font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
     white-space: pre;
     overflow-wrap: normal;
   }

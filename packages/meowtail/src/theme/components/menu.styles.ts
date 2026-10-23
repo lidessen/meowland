@@ -8,7 +8,7 @@ export const menuStyles = css`
   ${partSelector(menuContract, "root")} {
     min-width: 144px;
     max-width: min(360px, 100%);
-    font: ${uiTokens.type.body}/20px ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.bodyCompact} ${uiTokens.type.sans};
     color: ${uiTokens.ink.primary};
   }
   ${partSelector(menuContract, "item")} {
@@ -63,14 +63,14 @@ export const menuStyles = css`
   ${partSelector(menuContract, "shortcut")} {
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.micro};
-    line-height: 16px;
+    line-height: ${uiTokens.type.line.micro};
     white-space: nowrap;
   }
   ${partSelector(menuContract, "heading")} {
     padding: 8px 10px 4px;
     font-size: ${uiTokens.type.micro};
-    font-weight: 500;
-    line-height: 15px;
+    font-weight: ${uiTokens.type.weight.medium};
+    line-height: ${uiTokens.type.line.micro};
     letter-spacing: ${uiTokens.type.trackingCaps};
     text-transform: uppercase;
     color: ${uiTokens.ink.tertiary};

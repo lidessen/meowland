@@ -38,7 +38,7 @@ export const iconRailStyles = css`
     overflow: hidden;
     border-right: ${uiTokens.line.width} solid ${uiTokens.line.divider};
     background: ${uiTokens.surface.canvas};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     transition:
       width ${uiTokens.motion.settle} ${uiTokens.motion.ease},
       box-shadow ${uiTokens.motion.settle} ${uiTokens.motion.ease};
@@ -130,7 +130,7 @@ export const iconRailStyles = css`
   }
   ${openWithin(`${item("root")}[aria-current="page"]`)} {
     color: ${uiTokens.ink.primary};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   ${openWithin(`${item("root")}[aria-current="page"] ${item("icon")}`)} {
     color: ${uiTokens.accent.base};
@@ -190,7 +190,7 @@ export const iconRailStyles = css`
   ${item("root")}[data-meta-tone="accent"] ${item("meta")} {
     color: ${uiTokens.accent.base};
     font-size: ${uiTokens.type.micro};
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
   }
   ${openWithin(item("label").toString())},
   ${openWithin(item("meta").toString())} {
@@ -211,7 +211,7 @@ export const iconRailStyles = css`
     margin: 14px 10px 6px;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.micro};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     letter-spacing: ${uiTokens.type.trackingCaps};
     text-transform: uppercase;
   }

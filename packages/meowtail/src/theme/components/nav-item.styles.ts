@@ -7,7 +7,7 @@ export const navItemStyles = css`
   :where(${partSelector(navItemContract, "root")}) {
     box-sizing: border-box;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
   :where(${partSelector(navItemContract, "root")}):focus-visible {
     ${focusRing()}
@@ -30,7 +30,7 @@ export const navItemStyles = css`
   :where(${partSelector(navItemContract, "root")}[aria-current="page"]) {
     color: ${uiTokens.ink.primary};
     background: ${uiTokens.accent.selected};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   @media (hover: hover) {
     ${partSelector(navItemContract, "root")}:hover:not(:disabled):not([aria-current="page"]) {

@@ -10,7 +10,7 @@ export const metaRowStyles = css`
     gap: ${uiTokens.space.group};
     min-width: 0;
     color: ${uiTokens.ink.secondary};
-    font: ${uiTokens.type.caption}/18px ${uiTokens.type.sans};
+    font: ${uiTokens.type.caption} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
   }
   ${partSelector(metaRowContract, "root")}[${metaRowOptions.attribute("align")}="center"] {
     justify-content: center;

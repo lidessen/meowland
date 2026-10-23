@@ -20,7 +20,7 @@ export const resourceLinkStyles = css`
     background: ${uiTokens.surface.raised};
     box-shadow: ${uiTokens.shadow.raised};
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/1.5 ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     text-align: left;
     text-decoration: none;
     cursor: pointer;
@@ -52,7 +52,7 @@ export const resourceLinkStyles = css`
   ${link("title")} {
     overflow: hidden;
     font-size: ${uiTokens.type.body};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     text-overflow: ellipsis;
     white-space: nowrap;
   }

@@ -16,7 +16,7 @@ ${partSelector(cardContract, "root")} {
   padding: ${uiTokens.space.panel};
   /* The in-flow surface every bordered container shares: raised layer on the edge hairline. */
   ${surface("raised")}
-  font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+  font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
 }
 
 /* Embedded groups share their parent's surface; callers choose the relationship. */
@@ -52,8 +52,8 @@ ${partSelector(cardTitleContract, "root")} {
   margin: 0;
   color: ${uiTokens.ink.primary};
   font-size: ${uiTokens.type.title};
-  font-weight: 600;
-  line-height: 1.4;
+  font-weight: ${uiTokens.type.weight.semibold};
+  line-height: ${uiTokens.type.line.title};
   letter-spacing: ${uiTokens.type.trackingTight};
   overflow-wrap: anywhere;
 }

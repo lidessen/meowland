@@ -40,7 +40,7 @@ export const fieldSurfaceStyles = css`
     color: ${uiTokens.ink.primary};
     background: ${uiTokens.surface.field};
     box-shadow: ${uiTokens.shadow.field};
-    font: ${uiTokens.type.body}/22px ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.body} ${uiTokens.type.sans};
     outline: none;
     transition:
       border-color ${uiTokens.motion.response} ${uiTokens.motion.ease},

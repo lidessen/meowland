@@ -24,15 +24,15 @@ export const appBarStyles = css`
     overflow-wrap: anywhere;
     color: ${uiTokens.ink.primary};
     font-size: ${uiTokens.type.title};
-    font-weight: 600;
-    line-height: 1.375;
+    font-weight: ${uiTokens.type.weight.semibold};
+    line-height: ${uiTokens.type.line.title};
     letter-spacing: ${uiTokens.type.trackingTight};
   }
   ${partSelector(appBarContract, "status")} {
     min-width: 0;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
-    line-height: 18px;
+    line-height: ${uiTokens.type.line.caption};
   }
   ${partSelector(appBarContract, "actions")} {
     display: flex;

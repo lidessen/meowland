@@ -14,7 +14,7 @@ export const toastStyles = css`
     background: ${uiTokens.inverse.surface};
     color: ${uiTokens.inverse.ink};
     box-shadow: ${uiTokens.shadow.float};
-    font: ${uiTokens.type.body}/22px ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.body} ${uiTokens.type.sans};
     animation: ui-toast-enter ${uiTokens.motion.draw} ${uiTokens.motion.enter};
   }
   /* A toast rises into place once, when the host mounts it. */

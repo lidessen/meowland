@@ -6,7 +6,7 @@ export const emptyStateStyles = css`
   :where(${partSelector(emptyStateContract, "root")}) {
     box-sizing: border-box;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
   ${partSelector(emptyStateContract, "root")} {
     display: grid;
@@ -30,7 +30,7 @@ export const emptyStateStyles = css`
   ${partSelector(emptyStateContract, "title")} {
     margin: 0;
     font-size: ${uiTokens.type.title};
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: ${uiTokens.type.trackingTight};
   }
   ${partSelector(emptyStateContract, "description")} {

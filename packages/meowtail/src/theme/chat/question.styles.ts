@@ -13,7 +13,7 @@ export const chatQuestionStyles = css`
     border-radius: ${uiTokens.radius.xl};
     background: ${uiTokens.surface.raised};
     color: ${uiTokens.ink.primary};
-    font: ${chatTokens.fontBody}/24px ${uiTokens.type.sans};
+    font: ${chatTokens.fontBody} / ${chatTokens.leading} ${uiTokens.type.sans};
   }
   ${partSelector(chatQuestionContract, "root")}[hidden] {
     display: none;
@@ -21,14 +21,14 @@ export const chatQuestionStyles = css`
   ${partSelector(chatQuestionContract, "eyebrow")} {
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     margin-bottom: ${uiTokens.space.group};
   }
   ${partSelector(chatQuestionContract, "title")} {
     margin: 0;
     font-size: ${uiTokens.type.body};
-    font-weight: 500;
-    line-height: 24px;
+    font-weight: ${uiTokens.type.weight.medium};
+    line-height: ${uiTokens.type.line.reading};
     overflow-wrap: anywhere;
   }
   ${partSelector(chatQuestionContract, "description")} {

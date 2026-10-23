@@ -26,7 +26,7 @@ export const searchInputStyles = css`
     border-radius: 0;
     background: transparent;
     color: inherit;
-    font: ${uiTokens.type.body}/22px ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.body} ${uiTokens.type.sans};
     outline: none;
     box-shadow: none;
   }

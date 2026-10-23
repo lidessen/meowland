@@ -33,14 +33,14 @@ export const chatHeaderStyles = css`
     color: ${uiTokens.ink.tertiary};
     font-family: ${uiTokens.type.sans};
     font-size: ${uiTokens.type.caption};
-    font-weight: 400;
+    font-weight: ${uiTokens.type.weight.regular};
   }
 
   ${partSelector(chatHeaderContract, "title")} {
     margin: 0;
     font-size: ${uiTokens.type.body};
-    font-weight: 500;
-    line-height: 20px;
+    font-weight: ${uiTokens.type.weight.medium};
+    line-height: ${uiTokens.type.line.bodyCompact};
   }
 
   ${partSelector(chatHeaderContract, "description")} {
@@ -48,7 +48,7 @@ export const chatHeaderStyles = css`
     margin: 4px 0 0;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.label};
-    line-height: 20px;
+    line-height: ${uiTokens.type.line.label};
   }
 
   ${partSelector(chatHeaderContract, "status")} {
@@ -88,7 +88,7 @@ export const chatHeaderStyles = css`
 
     ${partSelector(chatHeaderContract, "description")} {
       font-size: ${uiTokens.type.caption};
-      line-height: 1.45;
+      line-height: ${uiTokens.type.line.caption};
     }
   }
 `;

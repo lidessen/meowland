@@ -18,7 +18,7 @@ export const listGroupStyles = css`
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     min-width: 0;
-    font: ${uiTokens.type.body}/1.5 ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     color: ${uiTokens.ink.primary};
   }
   ${group} > ${row("root")} + ${row("root")} {
@@ -50,7 +50,7 @@ export const listGroupStyles = css`
     gap: 4px 8px;
   }
   ${row("title")} {
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     overflow-wrap: anywhere;
   }
   ${row("tags")} {

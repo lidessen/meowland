@@ -17,7 +17,7 @@ export const popoverStyles = css`
     /* Solid, as in Grok and Mobbin: depth comes from the shadow, not translucency. */
     background: ${uiTokens.surface.overlay};
     box-shadow: ${uiTokens.shadow.float};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     transform-origin: top center;
   }
   ${partSelector(popoverContract, "panel")}:has(> ${partSelector(menuContract, "root")}) {

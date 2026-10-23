@@ -19,7 +19,7 @@ export const itemStyles = css`
     color: ${uiTokens.ink.primary};
     font-family: ${uiTokens.type.sans};
     font-size: ${uiTokens.type.body};
-    line-height: 1.5;
+    line-height: ${uiTokens.type.leading};
     text-align: start;
   }
   ${partSelector(itemContract, "root")} {
@@ -27,7 +27,7 @@ export const itemStyles = css`
       min-height: 34px;
       padding: 6px 8px;
       font-size: ${uiTokens.type.label};
-      line-height: 20px;
+      line-height: ${uiTokens.type.line.label};
     }
   }
   ${partSelector(itemContract, "root")} {
@@ -80,7 +80,7 @@ export const itemStyles = css`
     overflow-wrap: anywhere;
   }
   ${partSelector(itemContract, "title")} {
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   ${partSelector(itemContract, "meta")},
   ${partSelector(itemContract, "description")},
@@ -89,7 +89,7 @@ export const itemStyles = css`
     font-size: ${uiTokens.type.caption};
   }
   ${partSelector(itemContract, "meta")} {
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   ${partSelector(itemContract, "trailing")} {
     max-width: 40%;

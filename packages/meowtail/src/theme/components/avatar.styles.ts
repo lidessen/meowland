@@ -19,7 +19,7 @@ export const avatarStyles = css`
        A fill, so it takes no edge. */
     background: ${uiTokens.surface.fill};
     color: ${uiTokens.ink.chip};
-    font: 600 ${uiTokens.type.caption}/1 ${uiTokens.type.sans};
+    font: ${uiTokens.type.weight.semibold} ${uiTokens.type.caption} / 1 ${uiTokens.type.sans};
     user-select: none;
   }
   ${root} {

@@ -31,7 +31,7 @@ export const taskListStyles = css`
     background: ${uiTokens.surface.raised};
     box-shadow: ${uiTokens.shadow.raised};
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/20px ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.bodyCompact} ${uiTokens.type.sans};
   }
   ${part("summary")} {
     display: flex;
@@ -52,7 +52,7 @@ export const taskListStyles = css`
   ${part("title")} {
     min-width: 0;
     flex: 1 1 auto;
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
   }
   ${part("count")} {
     color: ${uiTokens.ink.secondary};

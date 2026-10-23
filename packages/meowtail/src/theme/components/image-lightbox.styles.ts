@@ -10,7 +10,7 @@ export const imageLightboxStyles = css`
     padding: 6px 12px;
     background: ${uiTokens.surface.overlay};
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/22px ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.body} ${uiTokens.type.sans};
     cursor: pointer;
   }
   ${partSelector(image, "dialog")} {
@@ -43,7 +43,7 @@ export const imageLightboxStyles = css`
     box-shadow: ${uiTokens.shadow.float};
   }
   ${partSelector(image, "caption")} {
-    font: ${uiTokens.type.body}/22px ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.body} ${uiTokens.type.sans};
     text-align: center;
   }
   ${partSelector(image, "close")} {
@@ -59,7 +59,7 @@ export const imageLightboxStyles = css`
     corner-shape: round;
     background: ${uiTokens.surface.raised};
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.pageTitle}/1 ${uiTokens.type.sans};
+    font: ${uiTokens.type.pageTitle} / 1 ${uiTokens.type.sans};
     cursor: pointer;
   }
   ${partSelector(image, "close")}:focus-visible, ${partSelector(image, "trigger")}:focus-visible {

@@ -12,7 +12,7 @@ export const jsonStyles = css`
     padding: 6px 8px 8px;
     color: ${uiTokens.ink.primary};
     background: transparent;
-    font: ${uiTokens.type.code}/16px ${uiTokens.type.mono};
+    font: ${uiTokens.type.code} / ${uiTokens.type.line.micro} ${uiTokens.type.mono};
   }
   ${partSelector(json, "summary")} {
     position: relative;
@@ -102,7 +102,7 @@ export const jsonStyles = css`
     }
   }
   ${partSelector(json, "feedback")} {
-    font: ${uiTokens.type.micro}/18px ${uiTokens.type.sans};
+    font: ${uiTokens.type.micro} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
     color: ${uiTokens.ink.secondary};
   }
   ${partSelector(block, "root")} {
@@ -113,7 +113,7 @@ export const jsonStyles = css`
   ${partSelector(block, "summary")} {
     cursor: pointer;
     color: ${uiTokens.ink.secondary};
-    font: ${uiTokens.type.label}/24px ${uiTokens.type.sans};
+    font: ${uiTokens.type.label} / ${uiTokens.type.line.reading} ${uiTokens.type.sans};
   }
   ${partSelector(block, "body")} {
     max-height: 420px;
@@ -121,7 +121,7 @@ export const jsonStyles = css`
   }
   ${partSelector(block, "error")} {
     color: ${uiTokens.status.danger};
-    font: ${uiTokens.type.label}/20px ${uiTokens.type.sans};
+    font: ${uiTokens.type.label} / ${uiTokens.type.line.label} ${uiTokens.type.sans};
   }
   ${partSelector(json, "copy")}:focus-visible, ${partSelector(json, "summary")}:focus-visible {
     ${focusRing()}

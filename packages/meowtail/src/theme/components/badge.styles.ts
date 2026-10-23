@@ -13,7 +13,8 @@ export const badgeStyles = css`
     corner-shape: round;
     color: ${uiTokens.ink.secondary};
     background: ${uiTokens.surface.fill};
-    font: 400 ${uiTokens.type.caption}/18px ${uiTokens.type.sans};
+    font: ${uiTokens.type.weight.regular} ${uiTokens.type.caption} / ${uiTokens.type.line.caption}
+      ${uiTokens.type.sans};
   }
   ${partSelector(badgeContract, "root")} {
     ${badgeOptions.when({ tone: "accent" })} {
@@ -44,8 +45,8 @@ export const badgeStyles = css`
       padding: 1px 8px;
       min-height: 20px;
       font-size: ${uiTokens.type.micro};
-      line-height: 17px;
-      font-weight: 500;
+      line-height: ${uiTokens.type.line.micro};
+      font-weight: ${uiTokens.type.weight.medium};
     }
   }
   ${partSelector(badgeContract, "root")} {

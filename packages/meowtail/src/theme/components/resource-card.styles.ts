@@ -17,7 +17,7 @@ export const resourceCardStyles = css`
     border-radius: ${uiTokens.radius.xl};
     background: ${uiTokens.surface.raised};
     box-shadow: ${uiTokens.shadow.raised};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     color: ${uiTokens.ink.primary};
     transition: border-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
@@ -65,7 +65,7 @@ export const resourceCardStyles = css`
   ${card("title")} {
     margin: 0;
     font-size: ${uiTokens.type.title};
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: ${uiTokens.type.trackingTight};
     overflow-wrap: anywhere;
   }

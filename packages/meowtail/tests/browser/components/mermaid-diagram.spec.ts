@@ -40,8 +40,30 @@ test("diagrams draw on the theme, follow the scheme in place and update from a S
     document.documentElement.setAttribute("data-meowui-color-scheme", "light"),
   );
 
-  // Text inside pie slices takes inverse ink: this pins the one Pele class the theme relies on.
-  await expect(page.locator(`${canvas("pie")} .pele-slice-labels[fill]`)).toHaveCount(1);
+  // The chart styles restyle Pele's marks by class name, which is not an API: pin each one and
+  // check the rule reaches it.
+  for (const [name, selector] of [
+    ["pie", ".pele-slices"],
+    ["pie", ".pele-slice-labels[fill]"],
+    ["pie", ".pele-legend rect"],
+    ["xychart", ".pele-grid"],
+    ["xychart", ".pele-axis"],
+    ["xychart", ".pele-axis-labels"],
+    ["xychart", ".pele-bars rect"],
+    ["xychart", ".pele-line circle"],
+  ] as const)
+    expect(await page.locator(`${canvas(name)} ${selector}`).count()).toBeGreaterThan(0);
+  const chart = await page.evaluate(() => {
+    const style = (selector: string) => getComputedStyle(document.querySelector(selector)!);
+    return {
+      ring: style('[data-diagram="pie"] .pele-slices').maskImage,
+      dot: style('[data-diagram="pie"] .pele-legend rect').rx,
+      bar: style('[data-diagram="xychart"] .pele-bars rect').transform,
+    };
+  });
+  expect(chart.ring).toContain("radial-gradient");
+  expect(chart.dot).toBe("50%");
+  expect(chart.bar).not.toBe("none");
 
   // A Signal source redraws in place.
   const nodes = () => page.locator(`${canvas("live")} svg .pele-nodes > *`).count();

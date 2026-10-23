@@ -13,6 +13,8 @@ import {
   ChevronRight,
   Check,
   ChevronUp,
+  CircleAlert,
+  CirclePause,
   Copy,
   ExternalLink,
   Eye,
@@ -114,6 +116,8 @@ const shapes = {
   check: () => renderNodes(Check),
   "thumbs-up": () => renderNodes(ThumbsUp),
   "thumbs-down": () => renderNodes(ThumbsDown),
+  "circle-alert": () => renderNodes(CircleAlert),
+  "circle-pause": () => renderNodes(CirclePause),
 };
 
 export type IconName = keyof typeof shapes;

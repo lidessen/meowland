@@ -81,6 +81,7 @@ export const ChatToolSequenceStory = defineStory({
             </ChatBubble>
             <ChatProcess label="Run verification · 4 items" open>
               <ChatToolCall
+                icon={<Icon name="terminal" />}
                 label="Run"
                 summary="bun test search/request.test.ts"
                 state="running"
@@ -89,6 +90,7 @@ export const ChatToolSequenceStory = defineStory({
                 <p>Waiting for process output.</p>
               </ChatToolCall>
               <ChatToolCall
+                icon={<Icon name="file-text" />}
                 label="Read"
                 summary="Restricted workspace configuration"
                 state="waiting"
@@ -96,10 +98,17 @@ export const ChatToolSequenceStory = defineStory({
               >
                 <p>Waiting for permission confirmation.</p>
               </ChatToolCall>
-              <ChatToolCall label="Run" summary="Remote connection check" state="error" collapsible>
+              <ChatToolCall
+                icon={<Icon name="terminal" />}
+                label="Run"
+                summary="Remote connection check"
+                state="error"
+                collapsible
+              >
                 <p>The connection failed; nothing on the remote was changed.</p>
               </ChatToolCall>
               <ChatToolCall
+                icon={<Icon name="terminal" />}
                 label="Run"
                 summary="Previous interrupted verification"
                 state="unknown"
@@ -252,6 +261,7 @@ export const ChatMessageCompositionStory = defineStory({
               </ChatBubble>
               <ChatProcess label="View investigation evidence · 2 items">
                 <ChatToolCall
+                  icon={<Icon name="file-text" />}
                   label="Read request log"
                   state="complete"
                   collapsible
@@ -262,6 +272,7 @@ export const ChatMessageCompositionStory = defineStory({
                   </p>
                 </ChatToolCall>
                 <ChatToolCall
+                  icon={<Icon name="file-text" />}
                   label="Check the result write path"
                   state="complete"
                   collapsible
@@ -342,6 +353,7 @@ export const ChatProcessDetailStory = defineStory({
         </ChatProcess>
         <ChatProcess label="Waiting for verification · 1 item" open>
           <ChatToolCall
+            icon={<Icon name="search" />}
             label="Verify quick successive input and list recovery after clearing the search term"
             state="waiting"
             detail="Requires a connection to the real service."

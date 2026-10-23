@@ -98,6 +98,7 @@ export const AssistantPartView = defineComponent<
     } else if (initial.kind === "tool") {
       const tool = () => value.value as typeof initial;
       fallback = h(ChatToolCall, {
+        icon: initial.icon ? h(Icon, { name: initial.icon }) : undefined,
         label: derived(() => tool().label),
         summary: derived(() => tool().summary),
         state: derived(() => tool().state ?? "unknown"),

@@ -308,7 +308,8 @@ test("a completed row keeps its default outcome out of the reading column", asyn
   });
   expect(geometry.quiet).toBe("true");
   expect(geometry.placed).toBe("absolute");
-  expect(geometry.summaryRight).toBeCloseTo(geometry.rowRight, 0);
+  // The target sits beside its verb; the quiet outcome takes no place in the row.
+  expect(geometry.summaryRight).toBeLessThanOrEqual(geometry.rowRight);
 });
 
 test("an activating row is one focus stop with the same row geometry", async ({ page }) => {

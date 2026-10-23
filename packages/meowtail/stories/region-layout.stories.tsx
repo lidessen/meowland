@@ -233,21 +233,43 @@ export const WorkspaceRegionStory = defineStory({
         toolbar={
           <Inline gap="compact" style={{ position: "relative", zIndex: 2 }}>
             <strong>Assistant</strong>
+            {/* A host's own inline expansion: a quiet trigger and a floating panel over the content. */}
             <details style={{ position: "relative" }}>
-              <summary>Current work</summary>
+              <summary
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "4px",
+                  padding: "4px 8px",
+                  borderRadius: String(uiTokens.radius.md),
+                  listStyle: "none",
+                  color: String(uiTokens.ink.secondary),
+                  fontWeight: 500,
+                  cursor: "pointer",
+                }}
+              >
+                Current work
+                <Icon name="chevron-down" size={14} />
+              </summary>
               <div
                 data-workspace-inline-panel
                 style={{
                   position: "absolute",
-                  top: "100%",
+                  top: "calc(100% + 6px)",
                   zIndex: 2,
+                  display: "grid",
+                  justifyItems: "start",
+                  gap: String(uiTokens.space.group),
                   width: "min(280px, 80vw)",
                   padding: String(uiTokens.space.section),
+                  borderRadius: String(uiTokens.radius.xl),
                   background: String(uiTokens.surface.overlay),
-                  border: `1px solid ${uiTokens.line.control}`,
+                  boxShadow: String(uiTokens.shadow.float),
                 }}
               >
-                <p>Review the current work and its evidence, then close this and keep reading.</p>
+                <p style={{ margin: 0 }}>
+                  Review the current work and its evidence, then close this and keep reading.
+                </p>
                 <Button size="small">View details</Button>
               </div>
             </details>

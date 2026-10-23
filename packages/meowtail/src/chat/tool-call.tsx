@@ -175,7 +175,7 @@ export const ChatToolCall = defineComponent<
         "header",
         onActivate !== undefined ? "button" : reveals ? "summary" : "div",
         onActivate !== undefined ? { type: "button", onClick: onActivate } : null,
-        context.part("icon", "span", { "aria-hidden": "true" }, icon ?? <Icon name="wrench" />),
+        context.part("icon", "span", { "aria-hidden": "true" }, icon ?? <Icon name="box" />),
         context.part("label", "strong", null, label),
         summary !== undefined
           ? context.part(

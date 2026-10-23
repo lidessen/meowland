@@ -48,3 +48,14 @@ test("caller icon data can expose an accessible label", () => {
   expect(html).toContain('class="meow-icon search-icon"');
   expect(html).not.toContain("aria-hidden");
 });
+
+test("the icon guide gives every semantic icon exactly one intent", async () => {
+  const guide = await Bun.file(new URL("../../../src/icons/README.md", import.meta.url)).text();
+  const section = guide.slice(guide.indexOf("## Which icon where"));
+  const rows = [...section.matchAll(/^\|[^|\n]+\|\s*`([a-z-]+)`\s*\|$/gm)].map((match) => match[1]);
+  // One row per icon: a second row would give one picture two meanings.
+  expect(new Set(rows).size).toBe(rows.length);
+  expect([...rows].sort()).toEqual([...iconNames].sort());
+  // "Open elsewhere" has one icon; the synonym was removed from the set.
+  expect(iconNames).not.toContain("external-link" as never);
+});

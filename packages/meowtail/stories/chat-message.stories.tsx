@@ -51,7 +51,7 @@ export const ChatToolSequenceStory = defineStory({
               <ChatToolCall
                 label="Read"
                 summary="src/search/request.ts"
-                icon={<Icon name="file" />}
+                icon={<Icon name="file-text" />}
                 collapsible
               >
                 <pre>
@@ -69,7 +69,7 @@ export const ChatToolSequenceStory = defineStory({
               <ChatToolCall
                 label="Read"
                 summary="src/search/results.ts"
-                icon={<Icon name="file" />}
+                icon={<Icon name="file-text" />}
                 collapsible
               >
                 <p>The request identity is not checked before submitting results.</p>
@@ -154,7 +154,7 @@ export const ChatToolCallActionStory = defineStory({
               <ChatToolCall
                 label="Read"
                 summary="src/search/request.ts"
-                icon={<Icon name="file" />}
+                icon={<Icon name="file-text" />}
                 collapsible
               >
                 <p>The expanded row leaves the result in place.</p>

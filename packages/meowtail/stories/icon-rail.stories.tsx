@@ -24,7 +24,7 @@ export const IconRailStory = defineStory({
               icon={<Icon name="file" />}
               label="Item with reminder"
             />
-            <RailSection label="Sample group" icon={<Icon name="wrench" />} href="#group">
+            <RailSection label="Sample group" icon={<Icon name="folder" />} href="#group">
               <RailItem href="#child" icon={<Icon name="file" />} label="Group item" />
             </RailSection>
           </IconRail>

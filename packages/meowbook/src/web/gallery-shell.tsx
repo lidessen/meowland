@@ -118,7 +118,7 @@ export function mountGallery() {
             aria-label="Standalone preview"
             title="Standalone preview"
           >
-            <Icon name="external-link" size={16} />
+            <Icon name="arrow-up-right" size={16} />
           </a>
         </header>
         <section className="workshop-intro" aria-label="Current component scenario">

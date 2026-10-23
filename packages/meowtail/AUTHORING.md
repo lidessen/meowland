@@ -242,6 +242,11 @@ Three layers keep a host component from drifting:
 
 The standard theme passes the same audit, and so do the three ports.
 
+Icons follow one map: [Which icon where](src/icons/README.md#which-icon-where) gives each intent
+one icon and says where icons go (leading names the type, trailing names what a click does, a state
+is never a recolored icon). Read a host's icons against it before adding one; an icon outside the
+semantic set goes through `IconSource` and still follows the placement rules.
+
 ## Where this goes past shadcn
 
 - **Parts are a typed contract.** `partSelector` only accepts a declared part, and option defaults

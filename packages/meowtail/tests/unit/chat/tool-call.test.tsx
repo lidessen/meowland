@@ -71,3 +71,16 @@ test("tool intents remain native buttons outside the disclosure summary", () => 
   expect(html).toContain("hidden disabled");
   expect(html).toContain('data-meowui-part="chat-tool-call/actions"');
 });
+
+test("a tool of unknown type takes the neutral box glyph, and a typed tool keeps its own", () => {
+  const unknown = render({ label: "Call", summary: "integration.lookup" });
+  expect(unknown).toContain('data-icon="box"');
+  expect(unknown).not.toContain('data-icon="wrench"');
+  const typed = render({
+    label: "Run",
+    summary: "bun test",
+    icon: h("svg", { "data-icon": "terminal" }),
+  });
+  expect(typed).toContain('data-icon="terminal"');
+  expect(typed).not.toContain('data-icon="box"');
+});

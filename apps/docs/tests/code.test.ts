@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { extractStorySource, statementEnd } from "../code";
+import { extractStorySource, renderSourceOf, statementEnd } from "../code";
 
 const SOURCE = `import { h } from "meowjsx/runtime";
 import { defineStory } from "meowbook";
@@ -55,5 +55,34 @@ describe("the end of a statement", () => {
   test("a closing brace inside a template literal does not count", () => {
     const source = "const a = `}`; const b = 2;";
     expect(statementEnd(source, 0)).toBe(source.indexOf("const b") - 1);
+  });
+});
+
+describe("the render excerpt", () => {
+  test("the excerpt is the render property, dedented, with its line offset", () => {
+    const code = extractStorySource(SOURCE, "ButtonStory") ?? "";
+    expect(renderSourceOf(code)).toEqual({
+      code: 'render: () => h("button", null, "Save")',
+      lineOffset: 3,
+    });
+  });
+
+  test("a multi-line render keeps its body and stops at the closing brace", () => {
+    const code = `export const A = defineStory({
+  id: "a",
+  render() {
+    const label = "Save, then close";
+    return h("button", null, label);
+  },
+  covers: ["a"],
+});`;
+    expect(renderSourceOf(code)?.code).toBe(`render() {
+  const label = "Save, then close";
+  return h("button", null, label);
+}`);
+  });
+
+  test("a story without render yields no excerpt", () => {
+    expect(renderSourceOf('export const A = defineStory({ id: "a" });')).toBeUndefined();
   });
 });

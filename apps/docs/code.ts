@@ -66,6 +66,29 @@ function skipTemplate(source: string, start: number): number {
  * and strings and comments are skipped so their contents cannot confuse it.
  */
 export function statementEnd(source: string, start: number): number {
+  return scan(source, start, (character, depth) => character === ";" && depth === 0);
+}
+
+/**
+ * Find where the object property that starts at `start` ends: before the `,` that separates it
+ * from the next property, or before the `}` that closes its object.
+ */
+export function propertyEnd(source: string, start: number): number {
+  return scan(
+    source,
+    start,
+    (character, depth) => (character === "," && depth === 0) || depth < 0,
+    false,
+  );
+}
+
+/** Walk code from `start`, skipping strings and comments, until `stop` holds. */
+function scan(
+  source: string,
+  start: number,
+  stop: (character: string, depth: number) => boolean,
+  inclusive = true,
+): number {
   let depth = 0;
   let index = start;
   while (index < source.length) {
@@ -97,10 +120,11 @@ export function statementEnd(source: string, start: number): number {
     }
     if (character === ")" || character === "]" || character === "}") {
       depth -= 1;
+      if (stop(character, depth)) return inclusive ? index + 1 : index;
       index += 1;
       continue;
     }
-    if (character === ";" && depth === 0) return index + 1;
+    if (stop(character, depth)) return inclusive ? index + 1 : index;
     index += 1;
   }
   return source.length;
@@ -118,6 +142,24 @@ export function extractStorySource(source: string, exportName: string): string |
   if (!match) return undefined;
   const code = source.slice(match.index, statementEnd(source, match.index)).trim();
   return code.length > 0 ? code : undefined;
+}
+
+/**
+ * The story's `render` property alone, dedented: the code that draws the example, without the
+ * story's id, title and coverage notes. `lineOffset` counts the lines before it in the statement.
+ */
+export function renderSourceOf(code: string): { code: string; lineOffset: number } | undefined {
+  const match = /^([ \t]*)render\s*(?:\(|:)/m.exec(code);
+  if (!match) return undefined;
+  const end = propertyEnd(code, match.index + match[1]!.length);
+  const indent = match[1]!.length;
+  const lines = code
+    .slice(match.index, end)
+    .split("\n")
+    .map((line) => (line.slice(0, indent).trim() === "" ? line.slice(indent) : line));
+  const render = lines.join("\n").trim();
+  if (!render) return undefined;
+  return { code: render, lineOffset: code.slice(0, match.index).split("\n").length - 1 };
 }
 
 /** Read the source of one story from the repository. */

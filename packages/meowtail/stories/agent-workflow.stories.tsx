@@ -61,7 +61,7 @@ export function agentWorkflowDemo(narrow = false): Child {
   const answer = signal("Waiting for you to choose the check scope; no execution failed.");
   const waiting = signal<ChatExecutionState>("waiting");
   const retryState = signal<ChatExecutionState>("error");
-  const retryStatus = signal("Local simulated read failed · Can retry");
+  const retryStatus = signal("Local simulated read failed; it can be retried");
   const feedback = signal(
     "All actions only change local example state; no tool or network request runs.",
   );
@@ -143,7 +143,7 @@ export function agentWorkflowDemo(narrow = false): Child {
           label="Generate check report"
           summary="Waiting for the file check to finish"
           state="queued"
-          statusLabel="Queued · Not started yet"
+          statusLabel="Not started yet"
           input="Summarize only confirmed findings."
           collapsible
         />
@@ -239,7 +239,7 @@ export function agentWorkflowDemo(narrow = false): Child {
           icon={<Icon name="search" />}
           label="Extra network search"
           state="cancelled"
-          statusLabel="Canceled · No network request was sent"
+          statusLabel="No network request was sent"
           outputSummary="Cancellation is a separate fact and is not shown as an execution error."
           collapsible
         />

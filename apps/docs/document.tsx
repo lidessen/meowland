@@ -85,6 +85,50 @@ const CATALOG_FILTER = `(() => {
   });
 })();`;
 
+/**
+ * Grow each live preview to fit its story. The canvas is same-origin, so the page reads the
+ * story's height directly; the fixed height is the floor and the no-script fallback, and a
+ * cap keeps a tall story scrolling inside its frame.
+ */
+const PREVIEW_FIT = `(() => {
+  const frames = document.querySelectorAll(".docs-preview-frame");
+  const fit = (frame) => {
+    let doc;
+    try { doc = frame.contentDocument; } catch { return; }
+    if (!doc || !doc.documentElement) return;
+    const tall = frame.classList.contains("docs-preview-frame-tall");
+    // The body's own extent, not the document's: the document never reports less than the frame.
+    const body = doc.body;
+    if (!body) return;
+    const margin = parseFloat(getComputedStyle(body).marginBottom) || 0;
+    const content = Math.ceil(Math.max(body.scrollHeight, body.getBoundingClientRect().bottom + margin));
+    // Grow only: a story that fills its viewport would otherwise shrink the frame with it.
+    const height = Math.max(tall ? 680 : 440, Math.min(content, tall ? 960 : 720));
+    if (Math.abs(frame.getBoundingClientRect().height - height) > 1) frame.style.height = height + "px";
+  };
+  for (const frame of frames) {
+    const watch = () => {
+      fit(frame);
+      let doc;
+      try { doc = frame.contentDocument; } catch { return; }
+      if (!doc || !window.ResizeObserver) return;
+      // Resize on the next frame, outside the observer's delivery, so the story's own
+      // observers never see a resize loop.
+      let pending = 0;
+      const observer = new ResizeObserver(() => {
+        if (pending) return;
+        pending = requestAnimationFrame(() => {
+          pending = 0;
+          fit(frame);
+        });
+      });
+      if (doc.body) observer.observe(doc.body);
+    };
+    frame.addEventListener("load", watch);
+    if (frame.contentDocument && frame.contentDocument.readyState === "complete") watch();
+  }
+})();`;
+
 /** Enhance the one navigation rail into an inline disclosure on narrow screens. */
 const NAVIGATION_DISCLOSURE = `(() => {
   const button = document.getElementById("docs-navigation-toggle");
@@ -247,6 +291,7 @@ function Document({
         </div>
         <script dangerouslySetInnerHTML={{ __html: CATALOG_FILTER }} />
         <script dangerouslySetInnerHTML={{ __html: NAVIGATION_DISCLOSURE }} />
+        <script dangerouslySetInnerHTML={{ __html: PREVIEW_FIT }} />
       </body>
     </html>
   );

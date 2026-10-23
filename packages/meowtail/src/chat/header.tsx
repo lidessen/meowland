@@ -14,6 +14,7 @@ export interface ChatHeaderProps extends Props {
   className?: string;
 }
 
+/** The top of a conversation: its title, status and actions. */
 export const ChatHeader = defineComponent<
   ChatHeaderProps,
   typeof chatHeaderContract.name,

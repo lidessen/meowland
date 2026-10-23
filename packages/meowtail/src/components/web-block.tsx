@@ -22,6 +22,7 @@ export function webSourceHref(url: string): string | undefined {
     return undefined;
   }
 }
+/** A web search result: an answer and the pages it came from. */
 export const WebBlock = defineComponent<
   WebBlockProps,
   "web-block",

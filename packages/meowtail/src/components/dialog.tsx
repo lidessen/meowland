@@ -12,6 +12,7 @@ export interface DialogProps extends Props {
   className?: string;
 }
 
+/** The native dialog element, themed; Modal builds a complete dialog on top of it. */
 export const Dialog = defineComponent<
   DialogProps,
   typeof dialogContract.name,
@@ -41,6 +42,7 @@ export interface DialogPanelProps extends Props {
   className?: string;
 }
 
+/** The body of a dialog, with an optional header that stays in place while the body scrolls. */
 export const DialogPanel = defineComponent<
   DialogPanelProps,
   typeof dialogPanelContract.name,
@@ -69,6 +71,7 @@ export interface DialogHeaderProps extends Props {
   className?: string;
 }
 
+/** The title block of a dialog: an optional eyebrow, the title, a description and actions. */
 export const DialogHeader = defineComponent<
   DialogHeaderProps,
   typeof dialogHeaderContract.name,
@@ -108,6 +111,7 @@ export interface DialogActionsProps extends Props {
   className?: string;
 }
 
+/** The row of buttons that ends a dialog. */
 export const DialogActions = defineComponent<
   DialogActionsProps,
   typeof dialogActionsContract.name,

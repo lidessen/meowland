@@ -72,6 +72,7 @@ export function terminalSpans(text: string): TerminalSpan[][] {
   if (rows.length > 1 && rows[rows.length - 1]!.every((span) => span.text === "")) rows.pop();
   return rows;
 }
+/** A command and its output, with the exit status. */
 export const TerminalBlock = defineComponent<
   TerminalBlockProps,
   "terminal-block",

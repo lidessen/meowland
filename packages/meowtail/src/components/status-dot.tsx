@@ -28,7 +28,10 @@ export interface StatusDotProps extends Props, ThemedProps<typeof statusDotOptio
   className?: string;
 }
 
-/** Decorative marker; the owner supplies adjacent text, so it is hidden from assistive tech. */
+/**
+ * A dot that shows the state of a piece of work. It is decorative: the owner supplies adjacent
+ * text, so it is hidden from assistive tech.
+ */
 export const StatusDot = defineComponent<
   StatusDotProps,
   typeof statusDotContract.name,

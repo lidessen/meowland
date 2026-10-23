@@ -13,6 +13,7 @@ export const inlineContract = {
 export interface InlineProps extends LayoutProps {
   wrap?: boolean;
 }
+/** Lays out children in a row that wraps, with a gap from the spacing scale. */
 export const Inline = defineComponent<InlineProps, "inline", "root">(
   inlineContract,
   ({ as = "div", align = "center", justify = "start", wrap = true, children, ...props }, context) =>

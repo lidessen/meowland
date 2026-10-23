@@ -30,7 +30,10 @@ export interface JsonTreeProps extends Props {
   onCopy?: (text: string) => Promise<void>;
 }
 
-/** Children are materialized only when their branch is first expanded. */
+/**
+ * A JSON value as an expandable tree. Children are materialized only when their branch is first
+ * expanded.
+ */
 export const JsonTree = defineComponent<
   JsonTreeProps,
   "json-tree",

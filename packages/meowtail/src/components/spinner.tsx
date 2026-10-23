@@ -9,6 +9,7 @@ export interface SpinnerProps extends Props {
   label: string;
   className?: string;
 }
+/** An indeterminate loading indicator with a label that says what is loading. */
 export const Spinner = defineComponent<SpinnerProps, "spinner", "root" | "icon" | "label">(
   spinnerContract,
   ({ label, className, ...props }, context) =>

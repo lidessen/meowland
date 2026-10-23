@@ -98,6 +98,7 @@ export function nativeToggleBindings({
   };
 }
 
+/** A native checkbox with its label, including the mixed state. */
 export const Checkbox = defineComponent<
   CheckboxProps,
   typeof checkboxContract.name,

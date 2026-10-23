@@ -31,6 +31,7 @@ export function searchBlockText(props: SearchBlockProps) {
         )
         .join("\n\n");
 }
+/** Search matches grouped by file, with line numbers. */
 export const SearchBlock = defineComponent<
   SearchBlockProps,
   "search-block",

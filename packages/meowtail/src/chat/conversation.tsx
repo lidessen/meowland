@@ -28,7 +28,9 @@ export const ChatConversationLatest = defineComponent<
   ),
 );
 
-/** Optional scroll owner for append-only transcripts. Give the root a constrained height.
+/**
+ * A scrolling transcript that follows new messages.
+ * Optional scroll owner for append-only transcripts. Give the root a constrained height.
  * Do not combine with an application-owned scroll controller. Children can use ChatMessageList.
  */
 export const ChatConversation = defineComponent<

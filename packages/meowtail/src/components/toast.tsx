@@ -11,7 +11,10 @@ export interface ToastProps extends Props {
   role?: "status" | "alert";
   className?: string;
 }
-/** Host owns visibility, lifetime and placement; mounting does not schedule timers. */
+/**
+ * A short notice that appears over the page. Host owns visibility, lifetime and placement; mounting
+ * does not schedule timers.
+ */
 export const Toast = defineComponent<ToastProps, "toast", (typeof toastContract.parts)[number]>(
   toastContract,
   ({ message, icon, actions, role = "status", className, ...props }, context) =>

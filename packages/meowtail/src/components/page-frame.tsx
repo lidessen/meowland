@@ -25,7 +25,10 @@ export interface PageFrameProps extends Props, ThemedProps<typeof pageFrameOptio
   className?: string;
 }
 
-/** The parent owns page chrome; its body receives only the remaining space. */
+/**
+ * A frame with fixed chrome and a body that takes the remaining space; the parent owns the
+ * chrome.
+ */
 export const PageFrame = defineComponent<
   PageFrameProps,
   "page-frame",

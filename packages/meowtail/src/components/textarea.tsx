@@ -9,6 +9,7 @@ export interface TextareaProps extends Props {
   className?: string;
 }
 
+/** A multi-line text input. */
 export const Textarea = defineComponent<
   TextareaProps,
   typeof textareaContract.name,

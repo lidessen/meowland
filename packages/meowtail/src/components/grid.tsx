@@ -23,6 +23,7 @@ export interface GridProps extends Props, ThemedProps<typeof gridOptions> {
   className?: string;
   columns?: "auto" | 1 | 2 | 3 | 4;
 }
+/** Lays out children in responsive columns. */
 export const Grid = defineComponent<GridProps, "grid", "root">(
   gridContract,
   ({ as = "div", align = "stretch", columns = "auto", children, ...props }, context) =>

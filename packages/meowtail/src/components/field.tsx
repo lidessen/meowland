@@ -28,6 +28,7 @@ export interface FieldProps extends Props {
   className?: string;
 }
 
+/** A labelled form control with optional help text and an error message. */
 export const Field = defineComponent<
   FieldProps,
   typeof fieldContract.name,

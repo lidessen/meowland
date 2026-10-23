@@ -52,6 +52,7 @@ interface MenuLevelProps extends MenuProps {
   placement?: "bottom" | "right";
   closeAncestors?: () => void;
 }
+/** A list of actions in a popover, with keyboard navigation and nested submenus. */
 export const Menu = defineComponent<MenuLevelProps, "menu", (typeof menuContract.parts)[number]>(
   menuContract,
   (

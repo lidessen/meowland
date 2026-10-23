@@ -10,6 +10,7 @@ export interface CardTitleProps extends Props {
   className?: string;
 }
 
+/** The title of a card. */
 export const CardTitle = defineComponent<CardTitleProps, "card-title", "root">(
   cardTitleContract,
   ({ as = "h2", children, className, ...props }, context) =>

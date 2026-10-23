@@ -45,6 +45,7 @@ export interface PopoverProps extends Props {
 const layers = new WeakMap<Document, HTMLElement[]>();
 const dismissedEvents = new WeakSet<Event>();
 
+/** A floating panel anchored to a trigger, in the top layer. */
 export const Popover = defineComponent<PopoverProps, "popover", "root" | "panel">(
   popoverContract,
   (

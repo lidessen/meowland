@@ -9,6 +9,7 @@ export interface ChatFrameProps extends Props {
   className?: string;
 }
 
+/** The outer surface of a conversation that holds its header, messages and composer. */
 export const ChatFrame = defineComponent<
   ChatFrameProps,
   typeof chatFrameContract.name,

@@ -26,7 +26,10 @@ export function diffBlockText(files: readonly DiffBlockFile[]) {
     )
     .join("\n\n");
 }
-/** Hosts provide semantic diff rows; this view does not infer changes or apply patches. */
+/**
+ * A file diff: removed and added lines with their context. Hosts provide semantic diff rows; this
+ * view does not infer changes or apply patches.
+ */
 export const DiffBlock = defineComponent<
   DiffBlockProps,
   "diff-block",

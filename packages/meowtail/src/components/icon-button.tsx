@@ -18,6 +18,7 @@ export interface IconButtonProps extends Props, ThemedProps<typeof iconButtonOpt
   className?: string;
 }
 
+/** A button that shows only an icon and carries its name for assistive technology. */
 export const IconButton = defineComponent<
   IconButtonProps,
   typeof iconButtonContract.name,

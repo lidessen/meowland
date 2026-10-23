@@ -7,7 +7,10 @@ export interface PathLabelProps extends Props {
   path: string;
   className?: string;
 }
-/** Text only: never resolves a path, grants access or opens a file. */
+/**
+ * A file path that keeps the file name visible when space runs out. Text only: never resolves a
+ * path, grants access or opens a file.
+ */
 export const PathLabel = defineComponent<
   PathLabelProps,
   "path-label",

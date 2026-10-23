@@ -13,6 +13,7 @@ export interface BreadcrumbProps extends Props {
   label?: string;
   className?: string;
 }
+/** The trail of pages from the top of a site to the current one. */
 export const Breadcrumb = defineComponent<
   BreadcrumbProps,
   "breadcrumb",

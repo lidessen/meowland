@@ -14,7 +14,10 @@ export interface ChatQuestionProps extends Props {
   actions?: Child;
 }
 
-/** Presentation only: submission, cancellation and question lifetime belong to the host. */
+/**
+ * A question the assistant asks the user, with choices and a written answer. Presentation only:
+ * submission, cancellation and question lifetime belong to the host.
+ */
 export const ChatQuestion = defineComponent<
   ChatQuestionProps,
   "chat-question",

@@ -131,6 +131,7 @@ export interface IconProps {
   label?: string;
 }
 
+/** One icon from the library's set, by name. */
 export function Icon({ name, size = 18, className, label }: IconProps): Child {
   return (
     <IconFrame size={size} className={className} label={label} dataIcon={name}>

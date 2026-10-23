@@ -19,7 +19,10 @@ export interface SkeletonBoundaryProps extends Props {
   className?: string;
 }
 
-/** Loading presentation preserves the mounted subtree; the caller owns request state. */
+/**
+ * Shows skeletons in place of a region while it loads. Loading presentation preserves the mounted
+ * subtree; the caller owns request state.
+ */
 export const SkeletonBoundary = defineComponent<
   SkeletonBoundaryProps,
   "skeleton-boundary",

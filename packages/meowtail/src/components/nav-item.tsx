@@ -21,6 +21,10 @@ export interface NavItemProps extends Props {
   className?: string;
 }
 
+/**
+ * One navigation entry: an icon, a label and an optional badge, marked when it is the current
+ * location.
+ */
 export const NavItem = defineComponent<
   NavItemProps,
   typeof navItemContract.name,

@@ -45,6 +45,7 @@ export interface CodeBlockProps extends Props {
   onCopy?: (code: string) => Promise<void>;
 }
 
+/** A block of code with its language, an optional title, soft wrap and copy. */
 export const CodeBlock = defineComponent<
   CodeBlockProps,
   "code-block",

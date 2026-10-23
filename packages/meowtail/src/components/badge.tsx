@@ -17,6 +17,7 @@ export interface BadgeProps extends Props, ThemedProps<typeof badgeOptions> {
   className?: string;
 }
 
+/** A small label that names a category, such as a version or a release stage. */
 export const Badge = defineComponent<
   BadgeProps,
   typeof badgeContract.name,

@@ -9,6 +9,7 @@ export interface CardHeaderProps extends Props {
   className?: string;
 }
 
+/** The top of a card: its title, description and actions. */
 export const CardHeader = defineComponent<CardHeaderProps, "card-header", "root">(
   cardHeaderContract,
   ({ children, className, ...props }, context) =>

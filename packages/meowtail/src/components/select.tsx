@@ -17,6 +17,7 @@ export interface SelectProps extends Props {
   className?: string;
 }
 
+/** A native select menu, themed. */
 export const Select = defineComponent<
   SelectProps,
   typeof selectContract.name,

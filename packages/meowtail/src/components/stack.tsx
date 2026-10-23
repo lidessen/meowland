@@ -11,6 +11,7 @@ export const stackContract = {
   }),
 } as const satisfies StyledComponentContract;
 export interface StackProps extends LayoutProps {}
+/** Lays out children in a column, with a gap from the spacing scale. */
 export const Stack = defineComponent<StackProps, "stack", "root">(
   stackContract,
   ({ as = "div", align = "stretch", justify = "start", children, ...props }, context) =>

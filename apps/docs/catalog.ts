@@ -125,28 +125,30 @@ const USED_IN_LIMIT = 3;
 
 /**
  * The stories whose example draws a component, as JSX or through `h`. Stories that document one
- * component come before composed scenes, and shorter examples before longer ones, so the first
- * is the one where the component is easiest to see.
+ * component come before composed scenes, then the examples that draw it most often, then the
+ * shorter ones, so the first is the one where the component is easiest to see.
  */
 function storiesUsing(
   title: string,
   stories: readonly StoryEntry[],
   sourceOf: (story: StoryEntry) => string | undefined,
 ): StoryEntry[] {
-  const pattern = new RegExp(`<${title}[\\s/>]|\\bh\\(${title}\\b`);
+  const pattern = new RegExp(`<${title}[\\s/>]|\\bh\\(${title}\\b`, "g");
   const seen = new Set<string>();
-  const matches: { story: StoryEntry; length: number }[] = [];
+  const matches: { story: StoryEntry; uses: number; length: number }[] = [];
   for (const story of stories) {
     if (seen.has(story.id)) continue;
     const source = sourceOf(story);
-    if (!source || !pattern.test(source)) continue;
+    const uses = source?.match(pattern)?.length ?? 0;
+    if (!source || uses === 0) continue;
     seen.add(story.id);
-    matches.push({ story, length: source.length });
+    matches.push({ story, uses, length: source.length });
   }
   return matches
     .sort(
       (left, right) =>
         Number(!left.story.component) - Number(!right.story.component) ||
+        right.uses - left.uses ||
         left.length - right.length,
     )
     .slice(0, USED_IN_LIMIT)

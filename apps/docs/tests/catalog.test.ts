@@ -57,9 +57,9 @@ describe("the component catalog", () => {
     expect(component!.slug).toBe("icon-source");
   });
 
-  test("a component without stories borrows the stories that draw it", () => {
+  test("a component without stories borrows the stories that draw it most", () => {
     const sources: Record<string, string> = {
-      form: '<Field label="Name"><Switch checked /></Field>',
+      form: '<Field label="Name"><Switch checked /><Switch /></Field>',
       settings: "h(Switch, { checked: true })",
       scene: "<Switch />",
       other: "<SwitchGroup />",
@@ -75,7 +75,7 @@ describe("the component catalog", () => {
     );
     const component = catalog.components.find((entry) => entry.title === "Switch");
     expect(component?.stories).toEqual([]);
-    expect(component?.usedIn.map((entry) => entry.id)).toEqual(["settings", "form", "scene"]);
+    expect(component?.usedIn.map((entry) => entry.id)).toEqual(["form", "settings", "scene"]);
     expect(component?.group).toBe("Content");
   });
 

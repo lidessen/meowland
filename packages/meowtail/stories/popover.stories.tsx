@@ -28,7 +28,9 @@ export const PopoverEscapeStory = defineStory({
     let closeFromCallback = false;
     return (
       <Stack gap="normal">
-        <Button onClick={() => dialog?.showModal()}>Open popover dialog</Button>
+        <div>
+          <Button onClick={() => dialog?.showModal()}>Open popover dialog</Button>
+        </div>
         <Dialog
           id="escape-dialog"
           labelledBy="escape-title"

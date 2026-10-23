@@ -35,14 +35,18 @@ export const Skeletons = defineStory({
               ),
             )}
           </section>
-          <Button
-            variant="outline"
-            onClick={() => {
-              loading.value = !loading.value;
-            }}
-          >
-            {mapSignal(loading, (value) => (value ? "Simulate load completion" : "Replay loading"))}
-          </Button>
+          <div>
+            <Button
+              variant="outline"
+              onClick={() => {
+                loading.value = !loading.value;
+              }}
+            >
+              {mapSignal(loading, (value) =>
+                value ? "Simulate load completion" : "Replay loading",
+              )}
+            </Button>
+          </div>
         </Stack>
       </Measure>
     );

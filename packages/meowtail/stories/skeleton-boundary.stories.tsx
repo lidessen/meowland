@@ -28,7 +28,7 @@ const copy = {
 const image =
   "data:image/svg+xml," +
   encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" width="96" height="72" viewBox="0 0 96 72"><rect width="96" height="72" rx="10" fill="#cbd5e1"/><circle cx="72" cy="21" r="9" fill="#f8fafc"/><path d="M0 61 31 28 52 49 68 35 96 65V72H0Z" fill="#64748b"/></svg>',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="96" height="72" viewBox="0 0 96 72"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dbeafe"/><stop offset="0.55" stop-color="#e0e7ff"/><stop offset="1" stop-color="#fce7f3"/></linearGradient><radialGradient id="s" cx="0.28" cy="0.3" r="0.6"><stop offset="0" stop-color="#ffffff" stop-opacity="0.9"/><stop offset="1" stop-color="#ffffff" stop-opacity="0"/></radialGradient></defs><rect width="96" height="72" rx="10" fill="url(#g)"/><rect width="96" height="72" rx="10" fill="url(#s)"/><path d="M0 56c18-10 34-12 52-4s30 8 44-2v12a10 10 0 0 1-10 10H10A10 10 0 0 1 0 62Z" fill="#6366f1" fill-opacity="0.18"/><path d="M0 63c20-7 38-7 56-1s28 5 40-1v1a10 10 0 0 1-10 10H10A10 10 0 0 1 0 62Z" fill="#6366f1" fill-opacity="0.24"/></svg>',
   );
 
 export const SkeletonBoundaryStory = defineStory({
@@ -63,7 +63,13 @@ export const SkeletonBoundaryStory = defineStory({
                 <CardContent>
                   <Stack gap="normal">
                     <Inline align="center">
-                      <img src={image} width={96} height={72} alt="Project cover" />
+                      <img
+                        src={image}
+                        width={96}
+                        height={72}
+                        alt="Project cover"
+                        style={{ borderRadius: "10px" }}
+                      />
                       <Stack gap="compact">
                         <Inline align="center" gap="compact">
                           <Icon name="folder" />

@@ -43,6 +43,11 @@ export const foundationStyles = css`
   :where([data-meowui-theme-root="meowui"] :focus-visible) {
     ${focusRing()}
   }
+  /* One quiet scrollbar for every scroll region: a thin control-line thumb on no track. */
+  :where([data-meowui-theme-root="meowui"], [data-meowui-theme-root="meowui"] *) {
+    scrollbar-width: thin;
+    scrollbar-color: ${uiTokens.line.control} transparent;
+  }
 `;
 
 export const baseStyles = css`

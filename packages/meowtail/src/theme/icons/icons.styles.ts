@@ -43,7 +43,7 @@ export const iconsStyles = css`
   .meow-empty-stack .empty-stack-front {
     fill: ${uiTokens.surface.raised};
     stroke: ${uiTokens.line.edge};
-    filter: drop-shadow(0 8px 14px color-mix(in srgb, ${uiTokens.ink.primary} 7%, transparent));
+    filter: drop-shadow(0 8px 14px color-mix(in srgb, ${uiTokens.surface.scrim} 35%, transparent));
   }
   .meow-empty-stack .empty-stack-tile {
     fill: ${uiTokens.accent.soft};

@@ -303,6 +303,7 @@ Theme file, `src/theme/components/callout.styles.ts`:
 ```tsx
 import { css, partSelector } from "meowcss/meowjsx";
 import { calloutContract, calloutOptions } from "../../components/callout";
+import { text } from "../recipes";
 import { uiTokens } from "../tokens";
 
 export const calloutStyles = css`
@@ -310,13 +311,12 @@ export const calloutStyles = css`
     display: grid;
     gap: ${uiTokens.space.group};
     padding: ${uiTokens.space.group};
-    color: ${uiTokens.ink.primary};
-    font: 400 ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
+    ${text("body")}
     background: ${uiTokens.surface.fill};
     border-radius: ${uiTokens.radius.lg};
   }
   ${partSelector(calloutContract, "title")} {
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   ${partSelector(calloutContract, "root")} {
     ${calloutOptions.when({ tone: "accent" })} {
@@ -348,6 +348,11 @@ File names, registration, and `mountStyles` / `applyTheme` / `Theme` stay in
   component and then splice it onto existing controls. Distinguish headings by semantics and font
   weight; not every question or field label uses the page-title font size. Specific sizes are decided
   by the theme; do not treat one set of numbers as universal aesthetics.
+- Set type with one style of the ramp: the `text(role)` recipe, or the `uiTokens.type` size with its
+  `type.line.*` box and a `type.weight.*` role ([which text style where](README.md#which-text-style-where)).
+  Body copy that other sizes nest inside keeps the unitless `type.leading`; a fixed line box uses
+  `line.*`. `line-height: 1` and `0` stay for boxes around a glyph. The audit rejects literal
+  sizes, line heights and weights, inside the `font` shorthand too.
 - Choose spacing by relationship: group within a field, section between related areas, panel at the
   edge of a standalone container. Check how parent padding, child padding, gap, and paragraph margins
   actually add up; do not just judge whether each value is reasonable on its own.

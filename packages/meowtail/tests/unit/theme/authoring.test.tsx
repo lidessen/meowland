@@ -52,6 +52,9 @@ describe("host authoring floor", () => {
         border-radius: 7px;
         transition: color 150ms ease;
         font-size: 13px;
+        line-height: 1.5;
+        font-weight: 600;
+        font: 500 13px/20px sans-serif;
       }
     `;
     expect(auditCSS(drifted, standardAuditRules).map((violation) => violation.rule)).toEqual([
@@ -59,7 +62,27 @@ describe("host authoring floor", () => {
       "literal-radius",
       "literal-duration",
       "literal-font-size",
+      "literal-line-height",
+      "literal-font-weight",
+      "literal-font",
     ]);
+  });
+
+  test("type ramp roles, the unitless leading and glyph boxes pass the type rules", () => {
+    const root = partSelector(planBadgeContract, "root");
+    const onRamp = css`
+      ${root} {
+        font: ${uiTokens.type.weight.medium} ${uiTokens.type.label} / ${uiTokens.type.line.label}
+          ${uiTokens.type.sans};
+        line-height: ${uiTokens.type.leading};
+        font-weight: ${uiTokens.type.weight.semibold};
+      }
+      ${root} > svg {
+        font: ${uiTokens.type.caption} / 1 ${uiTokens.type.sans};
+        line-height: 0;
+      }
+    `;
+    expect(auditCSS(onRamp, standardAuditRules)).toEqual([]);
   });
 
   test("the floor comes first and host fragments come after every standard family", () => {

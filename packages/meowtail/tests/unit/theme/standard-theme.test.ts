@@ -18,10 +18,10 @@ test("standard theme is generated from token definitions and typed part contract
   expect(standardTheme.cssText).not.toContain("@import");
 });
 
-test("titles use the UI face; the deprecated display token stays equal to it", () => {
-  expect(uiTokens.type.display.name).toBe("--ui-type-display");
+test("every title uses the UI face; there is no display face", () => {
+  expect("display" in uiTokens.type).toBe(false);
   expect(standardTheme.cssText).not.toContain("Iowan Old Style");
-  expect(standardTheme.cssText).not.toContain(`font-family: ${uiTokens.type.display}`);
+  expect(standardTheme.cssText).not.toContain("--ui-type-display");
   expect(standardTheme.cssText).toContain('data-meowui-part="page-header/title"');
   expect(standardTheme.cssText).toContain('data-meowui-part="section/title"');
 });

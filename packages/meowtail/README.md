@@ -181,7 +181,7 @@ Local spacing tokens are not the ceiling for page whitespace, and not every leve
 
 Use `uiTokens.type.body` for interface body text, `uiTokens.type.caption` for supporting descriptions, `uiTokens.type.body` for long-form and conversation body text,
 `uiTokens.type.title` for local titles, and `uiTokens.type.pageTitle` for complete page titles; do not use the page-title scale for field labels.
-`uiTokens.type.display` (`--ui-type-display`) is the serif stack for page and section titles. The default is Iowan Old Style, Palatino, Georgia, Times New Roman, Songti SC, Songti TC, Noto Serif SC, then `serif`. Body text stays on `uiTokens.type.sans`. A host overrides the variable on an ancestor; it does not need a second theme. The horizontal padding of ordinary controls comes from
+Every title uses `uiTokens.type.sans` ([which text style where](#which-text-style-where)). The horizontal padding of ordinary controls comes from
 `uiTokens.control.inset` (text inside field surfaces uses `uiTokens.control.fieldInset`); group, section, and panel express whitespace within a group, between areas, and at container edges respectively.
 Relative indentation in reading paragraphs, media sizes, graph coordinates, and touch targets still follow real usage and do not adopt control scales.
 
@@ -483,18 +483,32 @@ navigation, fields, execution states, and conversation on one board. The
 [`settings-workflow` scene](stories/settings-workflow.stories.tsx) shows a complete local edit,
 validation, correction, and save sequence. These are composition references, not backend integrations.
 
-| Text role       | Current standard theme                           | Use                                                                                |
-| --------------- | ------------------------------------------------ | ---------------------------------------------------------------------------------- |
-| UI body         | `uiTokens.type.body`, 14px                       | Settings, control labels, and ordinary interface content                           |
-| Conversation    | `chatTokens.fontBody`, 15px with 1.7 line height | Chat prose; this scale does not enlarge settings                                   |
-| Supporting text | `uiTokens.type.caption`, 12px                    | Descriptions, timestamps, and state labels                                         |
-| Headings        | `fontTitle`, 16px; `fontPageTitle`, 24px         | Component titles and page titles, with heading levels chosen by document structure |
+#### Which text style where
 
-`PageHeader` and `Section` titles use the serif `uiTokens.type.display` stack at their existing
-24px and 16px sizes. A nested `Section` title (h3 and below) is a 14px subheading and keeps
-`uiTokens.type.sans`, because a bold serif at body size loses its shapes. Body text and controls keep
-`uiTokens.type.sans`; other component titles retain their own font rules. Heading levels still follow
-document structure.
+Every piece of text is one style of the type ramp. A style binds a size to its line box, weight and
+tracking; apply it with the `text(role)` recipe from `meowtail/theme`, or with the matching
+`uiTokens.type` size, `type.line.*` and `type.weight.*` tokens where a part sets them one by one.
+All text uses `uiTokens.type.sans`; code uses `uiTokens.type.mono`. The standard audit rules reject
+literal font sizes, line heights and weights, including inside the `font` shorthand.
+
+| Style       | Size / line / weight      | Use                                                                           |
+| ----------- | ------------------------- | ----------------------------------------------------------------------------- |
+| `eyebrow`   | 11 / 16 / 500, small caps | The one group label: menu headings, navigation groups, specimen labels        |
+| `caption`   | 12 / 18 / 400             | Fine print: descriptions under a name, timestamps, receipts, counts           |
+| code        | 12 / 18, mono             | Code, terminal output and JSON (`type.code`, `type.line.code`)                |
+| `label`     | 13 / 20 / 500             | A name in a compact surface: field labels, row titles, tooltips               |
+| `body`      | 14 / 22 / 400             | Interface copy and controls; dense rows (menus, options) use a 20px line      |
+| `reading`   | 14 / 24 / 400             | Long-form copy: Prose, chat messages, notes                                   |
+| `title`     | 16 / 24 / 600             | A container's name: card, dialog, panel, section                              |
+| `heading`   | 20 / 28 / 600             | A heading inside reading content                                              |
+| `pageTitle` | 24 / 32 / 600             | The title of a page                                                           |
+| hero        | 40 / 48 / 600             | Marketing-level titles such as a docs home page; no library component uses it |
+
+Weights mean one thing each: 400 reads, 500 names a control or a label, 600 titles a container.
+Titles at `title` and above close up by `type.trackingTight`. Heading levels still follow document
+structure: a nested `Section` title (h3 and below) is a semibold body-size subheading, and Prose
+headings step down the ramp (`heading`, `title`, then semibold body; one step smaller inside a
+conversation).
 
 The main action uses `Button`'s default `primary` variant: a near-black fill in light mode and a near-white fill in
 dark mode, paired with `onPrimary`. Use `outline` for a secondary action and `quiet` for dismissal

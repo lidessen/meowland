@@ -802,7 +802,8 @@ export const docsStyles = css`
   }
   .docs-home-route h2 {
     margin: 0 0 18px;
-    font: 500 25px/1.25 ${uiTokens.type.display};
+    font: ${uiTokens.type.weight.semibold} ${uiTokens.type.heading} / ${uiTokens.type.line.heading}
+      ${uiTokens.type.sans};
     letter-spacing: -0.025em;
   }
   .docs-home-route ol {

@@ -44,7 +44,8 @@ export const planBadgeStyles = css`
     border-radius: ${uiTokens.radius.sm};
     background: ${uiTokens.surface.fill};
     color: ${uiTokens.ink.secondary};
-    font: 500 ${uiTokens.type.caption} / 16px ${uiTokens.type.sans};
+    font: ${uiTokens.type.weight.medium} ${uiTokens.type.caption} / ${uiTokens.type.line.micro}
+      ${uiTokens.type.sans};
     white-space: nowrap;
     ${planBadgeOptions.when({ tone: "pro" })} {
       background: ${uiTokens.action.primary};

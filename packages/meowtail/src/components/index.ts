@@ -171,6 +171,12 @@ export {
 } from "./choice-group";
 export { codeBlockContract } from "./code-block.contract";
 export { CodeBlock, type CodeBlockProps } from "./code-block";
+export { mermaidDiagramContract } from "./mermaid-diagram.contract";
+export {
+  MermaidDiagram,
+  type MermaidDiagramLimits,
+  type MermaidDiagramProps,
+} from "./mermaid-diagram";
 
 export { layoutOptions } from "./layout-types";
 export {

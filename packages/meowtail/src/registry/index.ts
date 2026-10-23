@@ -29,6 +29,7 @@ import {
 } from "../components";
 import {
   codeBlockContract,
+  mermaidDiagramContract,
   itemContract,
   fieldGroupContract,
   tabsContract,
@@ -162,6 +163,7 @@ export const MeowUIComponent = {
   DiffBlock: diffBlockContract.name,
   SearchBlock: searchBlockContract.name,
   CodeBlock: codeBlockContract.name,
+  MermaidDiagram: mermaidDiagramContract.name,
   Item: itemContract.name,
   ChatBubble: chatBubbleContract.name,
   ChatConversation: chatConversationContract.name,
@@ -303,6 +305,7 @@ export const meowUIComponents = [
   tableContract,
   numberInputContract,
   codeBlockContract,
+  mermaidDiagramContract,
   choiceGroupContract,
   chatQuestionContract,
   itemContract,
@@ -425,6 +428,7 @@ declare module "meowjsx" {
     "diff-block": { parts: (typeof diffBlockContract.parts)[number] };
     "search-block": { parts: (typeof searchBlockContract.parts)[number] };
     "code-block": { parts: (typeof codeBlockContract.parts)[number] };
+    "mermaid-diagram": { parts: (typeof mermaidDiagramContract.parts)[number] };
     tabs: { parts: (typeof tabsContract.parts)[number] };
     breadcrumb: { parts: (typeof breadcrumbContract.parts)[number] };
     alert: { parts: (typeof alertContract.parts)[number] };

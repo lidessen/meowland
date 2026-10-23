@@ -44,6 +44,7 @@ import { chatComposerStyles } from "./chat/composer.styles";
 import { composerPanelStyles } from "./chat/composer-panel.styles";
 import { chatRecordsStyles } from "./chat/records.styles";
 import { codeBlockStyles } from "./components/code-block.styles";
+import { mermaidDiagramStyles } from "./components/mermaid-diagram.styles";
 import { layoutStyles } from "./components/layout.styles";
 import { descriptionListStyles } from "./components/description-list.styles";
 import { pageFrameStyles } from "./components/page-frame.styles";
@@ -173,6 +174,7 @@ export const standardThemeStyles = [
   toggleStyles,
   sliderStyles,
   codeBlockStyles,
+  mermaidDiagramStyles,
   itemStyles,
   toolbarStyles,
   tabsStyles,

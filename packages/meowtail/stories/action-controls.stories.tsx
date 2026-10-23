@@ -105,7 +105,7 @@ export const ToolbarStory = defineStory({
       <Specimen label="Standalone action group" align="start">
         <Toolbar label="Editing and canvas">
           <Button size="small">Save layout</Button>
-          <Button size="small" tabIndex={-1}>
+          <Button size="small" variant="outline" tabIndex={-1}>
             Programmatic entry point
           </Button>
           <Toolbar label="Canvas zoom">
@@ -116,7 +116,9 @@ export const ToolbarStory = defineStory({
               <Icon name="plus" />
             </IconButton>
           </Toolbar>
-          <Button size="small">Cancel editing</Button>
+          <Button size="small" variant="quiet">
+            Cancel editing
+          </Button>
         </Toolbar>
       </Specimen>
       <Specimen label="Vertical toolbar" align="start">

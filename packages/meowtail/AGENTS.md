@@ -220,6 +220,9 @@ and the Meowbook gallery use the same tokens and roles as the library.
   without a dot; it names a category, not a state, so stories never put a state word in a `Badge`.
   Timeline keeps its rail dot for color and its state word as a tertiary caption. A sequence is
   summarized as a count or a duration, never a row of one dot per step.
+- Icons: one intent, one icon, from the map in [Which icon where](src/icons/README.md#which-icon-where);
+  every semantic icon has a row there and a test keeps the two in step. A leading icon names the type
+  and stays neutral, a trailing icon names what a click does, and an unknown tool type takes `box`.
 - Tool rows: the leading glyph names the tool's type in the tertiary ink in every state; the verb
   is 500 in the secondary ink and keeps its words; the target follows in the tertiary ink and
   truncates first; the state badge follows the target, and `statusLabel` is the fact line inside

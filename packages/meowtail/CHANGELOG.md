@@ -25,6 +25,8 @@ Candidate for the next alpha publish. This version is not on npm until the manua
 
 ### Changed
 
+- Breaking: `external-link` leaves the semantic icon set (`IconName`, `iconNames`, JSON `icon` values); `arrow-up-right` is the one "open elsewhere" icon. New icon `box` is the default glyph for a tool of unknown type, replacing the wrench. [Which icon where](src/icons/README.md#which-icon-where) maps every semantic icon to one intent with placement rules, and a unit test keeps the map and the set in step.
+
 - Breaking: the design system is one role tree, `uiTokens` (surface, inverse, line, ink, state, action, control, accent, status, type, space, icon, radius, shadow, motion, layout, glyph; CSS names `--ui-<group>-<key>`). `palette.ts`, `layerTokens`, `lineTokens`, `accentTokens`, `statusTokens`, `radiusTokens`, every flat `uiTokens` key and every alias are removed. Colors are literal scheme pairs; each status has one text-safe color shared by text and markers (the bright marker greens and the separate success ink are gone); `chatTokens` keeps only chat measures (`leading`, `listGap`, `listMaxWidth`, `userMaxWidth`, `bubbleRadius`, `readingInset`, `leadingGap`, `rowLine`, `fontBody`). The host hook for the title face is `--ui-type-display`.
 
 - The theme starts from a foundation fragment (replacing the control-font rule): border-box sizing, contained media, mono code, inherited control type, one focus outline and one thin control-line scrollbar inside a Meowland region; it resets no margins, headings or lists. The 2px focus outline and Card's raised surface now come from the recipes. The lightbox ink uses `inverse.ink`. Meowslides places the foundation before its own fragments.

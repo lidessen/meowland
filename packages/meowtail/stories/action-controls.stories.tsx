@@ -36,7 +36,7 @@ export const IconButtonStory = defineStory({
           <Icon name="arrow-up-right" />
         </IconButton>
         <IconButton label="Unavailable action" disabled>
-          <Icon name="wrench" />
+          <Icon name="settings" />
         </IconButton>
       </Toolbar>
       <Note>

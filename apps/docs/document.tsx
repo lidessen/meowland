@@ -275,7 +275,7 @@ function Document({
                 title="Open the component workbench"
                 aria-label="Open the component workbench"
               >
-                <Icon name="external-link" size={16} />
+                <Icon name="arrow-up-right" size={16} />
               </a>
             </header>
             <main className={path === "" ? "docs-content docs-content-home" : "docs-content"}>

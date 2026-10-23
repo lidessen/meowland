@@ -372,6 +372,7 @@ export const DesignLanguageStory = defineStory({
                   </p>
                   <ChatProcess label="Checked 3 kinds of components">
                     <ChatToolCall
+                      icon={<Icon name="file-text" />}
                       label="Calibrate component boundaries"
                       state="complete"
                       detail="Structure, state and accessibility come from components; size, material and motion come from themes."
@@ -520,14 +521,21 @@ export const ContentCarriersStory = defineStory({
         </DialogPanel>
       </Dialog>
       <ChatToolCall
+        icon={<Icon name="file-text" />}
         label="Check component states"
         state="running"
         detail="This is a fixed-state example; no background task runs."
       />
-      <ChatToolCall label="Waiting to confirm the change scope" state="waiting" collapsible>
+      <ChatToolCall
+        icon={<Icon name="file-text" />}
+        label="Waiting to confirm the change scope"
+        state="waiting"
+        collapsible
+      >
         <p>The component contract stays stable, and themes can evolve independently.</p>
       </ChatToolCall>
       <ChatToolCall
+        icon={<Icon name="network" />}
         label="Example connection lost"
         state="error"
         detail="Input is kept; retry once the connection returns."

@@ -1,6 +1,6 @@
 import { h, signal, type Child } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Button, DiffBlock, Inline, ResourceLink, Stack, Text } from "meowtail";
+import { Button, DiffBlock, Icon, Inline, ResourceLink, Stack, Text } from "meowtail";
 import {
   AssistantView,
   ChatProcess,
@@ -122,6 +122,7 @@ export function agentWorkflowDemo(narrow = false): Child {
         progress={progress}
       >
         <ChatToolCall
+          icon={<Icon name="file-text" />}
           label="Read file"
           summary="chat/agent-workflow-with-a-very-long-unbroken-file-name.tsx"
           state={state}
@@ -138,6 +139,7 @@ export function agentWorkflowDemo(narrow = false): Child {
           }}
         />
         <ChatToolCall
+          icon={<Icon name="file-text" />}
           label="Generate check report"
           summary="Waiting for the file check to finish"
           state="queued"
@@ -217,6 +219,7 @@ export function agentWorkflowDemo(narrow = false): Child {
     "index-tools": () => (
       <Stack gap="compact">
         <ChatToolCall
+          icon={<Icon name="database" />}
           label="Read local index"
           state={retryState}
           statusLabel={retryStatus}
@@ -233,6 +236,7 @@ export function agentWorkflowDemo(narrow = false): Child {
           }}
         />
         <ChatToolCall
+          icon={<Icon name="search" />}
           label="Extra network search"
           state="cancelled"
           statusLabel="Canceled · No network request was sent"
@@ -345,6 +349,7 @@ export function agentAssistantDemo(): Child {
         {
           id: "inspect-tool",
           kind: "tool",
+          icon: "file-text",
           label: "Read component files",
           summary: "packages/meowtail/src/chat/long-component-file-name.tsx",
           state: "running",
@@ -369,6 +374,7 @@ export function agentAssistantDemo(): Child {
         {
           id: "retry-tool",
           kind: "tool",
+          icon: "database",
           label: "Read index",
           state: "error",
           statusLabel: "Local simulated read failed",

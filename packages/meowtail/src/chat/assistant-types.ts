@@ -1,3 +1,4 @@
+import type { IconName } from "../icons/icon";
 import type { Child, MaybeSignal, Props } from "meowjsx";
 import type { ChatAttachmentItem } from "./attachments";
 import type { ChatMessageRole, ChatMessageStatus } from "./message";
@@ -27,6 +28,8 @@ export interface AssistantToolPart {
   id: string;
   kind: "tool";
   label: string;
+  /** The tool's type glyph (terminal, file-text, search…); the generic tool glyph otherwise. */
+  icon?: IconName;
   summary?: string;
   state?: ChatExecutionState;
   statusLabel?: string;

@@ -274,11 +274,13 @@ export const ExecutionDetailsStory = defineStory({
       {(["running", "complete", "waiting", "error"] as const).map((state) => (
         <section className="workshop-section" aria-label={`${state} execution state`}>
           <ChatToolCall
+            icon={<Icon name="list-checks" />}
             label={`Component check · ${state}`}
             state={state}
             detail="The plain carrier shows the evidence directly."
           />
           <ChatToolCall
+            icon={<Icon name="list-checks" />}
             label={`Expand the full check details and follow-up notes for ${state}`}
             state={state}
             collapsible
@@ -341,21 +343,37 @@ export const ExecutionWorkflowStory = defineStory({
             and empty orders.
           </p>
           <ChatProcess label="Checks and changes · 3 items" open>
-            <ChatToolCall label="Read the order summary and tests" state="complete" collapsible>
+            <ChatToolCall
+              icon={<Icon name="file-text" />}
+              label="Read the order summary and tests"
+              state="complete"
+              collapsible
+            >
               <p>
                 Read <code>orders.ts</code> and <code>orders.test.ts</code>. The summary object uses
                 a plain object, so <code>__proto__</code> and <code>constructor</code> hit prototype
                 properties.
               </p>
             </ChatToolCall>
-            <ChatToolCall label="Fix the summary for special SKUs" state="complete" collapsible>
+            <ChatToolCall
+              icon={<Icon name="file-text" />}
+              label="Fix the summary for special SKUs"
+              state="complete"
+              collapsible
+            >
               <p>
                 Store SKU counts with <code>Object.create(null)</code> while keeping the existing
                 return fields. Added regression tests for special key names and updated{" "}
                 <code>CHANGELOG.md</code>.
               </p>
             </ChatToolCall>
-            <ChatToolCall label="Run the order summary tests" state="complete" collapsible open>
+            <ChatToolCall
+              icon={<Icon name="terminal" />}
+              label="Run the order summary tests"
+              state="complete"
+              collapsible
+              open
+            >
               <pre>
                 <code>{`$ bun test orders.test.ts
 
@@ -376,6 +394,7 @@ Exit code 0`}</code>
         </ChatMessage>
         <ChatMessage role="assistant" author="Assistant" continuation>
           <ChatToolCall
+            icon={<Icon name="file-text" />}
             label="Check component library types"
             state="running"
             collapsible
@@ -388,6 +407,7 @@ Checking packages/meowtail/src/chat/tool-call.tsx`}</code>
             </pre>
           </ChatToolCall>
           <ChatToolCall
+            icon={<Icon name="terminal" />}
             label="Install project dependencies"
             state="waiting"
             collapsible
@@ -399,6 +419,7 @@ Checking packages/meowtail/src/chat/tool-call.tsx`}</code>
             </p>
           </ChatToolCall>
           <ChatToolCall
+            icon={<Icon name="terminal" />}
             label="Check formatting across the repository"
             state="error"
             collapsible

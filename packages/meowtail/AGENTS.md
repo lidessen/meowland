@@ -210,6 +210,10 @@ and the Meowbook gallery use the same tokens and roles as the library.
   stays underneath. Pressed actions take `shadow.pressed`.
 - Compact rows inside a card (resource, link, work and task rows) pad `space.insetBlock`
   `space.insetInline`; reading sections use the relationship steps.
+- Tool rows: the leading glyph names the tool's type in the tertiary ink; a state that needs the
+  reader replaces it (running turns a spinner, waiting pauses in the warning ink, an error alerts
+  in the danger ink), so a chain reads down its left edge. The verb is 500 in the secondary ink,
+  the target follows in the tertiary ink and yields width first, and the status sits right after it.
 - Status tint: Alert is the one surface that takes a status-tinted fill with a status-tinted edge.
   Other status carriers color only their marker and ink.
 - Focus: a 2px `state.focus` outline at 2px offset; inside a clipped scroller use -2px. Fields use

@@ -161,7 +161,22 @@ export const ChatToolCall = defineComponent<
         "header",
         onActivate !== undefined ? "button" : reveals ? "summary" : "div",
         onActivate !== undefined ? { type: "button", onClick: onActivate } : null,
-        context.part("icon", "span", { "aria-hidden": "true" }, icon ?? <Icon name="wrench" />),
+        context.part(
+          "icon",
+          "span",
+          { "aria-hidden": "true" },
+          <span data-tool-glyph="type">{icon ?? <Icon name="wrench" />}</span>,
+          // A state that needs the reader takes the glyph's place; the type returns when it settles.
+          <span data-tool-glyph="running">
+            <Icon name="loader-circle" />
+          </span>,
+          <span data-tool-glyph="waiting">
+            <Icon name="circle-pause" />
+          </span>,
+          <span data-tool-glyph="error">
+            <Icon name="circle-alert" />
+          </span>,
+        ),
         context.part("label", "strong", null, label),
         summary !== undefined
           ? context.part(

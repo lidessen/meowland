@@ -14,7 +14,7 @@ import {
 import type { ContentItem, SitePage } from "meowpress/build";
 import type { StoryEntry } from "meowbook";
 import type { Catalog, CatalogComponent, CatalogExample } from "./catalog";
-import type { StorySource } from "./code";
+import { renderSourceOf, type StorySource } from "./code";
 import type { DocsPackage } from "./packages";
 import {
   CodeSample,
@@ -79,7 +79,10 @@ function sourceFor(
 ): { source?: string; file?: string; line?: number } {
   const source = state.sources.get(story.id);
   if (!source) return {};
-  return { source: source.code, file: source.file, line: source.line };
+  // Show what draws the example; the story's id, title and coverage notes stay in its file.
+  const render = renderSourceOf(source.code);
+  if (!render) return { source: source.code, file: source.file, line: source.line };
+  return { source: render.code, file: source.file, line: source.line + render.lineOffset };
 }
 
 /** The trail that says where the reader is. */

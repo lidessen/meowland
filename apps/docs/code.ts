@@ -197,6 +197,93 @@ export function namedRenderSource(
   return code ? { code, offset: declaration.index } : undefined;
 }
 
+/** The longest usage snippet worth showing; a longer first use is a scene, not a usage. */
+const USAGE_LINE_LIMIT = 16;
+
+/** Skip a `{…}` expression inside JSX, from its opening brace. */
+function skipExpression(source: string, start: number): number {
+  return scan(source, start, (character, depth) => character === "}" && depth === 0);
+}
+
+/** Read the opening tag that starts at `start`: where it ends and whether it closes itself. */
+function openingTag(source: string, start: number): { end: number; selfClosing: boolean } {
+  let index = start + 1;
+  while (index < source.length) {
+    const character = source[index];
+    if (character === "{") {
+      index = skipExpression(source, index);
+      continue;
+    }
+    if (character === '"' || character === "'") {
+      index = skipQuoted(source, index, character);
+      continue;
+    }
+    if (character === ">") return { end: index + 1, selfClosing: source[index - 1] === "/" };
+    index += 1;
+  }
+  return { end: source.length, selfClosing: true };
+}
+
+/** The element named `name` whose opening tag starts at `start`, through its closing tag. */
+function elementAt(code: string, name: string, start: number): string | undefined {
+  const first = openingTag(code, start);
+  if (first.selfClosing) return code.slice(start, first.end);
+  let depth = 1;
+  let index = first.end;
+  while (index < code.length && depth > 0) {
+    const character = code[index];
+    if (character === "{") {
+      index = skipExpression(code, index);
+      continue;
+    }
+    if (code.startsWith(`</${name}`, index) && /[\s>]/.test(code[index + name.length + 2] ?? "")) {
+      index = code.indexOf(">", index) + 1;
+      depth -= 1;
+      continue;
+    }
+    if (character === "<" && /[A-Za-z]/.test(code[index + 1] ?? "")) {
+      const tag = openingTag(code, index);
+      const nested =
+        code.startsWith(`<${name}`, index) && /[\s/>]/.test(code[index + name.length + 1] ?? "");
+      if (nested && !tag.selfClosing) depth += 1;
+      index = tag.end;
+      continue;
+    }
+    index += 1;
+  }
+  return depth > 0 ? undefined : code.slice(start, index);
+}
+
+/** A `data-*` attribute: story wiring for feedback and tests, not part of a usage. */
+const DATA_ATTRIBUTE = /\s+data-[\w-]+(?:="[^"]*"|=\{[^{}]*\})?(?=[\s/>])/g;
+
+/** A value or child bound to a bare local name, such as `size={size}` or `{label}`. */
+const LOCAL_BINDING = /(?:=|>\s*)\{(?!true\}|false\}|null\}|undefined\})[a-z_$][\w$.]*\}/;
+
+/**
+ * The first readable use of the JSX element named `name` in a story's code, dedented: a usage
+ * snippet taken from the code that draws the preview rather than re-typed. Nested elements of
+ * the same name are matched, and text between tags is read as text, so an apostrophe cannot
+ * end the scan early. Story wiring (`data-*` attributes) is dropped. A use that reads a local variable, or runs longer than a few lines, shows
+ * a scene rather than a usage, so the search moves on to the next use.
+ */
+export function firstElementOf(code: string, name: string): string | undefined {
+  const opening = new RegExp(`<${name}(?=[\\s/>])`, "g");
+  for (const match of code.matchAll(opening)) {
+    const element = elementAt(code, name, match.index)?.replace(DATA_ATTRIBUTE, "");
+    if (!element || LOCAL_BINDING.test(element)) continue;
+    const lineStart = code.lastIndexOf("\n", match.index) + 1;
+    const indent = match.index - lineStart;
+    const lines = element
+      .split("\n")
+      .map((line, index) =>
+        index > 0 && line.slice(0, indent).trim() === "" ? line.slice(indent) : line,
+      );
+    if (lines.length <= USAGE_LINE_LIMIT) return lines.join("\n");
+  }
+  return undefined;
+}
+
 /** Read the source of one story from the repository. */
 export async function readStorySource(
   root: string,

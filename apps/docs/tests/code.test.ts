@@ -1,5 +1,11 @@
 import { describe, expect, test } from "bun:test";
-import { extractStorySource, namedRenderSource, renderSourceOf, statementEnd } from "../code";
+import {
+  extractStorySource,
+  firstElementOf,
+  namedRenderSource,
+  renderSourceOf,
+  statementEnd,
+} from "../code";
 
 const SOURCE = `import { h } from "meowjsx/runtime";
 import { defineStory } from "meowbook";
@@ -112,5 +118,48 @@ export const AssistantStory = defineStory({
   test("an inline render has no named source", () => {
     const story = 'export const A = defineStory({ id: "a", render: () => h("p") });';
     expect(namedRenderSource(story, story)).toBeUndefined();
+  });
+});
+
+describe("the usage snippet", () => {
+  const code = [
+    "render: () => (",
+    "    <Stack>",
+    '      <Button variant="quiet" onClick={() => go(">")}>',
+    "        Don't <Button>inner</Button> save",
+    "      </Button>",
+    "      <ButtonGroup />",
+    "    </Stack>",
+    "  )",
+  ].join("\n");
+
+  test("is the first element of that name, nested uses included, dedented", () => {
+    expect(firstElementOf(code, "Button")).toBe(
+      [
+        '<Button variant="quiet" onClick={() => go(">")}>',
+        "  Don't <Button>inner</Button> save",
+        "</Button>",
+      ].join("\n"),
+    );
+  });
+
+  test("matches whole names and self-closing elements", () => {
+    expect(firstElementOf(code, "ButtonGroup")).toBe("<ButtonGroup />");
+    expect(firstElementOf(code, "Card")).toBeUndefined();
+  });
+
+  test("skips a use bound to local variables for the next self-contained one", () => {
+    const loop = [
+      "{sizes.map((size) => <Button size={size}>{label}</Button>)}",
+      '<Button size="small" data-action="Saved." disabled={false}>Save</Button>',
+    ].join("\n");
+    expect(firstElementOf(loop, "Button")).toBe(
+      '<Button size="small" disabled={false}>Save</Button>',
+    );
+  });
+
+  test("leaves out a first use too long to read as a usage", () => {
+    const long = ["<Card>", ...Array.from({ length: 20 }, () => "  <p>line</p>"), "</Card>"];
+    expect(firstElementOf(long.join("\n"), "Card")).toBeUndefined();
   });
 });

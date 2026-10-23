@@ -6,7 +6,7 @@ import { Icon } from "meowtail/icons";
 import type { ContentItem, SitePage } from "meowpress/build";
 import type { StoryEntry } from "meowbook";
 import type { Catalog, CatalogComponent, CatalogExample } from "./catalog";
-import { renderSourceOf, type StorySource } from "./code";
+import { firstElementOf, renderSourceOf, type StorySource } from "./code";
 import type { DocsPackage } from "./packages";
 import {
   CodeSample,
@@ -278,6 +278,25 @@ function ComponentList({ state }: { state: DocsState }): Child {
   );
 }
 
+/**
+ * The import line of a public component and, when an example draws it in a few lines, that
+ * first use as a snippet: the code a reader copies first.
+ */
+function usageFor(
+  component: CatalogComponent,
+  state: DocsState,
+): { importLine: string; snippet?: string } | undefined {
+  const importLine = importLineFor(component.title);
+  if (!importLine) return undefined;
+  const stories = component.stories.length > 0 ? component.stories : component.usedIn;
+  for (const story of stories) {
+    const { source } = sourceFor(state, story);
+    const snippet = source ? firstElementOf(source, component.title) : undefined;
+    if (snippet) return { importLine, snippet };
+  }
+  return { importLine };
+}
+
 /** The line that imports a component, when its name is a public export of the package. */
 function importLineFor(name: string): string | undefined {
   return /^[A-Z][A-Za-z0-9]*$/.test(name) && name in meowtail
@@ -295,7 +314,7 @@ function PackagePage({
   state: DocsState;
 }): Child {
   const sections: ReadingSection[] = [
-    { id: "install", title: "Install", children: <InstallLine name={entry.name} /> },
+    { id: "installation", title: "Installation", children: <InstallLine name={entry.name} /> },
   ];
   if (content) {
     sections.push({
@@ -366,7 +385,7 @@ function ComponentPage({
       title: "Preview",
       description: borrowed
         ? `${component.title} has no story of its own; this one draws it as part of ${primary.component ?? "a composed scene"}.`
-        : "The first story that shows this component.",
+        : undefined,
       children: (
         <StoryExample
           storyId={primary.id}
@@ -379,17 +398,24 @@ function ComponentPage({
     });
   }
   sections.push({
-    id: "install",
-    title: "Install",
-    children: (
-      <Stack gap="compact">
-        <InstallLine name={COMPONENT_PACKAGE} />
-        {importLineFor(component.title) ? (
-          <CodeSample source={importLineFor(component.title)!} file="usage.ts" />
-        ) : null}
-      </Stack>
-    ),
+    id: "installation",
+    title: "Installation",
+    children: <InstallLine name={COMPONENT_PACKAGE} />,
   });
+  const usage = usageFor(component, state);
+  if (usage) {
+    sections.push({
+      id: "usage",
+      title: "Usage",
+      description: usage.snippet ? "Taken from the examples on this page." : undefined,
+      children: (
+        <CodeSample
+          source={usage.snippet ? `${usage.importLine}\n\n${usage.snippet}` : usage.importLine}
+          file={usage.snippet ? "usage.tsx" : "usage.ts"}
+        />
+      ),
+    });
+  }
   if (rest.length > 0) {
     sections.push({
       id: "examples",

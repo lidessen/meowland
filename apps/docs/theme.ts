@@ -587,6 +587,41 @@ export const docsStyles = css`
     border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
     border-radius: 0;
   }
+  /* Once tabs show one panel at a time, the code fills the frame on its own. */
+  [data-docs-tabs="ready"] .docs-specimen ${partSelector(codeBlockContract, "root")} {
+    border-top: 0;
+  }
+  [data-docs-panel][hidden] {
+    display: none;
+  }
+  /* Preview and Code: text tabs on a hairline, the selected one underlined in ink. */
+  .docs-tabs {
+    display: flex;
+    gap: 20px;
+    border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+  }
+  .docs-tabs[hidden] {
+    display: none;
+  }
+  .docs-tabs button {
+    margin: 0 0 -1px;
+    padding: 6px 0 8px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: none;
+    color: ${uiTokens.ink.secondary};
+    font: inherit;
+    font-size: ${uiTokens.type.label};
+    font-weight: 500;
+    cursor: pointer;
+  }
+  .docs-tabs button:hover {
+    color: ${uiTokens.ink.primary};
+  }
+  .docs-tabs button[aria-selected="true"] {
+    border-bottom-color: ${uiTokens.ink.primary};
+    color: ${uiTokens.ink.primary};
+  }
   .docs-article ${partSelector(codeBlockContract, "header")} {
     padding: 10px 16px;
     border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};

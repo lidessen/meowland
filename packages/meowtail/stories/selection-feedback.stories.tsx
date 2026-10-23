@@ -22,34 +22,42 @@ export const SegmentedFormStory = defineStory({
     const inside = signal("a");
     const outside = signal("a");
     return (
-      <Stack>
+      <Stack gap="relaxed" align="start">
         <form id="segmented-inside">
+          <Stack gap="compact" align="start">
+            <SegmentedControl
+              id="inside-choice"
+              name="mode"
+              label="Inner choice"
+              value={inside}
+              options={options}
+              onValueChange={(value) => {
+                inside.value = value;
+              }}
+            />
+            <Button type="reset" variant="outline" size="small">
+              Reset inner form
+            </Button>
+          </Stack>
+        </form>
+        <Stack gap="compact" align="start">
           <SegmentedControl
-            id="inside-choice"
+            id="outside-choice"
             name="mode"
-            label="Inner choice"
-            value={inside}
+            form="segmented-outside"
+            label="Outer choice"
+            value={outside}
             options={options}
             onValueChange={(value) => {
-              inside.value = value;
+              outside.value = value;
             }}
           />
-          <Button type="reset">Reset inner form</Button>
-        </form>
-        <form id="segmented-outside">
-          <Button type="reset">Reset outer form</Button>
-        </form>
-        <SegmentedControl
-          id="outside-choice"
-          name="mode"
-          form="segmented-outside"
-          label="Outer choice"
-          value={outside}
-          options={options}
-          onValueChange={(value) => {
-            outside.value = value;
-          }}
-        />
+          <form id="segmented-outside">
+            <Button type="reset" variant="outline" size="small">
+              Reset outer form
+            </Button>
+          </form>
+        </Stack>
       </Stack>
     );
   },

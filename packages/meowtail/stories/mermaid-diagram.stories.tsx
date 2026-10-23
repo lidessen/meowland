@@ -26,6 +26,13 @@ const usage = `pie title Where review time goes
   "Writing comments" : 18
   "Waiting on checks" : 14`;
 
+const weekly = `xychart-beta
+  title "Reviews per week"
+  x-axis [W1, W2, W3, W4, W5, W6]
+  y-axis "Reviews" 0 --> 40
+  bar [12, 18, 22, 19, 30, 34]
+  line [10, 15, 20, 22, 27, 31]`;
+
 const lifecycle = `stateDiagram-v2
   [*] --> Draft
   Draft --> Review: submit
@@ -48,6 +55,7 @@ export const MermaidDiagramStory = defineStory({
     "flowchart",
     "sequence",
     "pie",
+    "xychart",
     "state",
     "live source",
     "limits",
@@ -73,13 +81,14 @@ export const MermaidDiagramStory = defineStory({
             <MermaidDiagram data-diagram="state" title="Change lifecycle" source={lifecycle} />
           </Specimen>
         </Grid>
-        <Specimen
-          label="Chart"
-          note="Slices take the shared chart series in order."
-          width="content"
-        >
-          <MermaidDiagram data-diagram="pie" source={usage} />
-        </Specimen>
+        <Grid columns={2} gap="relaxed">
+          <Specimen label="Pie" note="Slices take the shared chart series in order.">
+            <MermaidDiagram data-diagram="pie" source={usage} />
+          </Specimen>
+          <Specimen label="Bars and a line">
+            <MermaidDiagram data-diagram="xychart" source={weekly} />
+          </Specimen>
+        </Grid>
         <Specimen label="Live source" note="A Signal source redraws in place." width="content">
           <MermaidDiagram data-diagram="live" title="Steps so far" source={steps} />
           <ActionRow>

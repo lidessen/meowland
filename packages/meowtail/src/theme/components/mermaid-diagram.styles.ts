@@ -90,11 +90,46 @@ export const mermaidDiagramStyles = css`
   ${part("root")}[data-state="error"] ${part("canvas")} {
     display: none;
   }
-  /* Pele paints labels inside pie slices in the background color, which is dark in the dark
-     scheme. They sit on saturated series colors in both schemes, so they take inverse ink.
-     Pele class names are not an API; the browser test pins this one. */
+  /*
+   * Charts follow the data-visualization rules: thin marks with surface gaps, recessive grid and
+   * axes, text in text ink. Pele draws them; these rules restyle its marks, and its class names
+   * are not an API, so the browser test pins each one used here.
+   */
+  /* The pie reads as a donut: a ring with 2px surface gaps between slices. */
+  ${part("canvas")} .pele-slices {
+    stroke-width: 2px;
+    mask-image: radial-gradient(circle closest-side, transparent 56%, black 56.5%);
+  }
+  /* Slice labels sit on the ring, on saturated series colors in both schemes. */
   ${part("canvas")} .pele-slice-labels[fill] {
     fill: ${uiTokens.inverse.ink};
+    font-weight: ${uiTokens.type.weight.medium};
+  }
+  ${part("canvas")} :is(.pele-legend, .pele-axis-labels, .pele-axis-titles) {
+    fill: ${uiTokens.ink.secondary};
+  }
+  ${part("canvas")} .pele-legend rect {
+    rx: 50%;
+  }
+  ${part("canvas")} .pele-grid {
+    stroke: ${uiTokens.line.divider};
+  }
+  ${part("canvas")} .pele-axis {
+    stroke: ${uiTokens.line.edge};
+  }
+  /* Bars narrow to a little over half their slot around their own center, so the plot reads as
+     marks rather than a block of color; the data end keeps a small round. */
+  ${part("canvas")} .pele-bars rect {
+    transform: scaleX(0.56);
+    transform-box: fill-box;
+    transform-origin: center;
+    rx: 4px;
+  }
+  /* Line points: a filled dot ringed in the surface, large enough to read over a bar. */
+  ${part("canvas")} .pele-line circle {
+    r: 4px;
+    stroke: ${uiTokens.surface.raised};
+    stroke-width: 2px;
   }
   ${part("canvas")} > svg {
     display: block;

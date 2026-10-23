@@ -16,12 +16,14 @@ export const emptyStateStyles = css`
     text-align: center;
   }
   ${partSelector(emptyStateContract, "illustration")} {
-    width: 72px;
+    display: grid;
+    justify-items: center;
     color: ${uiTokens.ink.secondary};
   }
+  /* Caller artwork fills a 72px mark; the default EmptyStack keeps its own wider size. */
   ${partSelector(emptyStateContract, "illustration")} > svg {
     display: block;
-    width: 100%;
+    width: 72px;
     height: auto;
     stroke-width: 2.4;
   }

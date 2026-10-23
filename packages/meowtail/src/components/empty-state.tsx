@@ -1,5 +1,5 @@
 import { defineComponent, h, type Child, type Props } from "meowjsx";
-import { DoodleCat } from "../icons/doodle-cat";
+import { EmptyStack } from "../icons/empty-stack";
 import { defineOptions } from "meowcss";
 import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
 
@@ -16,7 +16,7 @@ export interface EmptyStateProps extends Props, ThemedProps<typeof emptyStateOpt
   copy?: string;
   action?: Child;
   /**
-   * Artwork above the title. Omitted uses `DoodleCat`. `null` and `false` leave
+   * Artwork above the title. Omitted uses `EmptyStack`. `null` and `false` leave
    * the illustration part out. Presence is fixed for the mount.
    */
   illustration?: Child;
@@ -28,7 +28,7 @@ export const EmptyState = defineComponent<
   typeof emptyStateContract.name,
   (typeof emptyStateContract.parts)[number]
 >(emptyStateContract, ({ title, copy, action, illustration, className, ...props }, context) => {
-  const art = illustration === undefined ? <DoodleCat /> : illustration;
+  const art = illustration === undefined ? <EmptyStack /> : illustration;
   return context.part(
     "root",
     "div",

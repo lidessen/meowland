@@ -345,7 +345,7 @@ The parts are `root/trigger/value/indicator/list/group/option/native/validation`
 - Dialogs: Dialog, DialogPanel, DialogHeader, DialogActions.
 - Chat: ChatFrame, ChatHeader, ChatStatus, ChatConversation, ChatMessageList, ChatMessage, ChatBubble,
   ChatMessageActions, ChatComposer, ChatToolCall, ChatAttachments, ChatProcess, ChatSources.
-- Icons: the finite semantic set `Icon` and `iconNames` sourced from the pinned Lucide dependency, caller-supplied `IconSource` and `IconNode`, and the `meowtail/icons/lucide` pass-through for application icons, plus MeowlandMark, DoodleCat, NotesIcon, TasksIcon, SearchIcon, PlusIcon, GithubIcon, ExternalArrowIcon.
+- Icons: the finite semantic set `Icon` and `iconNames` sourced from the pinned Lucide dependency, caller-supplied `IconSource` and `IconNode`, and the `meowtail/icons/lucide` pass-through for application icons, plus MeowlandMark, DoodleCat, EmptyStack, NotesIcon, TasksIcon, SearchIcon, PlusIcon, GithubIcon, ExternalArrowIcon.
 
 Icons outside the semantic set go through `IconSource` with structural `IconNode` data from a trusted source. The pinned pass-through at `meowtail/icons/lucide` re-exports the installed Lucide version, so an application can use any Lucide icon without adding its own icon dependency; JSON surfaces keep only the finite `iconNames` set:
 
@@ -382,7 +382,7 @@ DialogPanel distributes standard whitespace inside its direct header and body, e
 
 `EmptyState size="compact"` is for a local empty list or an unselected content region, keeping the title, description, and actions while removing decorative artwork.
 The default `size="default"` keeps the full-page empty state; loading and failure still use their existing feedback and do not become empty states.
-`illustration` replaces the default `DoodleCat`. `null` and `false` leave the illustration part out. Presence is fixed for the mount, and compact size still hides that part when it is present.
+`illustration` replaces the default `EmptyStack`, three receding cards painted from the surface ladder with one accent spark. `null` and `false` leave the illustration part out. Presence is fixed for the mount, and compact size still hides that part when it is present.
 
 `ChatAttachments` accepts `items: readonly ChatAttachmentItem[]`, where each item has
 `id`, `name`, `url`, `mediaType`, and an optional `sizeBytes`; `label` defaults to "Message attachments".

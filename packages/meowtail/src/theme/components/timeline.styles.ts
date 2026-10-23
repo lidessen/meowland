@@ -56,22 +56,10 @@ export const timelineStyles = css`
     font-weight: 500;
     overflow-wrap: anywhere;
   }
+  /* The rail's dot carries the state's color; the word beside the title stays a quiet caption. */
   ${entry("state")} {
     font-size: ${uiTokens.type.caption};
-    color: ${uiTokens.ink.secondary};
-  }
-  ${entry("root")}[data-state="processing"] ${entry("state")} {
-    color: ${uiTokens.accent.base};
-  }
-  ${entry("root")}[data-state="returned"] ${entry("state")},
-  ${entry("root")}[data-state="success"] ${entry("state")} {
-    color: ${uiTokens.status.success};
-  }
-  ${entry("root")}[data-state="warning"] ${entry("state")} {
-    color: ${uiTokens.status.warning};
-  }
-  ${entry("root")}[data-state="danger"] ${entry("state")} {
-    color: ${uiTokens.status.danger};
+    color: ${uiTokens.ink.tertiary};
   }
   ${entry("description")} {
     margin: 0;

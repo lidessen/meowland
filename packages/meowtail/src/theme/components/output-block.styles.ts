@@ -204,13 +204,9 @@ export const outputBlockStyles = css`
     clip-path: inset(50%);
     white-space: nowrap;
   }
-  ${partSelector(terminal, "status")} {
-    flex: none;
-    font: ${uiTokens.type.micro}/22px ${uiTokens.type.sans};
-    color: ${uiTokens.ink.tertiary};
-  }
-  ${partSelector(terminal, "status")}[data-terminal-error="true"] {
-    color: ${uiTokens.status.danger};
+  /* The finished-but-not-clean state is the shared badge; the prompt's own dot steps aside for it. */
+  ${partSelector(terminal, "prompt")}:has(+ ${partSelector(terminal, "status")}) ${partSelector(terminal, "runState")} {
+    display: none;
   }
   ${partSelector(terminal, "span")}[data-ansi-bold="true"] {
     font-weight: 700;

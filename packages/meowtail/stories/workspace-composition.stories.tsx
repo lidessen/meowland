@@ -16,8 +16,8 @@ import {
   PageHeader,
   Popover,
   Stack,
-  StatusDot,
   Toolbar,
+  Status,
 } from "meowtail";
 
 export const WorkspaceCompositionStory = defineStory({
@@ -120,7 +120,7 @@ export const WorkspaceCompositionStory = defineStory({
                       <ListRow
                         title={`Check ${index + 1}`}
                         description="Dynamic content grows in the natural text flow; the body keeps scrolling while the page header stays put."
-                        status={[<StatusDot state="success" />, "Ready"]}
+                        status={<Status state="success" label="Ready" />}
                       />
                     )),
                   )}

@@ -316,11 +316,11 @@ export const DesignLanguageStory = defineStory({
             </div>
             <Separator />
             <div className="workshop-row">
-              <Badge>Draft</Badge>
-              <Badge tone="accent">In progress</Badge>
-              <Badge tone="success">Synced</Badge>
-              <Badge tone="warning">Waiting for review</Badge>
-              <Badge tone="danger">Failed</Badge>
+              <Status state="idle" label="Draft" />
+              <Status state="processing" label="Syncing" />
+              <Status state="success" label="Synced" />
+              <Status state="warning" label="In review" />
+              <Status state="danger" label="Failed" />
             </div>
             <div className="language-samples" aria-label="Execution state meanings">
               <Status state="processing" label="Processing · Work is happening now" />
@@ -405,7 +405,7 @@ export const DesignLanguageStory = defineStory({
                 </p>
                 <Separator />
                 <div className="workshop-row">
-                  <Badge tone="success">Synced</Badge>
+                  <Status state="success" label="Synced" />
                   <span className="language-note">Updated just now</span>
                 </div>
                 <Button variant="outline">View project</Button>

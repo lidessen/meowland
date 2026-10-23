@@ -1,7 +1,7 @@
 import { defineComponent, h, type ComponentContract, type Props } from "meowjsx";
 import { OutputBlock } from "./output-block";
+import { StatusDot } from "./status-dot";
 import { StateDot } from "./state-dot";
-import { Pill } from "./pill";
 
 export const terminalBlockContract = {
   name: "terminal-block",
@@ -145,8 +145,10 @@ export const TerminalBlock = defineComponent<
                   "span",
                   {
                     "data-terminal-error": failed ? "true" : undefined,
+                    "data-tone": failed ? "danger" : "unknown",
                   },
-                  <Pill style="color:inherit">{status}</Pill>,
+                  <StatusDot state={failed ? "danger" : "unknown"} />,
+                  status,
                 )
               : null}
           </div>

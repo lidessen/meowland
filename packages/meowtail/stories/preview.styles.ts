@@ -254,9 +254,14 @@ export const previewStyles = css`
     min-width: 0;
     gap: 6px;
   }
+  /* A field's helper action reads as a follow-on hint under the control, from its start edge. */
   .workshop-foundation-field-action {
     display: flex;
-    justify-content: flex-end;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px;
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
   }
   .workshop-foundation-destructive {
     display: flex;

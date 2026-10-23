@@ -184,6 +184,146 @@ export const docsStyles = css`
     border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     min-width: 0;
   }
+  /* Search: a field-shaped trigger in the header and a dialog over the site index. */
+  .docs-search-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex: none;
+    height: 32px;
+    margin-left: auto;
+    padding: 0 6px 0 10px;
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.md};
+    background: ${uiTokens.surface.raised};
+    color: ${uiTokens.ink.tertiary};
+    font: inherit;
+    font-size: ${uiTokens.type.label};
+    cursor: pointer;
+  }
+  .docs-search-open[hidden] {
+    display: none;
+  }
+  .docs-search-open > span {
+    min-width: 120px;
+    text-align: left;
+  }
+  .docs-search-open:hover {
+    border-color: ${uiTokens.line.control};
+    color: ${uiTokens.ink.secondary};
+  }
+  :is(.docs-search-open, .docs-search-field) kbd {
+    padding: 1px 6px;
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.sm};
+    color: ${uiTokens.ink.tertiary};
+    font: ${uiTokens.type.micro}/1.5 ${uiTokens.type.mono};
+  }
+  .docs-search-open:not([hidden]) ~ .docs-appearance {
+    margin-left: 0;
+  }
+  .docs-search-dialog {
+    width: min(600px, calc(100vw - 32px));
+    max-height: min(560px, calc(100dvh - 120px));
+    margin: 12vh auto auto;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.overlay};
+    color: ${uiTokens.ink.primary};
+    box-shadow: ${uiTokens.shadow.float};
+  }
+  .docs-search-dialog[open] {
+    display: flex;
+    flex-direction: column;
+    animation: docs-search-enter ${uiTokens.motion.settle} ${uiTokens.motion.enter};
+  }
+  .docs-search-dialog::backdrop {
+    background: ${uiTokens.surface.scrim};
+  }
+  @keyframes docs-search-enter {
+    from {
+      opacity: 0;
+      transform: translateY(-6px) scale(0.98);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .docs-search-dialog[open] {
+      animation: none;
+    }
+  }
+  .docs-search-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+    color: ${uiTokens.ink.tertiary};
+  }
+  .docs-search-field input {
+    flex: 1;
+    min-width: 0;
+    height: 52px;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body} ${uiTokens.type.sans};
+  }
+  .docs-search-field input::-webkit-search-cancel-button {
+    display: none;
+  }
+  .docs-search-results {
+    flex: 1;
+    min-height: 0;
+    margin: 0;
+    padding: 6px;
+    overflow-y: auto;
+    list-style: none;
+  }
+  .docs-search-results:empty {
+    display: none;
+  }
+  .docs-search-results a {
+    display: grid;
+    gap: 2px;
+    padding: 10px 12px;
+    border-radius: ${uiTokens.radius.lg};
+    color: inherit;
+    text-decoration: none;
+  }
+  .docs-search-results a[aria-selected="true"] {
+    background: ${uiTokens.accent.selected};
+  }
+  .docs-search-title {
+    font-weight: 500;
+  }
+  .docs-search-meta {
+    overflow: hidden;
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .docs-search-empty {
+    margin: 0;
+    padding: 28px 16px;
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.label};
+    text-align: center;
+  }
+  @media (max-width: 900px) {
+    .docs-search-open > span,
+    .docs-search-open > kbd {
+      display: none;
+    }
+    .docs-search-open {
+      width: 32px;
+      padding: 0;
+      justify-content: center;
+    }
+  }
   /* The appearance switch: one quiet icon button that shows the current choice. */
   .docs-appearance {
     display: inline-grid;
@@ -191,7 +331,6 @@ export const docsStyles = css`
     flex: none;
     width: 32px;
     height: 32px;
-    margin-left: auto;
     padding: 0;
     border: 0;
     border-radius: ${uiTokens.radius.md};

@@ -6,6 +6,7 @@ import { removeEmptyScriptChunks } from "./cleanup";
 import { readStorySource, type StorySource } from "./code";
 import { writeFavicon } from "./favicon";
 import { highlightStaticCode } from "./highlight";
+import { writeSearchIndex } from "./search";
 import { readPackages } from "./packages";
 import { createSiteConfig } from "./site.config";
 import { type DocsState } from "./pages";
@@ -39,6 +40,7 @@ export async function buildDocs(): Promise<void> {
   await buildSite(createSiteConfig(state, outputDirectory));
   await removeEmptyScriptChunks(outputDirectory);
   await highlightStaticCode(outputDirectory);
+  await writeSearchIndex(outputDirectory);
   await writeFavicon(outputDirectory);
 
   await buildStories(meowbookConfig, resolve(outputDirectory, "gallery"));

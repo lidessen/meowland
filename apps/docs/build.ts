@@ -8,7 +8,7 @@ import { writeFavicon } from "./favicon";
 import { highlightStaticCode } from "./highlight";
 import { writeSearchIndex } from "./search";
 import { readPackages } from "./packages";
-import { readComponentProps } from "./props";
+import { readComponentProps, splitSummary } from "./props";
 import { createSiteConfig } from "./site.config";
 import { type DocsState } from "./pages";
 import meowbookConfig from "./meowbook.config";
@@ -41,6 +41,12 @@ export async function buildDocs(): Promise<void> {
   });
 
   const props = await readComponentProps(resolve(root, "packages/meowtail/src"));
+  // What a component is comes from the first sentence of its JSDoc; a story description says
+  // what one example shows.
+  for (const component of catalog.components) {
+    const summary = props.get(component.title)?.summary;
+    if (summary) component.summary = splitSummary(summary).summary.replace(/`/g, "");
+  }
   const state: DocsState = { catalog, packages, sources, props };
   await buildSite(createSiteConfig(state, outputDirectory));
   await removeEmptyScriptChunks(outputDirectory);

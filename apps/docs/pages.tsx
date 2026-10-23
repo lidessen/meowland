@@ -8,9 +8,10 @@ import type { StoryEntry } from "meowbook";
 import type { Catalog, CatalogComponent, CatalogExample } from "./catalog";
 import { firstElementOf, renderSourceOf, type StorySource } from "./code";
 import type { DocsPackage } from "./packages";
-import type { ComponentProps } from "./props";
+import { splitSummary, type ComponentProps } from "./props";
 import {
   CodeSample,
+  InlineCodeNote,
   InstallLine,
   Note,
   PartList,
@@ -28,6 +29,9 @@ export interface DocsState {
   /** The props each component declares, by component name. */
   props?: Map<string, ComponentProps>;
 }
+
+/** The index of every component page. */
+const COMPONENTS_PATH = "components";
 
 /** The package that owns the component library. */
 export const COMPONENT_PACKAGE = "meowtail";
@@ -89,9 +93,13 @@ function trailFor(path: string, state: DocsState): TrailItem[] {
     const entry = state.packages.find((candidate) => candidate.path === path);
     return [{ label: "Package" }, { label: entry?.title ?? "Package" }];
   }
+  if (path === COMPONENTS_PATH) return [{ label: "Components" }];
   if (path.startsWith("components/")) {
     const component = state.catalog.components.find((candidate) => candidate.path === path);
-    return [{ label: component?.group ?? "Component" }, { label: component?.title ?? "Component" }];
+    return [
+      { label: "Components", href: `/${COMPONENTS_PATH}/` },
+      { label: component?.title ?? "Component" },
+    ];
   }
   const example = state.catalog.examples.find((candidate) => candidate.path === path);
   return [{ label: example?.group ?? "Example" }, { label: example?.title ?? "Example" }];
@@ -300,6 +308,12 @@ function usageFor(
   return { importLine };
 }
 
+/** What a component's JSDoc says after its first sentence: the contract notes. */
+function notesFor(props: ComponentProps | undefined): Child {
+  const rest = props?.summary ? splitSummary(props.summary).rest : undefined;
+  return rest ? <InlineCodeNote text={rest} /> : null;
+}
+
 /** The line that imports a component, when its name is a public export of the package. */
 function importLineFor(name: string): string | undefined {
   return /^[A-Z][A-Za-z0-9]*$/.test(name) && name in meowtail
@@ -446,6 +460,7 @@ function ComponentPage({
     title: "API reference",
     children: (
       <Stack gap="relaxed">
+        {notesFor(state.props?.get(component.title))}
         <div>
           <h3 className="docs-example-title">Props</h3>
           <PropsTable contract={component.contract} props={state.props?.get(component.title)} />
@@ -479,8 +494,8 @@ function ComponentPage({
       description={
         component.summary ??
         (primary
-          ? `Shown below inside the stories that use it. Its contract, style axes and DOM parts follow.`
-          : "No story covers this component yet. Its contract, style axes and DOM parts are listed below.")
+          ? "Shown below inside the stories that use it. Its props and DOM parts follow."
+          : "No story covers this component yet. Its props and DOM parts are listed below.")
       }
       width={PAGE_WIDTH}
     >
@@ -526,6 +541,23 @@ function ExamplePage({ example, state }: { example: CatalogExample; state: DocsS
   );
 }
 
+const COMPONENTS_SUMMARY =
+  "Every component the library publishes, grouped by what it is for. Each page has a live preview, its usage and its props.";
+
+/** The components index: every group with its components and one line on each. */
+function ComponentsPage({ state }: { state: DocsState }): Child {
+  return (
+    <Page
+      className="docs-reference-page"
+      title="Components"
+      description={COMPONENTS_SUMMARY}
+      width={PAGE_WIDTH}
+    >
+      <ComponentList state={state} />
+    </Page>
+  );
+}
+
 /** The body of one page. */
 export function renderPageBody(
   path: string,
@@ -533,6 +565,7 @@ export function renderPageBody(
   contentBySlug: Map<string, ContentItem>,
 ): Child {
   if (path === "") return <HomePage state={state} />;
+  if (path === COMPONENTS_PATH) return <ComponentsPage state={state} />;
   if (path.startsWith("packages/")) {
     const name = path.slice("packages/".length);
     const entry = state.packages.find((candidate) => candidate.path === path);
@@ -581,6 +614,7 @@ export function buildPages(
   };
 
   add("", SITE_NAME, SITE_DESCRIPTION, "Overview", 0);
+  add(COMPONENTS_PATH, "Components", COMPONENTS_SUMMARY, "Overview", 5);
   for (const entry of state.packages) {
     add(entry.path, entry.title, entry.summary, "Packages", 10);
   }

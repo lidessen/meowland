@@ -242,8 +242,8 @@ describe("the page sequence", () => {
   test("a page links the pages before and after it in sidebar order", () => {
     const html = document("packages/meowtail");
     const pager = html.slice(html.indexOf('class="docs-pager"'));
-    expect(pager).toContain('href="/" rel="prev"');
-    expect(pager).toContain("Home");
+    expect(pager).toContain('href="/components/" rel="prev"');
+    expect(pager).toContain("Components");
     expect(pager).toContain('rel="next"');
     expect(pager).not.toContain("/gallery/");
   });
@@ -252,7 +252,7 @@ describe("the page sequence", () => {
     const html = document("");
     const pager = html.slice(html.indexOf('class="docs-pager"'));
     expect(pager).not.toContain('rel="prev"');
-    expect(pager).toContain('href="/packages/meowtail/" rel="next"');
+    expect(pager).toContain('href="/components/" rel="next"');
   });
 });
 

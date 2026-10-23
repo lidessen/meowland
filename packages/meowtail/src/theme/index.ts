@@ -68,6 +68,7 @@ import { codeHighlightStyles } from "./shared/code-highlight.styles";
 import { fieldSurfaceStyles } from "./shared/field-surface.styles";
 import { actionRowStyles } from "./shared/action-row.styles";
 import { codeHighlightTokens } from "./shared/code-highlight.tokens";
+import { chartTokens } from "./shared/chart.tokens";
 import { statusDotStyles } from "./components/status-dot.styles";
 import { statusStyles } from "./components/status.styles";
 import { tagStyles } from "./components/tag.styles";
@@ -100,12 +101,14 @@ import { accordionStyles } from "./components/accordion.styles";
 import { contextMenuStyles } from "./components/context-menu.styles";
 
 export { standardOptions, uiTokens, chatTokens, logoTokens } from "./tokens";
+export { chartTokens } from "./shared/chart.tokens";
 
 export const standardThemeTokens = [
   uiTokens,
   chatTokens,
   alertTokens,
   codeHighlightTokens,
+  chartTokens,
 ] as const;
 
 export const standardThemeStyles = [

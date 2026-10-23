@@ -126,7 +126,8 @@ Every value a theme file paints with is a role in one tree, `uiTokens` in `src/t
 shadow or duration; a length that belongs to one part's geometry stays beside that part's selector.
 Colors are literal `[light, dark]` pairs and never reference another token, so a nested scheme
 region resolves its own value. Chat-only measures live in `chatTokens`; option-driven values
-(`alertTokens`) and syntax colors (`codeHighlightTokens`) are the only other sets. There are no
+(`alertTokens`), syntax colors (`codeHighlightTokens`) and the categorical chart series
+(`chartTokens.series1` … `series8`, taken in fixed order, never cycled) are the only other sets. There are no
 aliases: one role, one name.
 
 | Group     | Keys                                                                         | Rule                                                                       |

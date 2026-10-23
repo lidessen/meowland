@@ -124,7 +124,8 @@ function displayNames(): Map<string, string> {
 const USED_IN_LIMIT = 3;
 
 /**
- * The stories whose example draws a component, as JSX or through `h`. Stories that document one
+ * The stories whose example draws a component, as JSX or through `h`, or that name it in their
+ * `covers` list, which is how a story shows a registered part no public component exposes. Stories that document one
  * component come before composed scenes, then the examples that draw it most often, then the
  * shorter ones, so the first is the one where the component is easiest to see.
  */
@@ -139,10 +140,12 @@ function storiesUsing(
   for (const story of stories) {
     if (seen.has(story.id)) continue;
     const source = sourceOf(story);
-    const uses = source?.match(pattern)?.length ?? 0;
-    if (!source || uses === 0) continue;
+    const uses =
+      (source?.match(pattern)?.length ?? 0) +
+      (story.covers?.filter((entry) => entry === title).length ?? 0);
+    if (uses === 0) continue;
     seen.add(story.id);
-    matches.push({ story, uses, length: source.length });
+    matches.push({ story, uses, length: source?.length ?? 0 });
   }
   return matches
     .sort(

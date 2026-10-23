@@ -79,6 +79,14 @@ describe("the component catalog", () => {
     expect(component?.group).toBe("Content");
   });
 
+  test("a registered part without a component borrows the stories that cover it", () => {
+    const catalog = buildCatalog([
+      story({ id: "assistant", component: "AssistantView", covers: ["assistant-steps"] }),
+    ]);
+    const steps = catalog.components.find((entry) => entry.title === "assistant-steps");
+    expect(steps?.usedIn.map((entry) => entry.id)).toEqual(["assistant"]);
+  });
+
   test("the registry contributes the components no story covers", () => {
     const catalog = buildCatalog([story({ id: "button", component: "Button" })]);
     const withoutStories = catalog.components.filter(

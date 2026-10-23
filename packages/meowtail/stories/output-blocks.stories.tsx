@@ -10,6 +10,7 @@ export const OutputBlocksStory = defineStory({
   id: "output-blocks",
   title: "Execution output · Terminal, file, diff, and search",
   group: "Content",
+  covers: ["output-block", "TerminalBlock", "ReadBlock", "DiffBlock", "SearchBlock"],
   render: () => (
     <Stack>
       <TerminalBlock

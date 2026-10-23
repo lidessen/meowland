@@ -75,14 +75,31 @@ export function StoryExample({
   tall?: boolean;
 }): Child {
   return (
-    <Stack gap="compact" className="docs-example">
+    <Stack gap="compact" className="docs-example" data-docs-tabs={source ? "" : undefined}>
       <div className="docs-example-head">
         <h3 className="docs-example-title">{title}</h3>
         {description ? <p className="docs-note">{description}</p> : null}
       </div>
+      {/* Wired by the page script; without it the preview and its code both stay in view. */}
+      {source ? (
+        <div className="docs-tabs" role="tablist" aria-label={`${title}: preview or code`} hidden>
+          <button type="button" role="tab" aria-selected="true" data-docs-tab="preview">
+            Preview
+          </button>
+          <button type="button" role="tab" aria-selected="false" data-docs-tab="code">
+            Code
+          </button>
+        </div>
+      ) : null}
       <div className="docs-specimen">
-        <Preview storyId={storyId} title={title} tall={tall} />
-        {source ? <CodeSample source={source} file={file} line={line} /> : null}
+        <div data-docs-panel="preview">
+          <Preview storyId={storyId} title={title} tall={tall} />
+        </div>
+        {source ? (
+          <div data-docs-panel="code">
+            <CodeSample source={source} file={file} line={line} />
+          </div>
+        ) : null}
       </div>
     </Stack>
   );

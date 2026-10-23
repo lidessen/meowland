@@ -46,6 +46,14 @@ const state: DocsState = {
   packages,
   sources: new Map([
     [
+      "button",
+      {
+        code: 'export const ButtonStory = defineStory({\n  render: () => <Button variant="quiet">Save</Button>,\n});',
+        file: "packages/meowtail/stories/button.stories.tsx",
+        line: 1,
+      },
+    ],
+    [
       "workspace",
       {
         code: "const story = 1;",
@@ -186,7 +194,8 @@ describe("the docs pages", () => {
     const html = page("components/button");
     const toc = html.match(/<nav aria-label="On this page">([\s\S]*?)<\/nav>/)?.[1] ?? "";
     expect(toc).toContain('href="#preview"');
-    expect(toc).toContain('href="#install"');
+    expect(toc).toContain('href="#installation"');
+    expect(toc).toContain('href="#usage"');
     expect(toc).toContain('href="#api-reference"');
     expect(toc).not.toContain('href="#examples"');
     for (const [, id] of toc.matchAll(/href="#([^"]+)"/g)) {
@@ -195,6 +204,17 @@ describe("the docs pages", () => {
     expect(html).toMatch(
       /<details class="docs-toc-disclosure"><summary>On this page<svg[^>]*data-icon="chevron-down"/,
     );
+  });
+
+  test("examples ship a preview and code tab pair, and usage shows a real first use", () => {
+    const html = page("components/button");
+    expect(html).toMatch(/<div class="docs-tabs" role="tablist"[^>]*hidden/);
+    expect(html).toContain('data-docs-tab="preview"');
+    expect(html).toContain('data-docs-panel="code"');
+    expect(html).toContain(`example.setAttribute("data-docs-tabs", "ready")`);
+    const usage = html.match(/<section[^>]*id="usage"[\s\S]*?<\/section>/)?.[0] ?? "";
+    expect(usage).toContain("usage.tsx");
+    expect(usage).toContain("Button");
   });
 
   test("the desktop and disclosure contents share links with unique section targets", () => {
@@ -211,7 +231,7 @@ describe("the docs pages", () => {
   test("a package without authored content omits the overview from its table of contents", () => {
     const html = page("packages/meowtail");
     const toc = html.match(/<nav aria-label="On this page">([\s\S]*?)<\/nav>/)?.[1] ?? "";
-    expect(toc).toContain('href="#install"');
+    expect(toc).toContain('href="#installation"');
     expect(toc).toContain('href="#components"');
     expect(toc).not.toContain('href="#overview"');
     expect(html).toContain("Package guide");

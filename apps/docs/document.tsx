@@ -249,6 +249,59 @@ const CODE_ACTIONS = `(() => {
 })();`;
 
 /**
+ * Preview and Code tabs on each example. The page ships both panels; the script turns them into
+ * tabs with the preview selected, so the source stays one click away instead of filling the page.
+ */
+const EXAMPLE_TABS = `(() => {
+  let count = 0;
+  for (const example of document.querySelectorAll("[data-docs-tabs]")) {
+    const list = example.querySelector('[role="tablist"]');
+    if (!list) continue;
+    const tabs = Array.from(list.querySelectorAll('[role="tab"]'));
+    const panels = tabs.map((tab) =>
+      example.querySelector('[data-docs-panel="' + tab.getAttribute("data-docs-tab") + '"]'),
+    );
+    if (!tabs.length || panels.some((panel) => !panel)) continue;
+    count += 1;
+    tabs.forEach((tab, index) => {
+      const panel = panels[index];
+      tab.id = "docs-tab-" + count + "-" + index;
+      panel.id = "docs-panel-" + count + "-" + index;
+      tab.setAttribute("aria-controls", panel.id);
+      panel.setAttribute("role", "tabpanel");
+      panel.setAttribute("aria-labelledby", tab.id);
+    });
+    const select = (selected, focus) => {
+      tabs.forEach((tab, index) => {
+        const on = index === selected;
+        tab.setAttribute("aria-selected", String(on));
+        tab.tabIndex = on ? 0 : -1;
+        panels[index].hidden = !on;
+      });
+      if (focus) tabs[selected].focus();
+    };
+    tabs.forEach((tab, index) => {
+      tab.addEventListener("click", () => select(index, false));
+      tab.addEventListener("keydown", (event) => {
+        const last = tabs.length - 1;
+        const next =
+          event.key === "ArrowRight" ? (index === last ? 0 : index + 1)
+          : event.key === "ArrowLeft" ? (index === 0 ? last : index - 1)
+          : event.key === "Home" ? 0
+          : event.key === "End" ? last
+          : -1;
+        if (next < 0) return;
+        event.preventDefault();
+        select(next, true);
+      });
+    });
+    select(0, false);
+    list.hidden = false;
+    example.setAttribute("data-docs-tabs", "ready");
+  }
+})();`;
+
+/**
  * Site search: a dialog over the index the build writes. The index loads on first open, titles
  * outrank section names, which outrank descriptions and body text, and a result can land on the
  * section that matched.
@@ -627,6 +680,7 @@ function Document({
         <script dangerouslySetInnerHTML={{ __html: PREVIEW_FIT }} />
         <script dangerouslySetInnerHTML={{ __html: APPEARANCE_SWITCH }} />
         <script dangerouslySetInnerHTML={{ __html: FILTER_SHORTCUT }} />
+        <script dangerouslySetInnerHTML={{ __html: EXAMPLE_TABS }} />
         <script dangerouslySetInnerHTML={{ __html: CODE_ACTIONS }} />
         <script dangerouslySetInnerHTML={{ __html: SEARCH }} />
       </body>

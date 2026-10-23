@@ -9,7 +9,10 @@ export interface AspectRatioProps extends Props {
   ratio?: number;
   className?: string;
 }
-/** The ratio is layout, not a theme surface. Children choose their own media fitting. */
+/**
+ * Keeps its content at a fixed width-to-height ratio. The ratio is layout, not a theme surface.
+ * Children choose their own media fitting.
+ */
 export const AspectRatio = defineComponent<AspectRatioProps, "aspect-ratio", "root">(
   aspectRatioContract,
   ({ ratio = 16 / 9, children, className, style, ...props }, context) => {

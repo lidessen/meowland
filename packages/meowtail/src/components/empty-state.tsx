@@ -23,6 +23,10 @@ export interface EmptyStateProps extends Props, ThemedProps<typeof emptyStateOpt
   className?: string;
 }
 
+/**
+ * What a region shows while it has nothing: artwork, a title, a line of help and an optional next
+ * step.
+ */
 export const EmptyState = defineComponent<
   EmptyStateProps,
   typeof emptyStateContract.name,

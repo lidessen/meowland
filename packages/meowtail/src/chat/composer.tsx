@@ -62,6 +62,7 @@ export interface ChatComposerProps extends Props, ThemedProps<typeof chatCompose
   className?: string;
 }
 
+/** The message input of a conversation, with attachments, model choice and send. */
 export const ChatComposer = defineComponent<
   ChatComposerProps,
   typeof chatComposerContract.name,

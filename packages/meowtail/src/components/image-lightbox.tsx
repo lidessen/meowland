@@ -12,7 +12,10 @@ export interface ImageLightboxProps extends Props {
   trigger?: Child;
   onClose?: () => void;
 }
-/** Native modal top layer keeps the preview independent of transformed ancestors. */
+/**
+ * A full-screen viewer for one image. Native modal top layer keeps the preview independent of
+ * transformed ancestors.
+ */
 export const ImageLightbox = defineComponent<
   ImageLightboxProps,
   "image-lightbox",

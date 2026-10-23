@@ -10,6 +10,7 @@ export interface ChatMessageListProps extends Props {
   ariaLabel?: string;
 }
 
+/** The ordered messages of a conversation, announced as a log. */
 export const ChatMessageList = defineComponent<
   ChatMessageListProps,
   typeof chatMessageListContract.name,

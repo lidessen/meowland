@@ -44,6 +44,7 @@ export interface ChatMessageProps extends Props {
 const messageStatusTone = (status: ChatMessageStatus) =>
   status === "streaming" ? "processing" : status === "error" ? "danger" : "idle";
 
+/** One message in a conversation: the author, the time, the body and its actions. */
 export const ChatMessage = defineComponent<
   ChatMessageProps,
   typeof chatMessageContract.name,

@@ -23,7 +23,10 @@ export interface TextShimmerProps extends Props {
   className?: string;
   contentClassName?: string;
 }
-/** Nested fragments share the outer sweep; the inert copy is excluded from accessibility. */
+/**
+ * Text with a light sweep across it, for work in progress. Nested fragments share the outer sweep;
+ * the inert copy is excluded from accessibility.
+ */
 export const TextShimmer = defineComponent<
   TextShimmerProps,
   "text-shimmer",

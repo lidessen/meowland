@@ -17,6 +17,7 @@ export interface CardProps extends Props, ThemedProps<typeof cardOptions> {
   className?: string;
 }
 
+/** A bordered surface that groups one object's title, content and actions. */
 export const Card = defineComponent<
   CardProps,
   typeof cardContract.name,

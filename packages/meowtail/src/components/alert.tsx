@@ -23,7 +23,10 @@ export interface AlertProps extends Props, ThemedProps<typeof alertOptions> {
   actions?: Child;
   className?: string;
 }
-/** Urgency is explicit, independent of the visual tone. */
+/**
+ * A message about the page or a task, in one of the status tones. Urgency is explicit, independent
+ * of the visual tone.
+ */
 export const Alert = defineComponent<AlertProps, "alert", "root" | "title" | "body" | "actions">(
   alertContract,
   ({ title, role = "status", actions, children, className, ...props }, context) =>

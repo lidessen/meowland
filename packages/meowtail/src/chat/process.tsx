@@ -10,6 +10,7 @@ export interface ChatProcessProps extends Props {
   icon?: Child;
   open?: boolean;
 }
+/** A collapsible row for work that happened between messages, with its details inside. */
 export const ChatProcess = defineComponent<
   ChatProcessProps,
   "chat-process",

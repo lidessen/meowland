@@ -48,6 +48,7 @@ export interface ChatAttachmentsProps extends Props {
   className?: string;
 }
 
+/** Files attached to a message or a draft, with preview, download and remove actions. */
 export const ChatAttachments = defineComponent<
   ChatAttachmentsProps,
   typeof chatAttachmentsContract.name,

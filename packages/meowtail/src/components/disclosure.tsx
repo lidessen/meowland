@@ -22,7 +22,10 @@ export interface DisclosureProps extends Props {
   contentClassName?: string;
 }
 
-/** Native details owns expansion and keyboard behavior, independently of the theme. */
+/**
+ * A section the reader can expand and collapse. Native details owns expansion and keyboard
+ * behavior, independently of the theme.
+ */
 export const Disclosure = defineComponent<
   DisclosureProps,
   typeof disclosureContract.name,

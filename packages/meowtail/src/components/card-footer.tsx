@@ -9,6 +9,7 @@ export interface CardFooterProps extends Props {
   className?: string;
 }
 
+/** The row of actions at the end of a card. */
 export const CardFooter = defineComponent<CardFooterProps, "card-footer", "root">(
   cardFooterContract,
   ({ children, className, ...props }, context) =>

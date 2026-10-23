@@ -24,6 +24,7 @@ export interface ButtonProps extends Props, ThemedProps<typeof buttonOptions> {
   className?: string;
 }
 
+/** Triggers one action, in one of six levels and three sizes. */
 export const Button = defineComponent<
   ButtonProps,
   typeof buttonContract.name,

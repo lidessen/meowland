@@ -9,6 +9,7 @@ export interface ChatMessageActionsProps extends Props {
   className?: string;
 }
 
+/** The row of actions under a message, such as copy or retry. */
 export const ChatMessageActions = defineComponent<
   ChatMessageActionsProps,
   typeof chatMessageActionsContract.name,

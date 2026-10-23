@@ -140,6 +140,7 @@ function mountToolbar(root: HTMLElement) {
   };
 }
 
+/** A group of related controls that shares one Tab stop; the arrow keys move between them. */
 export const Toolbar = defineComponent<ToolbarProps, "toolbar", "root">(
   toolbarContract,
   ({ children, label, orientation = "horizontal", className, ...props }, context) =>

@@ -19,6 +19,7 @@ export interface ChatStatusProps extends Props, ThemedProps<typeof chatStatusOpt
   className?: string;
 }
 
+/** The connection or activity state of a conversation, as a dot and a word. */
 export const ChatStatus = defineComponent<
   ChatStatusProps,
   typeof chatStatusContract.name,

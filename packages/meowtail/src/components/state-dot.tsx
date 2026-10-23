@@ -11,7 +11,10 @@ export interface StateDotProps extends Props {
   size?: number;
   className?: string;
 }
-/** Decorative state marker; the owner supplies adjacent accessible status text. */
+/**
+ * A small dot that marks a state beside its text. It is decorative: the owner supplies the
+ * adjacent accessible status text.
+ */
 export const StateDot = defineComponent<StateDotProps, "state-dot", "root" | "motion">(
   stateDotContract,
   (

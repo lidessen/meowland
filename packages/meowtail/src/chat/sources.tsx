@@ -15,6 +15,7 @@ export interface ChatSourcesProps extends Props {
   items: readonly ChatSource[];
   label?: string;
 }
+/** The sources an answer cites, as a collapsible list of links. */
 export const ChatSources = defineComponent<
   ChatSourcesProps,
   "chat-sources",

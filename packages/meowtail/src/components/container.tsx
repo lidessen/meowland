@@ -15,6 +15,7 @@ export interface ContainerProps extends Props, ThemedProps<typeof containerOptio
   as?: "div" | "section" | "main" | "article" | "aside";
   className?: string;
 }
+/** Centers content at one of the page widths. */
 export const Container = defineComponent<ContainerProps, "container", "root">(
   containerContract,
   ({ as = "div", children, ...props }, context) =>

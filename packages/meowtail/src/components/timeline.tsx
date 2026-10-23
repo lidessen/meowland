@@ -35,6 +35,7 @@ export interface TimelineItemProps extends Props {
   className?: string;
 }
 
+/** One event on a Timeline: a marker, a title, its state and optional details. */
 export const TimelineItem = defineComponent<
   TimelineItemProps,
   typeof timelineItemContract.name,

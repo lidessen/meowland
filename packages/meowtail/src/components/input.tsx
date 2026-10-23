@@ -10,6 +10,7 @@ export interface InputProps extends Props {
   className?: string;
 }
 
+/** A single-line text input. */
 export const Input = defineComponent<
   InputProps,
   typeof inputContract.name,

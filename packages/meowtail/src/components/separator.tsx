@@ -10,6 +10,7 @@ export interface SeparatorProps extends Props {
   className?: string;
 }
 
+/** A thin rule that divides groups of content or tools. */
 export const Separator = defineComponent<
   SeparatorProps,
   typeof separatorContract.name,

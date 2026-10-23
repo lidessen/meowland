@@ -16,6 +16,7 @@ export interface LayoutItemProps extends Props {
   alignSelf?: LayoutAlign | "auto";
 }
 
+/** A wrapper that sets how one child of a Stack or Inline grows, shrinks and aligns. */
 export const LayoutItem = defineComponent<LayoutItemProps, "layout-item", "root">(
   layoutItemContract,
   (

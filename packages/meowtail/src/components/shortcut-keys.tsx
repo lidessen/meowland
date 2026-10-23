@@ -8,7 +8,10 @@ export interface ShortcutKeysProps extends Props {
   variant?: "plain" | "tooltip";
   className?: string;
 }
-/** Effective key labels belong to the command owner, including platform differences. */
+/**
+ * A keyboard shortcut, shown as keys. Effective key labels belong to the command owner, including
+ * platform differences.
+ */
 export const ShortcutKeys = defineComponent<ShortcutKeysProps, "shortcut-keys", "root" | "key">(
   shortcutKeysContract,
   ({ keys, variant = "plain", className, ...props }, context) =>

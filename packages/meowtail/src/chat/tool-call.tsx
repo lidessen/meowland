@@ -83,6 +83,7 @@ export interface ChatToolCallProps extends Props {
   className?: string;
 }
 
+/** One tool call in an assistant's work: what ran, on what, and how it ended. */
 export const ChatToolCall = defineComponent<
   ChatToolCallProps,
   typeof chatToolCallContract.name,

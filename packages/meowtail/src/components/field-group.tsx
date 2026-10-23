@@ -12,6 +12,7 @@ export interface FieldGroupProps extends Props {
   className?: string;
 }
 let nextFieldGroupId = 0;
+/** A titled set of related fields, as a native fieldset. */
 export const FieldGroup = defineComponent<
   FieldGroupProps,
   "field-group",

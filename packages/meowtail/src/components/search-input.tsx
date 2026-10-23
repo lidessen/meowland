@@ -18,7 +18,10 @@ export interface SearchInputProps extends Props {
   inputClassName?: string;
 }
 
-/** Native search editing and form semantics; filtering belongs to the consumer. */
+/**
+ * A text input for search, with a search icon. Native search editing and form semantics; filtering
+ * belongs to the consumer.
+ */
 export const SearchInput = defineComponent<
   SearchInputProps,
   typeof searchInputContract.name,

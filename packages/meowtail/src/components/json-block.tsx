@@ -6,7 +6,10 @@ export type JsonBlockProps = Props & {
   defaultOpen?: boolean;
   onCopy?: (text: string) => Promise<void>;
 } & ({ text: string; payload?: never } | { payload: unknown; text?: never });
-/** Serialization and rendering wait for expansion. Invalid text remains verbatim. */
+/**
+ * A collapsible block that shows a JSON value as a tree. Serialization and rendering wait for
+ * expansion. Invalid text remains verbatim.
+ */
 export const JsonBlock = defineComponent<
   JsonBlockProps,
   "json-block",

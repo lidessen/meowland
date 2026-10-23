@@ -9,6 +9,7 @@ export interface CardDescriptionProps extends Props {
   className?: string;
 }
 
+/** The supporting line under a card title. */
 export const CardDescription = defineComponent<CardDescriptionProps, "card-description", "root">(
   cardDescriptionContract,
   ({ children, className, ...props }, context) =>

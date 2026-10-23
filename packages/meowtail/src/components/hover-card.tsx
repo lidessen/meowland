@@ -19,7 +19,10 @@ export interface HoverCardProps extends Props {
   copiedLabel?: string;
   onCopy?: (text: string) => Promise<void>;
 }
-/** Selectable preview. Popover owns positioning, Escape, outside dismissal and focus. */
+/**
+ * A preview card that opens while a trigger is hovered or focused; its text stays selectable.
+ * Popover owns positioning, Escape, outside dismissal and focus.
+ */
 export const HoverCard = defineComponent<
   HoverCardProps,
   "hover-card",

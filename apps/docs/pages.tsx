@@ -8,14 +8,15 @@ import type { StoryEntry } from "meowbook";
 import type { Catalog, CatalogComponent, CatalogExample } from "./catalog";
 import { firstElementOf, renderSourceOf, type StorySource } from "./code";
 import type { DocsPackage } from "./packages";
+import type { ComponentProps } from "./props";
 import {
   CodeSample,
   InstallLine,
   Note,
   PartList,
+  PropsTable,
   Preview,
   StoryExample,
-  StyleAxesTable,
 } from "./parts";
 import { renderDocument, SITE_DESCRIPTION, SITE_NAME, type TrailItem } from "./document";
 
@@ -24,6 +25,8 @@ export interface DocsState {
   catalog: Catalog;
   packages: DocsPackage[];
   sources: Map<string, StorySource>;
+  /** The props each component declares, by component name. */
+  props?: Map<string, ComponentProps>;
 }
 
 /** The package that owns the component library. */
@@ -441,12 +444,11 @@ function ComponentPage({
   sections.push({
     id: "api-reference",
     title: "API reference",
-    description: "The style axes and the DOM parts of this component.",
     children: (
       <Stack gap="relaxed">
         <div>
-          <h3 className="docs-example-title">Style axes</h3>
-          <StyleAxesTable contract={component.contract} />
+          <h3 className="docs-example-title">Props</h3>
+          <PropsTable contract={component.contract} props={state.props?.get(component.title)} />
         </div>
         <div>
           <h3 className="docs-example-title">DOM parts</h3>

@@ -594,6 +594,38 @@ export const docsStyles = css`
   [data-docs-panel][hidden] {
     display: none;
   }
+  /* Props: the name, a required mark and its JSDoc stack in the first column; types wrap. */
+  .docs-prop {
+    display: grid;
+    gap: 4px;
+    min-width: 12rem;
+  }
+  .docs-prop-name {
+    display: inline-flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+  .docs-prop-name > code {
+    font-weight: 600;
+  }
+  .docs-prop-required {
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
+  }
+  .docs-prop-note {
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.label};
+    line-height: 1.5;
+    white-space: normal;
+  }
+  .docs-prop-type {
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+  .docs-prop-none {
+    color: ${uiTokens.ink.tertiary};
+  }
   /* Preview and Code: text tabs on a hairline, the selected one underlined in ink. */
   .docs-tabs {
     display: flex;

@@ -87,6 +87,31 @@ export function propertyEnd(source: string, start: number): number {
   );
 }
 
+/** Where the bracketed block that opens at `start` ends: just past its closing bracket. */
+export function blockEnd(source: string, start: number): number {
+  return scan(source, start, (character, depth) => /[)\]}]/.test(character) && depth === 0);
+}
+
+/**
+ * Split code at the separators that sit outside any brackets, strings and comments, such as the
+ * members of an interface body or the entries of a destructuring pattern.
+ */
+export function splitTopLevel(source: string, separators: string): string[] {
+  const parts: string[] = [];
+  let start = 0;
+  while (start < source.length) {
+    const end = scan(
+      source,
+      start,
+      (character, depth) => depth === 0 && separators.includes(character),
+      false,
+    );
+    parts.push(source.slice(start, end));
+    start = end + 1;
+  }
+  return parts.map((part) => part.trim()).filter(Boolean);
+}
+
 /** Walk code from `start`, skipping strings and comments, until `stop` holds. */
 function scan(
   source: string,

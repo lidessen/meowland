@@ -1,8 +1,9 @@
-import { h, type Child } from "meowjsx";
+import { Fragment, h, type Child } from "meowjsx";
 import "./runtime";
 import { Badge, Card, CodeBlock, Inline, Stack, Table } from "meowtail";
 import { Icon } from "meowtail/icons";
 import { styleAxes, type CatalogContract } from "./catalog";
+import type { ComponentProps } from "./props";
 
 /** The language label of the code surface, from the source file extension. */
 function languageFor(file?: string): string | undefined {
@@ -120,35 +121,107 @@ export function InstallLine({ name }: { name: string }): Child {
   );
 }
 
-/** The style axes of a component and the choices each axis allows. */
-export function StyleAxesTable({ contract }: { contract?: CatalogContract }): Child {
-  const axes = styleAxes(contract);
-  if (!axes.length) {
-    return <p className="docs-note">This component has no style axes.</p>;
+/** Prose with `code` spans, as JSDoc writes it. */
+function inlineCode(text: string): Child[] {
+  return text.split("`").map((piece, index) => (index % 2 === 1 ? <code>{piece}</code> : piece));
+}
+
+/** What the inherited part of a props interface adds, in words. */
+function inheritedNote(extended: readonly string[]): Child | undefined {
+  const others = extended.filter((entry) => entry !== "Props" && !entry.startsWith("ThemedProps<"));
+  const element = extended.includes("Props");
+  if (!element && !others.length) return undefined;
+  return (
+    <Note>
+      {element ? (
+        <>
+          Also takes <code>className</code>, <code>children</code> and the attributes and events of
+          its root element.
+        </>
+      ) : null}
+      {element && others.length ? " " : null}
+      {others.length ? (
+        <>
+          {element ? "It also extends " : "Also takes the props of "}
+          {others.map((entry, index) => (
+            <>
+              {index > 0 ? ", " : null}
+              <code>{entry}</code>
+            </>
+          ))}
+          .
+        </>
+      ) : null}
+    </Note>
+  );
+}
+
+/**
+ * The props of a component in one table: its style axes first, then the props its interface
+ * declares, each with its type, its default and the JSDoc written on it.
+ */
+export function PropsTable({
+  contract,
+  props,
+}: {
+  contract?: CatalogContract;
+  props?: ComponentProps;
+}): Child {
+  const rows: {
+    name: string;
+    type: string;
+    default?: string;
+    required?: boolean;
+    note?: string;
+  }[] = styleAxes(contract).map((entry) => ({
+    name: entry.axis,
+    type: entry.choices.map((choice) => JSON.stringify(choice)).join(" | "),
+    default: JSON.stringify(entry.default),
+  }));
+  for (const prop of props?.props ?? []) {
+    if (prop.name === "className" || rows.some((row) => row.name === prop.name)) continue;
+    rows.push({
+      name: prop.name,
+      type: prop.type,
+      default: prop.default,
+      required: !prop.optional,
+      note: prop.description,
+    });
+  }
+  const inherited = props ? inheritedNote(props.extends) : undefined;
+  if (!rows.length) {
+    return inherited ?? <Note>This component documents no props of its own.</Note>;
   }
   return (
-    <Table
-      label="Style axes"
-      columns={[
-        { id: "axis", header: "Axis", resizable: false },
-        { id: "choices", header: "Choices", resizable: false },
-        { id: "default", header: "Default", resizable: false },
-      ]}
-      rows={axes.map((entry) => ({
-        id: entry.axis,
-        cells: [
-          <code>{entry.axis}</code>,
-          <Inline gap="compact" wrap>
-            {entry.choices.map((choice) => (
-              <Badge tone="outline" size="small">
-                {choice}
-              </Badge>
-            ))}
-          </Inline>,
-          <code>{entry.default}</code>,
-        ],
-      }))}
-    />
+    <Stack gap="compact">
+      <Table
+        label="Props"
+        columns={[
+          { id: "prop", header: "Prop", width: 288, resizable: false },
+          { id: "type", header: "Type", width: 272, resizable: false },
+          { id: "default", header: "Default", resizable: false },
+        ]}
+        rows={rows.map((row) => ({
+          id: row.name,
+          cells: [
+            <div className="docs-prop">
+              <span className="docs-prop-name">
+                <code>{row.name}</code>
+                {row.required ? <span className="docs-prop-required">Required</span> : null}
+              </span>
+              {row.note ? <span className="docs-prop-note">{inlineCode(row.note)}</span> : null}
+            </div>,
+            <code className="docs-prop-type">{row.type}</code>,
+            row.default === undefined ? (
+              <span className="docs-prop-none">–</span>
+            ) : (
+              <code className="docs-prop-type">{row.default}</code>
+            ),
+          ],
+        }))}
+      />
+      {inherited ?? null}
+    </Stack>
   );
 }
 

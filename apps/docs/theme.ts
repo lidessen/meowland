@@ -444,8 +444,12 @@ export const docsStyles = css`
     border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
     background: transparent;
   }
+  /* The code actions need script; they appear once the page wires them. */
   .docs-article ${partSelector(codeBlockContract, "actions")} {
     display: none;
+  }
+  [data-docs-code-actions] .docs-article ${partSelector(codeBlockContract, "actions")} {
+    display: flex;
   }
   .docs-article ${partSelector(codeBlockContract, "content")} {
     max-height: ${docsTokens.codeHeight};

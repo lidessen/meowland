@@ -199,6 +199,37 @@ const APPEARANCE_SWITCH = `(() => {
   button.hidden = false;
 })();`;
 
+/**
+ * Wire each static code surface's own Soft wrap and Copy code buttons, which the library renders
+ * but cannot run without its runtime. Copy reads the code's text, so it copies what the reader sees.
+ */
+const CODE_ACTIONS = `(() => {
+  const blocks = document.querySelectorAll('.docs-article [data-meowui-part="code-block/root"]');
+  for (const block of blocks) {
+    const content = block.querySelector('[data-meowui-part="code-block/content"]');
+    const code = block.querySelector('[data-meowui-part="code-block/code"]');
+    const buttons = block.querySelectorAll('[data-meowui-part="code-block/actions"] button');
+    const [wrap, copy] = buttons;
+    if (!content || !code || !wrap || !copy) continue;
+    wrap.addEventListener("click", () => {
+      const next = content.getAttribute("data-wrap") === "true" ? "false" : "true";
+      content.setAttribute("data-wrap", next);
+      wrap.setAttribute("aria-pressed", next);
+    });
+    const label = copy.textContent;
+    copy.addEventListener("click", async () => {
+      try {
+        await navigator.clipboard.writeText(code.textContent || "");
+        copy.textContent = "Copied";
+      } catch {
+        copy.textContent = "Copy failed";
+      }
+      setTimeout(() => { copy.textContent = label; }, 1600);
+    });
+  }
+  document.documentElement.setAttribute("data-docs-code-actions", "");
+})();`;
+
 /** Press "/" anywhere outside a field to filter the navigation. */
 const FILTER_SHORTCUT = `(() => {
   const input = document.querySelector('[data-meowui-part="search-input/control"]');
@@ -441,6 +472,7 @@ function Document({
         <script dangerouslySetInnerHTML={{ __html: PREVIEW_FIT }} />
         <script dangerouslySetInnerHTML={{ __html: APPEARANCE_SWITCH }} />
         <script dangerouslySetInnerHTML={{ __html: FILTER_SHORTCUT }} />
+        <script dangerouslySetInnerHTML={{ __html: CODE_ACTIONS }} />
       </body>
     </html>
   );

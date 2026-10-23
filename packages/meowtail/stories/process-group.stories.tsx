@@ -1,6 +1,6 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Icon, ProcessGroup, ProcessStep, StatusDot, Tag } from "meowtail";
+import { Icon, ProcessGroup, ProcessStep, Status, Tag } from "meowtail";
 import { SchemePair } from "./scheme-pair";
 
 export const ProcessGroupNarrowStory = defineStory({
@@ -11,12 +11,12 @@ export const ProcessGroupNarrowStory = defineStory({
   component: "ProcessGroup",
   variant: "Narrow rows and long sequences",
   description:
-    "In a narrow container, the title and status dots stay on the first line while the action summary gets its own second line; a long sequence of status dots can wrap.",
+    "In a narrow container, the name and the closing fact stay on the first line while the state badge gets its own second line; a long sequence is summarized as a count, not a row of marks.",
   covers: [
     "ProcessGroup narrow summary",
     "title never wraps",
     "separate outcome row",
-    "many step dots",
+    "long sequence as a count",
   ],
   render() {
     return (
@@ -24,10 +24,8 @@ export const ProcessGroupNarrowStory = defineStory({
         {() => (
           <ProcessGroup
             title="Process · 13 steps"
-            status="Calls local capabilities, reads memory and knowledge, manages tasks, and more"
-            trailing={Array.from({ length: 12 }, () => (
-              <StatusDot state="success" size={6} />
-            ))}
+            status={<Status state="success" label="Completed" />}
+            trailing="12.4s"
           >
             <ProcessStep icon={<Icon name="terminal" />} meta="2.0s">
               Run command <code>go test ./server/...</code>
@@ -47,11 +45,11 @@ export const ProcessGroupStory = defineStory({
   component: "ProcessGroup",
   variant: "Expanded, collapsed, and running",
   description:
-    "A process group condenses what the assistant did into one line: name and step count, result, and a status dot per step. When expanded, each step gets one line, paths use a monospace font, and durations sit quietly on the right.",
+    "A process group condenses what the assistant did into one line: name and step count, the state badge, and one quiet closing fact. When expanded, each step gets one line, paths use a monospace font, and durations sit quietly on the right.",
   covers: [
     "ProcessGroup open/closed",
     "ProcessStep icon/meta/code",
-    "trailing status dots",
+    "state badge and closing fact",
     "running and failed steps",
     "light and dark",
   ],
@@ -63,12 +61,8 @@ export const ProcessGroupStory = defineStory({
             <ProcessGroup
               open
               title="Process · 3 steps"
-              status="Completed · 4.2s"
-              trailing={[
-                <StatusDot state="success" size={6} />,
-                <StatusDot state="success" size={6} />,
-                <StatusDot state="success" size={6} />,
-              ]}
+              status={<Status state="success" label="Completed" />}
+              trailing="4.2s"
             >
               <ProcessStep icon={<Icon name="search" />} meta="12 matches">
                 Search content <code>workflow-prototype</code>
@@ -82,19 +76,18 @@ export const ProcessGroupStory = defineStory({
             </ProcessGroup>
             <ProcessGroup
               title="Process · 4 steps"
-              status="1 step running"
-              trailing={[
-                <StatusDot state="success" size={6} />,
-                <StatusDot state="success" size={6} />,
-                <StatusDot state="danger" size={6} />,
-                <StatusDot state="processing" size={6} />,
-              ]}
+              status={<Status state="processing" label="Running" />}
+              trailing="2 / 4"
             >
               <ProcessStep icon={<Icon name="terminal" />} meta="2.0s">
                 Run command <code>go test ./server/...</code>
               </ProcessStep>
             </ProcessGroup>
-            <ProcessGroup open title="Process · 1 step" status="Unconfirmed result">
+            <ProcessGroup
+              open
+              title="Process · 1 step"
+              status={<Status state="unknown" label="Unconfirmed" />}
+            >
               <ProcessStep icon={<Icon name="folder-open" />} meta={<Tag>Not checked</Tag>}>
                 View directory{" "}
                 <code>

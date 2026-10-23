@@ -9,9 +9,12 @@ export const processGroupContract = {
 export interface ProcessGroupProps extends Props {
   /** The group's name and size, for example "Process · 3 steps". */
   title: Child;
-  /** Outcome in words, for example "Completed · 4.2s". */
+  /**
+   * The group's state right after the name: pass the shared state badge, for example
+   * `<Status state="success" label="Completed" />`. Plain words still render as a quiet fact.
+   */
   status?: Child;
-  /** Right-aligned summary of the steps, usually one StatusDot per step. */
+  /** One quiet right-aligned fact, such as the total duration or "2 / 4". Not a row of dots. */
   trailing?: Child;
   open?: boolean;
   className?: string;

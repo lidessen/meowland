@@ -38,12 +38,7 @@ test("tags are static spans; count and path are separate kinds", () => {
 
 test("process group keeps native details and one row per step", () => {
   const html = renderToHtml(
-    <ProcessGroup
-      title="Process · 2 steps"
-      status="Completed"
-      trailing={<StatusDot state="success" />}
-      open
-    >
+    <ProcessGroup title="Process · 2 steps" status="Completed" trailing="4.2s" open>
       <ProcessStep meta="1.1s">Read file</ProcessStep>
     </ProcessGroup>,
   );
@@ -52,6 +47,7 @@ test("process group keeps native details and one row per step", () => {
   expect(html).toContain(" open");
   expect(html).toContain("Process · 2 steps");
   expect(html).toContain("1.1s");
+  expect(html).toContain("4.2s");
 });
 
 test("work card is one native button with a status dot and an open affordance", () => {

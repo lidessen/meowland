@@ -11,7 +11,6 @@ const step = (part: (typeof processStepContract.parts)[number]) =>
 
 export const processGroupStyles = css`
   ${group("root")} {
-    container-type: inline-size;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     min-width: 0;
@@ -24,10 +23,12 @@ export const processGroupStyles = css`
     color: ${uiTokens.ink.secondary};
     font: ${uiTokens.type.label}/20px ${uiTokens.type.sans};
   }
+  /* One line when it fits; a narrow group wraps the badge and fact rather than stacking by rule. */
   ${group("summary")} {
     display: flex;
+    flex-wrap: wrap;
     align-items: center;
-    gap: 8px;
+    gap: 4px 8px;
     padding: 8px 12px;
     list-style: none;
     cursor: pointer;
@@ -55,11 +56,14 @@ export const processGroupStyles = css`
   ${group("root")}[open] > ${group("summary")} ${group("chevron")} {
     transform: rotate(90deg);
   }
-  /* Names stay on one line; compact containers give the outcome its own row below. */
+  /* A name stays on one line and truncates only when it alone outgrows the row. */
   ${group("title")} {
-    flex: 0 0 auto;
+    flex: 0 1 auto;
+    min-width: 0;
+    overflow: hidden;
     color: ${uiTokens.ink.primary};
     font-weight: 500;
+    text-overflow: ellipsis;
     white-space: nowrap;
   }
   ${group("status")} {
@@ -68,41 +72,23 @@ export const processGroupStyles = css`
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  /* The state badge (shared/state-badge.styles.ts) sits right after the name; the trailing
+     slot is one quiet fact at the row's end. */
   ${group("trailing")} {
     display: inline-flex;
     flex: 0 0 auto;
     align-items: center;
     gap: 4px;
     margin-left: auto;
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
   ${group("body")} {
     display: grid;
     padding: 2px 12px 10px 14px;
     border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
-  }
-  /* A compact group keeps the outcome readable below the name and step markers. */
-  @container (max-width: 400px) {
-    ${group("summary")} {
-      display: grid;
-      grid-template-columns: 14px minmax(0, 1fr) auto;
-      row-gap: 4px;
-    }
-    ${group("title")} {
-      min-width: 0;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    ${group("status")} {
-      grid-column: 2 / -1;
-      grid-row: 2;
-    }
-    ${group("trailing")} {
-      grid-column: 3;
-      grid-row: 1;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-      max-width: 120px;
-    }
   }
   ${group("root")}:not([open]) > ${group("body")} {
     display: none;

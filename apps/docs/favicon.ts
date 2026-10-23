@@ -5,50 +5,28 @@ const SIZE = 16;
 
 /** The site mark, drawn as the dark rounded square of the inline icon. */
 const BACKGROUND: readonly [number, number, number, number] = [0x0f, 0x11, 0x15, 0xff];
-/** The stroke of the mark. */
+/** The ink of the mark. */
 const STROKE: readonly [number, number, number, number] = [0xff, 0xff, 0xff, 0xff];
 
-/** The strokes of the "M", as pixel coordinates. */
-const STROKES: readonly (readonly (readonly [number, number])[])[] = [
-  [
-    [4, 10],
-    [4, 5],
-  ],
-  [
-    [4, 5],
-    [8, 8],
-  ],
-  [
-    [8, 8],
-    [11, 5],
-  ],
-  [
-    [11, 5],
-    [11, 10],
-  ],
-];
-
-/** Draw a line onto the pixel grid, one pixel wide. */
-function stroke(
-  pixels: Uint8Array,
-  from: readonly [number, number],
-  to: readonly [number, number],
-) {
-  const [x0, y0] = from;
-  const [x1, y1] = to;
-  const steps = Math.max(Math.abs(x1 - x0), Math.abs(y1 - y0));
-  for (let step = 0; step <= steps; step++) {
-    const t = steps === 0 ? 0 : step / steps;
-    const x = Math.round(x0 + (x1 - x0) * t);
-    const y = Math.round(y0 + (y1 - y0) * t);
-    if (x < 0 || x >= SIZE || y < 0 || y >= SIZE) continue;
-    const offset = (y * SIZE + x) * 4;
-    pixels[offset] = STROKE[0]!;
-    pixels[offset + 1] = STROKE[1]!;
-    pixels[offset + 2] = STROKE[2]!;
-    pixels[offset + 3] = STROKE[3]!;
-  }
-}
+/** The Meowland silhouette at 16 pixels: two ears, a round head and two eyes. */
+const MARK = [
+  "................",
+  "................",
+  "...#........#...",
+  "...##......##...",
+  "...###....###...",
+  "...##########...",
+  "..############..",
+  "..###..##..###..",
+  "..###..##..###..",
+  "..############..",
+  "..############..",
+  "...##########...",
+  "....########....",
+  "................",
+  "................",
+  "................",
+] as const;
 
 /** The 16 pixel RGBA image of the mark, top row first. */
 export function faviconPixels(): Uint8Array {
@@ -60,7 +38,13 @@ export function faviconPixels(): Uint8Array {
     pixels[offset + 2] = BACKGROUND[2]!;
     pixels[offset + 3] = BACKGROUND[3]!;
   }
-  for (const [from, to] of STROKES) stroke(pixels, from, to);
+  MARK.forEach((row, y) => {
+    for (let x = 0; x < SIZE; x++) {
+      if (row[x] !== "#") continue;
+      const offset = (y * SIZE + x) * 4;
+      pixels.set(STROKE, offset);
+    }
+  });
   return pixels;
 }
 

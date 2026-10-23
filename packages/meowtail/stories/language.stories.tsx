@@ -481,7 +481,7 @@ export const ContentCarriersStory = defineStory({
             url:
               "data:image/svg+xml," +
               encodeURIComponent(
-                '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180"><rect width="320" height="180" fill="#e6e8e5"/><rect x="20" y="20" width="70" height="140" rx="6" fill="#bdc5bd"/><rect x="108" y="20" width="192" height="84" rx="6" fill="#fafbf9"/><rect x="108" y="120" width="192" height="40" rx="6" fill="#fafbf9"/></svg>',
+                '<svg xmlns="http://www.w3.org/2000/svg" width="320" height="180" viewBox="0 0 320 180"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef2ff"/><stop offset="1" stop-color="#fdf2f8"/></linearGradient></defs><rect width="320" height="180" fill="url(#bg)"/><rect x="20" y="20" width="280" height="172" rx="12" fill="#ffffff" stroke="#e4e4e7"/><circle cx="34" cy="34" r="3.5" fill="#fca5a5"/><circle cx="46" cy="34" r="3.5" fill="#fcd34d"/><circle cx="58" cy="34" r="3.5" fill="#86efac"/><rect x="36" y="56" width="62" height="8" rx="4" fill="#e4e4e7"/><rect x="36" y="72" width="46" height="8" rx="4" fill="#f4f4f5"/><rect x="36" y="88" width="53" height="8" rx="4" fill="#f4f4f5"/><rect x="114" y="52" width="170" height="61" rx="8" fill="#6366f1" fill-opacity="0.14"/><rect x="114" y="125" width="136" height="8" rx="4" fill="#e4e4e7"/><rect x="114" y="141" width="94" height="8" rx="4" fill="#f4f4f5"/></svg>',
               ),
           },
           {

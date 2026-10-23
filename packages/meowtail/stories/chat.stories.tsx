@@ -474,7 +474,7 @@ export const AttachmentScaleStory = defineStory({
               url:
                 "data:image/svg+xml," +
                 encodeURIComponent(
-                  '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="120"><rect width="600" height="120" fill="#ced8d4"/><text x="24" y="68" font-size="24" fill="#34463e">600 × 120</text></svg>',
+                  '<svg xmlns="http://www.w3.org/2000/svg" width="600" height="120" viewBox="0 0 600 120"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e0e7ff"/><stop offset="1" stop-color="#fae8ff"/></linearGradient></defs><rect width="600" height="120" fill="url(#bg)"/><text x="300.0" y="60.0" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, sans-serif" font-size="22" font-weight="500" fill="#4f46e5" fill-opacity="0.7">600 × 120</text></svg>',
                 ),
             },
             {
@@ -484,7 +484,7 @@ export const AttachmentScaleStory = defineStory({
               url:
                 "data:image/svg+xml," +
                 encodeURIComponent(
-                  '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="360"><rect width="120" height="360" fill="#d8d8e1"/><text x="12" y="180" font-size="16" fill="#424254">120 × 360</text></svg>',
+                  '<svg xmlns="http://www.w3.org/2000/svg" width="120" height="360" viewBox="0 0 120 360"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#e0e7ff"/><stop offset="1" stop-color="#fae8ff"/></linearGradient></defs><rect width="120" height="360" fill="url(#bg)"/><text x="60.0" y="180.0" text-anchor="middle" dominant-baseline="middle" font-family="system-ui, sans-serif" font-size="16" font-weight="500" fill="#4f46e5" fill-opacity="0.7">120 × 360</text></svg>',
                 ),
             },
           ]}

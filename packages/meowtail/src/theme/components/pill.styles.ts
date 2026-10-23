@@ -11,7 +11,7 @@ export const pillStyles = css`
     box-sizing: border-box;
     padding: 0 8px;
     border: 0;
-    border-radius: 999px;
+    border-radius: ${uiTokens.radius.full};
     corner-shape: round;
     font: ${uiTokens.type.caption}/18px ${uiTokens.type.sans};
     color: ${uiTokens.ink.secondary};

@@ -1,7 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { resourceCardContract } from "../../components/resource-card";
-import { resourceCardTokens } from "./resource-card.tokens";
 
 const card = (part: (typeof resourceCardContract.parts)[number]) =>
   partSelector(resourceCardContract, part);
@@ -10,10 +9,10 @@ export const resourceCardStyles = css`
   ${card("root")} {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
-    gap: ${resourceCardTokens.gap};
+    gap: ${uiTokens.space.insetBlock};
     align-content: start;
     min-width: 0;
-    padding: ${resourceCardTokens.inset};
+    padding: ${uiTokens.space.insetInline};
     border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     border-radius: ${uiTokens.radius.xl};
     background: ${uiTokens.surface.raised};
@@ -54,8 +53,8 @@ export const resourceCardStyles = css`
     color: ${uiTokens.ink.tertiary};
   }
   ${card("icon")} svg {
-    width: 18px;
-    height: 18px;
+    width: ${uiTokens.icon.large};
+    height: ${uiTokens.icon.large};
   }
   ${card("copy")} {
     display: grid;
@@ -67,7 +66,7 @@ export const resourceCardStyles = css`
     margin: 0;
     font-size: ${uiTokens.type.title};
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: ${uiTokens.type.trackingTight};
     overflow-wrap: anywhere;
   }
   ${card("subtitle")} {

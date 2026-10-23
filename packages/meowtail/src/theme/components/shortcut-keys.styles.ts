@@ -6,7 +6,7 @@ export const shortcutKeysStyles = css`
   ${partSelector(shortcutKeysContract, "root")} {
     display: inline-flex;
     align-items: center;
-    gap: 3px;
+    gap: 4px;
     color: ${uiTokens.ink.tertiary};
     font: ${uiTokens.type.caption}/16px ${uiTokens.type.sans};
     white-space: nowrap;
@@ -30,6 +30,8 @@ export const shortcutKeysStyles = css`
     height: 16px;
     padding: 0 2px;
     border-radius: ${uiTokens.radius.xs};
-    background: color-mix(in srgb, ${uiTokens.inverse.surface}, white 18%);
+    /* The key carries its own inverse ink so it stays legible outside a tooltip. */
+    color: ${uiTokens.inverse.ink};
+    background: color-mix(in srgb, ${uiTokens.inverse.surface}, ${uiTokens.inverse.ink} 18%);
   }
 `;

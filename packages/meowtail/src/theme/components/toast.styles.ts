@@ -33,7 +33,7 @@ export const toastStyles = css`
   ${partSelector(toastContract, "actions")} :is(button, a) {
     min-height: 0;
     padding: 0;
-    margin-inline: 3px;
+    margin-inline: 4px;
     border: 0;
     background: transparent;
     color: ${uiTokens.inverse.action};

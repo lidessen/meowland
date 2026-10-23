@@ -71,7 +71,7 @@ export const menuStyles = css`
     font-size: ${uiTokens.type.micro};
     font-weight: 500;
     line-height: 15px;
-    letter-spacing: 0.04em;
+    letter-spacing: ${uiTokens.type.trackingCaps};
     text-transform: uppercase;
     color: ${uiTokens.ink.tertiary};
   }
@@ -79,7 +79,7 @@ export const menuStyles = css`
   ${partSelector(menuContract, "separator")} {
     height: 0.5px;
     background: ${uiTokens.line.divider};
-    margin: 5px -6px;
+    margin: 4px -6px;
   }
   @media (prefers-reduced-motion: reduce) {
     ${partSelector(menuContract, "item")} {

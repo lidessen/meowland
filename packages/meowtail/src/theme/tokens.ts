@@ -132,6 +132,10 @@ export const uiTokens = defineTokens("ui", {
     heading: "20px",
     pageTitle: "24px",
     leading: "1.5714285714",
+    /** Titles at `title` and above close up slightly. */
+    trackingTight: "-0.01em",
+    /** The small-caps group label. */
+    trackingCaps: "0.04em",
   },
   /** Spacing by relationship: within a group, between related areas, at a container edge. */
   space: {
@@ -140,13 +144,19 @@ export const uiTokens = defineTokens("ui", {
     panel: "24px",
     /** Between blocks of reading content. */
     prose: "12px",
+    /** Inset of a compact object (task list, work card, resource row): block, then inline. */
+    insetBlock: "12px",
+    insetInline: "16px",
     pageBlock: "36px",
     pageInline: "48px",
     pageBlockCompact: "20px",
     pageInlineCompact: "16px",
   },
+  /** Glyph sizes: small for chevrons and markers inside rows, size for ordinary icons, large for prominent actions and tiles. */
   icon: {
+    small: "14px",
     size: "16px",
+    large: "18px",
     stroke: "1.75",
   },
   /**
@@ -161,6 +171,8 @@ export const uiTokens = defineTokens("ui", {
     lg: "10px",
     xl: "14px",
     xxl: "22px",
+    /** Capsules: badges, tags, pills, tracks and round floating buttons. */
+    full: "999px",
   },
   /** Depth by role; each role takes one shadow and nothing else. */
   shadow: {
@@ -179,15 +191,29 @@ export const uiTokens = defineTokens("ui", {
       "0 0 0 1px rgb(0 0 0 / 6%), 0 1px 2px rgb(0 0 0 / 8%)",
       "0 0 0 1px rgb(255 255 255 / 8%), 0 1px 2px rgb(0 0 0 / 32%)",
     ],
+    /** An operated surface held down: the press sinks into it. */
+    pressed: "inset 0 1px 2px rgb(0 0 0 / 12%)",
+    /** A sheet attached to a screen edge (Drawer, expanded rail) throws its shadow sideways. */
+    sheet: ["12px 0 40px rgb(0 0 0 / 12%)", "12px 0 40px rgb(0 0 0 / 50%)"],
+    /** A slider knob resting on its track. */
+    knob: ["0 1px 2px rgb(0 0 0 / 16%)", "0 1px 2px rgb(0 0 0 / 40%)"],
     /** Floating surfaces: a ring plus a deep, soft drop. */
     float: [
       "0 0 0 1px rgb(0 0 0 / 7%), 0 4px 10px -4px rgb(0 0 0 / 8%), 0 16px 36px -8px rgb(0 0 0 / 14%)",
       "0 0 0 1px rgb(255 255 255 / 9%), 0 4px 10px -4px rgb(0 0 0 / 40%), 0 16px 36px -8px rgb(0 0 0 / 60%)",
     ],
   },
+  /**
+   * instant answers a press, response a hover, settle a state change, draw a line
+   * drawn across text; loop paces spinners and pulses, sweep a shimmer or wave.
+   */
   motion: {
+    instant: "40ms",
     response: "100ms",
     settle: "200ms",
+    draw: "360ms",
+    loop: "1.2s",
+    sweep: "1.6s",
     ease: "cubic-bezier(0.4, 0, 0.2, 1)",
   },
   layout: {
@@ -228,6 +254,8 @@ export const chatTokens = defineTokens("chat", {
   rowLine: "24px",
   userMaxWidth: "70.2%",
   bubbleRadius: "18px",
+  /** The composer bar's rounded ends. */
+  composerRadius: "24px",
 });
 
 /** Optional brand ink; absence uses the surrounding currentColor. */

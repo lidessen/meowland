@@ -59,7 +59,7 @@ ${partSelector(cardTitleContract, "root")} {
   font-size: ${uiTokens.type.title};
   font-weight: 600;
   line-height: 1.4;
-  letter-spacing: -0.01em;
+  letter-spacing: ${uiTokens.type.trackingTight};
   overflow-wrap: anywhere;
 }
 ${partSelector(cardDescriptionContract, "root")} {

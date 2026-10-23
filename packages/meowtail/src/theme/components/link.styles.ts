@@ -24,7 +24,7 @@ export const linkStyles = css`
   ${root}:focus-visible {
     outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
-    border-radius: 2px;
+    border-radius: ${uiTokens.radius.xs};
   }
   @media (prefers-reduced-motion: reduce) {
     ${root} {

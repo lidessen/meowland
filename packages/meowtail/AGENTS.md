@@ -126,28 +126,28 @@ Every value a theme file paints with is a role in one tree, `uiTokens` in `src/t
 shadow or duration; a length that belongs to one part's geometry stays beside that part's selector.
 Colors are literal `[light, dark]` pairs and never reference another token, so a nested scheme
 region resolves its own value. Chat-only measures live in `chatTokens`; option-driven values
-(`alertTokens`), syntax colors (`codeHighlightTokens`) and one component's rhythm
-(`resourceCardTokens`) are the only other sets. There are no aliases: one role, one name.
+(`alertTokens`) and syntax colors (`codeHighlightTokens`) are the only other sets. There are no
+aliases: one role, one name.
 
-| Group     | Keys                                                                                       | Rule                                                                       |
-| --------- | ------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------- |
-| `surface` | canvas, reading, raised, overlay, fill, field · tint, knockout, scrim                      | the surface ladder below; the last three are not rungs                     |
-| `inverse` | surface, ink, action                                                                       | Tooltip and Toast, dark in both schemes                                    |
-| `line`    | width, edge, divider, control, controlHover                                                | three jobs, all 1px                                                        |
-| `ink`     | primary, secondary, tertiary, chip                                                         | content, supporting copy and placeholders, captions, text on a chip        |
-| `state`   | hover, active, focus, focusRing                                                            | translucent overlays that work on any rung                                 |
-| `action`  | primary, primaryHover, onPrimary, soft, danger, onDanger                                   | filled actions; each "on" color sits with its fill                         |
-| `control` | small, regular, large, inset, fieldInset, trackInset, thumb, knob                          | the 28 / 36 / 44 ladder every single-line control shares                   |
-| `accent`  | base, soft, selected, ink, line, halo                                                      | what is happening now and where the reader is                              |
-| `status`  | info, success, warning, danger, unknown                                                    | one text-safe color per status, also used for markers; halos derive by mix |
-| `type`    | sans, display, mono, micro, caption, code, label, body, title, heading, pageTitle, leading | the ramp 11 / 12 / 12 / 13 / 14 / 16 / 20 / 24                             |
-| `space`   | group, section, panel, prose, page insets                                                  | spacing by relationship                                                    |
-| `icon`    | size, stroke                                                                               |                                                                            |
-| `radius`  | xs, sm, md, lg, xl, xxl                                                                    | by element size: marks, tags, small elements, controls, surfaces, dialogs  |
-| `shadow`  | raised, field, action, filled, thumb, float                                                | one shadow per role                                                        |
-| `motion`  | response, settle, ease                                                                     |                                                                            |
-| `layout`  | grid columns, containers, measure                                                          |                                                                            |
-| `glyph`   | chevron, check, arrow, cross, selectChevron                                                | mask glyphs colored by ink                                                 |
+| Group     | Keys                                                                         | Rule                                                                       |
+| --------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| `surface` | canvas, reading, raised, overlay, fill, field · tint, knockout, scrim        | the surface ladder below; the last three are not rungs                     |
+| `inverse` | surface, ink, action                                                         | Tooltip and Toast, dark in both schemes                                    |
+| `line`    | width, edge, divider, control, controlHover                                  | three jobs, all 1px                                                        |
+| `ink`     | primary, secondary, tertiary, chip                                           | content, supporting copy and placeholders, captions, text on a chip        |
+| `state`   | hover, active, focus, focusRing                                              | translucent overlays that work on any rung                                 |
+| `action`  | primary, primaryHover, onPrimary, soft, danger, onDanger                     | filled actions; each "on" color sits with its fill                         |
+| `control` | small, regular, large, inset, fieldInset, trackInset, thumb, knob            | the 28 / 36 / 44 ladder every single-line control shares                   |
+| `accent`  | base, soft, selected, ink, line, halo                                        | what is happening now and where the reader is                              |
+| `status`  | info, success, warning, danger, unknown                                      | one text-safe color per status, also used for markers; halos derive by mix |
+| `type`    | sans, display, mono, micro … pageTitle, leading, trackingTight, trackingCaps | the ramp 11 / 12 / 12 / 13 / 14 / 16 / 20 / 24; two tracking roles         |
+| `space`   | group, section, panel, prose, insetBlock, insetInline, page insets           | spacing by relationship; compact rows pad 12 / 16                          |
+| `icon`    | small, size, large, stroke                                                   | 14 / 16 / 18; no other glyph size                                          |
+| `radius`  | xs, sm, md, lg, xl, xxl, full                                                | by element size: marks, tags, small elements, controls, surfaces, dialogs  |
+| `shadow`  | raised, field, action, filled, thumb, pressed, knob, sheet, float            | one shadow per role                                                        |
+| `motion`  | instant, response, settle, draw, loop, sweep, ease                           | press, hover, open, draw-in, spinner turn, shimmer pass                    |
+| `layout`  | grid columns, containers, measure                                            |                                                                            |
+| `glyph`   | chevron, check, arrow, cross, selectChevron                                  | mask glyphs colored by ink                                                 |
 
 Field surfaces (Input, Textarea, Select, ChoiceSelect, SearchInput, NumberInput) take their box and
 their hover, focus, read-only, invalid and disabled states from
@@ -195,6 +195,26 @@ Group labels share one small-caps role: `type.micro`, weight 500, 0.04em trackin
 `ink.tertiary` (the `eyebrow` Text role). Menu headings, ChoiceSelect groups, NavList group titles,
 and the docs, gallery and story sidebars use it; do not invent another label style. The docs app
 and the Meowbook gallery use the same tokens and roles as the library.
+
+#### Component rules
+
+- Titles: 600 for a container's name (page, card, dialog, alert, task card); 500 for a row's or
+  item's name and for field labels. A label that names a group of rows is the eyebrow role, not a
+  smaller title.
+- Disclosure: inline flow (reasoning, process, sources) leads with a chevron-right that turns 90°; a
+  card collapsing its own body trails a chevron-down that turns 180°. Header heights follow the
+  control ladder: 24px inside a chat row, `control.regular` in a compact box, `control.large` for a
+  card-level header.
+- State: hover is `state.hover` and pressed or expanded is `state.active`, both translucent. On a
+  raised surface the overlay is painted as `background-image: linear-gradient(...)` so the rung
+  stays underneath. Pressed actions take `shadow.pressed`.
+- Compact rows inside a card (resource, link, work and task rows) pad `space.insetBlock`
+  `space.insetInline`; reading sections use the relationship steps.
+- Status tint: Alert is the one surface that takes a status-tinted fill with a status-tinted edge.
+  Other status carriers color only their marker and ink.
+- Focus: a 2px `state.focus` outline at 2px offset; inside a clipped scroller use -2px. Fields use
+  the field-surface ring instead.
+- Every ad hoc gap and padding sits on the 4px grid; tracking comes from the two tracking roles.
 
 Do not use `light-dark()`: it follows CSS `color-scheme`, not the theme's own scheme boundary.
 

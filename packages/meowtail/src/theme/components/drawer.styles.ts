@@ -23,7 +23,7 @@ export const drawerStyles = css`
     overflow: hidden;
   }
   ${root}::backdrop {
-    background: rgb(15 17 21 / 32%);
+    background: ${uiTokens.surface.scrim};
     opacity: 0;
     transition: opacity ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
@@ -41,7 +41,7 @@ export const drawerStyles = css`
     padding: max(24px, env(safe-area-inset-top)) 12px max(24px, env(safe-area-inset-bottom));
     overflow: hidden;
     background: ${uiTokens.surface.canvas};
-    box-shadow: 12px 0 40px rgb(0 0 0 / 12%);
+    box-shadow: ${uiTokens.shadow.sheet};
     font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
     transform: translateX(-100%);
     transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};

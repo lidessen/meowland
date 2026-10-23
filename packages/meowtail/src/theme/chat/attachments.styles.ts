@@ -49,7 +49,8 @@ export const chatAttachmentsStyles = css`
     padding: 8px 12px;
     border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     border-radius: ${chatTokens.bubbleRadius};
-    background: ${uiTokens.surface.fill};
+    /* An object in the conversation: a raised card, not a fill. */
+    background: ${uiTokens.surface.raised};
     color: ${uiTokens.ink.primary};
     text-decoration: none;
   }
@@ -154,7 +155,7 @@ export const chatAttachmentsStyles = css`
   }
   @media (hover: hover) {
     ${partSelector(chatAttachmentsContract, "remove")}:hover {
-      background: ${uiTokens.surface.fill};
+      background: ${uiTokens.state.hover};
       color: ${uiTokens.ink.primary};
     }
   }
@@ -175,13 +176,13 @@ export const chatAttachmentsStyles = css`
   }
   @media (hover: hover) {
     ${partSelector(chatAttachmentsContract, "previewButton")}:hover:not(:disabled) {
-      background: ${uiTokens.surface.fill};
+      background: ${uiTokens.state.hover};
     }
   }
   ${partSelector(chatAttachmentsContract, "previewButton")}:active:not(:disabled) {
-    background: ${uiTokens.surface.fill};
-    box-shadow: inset 0 1px 2px rgb(0 0 0 / 12%);
-    transition-duration: 40ms;
+    background: ${uiTokens.state.active};
+    box-shadow: ${uiTokens.shadow.pressed};
+    transition-duration: ${uiTokens.motion.instant};
   }
   ${partSelector(chatAttachmentsContract, "previewButton")}:focus-visible {
     outline: 2px solid ${uiTokens.state.focus};
@@ -196,12 +197,13 @@ export const chatAttachmentsStyles = css`
       background-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${partSelector(chatAttachmentsContract, "file")}:hover {
-    background: ${uiTokens.surface.fill};
+    /* The hover overlay sits on the raised card instead of replacing it. */
+    background-image: linear-gradient(${uiTokens.state.hover}, ${uiTokens.state.hover});
   }
   ${partSelector(chatAttachmentsContract, "image")}:focus-visible,
   ${partSelector(chatAttachmentsContract, "file")}:focus-visible {
     outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 3px;
+    outline-offset: 2px;
   }
   ${partSelector(chatAttachmentsContract, "icon")} svg {
     width: 28px;

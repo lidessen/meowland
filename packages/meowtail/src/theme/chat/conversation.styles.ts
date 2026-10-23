@@ -40,7 +40,7 @@ export const chatConversationStyles = css`
     padding: 0 ${uiTokens.control.inset};
     box-sizing: border-box;
     border: 0;
-    border-radius: 999px;
+    border-radius: ${uiTokens.radius.full};
     corner-shape: round;
     background: ${uiTokens.surface.overlay};
     color: ${uiTokens.ink.primary};

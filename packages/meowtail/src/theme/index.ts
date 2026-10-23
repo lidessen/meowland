@@ -81,7 +81,6 @@ import { navListStyles } from "./components/nav-list.styles";
 import { modalStyles } from "./components/modal.styles";
 import { listGroupStyles } from "./components/list-group.styles";
 import { resourceCardStyles } from "./components/resource-card.styles";
-import { resourceCardTokens } from "./components/resource-card.tokens";
 import { drawerStyles } from "./components/drawer.styles";
 import { windowTitleBarStyles } from "./components/window-title-bar.styles";
 import { progressStyles } from "./components/progress.styles";
@@ -104,7 +103,6 @@ export const standardThemeTokens = [
   chatTokens,
   alertTokens,
   codeHighlightTokens,
-  resourceCardTokens,
 ] as const;
 
 export const standardThemeStyles = [

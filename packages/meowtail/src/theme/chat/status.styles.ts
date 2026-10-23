@@ -38,7 +38,7 @@ export const chatStatusStyles = css`
 
   ${partSelector(chatStatusContract, "root")}[${chatStatusOptions.attribute("tone")}="busy"] ${partSelector(chatStatusContract, "dot")} {
     background: ${uiTokens.accent.base};
-    animation: meowui-pulse 1.1s infinite ease-in-out;
+    animation: meowui-pulse ${uiTokens.motion.loop} infinite ${uiTokens.motion.ease};
   }
 
   ${partSelector(chatStatusContract, "root")} {

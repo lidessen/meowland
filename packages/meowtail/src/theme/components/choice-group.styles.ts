@@ -68,12 +68,12 @@ export const choiceGroupStyles = css`
     flex: 0 0 auto;
     width: 16px;
     height: 16px;
-    margin: 3px 0 0;
+    margin: 4px 0 0;
     accent-color: ${uiTokens.ink.primary};
   }
   ${partSelector(choiceGroupContract, "content")} {
     display: grid;
-    gap: 3px;
+    gap: 4px;
     min-width: 0;
     overflow-wrap: anywhere;
   }

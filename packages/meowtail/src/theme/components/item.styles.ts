@@ -46,7 +46,7 @@ export const itemStyles = css`
   }
   ${partSelector(itemContract, "root")}[data-selected="true"],
   button${partSelector(itemContract, "root")}[aria-expanded="true"] {
-    background: ${uiTokens.state.hover};
+    background: ${uiTokens.state.active};
   }
   button${partSelector(itemContract, "root")}:focus-visible {
     outline: 2px solid ${uiTokens.state.focus};

@@ -54,7 +54,7 @@ export const stateDotStyles = css`
   }
   ${partSelector(stateDotContract, "motion")} {
     display: flex;
-    animation: ui-state-dot-spin 1.5s linear infinite;
+    animation: ui-state-dot-spin ${uiTokens.motion.loop} linear infinite;
   }
   @keyframes ui-state-dot-spin {
     to {

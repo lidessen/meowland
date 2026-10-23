@@ -32,7 +32,7 @@ export const breadcrumbStyles = css`
   }
   ${partSelector(breadcrumbContract, "link")}:focus-visible {
     outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 3px;
+    outline-offset: 2px;
   }
   ${partSelector(breadcrumbContract, "current")} {
     color: ${uiTokens.ink.primary};

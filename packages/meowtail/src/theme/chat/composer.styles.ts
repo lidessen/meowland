@@ -31,9 +31,9 @@ export const chatComposerStyles = css`
     background: ${uiTokens.state.hover};
     color: ${uiTokens.ink.primary};
   }
-  /* Open, the quiet trigger becomes a filled chip that anchors its menu. */
+  /* Open, the quiet trigger holds the active overlay that anchors its menu. */
   ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "trigger")}[aria-expanded="true"]:not(:disabled) {
-    background: ${uiTokens.surface.fill};
+    background: ${uiTokens.state.active};
     color: ${uiTokens.ink.primary};
   }
 
@@ -254,7 +254,7 @@ export const chatComposerStyles = css`
     padding: 0;
     line-height: 1.2;
     border: 1px solid transparent;
-    border-radius: 999px;
+    border-radius: ${uiTokens.radius.full};
     corner-shape: round;
     background: ${uiTokens.action.primary};
     color: ${uiTokens.action.onPrimary};
@@ -266,8 +266,8 @@ export const chatComposerStyles = css`
   }
 
   ${partSelector(chatComposerContract, "submit")} svg {
-    width: 18px;
-    height: 18px;
+    width: ${uiTokens.icon.large};
+    height: ${uiTokens.icon.large};
   }
 
   ${partSelector(chatComposerContract, "trailing")} + ${partSelector(chatComposerContract, "submit")} {
@@ -286,7 +286,7 @@ export const chatComposerStyles = css`
   }
 
   ${partSelector(chatComposerContract, "submit")}:hover:not(:disabled) {
-    background: color-mix(in srgb, ${uiTokens.action.primary} 86%, white);
+    background: ${uiTokens.action.primaryHover};
   }
 
   ${partSelector(chatComposerContract, "submit")}:disabled {
@@ -308,8 +308,8 @@ export const chatComposerStyles = css`
   }
 
   ${partSelector(chatComposerContract, "submit")}:active:not(:disabled) {
-    box-shadow: inset 0 1px 3px rgb(0 0 0 / 20%);
-    transition-duration: 40ms;
+    box-shadow: ${uiTokens.shadow.pressed};
+    transition-duration: ${uiTokens.motion.instant};
   }
 
   /* A compact writing surface grows with the draft, not with an empty tools row.
@@ -418,7 +418,7 @@ export const chatComposerStyles = css`
     height: 34px;
     min-width: 34px;
     min-height: 34px;
-    border-radius: 11px;
+    border-radius: ${uiTokens.radius.lg};
     background: ${uiTokens.action.primary};
     color: ${uiTokens.action.onPrimary};
     transform: none;
@@ -458,9 +458,8 @@ export const chatComposerStyles = css`
       align-items: end;
       gap: 0 8px;
       padding: 6px;
-      border-radius: 24px;
-      box-shadow: 0 2px 12px rgb(0 0 0 / 4%);
-    }
+      border-radius: ${chatTokens.composerRadius};
+      }
 
     ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "attachments")} {
       grid-column: 1 / -1;

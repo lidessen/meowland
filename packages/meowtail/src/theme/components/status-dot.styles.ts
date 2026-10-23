@@ -21,7 +21,7 @@ export const statusDotStyles = css`
     ${statusDotOptions.when({ state: "processing" })} {
       border: 0;
       background: ${uiTokens.accent.base};
-      animation: meow-status-pulse 1.2s infinite ease-in-out;
+      animation: meow-status-pulse ${uiTokens.motion.loop} infinite ${uiTokens.motion.ease};
     }
     ${statusDotOptions.when({ state: "success" })} {
       border: 0;
@@ -52,7 +52,7 @@ export const statusDotStyles = css`
     border-radius: 50%;
     corner-shape: round;
     background: ${uiTokens.accent.halo};
-    animation: meow-status-pulse 1.2s infinite ease-in-out;
+    animation: meow-status-pulse ${uiTokens.motion.loop} infinite ${uiTokens.motion.ease};
   }
   ${root}[data-halo="true"][${statusDotOptions.attribute("state")}="processing"] {
     animation: none;

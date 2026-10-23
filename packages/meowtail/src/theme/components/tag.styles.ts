@@ -32,8 +32,8 @@ export const tagStyles = css`
     ${tagOptions.when({ kind: "count" })} {
       min-width: 18px;
       height: 18px;
-      padding: 0 5px;
-      border-radius: 999px;
+      padding: 0 6px;
+      border-radius: ${uiTokens.radius.full};
       corner-shape: round;
       font-size: ${uiTokens.type.micro};
       line-height: 1;
@@ -45,7 +45,7 @@ export const tagStyles = css`
       overflow: hidden;
       text-overflow: ellipsis;
       vertical-align: baseline;
-      padding: 1px 5px;
+      padding: 1px 6px;
       border-radius: ${uiTokens.radius.xs};
       background: ${uiTokens.surface.tint};
       color: ${uiTokens.ink.primary};

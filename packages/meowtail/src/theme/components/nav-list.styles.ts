@@ -29,7 +29,7 @@ export const navListStyles = css`
     font-size: ${uiTokens.type.micro};
     font-weight: 500;
     line-height: 1.5;
-    letter-spacing: 0.04em;
+    letter-spacing: ${uiTokens.type.trackingCaps};
     text-transform: uppercase;
     overflow-wrap: anywhere;
   }
@@ -58,7 +58,7 @@ export const navListStyles = css`
     align-content: center;
     width: 100%;
     min-height: ${uiTokens.control.regular};
-    padding: 5px ${uiTokens.space.group};
+    padding: 4px ${uiTokens.space.group};
     border: 0;
     border-radius: ${uiTokens.radius.lg};
     color: ${uiTokens.ink.primary};

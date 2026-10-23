@@ -44,7 +44,7 @@ export const proseStyles = css`
     margin-top: ${uiTokens.space.group};
     font-weight: 600;
     line-height: 1.45;
-    letter-spacing: -0.01em;
+    letter-spacing: ${uiTokens.type.trackingTight};
   }
   ${scope} > :where(h2) {
     font-size: 1.15em;

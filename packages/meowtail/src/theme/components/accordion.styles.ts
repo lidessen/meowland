@@ -28,8 +28,9 @@ export const accordionStyles = css`
     font-size: ${uiTokens.type.body};
   }
   ${root} ${summary} {
-    min-height: 44px;
-    padding: 12px 16px;
+    /* A card-level header: the large control height, the compact inline inset. */
+    min-height: ${uiTokens.control.large};
+    padding: 10px ${uiTokens.space.insetInline};
     font-weight: 500;
     color: ${uiTokens.ink.primary};
     border-radius: 0;
@@ -42,12 +43,12 @@ export const accordionStyles = css`
   }
   @media (hover: hover) {
     ${root} ${summary}:hover {
-      background: ${uiTokens.surface.fill};
+      background: ${uiTokens.state.hover};
       color: ${uiTokens.ink.primary};
     }
   }
   ${root} ${content} {
-    padding: 0 16px 16px 38px;
+    padding: 0 ${uiTokens.space.insetInline} ${uiTokens.space.insetInline} 38px;
     color: ${uiTokens.ink.secondary};
     line-height: ${uiTokens.type.leading};
   }

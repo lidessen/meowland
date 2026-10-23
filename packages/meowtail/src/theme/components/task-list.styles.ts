@@ -36,7 +36,7 @@ export const taskListStyles = css`
     display: flex;
     align-items: center;
     gap: 12px;
-    padding: 12px 14px;
+    padding: ${uiTokens.space.insetBlock} ${uiTokens.space.insetInline};
     list-style: none;
     cursor: pointer;
     user-select: none;
@@ -66,8 +66,8 @@ export const taskListStyles = css`
     transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${part("chevron")} svg {
-    width: 14px;
-    height: 14px;
+    width: ${uiTokens.icon.small};
+    height: ${uiTokens.icon.small};
   }
   ${part("root")}[open] > ${part("summary")} ${part("chevron")} {
     transform: rotate(180deg);
@@ -75,7 +75,7 @@ export const taskListStyles = css`
   ${part("list")} {
     display: grid;
     margin: -4px 0 0;
-    padding: 0 14px 8px;
+    padding: 0 ${uiTokens.space.insetInline} ${uiTokens.space.group};
     list-style: none;
   }
   ${part("item")} {
@@ -109,7 +109,7 @@ export const taskListStyles = css`
     width: 0;
     height: 1px;
     background: currentColor;
-    transition: width 360ms ${uiTokens.motion.ease};
+    transition: width ${uiTokens.motion.draw} ${uiTokens.motion.ease};
   }
   ${struck} > ${part("label")}::after {
     width: 100%;

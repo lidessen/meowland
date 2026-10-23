@@ -27,7 +27,7 @@ export const processGroupStyles = css`
     display: flex;
     align-items: center;
     gap: 8px;
-    padding: 9px 12px;
+    padding: 8px 12px;
     list-style: none;
     cursor: pointer;
     user-select: none;
@@ -49,8 +49,8 @@ export const processGroupStyles = css`
     transition: transform ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${group("chevron")} svg {
-    width: 14px;
-    height: 14px;
+    width: ${uiTokens.icon.small};
+    height: ${uiTokens.icon.small};
   }
   ${group("root")}[open] > ${group("summary")} ${group("chevron")} {
     transform: rotate(90deg);
@@ -121,8 +121,8 @@ export const processGroupStyles = css`
     color: ${uiTokens.ink.tertiary};
   }
   ${step("icon")} svg {
-    width: 14px;
-    height: 14px;
+    width: ${uiTokens.icon.small};
+    height: ${uiTokens.icon.small};
   }
   ${step("label")} {
     min-width: 0;
@@ -131,7 +131,7 @@ export const processGroupStyles = css`
     white-space: nowrap;
   }
   ${step("label")} code {
-    padding: 1px 5px;
+    padding: 1px 6px;
     border-radius: ${uiTokens.radius.xs};
     background: ${uiTokens.surface.tint};
     color: ${uiTokens.ink.primary};

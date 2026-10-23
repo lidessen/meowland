@@ -35,7 +35,7 @@ export const toggleStyles = css`
     width: 36px;
     height: 20px;
     padding: 2px;
-    border-radius: 999px;
+    border-radius: ${uiTokens.radius.full};
     corner-shape: round;
     background: ${uiTokens.line.edge};
     pointer-events: none;
@@ -47,7 +47,7 @@ export const toggleStyles = css`
     border-radius: 50%;
     corner-shape: round;
     background: ${uiTokens.control.knob};
-    transition: transform 120ms ease;
+    transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${partSelector(switchContract, "input")}:checked + ${partSelector(switchContract, "track")} {
     background: ${uiTokens.action.primary};

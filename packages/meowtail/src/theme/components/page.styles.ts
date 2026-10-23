@@ -24,7 +24,7 @@ export const pageStyles = css`
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
     font-weight: 500;
-    letter-spacing: 0.04em;
+    letter-spacing: ${uiTokens.type.trackingCaps};
     line-height: 1.5;
     overflow-wrap: anywhere;
   }

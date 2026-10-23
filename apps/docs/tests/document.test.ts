@@ -235,3 +235,19 @@ describe("the page sequence", () => {
     expect(pager).toContain('href="/packages/meowtail/" rel="next"');
   });
 });
+
+describe("the reader's controls", () => {
+  test("the appearance choice applies before the stylesheet and the switch waits for script", () => {
+    const html = document("packages/meowtail");
+    const head = html.slice(0, html.indexOf("</head>"));
+    expect(head.indexOf("meowland-docs-appearance")).toBeGreaterThan(-1);
+    expect(head.indexOf("meowland-docs-appearance")).toBeLessThan(head.indexOf('rel="stylesheet"'));
+    expect(html).toMatch(/<button class="docs-appearance" id="docs-appearance"[^>]*hidden/);
+  });
+
+  test("the navigation filter shows its keyboard shortcut", () => {
+    expect(document("packages/meowtail")).toContain(
+      '<kbd class="docs-search-key" aria-hidden="true">/</kbd>',
+    );
+  });
+});

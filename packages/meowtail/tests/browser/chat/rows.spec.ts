@@ -352,7 +352,7 @@ test("an activating row is one focus stop with the same row geometry", async ({ 
   await expect(feedback).toHaveText("Activated: the host opens the record for this command.");
 });
 
-test("a row carries its state in the leading glyph as well as its status", async ({ page }) => {
+test("a row's type glyph stays neutral and its state badge carries the color", async ({ page }) => {
   await page.goto("/canvas.html?story=chat-tool-call-action");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const colours = await page.evaluate(() => {
@@ -364,12 +364,15 @@ test("a row carries its state in the leading glyph as well as its status", async
         state: root.getAttribute("data-tool-state"),
         glyph: getComputedStyle(icon).color,
         status: getComputedStyle(status).color,
+        tint: getComputedStyle(status).backgroundColor,
       };
     };
     return rows.map(read);
   });
   const complete = colours.find((row) => row.state === "complete")!;
   const failed = colours.find((row) => row.state === "error")!;
-  expect(failed.glyph).not.toBe(complete.glyph);
-  expect(failed.glyph).toBe(failed.status);
+  // The glyph names the tool's type in every state; only the badge speaks in the danger ink.
+  expect(failed.glyph).toBe(complete.glyph);
+  expect(failed.status).not.toBe(failed.glyph);
+  expect(failed.tint).not.toBe("rgba(0, 0, 0, 0)");
 });

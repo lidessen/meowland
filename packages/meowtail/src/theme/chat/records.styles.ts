@@ -97,48 +97,82 @@ export const chatRecordsStyles = css`
     line-height: 1;
   }
 
-  /* The glyph names the tool's type until a state needs the reader: running turns a
-     spinner, waiting pauses in the warning ink, an error alerts in the danger ink. So a chain
-     reads down its left edge, and color appears only where something is wrong or pending. */
-  ${partSelector(chatToolCallContract, "icon")} > [data-tool-glyph] {
-    display: none;
-    place-items: center;
-  }
-  ${partSelector(chatToolCallContract, "root")}:not([data-tool-state="running"], [data-tool-state="waiting"], [data-tool-state="error"]) ${partSelector(chatToolCallContract, "icon")} > [data-tool-glyph="type"],
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "icon")} > [data-tool-glyph="running"],
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="waiting"] ${partSelector(chatToolCallContract, "icon")} > [data-tool-glyph="waiting"],
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"] ${partSelector(chatToolCallContract, "icon")} > [data-tool-glyph="error"] {
-    display: grid;
-  }
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "icon")} {
-    color: ${uiTokens.ink.secondary};
-  }
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "icon")} > [data-tool-glyph="running"] {
-    animation: chat-tool-turn ${uiTokens.motion.loop} linear infinite;
-  }
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="waiting"] ${partSelector(chatToolCallContract, "icon")} {
-    color: ${uiTokens.status.warning};
-  }
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"] ${partSelector(chatToolCallContract, "icon")} {
-    color: ${uiTokens.status.danger};
-  }
   @keyframes chat-tool-turn {
     to {
       transform: rotate(360deg);
     }
   }
 
+  /* The state badge: one word and one glyph on a soft tint. Color lives here and nowhere
+     else in the row; the host's longer account reads as the fact line underneath. */
   ${partSelector(chatToolCallContract, "status")} {
-    flex: 0 1 auto;
-    white-space: normal;
-    overflow-wrap: anywhere;
-    min-width: 0;
-    margin-left: 4px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    flex: 0 0 auto;
+    height: 20px;
+    margin-left: 6px;
+    padding: 0 8px 0 6px;
+    border-radius: ${uiTokens.radius.full};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.micro};
+    font-weight: 500;
+    line-height: 20px;
+    letter-spacing: 0;
+    white-space: nowrap;
+  }
+  ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph] {
+    display: none;
+    place-items: center;
+  }
+  ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph] svg {
+    width: 12px;
+    height: 12px;
+  }
+  ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph="running"],
+  ${partSelector(chatToolCallContract, "root")}[data-tool-state="waiting"] ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph="waiting"],
+  ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"] ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph="error"],
+  ${partSelector(chatToolCallContract, "root")}:is([data-tool-state="success"], [data-tool-state="complete"]) ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph="done"] {
+    display: grid;
+  }
+  ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "status")} {
+    background: ${uiTokens.accent.soft};
+    color: ${uiTokens.accent.ink};
+  }
+  ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph="running"] {
+    animation: chat-tool-turn ${uiTokens.motion.loop} linear infinite;
+  }
+  ${partSelector(chatToolCallContract, "root")}[data-tool-state="waiting"] ${partSelector(chatToolCallContract, "status")} {
+    background: color-mix(in srgb, ${uiTokens.status.warning} 12%, transparent);
+    color: ${uiTokens.status.warning};
+  }
+  ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"] ${partSelector(chatToolCallContract, "status")} {
+    background: color-mix(in srgb, ${uiTokens.status.danger} 10%, transparent);
+    color: ${uiTokens.status.danger};
+  }
+  ${partSelector(chatToolCallContract, "root")}:is([data-tool-state="success"], [data-tool-state="complete"]) ${partSelector(chatToolCallContract, "status")} {
+    color: ${uiTokens.status.success};
+  }
+  ${partSelector(chatToolCallContract, "root")}:is([data-tool-state="cancelled"], [data-tool-state="unknown"], [data-tool-state="queued"]) ${partSelector(chatToolCallContract, "status")} {
+    padding-inline-start: 8px;
+    color: ${uiTokens.ink.tertiary};
+  }
+
+  /* The host's account of the state: a second header line, aligned with the label. */
+  ${partSelector(chatToolCallContract, "header")}:has(> ${partSelector(chatToolCallContract, "fact")}:not([hidden])) {
+    flex-wrap: wrap;
+    row-gap: 0;
+  }
+  ${partSelector(chatToolCallContract, "fact")} {
+    flex: 1 0 100%;
+    margin: -4px 0 2px;
+    padding-inline-start: var(${rowIndent});
+    font-weight: 400;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.caption};
-    /* A long target yields its width first; a state fact keeps its words up to half the row. */
-    flex-shrink: 0;
-    max-width: 50%;
+    line-height: 18px;
+    overflow-wrap: anywhere;
   }
 
   ${partSelector(chatToolCallContract, "label")} {
@@ -154,20 +188,6 @@ export const chatRecordsStyles = css`
   ${partSelector(chatToolCallContract, "header")}:has(> ${partSelector(chatToolCallContract, "summary")}) > ${partSelector(chatToolCallContract, "label")} {
     flex-shrink: 0;
     max-width: 50%;
-  }
-
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.status.danger};
-  }
-
-  /* Color is kept for states that need the reader: waiting and errors. Running and
-     finished rows stay neutral, so a long chain reads quietly. */
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.ink.secondary};
-  }
-
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="waiting"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.ink.secondary};
   }
 
   ${partSelector(chatToolCallContract, "detail")},
@@ -208,9 +228,6 @@ export const chatRecordsStyles = css`
   ${partSelector(chatToolCallContract, "input")} ${partSelector(outputBlockContract, "body")},
   ${partSelector(chatToolCallContract, "output")} ${partSelector(outputBlockContract, "body")} {
     max-height: 24rem;
-  }
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="success"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.ink.tertiary};
   }
   ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] {
     color: ${uiTokens.ink.tertiary};
@@ -381,20 +398,6 @@ export const chatRecordsStyles = css`
     overflow-wrap: anywhere;
   }
 
-  ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "status")} {
-    margin-left: 4px;
-    font-size: ${uiTokens.type.caption};
-    white-space: normal;
-  }
-
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"][data-tool-interactive="true"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.status.danger};
-  }
-
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"][data-tool-interactive="true"] ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.ink.secondary};
-  }
-
   ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] > ${partSelector(chatToolCallContract, "header")}:hover ${partSelector(chatToolCallContract, "label")} {
     color: ${uiTokens.ink.primary};
   }
@@ -451,6 +454,15 @@ export const chatRecordsStyles = css`
       grid-column: 2;
       margin-inline-start: 0;
     }
+    ${partSelector(chatToolCallContract, "status")} {
+      justify-self: start;
+      margin-block: 2px;
+    }
+    ${partSelector(chatToolCallContract, "fact")} {
+      grid-column: 2;
+      margin: 0;
+      padding-inline-start: 0;
+    }
     ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "chevron")} {
       inset-block: auto;
       top: calc(
@@ -469,14 +481,10 @@ export const chatRecordsStyles = css`
     ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] > ${partSelector(chatToolCallContract, "header")} {
       min-height: ${uiTokens.control.regular};
     }
-
-    ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "status")} {
-      font-size: ${uiTokens.type.caption};
-    }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(chatToolCallContract, "icon")} > [data-tool-glyph] {
+    ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph] {
       animation: none;
     }
     ${partSelector(chatProcessContract, "icon")},

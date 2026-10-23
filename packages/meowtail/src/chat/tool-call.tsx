@@ -22,6 +22,7 @@ export const chatToolCallContract = {
     "label",
     "summary",
     "status",
+    "fact",
     "chevron",
     "detail",
     "body",
@@ -49,7 +50,10 @@ export interface ChatToolCallProps extends Props {
   /** Short target or action summary, visible while collapsed. */
   summary?: MaybeSignal<string | undefined>;
   state?: MaybeSignal<ChatToolCallState>;
-  /** State facts, including who or what is being waited on, belong to the host. */
+  /**
+   * The host's account of the state (who or what is being waited on, why it failed). The badge
+   * names the state in one word; this fact reads as a quiet line under the row.
+   */
   statusLabel?: MaybeSignal<string | undefined>;
   detail?: Child;
   icon?: Child;
@@ -116,8 +120,13 @@ export const ChatToolCall = defineComponent<
       cancel: "Cancel",
       ...labels,
     };
-    const status = derived(() => unwrap(statusLabel) ?? executionStateLabel(unwrap(state)));
-    // Preserve the existing quiet completion default without interpreting missing data as success.
+    // The badge speaks the library's shared state vocabulary, the same words ChatTask uses.
+    // An explicitly empty statusLabel blanks the word, as it always has.
+    const stateWord = derived(() =>
+      unwrap(statusLabel) === "" ? "" : executionStateLabel(unwrap(state)),
+    );
+    const fact = derived(() => unwrap(statusLabel) ?? "");
+    // Preserve the quiet completion default without interpreting missing data as success.
     const quietStatus = derived(() => unwrap(state) === "complete" && !unwrap(statusLabel));
     // One interactive header: activation never also toggles an in-place disclosure.
     const reveals = collapsible && onActivate === undefined;
@@ -161,22 +170,7 @@ export const ChatToolCall = defineComponent<
         "header",
         onActivate !== undefined ? "button" : reveals ? "summary" : "div",
         onActivate !== undefined ? { type: "button", onClick: onActivate } : null,
-        context.part(
-          "icon",
-          "span",
-          { "aria-hidden": "true" },
-          <span data-tool-glyph="type">{icon ?? <Icon name="wrench" />}</span>,
-          // A state that needs the reader takes the glyph's place; the type returns when it settles.
-          <span data-tool-glyph="running">
-            <Icon name="loader-circle" />
-          </span>,
-          <span data-tool-glyph="waiting">
-            <Icon name="circle-pause" />
-          </span>,
-          <span data-tool-glyph="error">
-            <Icon name="circle-alert" />
-          </span>,
-        ),
+        context.part("icon", "span", { "aria-hidden": "true" }, icon ?? <Icon name="wrench" />),
         context.part("label", "strong", null, label),
         summary !== undefined
           ? context.part(
@@ -186,7 +180,26 @@ export const ChatToolCall = defineComponent<
               summary,
             )
           : null,
-        context.part("status", "span", null, status),
+        context.part(
+          "status",
+          "span",
+          { hidden: derived(() => !stateWord.value) },
+          <span data-tool-glyph="running">
+            <Icon name="loader-circle" />
+          </span>,
+          <span data-tool-glyph="waiting">
+            <Icon name="circle-pause" />
+          </span>,
+          <span data-tool-glyph="error">
+            <Icon name="x" />
+          </span>,
+          <span data-tool-glyph="done">
+            <Icon name="check" />
+          </span>,
+          stateWord,
+        ),
+        // Inside the header so a collapsed row still reads its fact.
+        context.part("fact", "span", { hidden: derived(() => !fact.value) }, fact),
         interactive
           ? context.part(
               "chevron",

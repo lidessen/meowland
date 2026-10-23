@@ -17,9 +17,19 @@ export const DetailComponentsStory = defineStory({
         <p>The body is provided by the caller.</p>
       </DetailSection>
       <Timeline>
-        <TimelineItem state="processing" title="In progress" stateLabel="In progress" />
-        <TimelineItem state="returned" title="Run returned" stateLabel="Returned" />
-        <TimelineItem state="success" title="Completed" stateLabel="Completed" />
+        <TimelineItem
+          state="success"
+          title="Draft submitted"
+          stateLabel="Done"
+          description="09:12 · 4 files changed"
+        />
+        <TimelineItem
+          state="returned"
+          title="Review returned"
+          stateLabel="Returned"
+          description="Two comments need a reply before the next run."
+        />
+        <TimelineItem state="processing" title="Checks running" stateLabel="In progress" />
       </Timeline>
       <ResourceLink href="#sample" title="Sample link" detail="Link style" />
       <ResourceLink

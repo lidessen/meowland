@@ -82,9 +82,10 @@ export const MessagePartsStory = defineStory({
             author="Assistant handling the component review"
             continuation
             timestamp="09:42"
+            avatar={<AssistantMark />}
           >
-            Continues the previous message without repeating the visual heading, while keeping
-            accessible author information.
+            Continues the previous reply in the same column: the avatar slot stays but goes blank,
+            and the author line keeps the turn attributed.
           </ChatMessage>
           <ChatMessage
             role="user"

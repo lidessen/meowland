@@ -1,6 +1,7 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { processGroupContract } from "../../components/process-group";
 import { processStepContract } from "../../components/process-step";
+import { statusContract } from "../../components/status";
 import { uiTokens } from "../tokens";
 import { focusRing } from "../recipes";
 
@@ -71,6 +72,15 @@ export const processGroupStyles = css`
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+  /* A badge leads the status; a fact after it reads as quiet words that truncate first. */
+  ${group("status")} > ${partSelector(statusContract, "root")} {
+    vertical-align: middle;
+  }
+  ${group("status")} > ${partSelector(statusContract, "root")} + * {
+    margin-inline-start: 8px;
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
   }
   /* The state badge (shared/state-badge.styles.ts) sits right after the name; the trailing
      slot is one quiet fact at the row's end. */

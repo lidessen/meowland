@@ -46,7 +46,7 @@ A finished reply carries a quiet action row: Copy (built in; it copies the reply
 
 ## Content and local customization
 
-Message `parts` include `text`, `code`, `process`, `attachments`, `tool`, and `task`. `text` is safe Markdown by default: raw HTML and images are shown as text, and only explicit HTTP, HTTPS, and mailto links navigate; code parts use the shared `CodeBlock`. Processes use native disclosure, and process steps take only normalized titles, descriptions, status text, and visual tone.
+Message `parts` include `text`, `code`, `process`, `attachments`, `tool`, and `task`. `text` is safe Markdown by default: raw HTML and images are shown as text, and only explicit HTTP, HTTPS, and mailto links navigate; code parts use the shared `CodeBlock`. Processes use native disclosure, and process steps take only normalized titles, descriptions, status text, and visual tone. A process may also carry `state` (the same execution states as tool and task parts): its header then shows the shared state badge after the title, with `statusText` as a quiet fact beside it. Whether the badge exists is fixed by the part's first value; later states update its tone and word in place. Without `state` the header shows the title and `statusText` alone.
 
 `renderPart` can replace just one part, and returning `undefined` uses the default implementation; `renderWorkDetail` replaces only the detail body. `composerTrailing` and `headerActions` hold local controls without replacing the whole page. Custom components still consume ancestor Context in the original render tree and do not create another renderer root.
 

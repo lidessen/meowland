@@ -3,6 +3,7 @@ import { Window } from "happy-dom";
 import { createRuntime, h, signal } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { AssistantComposer } from "../../../src/chat/assistant-composer";
+import { AssistantView } from "../../../src/chat/assistant";
 import type { AssistantDraft } from "../../../src/chat/assistant-types";
 import { ChatComposer } from "../../../src/chat/composer";
 import { Checkbox } from "../../../src/components/checkbox";
@@ -270,5 +271,41 @@ test("code block keeps wrap state when its code signal changes", async () => {
   expect(view.host.querySelector("figure")).toBe(root);
   expect(wrap.getAttribute("aria-pressed")).toBe("true");
   expect(view.host.textContent).toContain("const value = 2;");
+  view.unmount();
+});
+
+test("an Assistant process badge follows later states without remounting", async () => {
+  const process = (state: "running" | "success", statusText: string) => [
+    {
+      id: "reply",
+      role: "assistant" as const,
+      author: "Assistant",
+      parts: [
+        {
+          id: "process",
+          kind: "process" as const,
+          title: "Review process",
+          state,
+          statusText,
+          steps: [],
+        },
+      ],
+    },
+  ];
+  const messages = signal(process("running", "1 of 3"));
+  const view = mount(<AssistantView messages={messages} readOnly />);
+  const badge = () =>
+    view.host.querySelector(
+      '[data-meowui-part="process-group/status"] [data-meowui-part="status/root"]',
+    );
+  const first = badge();
+  expect(first?.getAttribute("data-tone")).toBe("processing");
+  expect(first?.textContent).toContain("Running");
+  expect(view.host.textContent).toContain("1 of 3");
+  messages.value = process("success", "3 steps");
+  await Promise.resolve();
+  expect(badge()).toBe(first);
+  expect(first?.getAttribute("data-tone")).toBe("success");
+  expect(view.host.textContent).toContain("3 steps");
   view.unmount();
 });

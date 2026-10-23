@@ -55,6 +55,7 @@ const part = s.union(
     id: s.string(),
     kind: s.enum("process"),
     title: s.string(),
+    state: optional(executionState),
     statusText: optional(s.string()),
     steps,
     defaultOpen: optional(s.boolean()),

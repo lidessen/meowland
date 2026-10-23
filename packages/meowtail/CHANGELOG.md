@@ -21,6 +21,7 @@ Candidate for the next alpha publish. This version is not on npm until the manua
 - `uiTokens.motion.enter` (`--ui-motion-enter`), the arrival curve: dialogs and modals rise out of a slight scale over a fading scrim, toasts rise into place once when mounted, and popovers, menus and the drawer now arrive on the same curve. Reduced motion turns each off.
 - A selected `Item` takes the shared selection tint (`accent.selected`) like navigation, tables and choices instead of the pressed gray, and hovering it keeps the tint; an open disclosure item stays the pressed gray.
 - Assistant `process` parts take an optional `state` (JSX and JSON): the header shows the shared state badge after the title and keeps `statusText` as a quiet fact beside it. The badge's presence is fixed by the part's first value; later states update it in place. Parts without `state` render as before.
+- `highlightCode`, `highlightLanguage` and `HighlightSpan` from the package root: CodeBlock's own highlighter, for hosts that render code ahead of time, such as a static site build. Its colors are the theme's code variables.
 - `Prose` with `measure` `reading | fill` and `as` `div | article | section`: long-form reading content. Tokens `uiTokens.space.prose` and `uiTokens.layout.measure`.
 
 ### Changed

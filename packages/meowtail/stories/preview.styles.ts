@@ -237,11 +237,15 @@ export const previewStyles = css`
   }
 
   /* Fixture composition: preserve relationships without changing component themes. */
+  /* A variant matrix, not an action row: equal columns keep each variant in the same column
+     across sizes and states, two to a line on a phone. */
   .workshop-foundation-action-grid {
-    display: flex;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr));
     gap: 8px;
     align-items: center;
+    justify-items: start;
+    width: 100%;
   }
   .workshop-foundation-range {
     display: grid;

@@ -1,6 +1,7 @@
 import { h, mapSignal, signal } from "meowjsx";
 import { defineStory } from "meowbook";
 import {
+  ActionRow,
   Button,
   Card,
   CardContent,
@@ -88,7 +89,7 @@ export const SkeletonBoundaryStory = defineStory({
                 </CardContent>
               </Card>
             </SkeletonBoundary>
-            <Inline>
+            <ActionRow>
               <Button
                 data-testid={`${id}-start`}
                 variant="outline"
@@ -116,7 +117,7 @@ export const SkeletonBoundaryStory = defineStory({
               >
                 {copy.append}
               </Button>
-            </Inline>
+            </ActionRow>
           </Stack>
         );
       }}

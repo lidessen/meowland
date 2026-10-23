@@ -1,6 +1,6 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Button, ChatReasoning, Inline, TaskList, type TaskListEntry } from "meowtail";
+import { ActionRow, Button, ChatReasoning, TaskList, type TaskListEntry } from "meowtail";
 import { Measure, Specimen, Specimens } from "./specimen";
 
 const steps = [
@@ -41,7 +41,7 @@ export const TaskListStory = defineStory({
       <Specimens>
         <Specimen label="In progress" width="narrow">
           <TaskList items={items} />
-          <Inline gap="compact">
+          <ActionRow>
             <Button size="small" variant="outline" data-task-advance onClick={advance}>
               Finish current step
             </Button>
@@ -55,7 +55,7 @@ export const TaskListStory = defineStory({
             >
               Reset
             </Button>
-          </Inline>
+          </ActionRow>
         </Specimen>
         <Specimen
           label="Every state"
@@ -112,7 +112,7 @@ export const ChatReasoningStory = defineStory({
               text={text}
               active={active}
             />
-            <Inline gap="compact">
+            <ActionRow>
               <Button
                 size="small"
                 variant="outline"
@@ -134,7 +134,7 @@ export const ChatReasoningStory = defineStory({
               >
                 Toggle finished
               </Button>
-            </Inline>
+            </ActionRow>
           </Specimen>
           <Specimen label="Finished">
             <ChatReasoning

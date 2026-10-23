@@ -1,6 +1,7 @@
 import { h, signal, type Child } from "meowjsx";
 import { defineStory } from "meowbook";
 import {
+  ActionRow,
   Button,
   ChatAttachments,
   ChatComposer,
@@ -145,7 +146,7 @@ export const ComposerAttachments = defineStory({
           </ChatComposer>
           <Stack gap="compact">
             <p data-submitted-snapshot>{submitted}</p>
-            <Inline>
+            <ActionRow>
               <Button
                 variant="outline"
                 size="small"
@@ -170,7 +171,7 @@ export const ComposerAttachments = defineStory({
               >
                 Simulate success
               </Button>
-            </Inline>
+            </ActionRow>
             <Note role="status">{feedback}</Note>
           </Stack>
           <Dialog

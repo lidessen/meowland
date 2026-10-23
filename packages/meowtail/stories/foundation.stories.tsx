@@ -2,25 +2,26 @@ import { h } from "meowjsx/runtime";
 import { signal } from "meowjsx";
 import { uiTokens } from "meowtail/theme";
 import {
+  ActionRow,
   Badge,
-  Section,
   Button,
+  Card,
   Dialog,
   DialogActions,
   DialogHeader,
   DialogPanel,
   EmptyState,
   Field,
+  Grid,
   Icon,
   IconButton,
-  Input,
-  Select,
-  Textarea,
-  Card,
-  Stack,
-  Grid,
   Inline,
+  Input,
   LayoutItem,
+  Section,
+  Select,
+  Stack,
+  Textarea,
 } from "meowtail";
 import { Measure, Note, Specimen, Specimens } from "./specimen";
 import { defineStory } from "meowbook";
@@ -47,7 +48,7 @@ export const ButtonsStory = defineStory({
             locally only.
           </span>
         </Stack>
-        <Inline gap="compact">
+        <ActionRow>
           <Button data-action="Saved the local sample.">Save changes</Button>
           <Button variant="outline" data-action="Diff sample selected.">
             View diff
@@ -55,12 +56,12 @@ export const ButtonsStory = defineStory({
           <Button variant="quiet" data-action="Continue editing.">
             Continue editing
           </Button>
-        </Inline>
+        </ActionRow>
         <Stack as="section" gap="compact" aria-label="Actions not yet available">
           <span style={{ color: uiTokens.ink.secondary, fontSize: uiTokens.type.caption }}>
             No submission target selected yet
           </span>
-          <Inline gap="compact">
+          <ActionRow>
             <Button disabled>Submit changes</Button>
             <Button variant="outline" disabled>
               Preview submission
@@ -71,7 +72,7 @@ export const ButtonsStory = defineStory({
             <Button variant="danger" disabled>
               Delete
             </Button>
-          </Inline>
+          </ActionRow>
         </Stack>
         <span
           style={{ color: uiTokens.ink.secondary, fontSize: uiTokens.type.caption }}

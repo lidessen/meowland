@@ -1,6 +1,6 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Button, Checkbox, Inline, Stack, Switch } from "meowtail";
+import { ActionRow, Button, Checkbox, Stack, Switch } from "meowtail";
 
 export const ToggleStory = defineStory({
   id: "toggles",
@@ -30,12 +30,12 @@ export const ToggleStory = defineStory({
           />
           <Switch label="Always on (rejects changes)" checked={true} />
           <Switch label="Unavailable" disabled />
-          <Inline>
+          <ActionRow>
             <Button type="reset" variant="outline">
               Reset
             </Button>
             <Button type="submit">Confirm</Button>
-          </Inline>
+          </ActionRow>
         </Stack>
       </form>
     );

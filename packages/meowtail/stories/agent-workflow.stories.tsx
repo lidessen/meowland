@@ -1,6 +1,6 @@
 import { h, signal, type Child } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Button, DiffBlock, Icon, Inline, ResourceLink, Stack, Text } from "meowtail";
+import { ActionRow, Button, DiffBlock, Icon, Inline, ResourceLink, Stack, Text } from "meowtail";
 import {
   AssistantView,
   ChatProcess,
@@ -161,7 +161,7 @@ export function agentWorkflowDemo(narrow = false): Child {
           questionId={narrow ? "agent-scope-narrow" : "agent-scope-wide"}
           description="This is an ordinary scope choice; it stays waiting until answered."
           actions={
-            <Inline gap="compact">
+            <ActionRow>
               <Button
                 size="small"
                 onClick={() => {
@@ -181,7 +181,7 @@ export function agentWorkflowDemo(narrow = false): Child {
               >
                 Cancel confirmation
               </Button>
-            </Inline>
+            </ActionRow>
           }
         />
       </ChatTask>

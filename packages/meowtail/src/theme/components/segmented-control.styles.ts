@@ -5,6 +5,9 @@ import { segmentedControlContract as segmented } from "../../components/segmente
 
 export const segmentedControlStyles = css`
   ${partSelector(segmented, "root")} {
+    /* A fieldset fills its block; the track hugs its choices like any other control. */
+    width: fit-content;
+    max-width: 100%;
     min-width: 0;
     margin: 0;
     padding: 0;

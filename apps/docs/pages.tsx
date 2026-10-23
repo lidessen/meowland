@@ -456,7 +456,12 @@ function ExamplePage({ example, state }: { example: CatalogExample; state: DocsS
           {
             id: "preview",
             title: "Preview",
-            children: <Preview storyId={example.story.id} title={example.title} tall />,
+            // The same framed specimen as a component page; the frame grows to fit the story.
+            children: (
+              <div className="docs-specimen">
+                <Preview storyId={example.story.id} title={example.title} />
+              </div>
+            ),
           },
           {
             id: "code",

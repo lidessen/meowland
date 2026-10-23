@@ -42,7 +42,7 @@ export const textShimmerStyles = css`
   }
   ${partSelector(shimmer, "root")}[data-active="true"] > ${partSelector(shimmer, "decoration")} {
     display: block;
-    animation: ui-text-shimmer 1.6s linear infinite;
+    animation: ui-text-shimmer ${uiTokens.motion.sweep} linear infinite;
   }
   @keyframes ui-text-shimmer {
     from {

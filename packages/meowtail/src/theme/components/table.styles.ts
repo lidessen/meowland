@@ -43,8 +43,7 @@ export const tableStyles = css`
     padding-block: 8px;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
-    font-weight: 600;
-    letter-spacing: 0.01em;
+    font-weight: 500;
     white-space: nowrap;
     background: ${uiTokens.surface.fill};
   }
@@ -88,7 +87,7 @@ export const tableStyles = css`
   ${part("sort")}:focus-visible {
     outline: 2px solid ${uiTokens.state.focus};
     outline-offset: 2px;
-    border-radius: 2px;
+    border-radius: ${uiTokens.radius.xs};
   }
   ${part("resize")} {
     position: absolute;

@@ -21,7 +21,7 @@ export const codeBlockStyles = css`
     /* Host actions take the free space, so the original language/actions row is unchanged. */
     justify-content: flex-start;
     gap: 12px;
-    padding: 9px 14px;
+    padding: 8px 14px;
     border-bottom: 0;
     background: ${uiTokens.surface.fill};
   }

@@ -77,7 +77,7 @@ export const dialogStyles = css`
     font-size: ${uiTokens.type.title};
     /* Same title role as Card, Section and EmptyState. */
     font-weight: 600;
-    letter-spacing: -0.01em;
+    letter-spacing: ${uiTokens.type.trackingTight};
     line-height: 24px;
     overflow-wrap: anywhere;
   }

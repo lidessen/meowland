@@ -13,7 +13,7 @@ export const resourceLinkStyles = css`
     gap: 12px;
     box-sizing: border-box;
     width: 100%;
-    padding: 12px;
+    padding: ${uiTokens.space.insetBlock} ${uiTokens.space.insetInline};
     border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     border-radius: ${uiTokens.radius.xl};
     background: ${uiTokens.surface.raised};

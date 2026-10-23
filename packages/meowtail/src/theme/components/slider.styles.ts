@@ -9,8 +9,6 @@ const thumb = partSelector(sliderContract, "thumb");
 const value = partSelector(sliderContract, "value");
 const fill = `linear-gradient(to right, ${uiTokens.accent.base} 0%, ${uiTokens.accent.base} var(--slider-fill, 0%), ${uiTokens.surface.fill} var(--slider-fill, 0%), ${uiTokens.surface.fill} 100%)`;
 const mutedFill = `linear-gradient(to right, ${uiTokens.ink.secondary} 0%, ${uiTokens.ink.secondary} var(--slider-fill, 0%), ${uiTokens.surface.fill} var(--slider-fill, 0%), ${uiTokens.surface.fill} 100%)`;
-const thumbShadow = "0 1px 2px rgb(0 0 0 / 16%)";
-const thumbShadowHover = "0 1px 3px rgb(0 0 0 / 22%)";
 
 export const sliderStyles = css`
   ${root} {
@@ -44,7 +42,7 @@ export const sliderStyles = css`
     position: relative;
     height: 6px;
     overflow: visible;
-    border-radius: 999px;
+    border-radius: ${uiTokens.radius.full};
     corner-shape: round;
     background: ${fill};
     pointer-events: none;
@@ -61,7 +59,7 @@ export const sliderStyles = css`
     border-radius: 50%;
     corner-shape: round;
     background: ${uiTokens.control.knob};
-    box-shadow: ${thumbShadow};
+    box-shadow: ${uiTokens.shadow.knob};
     transition: box-shadow ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${control}:focus-visible {
@@ -69,11 +67,11 @@ export const sliderStyles = css`
   }
   @media (hover: hover) {
     ${root}:has(${control}:hover:not(:disabled):not(:focus-visible)) ${thumb} {
-      box-shadow: ${thumbShadowHover};
+      box-shadow: ${uiTokens.shadow.knob};
     }
   }
   ${root}:has(${control}:active:not(:disabled):not(:focus-visible)) ${thumb} {
-    box-shadow: 0 1px 1px rgb(0 0 0 / 14%);
+    box-shadow: none;
   }
   /* Offset outline is transparent, so the track would show through the gap.
      An opaque halo keeps the 2px spacing of Button/Switch while covering the

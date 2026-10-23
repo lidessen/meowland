@@ -27,8 +27,8 @@ export const metaRowStyles = css`
     flex: none;
   }
   ${partSelector(metaRowContract, "icon")} svg {
-    width: 14px;
-    height: 14px;
+    width: ${uiTokens.icon.small};
+    height: ${uiTokens.icon.small};
     flex: none;
   }
   ${partSelector(metaRowContract, "label")} {

@@ -25,10 +25,13 @@ export const detailSectionStyles = css`
   }
   ${section("title")} {
     margin: 0;
-    color: ${uiTokens.ink.secondary};
-    font-size: ${uiTokens.type.caption};
-    font-weight: 600;
-    line-height: 1.5;
+    /* The shared small-caps group label. */
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.micro};
+    font-weight: 500;
+    line-height: 16px;
+    letter-spacing: ${uiTokens.type.trackingCaps};
+    text-transform: uppercase;
   }
   ${section("aside")} {
     color: ${uiTokens.ink.tertiary};

@@ -9,7 +9,7 @@ export const tooltipStyles = css`
     max-width: 100%;
   }
   ${partSelector(tooltipContract, "root")} > ${partSelector(popoverContract, "root")} > ${partSelector(popoverContract, "panel")} {
-    padding: 3px 7px;
+    padding: 4px 8px;
     width: max-content;
     max-width: min(50vw, calc(100vw - 16px));
     border-radius: ${uiTokens.radius.md};

@@ -13,7 +13,7 @@ export const workCardStyles = css`
     gap: 14px;
     box-sizing: border-box;
     width: min(100%, 460px);
-    padding: 14px 16px;
+    padding: ${uiTokens.space.insetBlock} ${uiTokens.space.insetInline};
     border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     border-radius: ${uiTokens.radius.xl};
     background: ${uiTokens.surface.raised};
@@ -28,7 +28,7 @@ export const workCardStyles = css`
   }
   ${part("root")}:hover {
     border-color: color-mix(in srgb, ${uiTokens.accent.base} 50%, transparent);
-    box-shadow: 0 2px 12px rgb(0 0 0 / 5%);
+    box-shadow: ${uiTokens.shadow.raised};
   }
   ${part("root")}:focus-visible {
     outline: 2px solid ${uiTokens.state.focus};
@@ -44,12 +44,12 @@ export const workCardStyles = css`
     color: ${uiTokens.accent.base};
   }
   ${part("icon")} svg {
-    width: 18px;
-    height: 18px;
+    width: ${uiTokens.icon.large};
+    height: ${uiTokens.icon.large};
   }
   ${part("copy")} {
     display: grid;
-    gap: 3px;
+    gap: 4px;
     min-width: 0;
   }
   ${part("title")} {

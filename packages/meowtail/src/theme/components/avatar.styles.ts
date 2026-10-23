@@ -40,7 +40,7 @@ export const avatarStyles = css`
   ${partSelector(avatarContract, "initials")} {
     display: grid;
     place-items: center;
-    letter-spacing: 0.04em;
+    letter-spacing: ${uiTokens.type.trackingCaps};
   }
   ${partSelector(avatarContract, "image")} {
     position: absolute;

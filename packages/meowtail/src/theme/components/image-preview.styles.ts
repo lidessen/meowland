@@ -54,7 +54,7 @@ export const imagePreviewStyles = css`
   }
   ${partSelector(preview, "status")} > svg {
     flex: none;
-    animation: image-preview-spin 1s linear infinite;
+    animation: image-preview-spin ${uiTokens.motion.loop} linear infinite;
   }
   @keyframes image-preview-spin {
     to {

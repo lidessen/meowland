@@ -400,7 +400,8 @@ export const chatRecordsStyles = css`
     width: 2px;
     height: 2px;
     margin: 0 8px 3px 2px;
-    border-radius: 1px;
+    border-radius: 50%;
+    corner-shape: round;
     background: ${uiTokens.ink.tertiary};
   }
 
@@ -518,7 +519,7 @@ export const chatRecordsStyles = css`
 
   ${partSelector(chatSourcesContract, "summary")}:focus-visible {
     outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 3px;
+    outline-offset: 2px;
   }
 
   ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] > ${partSelector(chatToolCallContract, "header")}:focus-visible {

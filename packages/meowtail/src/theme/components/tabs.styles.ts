@@ -27,7 +27,7 @@ export const tabsStyles = css`
     background: ${uiTokens.control.thumb};
     box-shadow: ${uiTokens.shadow.thumb};
     transform: translateX(calc(${tabsIndex} * 100%));
-    transition: transform 180ms ease;
+    transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
     pointer-events: none;
   }
   ${partSelector(tabsContract, "indicator")}:dir(rtl) {
@@ -52,7 +52,7 @@ export const tabsStyles = css`
     overflow: hidden;
     text-overflow: ellipsis;
     cursor: pointer;
-    transition: color 180ms ease;
+    transition: color ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${partSelector(tabsContract, "tab")}[aria-selected="true"] {
     color: ${uiTokens.ink.primary};

@@ -47,7 +47,7 @@ export const pageHeaderStyles = css`
     font-family: ${uiTokens.type.display};
     font-size: ${uiTokens.type.pageTitle};
     font-weight: 600;
-    letter-spacing: -0.015em;
+    letter-spacing: ${uiTokens.type.trackingTight};
     line-height: 1.3;
     overflow-wrap: anywhere;
   }

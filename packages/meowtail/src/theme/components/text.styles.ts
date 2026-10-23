@@ -31,7 +31,7 @@ export const textStyles = css`
       font-size: ${uiTokens.type.micro};
       font-weight: 500;
       line-height: 16px;
-      letter-spacing: 0.04em;
+      letter-spacing: ${uiTokens.type.trackingCaps};
       text-transform: uppercase;
     }
   }

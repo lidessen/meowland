@@ -55,8 +55,9 @@ export const fieldSurfaceStyles = css`
       border-color: ${uiTokens.line.controlHover};
     }
   }
+  /* Read-only text sits on a fill; the fill replaces the control line. */
   ${readOnly} {
-    border-color: ${uiTokens.line.edge};
+    border-color: transparent;
     background: ${uiTokens.surface.fill};
   }
   ${focused} {

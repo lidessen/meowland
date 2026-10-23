@@ -60,23 +60,23 @@ export const chatReasoningStyles = css`
     corner-shape: round;
     background: currentColor;
     opacity: 0.2;
-    animation: ui-reasoning-wave 1.6s ${uiTokens.motion.ease} infinite;
+    animation: ui-reasoning-wave ${uiTokens.motion.sweep} ${uiTokens.motion.ease} infinite;
   }
   ${part("icon")} [data-reasoning-dot]:nth-child(2),
   ${part("icon")} [data-reasoning-dot]:nth-child(4) {
-    animation-delay: 0.15s;
+    animation-delay: calc(${uiTokens.motion.sweep} * 0.1);
   }
   ${part("icon")} [data-reasoning-dot]:nth-child(3),
   ${part("icon")} [data-reasoning-dot]:nth-child(5),
   ${part("icon")} [data-reasoning-dot]:nth-child(7) {
-    animation-delay: 0.3s;
+    animation-delay: calc(${uiTokens.motion.sweep} * 0.2);
   }
   ${part("icon")} [data-reasoning-dot]:nth-child(6),
   ${part("icon")} [data-reasoning-dot]:nth-child(8) {
-    animation-delay: 0.45s;
+    animation-delay: calc(${uiTokens.motion.sweep} * 0.3);
   }
   ${part("icon")} [data-reasoning-dot]:nth-child(9) {
-    animation-delay: 0.6s;
+    animation-delay: calc(${uiTokens.motion.sweep} * 0.4);
   }
   @keyframes ui-reasoning-wave {
     0%,
@@ -88,8 +88,8 @@ export const chatReasoningStyles = css`
     }
   }
   ${part("icon")} svg {
-    width: 14px;
-    height: 14px;
+    width: ${uiTokens.icon.small};
+    height: ${uiTokens.icon.small};
     transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${part("root")}[open] > ${part("summary")} ${part("icon")} svg {

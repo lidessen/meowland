@@ -1,5 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
-import { uiTokens } from "../tokens";
+import { chatTokens, uiTokens } from "../tokens";
 import { composerPanelContract } from "../../chat/composer-panel";
 import { chatComposerContract } from "../../chat/composer";
 
@@ -19,7 +19,7 @@ export const composerPanelStyles = css`
     min-width: 0;
     padding: 12px 14px 10px;
     border: 0;
-    border-radius: 24px;
+    border-radius: ${chatTokens.composerRadius};
     background: ${uiTokens.surface.fill};
     box-shadow: 0 0 0 ${uiTokens.line.width} ${uiTokens.line.edge};
     transition: border-color ${uiTokens.motion.response} ${uiTokens.motion.ease};

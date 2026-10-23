@@ -31,8 +31,8 @@ export const choiceSelectStyles = css`
     color: ${uiTokens.ink.secondary};
   }
   ${partSelector(choiceSelectContract, "indicator")} svg {
-    width: 14px;
-    height: 14px;
+    width: ${uiTokens.icon.small};
+    height: ${uiTokens.icon.small};
   }
   ${partSelector(popoverContract, "panel")}:has(> ${partSelector(choiceSelectContract, "list")}) {
     padding: 6px;
@@ -45,8 +45,8 @@ export const choiceSelectStyles = css`
     box-sizing: border-box;
     width: 100%;
     min-height: 32px;
-    padding: 5px 7px;
-    margin-bottom: 3px;
+    padding: 4px 8px;
+    margin-bottom: 4px;
     border: 1px solid ${uiTokens.line.control};
     border-radius: ${uiTokens.radius.lg};
     background: ${uiTokens.surface.field};
@@ -76,12 +76,12 @@ export const choiceSelectStyles = css`
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.micro};
     font-weight: 500;
-    letter-spacing: 0.04em;
+    letter-spacing: ${uiTokens.type.trackingCaps};
     text-transform: uppercase;
   }
   ${partSelector(choiceSelectContract, "group")}:not(:first-child) {
     border-top: 1px solid ${uiTokens.line.divider};
-    margin: 5px -6px 0;
+    margin: 4px -6px 0;
     padding-inline: 16px;
   }
   ${partSelector(choiceSelectContract, "option")} {

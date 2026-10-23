@@ -34,7 +34,7 @@ export const listGroupStyles = css`
   }
   @media (hover: hover) {
     ${group} > ${row("root")}:not([data-expanded]) > ${row("line")}:hover {
-      background: ${uiTokens.surface.fill};
+      background: ${uiTokens.state.hover};
     }
   }
   ${row("copy")} {

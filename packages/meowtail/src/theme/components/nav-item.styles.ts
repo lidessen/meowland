@@ -18,7 +18,7 @@ export const navItemStyles = css`
     align-items: center;
     gap: 8px;
     min-height: 36px;
-    padding: 7px 12px;
+    padding: 6px 12px;
     border: 0;
     border-radius: ${uiTokens.radius.lg};
     color: ${uiTokens.ink.primary};

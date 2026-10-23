@@ -19,7 +19,7 @@ export const outputBlockStyles = css`
     display: flex;
     align-items: start;
     gap: 12px;
-    padding: 9px 14px;
+    padding: 8px 14px;
     background: ${uiTokens.surface.fill};
     font: ${uiTokens.type.micro}/18px ${uiTokens.type.sans};
   }
@@ -68,8 +68,8 @@ export const outputBlockStyles = css`
     display: none;
   }
   ${partSelector(block, "actions")}:focus-visible, ${partSelector(block, "toggle")}:focus-visible, ${partSelector(block, "body")}:focus-visible {
-    outline: 1.5px solid ${uiTokens.state.focus};
-    outline-offset: -1px;
+    outline: 2px solid ${uiTokens.state.focus};
+    outline-offset: -2px;
   }
   ${partSelector(read, "number")} {
     display: inline-block;

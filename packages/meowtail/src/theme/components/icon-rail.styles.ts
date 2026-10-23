@@ -44,7 +44,7 @@ export const iconRailStyles = css`
   }
   ${open} {
     width: 256px;
-    box-shadow: 16px 0 40px rgb(0 0 0 / 6%);
+    box-shadow: ${uiTokens.shadow.sheet};
     overflow-y: auto;
   }
   ${rail("brand")} {
@@ -139,12 +139,12 @@ export const iconRailStyles = css`
     display: grid;
     place-items: center;
     flex: 0 0 18px;
-    width: 18px;
-    height: 18px;
+    width: ${uiTokens.icon.large};
+    height: ${uiTokens.icon.large};
   }
   ${item("icon")} svg {
-    width: 18px;
-    height: 18px;
+    width: ${uiTokens.icon.large};
+    height: ${uiTokens.icon.large};
     stroke-width: 1.75;
   }
   ${item("dot")} {
@@ -157,7 +157,7 @@ export const iconRailStyles = css`
     border-radius: 50%;
     corner-shape: round;
     background: ${uiTokens.status.warning};
-    box-shadow: 0 0 0 2px ${uiTokens.surface.canvas};
+    box-shadow: 0 0 0 2px ${uiTokens.surface.knockout};
   }
   ${item("root")}[data-dot] ${item("dot")},
   ${section("root")}:has(${section("items")} ${item("root")}[data-dot]) ${section("shortcut")} ${item("dot")} {
@@ -211,8 +211,8 @@ export const iconRailStyles = css`
     margin: 14px 10px 6px;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.micro};
-    font-weight: 600;
-    letter-spacing: 0.06em;
+    font-weight: 500;
+    letter-spacing: ${uiTokens.type.trackingCaps};
     text-transform: uppercase;
   }
   ${section("items")} {

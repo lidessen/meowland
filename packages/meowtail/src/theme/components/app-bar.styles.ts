@@ -23,9 +23,10 @@ export const appBarStyles = css`
     margin: 0;
     overflow-wrap: anywhere;
     color: ${uiTokens.ink.primary};
-    font-size: ${uiTokens.type.heading};
+    font-size: ${uiTokens.type.title};
     font-weight: 600;
-    line-height: 1.25;
+    line-height: 1.375;
+    letter-spacing: ${uiTokens.type.trackingTight};
   }
   ${partSelector(appBarContract, "status")} {
     min-width: 0;

@@ -52,7 +52,7 @@ export const chatMessageStyles = css`
     border-radius: ${uiTokens.radius.md};
     /* Same glyph tile as Avatar: a quiet identity mark beside the author name. */
     box-sizing: border-box;
-    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border: 0;
     background: ${uiTokens.surface.fill};
     color: ${uiTokens.ink.primary};
     ${logoTokens.ink.name}: ${uiTokens.ink.primary};
@@ -163,7 +163,7 @@ export const chatMessageStyles = css`
     background: ${uiTokens.surface.fill};
     box-shadow: inset 0 0 0 ${uiTokens.line.width} ${uiTokens.line.divider};
     color: ${uiTokens.ink.primary};
-    border-radius: ${chatTokens.bubbleRadius} ${chatTokens.bubbleRadius} 4px ${chatTokens.bubbleRadius};
+    border-radius: ${chatTokens.bubbleRadius} ${chatTokens.bubbleRadius} ${uiTokens.radius.xs} ${chatTokens.bubbleRadius};
   }
 
   ${partSelector(chatMessageContract, "content")} p,
@@ -276,13 +276,8 @@ export const chatMessageStyles = css`
   }
 
   ${partSelector(chatMessageActionsContract, "root")} button svg {
-    width: 15px;
-    height: 15px;
-  }
-
-  ${partSelector(chatMessageContract, "root")}[data-chat-role="assistant"] ${partSelector(chatMessageActionsContract, "root")} button svg {
-    width: 17px;
-    height: 17px;
+    width: ${uiTokens.icon.size};
+    height: ${uiTokens.icon.size};
   }
 
   ${partSelector(chatMessageActionsContract, "root")} button[aria-label]:has(> svg):hover:not(:disabled),
@@ -300,8 +295,8 @@ export const chatMessageStyles = css`
   }
 
   .chat-copy-icon {
-    width: 13px;
-    height: 13px;
+    width: ${uiTokens.icon.small};
+    height: ${uiTokens.icon.small};
     flex: 0 0 auto;
   }
 

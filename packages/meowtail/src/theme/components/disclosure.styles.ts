@@ -23,7 +23,7 @@ export const disclosureStyles = css`
     cursor: pointer;
     list-style: none;
     overflow-wrap: anywhere;
-    transition: color ${uiTokens.motion.response} ease;
+    transition: color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
 
   ${partSelector(disclosureContract, "summary")}::-webkit-details-marker {
@@ -52,8 +52,8 @@ export const disclosureStyles = css`
     transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${partSelector(disclosureContract, "icon")} > svg {
-    width: 14px;
-    height: 14px;
+    width: ${uiTokens.icon.small};
+    height: ${uiTokens.icon.small};
   }
   ${partSelector(disclosureContract, "root")}[open] > ${partSelector(disclosureContract, "summary")} > ${partSelector(disclosureContract, "icon")} {
     transform: rotate(90deg);

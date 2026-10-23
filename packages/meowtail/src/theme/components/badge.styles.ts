@@ -9,7 +9,7 @@ export const badgeStyles = css`
     box-sizing: border-box;
     min-height: 24px;
     padding: 0 8px;
-    border-radius: 999px;
+    border-radius: ${uiTokens.radius.full};
     corner-shape: round;
     color: ${uiTokens.ink.secondary};
     background: ${uiTokens.surface.fill};

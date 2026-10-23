@@ -15,7 +15,7 @@ export const progressStyles = css`
     min-width: 0;
     height: 6px;
     overflow: hidden;
-    border-radius: 999px;
+    border-radius: ${uiTokens.radius.full};
     corner-shape: round;
     background: ${uiTokens.surface.fill};
   }
@@ -53,7 +53,7 @@ export const progressStyles = css`
     width: 36%;
     border-radius: inherit;
     background: ${uiTokens.accent.base};
-    animation: ui-progress-indeterminate 1.2s ${uiTokens.motion.ease} infinite;
+    animation: ui-progress-indeterminate ${uiTokens.motion.loop} ${uiTokens.motion.ease} infinite;
   }
   @keyframes ui-progress-indeterminate {
     0% {

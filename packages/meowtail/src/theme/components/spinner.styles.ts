@@ -13,7 +13,7 @@ export const spinnerStyles = css`
   }
   ${partSelector(spinnerContract, "icon")} {
     display: inline-flex;
-    animation: ui-spinner-turn 1s linear infinite;
+    animation: ui-spinner-turn ${uiTokens.motion.loop} linear infinite;
   }
   @keyframes ui-spinner-turn {
     to {

@@ -248,6 +248,112 @@ const CODE_ACTIONS = `(() => {
   document.documentElement.setAttribute("data-docs-code-actions", "");
 })();`;
 
+/**
+ * Site search: a dialog over the index the build writes. The index loads on first open, titles
+ * outrank section names, which outrank descriptions and body text, and a result can land on the
+ * section that matched.
+ */
+const SEARCH = `(() => {
+  const open = document.getElementById("docs-search-open");
+  const dialog = document.getElementById("docs-search-dialog");
+  if (!open || !dialog || !dialog.showModal) return;
+  const input = dialog.querySelector("input");
+  const list = dialog.querySelector("ul");
+  const empty = dialog.querySelector(".docs-search-empty");
+  let index, active = 0, results = [];
+  const load = () => (index ??= fetch("/search-index.json").then((r) => r.json()).catch(() => []));
+  const snippet = (entry, term) => {
+    const source = entry.description || entry.text;
+    const at = source.toLowerCase().indexOf(term);
+    if (at < 0) return source.slice(0, 110);
+    const from = Math.max(0, at - 40);
+    return (from > 0 ? "…" : "") + source.slice(from, from + 110);
+  };
+  const score = (entry, terms) => {
+    let total = 0, section;
+    const title = entry.title.toLowerCase();
+    for (const term of terms) {
+      let best = 0;
+      if (title === term) best = 40;
+      else if (title.startsWith(term)) best = 24;
+      else if (title.includes(term)) best = 16;
+      const hit = entry.sections.find((s) => s.title.toLowerCase().includes(term));
+      if (hit && best < 8) { best = 8; section = hit; }
+      if (!best && (entry.description + " " + entry.group).toLowerCase().includes(term)) best = 4;
+      if (!best && entry.text.toLowerCase().includes(term)) best = 1;
+      if (!best) return undefined;
+      total += best;
+    }
+    return { entry, total, section };
+  };
+  const paint = () => {
+    list.replaceChildren(...results.map((result, i) => {
+      const item = document.createElement("li");
+      const link = document.createElement("a");
+      link.href = result.entry.url + (result.section ? "#" + result.section.id : "");
+      link.id = "docs-search-result-" + i;
+      link.setAttribute("role", "option");
+      link.setAttribute("aria-selected", String(i === active));
+      const head = document.createElement("span");
+      head.className = "docs-search-title";
+      head.textContent = result.entry.title + (result.section ? " › " + result.section.title : "");
+      const meta = document.createElement("span");
+      meta.className = "docs-search-meta";
+      meta.textContent = [result.entry.group, result.snippet].filter(Boolean).join(" · ");
+      link.append(head, meta);
+      link.addEventListener("mousemove", () => { if (active !== i) { active = i; mark(); } });
+      item.append(link);
+      return item;
+    }));
+    empty.hidden = results.length > 0 || !input.value.trim();
+    mark();
+  };
+  const mark = () => {
+    list.querySelectorAll("a").forEach((link, i) => link.setAttribute("aria-selected", String(i === active)));
+    const current = list.querySelector('[aria-selected="true"]');
+    if (current) { input.setAttribute("aria-activedescendant", current.id); current.scrollIntoView({ block: "nearest" }); }
+    else input.removeAttribute("aria-activedescendant");
+  };
+  const search = async () => {
+    const entries = await load();
+    const terms = input.value.toLowerCase().split(/\\s+/).filter(Boolean);
+    results = terms.length
+      ? entries.map((entry) => score(entry, terms)).filter(Boolean)
+          .sort((a, b) => b.total - a.total).slice(0, 12)
+          .map((r) => ({ ...r, snippet: snippet(r.entry, terms[0]) }))
+      : [];
+    active = 0;
+    paint();
+  };
+  const show = () => {
+    if (dialog.open) return;
+    dialog.showModal();
+    input.select();
+    load();
+  };
+  open.addEventListener("click", show);
+  document.addEventListener("keydown", (event) => {
+    if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "k") {
+      event.preventDefault();
+      dialog.open ? dialog.close() : show();
+    }
+  });
+  input.addEventListener("input", search);
+  input.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+      event.preventDefault();
+      if (!results.length) return;
+      active = (active + (event.key === "ArrowDown" ? 1 : results.length - 1)) % results.length;
+      mark();
+    } else if (event.key === "Enter" && results[active]) {
+      event.preventDefault();
+      list.querySelectorAll("a")[active].click();
+    }
+  });
+  dialog.addEventListener("click", (event) => { if (event.target === dialog) dialog.close(); });
+  open.hidden = false;
+})();`;
+
 /** Press "/" anywhere outside a field to filter the navigation. */
 const FILTER_SHORTCUT = `(() => {
   const input = document.querySelector('[data-meowui-part="search-input/control"]');
@@ -457,6 +563,11 @@ function Document({
           <div className="docs-main">
             <header className="docs-header">
               <Breadcrumb items={trail} label="Breadcrumb" />
+              <button className="docs-search-open" id="docs-search-open" type="button" hidden>
+                <Icon name="search" size={14} />
+                <span>Search</span>
+                <kbd aria-hidden="true">⌘K</kbd>
+              </button>
               <button
                 className="docs-appearance"
                 id="docs-appearance"
@@ -485,12 +596,39 @@ function Document({
             </main>
           </div>
         </div>
+        <dialog
+          className="docs-search-dialog"
+          id="docs-search-dialog"
+          aria-label="Search the documentation"
+        >
+          <div className="docs-search-field">
+            <Icon name="search" size={16} />
+            {/* A text input, so Escape closes the dialog instead of clearing a search field. */}
+            <input
+              type="text"
+              enterKeyHint="search"
+              placeholder="Search components, packages and guides…"
+              aria-label="Search the documentation"
+              role="combobox"
+              aria-expanded="true"
+              aria-controls="docs-search-results"
+              autoComplete="off"
+              spellCheck={false}
+            />
+            <kbd aria-hidden="true">Esc</kbd>
+          </div>
+          <ul className="docs-search-results" id="docs-search-results" role="listbox" />
+          <p className="docs-search-empty" hidden>
+            No pages match. Try a component name or a word from its description.
+          </p>
+        </dialog>
         <script dangerouslySetInnerHTML={{ __html: CATALOG_FILTER }} />
         <script dangerouslySetInnerHTML={{ __html: NAVIGATION_DISCLOSURE }} />
         <script dangerouslySetInnerHTML={{ __html: PREVIEW_FIT }} />
         <script dangerouslySetInnerHTML={{ __html: APPEARANCE_SWITCH }} />
         <script dangerouslySetInnerHTML={{ __html: FILTER_SHORTCUT }} />
         <script dangerouslySetInnerHTML={{ __html: CODE_ACTIONS }} />
+        <script dangerouslySetInnerHTML={{ __html: SEARCH }} />
       </body>
     </html>
   );

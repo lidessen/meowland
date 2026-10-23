@@ -251,6 +251,15 @@ describe("the reader's controls", () => {
     expect(html).not.toMatch(/<html[^>]*data-docs-code-actions/);
   });
 
+  test("search waits for script, and its dialog precedes the script that wires it", () => {
+    const html = document("packages/meowtail");
+    expect(html).toMatch(/<button class="docs-search-open" id="docs-search-open"[^>]*hidden/);
+    expect(html.indexOf('id="docs-search-dialog"')).toBeGreaterThan(-1);
+    expect(html.indexOf('id="docs-search-dialog"')).toBeLessThan(html.indexOf("search-index.json"));
+    // The query splits on whitespace: the regex escape survives into the page.
+    expect(html).toContain("split(/\\s+/)");
+  });
+
   test("the navigation filter shows its keyboard shortcut", () => {
     expect(document("packages/meowtail")).toContain(
       '<kbd class="docs-search-key" aria-hidden="true">/</kbd>',

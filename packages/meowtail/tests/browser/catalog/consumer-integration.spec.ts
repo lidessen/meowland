@@ -14,7 +14,7 @@ test("MeowUI appearance changes presentation without replacing content or intera
   const process = page.locator("details").filter({ hasText: "Checked 3 kinds of components" });
   await process.locator("summary").click();
   await expect(process).toHaveJSProperty("open", true);
-  const button = page.getByRole("button", { name: "Save changes", exact: true });
+  const button = page.getByRole("button", { name: "Save", exact: true });
   const light = await button.evaluate((element) => {
     const style = getComputedStyle(element);
     return [style.backgroundColor, style.borderRadius, style.boxShadow];

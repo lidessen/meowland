@@ -16,6 +16,18 @@ const contract = {
 } as const;
 
 describe("component style props Web adapter", () => {
+  test("a second installed style props plugin keeps the explicit option the first resolved", () => {
+    const runtime = createRuntime({
+      components: [contract],
+      plugins: [createStylePropsPlugin(), { ...createStylePropsPlugin(), name: "second-copy" }],
+    });
+    const vnode = runtime.part({ component: contract.name, part: "root" }, "button", {
+      variant: "quiet",
+    });
+    const html = renderToHtmlWithRuntime(runtime, vnode);
+    expect(html).toContain('data-option-prototype-button-variant="quiet"');
+    expect(html).not.toContain('data-option-prototype-button-variant="primary"');
+  });
   test("a registered component without options still exposes its typed part selector", () => {
     const plain = { name: "plain", parts: ["root"] } as const;
     const runtime = createRuntime({ components: [plain], plugins: [createStylePropsPlugin()] });

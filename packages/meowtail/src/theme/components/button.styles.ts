@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { buttonContract, buttonOptions } from "../../components/button";
 import { iconButtonContract, iconButtonOptions } from "../../components/icon-button";
 
@@ -104,8 +105,7 @@ ${partSelector(buttonContract, "root")} {
   background: ${uiTokens.state.active};
 }
 :where(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")}):focus-visible {
-  outline: 2px solid ${uiTokens.state.focus};
-  outline-offset: 2px;
+  ${focusRing()}
 }
 :where(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")}):disabled {
   cursor: not-allowed;

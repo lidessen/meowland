@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { chatTokens, uiTokens, logoTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { chatBubbleContract, chatBubbleOptions } from "../../chat/bubble";
 import { chatMessageContract } from "../../chat/message";
 import { chatMessageActionsContract } from "../../chat/message-actions";
@@ -144,6 +145,8 @@ export const chatMessageStyles = css`
 
   ${partSelector(chatMessageContract, "content")} {
     display: grid;
+    /* A wide part (a diff, a long path) scrolls inside itself, never widens the column. */
+    grid-template-columns: minmax(0, 1fr);
     gap: ${uiTokens.space.prose};
   }
 
@@ -160,10 +163,10 @@ export const chatMessageStyles = css`
   }
 
   ${partSelector(chatMessageContract, "root")}[data-chat-role="user"] ${partSelector(chatBubbleContract, "root")}:is([${chatBubbleOptions.attribute("variant")}="filled"], [${chatBubbleOptions.attribute("variant")}="auto"][data-chat-role="user"]) {
+    /* A fill takes no edge; the question reads as one soft pill. */
     background: ${uiTokens.surface.fill};
-    box-shadow: inset 0 0 0 ${uiTokens.line.width} ${uiTokens.line.divider};
     color: ${uiTokens.ink.primary};
-    border-radius: ${chatTokens.bubbleRadius} ${chatTokens.bubbleRadius} ${uiTokens.radius.xs} ${chatTokens.bubbleRadius};
+    border-radius: ${chatTokens.bubbleRadius};
   }
 
   ${partSelector(chatMessageContract, "content")} p,
@@ -290,8 +293,7 @@ export const chatMessageStyles = css`
   and time stay visible so a run of consecutive replies never loses who is
   speaking; dropping the author made later deliveries read as anonymous. */
   :where(${partSelector(chatMessageActionsContract, "root")} button:not(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")})):focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
 
   .chat-copy-icon {

@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { resourceLinkContract } from "../../components/resource-link";
 
 const link = (part: (typeof resourceLinkContract.parts)[number]) =>
@@ -29,8 +30,7 @@ export const resourceLinkStyles = css`
     border-color: color-mix(in srgb, ${uiTokens.ink.primary} 24%, transparent);
   }
   ${link("root")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
   ${link("icon")} {
     display: grid;

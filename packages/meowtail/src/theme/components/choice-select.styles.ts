@@ -153,8 +153,7 @@ export const choiceSelectStyles = css`
     ${partSelector(choiceSelectContract, "search")},
     ${partSelector(choiceSelectContract, "option")} {
       min-height: 44px;
-      /* iOS zooms into a text control below 16px. */
-      font-size: 16px;
+      font-size: ${uiTokens.type.touchField};
     }
   }
   @media (prefers-reduced-motion: reduce) {

@@ -1,7 +1,8 @@
-import { defineTheme } from "meowcss/meowjsx";
+import { defineTheme, type CSSFragment, type ScopedTokens } from "meowcss/meowjsx";
+import type { TokenSet } from "meowcss";
 import { assistantStyles } from "./chat/assistant.styles";
 import { chatTaskStyles } from "./chat/task.styles";
-import { baseStyles, controlFontStyles, cornerShapeStyles } from "./base.styles";
+import { baseStyles, foundationStyles, cornerShapeStyles } from "./base.styles";
 import { pillStyles } from "./components/pill.styles";
 import { imagePreviewStyles } from "./components/image-preview.styles";
 import { outputBlockStyles } from "./components/output-block.styles";
@@ -107,9 +108,8 @@ export const standardThemeTokens = [
 
 export const standardThemeStyles = [
   // Shared foundations first: each family below overrides them.
-  controlFontStyles,
+  foundationStyles,
   fieldSurfaceStyles,
-  assistantStyles,
   chatTaskStyles,
   statusDotStyles,
   statusStyles,
@@ -202,6 +202,8 @@ export const standardThemeStyles = [
   pathPickerStyles,
   disclosureStyles,
   accordionStyles,
+  // The complete Assistant composes the chat families above, so it follows them.
+  assistantStyles,
   baseStyles,
 ] as const;
 
@@ -211,3 +213,27 @@ export const standardTheme = defineTheme({
   tokens: standardThemeTokens,
   styles: standardThemeStyles,
 });
+
+/** The floor every Meowland region starts from; an extended theme places it first. */
+export { foundationStyles as standardFoundationStyles } from "./base.styles";
+export { surface, text, focusRing, interactive } from "./recipes";
+export type { SurfaceRung, TextRole, InteractiveOptions } from "./recipes";
+export { standardAuditRules } from "./audit";
+
+/**
+ * The standard theme plus an application's own tokens and fragments, in the
+ * order the cascade needs: the standard families first, then the host's, so a
+ * host part never loses a tie to a library rule. One assembly keeps one token
+ * identity; do not build a second theme from copied token objects.
+ */
+export function extendStandardTheme(extension: {
+  tokens?: readonly (TokenSet | ScopedTokens)[];
+  styles?: readonly CSSFragment[];
+}) {
+  return defineTheme({
+    options: standardOptions,
+    defaults: { scheme: "auto" },
+    tokens: [...standardThemeTokens, ...(extension.tokens ?? [])],
+    styles: [...standardThemeStyles, ...(extension.styles ?? [])],
+  });
+}

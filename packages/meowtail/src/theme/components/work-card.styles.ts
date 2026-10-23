@@ -1,6 +1,7 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { workCardContract } from "../../components/work-card";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 
 const part = (name: (typeof workCardContract.parts)[number]) =>
   partSelector(workCardContract, name);
@@ -31,8 +32,7 @@ export const workCardStyles = css`
     box-shadow: ${uiTokens.shadow.raised};
   }
   ${part("root")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
   ${part("icon")} {
     display: grid;

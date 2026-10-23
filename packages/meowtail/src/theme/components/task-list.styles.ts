@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { taskListContract } from "../../components/task-list";
 
 const part = (name: (typeof taskListContract.parts)[number]) =>
@@ -45,8 +46,7 @@ export const taskListStyles = css`
     display: none;
   }
   ${part("summary")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: -2px;
+    ${focusRing({ inset: true })}
     border-radius: ${uiTokens.radius.xl};
   }
   ${part("title")} {

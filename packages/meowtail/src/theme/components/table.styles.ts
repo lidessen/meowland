@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { tableContract, tableMinWidth } from "../../components/table";
 
 const part = (name: (typeof tableContract.parts)[number]) => partSelector(tableContract, name);
@@ -85,8 +86,7 @@ export const tableStyles = css`
     color: currentColor;
   }
   ${part("sort")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
     border-radius: ${uiTokens.radius.xs};
   }
   ${part("resize")} {

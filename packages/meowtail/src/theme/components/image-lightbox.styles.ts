@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { imageLightboxContract as image } from "../../components/image-lightbox";
 
 export const imageLightboxStyles = css`
@@ -21,7 +22,7 @@ export const imageLightboxStyles = css`
     height: 100dvh;
     box-sizing: border-box;
     background: transparent;
-    color: white;
+    color: ${uiTokens.inverse.ink};
     margin: 0;
   }
   ${partSelector(image, "dialog")}[open] {
@@ -62,7 +63,6 @@ export const imageLightboxStyles = css`
     cursor: pointer;
   }
   ${partSelector(image, "close")}:focus-visible, ${partSelector(image, "trigger")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
 `;

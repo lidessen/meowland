@@ -12,7 +12,7 @@ import {
 import { Icon } from "../icons/icon";
 
 export const chatComposerOptions = defineOptions("chat-composer", {
-  layout: ["stacked", "inline", "hero"],
+  layout: ["stacked", "inline", "hero", "bar"],
   surface: ["default", "none"],
 });
 
@@ -41,7 +41,8 @@ export interface ChatComposerProps extends Props, ThemedProps<typeof chatCompose
   value?: MaybeSignal<string>;
   placeholder?: string;
   inputLabel?: string;
-  /** Inline keeps a short draft and its actions on one row; long drafts still grow. */
+  /** Inline keeps a short draft and its actions on one row; long drafts still grow.
+   * Bar is one rounded row: attach, text, trailing choices, send. */
   /** Draft attachments belong to the same writing surface; upload ownership stays with the host. */
   attachments?: Child;
   /** Model/provider selection beside the send action; options and state belong to the host. */

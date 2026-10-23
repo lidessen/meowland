@@ -12,6 +12,8 @@ import { AssistantQuestionView } from "./assistant-question";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { assistantScroll } from "./assistant-scroll";
 import { assistantViewContract } from "./assistant.contract";
+import { IconButton } from "../components/icon-button";
+import { Icon } from "../icons/icon";
 import {
   assistantCopy as defaultAssistantCopy,
   type AssistantViewProps,
@@ -147,6 +149,36 @@ export const AssistantView = defineComponent<
   const selected = context.signal("");
   const selectedWork = derived(() => work.value.find((item) => item.id === selected.value));
   const latestHidden = context.signal(true);
+  const historyOpen = context.signal(false);
+  // The reader's own words, newest last; the column jumps back to any of them.
+  const asked = derived(() =>
+    messages.value.flatMap((message) => {
+      if (message.role !== "user") return [];
+      const text = message.parts
+        .flatMap((part) => (part.kind === "text" ? [part.text] : []))
+        .join(" ")
+        .trim();
+      return text ? [{ id: message.id, text }] : [];
+    }),
+  );
+  const historyEnabled = options.history !== false;
+  // A host id names the column for aria-controls; without one the relationship stays implicit.
+  const historyId = options.id ? `${options.id}-history` : undefined;
+  let historyList: HTMLElement | undefined;
+  let historyTrigger: HTMLElement | undefined;
+  const closeHistory = (restoreFocus = true) => {
+    if (!historyOpen.value) return;
+    historyOpen.value = false;
+    if (restoreFocus)
+      queueMicrotask(() => {
+        if (!disposed && historyTrigger?.isConnected) historyTrigger.focus({ preventScroll: true });
+      });
+  };
+  const jumpTo = (id: string) => {
+    closeHistory(false);
+    // The transcript's scroll owner moves it; the host page keeps its own position.
+    scroll?.reveal(id);
+  };
   const bodyHidden = derived(() => !!selected.value);
   const detailHidden = derived(() => !selected.value);
   let content: HTMLElement | undefined;
@@ -204,6 +236,8 @@ export const AssistantView = defineComponent<
         value,
         renderPart: options.renderPart,
         onToolAction: options.onToolAction,
+        onMessageAction: options.onMessageAction,
+        labels: assistantCopy,
       }),
   );
   const messageRegion = context.part(
@@ -298,6 +332,50 @@ export const AssistantView = defineComponent<
         children: assistantCopy.latest,
       }),
     ),
+    historyEnabled
+      ? context.part(
+          "history",
+          "nav",
+          {
+            id: historyId,
+            "aria-label": assistantCopy.history,
+            ref: (element: HTMLElement) => {
+              historyList = element;
+            },
+            "data-open": derived(() => String(historyOpen.value)),
+            inert: derived(() => !historyOpen.value),
+            onClick: (event: MouseEvent) => {
+              // The blurred transcript behind the column dismisses it.
+              if (event.target === event.currentTarget) closeHistory();
+            },
+            onKeyDown: (event: KeyboardEvent) => {
+              if (event.key === "Escape") {
+                event.preventDefault();
+                closeHistory();
+              }
+            },
+          },
+          h(
+            "ol",
+            null,
+            keyed(
+              asked,
+              (item) => item.id,
+              (item) =>
+                h(
+                  "li",
+                  null,
+                  context.part(
+                    "historyItem",
+                    "button",
+                    { type: "button", onClick: () => jumpTo(item.value.id) },
+                    derived(() => item.value.text),
+                  ),
+                ),
+            ),
+          ),
+        )
+      : null,
   );
   const activityList = context.part(
     "activityBody",
@@ -427,6 +505,7 @@ export const AssistantView = defineComponent<
       "aria-label": options["aria-label"],
       className: options.className,
       "data-activity-open": derived(() => String(panelOpen.value)),
+      "data-history-open": derived(() => String(historyOpen.value)),
       ref: (element: HTMLElement) => {
         root = element;
         const observer = new ResizeObserver(syncDialog);
@@ -463,7 +542,51 @@ export const AssistantView = defineComponent<
         "div",
         null,
         messageRegion,
-        context.part("composer", "div", null, h(AssistantComposer, { options })),
+        context.part(
+          "composer",
+          "div",
+          {
+            onKeyDown: (event: KeyboardEvent) => {
+              if (event.key === "Escape" && historyOpen.value) {
+                event.preventDefault();
+                closeHistory();
+              }
+            },
+          },
+          h(AssistantComposer, {
+            options,
+            trailing: historyEnabled
+              ? context.part(
+                  "historyTrigger",
+                  "span",
+                  { hidden: derived(() => asked.value.length === 0) },
+                  h(IconButton, {
+                    label: derived(() =>
+                      historyOpen.value ? assistantCopy.closeHistory : assistantCopy.history,
+                    ),
+                    "aria-expanded": derived(() => String(historyOpen.value)),
+                    "aria-controls": historyId,
+                    ref: (element: HTMLElement) => {
+                      historyTrigger = element;
+                    },
+                    onClick: () => {
+                      historyOpen.value = !historyOpen.value;
+                      if (historyOpen.value)
+                        queueMicrotask(() => {
+                          if (disposed) return;
+                          const items = historyList?.querySelectorAll<HTMLElement>("button");
+                          items?.[items.length - 1]?.focus({ preventScroll: true });
+                        });
+                    },
+                    children: [
+                      h(Icon, { name: "history", className: "assistant-history-closed" }),
+                      h(Icon, { name: "x", className: "assistant-history-open" }),
+                    ],
+                  }),
+                )
+              : undefined,
+          }),
+        ),
         activityPanel,
       ),
     }),
@@ -476,6 +599,7 @@ export type {
   AssistantAttachment,
   AssistantMessage,
   AssistantMessagePart,
+  AssistantMessageAction,
   AssistantToolPart,
   AssistantTaskPart,
   AssistantProcessStep,

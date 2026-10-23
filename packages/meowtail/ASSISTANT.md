@@ -29,6 +29,10 @@ const view = (
 The component takes a constrained height from its parent container; standard installation still needs `createMeowUI` and `standardTheme.cssText`, and does not depend on Rossovia's CSS or controller. Messages and the composer share one reading column, and the return-to-latest action anchors only to the message region. Activity appears beside the container when wide and becomes a single native modal dialog when narrow, without re-mounting messages and drafts.
 The return-to-latest action uses normal layout flow below the message viewport; while shown it claims its natural height, and when hidden it returns that space. Historical body text is never covered by the button, and the composer still has its own region.
 
+A turn reads as the reader's question in a fill bubble and the reply as plain text, with no visible names or times; those stay in the message header for assistive technology. The composer is one rounded bar (attach, draft, trailing choices, send). Its history button gathers every question the reader asked into one column over the blurred transcript; choosing one closes the column and brings that turn to the top of the reading area without moving the host page, and Escape returns focus to the button. `history={false}` removes the button and column. A host `id` names the column for `aria-controls`.
+
+A finished reply carries a quiet action row: Copy (built in; it copies the reply's text parts) and, when the host passes `onMessageAction`, Good response, Bad response and Regenerate. Those are intents only: `onMessageAction(messageId, "good" | "bad" | "regenerate")` records nothing and regenerates nothing by itself. Streaming and pending replies hide the row until they complete.
+
 ## Ownership of data and actions
 
 - When `draft` is passed, the host is the only owner and must provide `onDraftChange` or an explicit `readOnly`. The component does not write to the passed Signal directly; when `draft` is not passed, `defaultDraft` initializes the component's own temporary draft. The host owns persistence.

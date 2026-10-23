@@ -1,6 +1,7 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { pillContract } from "../../components/pill";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 
 export const pillStyles = css`
   ${partSelector(pillContract, "root")} {
@@ -34,8 +35,7 @@ export const pillStyles = css`
     background: color-mix(in srgb, ${uiTokens.accent.base} 14%, ${uiTokens.accent.soft});
   }
   button${partSelector(pillContract, "root")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
   button${partSelector(pillContract, "root")}:disabled {
     opacity: 0.4;

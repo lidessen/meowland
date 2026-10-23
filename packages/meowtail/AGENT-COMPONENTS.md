@@ -110,8 +110,8 @@ Content beyond the default parts continues to use `renderPart`; do not replace t
 
 Meowbook scenes:
 
-- `agent-workflow`: concurrent runs, queuing, waiting for the user, and successful execution without a received reply; includes nested tasks, native plans, optional metadata, artifacts, attachments, and diffs.
-- `agent-workflow-narrow`: the same composition placed in a 320px local host inside a wide viewport, checking long Chinese and English text and paths without spaces.
+- `agent-workflow`: a four-turn conversation in `AssistantView` carrying concurrent runs, queuing, waiting for the user, successful execution without a received reply, a retryable failure and a cancellation; includes nested tasks, artifacts and diffs, the history column and reply actions.
+- `agent-workflow-narrow`: the same conversation placed in a 320px local host inside a wide viewport, checking long text and paths without spaces.
 - `agent-workflow-assistant`: default tool/task parts coexist with safe Markdown, activity, unanswered questions, attachments, sources, and the composer; buttons drive local output appends, retries, and cancellations without making external requests.
 
 This page describes capabilities and usage boundaries; actual run, independent review, screenshots, and installed-state results are governed by the verification receipt for that round. Browsers, screen readers, and real backend adapters that were not run are not considered passing just because the capabilities are listed here.

@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { itemContract, itemOptions } from "../../components/item";
 
 export const itemStyles = css`
@@ -49,8 +50,7 @@ export const itemStyles = css`
     background: ${uiTokens.state.active};
   }
   button${partSelector(itemContract, "root")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
   button${partSelector(itemContract, "root")}:disabled {
     opacity: 0.5;

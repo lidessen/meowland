@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { tabsContract, tabsCount, tabsIndex } from "../../components/tabs";
 
 export const tabsStyles = css`
@@ -66,8 +67,7 @@ export const tabsStyles = css`
   }
   ${partSelector(tabsContract, "tab")}:focus-visible,
   ${partSelector(tabsContract, "panel")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: -2px;
+    ${focusRing({ inset: true })}
   }
   ${partSelector(tabsContract, "tab")}:focus-visible {
     outline-offset: -2px;

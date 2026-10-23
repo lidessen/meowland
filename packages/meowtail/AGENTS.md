@@ -216,6 +216,12 @@ and the Meowbook gallery use the same tokens and roles as the library.
   the field-surface ring instead.
 - Every ad hoc gap and padding sits on the 4px grid; tracking comes from the two tracking roles.
 
+Theme files take shared rules from `src/theme/recipes.ts` (`surface`, `text`, `interactive`,
+`focusRing`) instead of restating them, and `standardAuditRules` keeps the standard theme free of
+literal colors, durations, font sizes and radii (`tests/unit/theme/authoring.test.tsx`). The
+foundation fragment is first in `standardThemeStyles`; an extended theme keeps it first. Host-facing
+guidance lives in [AUTHORING.md](AUTHORING.md).
+
 Do not use `light-dark()`: it follows CSS `color-scheme`, not the theme's own scheme boundary.
 
 Arrange siblings with `Stack`, `Inline`, or `Grid` and a `gap` of `none`, `compact`,

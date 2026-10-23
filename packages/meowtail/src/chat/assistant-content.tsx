@@ -8,9 +8,14 @@ import { ProcessGroup } from "../components/process-group";
 import { CodeBlock } from "../components/code-block";
 import { StatusDot } from "../components/status-dot";
 import { AssistantMarkdown } from "./assistant-markdown";
+import { ChatMessageActions } from "./message-actions";
+import { IconButton } from "../components/icon-button";
+import { Icon, type IconName } from "../icons/icon";
 import { assistantStepsContract } from "./assistant-steps.contract";
 import type {
+  AssistantLabels,
   AssistantMessage,
+  AssistantMessageAction,
   AssistantMessagePart,
   AssistantProcessStep,
   AssistantViewProps,
@@ -163,22 +168,83 @@ export const AssistantPartView = defineComponent<
   },
 );
 
+/** Copy, then the host's feedback intents, under a finished reply. */
+const AssistantReplyActions = defineComponent<
+  {
+    value: Signal<AssistantMessage>;
+    labels: AssistantLabels;
+    onMessageAction?: AssistantViewProps["onMessageAction"];
+  },
+  "assistant-message",
+  "root"
+>({ name: "assistant-message", parts: ["root"] }, ({ value, labels, onMessageAction }, context) => {
+  const copied = context.signal(false);
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  context.onCleanup(() => clearTimeout(timer));
+  const text = () =>
+    value.value.parts.flatMap((part) => (part.kind === "text" ? [part.text] : [])).join("\n\n");
+  const intent = (action: AssistantMessageAction, icon: IconName, label: string) =>
+    h(IconButton, {
+      size: "small",
+      label,
+      onClick: () => onMessageAction?.(value.value.id, action),
+      children: h(Icon, { name: icon }),
+    });
+  return h(ChatMessageActions, {
+    children: [
+      h(IconButton, {
+        size: "small",
+        label: derived(() => (copied.value ? labels.copied : labels.copy)),
+        hidden: derived(() => !text()),
+        onClick: async () => {
+          try {
+            await navigator.clipboard?.writeText(text());
+          } catch {
+            return;
+          }
+          copied.value = true;
+          clearTimeout(timer);
+          timer = setTimeout(() => {
+            copied.value = false;
+          }, 1600);
+        },
+        children: [
+          h(Icon, { name: "copy", className: "assistant-copy-idle" }),
+          h(Icon, { name: "check", className: "assistant-copy-done" }),
+        ],
+        "data-copied": derived(() => String(copied.value)),
+      }),
+      onMessageAction
+        ? [
+            intent("good", "thumbs-up", labels.good),
+            intent("bad", "thumbs-down", labels.bad),
+            intent("regenerate", "refresh-cw", labels.regenerate),
+          ]
+        : null,
+    ],
+  });
+});
+
 export const AssistantMessageView = defineComponent<
   {
     value: Signal<AssistantMessage>;
     renderPart?: AssistantViewProps["renderPart"];
     onToolAction?: AssistantViewProps["onToolAction"];
+    onMessageAction?: AssistantViewProps["onMessageAction"];
+    labels?: AssistantLabels;
   },
   "assistant-message",
   "root"
 >(
   { name: "assistant-message", parts: ["root"] },
-  ({ value, renderPart, onToolAction }, context) => {
+  ({ value, renderPart, onToolAction, onMessageAction, labels }, context) => {
     const parts = derived(() => value.value.parts);
+    // A message keeps its role for its keyed lifetime.
+    const reply = value.value.role === "assistant" && labels;
     return context.part(
       "root",
       "div",
-      { "data-assistant-message-id": value.value.id },
+      { "data-assistant-message-id": value.value.id, "data-assistant-role": value.value.role },
       h(ChatMessage, {
         role: value.value.role,
         author: "",
@@ -204,6 +270,16 @@ export const AssistantMessageView = defineComponent<
           ),
         ),
         surface: "none",
+        actions: reply
+          ? h(
+              "div",
+              {
+                "data-assistant-actions": true,
+                hidden: derived(() => !!value.value.status && value.value.status !== "complete"),
+              },
+              h(AssistantReplyActions, { value, labels: reply, onMessageAction }),
+            )
+          : undefined,
         children: keyed(
           parts,
           (part) => `${part.id}:${part.kind}`,

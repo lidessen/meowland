@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { chatConversationContract } from "../../chat/conversation";
 
 export const chatConversationStyles = css`
@@ -20,8 +21,7 @@ export const chatConversationStyles = css`
     overscroll-behavior-y: contain;
   }
   ${partSelector(chatConversationContract, "viewport")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: -2px;
+    ${focusRing({ inset: true })}
   }
   ${partSelector(chatConversationContract, "latest")} {
     display: inline-flex;
@@ -55,8 +55,7 @@ export const chatConversationStyles = css`
     background: ${uiTokens.state.hover};
   }
   ${partSelector(chatConversationContract, "latest")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
   @media (pointer: coarse) {
     ${partSelector(chatConversationContract, "latest")} {

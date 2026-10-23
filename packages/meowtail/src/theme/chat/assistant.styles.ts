@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens, chatTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { assistantViewContract } from "../../chat/assistant.contract";
 import { assistantStepsContract } from "../../chat/assistant-steps.contract";
 import { assistantMarkdownContract } from "../../chat/assistant-markdown";
@@ -10,6 +11,10 @@ import { pageFrameContract } from "../../components/page-frame";
 import { chatComposerContract } from "../../chat/composer";
 import { workCardContract } from "../../components/work-card";
 import { buttonContract } from "../../components/button";
+import { iconButtonContract } from "../../components/icon-button";
+import { chatMessageContract } from "../../chat/message";
+import { chatMessageListContract } from "../../chat/message-list";
+import { chatMessageActionsContract } from "../../chat/message-actions";
 
 const root = partSelector(assistantViewContract, "root");
 const layout = partSelector(assistantViewContract, "layout");
@@ -18,6 +23,9 @@ const viewport = partSelector(assistantViewContract, "viewport");
 const content = partSelector(assistantViewContract, "content");
 const composer = partSelector(assistantViewContract, "composer");
 const panel = `${root} [data-assistant-panel]`;
+const history = partSelector(assistantViewContract, "history");
+const historyItem = partSelector(assistantViewContract, "historyItem");
+const trigger = partSelector(assistantViewContract, "historyTrigger");
 
 /** The complete composition belongs to the shared theme, never a demo stylesheet. */
 export const assistantStyles = css`
@@ -64,11 +72,15 @@ export const assistantStyles = css`
     overflow-y: auto;
     overflow-anchor: none;
     overscroll-behavior-y: contain;
-    scrollbar-gutter: stable;
+    scrollbar-gutter: stable both-edges;
+    /* The transcript fades out under the header instead of being cut. */
+    mask-image: linear-gradient(to bottom, transparent, black ${uiTokens.space.section});
+    transition:
+      filter ${uiTokens.motion.settle} ${uiTokens.motion.ease},
+      opacity ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${viewport}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: -2px;
+    ${focusRing({ inset: true })}
   }
   ${content} {
     max-width: ${uiTokens.layout.containerContent};
@@ -76,22 +88,42 @@ export const assistantStyles = css`
     padding: ${uiTokens.space.section} ${uiTokens.space.panel};
     box-sizing: border-box;
   }
+  /* The content column already holds the reading inset and scroll; the list only stacks turns. */
+  ${content} ${partSelector(chatMessageListContract, "root")} {
+    gap: 0;
+    padding: 0;
+    overflow: visible;
+  }
+  /* One turn reads as a question bubble and a plain reply; the speaker is
+     carried by placement, so names and times stay for assistive technology. */
   ${content} [data-assistant-message-id] {
-    padding-block: ${uiTokens.space.group};
+    padding-block: calc(${chatTokens.listGap} / 2);
   }
-  ${content} [data-assistant-message-header] {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    gap: ${uiTokens.space.group};
-    color: ${uiTokens.ink.secondary};
-    font-size: ${uiTokens.type.caption};
+  ${content} [data-assistant-message-id] ${partSelector(chatMessageContract, "header")} {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
-  ${content} [data-assistant-message-header] strong {
-    color: ${uiTokens.ink.primary};
+  ${content} [data-assistant-role="assistant"] ${partSelector(chatMessageContract, "actions")} {
+    margin-top: ${uiTokens.space.group};
+    margin-inline-start: -6px;
+    opacity: 1;
   }
+  ${content} [data-assistant-actions] ${partSelector(chatMessageActionsContract, "root")} {
+    gap: 2px;
+  }
+  ${content} [data-assistant-actions] ${partSelector(iconButtonContract, "root")} .assistant-copy-done,
+  ${content} [data-assistant-actions] ${partSelector(iconButtonContract, "root")}[data-copied="true"] .assistant-copy-idle {
+    display: none;
+  }
+  ${content} [data-assistant-actions] ${partSelector(iconButtonContract, "root")}[data-copied="true"] .assistant-copy-done {
+    display: block;
+  }
+  /* Parts stack on the message content's prose gap, like paragraphs of one reply. */
   ${content} [data-assistant-part-id] {
-    margin-block: ${uiTokens.space.group};
     overflow-wrap: anywhere;
   }
   ${root} ${partSelector(assistantMarkdownContract, "root")} {
@@ -101,7 +133,7 @@ export const assistantStyles = css`
   }
   ${partSelector(assistantViewContract, "latest")} {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     flex-shrink: 0;
     width: 100%;
     max-width: ${uiTokens.layout.containerContent};
@@ -124,6 +156,105 @@ export const assistantStyles = css`
       max(${uiTokens.space.section}, env(safe-area-inset-bottom));
     box-sizing: border-box;
     min-width: 0;
+  }
+  /* A docked bar: the fill rung with a faint lift off the reading surface. */
+  ${composer} ${partSelector(chatComposerContract, "surface")} {
+    box-shadow: ${uiTokens.shadow.dock};
+  }
+  ${trigger} {
+    display: contents;
+  }
+  ${trigger} ${partSelector(iconButtonContract, "root")} .assistant-history-open,
+  ${trigger} ${partSelector(iconButtonContract, "root")}[aria-expanded="true"] .assistant-history-closed {
+    display: none;
+  }
+  ${trigger} ${partSelector(iconButtonContract, "root")}[aria-expanded="true"] .assistant-history-open {
+    display: block;
+  }
+  ${trigger} ${partSelector(iconButtonContract, "root")}[aria-expanded="true"] {
+    background: ${uiTokens.state.active};
+    color: ${uiTokens.ink.primary};
+  }
+  ${trigger}[hidden] {
+    display: none;
+  }
+
+  /* Your messages: one column of the questions asked, over the blurred transcript. */
+  ${history} {
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    box-sizing: border-box;
+    padding: ${uiTokens.space.section} ${uiTokens.space.panel};
+    overflow-y: auto;
+    visibility: hidden;
+    opacity: 0;
+    transition:
+      opacity ${uiTokens.motion.settle} ${uiTokens.motion.ease},
+      visibility 0s linear ${uiTokens.motion.settle};
+  }
+  ${history}[data-open="true"] {
+    visibility: visible;
+    opacity: 1;
+    transition: opacity ${uiTokens.motion.settle} ${uiTokens.motion.ease};
+  }
+  ${root}[data-history-open="true"] ${viewport} {
+    filter: blur(8px);
+    opacity: 0.6;
+    pointer-events: none;
+  }
+  ${history} > ol {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: ${uiTokens.space.group};
+    width: 100%;
+    max-width: ${uiTokens.layout.containerContent};
+    margin: 0 auto;
+    padding: 0;
+    list-style: none;
+  }
+  ${history} > ol > li {
+    display: flex;
+    justify-content: flex-end;
+    max-width: ${chatTokens.userMaxWidth};
+    transform: translateY(${uiTokens.space.group});
+    transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
+  }
+  ${history}[data-open="true"] > ol > li {
+    transform: none;
+  }
+  ${historyItem} {
+    box-sizing: border-box;
+    max-width: 100%;
+    padding: 8px 14px;
+    border: 0;
+    border-radius: ${chatTokens.bubbleRadius};
+    background: ${uiTokens.surface.fill};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body}/1.4 ${uiTokens.type.sans};
+    text-align: start;
+    overflow-wrap: anywhere;
+    cursor: pointer;
+    transition: background-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
+  }
+  @media (hover: hover) {
+    ${historyItem}:hover {
+      background-image: linear-gradient(${uiTokens.state.hover}, ${uiTokens.state.hover});
+    }
+  }
+  ${historyItem}:focus-visible {
+    ${focusRing()}
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ${viewport},
+    ${history},
+    ${history} > ol > li {
+      transition: none;
+    }
   }
   ${composer} ${partSelector(chatComposerContract, "input")} {
     min-height: 1.6em;
@@ -263,7 +394,8 @@ export const assistantStyles = css`
     ${content} {
       padding-inline: ${uiTokens.space.pageInlineCompact};
     }
-    ${composer} {
+    ${composer},
+    ${history} {
       padding-inline: ${uiTokens.space.pageInlineCompact};
     }
     ${partSelector(assistantViewContract, "latest")} {

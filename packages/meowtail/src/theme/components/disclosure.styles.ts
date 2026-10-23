@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { disclosureContract } from "../../components/disclosure";
 
 export const disclosureStyles = css`
@@ -38,8 +39,7 @@ export const disclosureStyles = css`
     }
   }
   ${partSelector(disclosureContract, "summary")}:focus-visible {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: 2px;
+    ${focusRing()}
   }
 
   ${partSelector(disclosureContract, "icon")} {

@@ -1,5 +1,6 @@
 import { css, partSelector } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
+import { focusRing } from "../recipes";
 import { segmentedControlContract as segmented } from "../../components/segmented-control";
 
 export const segmentedControlStyles = css`
@@ -56,8 +57,7 @@ export const segmentedControlStyles = css`
     box-shadow: ${uiTokens.shadow.thumb};
   }
   ${partSelector(segmented, "input")}:focus-visible + ${partSelector(segmented, "label")} {
-    outline: 2px solid ${uiTokens.state.focus};
-    outline-offset: -2px;
+    ${focusRing({ inset: true })}
   }
   ${partSelector(segmented, "input")}:disabled + ${partSelector(segmented, "label")} {
     opacity: 0.4;

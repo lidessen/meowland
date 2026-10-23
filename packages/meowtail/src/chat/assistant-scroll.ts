@@ -63,6 +63,21 @@ export function assistantScroll(
   return {
     beforeUpdate: capture,
     afterUpdate: restore,
+    /** Bring one message to the top of the reading area and keep it there as rows resize. */
+    reveal(id: string) {
+      const row = rows().find((item) => item.dataset.assistantMessageId === id);
+      if (!row) return;
+      following = false;
+      restoring = true;
+      viewport.scrollTop +=
+        row.getBoundingClientRect().top -
+        viewport.getBoundingClientRect().top -
+        Math.min(viewport.clientHeight / 6, 48);
+      capture();
+      onLatest(atLatest());
+      restoring = false;
+      viewport.focus({ preventScroll: true });
+    },
     latest() {
       following = true;
       restore();

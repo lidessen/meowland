@@ -45,13 +45,14 @@ test("nested task records keep long titles, statuses and footer controls within 
   await expect(page.getByRole("status")).toHaveText("Cancellation intent delivered to the host.");
 });
 
-test("a task in an equal-height composition keeps its facts and footer together", async ({
+test("a task inside a conversation reply keeps its facts and actions together", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.goto("/canvas.html?story=agent-workflow");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const task = page.getByRole("region", { name: "Confirm check scope", exact: true });
+  await task.scrollIntoViewIfNeeded();
   const relation = await task.evaluate((element) => {
     const header = element.querySelector('[data-meowui-part="chat-task/header"]')!;
     const execution = element.querySelector('[data-meowui-part="chat-task/execution"]')!;

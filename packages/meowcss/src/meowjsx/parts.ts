@@ -114,6 +114,9 @@ export function createStylePropsPlugin(): RuntimePlugin {
     render({ vnode, runtime }, next) {
       const identity = vnode.componentPart;
       if (!identity) return next(vnode);
+      // A second installed copy must not overwrite what the first already resolved:
+      // the first removed the option prop, so a rerun would only see the default.
+      if (vnode.props?.["data-meowui-part"] !== undefined) return next(vnode);
       const contract = runtime.registry.get(identity.component) as
         | (ComponentContract & { styleProps?: StylePropsBinding })
         | undefined;

@@ -72,6 +72,8 @@ function sourceFor(
   const source = state.sources.get(story.id);
   if (!source) return {};
   // Show what draws the example; the story's id, title and coverage notes stay in its file.
+  if (source.render)
+    return { source: source.render.code, file: source.file, line: source.render.line };
   const render = renderSourceOf(source.code);
   if (!render) return { source: source.code, file: source.file, line: source.line };
   return { source: render.code, file: source.file, line: source.line + render.lineOffset };

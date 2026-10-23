@@ -6,6 +6,11 @@ import type { StoryEntry } from "meowbook";
 export interface StorySource {
   /** The statement that defines the story. */
   code: string;
+  /**
+   * The code that draws the example, when the story's `render` names a function declared in
+   * the same file: that declaration and the line it starts on.
+   */
+  render?: { code: string; line: number };
   /** The repository-relative path of the file the story lives in. */
   file: string;
   /** The line the statement starts on. */
@@ -162,6 +167,36 @@ export function renderSourceOf(code: string): { code: string; lineOffset: number
   return { code: render, lineOffset: code.slice(0, match.index).split("\n").length - 1 };
 }
 
+/** Where a function declaration that starts at `start` ends: the `}` closing its body. */
+function functionEnd(source: string, start: number): number {
+  const body = source.indexOf("{", source.indexOf(")", start));
+  if (body < 0) return source.length;
+  return scan(source, body, (character, depth) => character === "}" && depth === 0);
+}
+
+/**
+ * When a story's render is only a name (`render: assistantDemo`), find that declaration in the
+ * story's file, so the docs show the code that draws the example rather than its name.
+ */
+export function namedRenderSource(
+  file: string,
+  storyCode: string,
+): { code: string; offset: number } | undefined {
+  const name = /^render\s*:\s*([A-Za-z_$][\w$]*)$/.exec(renderSourceOf(storyCode)?.code ?? "")?.[1];
+  if (!name) return undefined;
+  const escaped = name.replace(/\$/g, "\\$");
+  const declaration = new RegExp(
+    `^(?:export\\s+)?(?:(function)\\s+${escaped}\\b|const\\s+${escaped}\\b)`,
+    "m",
+  ).exec(file);
+  if (!declaration) return undefined;
+  const end = declaration[1]
+    ? functionEnd(file, declaration.index)
+    : statementEnd(file, declaration.index);
+  const code = file.slice(declaration.index, end).trim();
+  return code ? { code, offset: declaration.index } : undefined;
+}
+
 /** Read the source of one story from the repository. */
 export async function readStorySource(
   root: string,
@@ -175,8 +210,13 @@ export async function readStorySource(
   }
   const code = extractStorySource(source, story.exportName);
   if (!code) return undefined;
+  const named = namedRenderSource(source, code);
   return {
     code,
+    render: named && {
+      code: named.code,
+      line: source.slice(0, named.offset).split("\n").length,
+    },
     file: relative(root, story.file).split("\\").join("/"),
     line: story.line,
   };

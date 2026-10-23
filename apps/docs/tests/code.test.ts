@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import { extractStorySource, renderSourceOf, statementEnd } from "../code";
+import { extractStorySource, namedRenderSource, renderSourceOf, statementEnd } from "../code";
 
 const SOURCE = `import { h } from "meowjsx/runtime";
 import { defineStory } from "meowbook";
@@ -84,5 +84,33 @@ describe("the render excerpt", () => {
 
   test("a story without render yields no excerpt", () => {
     expect(renderSourceOf('export const A = defineStory({ id: "a" });')).toBeUndefined();
+  });
+});
+
+describe("a named render", () => {
+  const file = `import { h } from "meowjsx";
+
+export function assistantDemo(): Child {
+  const items = [{ id: "a" }];
+  return h("ul", null, items.map((item) => h("li", null, item.id)));
+}
+
+export const AssistantStory = defineStory({
+  id: "assistant",
+  render: assistantDemo,
+});
+`;
+  test("the docs read the function a story's render names", () => {
+    const story = extractStorySource(file, "AssistantStory") ?? "";
+    const named = namedRenderSource(file, story);
+    expect(named?.code).toBe(`export function assistantDemo(): Child {
+  const items = [{ id: "a" }];
+  return h("ul", null, items.map((item) => h("li", null, item.id)));
+}`);
+  });
+
+  test("an inline render has no named source", () => {
+    const story = 'export const A = defineStory({ id: "a", render: () => h("p") });';
+    expect(namedRenderSource(story, story)).toBeUndefined();
   });
 });

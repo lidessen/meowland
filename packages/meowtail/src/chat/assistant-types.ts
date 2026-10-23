@@ -67,6 +67,13 @@ export type AssistantMessagePart =
       id: string;
       kind: "process";
       title: string;
+      /**
+       * The group's lifecycle, shown as the shared state badge after the title. Whether the
+       * badge exists is fixed by the part's first value; later values update it in place.
+       * Omit it to keep the title and `statusText` alone.
+       */
+      state?: ChatExecutionState;
+      /** A quiet fact after the badge (or alone), such as "3 steps · returned". */
       statusText?: string;
       steps: readonly AssistantProcessStep[];
       defaultOpen?: boolean;

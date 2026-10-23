@@ -39,7 +39,8 @@ export function assistantDemo(): Child {
                 id: "process",
                 kind: "process",
                 title: "Review process",
-                statusText: "3 steps · returned",
+                state: "success",
+                statusText: "3 steps",
                 steps: [
                   {
                     id: "read",

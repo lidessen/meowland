@@ -7,6 +7,8 @@ import { ChatTask } from "./task";
 import { ProcessGroup } from "../components/process-group";
 import { CodeBlock } from "../components/code-block";
 import { StatusDot } from "../components/status-dot";
+import { Status } from "../components/status";
+import { executionStateLabel, executionStateTone } from "../shared/execution-state";
 import { AssistantMarkdown } from "./assistant-markdown";
 import { ChatMessageActions } from "./message-actions";
 import { IconButton } from "../components/icon-button";
@@ -141,12 +143,24 @@ export const AssistantPartView = defineComponent<
         }),
       });
     } else if (initial.kind === "process") {
+      const processPart = () => value.value as typeof initial;
+      // The badge's presence is fixed by the first value; its tone and word follow later ones.
+      const statusText = derived(() => processPart().statusText);
       fallback = h(ProcessGroup, {
-        title: derived(() => (value.value as typeof initial).title),
-        status: derived(() => (value.value as typeof initial).statusText),
+        title: derived(() => processPart().title),
+        status:
+          initial.state === undefined
+            ? statusText
+            : [
+                h(Status, {
+                  state: derived(() => executionStateTone(processPart().state ?? "unknown")),
+                  label: derived(() => executionStateLabel(processPart().state ?? "unknown")),
+                }),
+                h("span", { hidden: derived(() => !processPart().statusText) }, statusText),
+              ],
         open: initial.defaultOpen ?? false,
         children: h(AssistantSteps, {
-          steps: derived(() => (value.value as typeof initial).steps),
+          steps: derived(() => processPart().steps),
         }),
       });
     } else if (initial.kind === "code") {

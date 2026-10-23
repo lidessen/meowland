@@ -115,6 +115,43 @@ test("agent parts render the same escaped tool data and independent task facts i
   expect(jsonHtml).toContain("Reviewed two files");
 });
 
+test("a process state renders the same badge in JSON and JSX and stays optional", () => {
+  const catalog = createMeowUICatalog();
+  const withState = (state?: "running") => ({
+    readOnly: true,
+    allowAttachments: false,
+    messages: [
+      {
+        id: "reply",
+        role: "assistant" as const,
+        author: "Assistant",
+        parts: [
+          {
+            id: "process",
+            kind: "process" as const,
+            title: "Review process",
+            ...(state ? { state } : {}),
+            statusText: "1 of 3",
+            steps: [],
+          },
+        ],
+      },
+    ],
+  });
+  const json = (props: object) =>
+    renderToHtml(
+      createJsonView(parseJsonView({ component: "AssistantView", props }, catalog), { catalog }),
+    );
+  const badged = withState("running");
+  expect(json(badged)).toBe(renderToHtml(h(AssistantView, badged)));
+  expect(json(badged)).toContain('data-tone="processing"');
+  expect(json(badged)).toContain("Running");
+  const plain = withState();
+  expect(json(plain)).toBe(renderToHtml(h(AssistantView, plain)));
+  expect(json(plain)).not.toContain('data-tone="processing"');
+  expect(json(plain)).toContain("1 of 3");
+});
+
 test("agent JSON fields and intents remain a finite data contract", () => {
   const catalog = createMeowUICatalog();
   const view = (part: unknown) => ({

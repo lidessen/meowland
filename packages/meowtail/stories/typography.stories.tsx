@@ -1,6 +1,6 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Badge, Button, Card, Inline, Prose, Section, Stack, Text } from "meowtail";
+import { Button, Card, Inline, Prose, Section, Stack, Status, Text } from "meowtail";
 import { Measure, Specimen, Specimens } from "./specimen";
 
 export const TextRolesStory = defineStory({
@@ -38,9 +38,7 @@ export const TextRolesStory = defineStory({
                 <Text as="span">
                   <strong>Weekly digest</strong>
                 </Text>
-                <Badge size="small" tone="success">
-                  On
-                </Badge>
+                <Status state="success" label="On" />
               </Inline>
               <Text variant="secondary">
                 A summary of progress, decisions and upcoming milestones, sent every Monday.

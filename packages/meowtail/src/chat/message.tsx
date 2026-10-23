@@ -1,5 +1,6 @@
 import { h, defineComponent, type Child, type ComponentContract, type Props } from "meowjsx";
 import { ChatBubble } from "./bubble";
+import { StatusDot } from "../components/status-dot";
 import { messageRoleContext } from "./message-context";
 
 export const chatMessageContract = {
@@ -38,6 +39,10 @@ export interface ChatMessageProps extends Props {
   /** Joins a reply, retaining its author and the column of a supplied avatar. */
   continuation?: boolean;
 }
+
+/** The status badge's tone: work in progress, a failure, or a quiet standby. */
+const messageStatusTone = (status: ChatMessageStatus) =>
+  status === "streaming" ? "processing" : status === "error" ? "danger" : "idle";
 
 export const ChatMessage = defineComponent<
   ChatMessageProps,
@@ -94,7 +99,8 @@ export const ChatMessage = defineComponent<
                   ? context.part(
                       "status",
                       "span",
-                      null,
+                      { "data-tone": messageStatusTone(status) },
+                      h(StatusDot, { state: messageStatusTone(status) }),
                       status === "streaming"
                         ? "Generating"
                         : status === "pending"

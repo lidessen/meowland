@@ -23,14 +23,16 @@ export const ChatStatus = defineComponent<
   ChatStatusProps,
   typeof chatStatusContract.name,
   (typeof chatStatusContract.parts)[number]
->(chatStatusContract, ({ label, className, ...props }, context) =>
+>(chatStatusContract, ({ label, className, tone, ...props }, context) =>
   context.part(
     "root",
     "span",
     {
       ...props,
+      tone,
       className,
       role: "status",
+      "data-tone": tone ?? "idle",
     },
     context.part("dot", "i", { "aria-hidden": "true" }),
     context.part("label", "span", { "data-chat-status-label": true }, label),

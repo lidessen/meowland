@@ -211,12 +211,14 @@ and the Meowbook gallery use the same tokens and roles as the library.
 - Compact rows inside a card (resource, link, work and task rows) pad `space.insetBlock`
   `space.insetInline`; reading sections use the relationship steps.
 - State: a dot is the state mark everywhere. On a title line the dot sits in the one state badge
-  (`src/theme/shared/state-badge.styles.ts`: `Status`, tool rows, task headers): the dot and the
+  (`src/theme/shared/state-badge.styles.ts`: `Status`, `ChatStatus`, tool rows, task headers,
+  message status, the terminal's unclean exit): the dot and the
   state's word on a soft tint of the state's ink, right after the title or target, and the only
   color in its row. Under a title the dot leads the host's fact line (WorkCard, the Assistant
   activity). A longer account of a state is that fact line, never a longer badge or colored prose.
   A badge carrier writes `data-tone` with the StatusDot state it shows. `Badge` stays a label
-  without a dot; it names a category, not a state.
+  without a dot; it names a category, not a state, so stories never put a state word in a `Badge`.
+  Timeline keeps its rail dot for color and its state word as a tertiary caption.
 - Tool rows: the leading glyph names the tool's type in the tertiary ink in every state; the verb
   is 500 in the secondary ink and keeps its words; the target follows in the tertiary ink and
   truncates first; the state badge follows the target, and `statusLabel` is the fact line inside

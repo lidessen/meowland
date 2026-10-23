@@ -11,6 +11,7 @@ import {
   LayoutItem,
   PageHeader,
   Stack,
+  Status,
 } from "meowtail";
 import { Measure } from "./specimen";
 
@@ -84,7 +85,7 @@ export const StackStory = defineStory({
           </span>
         </Stack>
         <Inline gap="compact">
-          <Badge tone="success">Check completed</Badge>
+          <Status state="success" label="Checked" />
           <span>2 changes awaiting review</span>
         </Inline>
         <Inline>
@@ -119,7 +120,7 @@ export const InlineStory = defineStory({
           <Button variant="quiet">Keep the current results for now</Button>
         </Inline>
         <Inline align="start">
-          <Badge tone="warning">Needs confirmation</Badge>
+          <Status state="warning" label="Needs review" />
           <Stack gap="compact">
             <strong>Check the change scope</strong>
             <span>Confirm that no files outside the current task are included.</span>
@@ -144,13 +145,13 @@ export const GridStory = defineStory({
     <Measure width="wide">
       <Grid gap="relaxed">
         <Stack gap="compact" align="start">
-          <Badge tone="success">Completed</Badge>
+          <Status state="success" label="Completed" />
           <strong>Search result order and stale request handling</strong>
           <span>Keep newer results and ignore older ones that arrive late.</span>
           <Button variant="outline">View changes</Button>
         </Stack>
         <Stack gap="compact" align="start">
-          <Badge tone="warning">Needs confirmation</Badge>
+          <Status state="warning" label="Needs review" />
           <strong>Code reading and source checks in narrow-screen conversations</strong>
           <span>Code scrolls locally while the body stays readable.</span>
           <Button variant="outline">View record</Button>

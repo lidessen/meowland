@@ -8,8 +8,8 @@ import {
   PageHeader,
   ResourceCard,
   Stack,
-  StatusDot,
   Tag,
+  Status,
 } from "meowtail";
 
 export const PageStructureStory = defineStory({
@@ -93,7 +93,7 @@ export const PageStructureLongContentStory = defineStory({
         subtitle={longContentCopy.category}
         description={longContentCopy.description}
         icon={<Icon name="folder" />}
-        status={[<StatusDot state="success" />, longContentCopy.status]}
+        status={<Status state="success" label={longContentCopy.status} />}
         identity="workspace:development-documentation-service"
         actions={<Button size="small">{longContentCopy.action}</Button>}
       />

@@ -313,13 +313,13 @@ export const FieldErrorsStory = defineStory({
 
 export const BadgesStory = defineStory({
   id: "badges",
-  title: "Badge · Status and long names",
+  title: "Badge · Category labels and long names",
   group: "Basic controls",
   groupOrder: 10,
   component: "Badge",
-  variant: "Status and long names",
+  variant: "Category labels and long names",
   description:
-    "Shows how Badge actually renders. The label expresses status in text and does not rely on color alone.",
+    "Shows how Badge actually renders. A badge is a dot-less category label; a state uses Status, the dot-led state badge.",
   covers: [
     "Badge",
     "neutral / accent / success / warning / danger",
@@ -328,30 +328,33 @@ export const BadgesStory = defineStory({
   ],
   render: () => (
     <Specimens>
-      <Specimen label="Regular badges" note="Text carries the status; color only supports it.">
+      <Specimen
+        label="Regular badges"
+        note="Words name a category, never a state; tone only groups them."
+      >
         <Inline gap="compact">
-          <Badge tone="neutral">Not started</Badge>
-          <Badge tone="accent">In progress</Badge>
-          <Badge tone="success">Completed</Badge>
-          <Badge tone="warning">Waiting for input</Badge>
-          <Badge tone="danger">Failed</Badge>
-          <Badge>A longer status description to check on a narrow screen</Badge>
+          <Badge tone="neutral">Docs</Badge>
+          <Badge tone="accent">New</Badge>
+          <Badge tone="success">Stable</Badge>
+          <Badge tone="warning">Beta</Badge>
+          <Badge tone="danger">Deprecated</Badge>
+          <Badge>A longer category name to check on a narrow screen</Badge>
         </Inline>
       </Specimen>
       <Specimen label="Compact badges">
         <Inline gap="compact">
-          <Badge size="small">Not started</Badge>
+          <Badge size="small">Docs</Badge>
           <Badge size="small" tone="accent">
-            In progress
+            New
           </Badge>
           <Badge size="small" tone="success">
-            Completed
+            Stable
           </Badge>
           <Badge size="small" tone="warning">
-            Waiting for input
+            Beta
           </Badge>
           <Badge size="small" tone="danger">
-            Failed
+            Deprecated
           </Badge>
         </Inline>
       </Specimen>

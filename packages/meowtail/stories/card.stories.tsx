@@ -1,7 +1,6 @@
 import { h } from "meowjsx/runtime";
 import { defineStory } from "meowbook";
 import {
-  Badge,
   Button,
   Card,
   CardAction,
@@ -13,6 +12,7 @@ import {
   Icon,
   IconButton,
   Stack,
+  Status,
 } from "meowtail";
 import { Measure, Note } from "./specimen";
 
@@ -60,7 +60,7 @@ export const CardCompositionStory = defineStory({
                   Body text wrapping and local code scrolling are handled separately.
                 </CardDescription>
                 <CardAction>
-                  <Badge>Pending confirmation</Badge>
+                  <Status state="warning" label="Pending" />
                 </CardAction>
               </CardHeader>
               <CardContent>

@@ -4,6 +4,9 @@ import { statusContract } from "../../components/status";
 import { statusDotContract } from "../../components/status-dot";
 import { chatToolCallContract } from "../../chat/tool-call";
 import { chatTaskContract } from "../../chat/task";
+import { chatStatusContract } from "../../chat/status";
+import { chatMessageContract } from "../../chat/message";
+import { terminalBlockContract } from "../../components/terminal-block";
 
 /*
  * One state badge for every place a state sits on a title line: Status, a tool row, a task
@@ -12,7 +15,14 @@ import { chatTaskContract } from "../../chat/task";
  * beneath the title, never a longer badge. Each carrier writes data-tone with the StatusDot
  * state it shows.
  */
-const badges = `:where(${partSelector(statusContract, "root")}, ${partSelector(chatToolCallContract, "status")}, ${partSelector(chatTaskContract, "status")})`;
+const badges = `:where(${[
+  partSelector(statusContract, "root"),
+  partSelector(chatToolCallContract, "status"),
+  partSelector(chatTaskContract, "status"),
+  partSelector(chatStatusContract, "root"),
+  partSelector(chatMessageContract, "status"),
+  partSelector(terminalBlockContract, "status"),
+].join(", ")})`;
 const dot = partSelector(statusDotContract, "root");
 const tone = (name: string) => `:where(${badges}[data-tone="${name}"])`;
 
@@ -43,20 +53,24 @@ export const stateBadgeStyles = css`
     height: 6px;
     margin-top: 5px;
   }
-  ${tone("processing")} {
+  ${tone("processing")},
+  ${tone("busy")} {
     background: ${uiTokens.accent.soft};
     color: ${uiTokens.accent.ink};
   }
   ${tone("success")},
-  ${tone("returned")} {
+  ${tone("returned")},
+  ${tone("online")} {
     background: color-mix(in srgb, ${uiTokens.status.success} 10%, transparent);
     color: ${uiTokens.status.success};
   }
-  ${tone("warning")} {
+  ${tone("warning")},
+  ${tone("waiting")} {
     background: color-mix(in srgb, ${uiTokens.status.warning} 12%, transparent);
     color: ${uiTokens.status.warning};
   }
-  ${tone("danger")} {
+  ${tone("danger")},
+  ${tone("error")} {
     background: color-mix(in srgb, ${uiTokens.status.danger} 10%, transparent);
     color: ${uiTokens.status.danger};
   }

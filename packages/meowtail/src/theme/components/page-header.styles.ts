@@ -1,4 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
+import { text } from "../recipes";
 import { uiTokens } from "../tokens";
 import { pageHeaderContract } from "../../components/page-header";
 
@@ -44,11 +45,7 @@ export const pageHeaderStyles = css`
   ${header("title")} {
     margin: 0;
     min-width: 0;
-    font-family: ${uiTokens.type.display};
-    font-size: ${uiTokens.type.pageTitle};
-    font-weight: 600;
-    letter-spacing: ${uiTokens.type.trackingTight};
-    line-height: 1.3;
+    ${text("pageTitle")}
     overflow-wrap: anywhere;
   }
   ${header("description")} {

@@ -1,4 +1,5 @@
 import { css, partSelector } from "meowcss/meowjsx";
+import { text } from "../recipes";
 import { uiTokens } from "../tokens";
 import { sectionContract } from "../../components/section";
 
@@ -29,18 +30,14 @@ export const sectionStyles = css`
     flex: 1 1 var(${uiTokens.layout.gridCompact.name}, 160px);
     min-width: 0;
     margin: 0;
-    font-family: ${uiTokens.type.display};
-    font-size: ${uiTokens.type.title};
-    font-weight: 600;
-    line-height: 1.4;
-    letter-spacing: ${uiTokens.type.trackingTight};
+    ${text("title")}
     overflow-wrap: anywhere;
   }
-  /* A nested section reads as a subheading under the section that contains it.
-     At body size a bold serif loses its shapes, so subheadings use the UI face. */
+  /* A nested section reads as a subheading under the section that contains it: body size, still
+     semibold. */
   ${section("title")}:is(h3, h4, h5, h6) {
-    font-family: ${uiTokens.type.sans};
     font-size: ${uiTokens.type.body};
+    line-height: ${uiTokens.type.line.body};
   }
   ${section("description")} {
     order: 2;

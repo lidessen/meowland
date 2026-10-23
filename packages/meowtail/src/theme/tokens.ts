@@ -116,9 +116,12 @@ export const uiTokens = defineTokens("ui", {
   /** The type ramp: sizes, the line box of each size, and weights. */
   type: {
     sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif',
-    /** Serif stack for page and section titles; hosts override `--ui-type-display`. */
+    /**
+     * Deprecated: titles use the UI face. Kept equal to `sans` so a host that set
+     * `--ui-type-display` keeps working until it is removed.
+     */
     display:
-      '"Iowan Old Style", "Palatino Linotype", Palatino, Georgia, "Times New Roman", "Songti SC", "Songti TC", "Noto Serif SC", serif',
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif',
     mono: '"SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, "PingFang SC", "Microsoft YaHei"',
     /** Key caps, compact counts and small-caps group labels. */
     micro: "11px",

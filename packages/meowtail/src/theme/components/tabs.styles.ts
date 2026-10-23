@@ -13,6 +13,10 @@ export const tabsStyles = css`
     position: relative;
     display: grid;
     grid-template-columns: repeat(${tabsCount}, minmax(0, 1fr));
+    /* The track hugs its tabs (each as wide as the widest label) like SegmentedControl;
+       a narrow container still shrinks every column equally. */
+    width: fit-content;
+    max-width: 100%;
     /* Same track as SegmentedControl: one control height, concentric radii. */
     padding: ${uiTokens.control.trackInset};
     border-radius: calc(${uiTokens.radius.md} + ${uiTokens.control.trackInset});

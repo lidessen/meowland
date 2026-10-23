@@ -192,7 +192,9 @@ describe("the docs pages", () => {
     for (const [, id] of toc.matchAll(/href="#([^"]+)"/g)) {
       expect(html).toMatch(new RegExp(`<section[^>]*id="${id}"`));
     }
-    expect(html).toMatch(/<details class="docs-toc-disclosure"><summary>On this page<\/summary>/);
+    expect(html).toMatch(
+      /<details class="docs-toc-disclosure"><summary>On this page<svg[^>]*data-icon="chevron-down"/,
+    );
   });
 
   test("the desktop and disclosure contents share links with unique section targets", () => {

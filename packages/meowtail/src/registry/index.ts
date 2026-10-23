@@ -64,6 +64,7 @@ import {
   iconButtonContract,
   toolbarContract,
   actionRailContract,
+  actionRowContract,
   metaRowContract,
   inputContract,
   numberInputContract,
@@ -188,6 +189,7 @@ export const MeowUIComponent = {
   IconButton: iconButtonContract.name,
   Toolbar: toolbarContract.name,
   ActionRail: actionRailContract.name,
+  ActionRow: actionRowContract.name,
   MetaRow: metaRowContract.name,
   EmptyState: emptyStateContract.name,
   Card: cardContract.name,
@@ -332,6 +334,7 @@ export const meowUIComponents = [
   iconButtonContract,
   toolbarContract,
   actionRailContract,
+  actionRowContract,
   metaRowContract,
   emptyStateContract,
   cardContract,
@@ -449,6 +452,7 @@ declare module "meowjsx" {
     "icon-button": { parts: (typeof iconButtonContract.parts)[number] };
     toolbar: { parts: (typeof toolbarContract.parts)[number] };
     "action-rail": { parts: (typeof actionRailContract.parts)[number] };
+    "action-row": { parts: (typeof actionRowContract.parts)[number] };
     "meta-row": { parts: (typeof metaRowContract.parts)[number] };
     "empty-state": { parts: (typeof emptyStateContract.parts)[number] };
     card: { parts: "root" };

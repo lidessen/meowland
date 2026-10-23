@@ -1,4 +1,5 @@
 import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
+import { actionRowRef } from "../shared/action-row-fit";
 import { PageFrame } from "./page-frame";
 
 export const dialogContract = {
@@ -111,11 +112,11 @@ export interface DialogActionsProps extends Props {
   className?: string;
 }
 
-/** The row of buttons that ends a dialog. */
+/** The row of buttons that ends a dialog; it stacks whole when it does not fit, like ActionRow. */
 export const DialogActions = defineComponent<
   DialogActionsProps,
   typeof dialogActionsContract.name,
   (typeof dialogActionsContract.parts)[number]
 >(dialogActionsContract, ({ children, className, ...props }, context) =>
-  context.part("root", "div", { ...props, className }, children),
+  context.part("root", "div", { ...props, className, ref: actionRowRef(props.ref) }, children),
 );

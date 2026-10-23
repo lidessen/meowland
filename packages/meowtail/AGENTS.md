@@ -389,6 +389,13 @@ relationships, not numbers; values come from `uiTokens`.
   arranges reading content and caps it at the reading measure (`uiTokens.layout.measure`).
 - **Label every group.** When a region shows more than one group of things (variants, states,
   settings), each group gets an eyebrow label; groups sit a panel step apart.
+- **Actions sit in a row that fits or stacks whole.** A row of buttons is an `ActionRow` (or a
+  container that already is one: `CardFooter`, `DialogActions`, `ChatQuestion` actions). It stays on
+  one line while it fits; otherwise every text action becomes a full-width line and icon actions stay
+  together, never a ragged wrap or an orphan. One primary action per row, last in DOM order, which is
+  also the visual and focus order; group actions by intent rather than interleaving them. Header
+  action clusters (`PageHeader`, `Section`, card and code headers) and `Toolbar` keep their compact
+  rules. A variant matrix in a story is not an action row: lay it out in equal columns.
 
 In stories, `stories/specimen.tsx` applies these rules: `Specimens` / `Specimen` label each group,
 `Note` is the caption receipt, and `Measure` holds a host width on the canvas start edge. Component

@@ -50,6 +50,7 @@ export {
 } from "./icon-button";
 export { Toolbar, type ToolbarProps, toolbarContract } from "./toolbar";
 export { ActionRail, type ActionRailProps, actionRailContract } from "./action-rail";
+export { ActionRow, type ActionRowProps, actionRowContract, actionRowOptions } from "./action-row";
 export {
   MetaRow,
   type MetaItem,

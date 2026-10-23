@@ -199,7 +199,7 @@ export function PropsTable({
         columns={[
           { id: "prop", header: "Prop", width: 288, resizable: false },
           { id: "type", header: "Type", width: 272, resizable: false },
-          { id: "default", header: "Default", resizable: false },
+          { id: "default", header: "Default", minWidth: 128, resizable: false },
         ]}
         rows={rows.map((row) => ({
           id: row.name,

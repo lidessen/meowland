@@ -952,9 +952,6 @@ export const docsStyles = css`
     border-color: ${uiTokens.line.edge};
     background: ${uiTokens.surface.canvas};
   }
-  .docs-article ${partSelector(tableContract, "table")} {
-    min-width: 480px;
-  }
   .docs-article ${partSelector(tableContract, "heading")}, .docs-article ${partSelector(tableContract, "cell")} {
     padding: 12px 16px;
   }

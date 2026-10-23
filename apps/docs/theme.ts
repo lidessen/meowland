@@ -902,6 +902,7 @@ export const docsStyles = css`
   }
   .docs-index-list > li {
     display: grid;
+    align-content: start;
     gap: 2px;
     min-width: 0;
     padding: 10px 0;

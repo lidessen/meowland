@@ -1,6 +1,6 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Inline, StatusDot, Tag, type StatusDotState } from "meowtail";
+import { Inline, StatusDot, type StatusDotState } from "meowtail";
 import { SchemePair } from "./scheme-pair";
 
 const states: readonly [StatusDotState, string, string][] = [
@@ -58,12 +58,6 @@ export const StatusDotStory = defineStory({
               <StatusDot state="processing" />
               <StatusDot state="processing" size={10} />
               <StatusDot state="returned" size={10} />
-            </Inline>
-            <Inline align="center" gap="compact">
-              <Tag>3 steps</Tag>
-              <StatusDot state="success" size={6} />
-              <StatusDot state="success" size={6} />
-              <StatusDot state="warning" size={6} />
             </Inline>
           </div>
         )}

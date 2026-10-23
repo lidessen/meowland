@@ -56,18 +56,21 @@ export const workCardStyles = css`
     font-weight: 600;
     overflow-wrap: anywhere;
   }
+  /* The status line flows as text, so a long line wraps between words and the
+  detail's separator never starts a line of its own. */
   ${part("status")} {
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
+    display: block;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.label};
     line-height: 1.5;
   }
+  ${part("status")} > :first-child {
+    margin-inline-end: 6px;
+    vertical-align: 0.1em;
+  }
   ${part("detail")}::before {
     content: "·";
-    margin-inline-end: 6px;
+    margin-inline: 6px;
     color: ${uiTokens.ink.tertiary};
   }
   ${part("action")} {

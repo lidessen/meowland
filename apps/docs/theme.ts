@@ -476,8 +476,38 @@ export const docsStyles = css`
     color: ${uiTokens.ink.secondary};
   }
   .docs-install > span {
+    flex: 1;
     min-width: 0;
     overflow-wrap: anywhere;
+  }
+  .docs-install-copy {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 28px;
+    height: 28px;
+    margin: -4px -8px -4px 0;
+    padding: 0;
+    border: 0;
+    border-radius: ${uiTokens.radius.md};
+    background: transparent;
+    color: ${uiTokens.ink.tertiary};
+    cursor: pointer;
+  }
+  .docs-install-copy[hidden] {
+    display: none;
+  }
+  .docs-install-copy:hover {
+    background: ${uiTokens.state.hover};
+    color: ${uiTokens.ink.primary};
+  }
+  .docs-install-copy > svg:last-child,
+  .docs-install-copy[data-copied] > svg:first-child {
+    display: none;
+  }
+  .docs-install-copy[data-copied] > svg:last-child {
+    display: block;
+    color: ${uiTokens.status.success};
   }
 
   /* A wider introduction leads into an index, rather than another gallery. */

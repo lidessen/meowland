@@ -94,6 +94,11 @@ export function InstallLine({ name }: { name: string }): Child {
     <div className="docs-install">
       <Icon name="terminal" size={14} />
       <span>bun add {name}</span>
+      {/* Wired by the page script; without it the command is still selectable text. */}
+      <button className="docs-install-copy" type="button" aria-label="Copy install command" hidden>
+        <Icon name="copy" size={14} />
+        <Icon name="check" size={14} />
+      </button>
     </div>
   );
 }

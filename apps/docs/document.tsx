@@ -251,6 +251,7 @@ function Document({
         <div className="docs-shell">
           <div className="docs-mobile-bar">
             <a className="docs-mobile-brand" href="/">
+              <MeowlandMark />
               Meowland <span>docs</span>
             </a>
             <button
@@ -269,13 +270,9 @@ function Document({
           <div className="docs-main">
             <header className="docs-header">
               <Breadcrumb items={trail} label="Breadcrumb" />
-              <a
-                className="docs-header-link"
-                href="/gallery/"
-                title="Open the component workbench"
-                aria-label="Open the component workbench"
-              >
-                <Icon name="arrow-up-right" size={16} />
+              <a className="docs-header-link" href="/gallery/">
+                Workbench
+                <Icon name="arrow-up-right" size={14} />
               </a>
             </header>
             <main className={path === "" ? "docs-content docs-content-home" : "docs-content"}>

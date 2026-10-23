@@ -31,7 +31,7 @@ export const accordionStyles = css`
     /* A card-level header: the large control height, the compact inline inset. */
     min-height: ${uiTokens.control.large};
     padding: 10px ${uiTokens.space.insetInline};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     color: ${uiTokens.ink.primary};
     border-radius: 0;
     transition:

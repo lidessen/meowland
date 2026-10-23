@@ -25,7 +25,7 @@ export const chatReasoningStyles = css`
     cursor: pointer;
     color: ${uiTokens.ink.primary};
     font-size: ${uiTokens.type.body};
-    line-height: 20px;
+    line-height: ${uiTokens.type.line.bodyCompact};
   }
   ${part("root")}:not([data-active="true"]) > ${part("summary")} {
     color: ${uiTokens.ink.secondary};
@@ -111,7 +111,7 @@ export const chatReasoningStyles = css`
     margin: 0;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.body};
-    line-height: 1.625;
+    line-height: ${uiTokens.type.line.body};
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }

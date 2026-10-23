@@ -22,7 +22,7 @@ export const processGroupStyles = css`
     border-radius: ${uiTokens.radius.xl};
     background: ${uiTokens.surface.fill};
     color: ${uiTokens.ink.secondary};
-    font: ${uiTokens.type.label}/20px ${uiTokens.type.sans};
+    font: ${uiTokens.type.label} / ${uiTokens.type.line.label} ${uiTokens.type.sans};
   }
   /* One line when it fits; a narrow group wraps the badge and fact rather than stacking by rule. */
   ${group("summary")} {
@@ -63,7 +63,7 @@ export const processGroupStyles = css`
     min-width: 0;
     overflow: hidden;
     color: ${uiTokens.ink.primary};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     text-overflow: ellipsis;
     white-space: nowrap;
   }

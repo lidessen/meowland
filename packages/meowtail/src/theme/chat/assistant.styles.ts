@@ -35,7 +35,7 @@ export const assistantStyles = css`
     min-width: 0;
     color: ${uiTokens.ink.primary};
     background: ${uiTokens.surface.reading};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
   ${root} > ${partSelector(pageFrameContract, "root")} {
     height: 100%;
@@ -235,7 +235,7 @@ export const assistantStyles = css`
     border-radius: ${chatTokens.bubbleRadius};
     background: ${uiTokens.surface.fill};
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/1.4 ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.bodyCompact} ${uiTokens.type.sans};
     text-align: start;
     overflow-wrap: anywhere;
     cursor: pointer;

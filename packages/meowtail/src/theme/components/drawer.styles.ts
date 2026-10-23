@@ -42,7 +42,7 @@ export const drawerStyles = css`
     overflow: hidden;
     background: ${uiTokens.surface.canvas};
     box-shadow: ${uiTokens.shadow.sheet};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     transform: translateX(-100%);
     transition: transform ${uiTokens.motion.draw} ${uiTokens.motion.enter};
   }

@@ -9,7 +9,7 @@ export const webBlockStyles = css`
     border-radius: ${uiTokens.radius.xl};
     background: ${uiTokens.surface.fill};
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/20px ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.bodyCompact} ${uiTokens.type.sans};
   }
   ${partSelector(web, "answer")} {
     white-space: pre-wrap;
@@ -27,7 +27,7 @@ export const webBlockStyles = css`
   }
   ${partSelector(web, "link")} {
     color: ${uiTokens.status.info};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     text-decoration: none;
     overflow-wrap: anywhere;
   }
@@ -38,12 +38,12 @@ export const webBlockStyles = css`
   ${partSelector(web, "snippet")} {
     margin-top: 2px;
     color: ${uiTokens.ink.secondary};
-    font: ${uiTokens.type.label}/19px ${uiTokens.type.sans};
+    font: ${uiTokens.type.label} / ${uiTokens.type.line.label} ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
   ${partSelector(web, "meta")} {
     margin-top: 4px;
     color: ${uiTokens.ink.tertiary};
-    font: ${uiTokens.type.caption}/18px ${uiTokens.type.sans};
+    font: ${uiTokens.type.caption} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
   }
 `;

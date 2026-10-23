@@ -12,7 +12,7 @@ export const navListStyles = css`
     gap: ${uiTokens.space.section};
     min-width: 0;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
 
   /* A group is one heading and its rows; the group headings carry the sidebar rhythm. */
@@ -28,8 +28,8 @@ export const navListStyles = css`
     /* The shared small-caps label role: Menu and ChoiceSelect groups use it too. */
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.micro};
-    font-weight: 500;
-    line-height: 1.5;
+    font-weight: ${uiTokens.type.weight.medium};
+    line-height: ${uiTokens.type.line.micro};
     letter-spacing: ${uiTokens.type.trackingCaps};
     text-transform: uppercase;
     overflow-wrap: anywhere;
@@ -76,7 +76,7 @@ export const navListStyles = css`
   ${list("item")}[aria-current="page"] {
     color: ${uiTokens.ink.primary};
     background: ${uiTokens.accent.selected};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   @media (hover: hover) {
     ${list("item")}:hover:not(:disabled):not([aria-disabled="true"]):not([aria-current="page"]) {
@@ -122,7 +122,7 @@ export const navListStyles = css`
     margin-top: 2px;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
-    line-height: 1.5;
+    line-height: ${uiTokens.type.line.caption};
     overflow-wrap: anywhere;
   }
   ${list("badge")} {
@@ -133,7 +133,7 @@ export const navListStyles = css`
     margin-inline-start: ${uiTokens.space.group};
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
-    line-height: 1.5;
+    line-height: ${uiTokens.type.line.caption};
     overflow-wrap: anywhere;
   }
   ${list("meta")} {
@@ -144,7 +144,7 @@ export const navListStyles = css`
     margin-inline-start: ${uiTokens.space.group};
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.caption};
-    line-height: 1.5;
+    line-height: ${uiTokens.type.line.caption};
     font-variant-numeric: tabular-nums;
     overflow-wrap: anywhere;
   }

@@ -14,7 +14,7 @@ export const pageHeaderStyles = css`
     justify-content: space-between;
     flex-wrap: wrap;
     gap: ${uiTokens.space.section} ${uiTokens.space.panel};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     color: ${uiTokens.ink.primary};
   }
   ${header("copy")} {

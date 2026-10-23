@@ -51,7 +51,8 @@ export const segmentedControlStyles = css`
     padding: 4px 12px;
     border-radius: ${uiTokens.radius.md};
     text-align: center;
-    font: 500 ${uiTokens.type.body}/22px ${uiTokens.type.sans};
+    font: ${uiTokens.type.weight.medium} ${uiTokens.type.body} / ${uiTokens.type.line.body}
+      ${uiTokens.type.sans};
     color: ${uiTokens.ink.secondary};
   }
   ${partSelector(segmented, "input")}:checked + ${partSelector(segmented, "label")} {

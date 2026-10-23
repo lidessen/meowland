@@ -14,7 +14,7 @@ export const pillStyles = css`
     border: 0;
     border-radius: ${uiTokens.radius.full};
     corner-shape: round;
-    font: ${uiTokens.type.caption}/18px ${uiTokens.type.sans};
+    font: ${uiTokens.type.caption} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
     color: ${uiTokens.ink.secondary};
     background: ${uiTokens.surface.fill};
     white-space: nowrap;

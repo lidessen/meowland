@@ -51,7 +51,7 @@ export const nativeInputStyles = css`
   :where(${partSelector(selectContract, "root")}:is([multiple], [size]:not([size="0"]):not([size="1"]))) option:checked {
     color: ${uiTokens.ink.primary};
     background: ${uiTokens.accent.selected};
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
   }
   ${partSelector(selectContract, "root")} option:disabled {
     color: ${uiTokens.ink.tertiary};

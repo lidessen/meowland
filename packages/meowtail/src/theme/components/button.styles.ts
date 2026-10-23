@@ -18,7 +18,7 @@ export const buttonStyles = css`
   border-radius: ${uiTokens.radius.lg};
   background: transparent;
   color: ${uiTokens.ink.primary};
-  font: 500 ${uiTokens.type.body}/22px ${uiTokens.type.sans};
+  font: ${uiTokens.type.weight.medium} ${uiTokens.type.body} / ${uiTokens.type.line.body} ${uiTokens.type.sans};
   text-decoration: none;
   cursor: pointer;
   transition:
@@ -71,7 +71,7 @@ ${partSelector(buttonContract, "root")} {
   ${buttonOptions.when({ variant: "accent" })} {
     background: ${uiTokens.accent.soft};
     color: ${uiTokens.accent.ink};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
 }
 ${partSelector(buttonContract, "root")} {
@@ -120,7 +120,7 @@ ${partSelector(buttonContract, "root")} {
     padding-inline: 10px;
     border-radius: ${uiTokens.radius.md};
     font-size: ${uiTokens.type.caption};
-    line-height: 18px;
+    line-height: ${uiTokens.type.line.caption};
   }
 }
 ${partSelector(buttonContract, "root")} {

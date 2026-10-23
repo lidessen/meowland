@@ -14,7 +14,7 @@ export const chatTaskStyles = css`
     min-width: 0;
     max-width: 100%;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
   /* Title, then its state badge right beside it, then the host's fact on its own row. */
@@ -28,7 +28,7 @@ export const chatTaskStyles = css`
   ${part("title")} {
     flex: 0 1 auto;
     min-width: 0;
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
   }
   /* The state badge comes from shared/state-badge.styles.ts; the fact line takes its own row. */
   ${part("fact")} {
@@ -37,7 +37,7 @@ export const chatTaskStyles = css`
     margin-top: -2px;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.caption};
-    line-height: 18px;
+    line-height: ${uiTokens.type.line.caption};
     overflow-wrap: anywhere;
   }
   ${part("description")}, ${part("execution")}, ${part("reply")} {
@@ -55,7 +55,7 @@ export const chatTaskStyles = css`
   }
   ${part("progressLabel")} {
     min-width: 0;
-    line-height: 1.4;
+    line-height: ${uiTokens.type.line.caption};
   }
   ${part("progressBar")} {
     display: contents;

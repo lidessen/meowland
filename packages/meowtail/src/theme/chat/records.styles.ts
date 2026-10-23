@@ -111,10 +111,10 @@ export const chatRecordsStyles = css`
     flex: 1 0 100%;
     margin: -4px 0 2px;
     padding-inline-start: var(${rowIndent});
-    font-weight: 400;
+    font-weight: ${uiTokens.type.weight.regular};
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.caption};
-    line-height: 18px;
+    line-height: ${uiTokens.type.line.caption};
     overflow-wrap: anywhere;
   }
 
@@ -124,7 +124,7 @@ export const chatRecordsStyles = css`
     overflow-wrap: anywhere;
     text-wrap: balance;
     color: ${uiTokens.ink.secondary};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
 
   /* Beside a target the verb keeps its words; the target is what yields and truncates. */
@@ -138,7 +138,7 @@ export const chatRecordsStyles = css`
     min-width: 0;
     margin: 0;
     color: ${uiTokens.ink.secondary};
-    font: ${uiTokens.type.body}/1.65 ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.reading} ${uiTokens.type.sans};
   }
 
   ${partSelector(chatToolCallContract, "detail")} {
@@ -251,7 +251,7 @@ export const chatRecordsStyles = css`
     padding-block: ${uiTokens.space.group};
     padding-inline: var(${rowIndent}) 0;
     border-left: 0;
-    line-height: 1.65;
+    line-height: ${uiTokens.type.line.reading};
   }
 
   ${partSelector(chatProcessContract, "body")} > :first-child {
@@ -459,9 +459,9 @@ export const chatRecordsStyles = css`
     margin: 0;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.caption};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     font-family: ${uiTokens.type.sans};
-    line-height: 1.65;
+    line-height: ${uiTokens.type.line.caption};
   }
 
   .chat-tool-call-sections p {
@@ -469,7 +469,7 @@ export const chatRecordsStyles = css`
     color: ${uiTokens.ink.secondary};
     font-family: ${uiTokens.type.sans};
     font-size: ${uiTokens.type.body};
-    line-height: 1.65;
+    line-height: ${uiTokens.type.line.reading};
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
@@ -527,8 +527,8 @@ export const chatRecordsStyles = css`
   ${partSelector(chatSourcesContract, "link")} {
     color: ${uiTokens.status.info};
     font-size: ${uiTokens.type.body};
-    font-weight: 500;
-    line-height: 20px;
+    font-weight: ${uiTokens.type.weight.medium};
+    line-height: ${uiTokens.type.line.bodyCompact};
     text-decoration: none;
     overflow-wrap: anywhere;
     text-underline-offset: 3px;
@@ -541,7 +541,7 @@ export const chatRecordsStyles = css`
   ${partSelector(chatSourcesContract, "description")} {
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.label};
-    line-height: 19px;
+    line-height: ${uiTokens.type.line.label};
     overflow-wrap: anywhere;
   }
 
@@ -559,7 +559,7 @@ export const chatRecordsStyles = css`
     border: 0;
     border-radius: ${uiTokens.radius.xl};
     background: ${uiTokens.surface.fill};
-    font: ${uiTokens.type.caption}/18px ${uiTokens.type.mono};
+    font: ${uiTokens.type.caption} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
     white-space: pre-wrap;
   }
 

@@ -16,7 +16,7 @@ export const chatFrameStyles = css`
     min-width: 0;
     color: ${uiTokens.ink.primary};
     background: ${uiTokens.surface.reading};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
 
   ${partSelector(chatMessageListContract, "root")} {
@@ -57,8 +57,9 @@ export const chatFrameStyles = css`
     align-items: center;
     gap: ${uiTokens.space.section};
     color: ${uiTokens.ink.secondary};
+    min-height: 32px;
     font-size: ${uiTokens.type.caption};
-    line-height: 32px;
+    line-height: ${uiTokens.type.line.caption};
     white-space: nowrap;
     justify-content: center;
     margin-bottom: ${uiTokens.space.section};

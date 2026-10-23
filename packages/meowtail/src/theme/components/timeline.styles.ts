@@ -53,7 +53,7 @@ export const timelineStyles = css`
     min-width: 0;
   }
   ${entry("title")} {
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     overflow-wrap: anywhere;
   }
   /* The rail's dot carries the state's color; the word beside the title stays a quiet caption. */
@@ -65,7 +65,7 @@ export const timelineStyles = css`
     margin: 0;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.label};
-    line-height: 1.5;
+    line-height: ${uiTokens.type.line.label};
     overflow-wrap: anywhere;
   }
   ${entry("actions")} {

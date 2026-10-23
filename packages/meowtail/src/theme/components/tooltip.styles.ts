@@ -17,7 +17,7 @@ export const tooltipStyles = css`
     color: ${uiTokens.inverse.ink};
     box-shadow: none;
     backdrop-filter: none;
-    font: ${uiTokens.type.label}/20px ${uiTokens.type.sans};
+    font: ${uiTokens.type.label} / ${uiTokens.type.line.label} ${uiTokens.type.sans};
   }
   ${partSelector(tooltipContract, "content")} {
     display: block;

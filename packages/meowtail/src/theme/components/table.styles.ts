@@ -9,7 +9,7 @@ export const tableStyles = css`
   ${part("root")} {
     min-width: 0;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/1.5 ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
   ${part("scroller")} {
     overflow: auto;
@@ -44,7 +44,7 @@ export const tableStyles = css`
     padding-block: 8px;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     white-space: nowrap;
     background: ${uiTokens.surface.fill};
   }

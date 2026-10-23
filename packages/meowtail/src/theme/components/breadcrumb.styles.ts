@@ -36,7 +36,7 @@ export const breadcrumbStyles = css`
   }
   ${partSelector(breadcrumbContract, "current")} {
     color: ${uiTokens.ink.primary};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   ${partSelector(breadcrumbContract, "separator")} {
     color: ${uiTokens.ink.secondary};

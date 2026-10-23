@@ -52,7 +52,7 @@ export const hoverCardStyles = css`
     background: ${uiTokens.inverse.surface};
     pointer-events: none;
     color: ${uiTokens.inverse.ink};
-    font: ${uiTokens.type.body}/20px ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.bodyCompact} ${uiTokens.type.sans};
   }
   ${partSelector(hoverCardContract, "feedback")}:empty {
     display: none;

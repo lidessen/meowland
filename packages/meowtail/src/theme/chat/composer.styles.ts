@@ -25,7 +25,7 @@ export const chatComposerStyles = css`
     background: transparent;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.label};
-    line-height: 20px;
+    line-height: ${uiTokens.type.line.label};
   }
 
   ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "trigger")}:hover:not(:disabled) {
@@ -50,7 +50,7 @@ export const chatComposerStyles = css`
   ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "option")} {
     padding: 6px;
     font-size: ${uiTokens.type.body};
-    line-height: 22px;
+    line-height: ${uiTokens.type.line.body};
   }
 
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="hero"] ${partSelector(chatComposerContract, "input")} {
@@ -72,8 +72,8 @@ export const chatComposerStyles = css`
     background-size: 12px 12px;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.label};
-    line-height: 20px;
-    font-weight: 500;
+    line-height: ${uiTokens.type.line.label};
+    font-weight: ${uiTokens.type.weight.medium};
     cursor: pointer;
   }
 
@@ -167,8 +167,8 @@ export const chatComposerStyles = css`
     outline: 0;
     background: transparent;
     font-size: var(${chatTokens.fontBody.name}, ${uiTokens.type.body});
-    font-weight: 400;
-    line-height: 24px;
+    font-weight: ${uiTokens.type.weight.regular};
+    line-height: ${chatTokens.leading};
     caret-color: ${uiTokens.state.focus};
   }
 
@@ -251,7 +251,7 @@ export const chatComposerStyles = css`
     min-width: 34px;
     min-height: 34px;
     padding: 0;
-    line-height: 1.2;
+    line-height: 1;
     border: 1px solid transparent;
     border-radius: ${uiTokens.radius.full};
     corner-shape: round;
@@ -260,7 +260,7 @@ export const chatComposerStyles = css`
     transform: translateY(-2px);
     cursor: pointer;
     font-size: ${uiTokens.type.body};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     box-shadow: none;
   }
 
@@ -445,7 +445,7 @@ export const chatComposerStyles = css`
     overflow-wrap: anywhere;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.caption};
-    line-height: 18px;
+    line-height: ${uiTokens.type.line.caption};
     pointer-events: auto;
   }
 
@@ -471,7 +471,7 @@ export const chatComposerStyles = css`
       min-height: 36px;
       padding: 6px 4px;
       font-size: ${uiTokens.type.touchField};
-      line-height: 24px;
+      line-height: ${uiTokens.type.line.reading};
     }
 
     ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} {
@@ -542,7 +542,7 @@ export const chatComposerStyles = css`
     grid-row: 2;
     min-height: ${uiTokens.control.regular};
     padding: 6px 4px;
-    line-height: 24px;
+    line-height: ${uiTokens.type.line.reading};
   }
   ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "actions")} {
     display: contents;

@@ -52,7 +52,7 @@ export const tabsStyles = css`
     background: transparent;
     color: ${uiTokens.ink.secondary};
     font: inherit;
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;

@@ -20,7 +20,7 @@ export const sliderStyles = css`
     max-width: 100%;
     min-width: 0;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.caption}/1 ${uiTokens.type.sans};
+    font: ${uiTokens.type.caption} / 1 ${uiTokens.type.sans};
   }
   ${control} {
     grid-column: 1;

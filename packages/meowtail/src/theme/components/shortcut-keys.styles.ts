@@ -8,7 +8,7 @@ export const shortcutKeysStyles = css`
     align-items: center;
     gap: 4px;
     color: ${uiTokens.ink.tertiary};
-    font: ${uiTokens.type.caption}/16px ${uiTokens.type.sans};
+    font: ${uiTokens.type.caption} / ${uiTokens.type.line.micro} ${uiTokens.type.sans};
     white-space: nowrap;
     flex: none;
   }
@@ -22,7 +22,7 @@ export const shortcutKeysStyles = css`
   ${partSelector(shortcutKeysContract, "root")}[data-variant="tooltip"] {
     color: inherit;
     font-size: ${uiTokens.type.micro};
-    line-height: 14px;
+    line-height: ${uiTokens.type.line.micro};
     gap: 2px;
   }
   ${partSelector(shortcutKeysContract, "root")}[data-variant="tooltip"] ${partSelector(shortcutKeysContract, "key")}:not([data-separator]) {

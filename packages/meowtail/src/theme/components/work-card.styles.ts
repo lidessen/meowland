@@ -20,7 +20,7 @@ export const workCardStyles = css`
     background: ${uiTokens.surface.raised};
     box-shadow: ${uiTokens.shadow.raised};
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/1.5 ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     text-align: left;
     cursor: pointer;
     transition:
@@ -53,7 +53,7 @@ export const workCardStyles = css`
     min-width: 0;
   }
   ${part("title")} {
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
     overflow-wrap: anywhere;
   }
   /* The status line flows as text, so a long line wraps between words and the
@@ -62,7 +62,7 @@ export const workCardStyles = css`
     display: block;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.label};
-    line-height: 1.5;
+    line-height: ${uiTokens.type.line.label};
   }
   ${part("status")} > :first-child {
     margin-inline-end: 6px;

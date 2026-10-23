@@ -16,7 +16,7 @@ export const disclosureStyles = css`
     align-items: center;
     gap: 6px;
     min-height: 24px;
-    line-height: 24px;
+    line-height: ${uiTokens.type.line.reading};
     box-sizing: border-box;
     padding: 0;
     border-radius: ${uiTokens.radius.lg};

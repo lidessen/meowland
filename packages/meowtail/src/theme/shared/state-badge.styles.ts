@@ -42,7 +42,8 @@ export const stateBadgeStyles = css`
     border-radius: ${uiTokens.radius.lg};
     background: ${uiTokens.surface.fill};
     color: ${uiTokens.ink.secondary};
-    font: 500 ${uiTokens.type.micro} / 16px ${uiTokens.type.sans};
+    font: ${uiTokens.type.weight.medium} ${uiTokens.type.micro} / ${uiTokens.type.line.micro}
+      ${uiTokens.type.sans};
     letter-spacing: 0;
     overflow-wrap: anywhere;
   }

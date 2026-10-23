@@ -112,8 +112,8 @@ export const chatMessageStyles = css`
   ${partSelector(chatMessageContract, "author")} {
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
-    font-weight: 600;
-    line-height: 1.4;
+    font-weight: ${uiTokens.type.weight.semibold};
+    line-height: ${uiTokens.type.line.caption};
     white-space: nowrap;
   }
 
@@ -162,7 +162,7 @@ export const chatMessageStyles = css`
     padding: 8px 14px;
     border-color: transparent;
     border-radius: ${chatTokens.bubbleRadius};
-    line-height: 22px;
+    line-height: ${uiTokens.type.line.body};
     background: ${uiTokens.surface.fill};
   }
 

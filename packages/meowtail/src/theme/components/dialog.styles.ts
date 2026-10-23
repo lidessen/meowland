@@ -12,7 +12,7 @@ export const dialogStyles = css`
   :where(${partSelector(dialogContract, "root")}) {
     box-sizing: border-box;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
   ${partSelector(dialogContract, "root")} {
     background: ${uiTokens.surface.overlay};
@@ -100,9 +100,9 @@ export const dialogStyles = css`
     margin: 0;
     font-size: ${uiTokens.type.title};
     /* Same title role as Card, Section and EmptyState. */
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: ${uiTokens.type.trackingTight};
-    line-height: 24px;
+    line-height: ${uiTokens.type.line.title};
     overflow-wrap: anywhere;
   }
   ${partSelector(dialogHeaderContract, "identity")} {

@@ -10,12 +10,12 @@ export const choiceGroupStyles = css`
     padding: 0;
     border: 0;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/1.5 ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
   ${partSelector(choiceGroupContract, "legend")} {
     margin-bottom: ${uiTokens.space.group};
     padding: 0;
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   :where(${partSelector(choiceGroupContract, "legend")}[data-hidden="true"]) {
     position: absolute;
@@ -78,12 +78,12 @@ export const choiceGroupStyles = css`
     overflow-wrap: anywhere;
   }
   ${partSelector(choiceGroupContract, "label")} {
-    font-weight: 500;
-    line-height: 24px;
+    font-weight: ${uiTokens.type.weight.medium};
+    line-height: ${uiTokens.type.line.reading};
   }
   ${partSelector(choiceGroupContract, "description")} {
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.body};
-    line-height: 24px;
+    line-height: ${uiTokens.type.line.reading};
   }
 `;

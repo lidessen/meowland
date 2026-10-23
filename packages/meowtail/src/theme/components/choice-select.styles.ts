@@ -51,7 +51,7 @@ export const choiceSelectStyles = css`
     border-radius: ${uiTokens.radius.lg};
     background: ${uiTokens.surface.field};
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/22px ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.body} ${uiTokens.type.sans};
   }
   ${partSelector(choiceSelectContract, "search")}:focus-visible {
     border-color: ${uiTokens.state.focus};
@@ -75,7 +75,7 @@ export const choiceSelectStyles = css`
     padding: 8px 10px 4px;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.micro};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     letter-spacing: ${uiTokens.type.trackingCaps};
     text-transform: uppercase;
   }
@@ -97,7 +97,7 @@ export const choiceSelectStyles = css`
     border-radius: ${uiTokens.radius.md};
     background: transparent;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/20px ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.bodyCompact} ${uiTokens.type.sans};
     text-align: start;
     cursor: pointer;
     overflow-wrap: anywhere;
@@ -111,7 +111,7 @@ export const choiceSelectStyles = css`
     content: "✓";
   }
   ${partSelector(choiceSelectContract, "option")}[aria-selected="true"] {
-    font-weight: 400;
+    font-weight: ${uiTokens.type.weight.regular};
   }
   ${partSelector(choiceSelectContract, "option")}:focus {
     background: ${uiTokens.state.hover};

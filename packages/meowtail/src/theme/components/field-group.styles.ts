@@ -9,12 +9,12 @@ export const fieldGroupStyles = css`
     padding: 0;
     border: 0;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
   ${partSelector(fieldGroupContract, "legend")} {
     padding: 0;
     margin-bottom: ${uiTokens.space.group};
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
     overflow-wrap: anywhere;
   }
   ${partSelector(fieldGroupContract, "description")} {

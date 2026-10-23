@@ -14,7 +14,7 @@ export const sectionStyles = css`
     gap: ${uiTokens.space.group};
     min-width: 0;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
 
   /* The title row: description stays under the heading while actions sit on the
@@ -83,7 +83,7 @@ export const sectionStyles = css`
     min-width: 0;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
-    line-height: 1.5;
+    line-height: ${uiTokens.type.line.caption};
     overflow-wrap: anywhere;
   }
 

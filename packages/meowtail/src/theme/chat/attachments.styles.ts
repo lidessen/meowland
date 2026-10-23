@@ -91,14 +91,14 @@ export const chatAttachmentsStyles = css`
     text-overflow: ellipsis;
     white-space: nowrap;
     font-size: ${uiTokens.type.body};
-    font-weight: 500;
-    line-height: 22px;
+    font-weight: ${uiTokens.type.weight.medium};
+    line-height: ${uiTokens.type.line.body};
   }
 
   ${partSelector(chatAttachmentsContract, "size")} {
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.caption};
-    line-height: 15px;
+    line-height: ${uiTokens.type.line.caption};
   }
   ${partSelector(chatAttachmentsContract, "entry")} {
     position: relative;

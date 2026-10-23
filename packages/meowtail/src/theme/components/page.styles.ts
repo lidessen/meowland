@@ -9,7 +9,7 @@ export const pageStyles = css`
     box-sizing: border-box;
     min-width: 0;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
 
   /* The identity block: an optional eyebrow sits above PageHeader's h1. */
@@ -23,9 +23,9 @@ export const pageStyles = css`
     min-width: 0;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     letter-spacing: ${uiTokens.type.trackingCaps};
-    line-height: 1.5;
+    line-height: ${uiTokens.type.line.caption};
     overflow-wrap: anywhere;
   }
 

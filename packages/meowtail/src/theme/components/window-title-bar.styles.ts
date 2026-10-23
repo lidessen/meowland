@@ -28,7 +28,7 @@ export const windowTitleBarStyles = css`
     box-shadow: inset 0 calc(-1 * ${uiTokens.line.width}) 0 ${uiTokens.line.divider};
     background: ${uiTokens.surface.canvas};
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.caption}/1.25 ${uiTokens.type.sans};
+    font: ${uiTokens.type.caption} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
     user-select: none;
     -webkit-user-select: none;
     cursor: default;
@@ -52,7 +52,7 @@ export const windowTitleBarStyles = css`
     min-width: 0;
     overflow: hidden;
     color: ${uiTokens.ink.secondary};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     text-align: center;
     text-overflow: ellipsis;
     white-space: nowrap;

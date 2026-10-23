@@ -44,7 +44,7 @@ export const drawerStyles = css`
     box-shadow: ${uiTokens.shadow.sheet};
     font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
     transform: translateX(-100%);
-    transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
+    transition: transform ${uiTokens.motion.draw} ${uiTokens.motion.enter};
   }
   ${panel} > ${partSelector(pageFrameContract, "root")} {
     flex: 1;

@@ -145,7 +145,7 @@ aliases: one role, one name.
 | `icon`    | small, size, large, stroke                                                   | 14 / 16 / 18; no other glyph size                                          |
 | `radius`  | xs, sm, md, lg, xl, xxl, full                                                | by element size: marks, tags, small elements, controls, surfaces, dialogs  |
 | `shadow`  | raised, field, action, filled, thumb, pressed, knob, sheet, float            | one shadow per role                                                        |
-| `motion`  | instant, response, settle, draw, loop, sweep, ease                           | press, hover, open, draw-in, spinner turn, shimmer pass                    |
+| `motion`  | instant, response, settle, draw, loop, sweep, ease, enter                    | press, hover, open, draw-in, spinner turn, shimmer pass, surface arrival   |
 | `layout`  | grid columns, containers, measure                                            |                                                                            |
 | `glyph`   | chevron, check, arrow, cross, selectChevron                                  | mask glyphs colored by ink                                                 |
 

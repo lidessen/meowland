@@ -53,6 +53,30 @@ export const dialogStyles = css`
   ${partSelector(dialogContract, "root")}::backdrop {
     background: ${uiTokens.surface.scrim};
   }
+  /* A modal arrives: the scrim fades in and the panel rises out of a slight scale. */
+  ${partSelector(dialogContract, "root")}[open] {
+    animation: ui-dialog-enter ${uiTokens.motion.draw} ${uiTokens.motion.enter};
+  }
+  ${partSelector(dialogContract, "root")}[open]::backdrop {
+    animation: ui-scrim-enter ${uiTokens.motion.settle} ${uiTokens.motion.ease};
+  }
+  @keyframes ui-dialog-enter {
+    from {
+      opacity: 0;
+      transform: translateY(6px) scale(0.97);
+    }
+  }
+  @keyframes ui-scrim-enter {
+    from {
+      opacity: 0;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ${partSelector(dialogContract, "root")}[open],
+    ${partSelector(dialogContract, "root")}[open]::backdrop {
+      animation: none;
+    }
+  }
   :where(${partSelector(dialogHeaderContract, "root")}, ${partSelector(dialogActionsContract, "root")}) {
     display: flex;
     align-items: center;

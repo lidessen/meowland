@@ -48,6 +48,10 @@ for (const viewport of [
       const minimum = await trigger.evaluate((node) => getComputedStyle(node).minHeight);
       expect(await save.evaluate((node) => getComputedStyle(node).minHeight)).toBe(minimum);
       expect(await save.evaluate((node) => getComputedStyle(node).flexGrow)).toBe("0");
+      // Measure the resting layout, after the dialog's entrance motion settles.
+      await dialog.evaluate((node) =>
+        Promise.all(node.getAnimations().map((animation) => animation.finished)),
+      );
       const originalHeader = await header.boundingBox();
       const close = dialog.getByRole("button", { name: `Close ${name}`, exact: true });
       await page.keyboard.press("Tab");

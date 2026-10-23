@@ -222,6 +222,8 @@ export const uiTokens = defineTokens("ui", {
     loop: "1.2s",
     sweep: "1.6s",
     ease: "cubic-bezier(0.4, 0, 0.2, 1)",
+    /** Arrivals: a fast start that settles softly, for surfaces entering the screen. */
+    enter: "cubic-bezier(0.16, 1, 0.3, 1)",
   },
   layout: {
     gridCompact: "160px",

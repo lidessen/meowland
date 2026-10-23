@@ -571,9 +571,43 @@ export const docsStyles = css`
     text-decoration: underline;
     text-underline-offset: 3px;
   }
-  .docs-list {
+  /* The component index reads like a table of contents: a name and its one line. */
+  .docs-index {
     display: grid;
     gap: 8px;
+  }
+  .docs-index-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    column-gap: 32px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+  .docs-index-list > li {
+    display: grid;
+    gap: 2px;
+    min-width: 0;
+    padding: 10px 0;
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+  }
+  .docs-index-list a {
+    color: ${uiTokens.ink.primary};
+    font-weight: 500;
+    text-decoration: none;
+  }
+  .docs-index-list a:hover {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+  .docs-index-list span {
+    display: -webkit-box;
+    overflow: hidden;
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.caption};
+    line-height: 1.5;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
   }
 
   /* Reading content uses the library's Prose rhythm; the docs only set their

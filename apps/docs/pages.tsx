@@ -1,16 +1,7 @@
 import { h, type Child } from "meowjsx";
 import type { ThemeDefinition } from "meowcss";
-import {
-  Badge,
-  Inline,
-  Link,
-  Page,
-  PageHeader,
-  Prose,
-  ResourceLink,
-  Section,
-  Stack,
-} from "meowtail";
+import { Badge, Inline, Link, Page, PageHeader, Prose, Section, Stack } from "meowtail";
+import * as meowtail from "meowtail";
 import { Icon } from "meowtail/icons";
 import type { ContentItem, SitePage } from "meowpress/build";
 import type { StoryEntry } from "meowbook";
@@ -264,23 +255,32 @@ function summaryFor(state: DocsState, path: string): string | undefined {
   return state.catalog.components.find((component) => component.path === path)?.summary;
 }
 
+/** The component index: names and one-line summaries in two columns, without per-row icons. */
 function ComponentList({ state }: { state: DocsState }): Child {
   return (
     <Stack gap="relaxed">
       {state.catalog.navigation.map((group) => (
-        <div className="docs-list">
+        <div className="docs-index">
           <h3 className="docs-example-title">{group.label}</h3>
-          {group.entries.map((entry) => (
-            <ResourceLink
-              href={entry.href}
-              title={entry.label}
-              detail={summaryFor(state, entry.path)}
-            />
-          ))}
+          <ul className="docs-index-list">
+            {group.entries.map((entry) => (
+              <li>
+                <a href={entry.href}>{entry.label}</a>
+                <span>{summaryFor(state, entry.path) ?? ""}</span>
+              </li>
+            ))}
+          </ul>
         </div>
       ))}
     </Stack>
   );
+}
+
+/** The line that imports a component, when its name is a public export of the package. */
+function importLineFor(name: string): string | undefined {
+  return /^[A-Z][A-Za-z0-9]*$/.test(name) && name in meowtail
+    ? `import { ${name} } from "${COMPONENT_PACKAGE}";`
+    : undefined;
 }
 
 function PackagePage({
@@ -376,7 +376,14 @@ function ComponentPage({
   sections.push({
     id: "install",
     title: "Install",
-    children: <InstallLine name={COMPONENT_PACKAGE} />,
+    children: (
+      <Stack gap="compact">
+        <InstallLine name={COMPONENT_PACKAGE} />
+        {importLineFor(component.title) ? (
+          <CodeSample source={importLineFor(component.title)!} file="usage.ts" />
+        ) : null}
+      </Stack>
+    ),
   });
   if (rest.length > 0) {
     sections.push({

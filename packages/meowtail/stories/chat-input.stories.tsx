@@ -16,7 +16,7 @@ import { Measure, Note } from "./specimen";
 const imageUrl =
   "data:image/svg+xml," +
   encodeURIComponent(
-    '<svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240"><rect width="360" height="240" fill="#edf1ec"/><rect x="24" y="28" width="72" height="184" rx="8" fill="#c5cec2"/><rect x="112" y="28" width="224" height="112" rx="8" fill="#fff"/><rect x="112" y="156" width="224" height="56" rx="8" fill="#dbe3d8"/></svg>',
+    '<svg xmlns="http://www.w3.org/2000/svg" width="360" height="240" viewBox="0 0 360 240"><defs><linearGradient id="bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#eef2ff"/><stop offset="1" stop-color="#fdf2f8"/></linearGradient></defs><rect width="360" height="240" fill="url(#bg)"/><rect x="26" y="26" width="308" height="226" rx="12" fill="#ffffff" stroke="#e4e4e7"/><circle cx="40" cy="40" r="3.5" fill="#fca5a5"/><circle cx="52" cy="40" r="3.5" fill="#fcd34d"/><circle cx="64" cy="40" r="3.5" fill="#86efac"/><rect x="42" y="62" width="68" height="8" rx="4" fill="#e4e4e7"/><rect x="42" y="78" width="51" height="8" rx="4" fill="#f4f4f5"/><rect x="42" y="94" width="58" height="8" rx="4" fill="#f4f4f5"/><rect x="126" y="58" width="192" height="81" rx="8" fill="#6366f1" fill-opacity="0.14"/><rect x="126" y="151" width="154" height="8" rx="4" fill="#e4e4e7"/><rect x="126" y="167" width="106" height="8" rx="4" fill="#f4f4f5"/></svg>',
   );
 const sampleFiles = [
   { id: "layout", name: "workspace-sketch.svg", mediaType: "image/svg+xml", url: imageUrl },

@@ -8,6 +8,7 @@ import { writeFavicon } from "./favicon";
 import { highlightStaticCode } from "./highlight";
 import { writeSearchIndex } from "./search";
 import { readPackages } from "./packages";
+import { readComponentProps } from "./props";
 import { createSiteConfig } from "./site.config";
 import { type DocsState } from "./pages";
 import meowbookConfig from "./meowbook.config";
@@ -39,7 +40,8 @@ export async function buildDocs(): Promise<void> {
     return source?.render?.code ?? source?.code;
   });
 
-  const state: DocsState = { catalog, packages, sources };
+  const props = await readComponentProps(resolve(root, "packages/meowtail/src"));
+  const state: DocsState = { catalog, packages, sources, props };
   await buildSite(createSiteConfig(state, outputDirectory));
   await removeEmptyScriptChunks(outputDirectory);
   await highlightStaticCode(outputDirectory);

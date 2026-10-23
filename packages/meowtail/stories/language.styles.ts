@@ -47,7 +47,7 @@ export const languageStyles = css`
     letter-spacing: 0.08em;
   }
   .language-heading h1 {
-    font-family: ${uiTokens.type.display};
+    font-family: ${uiTokens.type.sans};
     font-size: ${uiTokens.type.pageTitle};
     line-height: 1.4;
     letter-spacing: -0.02em;
@@ -149,11 +149,11 @@ export const languageStyles = css`
     letter-spacing: -0.04em;
   }
   .language-type-specimen > span {
-    font-family: ${uiTokens.type.display};
+    font-family: ${uiTokens.type.sans};
     color: ${uiTokens.ink.secondary};
   }
   .language-display-specimen {
-    font-family: ${uiTokens.type.display};
+    font-family: ${uiTokens.type.sans};
     font-size: ${uiTokens.type.pageTitle};
     font-weight: 600;
     line-height: 1.4;

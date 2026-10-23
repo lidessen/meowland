@@ -35,6 +35,27 @@ export const standardAuditRules: readonly AuditRule[] = [
     violates: ({ value }) => !derived(value) && /\d(?:px|rem)\b/.test(value),
   },
   {
+    name: "literal-line-height",
+    message: "Set line height with a uiTokens.type line box or the unitless leading.",
+    properties: ["line-height"],
+    // 1 and 0 collapse a box around a glyph; they are geometry, not type.
+    violates: ({ value }) =>
+      !derived(value) && !/^(?:[01]|normal|inherit|initial|unset)$/.test(value.trim()),
+  },
+  {
+    name: "literal-font-weight",
+    message: "Set weight with a uiTokens.type.weight role.",
+    properties: ["font-weight"],
+    violates: ({ value }) => !derived(value) && /\d|\bbold|\blighter/i.test(value),
+  },
+  {
+    name: "literal-font",
+    message: "Write the font shorthand with uiTokens.type roles for weight, size and line height.",
+    properties: ["font"],
+    // Only `inherit`-style keywords, roles and a 1 or 0 line height may remain.
+    violates: ({ value }) => /\d|\bbold/i.test(strip(value).replace(/\/\s*[01](?![\w.])/, "")),
+  },
+  {
     name: "literal-radius",
     message: "Round corners with a uiTokens.radius role (0 and 50% are geometry).",
     properties: /^border(-[a-z]+)*-radius$/,

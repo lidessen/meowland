@@ -89,7 +89,7 @@ export const listRowStyles = css`
   }
   ${part("title")} {
     grid-area: title;
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     overflow-wrap: anywhere;
   }
   ${part("detail")} {

@@ -196,6 +196,7 @@ export const FieldsStory = defineStory({
             <option value="export">Export results</option>
           </Select>
           <div className="workshop-foundation-field-action">
+            <span>Not sure which to pick?</span>
             <Button
               variant="quiet"
               size="small"

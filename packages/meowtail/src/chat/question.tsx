@@ -1,4 +1,5 @@
 import { defineComponent, type Child, type ComponentContract, type Props } from "meowjsx";
+import { actionRowRef } from "../shared/action-row-fit";
 
 export const chatQuestionContract = {
   name: "chat-question",
@@ -46,6 +47,6 @@ export const ChatQuestion = defineComponent<
       description ? context.part("description", "p", null, description) : null,
       context.part("content", "div", null, children),
       feedback ? context.part("feedback", "div", { role: "status" }, feedback) : null,
-      actions ? context.part("actions", "div", null, actions) : null,
+      actions ? context.part("actions", "div", { ref: actionRowRef(undefined) }, actions) : null,
     ),
 );

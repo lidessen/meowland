@@ -66,6 +66,7 @@ import { textShimmerStyles } from "./components/text-shimmer.styles";
 import { riskConfirmationStyles } from "./components/risk-confirmation.styles";
 import { codeHighlightStyles } from "./shared/code-highlight.styles";
 import { fieldSurfaceStyles } from "./shared/field-surface.styles";
+import { actionRowStyles } from "./shared/action-row.styles";
 import { codeHighlightTokens } from "./shared/code-highlight.tokens";
 import { statusDotStyles } from "./components/status-dot.styles";
 import { statusStyles } from "./components/status.styles";
@@ -206,6 +207,8 @@ export const standardThemeStyles = [
   accordionStyles,
   // One state badge across Status, tool rows and task headers, after the families that place it.
   stateBadgeStyles,
+  // One fit rule for action rows, after the cards, dialogs and questions that hold them.
+  actionRowStyles,
   // The complete Assistant composes the chat families above, so it follows them.
   assistantStyles,
   baseStyles,

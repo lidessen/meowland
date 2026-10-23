@@ -193,6 +193,55 @@ function sidebarGroups(catalog: Catalog, packages: DocsPackage[]): NavListGroup[
   ];
 }
 
+/**
+ * The pages before and after this one in sidebar order, so a reader can keep going without
+ * returning to the rail. The workbench is a separate app, not a page in the sequence.
+ */
+function Pager({
+  catalog,
+  packages,
+  path,
+}: {
+  catalog: Catalog;
+  packages: DocsPackage[];
+  path: string;
+}): Child {
+  const pages = sidebarGroups(catalog, packages).flatMap((group) =>
+    group.items
+      .filter((item) => item.id !== "gallery")
+      .map((item) => ({ href: item.href!, label: String(item.label), group: group.label })),
+  );
+  const index = pages.findIndex((page) => page.href === (path ? `/${path}/` : "/"));
+  if (index < 0) return null;
+  const previous = pages[index - 1];
+  const next = pages[index + 1];
+  if (!previous && !next) return null;
+  return (
+    <nav className="docs-pager" aria-label="Pages">
+      {previous ? (
+        <a className="docs-pager-link" href={previous.href} rel="prev">
+          <span className="docs-pager-direction">
+            <Icon name="arrow-left" size={14} />
+            Previous
+          </span>
+          <span className="docs-pager-title">{previous.label}</span>
+        </a>
+      ) : (
+        <span />
+      )}
+      {next ? (
+        <a className="docs-pager-link docs-pager-next" href={next.href} rel="next">
+          <span className="docs-pager-direction">
+            Next
+            <Icon name="arrow-right" size={14} />
+          </span>
+          <span className="docs-pager-title">{next.label}</span>
+        </a>
+      ) : null}
+    </nav>
+  );
+}
+
 function Sidebar({
   catalog,
   packages,
@@ -277,6 +326,7 @@ function Document({
             </header>
             <main className={path === "" ? "docs-content docs-content-home" : "docs-content"}>
               <article className="docs-article">{children}</article>
+              <Pager catalog={catalog} packages={packages} path={path} />
               <footer className="docs-footer">
                 <span>Meowland documentation</span>
                 <span>

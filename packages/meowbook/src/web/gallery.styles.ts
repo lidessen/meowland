@@ -55,7 +55,7 @@ a {
   flex-shrink: 0;
   padding: 0 10px;
   font-size: ${uiTokens.type.title};
-  font-weight: 600;
+  font-weight: ${uiTokens.type.weight.semibold};
   letter-spacing: -0.02em;
 }
 .workshop-brand > svg {
@@ -63,7 +63,7 @@ a {
 }
 .workshop-brand > span {
   margin-left: auto;
-  font: ${uiTokens.type.micro}/1.5 ${uiTokens.type.mono};
+  font: ${uiTokens.type.micro} / ${uiTokens.type.line.micro} ${uiTokens.type.mono};
   color: ${uiTokens.ink.tertiary};
   border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
   padding: 1px 5px;
@@ -76,7 +76,7 @@ a {
   padding: 20px 10px 8px;
   color: ${uiTokens.ink.tertiary};
   font-size: ${uiTokens.type.micro};
-  font-weight: 500;
+  font-weight: ${uiTokens.type.weight.medium};
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
@@ -90,7 +90,7 @@ a {
 .catalog-empty {
   margin: 12px 10px;
   font-size: ${uiTokens.type.caption};
-  line-height: 1.7;
+  line-height: ${uiTokens.type.line.caption};
   color: ${uiTokens.ink.secondary};
   overflow-wrap: anywhere;
 }
@@ -163,7 +163,7 @@ a {
 }
 #breadcrumb-component {
   font-size: ${uiTokens.type.label};
-  font-weight: 500;
+  font-weight: ${uiTokens.type.weight.medium};
   margin: 0;
   min-width: 0;
   overflow: hidden;
@@ -193,15 +193,15 @@ a {
 #title {
   margin: 0;
   font-size: ${uiTokens.type.pageTitle};
-  line-height: 1.3;
-  font-weight: 600;
+  line-height: ${uiTokens.type.line.pageTitle};
+  font-weight: ${uiTokens.type.weight.semibold};
   letter-spacing: -0.02em;
 }
 #scenario-description {
   margin: 6px 0 16px;
   max-width: 76ch;
   font-size: ${uiTokens.type.caption};
-  line-height: 1.7;
+  line-height: ${uiTokens.type.line.caption};
   color: ${uiTokens.ink.secondary};
 }
 #variants {
@@ -317,7 +317,7 @@ a {
   display: none;
 }
 .workshop-observations > summary > strong {
-  font-weight: 500;
+  font-weight: ${uiTokens.type.weight.medium};
   color: ${uiTokens.ink.primary};
 }
 .workshop-observations > summary > ${partSelector(disclosureContract, "icon")} {
@@ -349,7 +349,7 @@ a {
   margin: 0 0 8px;
   color: ${uiTokens.ink.secondary};
   font-size: ${uiTokens.type.caption};
-  line-height: 1.7;
+  line-height: ${uiTokens.type.line.caption};
 }
 #covers {
   display: flex;
@@ -374,13 +374,13 @@ a {
 }
 .workshop-observation-head > strong {
   font-size: ${uiTokens.type.micro};
-  font-weight: 500;
+  font-weight: ${uiTokens.type.weight.medium};
   margin-right: auto;
 }
 #events {
   max-height: 80px;
   overflow: auto;
-  font: ${uiTokens.type.code}/1.8 ${uiTokens.type.mono};
+  font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
   color: ${uiTokens.ink.secondary};
   padding-left: 18px;
 }

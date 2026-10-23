@@ -40,7 +40,7 @@ export const languageStyles = css`
   .language-board code {
     font-family: ${uiTokens.type.mono};
     font-size: ${uiTokens.type.caption};
-    font-weight: 400;
+    font-weight: ${uiTokens.type.weight.regular};
     color: ${uiTokens.ink.secondary};
   }
   .language-eyebrow {
@@ -49,7 +49,7 @@ export const languageStyles = css`
   .language-heading h1 {
     font-family: ${uiTokens.type.sans};
     font-size: ${uiTokens.type.pageTitle};
-    line-height: 1.4;
+    line-height: ${uiTokens.type.line.pageTitle};
     letter-spacing: -0.02em;
     margin-block: ${languageTokens.halfLine};
   }
@@ -73,7 +73,7 @@ export const languageStyles = css`
     align-items: baseline;
     gap: ${languageTokens.halfLine};
     font-size: 1em;
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
   }
   .language-band > h2 > span {
     font: ${uiTokens.type.caption}/${uiTokens.type.leading} ${uiTokens.type.mono};
@@ -82,7 +82,7 @@ export const languageStyles = css`
   .language-board small {
     font-size: ${uiTokens.type.caption};
     color: ${uiTokens.ink.secondary};
-    font-weight: 400;
+    font-weight: ${uiTokens.type.weight.regular};
   }
   .language-grid {
     display: grid;
@@ -121,7 +121,7 @@ export const languageStyles = css`
   }
   .language-swatch strong {
     font-size: 1em;
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   .language-swatch code {
     font-size: ${uiTokens.type.caption};
@@ -145,7 +145,7 @@ export const languageStyles = css`
   }
   .language-type-specimen {
     font-size: 3em;
-    line-height: 1.2;
+    line-height: 1;
     letter-spacing: -0.04em;
   }
   .language-type-specimen > span {
@@ -155,8 +155,8 @@ export const languageStyles = css`
   .language-display-specimen {
     font-family: ${uiTokens.type.sans};
     font-size: ${uiTokens.type.pageTitle};
-    font-weight: 600;
-    line-height: 1.4;
+    font-weight: ${uiTokens.type.weight.semibold};
+    line-height: ${uiTokens.type.line.pageTitle};
   }
   .language-type-row {
     display: grid;

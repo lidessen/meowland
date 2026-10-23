@@ -52,7 +52,7 @@ export const previewStyles = css`
   .workshop-composition h1 {
     margin: 0;
     font-size: ${uiTokens.type.heading};
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: -0.025em;
   }
   .workshop-composition p {
@@ -114,14 +114,14 @@ export const previewStyles = css`
     margin: 0;
     font-size: ${uiTokens.type.title};
     letter-spacing: -0.01em;
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
   }
   /* Specimen labels share the small-caps label role the docs and gallery use. */
   .workshop-section-title {
     margin: 0;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.micro};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
@@ -130,7 +130,7 @@ export const previewStyles = css`
     margin: 0;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
-    line-height: 1.6;
+    line-height: ${uiTokens.type.line.caption};
   }
   .workshop-disclosure-detail {
     display: grid;
@@ -147,7 +147,7 @@ export const previewStyles = css`
   .workshop-document {
     display: grid;
     gap: 12px;
-    line-height: 1.7;
+    line-height: ${uiTokens.type.line.reading};
   }
   .workshop-document h3 {
     margin: 0;
@@ -292,7 +292,7 @@ export const previewStyles = css`
   .workshop-search-results h3 {
     margin: 0 0 3px;
     font-size: ${uiTokens.type.body};
-    font-weight: 550;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   .workshop-search-results p {
     margin: 0;

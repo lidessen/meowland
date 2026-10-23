@@ -113,7 +113,7 @@ export const uiTokens = defineTokens("ui", {
     danger: ["#c81e1e", "#f25a5a"],
     unknown: ["#a3a3a3", "#737373"],
   },
-  /** The type ramp. Every size in the theme is one of these roles. */
+  /** The type ramp: sizes, the line box of each size, and weights. */
   type: {
     sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif',
     /** Serif stack for page and section titles; hosts override `--ui-type-display`. */
@@ -131,6 +131,35 @@ export const uiTokens = defineTokens("ui", {
     title: "16px",
     heading: "20px",
     pageTitle: "24px",
+    /** Marketing-level titles, such as a docs home page. No library component uses it. */
+    hero: "40px",
+    /**
+     * The line box each size sits on, on a 2px rhythm. `bodyCompact` is body text in dense rows
+     * (menus, options, toggles) that keep a 20px line; `reading` is long-form copy.
+     */
+    line: {
+      micro: "16px",
+      caption: "18px",
+      code: "18px",
+      label: "20px",
+      bodyCompact: "20px",
+      body: "22px",
+      reading: "24px",
+      title: "24px",
+      heading: "28px",
+      pageTitle: "32px",
+      hero: "48px",
+    },
+    /** Regular for reading, medium for controls and labels, semibold for titles. */
+    weight: {
+      regular: "400",
+      medium: "500",
+      semibold: "600",
+    },
+    /**
+     * Unitless body leading (22/14), inherited by the root and by component roots; children that
+     * only change the size keep a proportional line. Fixed boxes use `line.*`.
+     */
     leading: "1.5714285714",
     /** Titles at `title` and above close up slightly. */
     /** The smallest size iOS edits without zooming; a touch field never goes below it. */

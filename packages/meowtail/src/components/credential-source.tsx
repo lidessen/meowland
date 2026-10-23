@@ -2,8 +2,10 @@ import { h } from "meowjsx";
 import { Button } from "./button";
 import { Field } from "./field";
 import { Input } from "./input";
+import { ListGroup, ListRow } from "./list-group";
 import { Select } from "./select";
 import { Stack } from "./stack";
+import { Status } from "./status";
 
 export interface CredentialSourceProps {
   id: string;
@@ -76,30 +78,48 @@ export function CredentialSource(props: CredentialSourceProps) {
           >
             Check environment variable
           </Button>
-          {props.variables?.map((variable) => (
-            <span>
-              {variable.name} ·{" "}
-              {variable.available === null
-                ? "Read from the WorkCell runtime environment"
-                : variable.available
-                  ? "Available"
-                  : "Not set"}
-            </span>
-          ))}
+          {props.variables?.length ? (
+            // The host's check result: one row per variable, its state as the shared badge.
+            <ListGroup aria-label="Environment variables">
+              {props.variables.map((variable) => (
+                <ListRow
+                  title={<code>{variable.name}</code>}
+                  description={
+                    variable.available === null
+                      ? "Read from the WorkCell runtime environment"
+                      : undefined
+                  }
+                  status={
+                    variable.available === null ? (
+                      <Status state="unknown" label="At runtime" />
+                    ) : variable.available ? (
+                      <Status state="success" label="Available" />
+                    ) : (
+                      <Status state="warning" label="Not set" />
+                    )
+                  }
+                />
+              ))}
+            </ListGroup>
+          ) : null}
         </Stack>
       ) : props.keepStored && props.hasStored ? (
-        <Stack gap="compact">
-          <span>Saved API Key</span>
-          <Button
-            type="button"
-            variant="outline"
-            style={{ alignSelf: "start" }}
-            disabled={disabled}
-            onClick={props.onReplace}
-          >
-            Replace API Key
-          </Button>
-        </Stack>
+        <ListRow
+          title="Saved API Key"
+          description="Kept in the credential store; never shown again."
+          status={<Status state="success" label="Saved" />}
+          actions={
+            <Button
+              type="button"
+              variant="outline"
+              size="small"
+              disabled={disabled}
+              onClick={props.onReplace}
+            >
+              Replace API Key
+            </Button>
+          }
+        />
       ) : (
         <Field
           label="API Key"

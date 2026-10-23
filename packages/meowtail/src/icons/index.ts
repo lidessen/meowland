@@ -1,4 +1,5 @@
 export { DoodleCat, type DoodleCatProps } from "./doodle-cat";
+export { EmptyStack, type EmptyStackProps } from "./empty-stack";
 export { ExternalArrowIcon } from "./external-arrow";
 export { GithubIcon } from "./github";
 export { MeowlandMark, type MeowlandMarkProps } from "./meowland-mark";

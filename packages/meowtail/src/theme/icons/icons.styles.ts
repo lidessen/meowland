@@ -9,6 +9,44 @@ export const iconsStyles = css`
     fill: currentColor;
     vertical-align: middle;
   }
+  /* EmptyState's default art: receding cards from the surface ladder, one accent spark. */
+  .meow-empty-stack {
+    display: block;
+    width: 112px;
+    height: auto;
+    overflow: visible;
+  }
+  .meow-empty-stack rect {
+    stroke-width: ${uiTokens.line.width};
+    vector-effect: non-scaling-stroke;
+  }
+  .meow-empty-stack .empty-stack-back {
+    fill: ${uiTokens.surface.fill};
+    stroke: ${uiTokens.line.divider};
+  }
+  .meow-empty-stack .empty-stack-middle {
+    fill: ${uiTokens.surface.raised};
+    stroke: ${uiTokens.line.edge};
+  }
+  .meow-empty-stack .empty-stack-front {
+    fill: ${uiTokens.surface.raised};
+    stroke: ${uiTokens.line.edge};
+    filter: drop-shadow(0 8px 14px color-mix(in srgb, ${uiTokens.ink.primary} 7%, transparent));
+  }
+  .meow-empty-stack .empty-stack-tile {
+    fill: ${uiTokens.accent.soft};
+    stroke: none;
+  }
+  .meow-empty-stack .empty-stack-spark {
+    fill: ${uiTokens.accent.ink};
+  }
+  .meow-empty-stack .empty-stack-line {
+    fill: ${uiTokens.surface.fill};
+    stroke: none;
+  }
+  .meow-empty-stack .empty-stack-line.is-short {
+    opacity: 0.7;
+  }
   .meow-doodle-cat {
     width: 120px;
     height: auto;

@@ -49,12 +49,16 @@ export const chatMessageStyles = css`
     width: 28px;
     height: 28px;
     overflow: hidden;
-    margin-top: 2px;
-    border-radius: ${uiTokens.radius.md};
-    /* Same glyph tile as Avatar: a quiet identity mark beside the author name. */
+    /* Centered on the author line (or the first line of text when names are hidden). */
+    margin-top: -3px;
+    border-radius: ${uiTokens.radius.full};
+    /* A raised disc with a hairline ring: an identity mark that holds its shape on any rung. */
     box-sizing: border-box;
     border: 0;
-    background: ${uiTokens.surface.fill};
+    background: ${uiTokens.surface.raised};
+    box-shadow:
+      inset 0 0 0 ${uiTokens.line.width} ${uiTokens.line.edge},
+      ${uiTokens.shadow.action};
     color: ${uiTokens.ink.primary};
     ${logoTokens.ink.name}: ${uiTokens.ink.primary};
   }

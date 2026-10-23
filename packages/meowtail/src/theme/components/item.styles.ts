@@ -42,10 +42,14 @@ export const itemStyles = css`
       background-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
       border-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
-  button${partSelector(itemContract, "root")}:hover:not(:disabled) {
+  button${partSelector(itemContract, "root")}:hover:not(:disabled, [data-selected="true"]) {
     background: ${uiTokens.state.hover};
   }
-  ${partSelector(itemContract, "root")}[data-selected="true"],
+  /* Selected takes the one selection tint used by navigation, tables and choices; an open
+     disclosure is a pressed state, not a selection. */
+  ${partSelector(itemContract, "root")}[data-selected="true"] {
+    background: ${uiTokens.accent.selected};
+  }
   button${partSelector(itemContract, "root")}[aria-expanded="true"] {
     background: ${uiTokens.state.active};
   }

@@ -15,6 +15,19 @@ export const toastStyles = css`
     color: ${uiTokens.inverse.ink};
     box-shadow: ${uiTokens.shadow.float};
     font: ${uiTokens.type.body}/22px ${uiTokens.type.sans};
+    animation: ui-toast-enter ${uiTokens.motion.draw} ${uiTokens.motion.enter};
+  }
+  /* A toast rises into place once, when the host mounts it. */
+  @keyframes ui-toast-enter {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ${partSelector(toastContract, "root")} {
+      animation: none;
+    }
   }
   ${partSelector(toastContract, "message")} {
     min-width: 0;

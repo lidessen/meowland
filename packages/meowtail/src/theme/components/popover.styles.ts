@@ -30,7 +30,7 @@ export const popoverStyles = css`
     transform-origin: bottom center;
   }
   ${partSelector(popoverContract, "panel")}:popover-open {
-    animation: ui-popover-enter ${uiTokens.motion.settle} ${uiTokens.motion.ease};
+    animation: ui-popover-enter ${uiTokens.motion.settle} ${uiTokens.motion.enter};
   }
   @keyframes ui-popover-enter {
     from {

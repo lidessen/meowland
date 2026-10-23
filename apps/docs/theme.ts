@@ -313,6 +313,15 @@ export const docsStyles = css`
     font-size: ${uiTokens.type.label};
     text-align: center;
   }
+  /* On the narrowest screens the header keeps the trail readable: Workbench becomes its arrow. */
+  @media (max-width: 480px) {
+    .docs-header-link > span {
+      display: none;
+    }
+    .docs-header-link {
+      padding: 0 8px;
+    }
+  }
   @media (max-width: 900px) {
     .docs-search-open > span,
     .docs-search-open > kbd {

@@ -579,8 +579,8 @@ function Document({
                 <IconSource source={Sun} size={16} className="docs-appearance-light" />
                 <IconSource source={Moon} size={16} className="docs-appearance-dark" />
               </button>
-              <a className="docs-header-link" href="/gallery/">
-                Workbench
+              <a className="docs-header-link" href="/gallery/" aria-label="Workbench">
+                <span>Workbench</span>
                 <Icon name="arrow-up-right" size={14} />
               </a>
             </header>

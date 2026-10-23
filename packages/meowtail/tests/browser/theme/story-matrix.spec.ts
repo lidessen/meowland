@@ -6,7 +6,8 @@ import type { StoryEntry } from "meowbook";
 for (const scheme of ["light", "dark"]) {
   for (const width of [1100, 390]) {
     test(`Studio ${scheme} ${width}: every component story`, async ({ page, request }, info) => {
-      test.setTimeout(60000);
+      // One pass visits every story (about a minute alone), so the budget leaves room for load.
+      test.setTimeout(180000);
       await page.setViewportSize({ width, height: 900 });
       await page.emulateMedia({ reducedMotion: "reduce" });
       const entries = (await (await request.get("/manifest.json")).json()) as StoryEntry[];

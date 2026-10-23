@@ -310,6 +310,17 @@ export const CompleteAssistant = defineStory({
   group: "Assistant",
   description:
     "Messages, safe rich text, process, draft, model selection, attachments, activity, work details and questions use one public component.",
-  covers: ["AssistantView", "draft", "process", "activity", "questions", "scroll"],
+  covers: [
+    "AssistantView",
+    "draft",
+    "process",
+    "activity",
+    "questions",
+    "scroll",
+    "assistant-composer",
+    "assistant-markdown",
+    "assistant-question",
+    "assistant-steps",
+  ],
   render: assistantDemo,
 });

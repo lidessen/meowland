@@ -17,29 +17,28 @@ export const chatTaskStyles = css`
     font: ${uiTokens.type.body}/${uiTokens.type.leading} ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
+  /* Title, then its state badge right beside it, then the host's fact on its own row. */
   ${part("header")} {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
-    gap: ${uiTokens.space.group} ${uiTokens.space.section};
+    align-items: center;
+    gap: 4px ${uiTokens.space.group};
     min-width: 0;
   }
   ${part("title")} {
-    flex: 1 1 14rem;
+    flex: 0 1 auto;
     min-width: 0;
     font-weight: 600;
   }
-  ${part("status")} {
-    display: inline-flex;
-    align-items: baseline;
-    gap: ${uiTokens.space.group};
+  /* The state badge comes from shared/state-badge.styles.ts; the fact line takes its own row. */
+  ${part("fact")} {
+    flex: 1 0 100%;
     min-width: 0;
-    max-width: 100%;
-    color: ${uiTokens.ink.secondary};
+    margin-top: -2px;
+    color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.caption};
-  }
-  ${part("status")} > :first-child {
-    flex: 0 0 auto;
+    line-height: 18px;
+    overflow-wrap: anywhere;
   }
   ${part("description")}, ${part("execution")}, ${part("reply")} {
     min-width: 0;

@@ -11,7 +11,12 @@ import {
 import { Icon } from "../icons/icon";
 import { Button } from "../components/button";
 import { OutputBlock } from "../components/output-block";
-import { executionStateLabel, type ChatExecutionState } from "../shared/execution-state";
+import {
+  executionStateLabel,
+  executionStateTone,
+  type ChatExecutionState,
+} from "../shared/execution-state";
+import { StatusDot } from "../components/status-dot";
 
 export const chatToolCallContract = {
   name: "chat-tool-call",
@@ -183,19 +188,11 @@ export const ChatToolCall = defineComponent<
         context.part(
           "status",
           "span",
-          { hidden: derived(() => !stateWord.value) },
-          <span data-tool-glyph="running">
-            <Icon name="loader-circle" />
-          </span>,
-          <span data-tool-glyph="waiting">
-            <Icon name="circle-pause" />
-          </span>,
-          <span data-tool-glyph="error">
-            <Icon name="x" />
-          </span>,
-          <span data-tool-glyph="done">
-            <Icon name="check" />
-          </span>,
+          {
+            hidden: derived(() => !stateWord.value),
+            "data-tone": derived(() => executionStateTone(unwrap(state))),
+          },
+          h(StatusDot, { state: derived(() => executionStateTone(unwrap(state))) }),
           stateWord,
         ),
         // Inside the header so a collapsed row still reads its fact.

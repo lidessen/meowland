@@ -15,7 +15,7 @@ export interface StatusProps extends Props {
   className?: string;
 }
 
-/** A state in words with a decorative dot. Use as slot content; composed markers remain owned by WorkCard and Timeline. */
+/** The state badge: a decorative dot and the state in a word or two, on a soft tint of the state's ink. Use as slot content; composed markers remain owned by WorkCard and Timeline. */
 export const Status = defineComponent<
   StatusProps,
   typeof statusContract.name,
@@ -24,7 +24,7 @@ export const Status = defineComponent<
   context.part(
     "root",
     "span",
-    { ...props, className },
+    { ...props, className, "data-tone": state ?? "unknown" },
     <StatusDot state={state} />,
     context.part("label", "span", null, label),
   ),

@@ -23,6 +23,7 @@ export const chatTaskContract = {
     "header",
     "title",
     "status",
+    "fact",
     "description",
     "execution",
     "reply",
@@ -124,9 +125,16 @@ export const ChatTask = defineComponent<
         context.part(
           "status",
           "span",
-          null,
+          { "data-tone": derived(() => executionStateTone(unwrap(state))) },
           h(StatusDot, { state: derived(() => executionStateTone(unwrap(state))) }),
-          derived(() => unwrap(statusLabel) ?? executionStateLabel(unwrap(state))),
+          derived(() => executionStateLabel(unwrap(state))),
+        ),
+        // The host's account of the state, under the title; the badge keeps one word.
+        context.part(
+          "fact",
+          "span",
+          { hidden: derived(() => !unwrap(statusLabel)) },
+          derived(() => unwrap(statusLabel) ?? ""),
         ),
       ),
       text("description", description),

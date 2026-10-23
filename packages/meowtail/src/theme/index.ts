@@ -1,6 +1,7 @@
 import { defineTheme, type CSSFragment, type ScopedTokens } from "meowcss/meowjsx";
 import type { TokenSet } from "meowcss";
 import { assistantStyles } from "./chat/assistant.styles";
+import { stateBadgeStyles } from "./shared/state-badge.styles";
 import { chatTaskStyles } from "./chat/task.styles";
 import { baseStyles, foundationStyles, cornerShapeStyles } from "./base.styles";
 import { pillStyles } from "./components/pill.styles";
@@ -109,6 +110,8 @@ export const standardThemeTokens = [
 export const standardThemeStyles = [
   // Shared foundations first: each family below overrides them.
   foundationStyles,
+  // A global default: every family that rounds a circle overrides it.
+  cornerShapeStyles,
   fieldSurfaceStyles,
   chatTaskStyles,
   statusDotStyles,
@@ -138,7 +141,6 @@ export const standardThemeStyles = [
   numberInputStyles,
   contextMenuStyles,
   pillStyles,
-  cornerShapeStyles,
   segmentedControlStyles,
   textShimmerStyles,
   riskConfirmationStyles,
@@ -202,6 +204,8 @@ export const standardThemeStyles = [
   pathPickerStyles,
   disclosureStyles,
   accordionStyles,
+  // One state badge across Status, tool rows and task headers, after the families that place it.
+  stateBadgeStyles,
   // The complete Assistant composes the chat families above, so it follows them.
   assistantStyles,
   baseStyles,

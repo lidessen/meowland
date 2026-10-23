@@ -97,66 +97,9 @@ export const chatRecordsStyles = css`
     line-height: 1;
   }
 
-  @keyframes chat-tool-turn {
-    to {
-      transform: rotate(360deg);
-    }
-  }
-
-  /* The state badge: one word and one glyph on a soft tint. Color lives here and nowhere
-     else in the row; the host's longer account reads as the fact line underneath. */
+  /* The state badge comes from shared/state-badge.styles.ts; the row only places it. */
   ${partSelector(chatToolCallContract, "status")} {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    flex: 0 0 auto;
-    height: 20px;
     margin-left: 6px;
-    padding: 0 8px 0 6px;
-    border-radius: ${uiTokens.radius.full};
-    background: ${uiTokens.surface.fill};
-    color: ${uiTokens.ink.secondary};
-    font-size: ${uiTokens.type.micro};
-    font-weight: 500;
-    line-height: 20px;
-    letter-spacing: 0;
-    white-space: nowrap;
-  }
-  ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph] {
-    display: none;
-    place-items: center;
-  }
-  ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph] svg {
-    width: 12px;
-    height: 12px;
-  }
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph="running"],
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="waiting"] ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph="waiting"],
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"] ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph="error"],
-  ${partSelector(chatToolCallContract, "root")}:is([data-tool-state="success"], [data-tool-state="complete"]) ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph="done"] {
-    display: grid;
-  }
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "status")} {
-    background: ${uiTokens.accent.soft};
-    color: ${uiTokens.accent.ink};
-  }
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph="running"] {
-    animation: chat-tool-turn ${uiTokens.motion.loop} linear infinite;
-  }
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="waiting"] ${partSelector(chatToolCallContract, "status")} {
-    background: color-mix(in srgb, ${uiTokens.status.warning} 12%, transparent);
-    color: ${uiTokens.status.warning};
-  }
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"] ${partSelector(chatToolCallContract, "status")} {
-    background: color-mix(in srgb, ${uiTokens.status.danger} 10%, transparent);
-    color: ${uiTokens.status.danger};
-  }
-  ${partSelector(chatToolCallContract, "root")}:is([data-tool-state="success"], [data-tool-state="complete"]) ${partSelector(chatToolCallContract, "status")} {
-    color: ${uiTokens.status.success};
-  }
-  ${partSelector(chatToolCallContract, "root")}:is([data-tool-state="cancelled"], [data-tool-state="unknown"], [data-tool-state="queued"]) ${partSelector(chatToolCallContract, "status")} {
-    padding-inline-start: 8px;
-    color: ${uiTokens.ink.tertiary};
   }
 
   /* The host's account of the state: a second header line, aligned with the label. */
@@ -484,9 +427,6 @@ export const chatRecordsStyles = css`
   }
 
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(chatToolCallContract, "status")} > [data-tool-glyph] {
-      animation: none;
-    }
     ${partSelector(chatProcessContract, "icon")},
     ${partSelector(chatSourcesContract, "icon")},
     ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "icon")} {

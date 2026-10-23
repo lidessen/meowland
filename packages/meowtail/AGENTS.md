@@ -210,12 +210,17 @@ and the Meowbook gallery use the same tokens and roles as the library.
   stays underneath. Pressed actions take `shadow.pressed`.
 - Compact rows inside a card (resource, link, work and task rows) pad `space.insetBlock`
   `space.insetInline`; reading sections use the relationship steps.
-- Tool rows: the leading glyph names the tool's type and stays in the tertiary ink in every
-  state. The state is one badge after the target: the shared execution word and a glyph on a soft
-  tint (accent for running, warning for waiting, danger for an error, neutral otherwise), and the
-  only color in the row. The host's longer account (`statusLabel`) is a caption line under the
-  label, inside the header so a collapsed row keeps it. The verb is 500 in the secondary ink and
-  keeps its words; the target follows in the tertiary ink and truncates first.
+- State: a dot is the state mark everywhere. On a title line the dot sits in the one state badge
+  (`src/theme/shared/state-badge.styles.ts`: `Status`, tool rows, task headers): the dot and the
+  state's word on a soft tint of the state's ink, right after the title or target, and the only
+  color in its row. Under a title the dot leads the host's fact line (WorkCard, the Assistant
+  activity). A longer account of a state is that fact line, never a longer badge or colored prose.
+  A badge carrier writes `data-tone` with the StatusDot state it shows. `Badge` stays a label
+  without a dot; it names a category, not a state.
+- Tool rows: the leading glyph names the tool's type in the tertiary ink in every state; the verb
+  is 500 in the secondary ink and keeps its words; the target follows in the tertiary ink and
+  truncates first; the state badge follows the target, and `statusLabel` is the fact line inside
+  the header so a collapsed row keeps it.
 - Status tint: Alert is the one surface that takes a status-tinted fill with a status-tinted edge.
   Other status carriers color only their marker and ink.
 - Focus: a 2px `state.focus` outline at 2px offset; inside a clipped scroller use -2px. Fields use

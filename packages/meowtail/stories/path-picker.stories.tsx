@@ -37,7 +37,7 @@ export const PathPickerStory = defineStory({
             }}
           />
         </Field>
-        <Stack gap="compact">
+        <Stack gap="compact" align="start">
           <Button
             variant="quiet"
             onClick={() => {

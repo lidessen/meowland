@@ -3,6 +3,7 @@ import "./runtime";
 import { Badge, Card, CodeBlock, Inline, Stack, Table } from "meowtail";
 import { Icon } from "meowtail/icons";
 import { styleAxes, type CatalogContract } from "./catalog";
+import { splitTopLevel } from "./code";
 import type { ComponentProps } from "./props";
 
 /** The language label of the code surface, from the source file extension. */
@@ -126,10 +127,41 @@ function inlineCode(text: string): Child[] {
   return text.split("`").map((piece, index) => (index % 2 === 1 ? <code>{piece}</code> : piece));
 }
 
+/** A note whose `code` spans, written as JSDoc does, render as code. */
+export function InlineCodeNote({ text }: { text: string }): Child {
+  return <p className="docs-note">{inlineCode(text)}</p>;
+}
+
+/** The shapes of a parenthesized union such as `( | { kind: "a" } | { kind: "b" } )`. */
+function unionShapes(entry: string): string[] {
+  return splitTopLevel(entry.replace(/^\(\s*|\s*\)$/g, ""), "|");
+}
+
 /** What the inherited part of a props interface adds, in words. */
 function inheritedNote(extended: readonly string[]): Child | undefined {
-  const others = extended.filter((entry) => entry !== "Props" && !entry.startsWith("ThemedProps<"));
-  const element = extended.includes("Props");
+  const unions = extended.filter((entry) => entry.startsWith("("));
+  const others = extended.filter(
+    (entry) => entry !== "Props" && !entry.startsWith("ThemedProps<") && !entry.startsWith("("),
+  );
+  const shapes = unions.length ? (
+    <Stack gap="compact">
+      <p className="docs-note">It also takes exactly one of these shapes:</p>
+      {unions.flatMap(unionShapes).map((shape) => (
+        <code className="docs-prop-type docs-prop-shape">{shape}</code>
+      ))}
+    </Stack>
+  ) : null;
+  const note = inheritedSentence(extended.includes("Props"), others);
+  if (!note && !shapes) return undefined;
+  return (
+    <Stack gap="compact">
+      {note}
+      {shapes}
+    </Stack>
+  );
+}
+
+function inheritedSentence(element: boolean, others: readonly string[]): Child | undefined {
   if (!element && !others.length) return undefined;
   return (
     <Note>

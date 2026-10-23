@@ -623,6 +623,13 @@ export const docsStyles = css`
     white-space: normal;
     overflow-wrap: anywhere;
   }
+  .docs-prop-shape {
+    display: block;
+    padding: 8px 12px;
+    border-radius: ${uiTokens.radius.md};
+    background: ${uiTokens.surface.fill};
+    font-size: ${uiTokens.type.label};
+  }
   .docs-prop-none {
     color: ${uiTokens.ink.tertiary};
   }

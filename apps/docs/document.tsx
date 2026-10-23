@@ -462,6 +462,7 @@ function sidebarGroups(catalog: Catalog, packages: DocsPackage[]): NavListGroup[
       label: "Start here",
       items: [
         { id: "", href: "/", label: "Home" },
+        { id: "components", href: "/components/", label: "Components" },
         { id: "gallery", href: "/gallery/", label: "Component workbench" },
       ],
     },

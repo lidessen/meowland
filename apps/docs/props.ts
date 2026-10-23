@@ -1,6 +1,6 @@
 import { readdir, readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { blockEnd, splitTopLevel } from "./code";
+import { blockEnd, splitTopLevel, statementEnd } from "./code";
 
 /** One prop a component declares, as its source spells it. */
 export interface PropDoc {
@@ -19,6 +19,14 @@ export interface ComponentProps {
   props: PropDoc[];
   /** The `extends` clause, one entry per extended type. */
   extends: string[];
+  /** The JSDoc written on the component's declaration: what it is, in a sentence or two. */
+  summary?: string;
+}
+
+interface ComponentDoc {
+  propsName: string;
+  defaults: Map<string, string>;
+  summary?: string;
 }
 
 interface InterfaceDoc {
@@ -60,6 +68,19 @@ export function interfaceMembers(body: string): PropDoc[] {
   return members;
 }
 
+/** The JSDoc block that ends right before `index`, when one does. */
+function docBefore(source: string, index: number): string | undefined {
+  const comment = /\/\*\*((?:(?!\*\/)[\s\S])*)\*\/\s*$/.exec(source.slice(0, index));
+  return comment ? commentText(comment[0].trim()) : undefined;
+}
+
+/** The first sentence of a JSDoc text, and what follows it. */
+export function splitSummary(text: string): { summary: string; rest?: string } {
+  const match = /^([\s\S]+?[.!?])(?:\s+([\s\S]+))?$/.exec(text.trim());
+  if (!match) return { summary: text.trim() };
+  return match[2] ? { summary: match[1]!, rest: match[2] } : { summary: match[1]! };
+}
+
 /** The defaults an object destructuring pattern gives, by prop name. */
 export function patternDefaults(pattern: string): Map<string, string> {
   const defaults = new Map<string, string>();
@@ -84,9 +105,9 @@ function patternAfter(source: string, from: number): string | undefined {
 export function readPropsSource(
   source: string,
   interfaces: Map<string, InterfaceDoc>,
-  components: Map<string, { propsName: string; defaults: Map<string, string> }>,
+  components: Map<string, ComponentDoc>,
 ): void {
-  const declaration = /export interface ([\w$]+)(?:<[^{]*?>)?\s*(?:extends\s+([^{]+?))?\s*\{/g;
+  const declaration = /(?:export )?interface ([\w$]+)(?:<[^{]*?>)?\s*(?:extends\s+([^{]+?))?\s*\{/g;
   for (const match of source.matchAll(declaration)) {
     const brace = match.index + match[0].length - 1;
     const body = source.slice(brace + 1, blockEnd(source, brace) - 1);
@@ -97,12 +118,25 @@ export function readPropsSource(
         : [],
     });
   }
+  // `type XProps = Props & { … }`: the object literal holds the members, the rest is inherited.
+  for (const match of source.matchAll(/export type ([\w$]+Props)(?:<[^=]*?>)?\s*=/g)) {
+    const start = match.index + match[0].length;
+    const parts = splitTopLevel(source.slice(start, statementEnd(source, start) - 1), "&");
+    const literal = parts.find((part) => part.startsWith("{"));
+    interfaces.set(match[1]!, {
+      members: literal ? interfaceMembers(literal.slice(1, -1)) : [],
+      extends: parts
+        .filter((part) => !part.startsWith("{"))
+        .map((part) => part.replace(/\s+/g, " ")),
+    });
+  }
   const defined = /export const ([\w$]+)\s*=\s*defineComponent<\s*([\w$]+)/g;
   for (const match of source.matchAll(defined)) {
     const pattern = patternAfter(source, match.index + match[0].length);
     components.set(match[1]!, {
       propsName: match[2]!,
       defaults: pattern ? patternDefaults(pattern) : new Map(),
+      summary: docBefore(source, match.index),
     });
   }
   const declared = /export function ([A-Z][\w$]*)\s*\(\s*\{/g;
@@ -114,7 +148,16 @@ export function readPropsSource(
     components.set(match[1]!, {
       propsName,
       defaults: patternDefaults(source.slice(brace + 1, end - 1)),
+      summary: docBefore(source, match.index),
     });
+  }
+  // Any other exported component still has its JSDoc, even when its props are not destructured.
+  for (const match of source.matchAll(/^export (?:const|function) ([A-Z][\w$]*)\b/gm)) {
+    const summary = docBefore(source, match.index);
+    const known = components.get(match[1]!);
+    if (known) known.summary ??= summary;
+    else if (summary)
+      components.set(match[1]!, { propsName: `${match[1]}Props`, defaults: new Map(), summary });
   }
 }
 
@@ -131,11 +174,12 @@ async function sourceFiles(directory: string): Promise<string[]> {
 /**
  * The props each component of a package documents, read from its source: the members of its
  * props interface with their JSDoc, and the defaults its setup destructures. Inherited element
- * props are not listed one by one; `extends` names where they come from.
+ * props are not listed one by one; `extends` names where they come from. The JSDoc on the
+ * component's own declaration becomes its summary.
  */
 export async function readComponentProps(directory: string): Promise<Map<string, ComponentProps>> {
   const interfaces = new Map<string, InterfaceDoc>();
-  const components = new Map<string, { propsName: string; defaults: Map<string, string> }>();
+  const components = new Map<string, ComponentDoc>();
   for (const file of await sourceFiles(directory)) {
     readPropsSource(await readFile(file, "utf8"), interfaces, components);
   }
@@ -170,14 +214,18 @@ export async function readComponentProps(directory: string): Promise<Map<string,
   ]);
   for (const name of names) {
     const component = components.get(name);
-    const declared = resolve(component?.propsName ?? `${name}Props`, new Set());
-    if (!declared) continue;
+    const declared = resolve(component?.propsName ?? `${name}Props`, new Set()) ?? {
+      members: [],
+      extends: [],
+    };
+    if (!declared.members.length && !declared.extends.length && !component?.summary) continue;
     result.set(name, {
       props: declared.members.map((member) => {
         const value = component?.defaults.get(member.name);
         return value === undefined ? member : { ...member, default: value };
       }),
       extends: declared.extends,
+      ...(component?.summary ? { summary: component.summary } : {}),
     });
   }
   return result;

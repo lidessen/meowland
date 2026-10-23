@@ -1,6 +1,6 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Button, Card, Inline, Prose, Section, Stack, Status, Text } from "meowtail";
+import { ActionRow, Button, Card, Inline, Prose, Section, Stack, Status, Text } from "meowtail";
 import { uiTokens } from "meowtail/theme";
 import { Measure, Specimen, Specimens } from "./specimen";
 
@@ -46,12 +46,12 @@ export const TextRolesStory = defineStory({
                 A summary of progress, decisions and upcoming milestones, sent every Monday.
               </Text>
             </Stack>
-            <Inline gap="compact">
+            <ActionRow>
               <Button size="small">Edit schedule</Button>
               <Button size="small" variant="quiet">
                 Preview
               </Button>
-            </Inline>
+            </ActionRow>
             <Text variant="caption">Last sent on Monday at 09:00.</Text>
           </Stack>
         </Card>

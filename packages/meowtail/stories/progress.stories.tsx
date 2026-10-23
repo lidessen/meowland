@@ -1,6 +1,6 @@
 import { h, signal } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Button, Inline, Progress, Stack } from "meowtail";
+import { ActionRow, Button, Progress, Stack } from "meowtail";
 import { Measure } from "./specimen";
 
 export const ProgressStory = defineStory({
@@ -21,7 +21,7 @@ export const ProgressStory = defineStory({
             <span>Reviewed 2 of 5 files</span>
             <Progress label="Reviewed 2 of 5 files" value={value} max={5} />
           </Stack>
-          <Inline gap="compact">
+          <ActionRow>
             <Button
               variant="outline"
               size="small"
@@ -40,7 +40,7 @@ export const ProgressStory = defineStory({
             >
               More
             </Button>
-          </Inline>
+          </ActionRow>
           <Stack gap="compact">
             <span>Connecting to the workspace</span>
             <Progress label="Connecting to the workspace" />

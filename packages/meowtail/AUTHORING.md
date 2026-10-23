@@ -37,19 +37,19 @@ a stat card, a settings row) are exactly that.
 
 ## The translation
 
-| shadcn + Tailwind                                    | Meowland                                                                                                                  |
-| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
-| A function component that re-renders                 | `defineComponent`: setup runs once per mount; a `Signal` bound to an attribute, text or child is what changes later       |
-| `data-slot="card-title"`                             | contract `parts`; `context.part("title", "h3", …)` writes `data-meowui-part="app-card/title"`                             |
-| `cva({ variants })` + `VariantProps`                 | `defineOptions` + `defineStyleProps` on the contract, `ThemedProps` on the props, `options.when({ tone: "pro" })` in CSS  |
-| Utility classes in `className`                       | a `css` fragment beside the component, selecting parts with `partSelector` and painting with `uiTokens` roles and recipes |
-| The Tailwind scale (`p-4`, `rounded-lg`, `bg-muted`) | roles: `uiTokens.space.*`, `radius.*`, `surface.*`, `ink.*`, `type.*`, `motion.*`                                         |
-| `dark:` variants                                     | nothing: every color role is a `[light, dark]` pair, and nested scheme regions resolve their own value                    |
-| `hover:`, `focus-visible:`, `disabled:`              | `interactive({ on })` and `focusRing()`                                                                                   |
-| `cn()` and `tailwind-merge`                          | every part selector has zero specificity, so a host rule or `className` wins without a merge step                         |
-| Radix primitives                                     | Meowtail's behavior components above; for a new primitive, native elements (`button`, `dialog`, `details`) first          |
-| Tailwind preflight                                   | the standard theme's foundation: border-box sizing, contained media, mono code, inherited control type, one focus outline |
-| A lint plugin for class names                        | `auditCSS(fragment, standardAuditRules)` in a unit test: literal colors, durations, font sizes and radii fail             |
+| shadcn + Tailwind                                    | Meowland                                                                                                                                      |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| A function component that re-renders                 | `defineComponent`: setup runs once per mount; a `Signal` bound to an attribute, text or child is what changes later                           |
+| `data-slot="card-title"`                             | contract `parts`; `context.part("title", "h3", …)` writes `data-meowui-part="app-card/title"`                                                 |
+| `cva({ variants })` + `VariantProps`                 | `defineOptions` + `defineStyleProps` on the contract, `ThemedProps` on the props, `options.when({ tone: "pro" })` in CSS                      |
+| Utility classes in `className`                       | a `css` fragment beside the component, selecting parts with `partSelector` and painting with `uiTokens` roles and recipes                     |
+| The Tailwind scale (`p-4`, `rounded-lg`, `bg-muted`) | roles: `uiTokens.space.*`, `radius.*`, `surface.*`, `ink.*`, `type.*`, `motion.*`                                                             |
+| `dark:` variants                                     | nothing: every color role is a `[light, dark]` pair, and nested scheme regions resolve their own value                                        |
+| `hover:`, `focus-visible:`, `disabled:`              | `interactive({ on })` and `focusRing()`                                                                                                       |
+| `cn()` and `tailwind-merge`                          | every part selector has zero specificity, so a host rule or `className` wins without a merge step                                             |
+| Radix primitives                                     | Meowtail's behavior components above; for a new primitive, native elements (`button`, `dialog`, `details`) first                              |
+| Tailwind preflight                                   | the standard theme's foundation: border-box sizing, contained media, mono code, inherited control type, one focus outline, one thin scrollbar |
+| A lint plugin for class names                        | `auditCSS(fragment, standardAuditRules)` in a unit test: literal colors, durations, font sizes and radii fail                                 |
 
 ## Wiring
 

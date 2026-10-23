@@ -357,13 +357,16 @@ function ComponentPage({
   component: CatalogComponent;
   state: DocsState;
 }): Child {
-  const [primary, ...rest] = component.stories;
+  const borrowed = component.stories.length === 0;
+  const [primary, ...rest] = borrowed ? component.usedIn : component.stories;
   const sections: ReadingSection[] = [];
   if (primary) {
     sections.push({
       id: "preview",
       title: "Preview",
-      description: "The first story that shows this component.",
+      description: borrowed
+        ? `${component.title} has no story of its own; this one draws it as part of ${primary.component ?? "a composed scene"}.`
+        : "The first story that shows this component.",
       children: (
         <StoryExample
           storyId={primary.id}
@@ -391,7 +394,9 @@ function ComponentPage({
     sections.push({
       id: "examples",
       title: "Examples",
-      description: "The other stories that show this component.",
+      description: borrowed
+        ? `Other stories that draw ${component.title}.`
+        : "The other stories that show this component.",
       children: (
         <Stack gap="relaxed">
           {rest.map((story) => (
@@ -445,7 +450,9 @@ function ComponentPage({
       title={component.title}
       description={
         component.summary ??
-        "No story covers this component yet. Its contract, style axes and DOM parts are listed below."
+        (primary
+          ? `Shown below inside the stories that use it. Its contract, style axes and DOM parts follow.`
+          : "No story covers this component yet. Its contract, style axes and DOM parts are listed below.")
       }
       width={PAGE_WIDTH}
     >

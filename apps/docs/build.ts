@@ -28,13 +28,16 @@ export const outputDirectory = resolve(import.meta.dir, "dist");
  */
 export async function buildDocs(): Promise<void> {
   const stories = await discoverStories(meowbookConfig);
-  const catalog = buildCatalog(stories);
   const packages = await readPackages(root);
   const sources = new Map<string, StorySource>();
   for (const story of stories) {
     const source = await readStorySource(root, story);
     if (source) sources.set(story.id, source);
   }
+  const catalog = buildCatalog(stories, (story) => {
+    const source = sources.get(story.id);
+    return source?.render?.code ?? source?.code;
+  });
 
   const state: DocsState = { catalog, packages, sources };
   await buildSite(createSiteConfig(state, outputDirectory));

@@ -57,6 +57,28 @@ describe("the component catalog", () => {
     expect(component!.slug).toBe("icon-source");
   });
 
+  test("a component without stories borrows the stories that draw it", () => {
+    const sources: Record<string, string> = {
+      form: '<Field label="Name"><Switch checked /></Field>',
+      settings: "h(Switch, { checked: true })",
+      scene: "<Switch />",
+      other: "<SwitchGroup />",
+    };
+    const catalog = buildCatalog(
+      [
+        story({ id: "scene", group: "Scenes" }),
+        story({ id: "form", component: "Field", group: "Forms" }),
+        story({ id: "settings", component: "Card", group: "Content" }),
+        story({ id: "other", component: "Badge", group: "Basic controls" }),
+      ],
+      (entry) => sources[entry.id],
+    );
+    const component = catalog.components.find((entry) => entry.title === "Switch");
+    expect(component?.stories).toEqual([]);
+    expect(component?.usedIn.map((entry) => entry.id)).toEqual(["settings", "form", "scene"]);
+    expect(component?.group).toBe("Content");
+  });
+
   test("the registry contributes the components no story covers", () => {
     const catalog = buildCatalog([story({ id: "button", component: "Button" })]);
     const withoutStories = catalog.components.filter(

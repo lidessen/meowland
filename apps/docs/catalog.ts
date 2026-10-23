@@ -25,6 +25,11 @@ export interface CatalogComponent {
   group: string;
   /** Stories that show the component. */
   stories: StoryEntry[];
+  /**
+   * Stories of other components whose example draws this one, for a component without stories
+   * of its own; the most focused first.
+   */
+  usedIn: StoryEntry[];
   /** The registry contract, when the component has one. */
   contract?: CatalogContract;
   /** One line describing the component, taken from the first story that has one. */
@@ -115,6 +120,39 @@ function displayNames(): Map<string, string> {
   return names;
 }
 
+/** How many borrowed stories a component without stories of its own shows. */
+const USED_IN_LIMIT = 3;
+
+/**
+ * The stories whose example draws a component, as JSX or through `h`. Stories that document one
+ * component come before composed scenes, and shorter examples before longer ones, so the first
+ * is the one where the component is easiest to see.
+ */
+function storiesUsing(
+  title: string,
+  stories: readonly StoryEntry[],
+  sourceOf: (story: StoryEntry) => string | undefined,
+): StoryEntry[] {
+  const pattern = new RegExp(`<${title}[\\s/>]|\\bh\\(${title}\\b`);
+  const seen = new Set<string>();
+  const matches: { story: StoryEntry; length: number }[] = [];
+  for (const story of stories) {
+    if (seen.has(story.id)) continue;
+    const source = sourceOf(story);
+    if (!source || !pattern.test(source)) continue;
+    seen.add(story.id);
+    matches.push({ story, length: source.length });
+  }
+  return matches
+    .sort(
+      (left, right) =>
+        Number(!left.story.component) - Number(!right.story.component) ||
+        left.length - right.length,
+    )
+    .slice(0, USED_IN_LIMIT)
+    .map((match) => match.story);
+}
+
 /** The earliest order the stories declare for a group. */
 function groupOrders(stories: readonly StoryEntry[]): Map<string, number> {
   const orders = new Map<string, number>();
@@ -132,7 +170,10 @@ function groupOrders(stories: readonly StoryEntry[]): Map<string, number> {
  * registry. The manifest decides what is shown and in which group; the registry
  * supplies the style axes and the DOM parts.
  */
-export function buildCatalog(stories: readonly StoryEntry[]): Catalog {
+export function buildCatalog(
+  stories: readonly StoryEntry[],
+  sourceOf: (story: StoryEntry) => string | undefined = () => undefined,
+): Catalog {
   const contracts = contractsByName();
   const byTitle = contractsByTitle(contracts);
   const orders = groupOrders(stories);
@@ -169,6 +210,7 @@ export function buildCatalog(stories: readonly StoryEntry[]): Catalog {
       title: story.component,
       group: story.group ?? UNCATEGORIZED_GROUP,
       stories: [],
+      usedIn: [],
       contract,
     });
   }
@@ -194,12 +236,15 @@ export function buildCatalog(stories: readonly StoryEntry[]): Catalog {
     while (usedSlugs.has(slug)) slug = `${name}-${suffix++}`;
     usedSlugs.add(slug);
     const entry = contracts.get(name);
+    const title = titles.get(name) ?? name;
+    const usedIn = storiesUsing(title, stories, sourceOf);
     components.push({
       slug,
       path: `components/${slug}`,
-      title: titles.get(name) ?? name,
-      group: UNCATEGORIZED_GROUP,
+      title,
+      group: usedIn[0]?.group ?? UNCATEGORIZED_GROUP,
       stories: [],
+      usedIn,
       contract: entry,
     });
   }

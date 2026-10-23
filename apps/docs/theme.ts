@@ -43,7 +43,7 @@ export const docsStyles = css`
   body {
     background: ${uiTokens.surface.canvas};
     color: ${uiTokens.ink.primary};
-    font: 15px/1.7 ${uiTokens.type.sans};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.reading} ${uiTokens.type.sans};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -92,7 +92,7 @@ export const docsStyles = css`
     padding: 0 10px;
     color: ${uiTokens.ink.primary};
     font-size: ${uiTokens.type.title};
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: -0.02em;
   }
   .docs-brand > svg {
@@ -103,7 +103,7 @@ export const docsStyles = css`
   .docs-brand > span {
     margin-left: auto;
     color: ${uiTokens.ink.tertiary};
-    font: ${uiTokens.type.micro}/1.5 ${uiTokens.type.mono};
+    font: ${uiTokens.type.micro} / ${uiTokens.type.line.micro} ${uiTokens.type.mono};
     letter-spacing: 0;
   }
   .docs-search {
@@ -122,7 +122,7 @@ export const docsStyles = css`
     padding: 24px 10px 12px;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.micro};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
@@ -162,7 +162,7 @@ export const docsStyles = css`
     margin: 12px 10px;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
-    line-height: 1.7;
+    line-height: ${uiTokens.type.line.caption};
     overflow-wrap: anywhere;
   }
 
@@ -217,7 +217,7 @@ export const docsStyles = css`
     border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     border-radius: ${uiTokens.radius.sm};
     color: ${uiTokens.ink.tertiary};
-    font: ${uiTokens.type.micro}/1.5 ${uiTokens.type.mono};
+    font: ${uiTokens.type.micro} / ${uiTokens.type.line.micro} ${uiTokens.type.mono};
   }
   .docs-search-open:not([hidden]) ~ .docs-appearance {
     margin-left: 0;
@@ -297,7 +297,7 @@ export const docsStyles = css`
     background: ${uiTokens.accent.selected};
   }
   .docs-search-title {
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   .docs-search-meta {
     overflow: hidden;
@@ -404,7 +404,7 @@ export const docsStyles = css`
     border-radius: ${uiTokens.radius.md};
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.label};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     text-decoration: none;
   }
   .docs-header-link:hover {
@@ -413,11 +413,11 @@ export const docsStyles = css`
   }
   .docs-header ${partSelector(breadcrumbContract, "item")}:not(:last-child) ${partSelector(breadcrumbContract, "current")} {
     color: ${uiTokens.ink.secondary};
-    font-weight: 400;
+    font-weight: ${uiTokens.type.weight.regular};
   }
   .docs-header ${partSelector(breadcrumbContract, "current")} {
     font-size: ${uiTokens.type.caption};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
 
   /* Identity, installation and prose share one reading axis. */
@@ -432,8 +432,8 @@ export const docsStyles = css`
     margin-inline: auto;
   }
   .docs-article ${partSelector(pageContract, "root")}, .docs-article ${partSelector(sectionContract, "root")} {
-    font-size: 15px;
-    line-height: 1.75;
+    font-size: ${uiTokens.type.body};
+    line-height: ${uiTokens.type.line.reading};
   }
   .docs-article ${partSelector(pageContract, "header")} {
     margin-bottom: 32px;
@@ -448,15 +448,15 @@ export const docsStyles = css`
     gap: 14px;
   }
   .docs-article ${partSelector(pageHeaderContract, "title")} {
-    font-size: 40px;
-    line-height: 1.15;
-    font-weight: 500;
+    font-size: ${uiTokens.type.hero};
+    line-height: ${uiTokens.type.line.hero};
+    font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: -0.035em;
   }
   .docs-article ${partSelector(pageHeaderContract, "description")} {
     max-width: 62ch;
     font-size: ${uiTokens.type.title};
-    line-height: 1.75;
+    line-height: ${uiTokens.type.line.title};
   }
   .docs-article ${partSelector(pageContract, "content")}, .docs-sections {
     display: grid;
@@ -468,14 +468,14 @@ export const docsStyles = css`
     scroll-margin-top: 88px;
   }
   .docs-article ${partSelector(sectionContract, "title")} {
-    font-size: 25px;
-    font-weight: 500;
-    line-height: 1.3;
+    font-size: ${uiTokens.type.heading};
+    font-weight: ${uiTokens.type.weight.semibold};
+    line-height: ${uiTokens.type.line.heading};
     letter-spacing: -0.02em;
   }
   .docs-article ${partSelector(sectionContract, "description")} {
     font-size: ${uiTokens.type.body};
-    line-height: 1.75;
+    line-height: ${uiTokens.type.line.reading};
   }
   .docs-article ${partSelector(sectionContract, "content")} {
     gap: 16px;
@@ -488,7 +488,7 @@ export const docsStyles = css`
   .docs-toc {
     min-width: 0;
     font-size: ${uiTokens.type.caption};
-    line-height: 1.6;
+    line-height: ${uiTokens.type.line.caption};
     color: ${uiTokens.ink.secondary};
   }
   .docs-toc-desktop {
@@ -505,7 +505,7 @@ export const docsStyles = css`
     list-style: none;
     color: ${uiTokens.ink.primary};
     cursor: pointer;
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   .docs-toc-disclosure > summary::-webkit-details-marker {
     display: none;
@@ -532,7 +532,7 @@ export const docsStyles = css`
     margin: 0;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.label};
-    line-height: 1.7;
+    line-height: ${uiTokens.type.line.label};
   }
   .docs-example {
     min-width: 0;
@@ -546,7 +546,7 @@ export const docsStyles = css`
   .docs-example-title {
     margin: 0;
     font-size: ${uiTokens.type.body};
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: -0.005em;
   }
   /* One specimen: the live preview on the raised surface, its code recessed
@@ -607,7 +607,7 @@ export const docsStyles = css`
     gap: 8px;
   }
   .docs-prop-name > code {
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
   }
   .docs-prop-required {
     color: ${uiTokens.ink.tertiary};
@@ -616,7 +616,7 @@ export const docsStyles = css`
   .docs-prop-note {
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.label};
-    line-height: 1.5;
+    line-height: ${uiTokens.type.line.label};
     white-space: normal;
   }
   .docs-prop-type {
@@ -651,7 +651,7 @@ export const docsStyles = css`
     color: ${uiTokens.ink.secondary};
     font: inherit;
     font-size: ${uiTokens.type.label};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     cursor: pointer;
   }
   .docs-tabs button:hover {
@@ -677,7 +677,7 @@ export const docsStyles = css`
     max-height: ${docsTokens.codeHeight};
     padding: 16px;
     font-size: ${uiTokens.type.code};
-    line-height: 1.75;
+    line-height: ${uiTokens.type.line.code};
     scrollbar-width: thin;
   }
   .docs-install {
@@ -691,7 +691,7 @@ export const docsStyles = css`
     border-radius: ${uiTokens.radius.lg};
     background: ${uiTokens.surface.raised};
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.code}/1.7 ${uiTokens.type.mono};
+    font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
   }
   .docs-install > svg {
     flex: none;
@@ -755,16 +755,16 @@ export const docsStyles = css`
   }
   .docs-home-intro ${partSelector(pageHeaderContract, "title")} {
     max-width: 17ch;
-    font-size: 52px;
-    line-height: 1.06;
+    font-size: ${uiTokens.type.hero};
+    line-height: ${uiTokens.type.line.hero};
     letter-spacing: -0.04em;
     text-wrap: balance;
   }
   .docs-home-intro ${partSelector(pageHeaderContract, "description")} {
     max-width: 46ch;
     margin-top: 8px;
-    font-size: 15px;
-    line-height: 1.8;
+    font-size: ${uiTokens.type.title};
+    line-height: ${uiTokens.type.line.title};
   }
   .docs-home-actions {
     display: flex;
@@ -782,7 +782,7 @@ export const docsStyles = css`
     border-radius: ${uiTokens.radius.md};
     background: ${uiTokens.action.primary};
     color: ${uiTokens.action.onPrimary};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     text-decoration: none;
   }
   .docs-home-actions .docs-home-primary:hover {
@@ -823,7 +823,7 @@ export const docsStyles = css`
     flex: none;
     padding-top: 2px;
     color: ${uiTokens.ink.secondary};
-    font: ${uiTokens.type.code}/1.7 ${uiTokens.type.mono};
+    font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
   }
   .docs-home-route li > a > span:last-child {
     display: grid;
@@ -831,12 +831,12 @@ export const docsStyles = css`
   }
   .docs-home-route strong {
     font-size: ${uiTokens.type.label};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
   }
   .docs-home-route strong + span {
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
-    line-height: 1.6;
+    line-height: ${uiTokens.type.line.caption};
   }
   .docs-home-route li > a:hover strong,
   .docs-package-link:hover strong {
@@ -862,22 +862,22 @@ export const docsStyles = css`
   .docs-package-number {
     padding-top: 4px;
     color: ${uiTokens.ink.secondary};
-    font: ${uiTokens.type.code}/1.7 ${uiTokens.type.mono};
+    font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
   }
   .docs-package-link strong {
     font-size: ${uiTokens.type.title};
-    font-weight: 600;
+    font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: -0.02em;
   }
   .docs-package-link p {
     margin: 8px 0 12px;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.label};
-    line-height: 1.75;
+    line-height: ${uiTokens.type.line.label};
   }
   .docs-package-version {
     color: ${uiTokens.ink.secondary};
-    font: ${uiTokens.type.micro}/1.7 ${uiTokens.type.mono};
+    font: ${uiTokens.type.micro} / ${uiTokens.type.line.micro} ${uiTokens.type.mono};
   }
   .docs-grid {
     display: grid;
@@ -911,7 +911,7 @@ export const docsStyles = css`
   }
   .docs-index-list a {
     color: ${uiTokens.ink.primary};
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     text-decoration: none;
   }
   .docs-index-list a:hover {
@@ -923,7 +923,7 @@ export const docsStyles = css`
     overflow: hidden;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.caption};
-    line-height: 1.5;
+    line-height: ${uiTokens.type.line.caption};
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 2;
   }
@@ -931,8 +931,8 @@ export const docsStyles = css`
   /* Reading content uses the library's Prose rhythm; the docs only set their
      reading size and keep headings clear of the sticky header. */
   .docs-article ${partSelector(proseContract, "root")} {
-    font-size: 15px;
-    line-height: 1.75;
+    font-size: ${uiTokens.type.body};
+    line-height: ${uiTokens.type.line.reading};
   }
   .docs-article ${partSelector(proseContract, "root")} > :where(h2, h3, h4) {
     scroll-margin-top: 88px;
@@ -1013,7 +1013,7 @@ export const docsStyles = css`
   }
   .docs-pager-title {
     overflow: hidden;
-    font-weight: 500;
+    font-weight: ${uiTokens.type.weight.medium};
     text-overflow: ellipsis;
     white-space: nowrap;
   }
@@ -1071,7 +1071,7 @@ export const docsStyles = css`
       margin: 0;
       color: ${uiTokens.ink.primary};
       font-size: ${uiTokens.type.micro};
-      font-weight: 500;
+      font-weight: ${uiTokens.type.weight.medium};
     }
     .docs-content:not(.docs-content-home) :is(.docs-footer, .docs-pager) {
       max-width: 928px;
@@ -1084,7 +1084,6 @@ export const docsStyles = css`
     }
     .docs-home-intro ${partSelector(pageHeaderContract, "title")} {
       max-width: 16ch;
-      font-size: 48px;
     }
     .docs-home-route {
       padding-top: 28px;
@@ -1122,12 +1121,12 @@ export const docsStyles = css`
       display: inline-flex;
       align-items: center;
       gap: 8px;
-      font-size: 15px;
+      font-size: ${uiTokens.type.title};
       letter-spacing: -0.4px;
     }
     .docs-mobile-brand {
       color: ${uiTokens.ink.primary};
-      font-weight: 600;
+      font-weight: ${uiTokens.type.weight.semibold};
     }
     .docs-mobile-brand > svg {
       width: 20px;
@@ -1136,8 +1135,8 @@ export const docsStyles = css`
     }
     .docs-mobile-brand > span {
       color: ${uiTokens.ink.tertiary};
-      font: ${uiTokens.type.micro}/1.5 ${uiTokens.type.mono};
-      font-weight: 400;
+      font: ${uiTokens.type.micro} / ${uiTokens.type.line.micro} ${uiTokens.type.mono};
+      font-weight: ${uiTokens.type.weight.regular};
       letter-spacing: 0;
     }
     .docs-navigation-toggle {
@@ -1152,7 +1151,7 @@ export const docsStyles = css`
       border-radius: ${uiTokens.radius.md};
       background: ${uiTokens.surface.canvas};
       color: ${uiTokens.ink.primary};
-      font: 12px/1.5 ${uiTokens.type.sans};
+      font: ${uiTokens.type.caption} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
       cursor: pointer;
     }
     .docs-navigation-toggle[aria-expanded="true"] {
@@ -1180,16 +1179,17 @@ export const docsStyles = css`
       padding: 32px 20px 0;
     }
     .docs-article ${partSelector(pageHeaderContract, "title")} {
-      font-size: 34px;
+      font-size: ${uiTokens.type.pageTitle};
+      line-height: ${uiTokens.type.line.pageTitle};
     }
     .docs-article ${partSelector(pageHeaderContract, "description")} {
-      font-size: 15px;
+      font-size: ${uiTokens.type.body};
     }
     .docs-article ${partSelector(pageContract, "header")} {
       margin-bottom: 24px;
     }
     .docs-article ${partSelector(sectionContract, "title")} {
-      font-size: 23px;
+      font-size: ${uiTokens.type.heading};
     }
     .docs-reading-layout {
       gap: 28px;
@@ -1207,7 +1207,6 @@ export const docsStyles = css`
     }
     .docs-home-intro ${partSelector(pageHeaderContract, "title")} {
       max-width: 14ch;
-      font-size: 44px;
     }
     .docs-home-route ol {
       grid-template-columns: minmax(0, 1fr);

@@ -245,6 +245,12 @@ describe("the reader's controls", () => {
     expect(html).toMatch(/<button class="docs-appearance" id="docs-appearance"[^>]*hidden/);
   });
 
+  test("code actions stay hidden until the page wires them", () => {
+    const html = document("packages/meowtail");
+    expect(html).toContain('setAttribute("data-docs-code-actions"');
+    expect(html).not.toMatch(/<html[^>]*data-docs-code-actions/);
+  });
+
   test("the navigation filter shows its keyboard shortcut", () => {
     expect(document("packages/meowtail")).toContain(
       '<kbd class="docs-search-key" aria-hidden="true">/</kbd>',

@@ -1,7 +1,8 @@
 # Meowland documentation
 
-The documentation site for the Meowland packages. It is a private app: it is not published, and
-nothing here deploys. It builds a static site into `dist/` and serves it over loopback.
+The documentation site for the Meowland packages. It is a private workspace app, not an npm package.
+It builds a static site into `dist/` for local preview and for the existing Vercel `meowland` project
+at [meowland.dev](https://meowland.dev).
 
 ## What it is made of
 
@@ -26,6 +27,22 @@ bun run test      # the app's unit tests
 ```
 
 The site is a static directory. Any static server can serve it; `bun run dev` is only a convenience.
+
+## Vercel deployment
+
+Keep the Vercel project's Root Directory at the repository root. The root `vercel.json` selects a
+static build, installs the checked-in Bun lockfile, builds the workspace packages before this app,
+and serves `apps/docs/dist`. The build order is the same as the local check:
+
+```sh
+bun install --frozen-lockfile
+bun run build
+bun run --filter @meowland/docs build
+```
+
+Each docs route has its own `index.html`, so the deployment needs no single-page-app rewrite. The
+existing `meowland.dev` project domain points at the production deployment; npm package releases
+follow their separate manual workflow.
 
 ## The files
 
@@ -66,7 +83,8 @@ dist/
 - The [Meowtail component catalog](../../packages/meowtail/COMPONENTS.md) owns the maintained
   component list and planned additions. This app generates the current reference from stories and
   registry contracts; it does not maintain another planning inventory.
-- The delivery is local. Publishing the site, or a deployment workflow, is a separate decision.
+- Vercel deploys this static site from the repository configuration. The GitHub build-and-lint
+  workflow does not publish it, and the npm release workflow remains separate.
 
 ## The look
 

@@ -184,6 +184,66 @@ export const docsStyles = css`
     border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     min-width: 0;
   }
+  /* The appearance switch: one quiet icon button that shows the current choice. */
+  .docs-appearance {
+    display: inline-grid;
+    place-items: center;
+    flex: none;
+    width: 32px;
+    height: 32px;
+    margin-left: auto;
+    padding: 0;
+    border: 0;
+    border-radius: ${uiTokens.radius.md};
+    background: transparent;
+    color: ${uiTokens.ink.secondary};
+    cursor: pointer;
+  }
+  .docs-appearance[hidden] {
+    display: none;
+  }
+  .docs-appearance:hover {
+    background: ${uiTokens.state.hover};
+    color: ${uiTokens.ink.primary};
+  }
+  .docs-appearance > svg {
+    display: none;
+  }
+  .docs-appearance[data-appearance="auto"] > .docs-appearance-auto,
+  .docs-appearance[data-appearance="light"] > .docs-appearance-light,
+  .docs-appearance[data-appearance="dark"] > .docs-appearance-dark {
+    display: block;
+  }
+  .docs-appearance:not([hidden]) + .docs-header-link {
+    margin-left: 0;
+  }
+  /* The filter shows its keyboard shortcut at its end. */
+  .docs-search-wrap {
+    position: relative;
+    flex: none;
+  }
+  .docs-search-key {
+    position: absolute;
+    top: 50%;
+    right: 10px;
+    display: grid;
+    place-items: center;
+    min-width: 20px;
+    height: 20px;
+    padding: 0 4px;
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-radius: ${uiTokens.radius.sm};
+    color: ${uiTokens.ink.tertiary};
+    font: ${uiTokens.type.micro}/1 ${uiTokens.type.mono};
+    pointer-events: none;
+    transform: translateY(-50%);
+  }
+  .docs-search-wrap:focus-within .docs-search-key {
+    display: none;
+  }
+  .docs-search-wrap ${partSelector(searchInputContract, "control")} {
+    padding-right: 36px;
+  }
   /* The one way out to the workbench: a quiet labeled link, not an unnamed glyph. */
   .docs-header-link {
     display: inline-flex;

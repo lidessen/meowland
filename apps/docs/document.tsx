@@ -3,7 +3,8 @@ import "./runtime";
 import { h, type Child } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
 import { Breadcrumb, NavList, SearchInput, type NavListGroup } from "meowtail";
-import { Icon, MeowlandMark } from "meowtail/icons";
+import { Icon, IconSource, MeowlandMark } from "meowtail/icons";
+import { Monitor, Moon, Sun } from "meowtail/icons/lucide";
 import type { Catalog, NavigationGroup } from "./catalog";
 import type { DocsPackage } from "./packages";
 
@@ -127,6 +128,88 @@ const PREVIEW_FIT = `(() => {
     frame.addEventListener("load", watch);
     if (frame.contentDocument && frame.contentDocument.readyState === "complete") watch();
   }
+})();`;
+
+/** The reader's appearance choice, applied before the stylesheet paints so no page flashes. */
+const APPEARANCE_STORE = "meowland-docs-appearance";
+const APPEARANCE_EARLY = `(() => {
+  try {
+    const choice = localStorage.getItem("${APPEARANCE_STORE}");
+    if (choice === "light" || choice === "dark")
+      document.documentElement.setAttribute("data-meowui-color-scheme", choice);
+  } catch {}
+})();`;
+
+/**
+ * Cycle the appearance: system, light, dark. The choice persists for the reader and reaches the
+ * live previews too, since they share the site's origin.
+ */
+const APPEARANCE_SWITCH = `(() => {
+  const button = document.getElementById("docs-appearance");
+  if (!button) return;
+  const order = ["auto", "light", "dark"];
+  const names = { auto: "System", light: "Light", dark: "Dark" };
+  const root = document.documentElement;
+  const current = () => root.getAttribute("data-meowui-color-scheme") || "auto";
+  const paintFrames = (choice) => {
+    for (const frame of document.querySelectorAll("iframe.docs-preview-frame")) {
+      try {
+        const doc = frame.contentDocument;
+        if (doc && doc.documentElement) doc.documentElement.setAttribute("data-meowui-color-scheme", choice);
+      } catch {}
+    }
+  };
+  const show = () => {
+    const choice = current();
+    button.setAttribute("data-appearance", choice);
+    button.setAttribute("aria-label", "Appearance: " + names[choice]);
+    button.title = "Appearance: " + names[choice];
+  };
+  button.addEventListener("click", () => {
+    const next = order[(order.indexOf(current()) + 1) % order.length];
+    root.setAttribute("data-meowui-color-scheme", next);
+    try {
+      if (next === "auto") localStorage.removeItem("${APPEARANCE_STORE}");
+      else localStorage.setItem("${APPEARANCE_STORE}", next);
+    } catch {}
+    paintFrames(next);
+    show();
+  });
+  // A story re-applies its theme as it mounts; keep the reader's choice on each preview.
+  const follow = (frame) => {
+    let doc;
+    try { doc = frame.contentDocument; } catch { return; }
+    if (!doc || !doc.documentElement) return;
+    const sync = () => {
+      const choice = current();
+      if (doc.documentElement.getAttribute("data-meowui-color-scheme") !== choice)
+        doc.documentElement.setAttribute("data-meowui-color-scheme", choice);
+    };
+    new MutationObserver(sync).observe(doc.documentElement, {
+      attributes: true,
+      attributeFilter: ["data-meowui-color-scheme"],
+    });
+    sync();
+  };
+  for (const frame of document.querySelectorAll("iframe.docs-preview-frame")) {
+    frame.addEventListener("load", () => follow(frame));
+    if (frame.contentDocument && frame.contentDocument.readyState === "complete") follow(frame);
+  }
+  show();
+  button.hidden = false;
+})();`;
+
+/** Press "/" anywhere outside a field to filter the navigation. */
+const FILTER_SHORTCUT = `(() => {
+  const input = document.querySelector('[data-meowui-part="search-input/control"]');
+  if (!input) return;
+  document.addEventListener("keydown", (event) => {
+    if (event.key !== "/" || event.metaKey || event.ctrlKey || event.altKey) return;
+    const target = event.target;
+    if (target instanceof HTMLElement && target.closest("input, textarea, select, [contenteditable]")) return;
+    event.preventDefault();
+    input.focus();
+  });
 })();`;
 
 /** Enhance the one navigation rail into an inline disclosure on narrow screens. */
@@ -258,11 +341,16 @@ function Sidebar({
         <strong>Meowland</strong>
         <span>docs</span>
       </a>
-      <SearchInput
-        className="docs-search"
-        label="Filter navigation"
-        placeholder="Filter navigation…"
-      />
+      <div className="docs-search-wrap">
+        <SearchInput
+          className="docs-search"
+          label="Filter navigation"
+          placeholder="Filter navigation…"
+        />
+        <kbd className="docs-search-key" aria-hidden="true">
+          /
+        </kbd>
+      </div>
       <div className="docs-catalog-label">Documentation</div>
       <div className="docs-catalog" id="docs-catalog">
         <NavList label="Documentation" activeId={path} groups={sidebarGroups(catalog, packages)} />
@@ -290,6 +378,7 @@ function Document({
     <html lang="en" {...themeAttributes(theme)}>
       <head>
         <meta charSet="UTF-8" />
+        <script dangerouslySetInnerHTML={{ __html: APPEARANCE_EARLY }} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description" content={description ?? SITE_DESCRIPTION} />
         <link rel="icon" href={FAVICON} />
@@ -319,6 +408,17 @@ function Document({
           <div className="docs-main">
             <header className="docs-header">
               <Breadcrumb items={trail} label="Breadcrumb" />
+              <button
+                className="docs-appearance"
+                id="docs-appearance"
+                type="button"
+                aria-label="Appearance: System"
+                hidden
+              >
+                <IconSource source={Monitor} size={16} className="docs-appearance-auto" />
+                <IconSource source={Sun} size={16} className="docs-appearance-light" />
+                <IconSource source={Moon} size={16} className="docs-appearance-dark" />
+              </button>
               <a className="docs-header-link" href="/gallery/">
                 Workbench
                 <Icon name="arrow-up-right" size={14} />
@@ -339,6 +439,8 @@ function Document({
         <script dangerouslySetInnerHTML={{ __html: CATALOG_FILTER }} />
         <script dangerouslySetInnerHTML={{ __html: NAVIGATION_DISCLOSURE }} />
         <script dangerouslySetInnerHTML={{ __html: PREVIEW_FIT }} />
+        <script dangerouslySetInnerHTML={{ __html: APPEARANCE_SWITCH }} />
+        <script dangerouslySetInnerHTML={{ __html: FILTER_SHORTCUT }} />
       </body>
     </html>
   );

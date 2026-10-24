@@ -44,14 +44,16 @@ The source code comes from the library directory of the Rossovia repository and 
 
 ## Release status
 
-Current operations use [manual Actions + npm OIDC publishing](docs/releasing.md): explicit package selection and independent versions; prereleases use `alpha`, stable releases use `latest`. Regular pushes only check; publishing is triggered by a manual workflow and does not depend on long-lived npm tokens. The scripts do not manage GitHub Releases; the completed releases below remain historical facts. `meowjsx@0.1.1-alpha.0`, `meowcss@0.1.1-alpha.0`, `meowtail@0.2.0-alpha.0`, `meowbook@0.1.2-alpha.0` and `meowpress@0.1.1-alpha.0` have been published through Actions OIDC and accepted from the registry. `meowtail@0.2.0-alpha.1`, `meowbook@0.1.2-alpha.1` and `meowpress@0.1.1-alpha.1` were subsequently published under `alpha` by [the exact-source OIDC run](https://github.com/lidessen/meowland/actions/runs/39185612444) and passed independent registry consumption. Their public tarballs match the accepted local bytes; all `latest` tags remain unchanged. See the [publication receipt](docs/records/2026-10-19-alpha1-publication.md). Slides `0.1.0-alpha.0` remains unpublished; its new-package bootstrap and publication still require separate authorization.
+Current operations use [manual Actions + npm OIDC publishing](docs/releasing.md): explicit package selection and independent versions; prereleases use `alpha`, stable releases use `latest`. Regular pushes only check; publishing is triggered by a manual workflow and does not depend on long-lived npm tokens. The scripts do not manage GitHub Releases; the completed releases below remain historical facts. `meowjsx@0.1.1-alpha.0`, `meowcss@0.1.1-alpha.0`, `meowtail@0.2.0-alpha.0`, `meowbook@0.1.2-alpha.0` and `meowpress@0.1.1-alpha.0` have been published through Actions OIDC and accepted from the registry. `meowtail@0.2.0-alpha.1`, `meowbook@0.1.2-alpha.1` and `meowpress@0.1.1-alpha.1` were subsequently published under `alpha` by [the exact-source OIDC run](https://github.com/lidessen/meowland/actions/runs/39185612444) and passed independent registry consumption. Their public tarballs match the accepted local bytes; all `latest` tags remain unchanged. See the [publication receipt](docs/records/2026-10-19-alpha1-publication.md).
 
-The current local authoring migration prepares JSX/CSS/Book/Press `0.2.0-alpha.0`, Tail
-`0.3.0-alpha.0` and Slides `0.1.0-alpha.1`. These candidates replace component definers/contracts
-with ordinary functions and static metadata, and replace theme recipes with class values and `cx`.
-The implementation has passed local static, browser and isolated tarball acceptance; see the
-[authoring migration receipt](docs/records/2026-10-24-authoring-migration.md) for exact inputs and
-coverage. These version changes do not publish packages.
+The authoring migration is published under `alpha` as JSX/CSS/Book/Press `0.2.0-alpha.0` and Tail
+`0.3.0-alpha.0`. These versions replace component definers/contracts with ordinary functions and
+static metadata, and replace theme recipes with class values and `cx`. The
+[OIDC publication receipt](docs/records/2026-10-24-authoring-alpha-publication.md) records the exact
+source, checks, public bytes and registry consumption. Slides `0.1.0-alpha.1` passed local tarball
+acceptance but remains unpublished until its first-package bootstrap and trusted publisher are set up.
+The earlier [authoring migration receipt](docs/records/2026-10-24-authoring-migration.md) retains the
+implementation's original local acceptance scope.
 
 The public source repository is [lidessen/meowland](https://github.com/lidessen/meowland). Current official versions are `meowjsx@0.1.0`, `meowcss@0.1.0`, `meowtail@0.1.0`, `meowbook@0.1.1` and `meowpress@0.1.0`, all of which have completed npm publishing, independent-registry installation acceptance and official GitHub Releases. The original JSX/CSS tags and assets remain unchanged; see the [release receipt](docs/records/2026-10-17-tail-book-press-publish.md) for this batch's exact candidates, artifacts and acceptance scope.
 

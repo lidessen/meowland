@@ -199,3 +199,39 @@ test("page headers allocate natural height to wrapped identity, actions, and cat
   expect(await insideHeader()).toBe(true);
   await expect(page.getByRole("button", { name: "Refresh catalog", exact: true })).toBeInViewport();
 });
+
+test("the dialog header gains its edge only while the body is scrolled under it", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 1100, height: 900 });
+  await page.goto("/canvas.html?story=dialog-layout");
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  // An edge is drawn when the header's inset shadow has a visible color.
+  const edge = (dialog: Locator) =>
+    dialog.locator('[data-meowui-part="page-frame/header"]').evaluate((node) => {
+      const shadow = getComputedStyle(node).boxShadow;
+      return shadow !== "none" && !/rgba\([^)]*,\s*0\)/.test(shadow);
+    });
+  for (const [name, scrolls] of [
+    ["Long body", true],
+    ["Short form", false],
+  ] as const) {
+    await page.getByRole("button", { name: `Open ${name}`, exact: true }).click();
+    const dialog = page.getByRole("dialog", {
+      name: `${name} · Current item and close action`,
+      exact: true,
+    });
+    const body = dialog.locator('[data-meowui-part="page-frame/body"]');
+    expect(await edge(dialog)).toBe(false);
+    await body.evaluate((node) => {
+      node.scrollTop = node.scrollHeight;
+    });
+    await expect.poll(() => edge(dialog)).toBe(scrolls);
+    await body.evaluate((node) => {
+      node.scrollTop = 0;
+    });
+    await expect.poll(() => edge(dialog)).toBe(false);
+    await page.keyboard.press("Escape");
+    await expect(dialog).toBeHidden();
+  }
+});

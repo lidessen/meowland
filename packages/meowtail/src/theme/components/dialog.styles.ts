@@ -40,8 +40,35 @@ export const dialogStyles = css`
   ${dialogPanelPartRefs.root} > ${pageFramePartRefs.root} > ${pageFramePartRefs.body} {
     padding: ${uiTokens.space.panel};
   }
+  /* The section step splits around the header's edge: a group step stays under the header so
+     scrolled text never touches it, and the rest stays inside the scrollport. */
+  ${dialogPanelPartRefs.root} > ${pageFramePartRefs.root}:has(> ${pageFramePartRefs.header}) {
+    timeline-scope: --ui-dialog-body;
+  }
+  ${dialogPanelPartRefs.root} > ${pageFramePartRefs.root} > ${pageFramePartRefs.header}:has(+ ${pageFramePartRefs.body}) {
+    padding-bottom: ${uiTokens.space.group};
+  }
   ${dialogPanelPartRefs.root} > ${pageFramePartRefs.root} > ${pageFramePartRefs.header} + ${pageFramePartRefs.body} {
-    padding-top: ${uiTokens.space.section};
+    padding-top: calc(${uiTokens.space.section} - ${uiTokens.space.group});
+    scroll-timeline: --ui-dialog-body block;
+    /* Focus scrolling stops short of the edge, so a control's focus ink stays inside the body. */
+    scroll-padding-block: ${uiTokens.space.group};
+  }
+  /* The header's edge appears once the body scrolls under it; a body that fits never shows it. */
+  @supports (animation-timeline: scroll()) {
+    ${dialogPanelPartRefs.root} > ${pageFramePartRefs.root} > ${pageFramePartRefs.header}:has(+ ${pageFramePartRefs.body}) {
+      animation: ui-dialog-header-edge linear both;
+      animation-timeline: --ui-dialog-body;
+      animation-range: 0 ${uiTokens.space.group};
+    }
+  }
+  @keyframes ui-dialog-header-edge {
+    from {
+      box-shadow: inset 0 calc(-1 * ${uiTokens.line.width}) 0 transparent;
+    }
+    to {
+      box-shadow: inset 0 calc(-1 * ${uiTokens.line.width}) 0 ${uiTokens.line.divider};
+    }
   }
   ${dialogPartRefs.root} {
     width: min(380px, calc(100vw - 48px));

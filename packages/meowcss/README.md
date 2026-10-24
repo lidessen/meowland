@@ -77,6 +77,13 @@ and at-rules included, comments and custom property definitions skipped) and ret
 `AuditRule` flags, with the property, value, selector and line. The root knows no scale: a consumer
 supplies the rules (Meowtail's are `standardAuditRules`), and `allow` accepts a deliberate exception.
 
+## Utility styles design
+
+The [utility styles design](../../docs/designs/2026-10-24-utility-styles.md) proposes a finite,
+token-backed utility catalog: `apply(spec)` inside theme files and an `sx` prop on host nodes and
+component parts. This is a proposed direction pending challenge and implementation; no current
+export provides it.
+
 ## Verification
 
 - `bun test packages/meowcss/tests/unit` verifies pure generation, typed parts, carriers, cross-entry token identity and theme lifecycle.

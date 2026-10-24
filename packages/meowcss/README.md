@@ -79,10 +79,10 @@ supplies the rules (Meowtail's are `standardAuditRules`), and `allow` accepts a 
 
 ## Utility styles design
 
-The [utility styles design](../../docs/designs/2026-10-24-utility-styles.md) proposes a finite,
-token-backed utility catalog: `apply(spec)` inside theme files and an `sx` prop on host nodes and
-component parts. This is a proposed direction pending challenge and implementation; no current
-export provides it.
+The [utility styles design](../../docs/designs/2026-10-24-utility-styles.md) proposes utilities
+as typed functions over tokens (`p("group")`, `hover(bg("fill"))`) that compose into style values.
+Styles stay independent of component parts and are associated where they are used: a part selector
+in a theme, or a class on an instance. This is a proposed direction; no current export provides it.
 
 ## Verification
 

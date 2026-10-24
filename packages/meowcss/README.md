@@ -63,6 +63,8 @@ Components and themes share each `defineOptions` object from an implementation-f
 option-source definitions. Theme assembly does not compare component metadata with independently
 authored schemas. The root and adapters share the same internal token module; builds must not inline
 one copy per entry.
+`css` throws when an interpolation would print as `[object Object]`; a part descriptor from a second
+installed MeowJSX copy is the usual cause.
 
 ## Web lifecycle
 

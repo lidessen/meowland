@@ -157,6 +157,15 @@ To mount this custom component, use the same lifecycle as the first example with
 ready.</Callout>`. Extended themes reuse the standard token and fragment objects, including one
 utility fragment after the component styles. Keep those shared identities when assembling a theme.
 
+## Import only what you use
+
+The package declares `sideEffects: false` and every public entry is plain ESM, so a bundler keeps
+only what you import. `uiTokens` or `ui` alone does not bring in components, the JSX runtime or the
+theme rules; `standardTheme` brings the complete stylesheet; a `Button` import does not bring other
+components. Shiki loads only with the code surfaces (`CodeBlock`, `ReadBlock`, `JsonBlock`,
+`AssistantView`). Register components with `createMeowUI({ components: [...] })`; `meowUIComponents`
+is the full catalog and keeps every component.
+
 ## This site is made of it
 
 The site uses Meowtail for shared frames, tables, badges and links, with site layout in its own

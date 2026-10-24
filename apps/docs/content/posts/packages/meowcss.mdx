@@ -124,3 +124,18 @@ A static host writes `theme.cssText` to a stylesheet and uses `themeAttributes` 
 browser host calls `mountStyles(document, theme.cssText)` and `applyTheme(root, theme, config)`, keeping
 both cleanup functions. The Web `Theme` component binds configuration only; it does not load CSS.
 Importing any entry does not install styles or register components.
+
+## Bundling
+
+The package declares `sideEffects: false`. Its factories (`css`, `defineTokens`, `defineOptions`,
+`defineTheme`, `cx`, `parts` and the rest) are marked `@__NO_SIDE_EFFECTS__`, so Rollup drops an
+unused call in your own theme modules as well. esbuild applies that mark only inside the declaring
+module and Bun does not apply it, so with those bundlers write `/* @__PURE__ */` before a top-level
+call that should be droppable:
+
+```ts
+export const appTheme = /* @__PURE__ */ defineTheme({/* ... */});
+```
+
+`css` throws when a value would print as `[object Object]`. A part descriptor created by a second
+installed copy of MeowJSX is the usual cause; install one copy shared by MeowCSS and the host.

@@ -20,6 +20,10 @@ candidate and requires MeowJSX and MeowCSS `^0.2.0-alpha.0`.
   `partSelector`, and `surface`/`text`/`interactive`/`focusRing` recipe functions and types without aliases.
   Components forward class lists and composed refs while preserving their existing identities,
   options, Signal updates and lifecycle.
+- Importing `uiTokens` or `ui` alone no longer loads the Alert component, the JSX runtime or the theme
+  rules, and `standardTheme` is droppable when unused. `DialogPanel`, `DialogHeader` and
+  `DialogActions` move to their own modules; `./dialog` and the package entries still export all
+  four, so a `Dialog` import no longer keeps the others.
 
 ## 0.2.0-alpha.3
 

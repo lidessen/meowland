@@ -104,6 +104,12 @@ nullish values and empty strings. Static HTML reads the current values without s
 lists do not interpret object dictionaries or merge conflicting classes. The
 [MeowCSS guide](/packages/meowcss/#class-values-and-cx) covers reusable class values and `cx`.
 
+## Bundling
+
+The package declares `sideEffects: false`. The default runtime, JSX runtime and Web renderer are
+created by pure calls, so a bundle that imports only Signals, Context or types leaves the runtime
+and renderer out.
+
 ## Register and mount
 
 Metadata does not register a component. Register its function on the runtime that renders it; this

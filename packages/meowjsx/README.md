@@ -117,8 +117,8 @@ The [parts and ref-binding design](../../docs/designs/2026-10-24-component-parts
 selects ordinary function components and native JSX with `ref={ctx.parts.root}` or composed
 `ref={[ctx.parts.root, forwardedRef, mount]}` bindings. This is a design direction pending
 implementation and type validation; current exports still use `context.part(...)`. It is a
-breaking change: `context.part`, the old `defineComponent` form and `partSelector` are removed
-without aliases.
+breaking change: `context.part`, `defineComponent`, hand-written `ComponentContract` objects and
+`partSelector` are removed without aliases; themes address parts through a type-only adapter.
 
 ## Verification
 

@@ -47,7 +47,7 @@ options; runtime themes and Web shadows also consume the identity.
 
 ## Selected authoring surface
 
-`ctx.parts` exposes the finite part names associated with the component's contract. Each member is
+`ctx.parts` exposes the finite part names declared in the component's definition. Each member is
 an opaque, reusable binding descriptor. It carries identity and original component props; it does
 not automatically forward those props, merge events, hold a single current element, or create a
 component instance.
@@ -178,13 +178,35 @@ an implicit context through this design.
 ## Contracts and component forwarding
 
 Component identity, finite part names, style-option axes, defaults and carrier parts remain
-available before mounting. CSS assembly, selectors and documentation use that information without
-executing components. The initial implementation can retain existing contract objects and attach
-them to ordinary functions. Removing repeated generic arguments is part of the authoring goal;
-automatically generating contracts is not required for ref bindings.
+available before mounting, for the registry, shadows, the JSON catalog and documentation. Authors
+no longer write that information as a separate `ComponentContract` object. A component is defined
+once, with its identity inline, and the definition carries it:
 
-The exact typed association between an ordinary function, its contract and `ctx.parts` remains to
-be prototyped. A renamed or minified JavaScript function name is not a stable contract identity.
+```tsx
+// Working names.
+export const Card = component(
+  {
+    name: "card",
+    parts: ["root", "header", "body"],
+    style: defineStyleProps(cardOptions, { defaults: { tone: "neutral" } }),
+  },
+  ({ title, children, ref, ...props }, ctx) => (
+    <section {...props} ref={[ctx.parts.root, ref]}>
+      <h2 ref={ctx.parts.header}>{title}</h2>
+      <div ref={ctx.parts.body}>{children}</div>
+    </section>
+  ),
+);
+
+createMeowUI({ components: [Card, Alert] });
+```
+
+Name, part names and style binding are inferred from the literal; no generic arguments are repeated.
+The registry takes components directly. The `style` field stays opaque to the MeowJSX core: it is
+produced by `defineStyleProps` in `meowcss/meowjsx`, as today, so the core does not depend on
+MeowCSS. The component name is an explicit string, because a renamed or minified JavaScript function
+name is not a stable identity. Where the identity is stored on the function, and how a host reads it,
+comes from the type prototype.
 
 A ref passed to a function component remains a component prop. Core does not search the component's
 output for a first element or automatically choose a node from multi-root output. Components
@@ -192,30 +214,46 @@ explicitly forward refs to their intended host node and compose them with local 
 initial migration must audit wrappers that currently assume `props.ref` is a callable function;
 those wrappers must accept and forward composed refs too.
 
-Registration, theme assembly and CSS installation retain their existing owners. Attaching a
-contract to a function does not register it or install styles.
+Registration, theme assembly and CSS installation retain their existing owners. Defining a
+component does not register it or install styles.
 
-### Themes address parts through the same descriptors
+### Themes address parts through a type-only adapter
 
-The descriptors are defined with the contract, before any mount, and `ctx.parts` is that same
-object. A theme therefore addresses a part by interpolating its descriptor, and `partSelector` is
-not needed:
+A theme does not import a component at runtime. It imports the component's type and builds part
+descriptors from the name through one universal adapter:
 
 ```ts
-// Working names: the contract exposes its part descriptors.
+import type { Card } from "../../components/card";
+import { css, parts } from "meowcss/meowjsx";
+
+const card = parts<typeof Card>("card");
+
 export const cardStyles = css`
-  ${cardContract.parts.root} {
+  ${card.root} {
     ${ui.cx(ui.p.panel, ui.bg.raised)}
   }
 `;
 ```
 
-The `css` template in `meowcss/meowjsx` recognizes a part descriptor through a MeowJSX guard and
-emits the part selector (`:where([data-meowui-part="card/root"])`) and the contract dependency that
-`defineTheme` uses for carrier inference. The MeowJSX core gains no CSS text; the selector form stays
-owned by the adapter, as it is today. Styles themselves stay independent of parts: the descriptor
-is where a theme associates a style with a part, as the
-[utility styles design](2026-10-24-utility-styles.md) describes.
+- `import type` is erased, so a theme module loads no component code, and the JSON catalog, docs
+  and build scripts keep importing only what they use.
+- The argument is typed as the component's name literal, so `parts<typeof Card>("crad")` does not
+  compile, and the editor offers `"card"`. Members are typed as the component's part names.
+- At runtime the adapter needs only the name: `card.root` is a descriptor equal to the one
+  `ctx.parts.root` binds, by component name and part name. It is created on access, so the adapter
+  holds no part list; the type is the check. A theme can still be checked against the registered
+  components when it is assembled.
+- The `css` template in `meowcss/meowjsx` recognizes a descriptor through a MeowJSX guard and emits
+  the part selector `:where([data-meowui-part="card/root"])`. The MeowJSX core gains no CSS text.
+
+Because a theme no longer holds component contracts, `defineTheme` no longer infers option
+carriers from them. A conditional token bound to a component option resolves on the element that
+carries the option attribute: `:where([data-option-alert-tone="warning"])`. The style-props plugin
+already writes that attribute only on the carrier parts, so the computed result is the same, and
+the explicit `sources` binding is no longer needed for component options.
+
+Styles themselves stay independent of parts: the descriptor is where a theme associates a style
+with a part, as the [utility styles design](2026-10-24-utility-styles.md) describes.
 
 ## Breaking changes
 
@@ -224,18 +262,22 @@ in-repository component, theme, story and app migrates before the release that s
 affected package takes a breaking version bump under the [release contract](../releasing.md).
 
 - `context.part(name, tag, props, ...children)` is removed. Parts are bound with `ref={ctx.parts.x}`.
-- `defineComponent` with repeated name and part generics is removed. Components are ordinary
-  functions with an attached contract; the exact attachment API comes from the type prototype.
-- `partSelector(contract, part)` is removed from `meowcss/meowjsx`. Themes interpolate the part
-  descriptor directly, as above. The same applies to `ScopedTokens.at`, which takes a descriptor.
-- `ComponentContract.parts` changes from an array of names to the descriptor record. Code that reads
-  it as an array (`contract.parts.includes(...)`) breaks; the finite names stay available from the
-  record's keys.
+- `defineComponent` is removed. Components are defined once with their identity inline, as above.
+- `ComponentContract` is no longer an authoring surface: the `*Contract` objects and their
+  `satisfies ComponentContract` / `StyledComponentContract` declarations are removed, and the
+  registry, `createMeowUI` and plugin `components` lists take components instead of contracts.
+  Public exports named `*Contract` from Meowtail and Meowslides are removed.
+- `partSelector(contract, part)` is removed from `meowcss/meowjsx`. Themes use `parts<typeof X>(name)`
+  descriptors. `ScopedTokens.at` takes a descriptor.
+- `defineTheme` in `meowcss/meowjsx` no longer reads contract dependencies from fragments to infer
+  carriers; option tokens bind by option attribute. `CSSFragment` no longer carries component
+  dependencies.
 - `props.ref` on a component may be a composed array, not only a callback. Wrappers that call it as
   a function break and must forward it instead.
 
 Unchanged: part identity on the VNode (`componentPart`), the `data-meowui-part` marker and its
-values, option attributes, `defineOptions`, `defineStyleProps` and the style-props plugin's behavior.
+values, option attribute names and values, `defineOptions`, `defineStyleProps` and the style-props
+plugin's behavior.
 
 ## Alternatives considered
 
@@ -270,10 +312,12 @@ Failure cleanup and contextual typing still need the implementation checks below
    `Accordion` for repeated parts, and a host-forwarding control. Verify keyboard behavior, focus and
    drafts in the relevant real scenarios; unchanged observation depth and shadow behavior need
    focused contract checks.
-5. Teach the `meowcss/meowjsx` `css` template and `defineTheme` to accept part descriptors, then
-   migrate every `partSelector` call and remove it. Confirm the generated `cssText` is unchanged.
+5. Add the `parts<typeof X>(name)` adapter and descriptor support in the `meowcss/meowjsx` `css`
+   template; bind option tokens by attribute. Migrate every `partSelector` call and contract import
+   in themes to type-only imports, then remove `partSelector`. Confirm the generated `cssText` gives
+   unchanged computed styles.
 6. Update component authoring guidance, migrate the remaining components and wrappers, and remove
-   `context.part` and the old `defineComponent` form in the same release. There is no compatibility
+   `context.part`, `defineComponent` and the `*Contract` exports in the same release. There is no compatibility
    period.
 
 Use [development checks](../development-checks.md) for commands and coverage. No runtime, type,

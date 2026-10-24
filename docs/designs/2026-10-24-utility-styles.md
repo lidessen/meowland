@@ -63,8 +63,10 @@ Interpolating a class into a rule body expands its declarations; conditions expa
 `css` recognizes a class value (by its own marker, not by `toString`):
 
 ```ts
+const card = parts<typeof Card>("card"); // type-only import of Card
+
 export const cardStyles = css`
-  ${cardContract.parts.root} {
+  ${card.root} {
     ${ui.cx(ui.p.panel, ui.bg.raised, ui.radius.xl, ui.hover(ui.bg.fill))}
   }
 `;

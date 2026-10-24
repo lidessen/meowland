@@ -51,3 +51,10 @@ test("the assembled standard theme still carries its rules", async () => {
   const text = await bundle("meowtail/theme", ["standardTheme"]);
   expect(found(text, [themeRulesMarker])).toEqual([themeRulesMarker]);
 });
+
+test("a Dialog import leaves the other dialog pieces out", async () => {
+  const text = await bundle("meowtail", ["Dialog"]);
+  expect(
+    found(text, ['"dialog"', '"dialog-panel"', '"dialog-header"', '"dialog-actions"']),
+  ).toEqual(['"dialog"']);
+});

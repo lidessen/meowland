@@ -19,6 +19,11 @@ export function css(
     const value = values[index];
     if (value === undefined) return result + part;
     const interpolation = isClassValue(value) ? classDeclarations(value) : String(value);
+    // A plain object has no CSS form. A part descriptor from a second meowjsx copy lands here.
+    if (interpolation === "[object Object]")
+      throw new Error(
+        "css cannot interpolate a plain object; part descriptors need the same meowjsx copy as meowcss",
+      );
     return result + part + interpolation;
   }, "");
   return Object.freeze({ text, toString: () => text });

@@ -2,7 +2,10 @@
 
 Status: implementation and bounded local acceptance completed on 2026-10-24. The candidate is an
 uncommitted working tree based on `e3ee49a2076721e999f1e9901c1bf971b883270a`, not a released commit.
-This task created no branch, commit, push, npm publication, release dispatch or deployment.
+This task created no branch, commit, push, npm publication, release dispatch or deployment. The work
+was later committed as `46c8ec8`, with documentation in `22175b8`; this receipt does not establish
+that those commits match the acceptance snapshot below. Later bundle-size and review fixes are
+separate commits on top of them.
 
 The implemented contracts are the [component parts and refs design](../designs/2026-10-24-component-parts-ref-bindings.md)
 and [utility values design](../designs/2026-10-24-utility-styles.md). Published versions retain their

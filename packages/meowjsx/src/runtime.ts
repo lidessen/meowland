@@ -294,9 +294,11 @@ export function createRuntime(options: RuntimeOptions = {}): Runtime {
     ...children: Child[]
   ): VNode => {
     const context = { type, props: { ...props }, children, runtime };
-    const candidate = createBaseVNode(context);
-    const normalized = normalizeHostVNode(candidate);
-    if (normalized.raw) return normalized;
+    // Only a host ref can carry a part, and a part bypasses create hooks; skip the probe otherwise.
+    if (typeof type === "string" && Object.hasOwn(context.props, "ref")) {
+      const normalized = normalizeHostVNode(createBaseVNode(context));
+      if (normalized.raw) return normalized;
+    }
     return normalizeHostVNode(runCreateHooks(state, context));
   };
 

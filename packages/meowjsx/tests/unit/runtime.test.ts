@@ -398,3 +398,25 @@ test("plugin setup receives registered contributions and owns cleanup", () => {
   expect(runtime.registry.has(Card.meta.name)).toBe(false);
   expect(runtime.shadowRegistry.list()).toEqual([]);
 });
+
+test("hosts without a ref and components pass through create hooks exactly once", () => {
+  const seen: unknown[] = [];
+  const runtime = createRuntime({
+    plugins: [
+      {
+        create(context, next) {
+          seen.push(context.type);
+          return next(context);
+        },
+      },
+    ],
+  });
+  function Card() {
+    return null;
+  }
+  const host = runtime.h("div", { id: "plain" }, "text");
+  const component = runtime.h(Card, null);
+  expect(seen).toEqual(["div", Card]);
+  expect(host.props).toEqual({ id: "plain", children: "text" });
+  expect(component.raw).toBeUndefined();
+});

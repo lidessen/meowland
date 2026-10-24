@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { createRuntime, h, type Context } from "meowjsx";
 import { renderToHtmlWithRuntime } from "meowjsx/web";
-import { createStylePropsPlugin, defineStyleProps, parts } from "meowcss/meowjsx";
+import { createStylePropsPlugin, css, defineStyleProps, parts } from "meowcss/meowjsx";
 import { defineOptions } from "meowcss";
 
 const options = defineOptions("prototype-button", {
@@ -68,4 +68,23 @@ describe("component style props Web adapter", () => {
     node.componentPart = { component: "invalid", part: "root" };
     expect(() => renderToHtmlWithRuntime(rt, node)).toThrow("Unknown bound part");
   });
+});
+
+test("a descriptor that this meowjsx copy did not create fails instead of emitting [object Object]", () => {
+  // Same shape as a descriptor from a second installed meowjsx copy.
+  const foreign = Object.freeze({ component: "prototype-button", part: "root" });
+  expect(
+    () => css`
+      ${foreign as unknown as string} {
+        color: red;
+      }
+    `,
+  ).toThrow(/same meowjsx copy/);
+  expect(
+    css`
+      ${p.root} {
+        color: red;
+      }
+    `.text,
+  ).toContain('data-meowui-part="prototype-button/root"');
 });

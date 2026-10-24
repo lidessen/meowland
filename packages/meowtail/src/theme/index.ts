@@ -223,7 +223,7 @@ export const standardThemeStyles = [
   utilityStyles,
 ] as const;
 
-export const standardTheme = defineTheme({
+export const standardTheme = /* @__PURE__ */ defineTheme({
   options: standardOptions,
   defaults: { scheme: "auto" },
   tokens: standardThemeTokens,

@@ -16,6 +16,7 @@ export function isContextProvider(component: Function): boolean {
   return providers.has(component);
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 export function createContext<T>(defaultValue: T): ContextValue<T> {
   const key = Symbol("meowjsx.context");
   const Provider: ContextValue<T>["Provider"] = ({ children }) => children ?? null;

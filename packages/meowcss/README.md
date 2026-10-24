@@ -98,6 +98,15 @@ ordinary CSS in the declarations; there is no condition language, scanning or au
 The [utility styles design](../../docs/designs/2026-10-24-utility-styles.md) records the breaking
 replacement of the old recipe surface.
 
+## Bundling
+
+The package declares `sideEffects: false`. `css`, `defineOptions`, `defineTokens`, `tokenRef`,
+`compileTokens`, `defineTheme`, `themeAttributes`, `defineClassValue`, `cx`, `defineStyleProps`
+and `parts` are marked `@__NO_SIDE_EFFECTS__`, so Rollup drops an unused call anywhere, including in
+a consumer's own theme modules. In local checks with esbuild 0.25 the mark applied only inside the
+declaring module, and Bun 1.4 did not apply it; with those bundlers, mark a top-level call
+`/* @__PURE__ */` when it should be droppable.
+
 ## Verification
 
 - `bun test packages/meowcss/tests/unit` verifies pure generation, typed parts, carriers, cross-entry token identity and theme lifecycle.

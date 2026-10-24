@@ -73,8 +73,14 @@ export function createWebRenderer(
 }
 
 /** The default runtime's Web renderer; apps that install into it use this one. */
-export const defaultWebRenderer = createWebRenderer();
+export const defaultWebRenderer = /* @__PURE__ */ createWebRenderer();
 
-export const render = defaultWebRenderer.render;
-export const mount = defaultWebRenderer.mount;
-export const renderToHtml = defaultWebRenderer.renderToHtml;
+// A pure read lets bundlers drop the default renderer when none of these members is used.
+/* @__NO_SIDE_EFFECTS__ */
+function defaultMember<Key extends keyof WebRenderer>(key: Key): WebRenderer[Key] {
+  return defaultWebRenderer[key];
+}
+
+export const render = /* @__PURE__ */ defaultMember("render");
+export const mount = /* @__PURE__ */ defaultMember("mount");
+export const renderToHtml = /* @__PURE__ */ defaultMember("renderToHtml");

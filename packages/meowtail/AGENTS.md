@@ -498,6 +498,12 @@ Themes type-import components and runtime-import only implementation-free option
 selective registration factory imports no complete component catalog. The syntax highlighter stays
 in the code-surface components, so a host registering only Button does not retain its engine graph.
 `sideEffects: false` lets a bundler drop unused component modules from the package barrel.
+Inside a kept module, esbuild and Bun drop an unused top-level value only when its call is marked
+`/* @__PURE__ */`; mark a top-level assembly from many imports (such as `standardTheme`) that way.
+The MeowCSS factories carry `@__NO_SIDE_EFFECTS__`, which only Rollup applies across modules. Several
+components in one module are kept together by esbuild because `X.meta = …` is a statement, so keep
+unrelated components in separate modules. `tests/unit/tree-shaking.test.ts` guards the token, `ui`,
+Signal-only and presentation-options bundles.
 `standardTheme.cssText` is handed to the host for explicit composition: static builds generate CSS
 assets, dynamic documents use `mountStyles` and clean up; root configuration uses `Theme`,
 `applyTheme`, or `themeAttributes`.

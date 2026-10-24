@@ -24,6 +24,7 @@ export interface StylePropsBinding<O extends Options<any> = Options<any>> {
   readonly parts: readonly string[];
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 export function defineStyleProps<O extends Options<any>>(
   options: O,
   config: {
@@ -63,6 +64,7 @@ export type Parts<C> = {
 };
 
 /** Creates type-checked, runtime-lazy descriptors for a component's declared parts. */
+/* @__NO_SIDE_EFFECTS__ */
 export function parts<C extends ComponentWithMeta>(componentName: ComponentName<C>): Parts<C> {
   return new Proxy(Object.create(null) as Parts<C>, {
     get(_target, property) {

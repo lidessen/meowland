@@ -3,6 +3,7 @@
   "version": "0.2.0-alpha.0",
   "license": "MIT",
   "type": "module",
+  "sideEffects": false,
   "scripts": {
     "test": "bun test tests/unit",
     "typecheck": "tsc -p tsconfig.core.json && tsc -p tsconfig.renderer.json && tsc -p tsconfig.web.json"

@@ -83,6 +83,7 @@ function valueDescription(source: Source, input: unknown): ConditionalValue {
   });
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 export function defineOptions<const A extends Axes>(
   name: string,
   input: A & { scheme?: never },
@@ -183,10 +184,12 @@ const definitions = new WeakMap<object, readonly Declaration[]>();
 export function isTokenSet(value: unknown): value is TokenSet {
   return typeof value === "object" && value !== null && definitions.has(value);
 }
+/* @__NO_SIDE_EFFECTS__ */
 export function tokenRef(namespace: string, ...path: string[]): TokenRef {
   const name = `--${[namespace, ...path].map(segment).join("-")}`;
   return Object.freeze({ name, toString: () => `var(${name})` });
 }
+/* @__NO_SIDE_EFFECTS__ */
 export function defineTokens<const T extends TokenTree>(
   namespace: string,
   input: T,
@@ -240,6 +243,7 @@ export interface TokenBinding {
   /** Optional selector resolver used by component adapters for otherwise-unbound sources. */
   readonly resolveSource?: (attribute: string) => string | undefined;
 }
+/* @__NO_SIDE_EFFECTS__ */
 export function compileTokens(
   tokens: TokenSet | readonly TokenSet[],
   binding: TokenBinding,

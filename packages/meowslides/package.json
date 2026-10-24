@@ -3,6 +3,7 @@
   "version": "0.1.0-alpha.1",
   "license": "MIT",
   "type": "module",
+  "sideEffects": false,
   "description": "MeowJSX presentation runtime and trusted local MDX authoring",
   "repository": {
     "type": "git",

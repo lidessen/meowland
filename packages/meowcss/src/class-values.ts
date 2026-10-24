@@ -37,6 +37,7 @@ function makeValue(className: string, metadata: ValueMetadata): ClassValue {
 }
 
 /** Creates a theme-owned class value; `order` is its position in that theme's catalog. */
+/* @__NO_SIDE_EFFECTS__ */
 export function defineClassValue(
   className: string,
   order: number,
@@ -89,6 +90,7 @@ function appendInput(
 }
 
 /** Composes classes without interpreting names or resolving stylesheet conflicts. */
+/* @__NO_SIDE_EFFECTS__ */
 export function cx(...inputs: readonly ClassNameInput[]): ClassValue {
   const classNames: string[] = [];
   const declarations: DeclarationEntry[] = [];

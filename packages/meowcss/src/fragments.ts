@@ -10,6 +10,7 @@ export interface CSSValue {
   toString(): string;
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 export function css(
   strings: TemplateStringsArray,
   ...values: (string | number | CSSValue | ClassValue)[]

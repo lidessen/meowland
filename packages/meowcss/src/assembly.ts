@@ -66,6 +66,7 @@ function assembleTheme<O extends Options<any>>(
 }
 
 /** A static attribute snapshot; no subscriptions, JSX runtime or DOM access. */
+/* @__NO_SIDE_EFFECTS__ */
 export function themeAttributes(
   theme?: ThemeDefinition,
   config?: Selection,
@@ -78,6 +79,7 @@ export function themeAttributes(
   };
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 export function defineTheme<O extends Options<any>>(config: {
   options: O;
   defaults: Defaults<NoInfer<O>>;

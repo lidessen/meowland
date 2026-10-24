@@ -44,9 +44,15 @@ export function createJSXRuntime(runtime: Runtime): JSXRuntime {
   };
 }
 
-const defaultJSXRuntime = createJSXRuntime(defaultRuntime);
+const defaultJSXRuntime = /* @__PURE__ */ createJSXRuntime(defaultRuntime);
 
-export const Fragment = defaultJSXRuntime.Fragment;
-export const jsx = defaultJSXRuntime.jsx;
-export const jsxs = defaultJSXRuntime.jsxs;
-export const jsxDEV = defaultJSXRuntime.jsxDEV;
+// A pure read lets bundlers drop the default JSX runtime when none of these members is used.
+/* @__NO_SIDE_EFFECTS__ */
+function defaultMember<Key extends keyof JSXRuntime>(key: Key): JSXRuntime[Key] {
+  return defaultJSXRuntime[key];
+}
+
+export const Fragment = /* @__PURE__ */ defaultMember("Fragment");
+export const jsx = /* @__PURE__ */ defaultMember("jsx");
+export const jsxs = /* @__PURE__ */ defaultMember("jsxs");
+export const jsxDEV = /* @__PURE__ */ defaultMember("jsxDEV");

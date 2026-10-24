@@ -404,14 +404,20 @@ export function createRuntime(options: RuntimeOptions = {}): Runtime {
   return runtime;
 }
 
-export const defaultRuntime = createRuntime();
+export const defaultRuntime = /* @__PURE__ */ createRuntime();
 
-export const registry = defaultRuntime.registry;
-export const h = defaultRuntime.h;
-export const raw = defaultRuntime.raw;
-export const Fragment = defaultRuntime.Fragment;
+// A pure read lets bundlers drop the default runtime when none of these members is used.
+/* @__NO_SIDE_EFFECTS__ */
+function defaultMember<Key extends keyof Runtime>(key: Key): Runtime[Key] {
+  return defaultRuntime[key];
+}
 
-export const registerComponent = defaultRuntime.registerComponent;
+export const registry = /* @__PURE__ */ defaultMember("registry");
+export const h = /* @__PURE__ */ defaultMember("h");
+export const raw = /* @__PURE__ */ defaultMember("raw");
+export const Fragment = /* @__PURE__ */ defaultMember("Fragment");
+
+export const registerComponent = /* @__PURE__ */ defaultMember("registerComponent");
 
 export function useRuntime(plugin: RuntimePluginOption): Cleanup {
   return defaultRuntime.use(plugin);

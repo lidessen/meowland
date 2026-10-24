@@ -17,6 +17,7 @@ function selectorForPart(part: PartDescriptor): string {
   return `:where([data-meowui-part=${JSON.stringify(`${part.component}/${part.part}`)}])`;
 }
 
+/* @__NO_SIDE_EFFECTS__ */
 export function defineTheme<O extends Options<any>>(config: {
   options: O;
   defaults: Defaults<NoInfer<O>>;

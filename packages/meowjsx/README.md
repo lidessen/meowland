@@ -168,6 +168,13 @@ HTML/SVG node inference for native JSX refs. Register component functions with `
 metadata does not register itself. The [parts and ref-binding design](../../docs/designs/2026-10-24-component-parts-ref-bindings.md)
 records the breaking migration and theme adapter.
 
+## Bundling
+
+The package declares `sideEffects: false` and ships one ESM module per source file. The default
+runtime, JSX runtime and Web renderer are created by `/* @__PURE__ */` calls, and their exported
+members (`h`, `Fragment`, `jsx`, `render` and the rest) are pure reads, so a bundle that imports only
+Signals, Context or types leaves the runtime and renderer out.
+
 ## Verification
 
 - `bun test packages/meowjsx/tests/unit`: Signal, VNode, plugin, metadata, part/ref bindings, fake target seam and Web host tests.

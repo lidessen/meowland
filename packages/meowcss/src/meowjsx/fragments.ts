@@ -6,6 +6,7 @@ import type { Condition, TokenRef } from "../values";
 export type CSSFragment = Fragment;
 
 /** CSS composition emits part selectors while leaving theme assembly registry-free. */
+/* @__NO_SIDE_EFFECTS__ */
 export function css(
   strings: TemplateStringsArray,
   ...values: (string | number | TokenRef | Condition | PartDescriptor | ClassValue | CSSFragment)[]

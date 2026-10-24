@@ -1,4 +1,4 @@
-import { alertOptions } from "../components/alert";
+import { alertOptions } from "../components/alert.options";
 import { defineOptions, defineTokens, tokenRef } from "meowcss";
 
 /** Shared standard-theme parameters; scheme is built in, no fixed density axis. */

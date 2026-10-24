@@ -1,18 +1,18 @@
 # MeowCSS
 
-MeowCSS is a token, option and CSS generation mechanism. It owns no component and no layout: it
-turns declared tokens, options and style fragments into one stylesheet that a document mounts once.
+MeowCSS turns tokens, options and style fragments into a stylesheet. Its root entry also provides
+`cx` and class values. The root is independent of JSX, UI and the DOM; component bindings come from
+`meowcss/meowjsx`, and browser theme lifecycle comes from `meowcss/web`.
 
 ## Tokens, options, styles
 
-A theme is three things: the options that name the axes, the tokens that hold the values, and the
-style fragments that use them.
+A theme declares its configuration options, the tokens that hold values, and the fragments that use
+them. This example needs only the root entry and can run in a build program without a document.
 
 ```ts
-import { css, defineOptions, defineTokens } from "meowcss";
-import { defineTheme } from "meowcss/meowjsx";
+import { css, defineOptions, defineTheme, defineTokens } from "meowcss";
 
-const options = defineOptions("reader", { tone: ["quiet", "loud"] });
+const options = defineOptions("reader", {});
 const tokens = defineTokens("reader", {
   ink: ["#111111", "#f5f5f5"],
   measure: "68ch",
@@ -20,10 +20,10 @@ const tokens = defineTokens("reader", {
 
 export const readerTheme = defineTheme({
   options,
-  defaults: { scheme: "auto", tone: "quiet" },
+  defaults: { scheme: "auto" },
   tokens: [tokens],
   styles: css`
-    body {
+    .reader {
       color: ${tokens.ink};
       max-width: ${tokens.measure};
     }
@@ -31,17 +31,96 @@ export const readerTheme = defineTheme({
 });
 ```
 
-The token path is checked at compile time, so a renamed token is a type error rather than a silent
-blank value. Interpolating a token emits a CSS variable, and a token that holds a light and a dark
-value resolves per scheme.
+The token path is checked at compile time, so a renamed token is a type error. Interpolating a token
+emits a CSS variable, and a light/dark pair resolves per scheme. `readerTheme.cssText` contains the
+resulting stylesheet; `themeAttributes(readerTheme)` provides the attributes for a static theme root.
+The build host writes the CSS asset and places those attributes on the HTML root.
 
-## Options are axes
+<h2 id="class-values-and-cx">Class values and cx</h2>
 
-An option set declares the axes a component may vary along and the choices each axis allows. The
-component declares the axis in its style metadata; the theme decides what a choice looks like. A component
-never writes a `data-option` attribute by hand.
+Meowtail supplies the built-in `ui` catalog. Use its values directly in a MeowJSX class list, or
+compose a reusable value with `cx` from MeowCSS.
 
-<Callout tone="note">
-  The root entry depends on neither JSX, nor UI, nor the DOM. The component adapter is
-  `meowcss/meowjsx` and the DOM theme lifecycle is `meowcss/web`.
-</Callout>
+```tsx
+import { h } from "meowjsx";
+import { cx } from "meowcss";
+import { ui } from "meowtail/theme";
+
+const panelClasses = cx(ui.p.panel, ui.bg.raised, ui.radius.xl);
+
+export const panel = (
+  <aside className={cx("host-panel", panelClasses)}>
+    <p className={[ui.text.caption, ui.color.secondary]}>Changes saved</p>
+  </aside>
+);
+```
+
+`cx` accepts class values, plain class strings and nested readonly lists, omitting `false`, `null`,
+`undefined` and empty strings. JavaScript supplies conditions, such as `active && "is-active"`.
+It preserves class argument order and returns a value whose string conversion gives the joined
+classes. Stylesheet order and the CSS cascade decide overlapping properties; changing argument order
+does not resolve conflicts.
+
+MeowJSX class lists also accept Signals. Keep those Signals in `className={[baseClasses, callerClasses]}`
+or use `mapSignal` to compute a new composite; `cx` itself does not subscribe to Signals. In
+particular, a component forwarding `Props["className"]` should retain that full value in a class list.
+
+A class value retains its declarations, so the same composition can supply a theme rule:
+
+```ts
+import { css, cx } from "meowcss";
+import { ui } from "meowtail/theme";
+
+export const panelStyles = css`
+  .host-panel {
+    ${cx(ui.p.panel, ui.bg.raised, ui.radius.xl)}
+  }
+`;
+```
+
+Within one composite, declarations from the same catalog expand in that catalog's numeric order,
+matching its stylesheet; catalogs are grouped by first appearance. Separate interpolations and
+handwritten declarations keep ordinary CSS order. A plain class string has no attached declarations,
+so a composite containing one is valid for `className` but throws if expanded as declarations.
+
+The standard Meowtail theme includes the `ui` stylesheet. Creating a class value or calling `cx`
+does not install styles, scan source files or register anything during rendering. Another theme can
+use `defineClassValue(className, order, declarations, catalog)` to build its own catalog. Reuse one
+object or Symbol for its catalog identity and match the numeric order to the rules it delivers.
+
+## Component options and parts
+
+An option set names an axis and its allowed values. The component attaches it to `meta.style` with
+`defineStyleProps`; the theme addresses finite parts using a type-only component import.
+
+```ts
+import type { Button } from "meowtail";
+import { buttonOptions } from "meowtail";
+import { css, parts } from "meowcss/meowjsx";
+import { uiTokens } from "meowtail/theme";
+
+const button = parts<typeof Button>("button");
+export const buttonStyles = css`
+  ${button.root} {
+    ${buttonOptions.when({ variant: "quiet" })} {
+      color: ${uiTokens.ink.secondary};
+    }
+  }
+`;
+```
+
+`parts` exposes only the component's declared names and does not load its implementation. Components
+and themes share options from an implementation-free module. The style-props adapter writes option
+attributes on the declared carrier parts, so components do not hand-write generated attributes.
+The [Meowtail guide](/packages/meowtail/#a-component-declares-the-theme-paints) shows that wiring.
+
+The adapter's `defineTheme` binds option-dependent component tokens through those attributes. Root
+and scheme configuration stays regional. Pure CSS consumers use the root `defineTheme` with explicit
+`sources` and selectors for option-dependent tokens.
+
+## Deliver the theme
+
+A static host writes `theme.cssText` to a stylesheet and uses `themeAttributes` for its root. A dynamic
+browser host calls `mountStyles(document, theme.cssText)` and `applyTheme(root, theme, config)`, keeping
+both cleanup functions. The Web `Theme` component binds configuration only; it does not load CSS.
+Importing any entry does not install styles or register components.

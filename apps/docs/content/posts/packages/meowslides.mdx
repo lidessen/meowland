@@ -7,26 +7,33 @@ on it.
 
 ## What a slide is
 
-A slide is data: a title, some content and the elements that reveal in a step.
+A slide has an id, a title and a render function. Set `steps` to the number of advances after the
+initial view, then use `Reveal` at the matching step.
 
 ```tsx
+import { h } from "meowjsx";
 import { Presentation, Reveal, type SlideDefinition } from "meowslides";
 
-const deck: SlideDefinition[] = [
+const deck = [
   {
     id: "opening",
-    layout: "title",
-    content: [{ type: "text", text: "One render graph" }],
+    title: "One render graph",
+    render: () => <h1>One render graph</h1>,
   },
   {
     id: "detail",
-    layout: "default",
-    content: [
-      { type: "text", text: "The next point" },
-      { type: "reveal", content: [{ type: "text", text: "arrives on a step" }] },
-    ],
+    title: "The next point",
+    steps: 1,
+    render: () => (
+      <section>
+        <h2>The next point</h2>
+        <Reveal at={1}>It arrives on a step.</Reveal>
+      </section>
+    ),
   },
-];
+] satisfies readonly SlideDefinition[];
+
+export const example = <Presentation title="One render graph" slides={deck} />;
 ```
 
 ## Trust boundary

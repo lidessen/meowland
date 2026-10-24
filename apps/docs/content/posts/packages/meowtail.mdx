@@ -1,41 +1,105 @@
 # Meowtail
 
-Meowtail is the component library the rest of Meowland is built from. It owns the cross-application
-components, the semantic layout, the standard theme and the complete Assistant composition.
-Networking, execution, permissions and persistence stay with the host.
+Meowtail provides cross-application components, semantic layout, the standard theme and the complete
+Assistant composition. Networking, execution, permissions and persistence stay with the host.
 
-## A component declares, the theme paints
+## Three steps to a working page
 
-The component is an ordinary function with typed `.meta`; style declarations stay on the metadata object while selectors use the CSS part descriptors.
+Register the components on the runtime that renders the page, deliver the stylesheet, then bind the
+theme root. This browser entry assumes the page contains `<main id="app"></main>`.
 
 ```tsx
-import { type Context, type Props, createRuntime, h } from "meowjsx";
-import "meowjsx/web";
+import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { cx, defineOptions } from "meowcss";
 import { applyTheme, mountStyles } from "meowcss/web";
-import { css, defineStyleProps, parts, type ThemedProps } from "meowcss/meowjsx";
-import { createMeowUI } from "meowtail";
-import { extendStandardTheme, ui, uiTokens } from "meowtail/theme";
+import { Button, createMeowUI } from "meowtail";
+import { standardTheme } from "meowtail/theme";
+
+const host = document.querySelector<HTMLElement>("#app");
+if (!host) throw new Error("Missing app root");
+
+const runtime = createRuntime();
+const uninstall = runtime.use(createMeowUI({ components: [Button] }));
+const removeStyles = mountStyles(host.ownerDocument, standardTheme.cssText);
+const removeTheme = applyTheme(host, standardTheme);
+const mounted = createWebRenderer(runtime).render(<Button>Save</Button>, host);
+
+export function dispose() {
+  mounted.unmount();
+  removeTheme();
+  removeStyles();
+  uninstall();
+}
+```
+
+Call `dispose` when the host is destroyed. Component imports, registration and theme delivery each
+have a separate job. Register every family rendered by the host and its compositions. A host that
+needs the full catalog can import `meowUIComponents` from `meowtail` and pass it as `components`.
+The selective factory does not import the full catalog itself.
+
+The standard theme provides typography, component rules and utility classes. It does not reset
+`html` or `body` margins or allocate the page layout. Compose a page with `Page`, `Stack`, `Inline`
+and `Grid`; register those components when the page uses them.
+
+## Class lists and cx
+
+Use `ui` from `meowtail/theme` for the built-in class catalog and `cx` from `meowcss` for a reusable
+composition. Both forms below use rules already delivered by the standard theme.
+
+```tsx
+import { h, mapSignal, signal } from "meowjsx";
+import { cx } from "meowcss";
+import { ui } from "meowtail/theme";
+
+const panelClasses = cx(ui.p.panel, ui.bg.raised, ui.radius.xl);
+const selected = signal(false);
+
+export const panel = (
+  <section className={[panelClasses, mapSignal(selected, (on) => on && "is-selected")]}>
+    <p className={[ui.text.caption, ui.color.secondary]}>Changes saved</p>
+  </section>
+);
+```
+
+`className` keeps nested lists and Signals live. `cx` composes class values and strings; it preserves
+declarations for reuse in a CSS template. Use a class list when forwarding a caller's `className`,
+since that prop may contain Signals. JavaScript supplies conditions, and theme CSS supplies hover,
+focus and responsive rules. Stylesheet order and the CSS cascade resolve conflicts. The
+[MeowCSS guide](/packages/meowcss/#class-values-and-cx) covers declaration expansion and custom catalogs.
+
+<h2 id="a-component-declares-the-theme-paints">A component declares, the theme paints</h2>
+
+A component names its parts and finite style options in static `meta`. Keep shared options in a
+module that imports no component implementation.
+
+```ts
+// callout.options.ts
+import { defineOptions } from "meowcss";
 
 export const calloutOptions = defineOptions("callout", {
   tone: ["neutral", "accent"],
 });
+```
+
+The component forwards native props, including the caller's class list, and explicitly composes the
+caller ref with its root part. Its function body runs once per mount.
+
+```tsx
+// callout.tsx
+import { h, type Context, type Props } from "meowjsx";
+import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
+import { calloutOptions } from "./callout.options";
 
 export interface CalloutProps extends Props, ThemedProps<typeof calloutOptions> {
   title: string;
 }
 
 export function Callout(
-  { title, children, ref, className, ...props }: CalloutProps,
+  { title, children, ref, ...props }: CalloutProps,
   context: Context<typeof Callout>,
 ) {
   return (
-    <aside
-      {...props}
-      className={cx(className, ui.bg.fill, ui.text.secondary)}
-      ref={[context.parts.root, ref]}
-    >
+    <aside {...props} ref={[context.parts.root, ref]}>
       <strong ref={context.parts.title}>{title}</strong>
       {children}
     </aside>
@@ -46,18 +110,34 @@ Callout.meta = {
   parts: ["root", "title"],
   style: defineStyleProps(calloutOptions, { defaults: { tone: "neutral" } }),
 } as const;
+```
+
+The theme type-imports the component to address its finite parts. It runtime-imports the shared
+options, then paints the parts with tokens and class-value declarations.
+
+```ts
+// callout.theme.ts
+import type { Callout } from "./callout";
+import { css, parts } from "meowcss/meowjsx";
+import { extendStandardTheme, ui, uiTokens } from "meowtail/theme";
+import { calloutOptions } from "./callout.options";
 
 const callout = parts<typeof Callout>("callout");
 export const calloutTheme = extendStandardTheme({
   styles: [
     css`
       ${callout.root} {
+        display: grid;
+        gap: ${uiTokens.space.group};
+        ${ui.text.body}
+        ${ui.bg.fill}
+        ${ui.p.group}
         border-radius: ${uiTokens.radius.lg};
-        padding: ${uiTokens.space.group};
         border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
-      }
-      ${callout.root}[${calloutOptions.attribute("tone")}="accent"] {
-        ${uiTokens.accent.line};
+        ${calloutOptions.when({ tone: "accent" })} {
+          border-color: ${uiTokens.accent.line};
+          background: ${uiTokens.accent.soft};
+        }
       }
       ${callout.title} {
         font-weight: ${uiTokens.type.weight.semibold};
@@ -65,44 +145,20 @@ export const calloutTheme = extendStandardTheme({
     `,
   ],
 });
-
-const calloutRuntime = createRuntime({ plugins: [createMeowUI({ components: [Callout] })] });
-const calloutRenderer = createWebRenderer(calloutRuntime);
-const document = globalThis.document;
-mountStyles(document, calloutTheme.cssText);
-applyTheme(document.documentElement, calloutTheme);
-calloutRenderer.render(
-  h(Callout, { title: "Saved", tone: "accent" }, "Your changes are ready."),
-  document.querySelector("#callout"),
-);
 ```
 
-The component binds its finite parts with `context.parts`, and the theme selects them with typed CSS descriptors. `cx` composes class values from `ui`; the standard theme includes those utility declarations. The style plugin writes the part and option attributes during rendering, so components never set those attributes by hand.
+Core binds the part identity through `ref`. The style-props adapter registered by `createMeowUI`
+consumes `tone` and writes its generated option attribute on the root carrier. Components do not
+hand-write those attributes. `parts<typeof Callout>("callout")` exposes only the parts declared in
+`Callout.meta`, and `defineStyleProps` checks the allowed defaults.
 
-## Three steps to a working page
-
-Importing components is not enough. A page needs the component registry installed on its runtime,
-the theme stylesheet mounted, and the theme root bound to the document.
-
-```tsx
-import { createRuntime, h } from "meowjsx";
-import { createWebRenderer } from "meowjsx/web";
-import { Button, createMeowUI, meowUIComponents } from "meowtail";
-import { standardTheme } from "meowtail/theme";
-import { applyTheme, mountStyles } from "meowcss/web";
-
-const runtime = createRuntime({
-  plugins: [createMeowUI({ components: meowUIComponents })],
-});
-const renderer = createWebRenderer(runtime);
-const document = globalThis.document;
-
-mountStyles(document, standardTheme.cssText);
-applyTheme(document.documentElement, standardTheme);
-renderer.render(h(Button, null, "Save"), document.querySelector("#app"));
-```
+To mount this custom component, use the same lifecycle as the first example with
+`components: [Callout]`, `calloutTheme` and `<Callout title="Saved" tone="accent">Your changes are
+ready.</Callout>`. Extended themes reuse the standard token and fragment objects, including one
+utility fragment after the component styles. Keep those shared identities when assembling a theme.
 
 ## This site is made of it
 
-Every frame, table, badge and link on this site is a Meowtail component, painted by a theme that
-extends the standard theme. The site does not carry a second palette or a second radius scale.
+The site uses Meowtail for shared frames, tables, badges and links, with site layout in its own
+theme. Stories supply scenario data and drive real components; the documentation app does not copy
+their implementations. Each component reference lists its `meta` name, style axes and finite parts.

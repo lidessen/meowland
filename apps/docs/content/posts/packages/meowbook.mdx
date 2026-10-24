@@ -8,7 +8,7 @@ them, and runs each story in an isolated canvas. It does not depend on Storybook
 A story declares what to show, in which group, and which component it belongs to.
 
 ```tsx
-import { h } from "meowjsx/runtime";
+import { h } from "meowjsx";
 import { defineStory } from "meowbook";
 import { Button } from "meowtail";
 
@@ -25,6 +25,26 @@ export const ButtonStory = defineStory({
 
 Discovery reads the file with a parser and never executes it, so a broken story cannot run during
 the build.
+
+## Register components in the preview
+
+A story that renders Meowtail components needs a preview environment that registers them and mounts
+their theme. Point `preview` in `meowbook.config.ts` at this file.
+
+```ts
+import { createRuntime } from "meowjsx";
+import { applyTheme, mountStyles } from "meowcss/web";
+import { createMeowUI, meowUIComponents } from "meowtail";
+import { standardTheme } from "meowtail/theme";
+import type { PreviewEnvironment } from "meowbook";
+
+export default (({ root, onCleanup }) => {
+  const document = root.ownerDocument;
+  onCleanup(mountStyles(document, standardTheme.cssText));
+  onCleanup(applyTheme(document.documentElement, standardTheme));
+  return createRuntime({ plugins: [createMeowUI({ components: meowUIComponents })] });
+}) satisfies PreviewEnvironment;
+```
 
 ## The canvas is a separate document
 

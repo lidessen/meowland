@@ -1,13 +1,13 @@
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
 
-/** One published package the site documents. */
+/** One workspace package the site documents. */
 export interface DocsPackage {
   /** The npm name. */
   name: string;
   /** The name as the site titles the page. */
   title: string;
-  /** The published version. */
+  /** The version declared by the workspace manifest, which may be an unpublished candidate. */
   version: string;
   /** The one-line summary the site shows. */
   summary: string;
@@ -47,7 +47,7 @@ interface PackageManifest {
   description?: string;
 }
 
-/** Read the published packages from the workspace manifests. */
+/** Read the documented packages from the workspace manifests. */
 export async function readPackages(root: string): Promise<DocsPackage[]> {
   const packages: DocsPackage[] = [];
   for (const name of PACKAGE_NAMES) {

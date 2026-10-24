@@ -216,7 +216,7 @@ function HomePage({ state }: { state: DocsState }): Child {
                 <strong>{entry.title}</strong>
                 <p>{entry.summary}</p>
                 <span className="docs-package-version">
-                  {entry.version === "unpublished" ? "Unpublished" : `v${entry.version}`}
+                  {entry.version === "unpublished" ? "Unpublished" : `Source v${entry.version}`}
                 </span>
               </div>
             </a>
@@ -331,7 +331,21 @@ function PackagePage({
   state: DocsState;
 }): Child {
   const sections: ReadingSection[] = [
-    { id: "installation", title: "Installation", children: <InstallLine name={entry.name} /> },
+    {
+      id: "installation",
+      title: "Installation",
+      children: (
+        <Stack gap="compact">
+          <InstallLine name={entry.name} />
+          <Note>
+            This guide follows the workspace source. The version badge comes from its package
+            manifest; local candidates may include APIs absent from npm. Check the repository's{" "}
+            <a href="https://github.com/lidessen/meowland#release-status">release status</a> before
+            choosing an install version.
+          </Note>
+        </Stack>
+      ),
+    },
   ];
   if (content) {
     sections.push({
@@ -376,7 +390,7 @@ function PackagePage({
       description={entry.summary}
       actions={
         <Badge tone="outline" size="small">
-          {entry.version === "unpublished" ? "Unpublished" : `v${entry.version}`}
+          {entry.version === "unpublished" ? "Unpublished" : `Source v${entry.version}`}
         </Badge>
       }
       width={PAGE_WIDTH}
@@ -473,8 +487,9 @@ function ComponentPage({
           <h3 className="docs-example-title">Registry</h3>
           {component.meta ? (
             <Note>
-              The component is registered as <code>{component.meta.name}</code> in the meowtail
-              component registry.
+              The component's static <code>meta</code> declares the name{" "}
+              <code>{component.meta.name}</code>. Register its function with{" "}
+              <code>createMeowUI({"{ components: [...] }"})</code> on the runtime that renders it.
             </Note>
           ) : (
             <Note>

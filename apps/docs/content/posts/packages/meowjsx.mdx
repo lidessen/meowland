@@ -1,32 +1,53 @@
 # MeowJSX
 
-MeowJSX is the rendering runtime the rest of the library sits on. It renders a tree of nodes, and it
-lets a component bind a signal to an attribute or a text node, so a later change reaches the DOM
-without re-rendering the tree.
+MeowJSX is the rendering runtime the rest of the library sits on. A component binds Signals to
+attributes, text or children, and later changes update those bindings without running the component
+function again. The root entry is independent of the DOM; browser rendering comes from `meowjsx/web`.
 
 ## Setup runs once
 
-A component uses an ordinary function declaration, types its context as `Context<typeof Toggle>`, and attaches the finite part list as `.meta`. Binding the root descriptor with native `ref` keeps the host element in normal JSX.
+A component is an ordinary function. Its static `meta` declares a stable name and finite parts;
+`Context<typeof Toggle>` supplies those parts and the mount lifecycle.
 
 ```tsx
-import { mapSignal, type Context, type MaybeSignal, type Props } from "meowjsx";
+import {
+  h,
+  isSignal,
+  mapSignal,
+  unwrap,
+  type Context,
+  type MaybeSignal,
+  type Props,
+} from "meowjsx";
+import type { WebRef } from "meowjsx/web";
 
 export interface ToggleProps extends Props {
-  /** Controlled when provided; a signal keeps it live. */
   pressed?: MaybeSignal<boolean>;
+  defaultPressed?: boolean;
   onPressedChange?: (pressed: boolean) => void;
+  ref?: WebRef<HTMLButtonElement>;
 }
 
 export function Toggle(
-  { pressed = false, onPressedChange, children, ref, ...props }: ToggleProps,
+  { pressed, defaultPressed = false, onPressedChange, children, ref, ...props }: ToggleProps,
   context: Context<typeof Toggle>,
 ) {
+  const local = context.signal(defaultPressed);
+  const current = pressed !== undefined ? pressed : local;
+  const ariaPressed = isSignal(current)
+    ? mapSignal(current, (value) => String(value))
+    : String(current);
+
   return (
     <button
       {...props}
       type="button"
-      aria-pressed={mapSignal(pressed, (value) => String(value))}
-      onClick={() => onPressedChange?.(!pressed)}
+      aria-pressed={ariaPressed}
+      onClick={() => {
+        const next = !unwrap(current);
+        if (pressed === undefined) local.value = next;
+        onPressedChange?.(next);
+      }}
       ref={[context.parts.root, ref]}
     >
       {children}
@@ -36,19 +57,79 @@ export function Toggle(
 Toggle.meta = { name: "toggle", parts: ["root"] } as const;
 ```
 
-The setup body still runs once for that mount; `.meta` supplies stable component identity and the finite parts available through `context.parts`.
+Passing `pressed` makes the host the owner, including when the value is `false`. Omitting it uses the
+local Signal. This choice stays fixed for the mount. The click handler reads `unwrap(current)` when
+the event happens, so it uses the latest value; reading it once during setup would capture a snapshot.
 
-## The pieces
+`context.signal`, `context.effect` and `context.onCleanup` belong to the mount. Use an effect for an
+outside operation such as a timer, and release it on cleanup. Compute values with
+`mapSignal` for one source or `derived` for several Signals, then bind the result.
 
-- `createRuntime` builds an isolated runtime with its own component registry, plugins and shadow
-  registry. A runtime is a real boundary: two runtimes never share a context, a registry entry or a
-  symbol.
-- `createWebRenderer(runtime).renderToHtml(node)` produces static HTML from a tree, and
-  `createWebRenderer(runtime).render(node, host)` mounts a live tree into the DOM.
-- `h`, `Fragment` and the `Props` and `Child` types are the JSX surface. The root entry does not
-  depend on the DOM; the web entry does.
+`Context<typeof Toggle>` types the part names. When setup also needs the declared types of
+`context.props`, use `Context<typeof Toggle, ToggleProps>`. The separate `metadata` property is for
+development tools; authoring identity and parts live in `meta`.
 
-<Callout tone="note">
-  The runtime entry never touches the DOM. Anything that needs a document imports from
-  `meowjsx/web`.
-</Callout>
+## Parts and composed refs
+
+The root `ref` in the example combines a part descriptor with the caller's ref. Component refs are
+ordinary props: each component explicitly forwards them to its intended native element. A component
+with several hosts can choose which one receives the caller's ref.
+
+Native refs accept callbacks, part descriptors, nested readonly arrays, and `false`, `null` or
+`undefined` omissions. Callbacks run in list order during host-property setup, before the children
+mount and before the host is inserted. Return a synchronous cleanup function to release a listener
+or observer; acquired cleanups run once in reverse order when the host unmounts or mounting fails.
+
+A host accepts one distinct component/part identity. The same descriptor can mark several hosts.
+Static HTML keeps the part identity but omits refs and never invokes callbacks. Importing
+`meowjsx/web` also supplies HTML and SVG node inference for native JSX callbacks, while the generic
+ref types remain in the DOM-free root.
+
+## Class lists
+
+`className` accepts strings, stringifiable class values and nested readonly lists. Signals can appear
+at any depth, so a component can forward a caller's full class list without converting it to a string.
+
+```tsx
+import { h, mapSignal, signal } from "meowjsx";
+
+const selected = signal(false);
+export const panel = (
+  <div className={["panel", [mapSignal(selected, (on) => on && "is-selected"), null]]}>Ready</div>
+);
+```
+
+Changing `selected.value` updates the mounted class attribute. Lists preserve order and omit `false`,
+nullish values and empty strings. Static HTML reads the current values without subscribing. Class
+lists do not interpret object dictionaries or merge conflicting classes. The
+[MeowCSS guide](/packages/meowcss/#class-values-and-cx) covers reusable class values and `cx`.
+
+## Register and mount
+
+Metadata does not register a component. Register its function on the runtime that renders it; this
+browser entry assumes the component above is in `toggle.tsx` and the page has `<main id="app"></main>`.
+
+```tsx
+import { createRuntime, h } from "meowjsx";
+import { createWebRenderer } from "meowjsx/web";
+import { Toggle } from "./toggle";
+
+const host = document.querySelector<HTMLElement>("#app");
+if (!host) throw new Error("Missing app root");
+
+const runtime = createRuntime();
+const unregister = runtime.use({ components: [Toggle] });
+const renderer = createWebRenderer(runtime);
+const mounted = renderer.render(<Toggle>Pin this item</Toggle>, host);
+
+export function dispose() {
+  mounted.unmount();
+  unregister();
+}
+```
+
+Call `dispose` when the host is destroyed. For static output, `renderer.renderToHtml(node)` serializes
+the tree without mounting a DOM. A runtime isolates its registrations, plugins and shadows. Render-tree
+Providers determine the environment each descendant reads. Entry points used in the same render graph
+must share the core modules that own Signal, Context and part identity; creating a second runtime is
+still a valid way to isolate another application.

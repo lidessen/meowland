@@ -179,34 +179,41 @@ an implicit context through this design.
 
 Component identity, finite part names, style-option axes, defaults and carrier parts remain
 available before mounting, for the registry, shadows, the JSON catalog and documentation. Authors
-no longer write that information as a separate `ComponentContract` object. A component is defined
-once, with its identity inline, and the definition carries it:
+no longer write that information as a separate `ComponentContract` object or wrap the function in a
+definer. A component is an ordinary function declaration, and its identity is a static property on
+that function:
 
 ```tsx
-// Working names.
-export const Card = component(
-  {
-    name: "card",
-    parts: ["root", "header", "body"],
-    style: defineStyleProps(cardOptions, { defaults: { tone: "neutral" } }),
-  },
-  ({ title, children, ref, ...props }, ctx) => (
+// Working names: `meta` and `Context`.
+export function Card({ title, children, ref, ...props }: CardProps, ctx: Context<typeof Card>) {
+  return (
     <section {...props} ref={[ctx.parts.root, ref]}>
       <h2 ref={ctx.parts.header}>{title}</h2>
       <div ref={ctx.parts.body}>{children}</div>
     </section>
-  ),
-);
+  );
+}
+Card.meta = {
+  name: "card",
+  parts: ["root", "header", "body"],
+  style: defineStyleProps(cardOptions, { defaults: { tone: "neutral" } }),
+} as const;
 
 createMeowUI({ components: [Card, Alert] });
 ```
 
-Name, part names and style binding are inferred from the literal; no generic arguments are repeated.
-The registry takes components directly. The `style` field stays opaque to the MeowJSX core: it is
-produced by `defineStyleProps` in `meowcss/meowjsx`, as today, so the core does not depend on
+TypeScript types a property assigned to a function declaration as part of `typeof Card`, and a
+parameter may refer to `typeof Card`, so `ctx.parts` is typed from `meta` with no generic
+arguments and no second list of part names; an unknown part does not compile. A small compiler
+check of this shape and of the theme adapter below passed outside the repository; it is not the
+type prototype step. A `const` arrow component cannot refer to its own type in a parameter; it
+declares its `meta` object first and types the context from that object.
+
+The registry takes components and reads `meta`. The `style` field stays opaque to the MeowJSX core:
+it is produced by `defineStyleProps` in `meowcss/meowjsx`, as today, so the core does not depend on
 MeowCSS. The component name is an explicit string, because a renamed or minified JavaScript function
-name is not a stable identity. Where the identity is stored on the function, and how a host reads it,
-comes from the type prototype.
+name is not a stable identity. A function without `meta` is still a valid component; it simply has
+no parts.
 
 A ref passed to a function component remains a component prop. Core does not search the component's
 output for a first element or automatically choose a node from multi-root output. Components
@@ -214,8 +221,8 @@ explicitly forward refs to their intended host node and compose them with local 
 initial migration must audit wrappers that currently assume `props.ref` is a callable function;
 those wrappers must accept and forward composed refs too.
 
-Registration, theme assembly and CSS installation retain their existing owners. Defining a
-component does not register it or install styles.
+Registration, theme assembly and CSS installation retain their existing owners. Declaring `meta`
+does not register a component or install styles.
 
 ### Themes address parts through a type-only adapter
 
@@ -262,7 +269,7 @@ in-repository component, theme, story and app migrates before the release that s
 affected package takes a breaking version bump under the [release contract](../releasing.md).
 
 - `context.part(name, tag, props, ...children)` is removed. Parts are bound with `ref={ctx.parts.x}`.
-- `defineComponent` is removed. Components are defined once with their identity inline, as above.
+- `defineComponent` is removed. Components are ordinary functions with a static `meta`, as above.
 - `ComponentContract` is no longer an authoring surface: the `*Contract` objects and their
   `satisfies ComponentContract` / `StyledComponentContract` declarations are removed, and the
   registry, `createMeowUI` and plugin `components` lists take components instead of contracts.

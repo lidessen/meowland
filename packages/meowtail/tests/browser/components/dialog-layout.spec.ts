@@ -200,18 +200,19 @@ test("page headers allocate natural height to wrapped identity, actions, and cat
   await expect(page.getByRole("button", { name: "Refresh catalog", exact: true })).toBeInViewport();
 });
 
+// An edge is drawn when the frame header's inset shadow has a visible color.
+const headerEdge = (surface: Locator) =>
+  surface.locator('[data-meowui-part="page-frame/header"]').evaluate((node) => {
+    const shadow = getComputedStyle(node).boxShadow;
+    return shadow !== "none" && !/rgba\([^)]*,\s*0\)/.test(shadow);
+  });
+
 test("the dialog header gains its edge only while the body is scrolled under it", async ({
   page,
 }) => {
   await page.setViewportSize({ width: 1100, height: 900 });
   await page.goto("/canvas.html?story=dialog-layout");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  // An edge is drawn when the header's inset shadow has a visible color.
-  const edge = (dialog: Locator) =>
-    dialog.locator('[data-meowui-part="page-frame/header"]').evaluate((node) => {
-      const shadow = getComputedStyle(node).boxShadow;
-      return shadow !== "none" && !/rgba\([^)]*,\s*0\)/.test(shadow);
-    });
   for (const [name, scrolls] of [
     ["Long body", true],
     ["Short form", false],
@@ -222,16 +223,34 @@ test("the dialog header gains its edge only while the body is scrolled under it"
       exact: true,
     });
     const body = dialog.locator('[data-meowui-part="page-frame/body"]');
-    expect(await edge(dialog)).toBe(false);
+    expect(await headerEdge(dialog)).toBe(false);
     await body.evaluate((node) => {
       node.scrollTop = node.scrollHeight;
     });
-    await expect.poll(() => edge(dialog)).toBe(scrolls);
+    await expect.poll(() => headerEdge(dialog)).toBe(scrolls);
     await body.evaluate((node) => {
       node.scrollTop = 0;
     });
-    await expect.poll(() => edge(dialog)).toBe(false);
+    await expect.poll(() => headerEdge(dialog)).toBe(false);
     await page.keyboard.press("Escape");
     await expect(dialog).toBeHidden();
   }
+});
+
+test("the drawer header gains its edge while the navigation scrolls under it", async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 330 });
+  await page.goto("/canvas.html?story=drawer");
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  await page.getByRole("button", { name: "Open navigation drawer" }).click();
+  const drawer = page.getByRole("dialog", { name: "Main navigation" });
+  const body = drawer.locator('[data-meowui-part="page-frame/body"]');
+  expect(await headerEdge(drawer)).toBe(false);
+  await body.evaluate((node) => {
+    node.scrollTop = node.scrollHeight;
+  });
+  await expect.poll(() => headerEdge(drawer)).toBe(true);
+  await body.evaluate((node) => {
+    node.scrollTop = 0;
+  });
+  await expect.poll(() => headerEdge(drawer)).toBe(false);
 });

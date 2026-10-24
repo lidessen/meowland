@@ -248,7 +248,7 @@ test("runtime can bind its component and Signal semantics to a target renderer",
   };
   const target = runtime.createRenderer(strategy);
   const label = signal("before");
-  const view = target.mount(runtime.h("p", { title: label }, label), root);
+  const view = target.render(runtime.h("p", { title: label }, label), root);
 
   const paragraph = root.childNodes[0] as TestHostNode;
   expect(paragraph.getAttribute("title")).toBe("before");
@@ -293,7 +293,7 @@ test("target renderers preserve component parts and declare shadow mount capabil
   };
   const root = new TestHostNode("main");
 
-  expect(() => runtime.createRenderer(strategy).mount(runtime.h(Card, null), root)).toThrow(
+  expect(() => runtime.createRenderer(strategy).render(runtime.h(Card, null), root)).toThrow(
     /onMount hook for shadow target-card\.root/,
   );
 
@@ -308,7 +308,7 @@ test("target renderers preserve component parts and declare shadow mount capabil
       };
     },
   });
-  const view = target.mount(runtime.h(Card, null), root);
+  const view = target.render(runtime.h(Card, null), root);
   expect(seenPart).toBe("root");
   expect(mountCount).toBe(1);
   view.unmount();

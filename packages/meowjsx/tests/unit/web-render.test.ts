@@ -72,7 +72,7 @@ test("replacement covers prebuilt, repeated, Signal and Promise children with it
     expect(shadowMounts).toBe(0);
     expect(html).toContain('data-theme="replacement"');
     const root = new TestElement("main");
-    const mounted = web.mount(
+    const mounted = web.render(
       [prebuilt, prebuilt, changing, Promise.resolve(prebuilt)],
       root as unknown as Element,
     );
@@ -109,7 +109,7 @@ test("Web onError receives asynchronous rejection and component mount errors", a
     const Broken: Component = () => {
       throw failure;
     };
-    const mounted = web.mount(
+    const mounted = web.render(
       [Promise.reject(rejection), Promise.resolve(h(Broken, {}))],
       new TestElement("main") as unknown as Element,
     );
@@ -127,7 +127,7 @@ test("events without handler properties support signal replacement and unmount c
       events.push("initial");
     });
     const host = new TestElement("main");
-    const mounted = createWebRenderer(createRuntime()).mount(
+    const mounted = createWebRenderer(createRuntime()).render(
       h("span", { onFocusIn: handler }),
       host as unknown as Element,
     );
@@ -280,7 +280,7 @@ test("nested class lists agree in static HTML and Web and retain theme classes",
       "<div></div>",
     );
     const host = new TestElement("main");
-    const mounted = web.mount(vnode, host as unknown as Element);
+    const mounted = web.render(vnode, host as unknown as Element);
     const element = host.childNodes[0] as TestElement;
     expect(element.getAttribute("class")).toBe("host custom themed surface");
     themeClass.value = ["updated"];
@@ -323,7 +323,7 @@ test("class lists rebind nested structural Signals even when the class text is u
     expect(web.renderToHtml(vnode)).toBe('<div class="base same same"></div>');
     expect(outer.subscribers).toBe(0);
     const host = new TestElement("main");
-    const mounted = web.mount(vnode, host as unknown as Element);
+    const mounted = web.render(vnode, host as unknown as Element);
     const element = host.childNodes[0] as TestElement;
     expect(first.subscribers).toBe(1);
     outer.set([second, second]);
@@ -365,7 +365,7 @@ test("class-list subscription failures release acquired sources", () =>
     };
     const host = new TestElement("main");
     expect(() =>
-      createWebRenderer(createRuntime()).mount(
+      createWebRenderer(createRuntime()).render(
         h("div", { className: [first, broken] }),
         host as unknown as Element,
       ),
@@ -436,7 +436,7 @@ test("composed refs call in order and clean up in reverse once", async () => {
         null,
       ],
     });
-    const mounted = createWebRenderer(runtime).mount(vnode, root as unknown as Element);
+    const mounted = createWebRenderer(runtime).render(vnode, root as unknown as Element);
     expect(events).toEqual(["first:button", "second:button"]);
     mounted.unmount();
     mounted.unmount();
@@ -462,7 +462,7 @@ test("ref mount failure rolls back every acquired cleanup and preserves the call
       ],
     });
     expect(() =>
-      createWebRenderer(createRuntime()).mount(vnode, root as unknown as Element),
+      createWebRenderer(createRuntime()).render(vnode, root as unknown as Element),
     ).toThrow(failure);
     expect(events).toEqual(["cleanup:second", "cleanup:first"]);
     expect(root.childNodes).toHaveLength(0);
@@ -484,7 +484,7 @@ test("ref cleanup failure still releases every binding and removes the host once
         () => () => events.push("third"),
       ],
     });
-    const mounted = createWebRenderer(createRuntime()).mount(vnode, root as unknown as Element);
+    const mounted = createWebRenderer(createRuntime()).render(vnode, root as unknown as Element);
     expect(() => mounted.unmount()).toThrow(failure);
     expect(events).toEqual(["third", "second", "first"]);
     expect(root.childNodes).toHaveLength(0);
@@ -521,7 +521,7 @@ test("child or insertion failure rolls back mounted refs and preserves the mount
         stage === "child" ? h(Failure, {}) : "ready",
       );
       expect(() =>
-        createWebRenderer(createRuntime()).mount(vnode, root as unknown as Element),
+        createWebRenderer(createRuntime()).render(vnode, root as unknown as Element),
       ).toThrow(failure);
       expect(events).toEqual(["second", "first"]);
       expect(root.childNodes).toHaveLength(0);
@@ -593,7 +593,7 @@ test("ordinary refs pass through create hooks without duplicate normalization", 
     expect(createCalls).toBe(1);
     expect(vnode.props.title).toBe("hooked");
     const root = new TestElement("main");
-    createWebRenderer(createRuntime()).mount(vnode, root as unknown as Element);
+    createWebRenderer(createRuntime()).render(vnode, root as unknown as Element);
     expect(events).toEqual(["ref", "ref"]);
   });
 });
@@ -632,7 +632,7 @@ test("automatic JSX reuses a part descriptor across hosts and still runs render 
     expect(mounted).toHaveLength(0);
     rendered.length = 0;
     const root = new TestElement("main");
-    const view = createWebRenderer(runtime).mount(node, root as unknown as Element);
+    const view = createWebRenderer(runtime).render(node, root as unknown as Element);
     expect(mounted).toHaveLength(2);
     expect(new Set(mounted).size).toBe(2);
     expect(mounted.map((element) => element.tagName)).toEqual(["span", "span"]);
@@ -672,7 +672,7 @@ test("render hooks normalize refs they add and preserve callback cleanup", async
     expect(web.renderToHtml(vnode)).toBe("<div></div>");
     expect(events).toEqual([]);
     const root = new TestElement("main");
-    const view = web.mount(vnode, root as unknown as Element);
+    const view = web.render(vnode, root as unknown as Element);
     expect(events).toEqual(["mount"]);
     view.unmount();
     expect(events).toEqual(["mount", "cleanup"]);

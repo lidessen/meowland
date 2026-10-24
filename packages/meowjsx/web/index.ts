@@ -8,7 +8,6 @@ export type {
 export {
   createWebRenderer,
   defaultWebRenderer,
-  mount,
   render,
   renderToHtml,
   type WebRenderer,

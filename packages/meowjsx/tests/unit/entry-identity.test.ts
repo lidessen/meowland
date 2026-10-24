@@ -7,10 +7,17 @@ import { defaultRuntime as runtimeEntry, signal } from "../../src/runtime";
 import { Fragment, jsx } from "../../src/jsx-runtime";
 import { Fragment as developmentFragment, jsxDEV } from "../../src/jsx-dev-runtime";
 import { defaultWebRenderer, renderToHtml } from "../../web/index";
+import * as web from "../../web/index";
 
 test("root, automatic JSX, development JSX and Web share the same runtime and context", () => {
   expect(runtimeEntry).toBe(defaultRuntime);
   expect(defaultWebRenderer.runtime).toBe(defaultRuntime);
+  expect(rootSignals.defineShadow).toBe(runtimeSignals.defineShadow);
+  expect("shadow" in rootSignals).toBe(false);
+  expect("shadow" in runtimeSignals).toBe(false);
+  expect(web.render).toBe(defaultWebRenderer.render);
+  expect("mount" in web).toBe(false);
+  expect("mount" in defaultWebRenderer).toBe(false);
   expect(developmentFragment).toBe(Fragment);
   const Value = createContext("outside");
   const Read = () => useContext(Value);

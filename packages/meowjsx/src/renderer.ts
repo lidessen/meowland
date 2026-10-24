@@ -1,6 +1,6 @@
 import type { ContextScope } from "./context";
 import { isKeyedChild, readKeyedEntries, type KeyedChild } from "./keyed";
-import { signal } from "./reactive";
+import { isAsyncIterable, isPromiseLike, isSignal, signal } from "./reactive";
 import { normalizeClassName } from "./style";
 import { isNormalizedRef, mountRefBindings, type NormalizedRef } from "./parts";
 export {
@@ -154,7 +154,6 @@ export interface Renderer<TNode> {
   insert(parent: TNode, node: TNode, before?: TNode | null): void;
   remove(node: TNode): void;
   setProperty(node: TNode, name: string, value: unknown): void | RendererCleanup;
-  mount(node: RenderableChild, parent: TNode, before?: TNode | null): Rendered<TNode>;
   render(node: RenderableChild, parent: TNode, before?: TNode | null): Rendered<TNode>;
 }
 
@@ -190,32 +189,6 @@ function tryCleanups(cleanups: readonly RendererCleanup[]): { failed: boolean; e
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null;
-}
-
-function isSignal(value: unknown): value is SignalLike<unknown> {
-  return (
-    (typeof value === "object" || typeof value === "function") &&
-    value !== null &&
-    "value" in value &&
-    "subscribe" in value &&
-    typeof (value as { subscribe?: unknown }).subscribe === "function"
-  );
-}
-
-function isPromiseLike(value: unknown): value is PromiseLike<unknown> {
-  return (
-    (typeof value === "object" || typeof value === "function") &&
-    value !== null &&
-    typeof (value as { then?: unknown }).then === "function"
-  );
-}
-
-function isAsyncIterable(value: unknown): value is AsyncIterable<RenderableChild> {
-  return (
-    (typeof value === "object" || typeof value === "function") &&
-    value !== null &&
-    typeof (value as { [Symbol.asyncIterator]?: unknown })[Symbol.asyncIterator] === "function"
-  );
 }
 
 function isVNode(value: unknown): value is RenderableVNode {
@@ -861,7 +834,7 @@ export function createRenderer<TNode>(
     }
   }
 
-  const mount = (
+  const render = (
     node: RenderableChild,
     parent: TNode,
     before: TNode | null = null,
@@ -882,7 +855,6 @@ export function createRenderer<TNode>(
     insert: (parent, node, before) => strategy.insert(parent, node, before),
     remove: (node) => strategy.remove(node),
     setProperty: (node, name, value) => strategy.setProperty(node, name, value),
-    mount,
-    render: mount,
+    render,
   };
 }

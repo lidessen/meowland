@@ -72,7 +72,7 @@ test("observation retains semantic and replacement identities without adding hos
     },
   });
   const root = renderer.createElement("root");
-  const mounted = renderer.mount(h(App, {}), root);
+  const mounted = renderer.render(h(App, {}), root);
   const [app, provider, fragment, replacement] = [...instances.values()];
   expect(provider!.parent).toBe(app!);
   expect(provider!.semantic).toBe("context-provider");
@@ -126,7 +126,7 @@ test("delayed owners retain live text and multi-root output through replacement 
     },
   });
   const root = renderer.createElement("root");
-  const mounted = renderer.mount(h(App, {}), root);
+  const mounted = renderer.render(h(App, {}), root);
   const app = [...instances.values()].find((instance) => instance.component === App)!;
   const initial = [...instances.values()].find((instance) => instance.component === Text)!;
   const liveNodes = app.nodes;
@@ -181,14 +181,14 @@ test("unmounted promises and failed subtrees cannot leave observed instances", a
     },
   });
   const root = renderer.createElement("root");
-  const pending = renderer.mount(h(Pending, {}), root);
+  const pending = renderer.render(h(Pending, {}), root);
   pending.unmount();
   const Visible = () => h("span", {}, "late");
   resolve(h(Visible, {}));
   await new Promise((done) => setTimeout(done, 0));
   expect(instances.size).toBe(0);
   const Broken: Component = () => [() => null, h(Visible, {})] as unknown as Child;
-  expect(() => renderer.mount(h(Broken, {}), root)).toThrow("invalid child");
+  expect(() => renderer.render(h(Broken, {}), root)).toThrow("invalid child");
   expect(instances.size).toBe(0);
   expect(root.children).toEqual([]);
 });
@@ -232,7 +232,7 @@ test("observation roots exclude containers without adding component calls and re
     },
   });
   const root = renderer.createElement("root");
-  const mounted = renderer.mount(h(Container, {}), root);
+  const mounted = renderer.render(h(Container, {}), root);
   expect(instances.size).toBe(0);
   changing.value = h(Leaf, {});
   resolve(h(Leaf, {}));

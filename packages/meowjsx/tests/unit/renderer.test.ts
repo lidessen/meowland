@@ -28,7 +28,7 @@ test("context follows the tree through host wrappers, sibling providers and dela
   const runtime = createRuntime();
   const renderer = runtime.createRenderer(fakeStrategy());
   const root = renderer.createElement("root");
-  const mounted = renderer.mount(
+  const mounted = renderer.render(
     [
       h(
         Value.Provider,
@@ -54,7 +54,7 @@ test("context follows the tree through host wrappers, sibling providers and dela
   expect(words).toEqual(["outer", "inner", "inner", "outer", "default"]);
   const other = createRuntime().createRenderer(fakeStrategy());
   const otherRoot = other.createElement("root");
-  other.mount(prebuilt, otherRoot);
+  other.render(prebuilt, otherRoot);
   expect(text(otherRoot)).toBe("default");
   mounted.unmount();
   expect(root.children).toHaveLength(0);
@@ -75,9 +75,9 @@ test("async iterable replacements retain their provider scope after other roots 
   }
   const renderer = createRuntime().createRenderer(fakeStrategy());
   const root = renderer.createElement("root");
-  const mounted = renderer.mount(h(Value.Provider, { value: "stream" }, values()), root);
+  const mounted = renderer.render(h(Value.Provider, { value: "stream" }, values()), root);
   const sibling = renderer.createElement("root");
-  renderer.mount(h(Value.Provider, { value: "other" }, h(Reader, {})), sibling);
+  renderer.render(h(Value.Provider, { value: "other" }, h(Reader, {})), sibling);
   release();
   await new Promise((resolve) => setTimeout(resolve, 0));
   expect(root.children.filter((node) => node.kind === "text").map((node) => node.value)).toEqual([
@@ -170,6 +170,7 @@ describe("createRenderer", () => {
     const strategy = fakeStrategy();
     const renderer = createRuntime().createRenderer(strategy);
     const root = renderer.createElement("root");
+    expect("mount" in renderer).toBe(false);
     let current = "before";
     const listeners = new Set<(value: string) => void>();
     const label: SignalLike<string> = {
@@ -181,7 +182,7 @@ describe("createRenderer", () => {
         return () => listeners.delete(listener);
       },
     };
-    const view = renderer.mount(
+    const view = renderer.render(
       {
         type: "panel",
         props: { children: ["prefix", label, "suffix"] },
@@ -233,7 +234,7 @@ describe("createRenderer", () => {
       props: { children: props.children },
     });
 
-    const view = renderer.mount({ type: component, props: { children: "ready" } }, root);
+    const view = renderer.render({ type: component, props: { children: "ready" } }, root);
     expect(root.children[0]?.value).toBe("label");
     expect(transformed).toEqual(["label"]);
 
@@ -259,7 +260,7 @@ describe("createRenderer", () => {
       props: { children: props.children },
     });
 
-    const view = renderer.mount({ type: component, props: { children: "ready" } }, root);
+    const view = renderer.render({ type: component, props: { children: "ready" } }, root);
     expect(root.children[0]?.value).toBe("label");
     expect(root.children[0]?.children[0]?.value).toBe("ready");
 
@@ -284,7 +285,7 @@ describe("createRenderer", () => {
       },
     };
 
-    const view = renderer.mount(source, root);
+    const view = renderer.render(source, root);
     const listener = [...listeners][0]!;
     const invalid = { type: 42, props: {} } as unknown as RenderableChild;
 
@@ -316,7 +317,7 @@ describe("createRenderer", () => {
         };
       },
     };
-    const view = renderer.mount(source, root);
+    const view = renderer.render(source, root);
 
     expect(() => view.unmount()).toThrow("unsubscribe first");
     expect(removed).toEqual(["value", "signal"]);
@@ -333,7 +334,7 @@ describe("createRenderer", () => {
     };
     const renderer = createRenderer(strategy);
     const root = renderer.createElement("root");
-    const view = renderer.mount(["first", "second"], root);
+    const view = renderer.render(["first", "second"], root);
 
     expect(() => view.unmount()).toThrow("remove first");
     expect(removed).toEqual(["first", "second"]);
@@ -365,7 +366,7 @@ describe("createRenderer", () => {
       },
     });
     const root = renderer.createElement("root");
-    const view = renderer.mount(
+    const view = renderer.render(
       { type: "panel", props: { title: "value", children: "child" } },
       root,
     );
@@ -383,7 +384,7 @@ describe("createRenderer", () => {
       },
     });
     const root = renderer.createElement("root");
-    const resolved = renderer.mount(Promise.resolve("ready"), root);
+    const resolved = renderer.render(Promise.resolve("ready"), root);
     await Promise.resolve();
     await Promise.resolve();
     expect(root.children.map((child) => child.value)).toEqual(["async", "ready"]);
@@ -391,14 +392,14 @@ describe("createRenderer", () => {
     expect(root.children).toEqual([]);
 
     const rejectedError = new Error("promise failed");
-    const rejected = renderer.mount(Promise.reject(rejectedError), root);
+    const rejected = renderer.render(Promise.reject(rejectedError), root);
     await Promise.resolve();
     await Promise.resolve();
     expect(errors).toEqual([rejectedError]);
     rejected.unmount();
 
     const lateError = new Error("late promise failed");
-    const late = renderer.mount(
+    const late = renderer.render(
       new Promise<never>((_, reject) => queueMicrotask(() => reject(lateError))),
       root,
     );
@@ -432,7 +433,7 @@ describe("createRenderer", () => {
       },
     };
 
-    const view = renderer.mount(iterable, root);
+    const view = renderer.render(iterable, root);
     expect(nextCalls).toBe(1);
     resolveNext({ done: false, value: "streamed" });
     await Promise.resolve();
@@ -461,7 +462,7 @@ describe("createRenderer", () => {
       },
     };
 
-    const view = renderer.mount(iterable, root);
+    const view = renderer.render(iterable, root);
     await Promise.resolve();
     await Promise.resolve();
     expect(errors).toEqual([rejectedError]);
@@ -492,7 +493,7 @@ describe("createRenderer", () => {
     };
     const renderer = createRenderer(strategy);
     const root = renderer.createElement("root");
-    const view = renderer.mount(iterable, root);
+    const view = renderer.render(iterable, root);
 
     expect(() => view.unmount()).toThrow("iterator return");
     expect(returnCalls).toBe(1);

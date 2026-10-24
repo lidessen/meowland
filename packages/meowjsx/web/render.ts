@@ -21,7 +21,6 @@ import { WebObservationContext } from "./observation";
 export interface WebRenderer {
   readonly runtime: Runtime;
   readonly render: (node: Child, container: Element) => MountResult;
-  readonly mount: (node: Child, container: Element) => MountResult;
   readonly renderToHtml: (node: Child) => string;
 }
 
@@ -56,7 +55,7 @@ export function createWebRenderer(
     const child = options.observation
       ? h(WebObservationContext.Provider, { value: options.observation }, node)
       : node;
-    const mounted = renderer.mount(
+    const mounted = renderer.render(
       child as unknown as RenderableChild,
       container as unknown as DomNode,
       null,
@@ -67,7 +66,6 @@ export function createWebRenderer(
   return {
     runtime,
     render,
-    mount: render,
     renderToHtml: (node) => renderToHtmlWithRuntime(runtime, node),
   };
 }
@@ -82,5 +80,4 @@ function defaultMember<Key extends keyof WebRenderer>(key: Key): WebRenderer[Key
 }
 
 export const render = /* @__PURE__ */ defaultMember("render");
-export const mount = /* @__PURE__ */ defaultMember("mount");
 export const renderToHtml = /* @__PURE__ */ defaultMember("renderToHtml");

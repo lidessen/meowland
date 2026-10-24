@@ -186,8 +186,11 @@ function probes(selected: string[]) {
     code.push(
       `import * as jsx from "meowjsx"; import * as runtime from "meowjsx/runtime";import * as signals from "meowjsx/signal";for(const name of ["signal","batch","derived","mapSignal","isSignal","unwrap"])assert.equal(signals[name],jsx[name]);import {jsx as automatic} from "meowjsx/jsx-runtime";import {jsxDEV} from "meowjsx/jsx-dev-runtime";import {renderToHtml} from "meowjsx/web";for(const name of ["signal","isSignal","createContext","useContext","defaultRuntime"])assert.equal(jsx[name],runtime[name]);const shared=jsx.signal("cross-entry");const Context=jsx.createContext(shared);const Read=()=>{const value=runtime.useContext(Context);assert.ok(runtime.isSignal(value));return value;};assert.equal(renderToHtml(jsxDEV(Context.Provider,{value:shared,children:automatic(Read,{})})),"cross-entry");shared.value="updated";assert.equal(renderToHtml(automatic(Context.Provider,{value:shared,children:automatic(Read,{})})),"updated");`,
     );
+    code.push(
+      `import * as web from "meowjsx/web";assert.equal("shadow" in jsx,false);assert.equal("shadow" in runtime,false);assert.equal(jsx.defineShadow,runtime.defineShadow);assert.equal("mount" in web,false);assert.equal("mount" in web.defaultWebRenderer,false);assert.equal(web.render,web.defaultWebRenderer.render);`,
+    );
     core.push(
-      `import { createRuntime } from "meowjsx"; import { signal } from "meowjsx/signal";import {isSignal} from "meowjsx/runtime";export const state=isSignal(signal(1));export const runtime=createRuntime();`,
+      `import { createRuntime } from "meowjsx"; import { signal } from "meowjsx/signal";import {isSignal} from "meowjsx/runtime";import type {RenderableChild,Renderer,SignalLike} from "meowjsx/renderer";type Assert<T extends true>=T;type NoMountAlias=Assert<"mount" extends keyof Renderer<unknown>?false:true>;const external:SignalLike<number>={value:1,subscribe:()=>()=>{}};export const child:RenderableChild=external;export const own:SignalLike<number>=signal(1);export const state=isSignal(own);export const runtime=createRuntime();`,
     );
   }
   if (has("meowcss"))

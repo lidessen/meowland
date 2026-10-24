@@ -156,8 +156,6 @@ export function defineShadow<
   >;
 }
 
-export const shadow = defineShadow;
-
 export function createRuntime(options: RuntimeOptions = {}): Runtime {
   const state: RuntimeState = {
     createHooks: [],

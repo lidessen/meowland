@@ -17,11 +17,16 @@ import {
 } from "../../src/runtime";
 import { mapSignal, signal } from "meowjsx/signal";
 import type { MaybeSignal, ReadableSignal, Signal, WritableSignal } from "meowjsx/signal";
+import type { RenderableChild, Renderer, SignalLike } from "../../src/renderer";
 
 const externalSignal: ReadableSignal<number> = { value: 1, subscribe: () => () => {} };
 const writableSignal: WritableSignal<number> = signal(1);
 const readableSignal: Signal<number> = externalSignal;
 const maybeSignal: MaybeSignal<number> = readableSignal;
+const externalRendererSignal: SignalLike<number> = { value: 1, subscribe: () => () => {} };
+const ownRendererSignal: SignalLike<number> = writableSignal;
+const rendererChildren: RenderableChild[] = [externalRendererSignal, ownRendererSignal];
+void rendererChildren;
 void writableSignal;
 void maybeSignal;
 
@@ -37,6 +42,7 @@ const invalidClass: ClassValue = true;
 void invalidClass;
 
 type Assert<T extends true> = T;
+type _RendererHasNoMountAlias = Assert<"mount" extends keyof Renderer<unknown> ? false : true>;
 type _LifecycleHasNoSignalFactory = Assert<"signal" extends keyof LifecycleScope ? false : true>;
 type _ComponentHasNoSignalFactory = Assert<
   "signal" extends keyof Context<typeof Card> ? false : true

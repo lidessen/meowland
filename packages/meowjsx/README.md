@@ -98,6 +98,16 @@ meowjsx (this package: core + JSX contract)
 The core root has no `render`/`renderToHtml`: `render(node, Element)` and HTML serialization are imported from
 `meowjsx/web`. The root does not import Web back; both use the same core module, and multiple explicit Runtimes can still be created independently.
 
+### API migration
+
+- Use `defineShadow(component, part, setup)` in place of the removed `shadow` alias. It creates a
+  definition; register it through `createRuntime({ shadows: [...] })` or a runtime plugin. Setup runs
+  when the target mounts the matching part. Core keeps the host handle generic; `meowjsx/web` types
+  it as `Element`.
+- Use `renderer.render(node, parent, before?)` on the target-neutral renderer and
+  `web.render(node, container)` on the Web renderer. Both return an `unmount()` handle. The `mount`
+  methods and top-level Web `mount` export are removed; static output remains `renderToHtml`.
+
 ## Invariant: core contains no platform
 
 The core source (including types) does not contain `document`, `window`, DOM `Element`/`HTMLElement`,
@@ -218,11 +228,12 @@ Import reactive functions and types from `meowjsx/signal`:
 import { signal, mapSignal, derived, batch, type ReadableSignal } from "meowjsx/signal";
 ```
 
-JSX bindings accept any object that satisfies this structural contract; no MeowJSX constructor or
-brand is required:
+The renderer's `SignalLike<T>` type from `meowjsx/renderer` describes its structural input protocol.
+MeowJSX's `ReadableSignal<T>` and compatible external implementations satisfy that protocol. JSX
+bindings accept any object with this shape; no MeowJSX constructor or brand is required:
 
 ```ts
-interface ReadableSignal<T> {
+interface SignalLike<T> {
   readonly value: T;
   subscribe(listener: (value: T) => void): () => void;
 }

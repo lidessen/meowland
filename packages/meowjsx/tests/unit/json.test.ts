@@ -243,7 +243,7 @@ test("the existing renderer owns JSON binding subscriptions and removes them on 
   );
   expect(subscriptions).toBe(0);
   const root = node();
-  const mounted = createRuntime().createRenderer(strategy).mount(child, root);
+  const mounted = createRuntime().createRenderer(strategy).render(child, root);
   expect(subscriptions).toBe(1);
   expect(text(root)).toBe("first");
   original.value = "next";

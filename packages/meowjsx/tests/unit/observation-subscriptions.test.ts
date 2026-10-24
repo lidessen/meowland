@@ -64,8 +64,8 @@ test("late subscriptions read current membership and scope reused VNodes by moun
   const reused = h(Parent, {});
   const renderer = createRuntime().createRenderer(strategy(), { observer: observation.observer });
   const root = renderer.createElement("root");
-  const first = renderer.mount(reused, root);
-  const second = renderer.mount(reused, root);
+  const first = renderer.render(reused, root);
+  const second = renderer.render(reused, root);
   await settled();
   let allChanges = 0;
   observation.subscribe(() => allChanges++);
@@ -97,7 +97,7 @@ test("unsubscribing during delivery prevents cancelled listeners from being call
   const observation = createComponentObservation<Node>();
   const value = signal<Child>("First");
   const renderer = createRuntime().createRenderer(strategy(), { observer: observation.observer });
-  const mounted = renderer.mount(
+  const mounted = renderer.render(
     h(() => value, {}),
     renderer.createElement("root"),
   );
@@ -125,7 +125,7 @@ test("listener-triggered rendering is notified in a later round rather than recu
   const observation = createComponentObservation<Node>();
   const value = signal<Child>("Initial");
   const renderer = createRuntime().createRenderer(strategy(), { observer: observation.observer });
-  const mounted = renderer.mount(
+  const mounted = renderer.render(
     h(() => value, {}),
     renderer.createElement("root"),
   );
@@ -158,7 +158,7 @@ test("subscriber exceptions reach the error handler without rolling back renderi
     throw failure;
   });
   observation.subscribe(() => peerCalls++);
-  const mounted = renderer.mount(
+  const mounted = renderer.render(
     h(() => h("b", {}, "Keep rendered content"), {}),
     root,
   );
@@ -178,7 +178,7 @@ test("a partially mounted subtree rolls back before subscribers can read it", as
   const App = () => value;
   const renderer = createRuntime().createRenderer(strategy(), { observer: observation.observer });
   const root = renderer.createElement("root");
-  const mounted = renderer.mount(h(App, {}), root);
+  const mounted = renderer.render(h(App, {}), root);
   await settled();
   const original = observation.read();
   const states: string[][] = [];
@@ -187,7 +187,7 @@ test("a partially mounted subtree rolls back before subscribers can read it", as
   );
   const Visible = () => h("i", {}, "Transient");
   const Broken: Component = () => [() => null, h(Visible, {})] as unknown as Child;
-  expect(() => renderer.mount(h(Broken, {}), root)).toThrow("invalid child");
+  expect(() => renderer.render(h(Broken, {}), root)).toThrow("invalid child");
   await settled();
   expect(observation.read()).toEqual(original);
   expect(states.every((state) => state.join() === ["Stable", "b"].sort().join())).toBe(true);
@@ -202,7 +202,7 @@ test("property-only updates invalidate observation without replacing host nodes"
   const value = signal("Before");
   const observation = createComponentObservation<Node>();
   const renderer = createRuntime().createRenderer(strategy(), { observer: observation.observer });
-  const mounted = renderer.mount(
+  const mounted = renderer.render(
     h(() => h("input", { value }), {}),
     renderer.createElement("root"),
   );
@@ -229,7 +229,7 @@ test("cancelled async scopes and disposed subscriptions cannot be resurrected by
   const observation = createComponentObservation<Node>();
   const renderer = createRuntime().createRenderer(strategy(), { observer: observation.observer });
   const root = renderer.createElement("root");
-  const mounted = renderer.mount(
+  const mounted = renderer.render(
     h(() => pending, {}),
     root,
   );
@@ -259,7 +259,7 @@ test("observation and disposal do not introduce host operations into ordinary re
       observer: observation?.observer,
     });
     const root = renderer.createElement("root");
-    const mounted = renderer.mount(
+    const mounted = renderer.render(
       h(() => h("div", {}, value), {}),
       root,
     );

@@ -70,7 +70,8 @@ development tools; authoring identity and parts live in `meta`.
 types without creating a runtime or renderer. The existing root and runtime exports share that same
 reactive implementation.
 
-JSX bindings accept any object with a readable `value` and a
+Target renderers accept the `SignalLike<T>` structural protocol from `meowjsx/renderer`. MeowJSX's
+own Signals and compatible external implementations satisfy it: a readable `value` and a
 `subscribe(listener: (value: T) => void): () => void` method. `value` supplies the current value;
 `subscribe` reports changed values and returns an unsubscribe function. The renderer releases its
 subscription on unmount. No constructor or brand ties the object to MeowJSX. An external library with
@@ -118,6 +119,18 @@ nullish values and empty strings. Static HTML reads the current values without s
 lists do not interpret object dictionaries or merge conflicting classes. The
 [MeowCSS guide](/packages/meowcss/#class-values-and-cx) covers reusable class values and `cx`.
 
+## Shadows
+
+`defineShadow(component, part, setup)` creates a definition for behavior attached to a declared
+component part. Register that definition through `createRuntime({ shadows: [...] })` or a runtime
+plugin. Defining it does not run setup; the target runs setup when it mounts the matching part and
+releases the instance on unmount. Component parts remain the theme's styling boundary.
+
+Import `defineShadow` from `meowjsx/web` for browser behavior; its context supplies a real `Element`.
+The core `defineShadow` keeps the host handle generic for other targets. `context.effect` and
+`context.onCleanup` follow the same mount lifecycle as components. The former `shadow` function alias
+is removed; `defineShadow` is the declaration API.
+
 ## Bundling
 
 The package declares `sideEffects: false`. The default runtime, JSX runtime and Web renderer are
@@ -147,6 +160,10 @@ export function dispose() {
   unregister();
 }
 ```
+
+Both target-neutral and Web renderers use `render` to create a live tree and return an `unmount()`
+handle. The target-neutral renderer also accepts an optional insertion anchor. The former `mount`
+methods and top-level Web `mount` export are removed; use `render` in existing callers.
 
 Call `dispose` when the host is destroyed. For static output, `renderer.renderToHtml(node)` serializes
 the tree without mounting a DOM. A runtime isolates its registrations, plugins and shadows. Render-tree

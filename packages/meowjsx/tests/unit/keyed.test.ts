@@ -101,7 +101,7 @@ test("keyed rows retain their nodes, context, observation parents and local stat
       onUnmount: (item) => observed.delete(item),
     },
   });
-  const mount = render.mount(h(Environment.Provider, { value: "scope:" }, h(List, {})), root);
+  const mount = render.render(h(Environment.Provider, { value: "scope:" }, h(List, {})), root);
   const [a, b] = elements(root);
   a!.props.open = true;
   const rowInstances = [...observed].filter((item) => item.component === Row);
@@ -143,7 +143,7 @@ test("moving a keyed range includes live Signal and Promise output", async () =>
       Promise.resolve(item.value + "!"),
     ],
   );
-  const mount = createRuntime().createRenderer(strategy).mount(child, root);
+  const mount = createRuntime().createRenderer(strategy).render(child, root);
   await flush();
   content.value = { a: "A2", b: "B2" };
   await flush();
@@ -172,7 +172,7 @@ test("duplicate keys and failed new mounts leave existing rows and values intact
   );
   const mount = createRuntime()
     .createRenderer(strategy, { onError: (error) => failures.push(error) })
-    .mount(child, root);
+    .render(child, root);
   const original = elements(root)[0];
   items.value = [
     { id: "a", label: "changed" },
@@ -220,7 +220,7 @@ test("keyed cleanup releases every row and its source subscription when a row cl
   Row.meta = { name: "cleanup-row", parts: [] } as const;
   const mount = createRuntime()
     .createRenderer(strategy)
-    .mount(
+    .render(
       keyed(
         source,
         (id) => id,
@@ -270,7 +270,7 @@ test("static keyed HTML uses the same context without subscribing and rejects in
   expect(() =>
     createRuntime()
       .createRenderer(strategy)
-      .mount(
+      .render(
         keyed(
           [1, 1],
           (id) => id,

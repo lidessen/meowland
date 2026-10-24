@@ -46,8 +46,10 @@ const circleRef = (
   />
 );
 
+type Assert<T extends true> = T;
+type _WebRendererHasNoMountAlias = Assert<"mount" extends keyof WebRenderer ? false : true>;
 const web: WebRenderer = createWebRenderer(createRuntime());
-const mounted = web.mount(h("p", {}, "Web target"), host);
+const mounted = web.render(h("p", {}, "Web target"), host);
 mounted.unmount();
 const skeleton: SkeletonOptions = { scope: host };
 
@@ -77,4 +79,4 @@ void svgRefs;
 void sectionRef;
 void circleRef;
 // @ts-expect-error DOM mounting requires an Element, not a text identifier.
-web.mount(h("p", {}, "Web target"), "host");
+web.render(h("p", {}, "Web target"), "host");

@@ -17,7 +17,7 @@ function mount(node: unknown) {
   installMeowUI({ components: meowUIComponents }, runtime);
   const host = document.createElement("div");
   document.body.append(host);
-  const mounted = createWebRenderer(runtime).mount(node as never, host);
+  const mounted = createWebRenderer(runtime).render(node as never, host);
   return {
     host,
     unmount() {

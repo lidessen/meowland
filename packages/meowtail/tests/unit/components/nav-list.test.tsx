@@ -34,7 +34,7 @@ function renderer() {
 function mount(node: unknown) {
   const host = document.createElement("div");
   document.body.append(host);
-  const mounted = renderer().mount(node as never, host);
+  const mounted = renderer().render(node as never, host);
   return {
     host,
     unmount() {

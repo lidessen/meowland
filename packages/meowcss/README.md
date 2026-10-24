@@ -80,9 +80,9 @@ supplies the rules (Meowtail's are `standardAuditRules`), and `allow` accepts a 
 ## Utility styles design
 
 The [utility styles design](../../docs/designs/2026-10-24-utility-styles.md) proposes utilities
-as typed functions over tokens (`p("group")`, `hover(bg("fill"))`) that compose into style values.
-Styles stay independent of component parts and are associated where they are used: a part selector
-in a theme, or a class on an instance. This is a proposed direction; no current export provides it.
+as typed functions over tokens that return classes (`className={[p("group"), hover(bg("fill"))]}`),
+with conditions and composition as higher-order classes. The same class expands to declarations
+inside a theme rule; classes stay independent of component parts. This is a proposed direction; no current export provides it.
 
 ## Verification
 

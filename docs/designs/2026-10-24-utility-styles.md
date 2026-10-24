@@ -1,94 +1,104 @@
-# Utility styles as functions
+# Utility classes as values
 
 Status: proposed direction, pending implementation. No current export changes with this document;
 names are working names.
 
-MeowCSS is JavaScript, so a utility does not need a class-string language or a generated catalog.
-A utility is a function that takes a token key and returns a `CSSFragment`. A style is a value
-composed from those fragments. Styles know nothing about component parts; a part, or any node, is
-associated with a style where it is used.
+MeowCSS is JavaScript, so a utility does not need a class-string language. A utility is a function
+over a token scale, and what it returns is a class: a value that a component's `className` takes
+directly and that a theme rule can expand into declarations. Conditions and composition are
+higher-order classes: functions from classes to classes. Classes know nothing about component
+parts; a part, or any node, is associated with a class where it is used.
 
-## Utilities are functions
-
-```ts
-import { css } from "meowcss";
-import { p, gap, bg, ink, radius, text, hover, wide } from "meowtail/theme";
-
-const card = css`
-  ${p("panel")} ${bg("raised")} ${radius("xl")}
-  ${hover(bg("fill"))}
-  ${wide(p("section"))}
-`;
+```tsx
+<Card className={[p("group"), bg("fill")]} />
+<div className={[p("panel"), radius("xl"), hover(bg("fill")), wide(p("section"))]} />
 ```
 
-The same values compose without a template where that reads better:
+## Classes
 
-```ts
-const card = style(p("panel"), bg("raised"), radius("xl"), hover(bg("fill")));
-const compactCard = style(card, p("group"));
+`p("group")` returns a `UtilityClass`:
+
+- its class name, `ui-p-group`, derived from the utility and the key, so static HTML and Web
+  mounting agree and the name reads in devtools;
+- its declarations, `padding: var(--ui-space-group);`.
+
+`String(p("group"))` is the class name, so the existing `className` path (which stringifies the
+value) already accepts a single class or a Signal of one:
+
+```tsx
+<div className={mapSignal(selected, (on) => (on ? bg("selected") : bg("raised")))} />
 ```
 
-- `meowcss` provides the mechanism: `utility(properties, scale)` builds a typed function from one
-  token group (or a finite keyword map), and `condition(wrapper)` builds a wrapper such as `hover` or
-  `wide` that nests a fragment under `&:hover` or a media query. `style(...fragments)` concatenates.
-  No DOM, no JSX, no scanning.
-- Meowtail owns the concrete set over `uiTokens` (`p`, `px`, `gap`, `bg`, `ink`, `radius`, …) and
-  its conditions. The existing recipes (`surface`, `text`, `interactive`, `focusRing`) are already
-  this shape and join the set unchanged.
-- Arguments are typed from the scale: `p("group")` compiles, `p("13px")` does not. A function may
-  take more than a key when the value really is a parameter, such as `columns(3)`. A one-off literal
-  stays a plain declaration beside its selector, where the audit still sees it.
+Arguments are typed from the scale: `p("group")` compiles, `p("13px")` does not. A utility that
+produces classes has a finite scale (one token group or a finite keyword map). A one-off literal is
+not a class; it stays a declaration beside its selector, where the audit sees it.
 
-## Associating styles where they are used
+## Higher-order classes
 
-A style is not tied to a part. The association is made by whoever uses it.
+A higher-order class takes classes and returns a class.
 
-In a theme, a part selector takes a style. This already works with today's `css` template; only the
-utilities are new:
+- Conditions: `hover(bg("fill"))` is the class `ui-hover:bg-fill`, whose rule is
+  `.ui-hover\:bg-fill:hover { … }`. `wide(p("section"))` nests the rule in the catalog's media query.
+  Conditions compose: `wide(hover(bg("fill")))`.
+- Composition: `cx(p("panel"), bg("raised"), radius("xl"))` is one value holding those atoms. Its
+  class name is the atoms' names joined, so it introduces no new rule. A named style is just a
+  constant: `const card = cx(...)`, and `cx(card, p("group"))` overrides by order (a later atom of
+  the same utility replaces the earlier one).
+- `className` arrays: MeowJSX normalizes an array (nested, with `false`, `null` and `undefined`
+  ignored) into a class list, so `className={[card, active && bg("selected")]}` works for plain
+  strings too. This is the one renderer change; it belongs in the core prop normalization so static
+  HTML and Web agree.
+
+Because every composite is a list of atoms and every scale is finite, the CSS needed for any class
+anyone can write is the atom sheet: each utility × its keys × the conditions it allows. There is
+no per-style registration, hashing or scanning.
+
+## Classes in themes
+
+Interpolating a class into a rule body expands its declarations; conditions expand to nested rules.
+`css` recognizes a class value (by its own marker, not by `toString`):
 
 ```ts
 export const cardStyles = css`
   ${partSelector(cardContract, "root")} {
-    ${card}
-  }
-  ${partSelector(cardContract, "header")} {
-    ${style(text("title"), gap("group"))}
+    ${cx(p("panel"), bg("raised"), radius("xl"), hover(bg("fill")))}
   }
 `;
 ```
 
-On an instance, a host attaches a style as a class. `classOf(style)` returns a deterministic class
-name derived from the fragment text, so static HTML and Web mounting agree:
+The association between a part and a style is made here, by the theme, exactly as today. The
+existing recipes (`surface`, `text`, `interactive`, `focusRing`) become utilities of the same kind:
+`text("caption")` works in a theme rule and in `className`.
 
-```tsx
-<Card className={classOf(style(p("group"), bg("fill")))} />
-<div className={classOf(card)} />
-```
+## Ownership and delivery
 
-The class needs its rule in the sheet. Delivery stays explicit: the host lists the styles it uses as
-classes, `sheet(card, …)`, and passes that fragment to `defineTheme` with its other styles, the same
-way the docs app passes `docsStyles` today. A utility's scale is finite, so `sheet(p, bg)` can also
-emit every value of those utilities for hosts that want ad hoc atoms without listing each style.
+- `meowcss` root: `utility(name, properties, scale)`, `condition(name, wrapper)`, `cx`, class
+  values, their `css` expansion and `atomSheet(utilities, conditions)`. No DOM, no JSX.
+- MeowJSX: `className` array normalization only.
+- Meowtail: the concrete utilities over `uiTokens` and their allowed conditions, and the atom sheet
+  appended last in `standardTheme.cssText`, after the component fragments. A utility class is
+  `0,1,0` and the theme's part rules are `:where(...)`, so an instance class wins over the theme's
+  paint of the same property; a conditioned class is emitted after the plain ones.
+- The atom sheet is audited with `standardAuditRules`, and a size budget test keeps conditions a
+  deliberate choice per utility.
 
-Component contracts, part markers, option attributes and the theme's paint of parts stay as they
-are. Meowtail components keep their look in theme files; a host class remains a local adjustment,
-not the component's look.
+Component contracts, part markers and option attributes do not change. A Meowtail component keeps
+its look in its theme file and forwards a host `className` on its root; a host class is a local
+adjustment, not the component's look.
 
 ## Open questions
 
-- Whether `classOf` should also accept the fragment directly in `className` (a fragment as a class
-  value), or stay an explicit call.
 - Condition kinds: media queries, or container queries for components embedded in host layouts.
-- Whether the docs app, stories and examples migrate their inline `style` objects and ad hoc classes
-  to utilities, and which inline styles are instance measurements that should stay.
+- Which inline `style` objects in stories and examples become classes, and which are instance
+  measurements that stay.
 
 ## Implementation and verification
 
-1. `utility`, `condition`, `style`, `classOf` and `sheet` in the `meowcss` root, with unit tests for
-   determinism, condition nesting and type cases for invalid keys, inside the DOM-free core check.
-2. Meowtail's utility set over `uiTokens`; audit the output of `sheet(...)` for every utility with
-   `standardAuditRules`.
-3. Rewrite a few theme files with utilities and confirm the generated `cssText` gives unchanged
-   computed styles; migrate a story with inline styles and look at it in Meowbook.
+1. Class values, `utility`, `condition`, `cx`, `css` expansion and `atomSheet` in the `meowcss`
+   root: tests for names, determinism, override order, condition nesting, and type cases for
+   invalid keys, inside the DOM-free core check.
+2. `className` array normalization in MeowJSX, checked through static HTML and Web mounting.
+3. Meowtail utilities over `uiTokens`; audit and budget the atom sheet; rewrite a few theme files
+   and confirm unchanged computed styles; migrate a story and look at it in Meowbook.
 
 Use [development checks](../development-checks.md) for commands and coverage.

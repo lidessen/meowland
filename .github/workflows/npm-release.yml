@@ -3,6 +3,12 @@ name: Publish npm packages
 on:
   workflow_dispatch:
     inputs:
+      operation:
+        description: Publish reviewed tarballs or move only the pinned dev dist-tags
+        required: true
+        default: publish
+        type: choice
+        options: [publish, tag-dev]
       source_sha:
         description: Full source SHA, equal to main and this workflow run
         required: true
@@ -26,7 +32,7 @@ concurrency:
 
 jobs:
   prepare:
-    if: github.repository == 'lidessen/meowland' && github.ref == 'refs/heads/main' && inputs.source_sha == github.sha
+    if: inputs.operation == 'publish' && github.repository == 'lidessen/meowland' && github.ref == 'refs/heads/main' && inputs.source_sha == github.sha
     runs-on: ubuntu-latest
     env:
       SOURCE_SHA: ${{ inputs.source_sha }}
@@ -57,6 +63,7 @@ jobs:
 
   publish:
     needs: prepare
+    if: inputs.operation == 'publish'
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -101,3 +108,30 @@ jobs:
           path: artifacts/npm-release/
           if-no-files-found: warn
           retention-days: 30
+
+  tag-dev:
+    if: inputs.operation == 'tag-dev' && github.repository == 'lidessen/meowland' && github.ref == 'refs/heads/main' && inputs.source_sha == github.sha
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      SOURCE_SHA: ${{ inputs.source_sha }}
+      PACKAGES: ${{ inputs.packages }}
+      CHANNEL: ${{ inputs.channel }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.sha }}
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          package-manager-cache: false
+      - run: npm install --global npm@11.21.0 --ignore-scripts
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile --ignore-scripts
+      - name: Verify published bytes and add only the dev dist-tags through npm OIDC
+        run: bun scripts/release-tag-dev.ts --commit "$SOURCE_SHA" --packages "$PACKAGES" --channel "$CHANNEL" --execute

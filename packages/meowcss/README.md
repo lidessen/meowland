@@ -82,7 +82,8 @@ supplies the rules (Meowtail's are `standardAuditRules`), and `allow` accepts a 
 The [utility styles design](../../docs/designs/2026-10-24-utility-styles.md) proposes utilities
 as typed functions over tokens that return classes (`className={[ui.p.group, ui.hover(ui.bg.fill)]}`),
 with conditions and composition as higher-order classes. The same class expands to declarations
-inside a theme rule; classes stay independent of component parts. This is a proposed direction; no current export provides it.
+inside a theme rule; classes stay independent of component parts. It is a selected, not yet
+implemented, breaking change: the `meowtail/theme` recipe functions are removed without aliases.
 
 ## Verification
 

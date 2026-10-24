@@ -1,7 +1,7 @@
 # Utility classes as values
 
-Status: proposed direction, pending implementation. No current export changes with this document;
-names are working names.
+Status: selected direction, not implemented. This is a breaking change with no compatibility layer
+for the old styling surface; see [Breaking changes](#breaking-changes). Names are working names.
 
 MeowCSS is JavaScript, so a utility does not need a class-string language. Utilities live on one
 namespace object, `ui`, built from the token scales: `ui.p.group` is a class, a value that a
@@ -71,8 +71,8 @@ export const cardStyles = css`
 ```
 
 The association between a part and a style is made here, by the theme, exactly as today. The
-existing recipes (`surface`, `text`, `interactive`, `focusRing`) become utilities of the same kind:
-`ui.text.caption` works in a theme rule and in `className`.
+existing recipes (`surface`, `text`, `interactive`, `focusRing`) are replaced by utilities of the
+same kind: `ui.text.caption` works in a theme rule and in `className`.
 
 ## Ownership and delivery
 
@@ -90,6 +90,25 @@ existing recipes (`surface`, `text`, `interactive`, `focusRing`) become utilitie
 Component contracts, part markers and option attributes do not change. A Meowtail component keeps
 its look in its theme file and forwards a host `className` on its root; a host class is a local
 adjustment, not the component's look.
+
+## Breaking changes
+
+The new surface replaces the old one; there are no aliases, shims or deprecation period. Callers
+migrate in the change that lands each step, and each affected package takes a breaking version
+bump under the [release contract](../releasing.md).
+
+- The recipe functions `surface`, `text`, `interactive` and `focusRing`, and their types
+  `SurfaceRung`, `TextRole` and `InteractiveOptions`, are removed from `meowtail/theme`. Their uses
+  in Meowtail themes, the docs app, Meowbook and stories move to `ui` classes. Parameterized recipes
+  (`focusRing({ inset })`, `interactive({ on, pressed })`) become finite keys or conditions on `ui`;
+  the exact mapping is decided in implementation.
+- `className` changes meaning for arrays: an array is a class list, not a value stringified with
+  commas. A host that relied on the old stringification breaks.
+- Hosts and stories that paint with inline `style` objects or ad hoc classes restating tokens are
+  expected to move to `ui` classes; inline `style` stays only for instance measurements.
+
+Unchanged: `uiTokens` and every token name, the `css` template, `partSelector`, `defineOptions`,
+`defineStyleProps`, component contracts, part markers and option attributes.
 
 ## A Tailwind-style export later
 

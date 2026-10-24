@@ -1,4 +1,5 @@
-import { h, signal } from "meowjsx";
+import { h } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { Presentation, type SlideBackground, type SlideDefinition } from "meowslides";
 import type { SlideBackground as RootBackground } from "meowslides";
 

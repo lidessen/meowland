@@ -1,4 +1,5 @@
-import { derived, h, isSignal, unwrap, type MaybeSignal, type Props, type Context } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
+import { derived, isSignal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Dialog, DialogPanel, DialogHeader, DialogActions } from "./dialog";
 import { Checkbox } from "./checkbox";
 import { Button } from "./button";

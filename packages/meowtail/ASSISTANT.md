@@ -5,7 +5,8 @@ Status: the new composition is implemented, and the author's local behavior regr
 `AssistantView` from `meowtail/chat` provides messages, safe Markdown, code, processes, inputs, attachments, model and thinking options, current activity, background work details, and unanswered questions. The default structure and visuals live in the library; the `assistant-complete` scene in Meowbook only supplies local data and actions.
 
 ```tsx
-import { h, signal } from "meowjsx";
+import { h } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { AssistantView, type AssistantDraft, type AssistantMessage } from "meowtail/chat";
 
 const messages = signal<readonly AssistantMessage[]>([]);

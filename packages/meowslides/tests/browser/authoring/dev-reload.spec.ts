@@ -21,7 +21,7 @@ export { createSession } from "./counter";
 
 <Counter session={props.session} />
 `;
-  const counterSource = `import { h, signal } from "meowjsx";
+  const counterSource = `import { h } from "meowjsx"; import { signal } from "meowjsx/signal";
 export function createSession() { return { count: signal(0) }; }
 export function Counter({ session }) {
   return <button type="button" aria-label="Increment" onClick={() => { session.count.value++; }}>{session.count}</button>;

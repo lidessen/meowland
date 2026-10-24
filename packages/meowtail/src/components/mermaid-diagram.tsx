@@ -1,12 +1,5 @@
-import {
-  derived,
-  h,
-  unwrap,
-  type Child,
-  type MaybeSignal,
-  type Props,
-  type Context,
-} from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
+import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Button } from "./button";
 import { copyTextToClipboard } from "../clipboard";
 
@@ -57,10 +50,10 @@ export function MermaidDiagram(
   context: Context<typeof MermaidDiagram>,
 ) {
   // "source" until the first drawing lands, so server output and slow loads read as text.
-  const state = context.signal<"source" | "ready" | "error">("source");
-  const errorText = context.signal("");
-  const copying = context.signal(false);
-  const feedback = context.signal("");
+  const state = signal<"source" | "ready" | "error">("source");
+  const errorText = signal("");
+  const copying = signal(false);
+  const feedback = signal("");
   const options = {
     links: false,
     images: false,

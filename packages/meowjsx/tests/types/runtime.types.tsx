@@ -4,17 +4,26 @@ import {
   defineShadow,
   h,
   keyed,
-  mapSignal,
-  signal,
   type Child,
   type ClassValue,
   type Component,
   type Context,
+  type LifecycleScope,
+  type ShadowContext,
   type Props,
   type ThemeStyle,
   type RuntimePlugin,
   type RuntimePluginOption,
 } from "../../src/runtime";
+import { mapSignal, signal } from "meowjsx/signal";
+import type { MaybeSignal, ReadableSignal, Signal, WritableSignal } from "meowjsx/signal";
+
+const externalSignal: ReadableSignal<number> = { value: 1, subscribe: () => () => {} };
+const writableSignal: WritableSignal<number> = signal(1);
+const readableSignal: Signal<number> = externalSignal;
+const maybeSignal: MaybeSignal<number> = readableSignal;
+void writableSignal;
+void maybeSignal;
 
 const classList: ClassValue = ["base", [false, null, undefined, signal("active")]] as const;
 const classProps: Props = { className: signal<ClassValue>(classList) };
@@ -28,6 +37,11 @@ const invalidClass: ClassValue = true;
 void invalidClass;
 
 type Assert<T extends true> = T;
+type _LifecycleHasNoSignalFactory = Assert<"signal" extends keyof LifecycleScope ? false : true>;
+type _ComponentHasNoSignalFactory = Assert<
+  "signal" extends keyof Context<typeof Card> ? false : true
+>;
+type _ShadowHasNoSignalFactory = Assert<"signal" extends keyof ShadowContext ? false : true>;
 const rows = signal<readonly { id: string; label: string }[]>([]);
 const keyedChild: Child = keyed(
   rows,

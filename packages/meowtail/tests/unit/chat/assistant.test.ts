@@ -2,7 +2,8 @@ import { describe, expect, test } from "bun:test";
 import { consumeAssistantDraft, snapshotAssistantDraft } from "../../../src/chat/assistant-draft";
 import { assistantMarkdown } from "../../../src/chat/assistant-markdown";
 import { AssistantView } from "../../../src/chat/assistant";
-import { createRuntime, h, signal } from "meowjsx";
+import { createRuntime, h } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
 import { installMeowUI, meowUIComponents } from "meowtail";
 

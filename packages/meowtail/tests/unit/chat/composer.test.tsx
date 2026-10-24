@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { createRuntime, h, unwrap } from "meowjsx";
+import { createRuntime, h } from "meowjsx";
+import { unwrap } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
 import { ChatComposer } from "../../../src/chat/composer";
 import { ChatAttachments } from "../../../src/chat/attachments";

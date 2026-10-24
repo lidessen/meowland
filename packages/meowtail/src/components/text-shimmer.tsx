@@ -1,14 +1,5 @@
-import {
-  createContext,
-  derived,
-  h,
-  unwrap,
-  useContext,
-  type Child,
-  type Context,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { createContext, h, useContext, type Child, type Context, type Props } from "meowjsx";
+import { derived, unwrap, type MaybeSignal } from "meowjsx/signal";
 const ShimmerContent = createContext(false);
 export interface TextShimmerProps extends Props {
   text?: MaybeSignal<string>;

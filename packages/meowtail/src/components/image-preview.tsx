@@ -1,4 +1,5 @@
-import { h, mapSignal, type Props, type Context } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
+import { mapSignal, signal } from "meowjsx/signal";
 import { Icon } from "../icons/icon";
 
 export interface ImagePreviewProps extends Props {
@@ -25,7 +26,7 @@ export function ImagePreview(
   }: ImagePreviewProps,
   context: Context<typeof ImagePreview>,
 ) {
-  const state = context.signal<"loading" | "ready" | "failed">("loading");
+  const state = signal<"loading" | "ready" | "failed">("loading");
   return (
     <span {...props} data-image-state={state} ref={[context.parts.root, props.ref]}>
       {[

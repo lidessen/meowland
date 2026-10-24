@@ -1,4 +1,5 @@
-import { h, signal } from "meowjsx";
+import { h } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { Button, Inline, Stack } from "meowtail";
 import {
   ChatConversation,

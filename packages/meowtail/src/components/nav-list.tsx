@@ -1,13 +1,5 @@
-import {
-  derived,
-  h,
-  isSignal,
-  unwrap,
-  type Child,
-  type MaybeSignal,
-  type Props,
-  type Context,
-} from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
+import { derived, isSignal, unwrap, type MaybeSignal } from "meowjsx/signal";
 
 export interface NavListItem {
   id: string;

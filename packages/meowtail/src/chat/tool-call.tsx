@@ -1,12 +1,5 @@
-import {
-  derived,
-  h,
-  unwrap,
-  type Child,
-  type Context,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { h, type Child, type Context, type Props } from "meowjsx";
+import { derived, unwrap, type MaybeSignal } from "meowjsx/signal";
 // Fragment is required by the classic JSX transform for tool header content.
 // eslint-disable-next-line no-unused-vars
 import { Fragment } from "meowjsx";

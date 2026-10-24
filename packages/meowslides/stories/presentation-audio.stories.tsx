@@ -1,4 +1,5 @@
-import { h, mapSignal, signal } from "meowjsx";
+import { h } from "meowjsx";
+import { mapSignal, signal } from "meowjsx/signal";
 import { Button, Inline, LayoutItem, Stack } from "meowtail";
 import { defineStory } from "meowbook";
 import { Presentation, PresentationAudio, PresentationLayout } from "meowslides";

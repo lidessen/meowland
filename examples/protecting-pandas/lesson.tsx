@@ -1,4 +1,5 @@
-import { h, mapSignal, signal, type Child, type MaybeSignal, type WritableSignal } from "meowjsx";
+import { h, type Child } from "meowjsx";
+import { mapSignal, signal, type MaybeSignal, type WritableSignal } from "meowjsx/signal";
 import { ImagePreview, Inline, Stack } from "meowtail";
 import {
   Presentation,

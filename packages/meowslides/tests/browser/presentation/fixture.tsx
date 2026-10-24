@@ -1,4 +1,5 @@
-import { createRuntime, h, mapSignal, signal, type Child, type Context, type VNode } from "meowjsx";
+import { createRuntime, h, type Child, type Context, type VNode } from "meowjsx";
+import { mapSignal, signal } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
 import { Button, createMeowUI, meowUIComponents } from "meowtail";
 import { applyTheme, mountStyles } from "meowcss/web";

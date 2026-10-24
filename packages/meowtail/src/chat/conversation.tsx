@@ -1,4 +1,5 @@
 import { h, type Context, type Props } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { createChatScroll } from "./conversation-scroll";
 
 export interface ChatConversationProps extends Props {
@@ -37,7 +38,7 @@ export function ChatConversation(
   }: ChatConversationProps,
   context: Context<typeof ChatConversation>,
 ) {
-  const hidden = context.signal(true);
+  const hidden = signal(true);
   let jump: (() => void) | undefined;
   const mount = (root: Element) => {
     let disposed = false;

@@ -1,4 +1,5 @@
-import { h, signal, type Child } from "meowjsx";
+import { h, type Child } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { createSkeletonController } from "meowjsx/web";
 import { defineStory } from "meowbook";
 import { SkeletonBoundary } from "../../src/components";

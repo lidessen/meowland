@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { Window } from "happy-dom";
-import { createRuntime, h, signal } from "meowjsx";
+import { createRuntime, h } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
 import { ChatReasoning } from "../../../src/chat/reasoning";
 import { TaskList, type TaskListEntry } from "../../../src/components/task-list";

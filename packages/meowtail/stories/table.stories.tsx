@@ -1,4 +1,5 @@
-import { h, mapSignal, signal } from "meowjsx";
+import { h } from "meowjsx";
+import { mapSignal, signal } from "meowjsx/signal";
 import { defineStory } from "meowbook";
 import { Stack, Table, type TableRow, type TableSort } from "meowtail";
 import { Note } from "./specimen";

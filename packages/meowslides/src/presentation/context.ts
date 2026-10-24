@@ -1,4 +1,5 @@
-import { createContext, useContext, type LifecycleScope, type ReadableSignal } from "meowjsx";
+import { createContext, useContext, type LifecycleScope } from "meowjsx";
+import { signal, type ReadableSignal } from "meowjsx/signal";
 import type { SlideSession } from "./types";
 
 export const PresentationActivity = createContext<ReadableSignal<boolean> | undefined>(undefined);
@@ -22,7 +23,7 @@ export function activitySignal(
   scope: LifecycleScope,
   read: () => boolean,
 ): ReadableSignal<boolean> {
-  const changed = scope.signal(read());
+  const changed = signal(read());
   scope.effect(() => {
     changed.value = read();
   });

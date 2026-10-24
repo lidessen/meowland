@@ -32,7 +32,8 @@ async function bundle(specifier: string, names: readonly string[]): Promise<stri
 }
 
 test("a Signal-only import leaves the default runtime and renderer out", async () => {
-  expect(found(await bundle("meowjsx", ["signal"]), [runtimeMarker])).toEqual([]);
+  for (const entry of ["meowjsx", "meowjsx/signal"])
+    expect(found(await bundle(entry, ["signal"]), [runtimeMarker])).toEqual([]);
 });
 
 test("token and class-value imports leave components, the runtime and theme rules out", async () => {

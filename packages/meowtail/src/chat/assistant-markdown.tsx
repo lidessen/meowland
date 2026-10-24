@@ -1,4 +1,5 @@
-import { derived, h, type Context, type Props, type Signal } from "meowjsx";
+import { h, type Context, type Props } from "meowjsx";
+import { derived, type Signal } from "meowjsx/signal";
 import { Marked, Renderer } from "marked";
 
 const escape = (text: string) =>

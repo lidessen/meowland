@@ -75,7 +75,6 @@ export interface ComponentRegistry {
 }
 export interface LifecycleScope {
   readonly runtime: Runtime;
-  signal<T>(initialValue: T): WritableSignal<T>;
   effect(run: Effect): Cleanup;
   onCleanup(cleanup: Cleanup): void;
 }

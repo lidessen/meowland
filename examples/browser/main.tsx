@@ -1,4 +1,5 @@
-import { defaultRuntime, h, signal } from "meowjsx";
+import { defaultRuntime, h } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { render } from "meowjsx/web";
 import { Button, Card, installMeowUI } from "meowtail";
 import { standardTheme } from "meowtail/theme";

@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { createRuntime, h, signal, type Props } from "meowjsx";
+import { createRuntime, h, type Props } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
 import { Checkbox, Switch, installMeowUI, meowUIComponents } from "../../../src/index";
 import { mountComponent } from "./mount";

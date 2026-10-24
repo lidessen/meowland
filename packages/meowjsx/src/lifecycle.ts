@@ -1,10 +1,10 @@
-import { createReactiveEffect, signal } from "./reactive";
+import { createReactiveEffect } from "./reactive";
 import type { Cleanup, LifecycleScope, Runtime } from "./types";
 
 /**
  * Create a lifecycle scope. Components receive one per invocation; a target
- * that mounts a shadow uses the same primitive so signals, effects, and
- * cleanups follow one ownership rule.
+ * that mounts a shadow uses the same primitive so effects and cleanups follow
+ * one ownership rule.
  */
 export function createLifecycleScope(runtime: Runtime): LifecycleScope & { dispose(): void } {
   let active = true;
@@ -27,7 +27,6 @@ export function createLifecycleScope(runtime: Runtime): LifecycleScope & { dispo
 
   return {
     runtime,
-    signal,
     effect(run): Cleanup {
       const stop = createReactiveEffect(run);
       onCleanup(stop);

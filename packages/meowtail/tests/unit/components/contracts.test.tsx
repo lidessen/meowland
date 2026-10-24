@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { createRuntime, createThemePlugin, h, signal, type Child } from "meowjsx";
+import { createRuntime, createThemePlugin, h, type Child } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
 import { installMeowUI, meowUIComponents } from "../../../src/registry";
 import {

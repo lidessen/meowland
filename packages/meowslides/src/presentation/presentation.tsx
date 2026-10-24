@@ -1,14 +1,12 @@
+import { h, type Child, type Context, type Props } from "meowjsx";
 import {
   batch,
-  h,
   mapSignal,
+  signal,
   unwrap,
-  type Child,
-  type Context,
-  type Props,
   type ReadableSignal,
   type WritableSignal,
-} from "meowjsx";
+} from "meowjsx/signal";
 import { Button, Inline, LayoutItem, Popover, Stack, Icon } from "meowtail";
 import {
   PresentationActivity,
@@ -107,32 +105,31 @@ export function Presentation(
 ) {
   const parts = context.parts;
   validateSlides(slides);
-  const position =
-    suppliedPosition ?? context.signal<SlidePosition>({ slideId: slides[0]!.id, step: 0 });
+  const position = suppliedPosition ?? signal<SlidePosition>({ slideId: slides[0]!.id, step: 0 });
   positionIndex(slides, position.value);
   const resolveBackground = (): SlideBackground =>
     unwrap(slides[positionIndex(slides, position.value)]!.background) ??
     unwrap(background) ??
     "theme";
-  const resolvedBackground = context.signal(resolveBackground());
+  const resolvedBackground = signal(resolveBackground());
   context.effect(() => {
     resolvedBackground.value = resolveBackground();
   });
-  const paused = context.signal(false);
-  const optionsOpen = context.signal(false);
+  const paused = signal(false);
+  const optionsOpen = signal(false);
   const optionsId = `meowui-presentation-options-${++nextPresentationId}`;
   let firstOption: HTMLButtonElement | undefined;
-  const visible = context.signal(false);
+  const visible = signal(false);
   const activity = activitySignal(context, () => unwrap(active) && visible.value && !paused.value);
-  const scale = context.signal(1);
-  const actualSize = context.signal(false);
-  const overflow = context.signal(false);
+  const scale = signal(1);
+  const actualSize = signal(false);
+  const overflow = signal(false);
   let viewport: HTMLElement | undefined;
   let stage: HTMLElement | undefined;
   let frame: HTMLElement | undefined;
   let heading: HTMLElement | undefined;
   let currentId = position.value.slideId;
-  let currentEnabled = context.signal(true);
+  let currentEnabled = signal(true);
   const motion = entranceMotion(context, activity);
   let reducedMotion: MediaQueryList | undefined;
   let entranceFrame: number | undefined;
@@ -149,7 +146,7 @@ export function Presentation(
   const focusFallback = () => heading?.focus();
   // Use the first child as the signal's initial value: setting it before mount
   // would queue a notification and mount the same page again for new subscribers.
-  const page = context.signal<Child>(
+  const page = signal<Child>(
     <CurrentSlide
       slide={slides[positionIndex(slides, position.value)]!}
       position={position}
@@ -200,7 +197,7 @@ export function Presentation(
     const hadPageFocus = stage && stage.contains(stage.ownerDocument.activeElement);
     if (hadPageFocus) focusFallback();
     currentId = value.slideId;
-    currentEnabled = context.signal(true);
+    currentEnabled = signal(true);
     page.value = (
       <CurrentSlide
         slide={slides[index]!}

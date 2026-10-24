@@ -1,4 +1,5 @@
-import { h, mapSignal, signal } from "meowjsx";
+import { h } from "meowjsx";
+import { mapSignal, signal } from "meowjsx/signal";
 import { defineStory, type StoryContext } from "meowbook";
 import { Button } from "meowtail";
 import { createImageLoadingDeck } from "../../deck";

@@ -873,25 +873,27 @@ test("runtime plugins support presets, falsy entries, and enforce ordering", () 
   ]);
 });
 
-test("components and shadows share scoped lifecycle primitives", async () => {
+test("components and shadows scope effects and cleanup with imported signals", async () => {
   await withTestDOM(async () => {
     type CardProps = { title: string; active: boolean };
     const events: string[] = [];
     let componentValue: WritableSignal<string> | undefined;
     let shadowValue: WritableSignal<boolean> | undefined;
     function Card(props: CardProps, context: Context<typeof Card, CardProps>) {
-      componentValue = context.signal(props.title);
+      expect("signal" in context).toBe(false);
+      componentValue = signal(props.title);
       context.effect(() => {
         events.push(`component:${componentValue?.value}`);
         return () => events.push("component cleanup");
       });
       context.onCleanup(() => events.push("component scope cleanup"));
-      return h("article", { ref: context.parts.root }, props.title);
+      return h("article", { ref: context.parts.root }, componentValue);
     }
     Card.meta = { name: "lifecycle-card", parts: ["root"] } as const;
 
     const CardRootShadow = defineShadow(Card, "root", (props, context) => {
-      shadowValue = context.signal(props.active);
+      expect("signal" in context).toBe(false);
+      shadowValue = signal(props.active);
       context.effect(() => {
         context.element.toggleAttribute("data-active", shadowValue?.value);
         events.push(`shadow:${shadowValue?.value}`);
@@ -912,6 +914,9 @@ test("components and shadows share scoped lifecycle primitives", async () => {
 
     expect(element.tagName).toBe("article");
     expect(element.getAttribute("data-active")).toBe(null);
+    expect(
+      element.childNodes.some((node) => node instanceof TestText && node.data === "hello"),
+    ).toBe(true);
     expect(events).toEqual(["component:hello", "shadow:false"]);
 
     shadowValue!.value = true;
@@ -923,10 +928,19 @@ test("components and shadows share scoped lifecycle primitives", async () => {
     await Promise.resolve();
     await Promise.resolve();
     expect(events).toContain("component:updated");
+    expect(
+      element.childNodes.some((node) => node instanceof TestText && node.data === "updated"),
+    ).toBe(true);
 
     mounted.unmount();
     mounted.unmount();
     expect(root.childNodes).toEqual([]);
+    const afterUnmount = [...events];
+    componentValue!.value = "after unmount";
+    shadowValue!.value = false;
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(events).toEqual(afterUnmount);
     expect(events).toEqual([
       "component:hello",
       "shadow:false",

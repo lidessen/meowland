@@ -1,4 +1,5 @@
-import { h, unwrap, type Child, type MaybeSignal, type Props, type Context } from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
+import { unwrap, type MaybeSignal } from "meowjsx/signal";
 import { PageFrame } from "./page-frame";
 
 export interface DrawerProps extends Props {

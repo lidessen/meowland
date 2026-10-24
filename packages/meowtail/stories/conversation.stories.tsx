@@ -1,5 +1,6 @@
 import { uiTokens } from "meowtail/theme";
-import { h, signal, type Child } from "meowjsx";
+import { h, type Child } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { defineStory } from "meowbook";
 import { ChatConversation, ChatMessageList, ChatMessage, Button, Stack, Inline } from "meowtail";
 

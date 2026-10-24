@@ -10,15 +10,8 @@ A component is an ordinary function. Its static `meta` declares a stable name an
 `Context<typeof Toggle>` supplies those parts and the mount lifecycle.
 
 ```tsx
-import {
-  h,
-  isSignal,
-  mapSignal,
-  unwrap,
-  type Context,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { h, type Context, type Props } from "meowjsx";
+import { isSignal, mapSignal, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import type { WebRef } from "meowjsx/web";
 
 export interface ToggleProps extends Props {
@@ -32,7 +25,7 @@ export function Toggle(
   { pressed, defaultPressed = false, onPressedChange, children, ref, ...props }: ToggleProps,
   context: Context<typeof Toggle>,
 ) {
-  const local = context.signal(defaultPressed);
+  const local = signal(defaultPressed);
   const current = pressed !== undefined ? pressed : local;
   const ariaPressed = isSignal(current)
     ? mapSignal(current, (value) => String(value))
@@ -61,13 +54,33 @@ Passing `pressed` makes the host the owner, including when the value is `false`.
 local Signal. This choice stays fixed for the mount. The click handler reads `unwrap(current)` when
 the event happens, so it uses the latest value; reading it once during setup would capture a snapshot.
 
-`context.signal`, `context.effect` and `context.onCleanup` belong to the mount. Use an effect for an
-outside operation such as a timer, and release it on cleanup. Compute values with
-`mapSignal` for one source or `derived` for several Signals, then bind the result.
+Import `signal` directly from `meowjsx/signal` and create local state inside setup. Each mount creates its
+own Signals. `context.effect` and `context.onCleanup` manage effects and cleanup for that mount.
+Use an effect for an outside operation such as a timer, and release it on cleanup. Register any manual
+subscription's unsubscribe function with `context.onCleanup`. Compute values with `mapSignal` for one
+source or `derived` for several Signals, then bind the result.
 
 `Context<typeof Toggle>` types the part names. When setup also needs the declared types of
 `context.props`, use `Context<typeof Toggle, ToggleProps>`. The separate `metadata` property is for
 development tools; authoring identity and parts live in `meta`.
+
+## Signals from other implementations
+
+`meowjsx/signal` supplies `signal`, `batch`, `mapSignal`, `derived`, `isSignal`, `unwrap` and Signal
+types without creating a runtime or renderer. The existing root and runtime exports share that same
+reactive implementation.
+
+JSX bindings accept any object with a readable `value` and a
+`subscribe(listener: (value: T) => void): () => void` method. `value` supplies the current value;
+`subscribe` reports changed values and returns an unsubscribe function. The renderer releases its
+subscription on unmount. No constructor or brand ties the object to MeowJSX. An external library with
+a different API needs an adapter to that contract. `mapSignal(source, map)` explicitly subscribes to
+its source and can also use an external implementation.
+
+Automatic dependency tracking in `context.effect` and `derived` requires getters from the shared
+MeowJSX reactive implementation. Reading an external Signal's `.value` alone does not register a
+dependency, including inside a component's derived logic. Use `mapSignal` for an explicit source, or
+subscribe directly and register its unsubscribe function with `context.onCleanup`.
 
 ## Parts and composed refs
 
@@ -91,7 +104,8 @@ ref types remain in the DOM-free root.
 at any depth, so a component can forward a caller's full class list without converting it to a string.
 
 ```tsx
-import { h, mapSignal, signal } from "meowjsx";
+import { h } from "meowjsx";
+import { mapSignal, signal } from "meowjsx/signal";
 
 const selected = signal(false);
 export const panel = (

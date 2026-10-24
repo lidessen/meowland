@@ -1,4 +1,5 @@
-import { derived, h, unwrap, type Context, type MaybeSignal, type Props } from "meowjsx";
+import { h, type Context, type Props } from "meowjsx";
+import { derived, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Icon } from "../icons/icon";
 import { TextShimmer } from "../components/text-shimmer";
 

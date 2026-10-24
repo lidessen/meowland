@@ -50,7 +50,7 @@ export const CodeBlockHeaderStory = defineStory({
             View source
           </Button>,
         ]}
-        code={`import { signal } from "meowjsx";
+        code={`import { signal } from "meowjsx/signal";
 
 const connection = signal<"idle" | "connecting" | "ready">("idle");
 

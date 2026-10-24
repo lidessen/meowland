@@ -1,4 +1,5 @@
-import { h, mapSignal, signal } from "meowjsx";
+import { h } from "meowjsx";
+import { mapSignal, signal } from "meowjsx/signal";
 import { Reveal as RootReveal, type RevealProps as RootRevealProps } from "meowslides";
 import { Reveal, type RevealProps } from "meowslides";
 

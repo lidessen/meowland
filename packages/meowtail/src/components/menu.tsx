@@ -1,4 +1,5 @@
-import { h, unwrap, type Child, type MaybeSignal, type Props, type Context } from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
+import { signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Popover, type PopoverTriggerBindings } from "./popover";
 import { Icon } from "../icons/icon";
 import { activeElementInRoot, elementByIdInRoot } from "../shared/dom-root";
@@ -57,7 +58,7 @@ export function Menu(
   }: MenuLevelProps,
   context: Context<typeof Menu>,
 ) {
-  const local = context.signal(false);
+  const local = signal(false);
   const state = open !== undefined ? open : local;
   let root: HTMLElement | undefined;
   let search = "";
@@ -99,7 +100,7 @@ export function Menu(
       ) : null,
     ];
     if (item.children) {
-      const childOpen = context.signal(false);
+      const childOpen = signal(false);
       let timer: ReturnType<typeof setTimeout> | undefined;
       const clear = () => {
         clearTimeout(timer);

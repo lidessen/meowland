@@ -1,5 +1,5 @@
 import { h } from "meowjsx/runtime";
-import { signal } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { uiTokens } from "meowtail/theme";
 import {
   ActionRow,

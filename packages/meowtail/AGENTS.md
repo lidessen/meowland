@@ -21,10 +21,11 @@ A component function body is setup. It runs once for that mount. Nothing runs it
 re-render and no hook order. A later change reaches the DOM only through a Signal that setup bound
 to a prop, an attribute, a text node, or a child.
 
-`context.signal`, `context.effect`, and `context.onCleanup` belong to that mount. They come from the
-same `meowjsx` entry as `Context`, `isSignal`, `mapSignal`, `derived`, `unwrap`, `keyed`,
-and `useContext`. There is no `useState`, `useEffect`, `useMemo`, `useCallback`, or `useRef`. Do not add
-a helper with that shape.
+Import `signal`, `isSignal`, `mapSignal`, `derived`, `unwrap` and Signal types from `meowjsx/signal`;
+create local state inside setup. `context.effect` and `context.onCleanup` belong to that mount; the
+context does not create or dispose Signals. `Context`, `keyed` and `useContext` come from `meowjsx`.
+There is no `useState`, `useEffect`, `useMemo`, `useCallback`, or `useRef`. Do not add a helper with
+that shape.
 
 | Do                                                                                                                                                                                                                          | Don't                                                                                                                                                  |
 | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------ |
@@ -42,15 +43,8 @@ a helper with that shape.
 `Switch` remains the product control for a boolean field. This toggle shows the setup rules only.
 
 ```tsx
-import {
-  h,
-  isSignal,
-  mapSignal,
-  unwrap,
-  type Context,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { h, type Context, type Props } from "meowjsx";
+import { isSignal, mapSignal, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 
 export interface ToggleProps extends Props {
   /** Controlled when provided; a Signal keeps it live. */
@@ -73,7 +67,7 @@ export function Toggle(
   }: ToggleProps,
   context: Context<typeof Toggle>,
 ) {
-  const local = context.signal(defaultPressed);
+  const local = signal(defaultPressed);
   // Presence decides the owner. false is a controlled value.
   const current = pressed !== undefined ? pressed : local;
   const ariaPressed = isSignal(current)

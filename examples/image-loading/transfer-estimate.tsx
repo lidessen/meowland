@@ -1,4 +1,5 @@
-import { h, mapSignal, type Context, type ReadableSignal } from "meowjsx";
+import { h, type Context } from "meowjsx";
+import { mapSignal, signal, type ReadableSignal } from "meowjsx/signal";
 import type { WebRef } from "meowjsx/web";
 import "meowjsx/web";
 import { Button } from "meowtail";
@@ -15,9 +16,9 @@ export function TransferEstimate(
   context: Context<typeof TransferEstimate>,
 ) {
   const active = usePresentationActivity();
-  const progress = context.signal(1);
-  const replay = context.signal(0);
-  const reduceMotion = context.signal(false);
+  const progress = signal(1);
+  const replay = signal(0);
+  const reduceMotion = signal(false);
   context.effect(() => {
     const query = matchMedia("(prefers-reduced-motion: reduce)");
     const update = () => {

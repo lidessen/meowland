@@ -1,12 +1,5 @@
-import {
-  derived,
-  h,
-  type Child,
-  type Props,
-  type MaybeSignal,
-  unwrap,
-  type Context,
-} from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
+import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { copyTextToClipboard } from "../clipboard";
 
 export interface OutputBlockProps extends Props {
@@ -42,8 +35,8 @@ export function OutputBlock(
   }: OutputBlockProps,
   context: Context<typeof OutputBlock>,
 ) {
-  const feedback = context.signal("");
-  const busy = context.signal(false);
+  const feedback = signal("");
+  const busy = signal(false);
   let disposed = false;
   context.onCleanup(() => {
     disposed = true;

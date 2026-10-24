@@ -1,4 +1,5 @@
-import { h, type Props, type MaybeSignal, type Context } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
+import { type MaybeSignal } from "meowjsx/signal";
 
 /** Native options, selection, keyboard interaction and form behavior. */
 export interface SelectProps extends Props {

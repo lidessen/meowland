@@ -32,7 +32,8 @@ This round fills two high-frequency joints: extending the existing `ChatToolCall
 ## Tool calls: separate data from execution actions
 
 ```tsx
-import { h, signal } from "meowjsx";
+import { h } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { ChatToolCall, type ChatExecutionState } from "meowtail/chat";
 
 const state = signal<ChatExecutionState>("queued");

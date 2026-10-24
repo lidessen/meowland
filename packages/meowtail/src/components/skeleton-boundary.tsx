@@ -1,4 +1,5 @@
-import { derived, unwrap, type MaybeSignal, type Props, type Context, h } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
+import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { createSkeletonController, useWebObservation } from "meowjsx/web";
 
 export interface SkeletonBoundaryProps extends Props {
@@ -16,7 +17,7 @@ export function SkeletonBoundary(
   context: Context<typeof SkeletonBoundary>,
 ) {
   const observation = useWebObservation();
-  const mounted = context.signal<HTMLElement | null>(null);
+  const mounted = signal<HTMLElement | null>(null);
   const busy = derived(() => unwrap(active));
   const busyAttribute = derived(() => String(unwrap(active)));
   const announcement = derived(() => (unwrap(active) ? label : ""));

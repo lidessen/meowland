@@ -1,12 +1,5 @@
-import {
-  derived,
-  h,
-  unwrap,
-  type Child,
-  type Context,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { h, type Child, type Context, type Props } from "meowjsx";
+import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { tabsCount, tabsIndex } from "./tabs.options";
 export { tabsCount, tabsIndex } from "./tabs.options";
 
@@ -44,8 +37,8 @@ export function Tabs(
 ) {
   void children;
   const enabled = items.flatMap((item, index) => (item.disabled ? [] : [index]));
-  const local = context.signal(defaultValue ?? items[enabled[0] ?? -1]?.value ?? "");
-  const focus = context.signal(enabled[0] ?? -1);
+  const local = signal(defaultValue ?? items[enabled[0] ?? -1]?.value ?? "");
+  const focus = signal(enabled[0] ?? -1);
   const current = value !== undefined ? value : local;
   const activeIndex = derived(() =>
     items.findIndex((item) => item.value === unwrap(current) && !item.disabled),

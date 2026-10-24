@@ -1,4 +1,5 @@
-import { batch, derived, h, unwrap, type MaybeSignal, type Props, type Context } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
+import { batch, derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Button } from "./button";
 import { Input } from "./input";
 
@@ -37,8 +38,8 @@ export function PathPicker(
   }: PathPickerProps,
   context: Context<typeof PathPicker>,
 ) {
-  const pending = context.signal(false);
-  const feedback = context.signal("");
+  const pending = signal(false);
+  const feedback = signal("");
   const locked = derived(() => unwrap(readOnly) || pending.value);
   const buttonDisabled = derived(() => unwrap(disabled) || unwrap(readOnly) || pending.value);
   const buttonLabel = derived(() => (pending.value ? messages.pending : messages[kind]));

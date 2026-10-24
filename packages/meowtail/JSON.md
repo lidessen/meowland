@@ -4,7 +4,7 @@
 
 ```ts
 import { createJsonView, parseJsonView } from "meowjsx/json";
-import { signal, type ReadableSignal } from "meowjsx";
+import { signal, type ReadableSignal } from "meowjsx/signal";
 import type { AssistantDraft, AssistantMessage } from "meowtail/chat";
 import { createMeowUICatalog } from "meowtail/json";
 

@@ -1,4 +1,5 @@
 import { h, type Child, type Props, type Context } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { CodeBlock } from "./code-block";
 
 export type JsonBlockProps = Props & {
@@ -14,7 +15,7 @@ export function JsonBlock(
   { text, payload, label = "JSON", defaultOpen = false, onCopy, ...props }: JsonBlockProps,
   context: Context<typeof JsonBlock>,
 ) {
-  const body = context.signal<Child>(null);
+  const body = signal<Child>(null);
   let loaded = false;
   const load = () => {
     if (loaded) return;

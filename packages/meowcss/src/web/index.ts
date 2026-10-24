@@ -1,4 +1,5 @@
-import { h, isSignal, type Child, type MaybeSignal, type StyleValue } from "meowjsx";
+import { h, type Child, type StyleValue } from "meowjsx";
+import { isSignal, type MaybeSignal } from "meowjsx/signal";
 import { themeAttributes, type ThemeDefinition } from "../assembly";
 import type { Selection } from "../values";
 

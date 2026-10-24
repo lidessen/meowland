@@ -1,5 +1,6 @@
 import type { IconName } from "../icons/icon";
-import type { Child, MaybeSignal, Props } from "meowjsx";
+import type { Child, Props } from "meowjsx";
+import type { MaybeSignal } from "meowjsx/signal";
 import type { ChatAttachmentItem } from "./attachments";
 import type { ChatMessageRole, ChatMessageStatus } from "./message";
 import type { StatusDotState } from "../components/status-dot";

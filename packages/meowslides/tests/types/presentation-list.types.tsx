@@ -1,4 +1,5 @@
-import { h, signal } from "meowjsx";
+import { h } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { PresentationList, type PresentationListProps } from "meowslides";
 import {
   PresentationList as RootList,

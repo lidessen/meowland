@@ -1,15 +1,5 @@
-import {
-  derived,
-  isSignal,
-  mapSignal,
-  unwrap,
-  type Child,
-  type MaybeSignal,
-  type Props,
-  type VNode,
-  type Context,
-  h,
-} from "meowjsx";
+import { type Child, type Props, type VNode, type Context, h } from "meowjsx";
+import { derived, isSignal, mapSignal, unwrap, type MaybeSignal } from "meowjsx/signal";
 
 export interface FieldProps extends Props {
   label: Child;

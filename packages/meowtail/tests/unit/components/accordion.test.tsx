@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { createRuntime, h, signal } from "meowjsx";
+import { createRuntime, h } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
 import { Accordion, installMeowUI, meowUIComponents } from "../../../src/index";
 

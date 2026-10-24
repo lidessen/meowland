@@ -1,13 +1,5 @@
-import {
-  derived,
-  h,
-  keyed,
-  unwrap,
-  type Child,
-  type MaybeSignal,
-  type Props,
-  type Context,
-} from "meowjsx";
+import { h, keyed, type Child, type Props, type Context } from "meowjsx";
+import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Checkbox } from "./checkbox";
 import { Icon } from "../icons/icon";
 import { tableMinWidth } from "./table.options";
@@ -89,14 +81,14 @@ export function Table(
   }: TableProps,
   context: Context<typeof Table>,
 ) {
-  const localSort = context.signal<TableSort | undefined>(defaultSort);
-  const localSelected = context.signal<readonly string[]>(defaultSelected);
+  const localSort = signal<TableSort | undefined>(defaultSort);
+  const localSelected = signal<readonly string[]>(defaultSelected);
   const rowsView = derived(() => unwrap(rows));
   const sortState = derived(() => (sort === undefined ? localSort.value : unwrap(sort)));
   const selectedState = derived(() =>
     selected === undefined ? localSelected.value : unwrap(selected),
   );
-  const widths = context.signal<Record<string, number>>(
+  const widths = signal<Record<string, number>>(
     Object.fromEntries(
       columns.flatMap((column) => (column.width !== undefined ? [[column.id, column.width]] : [])),
     ),

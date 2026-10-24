@@ -1,4 +1,5 @@
-import { derived, unwrap, type MaybeSignal, type Props, type Context, h } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
+import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 
 export interface SliderProps extends Props {
   /** Accessible name for the native range control. */
@@ -41,7 +42,7 @@ export function Slider(
   context: Context<typeof Slider>,
 ) {
   const initial = value === undefined ? (defaultValue ?? min) : unwrap(value);
-  const local = context.signal(initial);
+  const local = signal(initial);
   const current = value !== undefined ? value : local;
   const readValue = () => unwrap(current);
   const display = derived(() => String(readValue()));

@@ -1,4 +1,5 @@
 import { h, type Child, type Props, type Context } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { OutputBlock } from "./output-block";
 
 import { highlightCode, type HighlightSpan } from "../syntax-highlight";
@@ -33,7 +34,7 @@ export function ReadBlock(
   context: Context<typeof ReadBlock>,
 ) {
   const raw = lines.map((line) => line.text).join("\n");
-  const content = lines.map((line) => context.signal<Child>(line.text || "\u200b"));
+  const content = lines.map((line) => signal<Child>(line.text || "\u200b"));
   let disposed = false;
   context.onCleanup(() => {
     disposed = true;

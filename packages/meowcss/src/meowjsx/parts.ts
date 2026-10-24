@@ -1,14 +1,12 @@
 import {
   createPartDescriptor,
-  isSignal,
   type Component,
   type ComponentMeta,
-  type MaybeSignal,
   type PartDescriptor,
   type Props,
-  type ReadableSignal,
   type RuntimePlugin,
 } from "meowjsx";
+import { isSignal, type MaybeSignal, type ReadableSignal } from "meowjsx/signal";
 import type { Options } from "../values";
 
 export type ThemedProps<O extends Options<any>> = {

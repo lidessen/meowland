@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { Window } from "happy-dom";
-import { createRuntime, h, signal, type Child } from "meowjsx";
+import { createRuntime, h, type Child } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
 import { Field, Input, installMeowUI, meowUIComponents } from "../../../src/index";
 

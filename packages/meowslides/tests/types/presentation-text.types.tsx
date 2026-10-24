@@ -1,4 +1,5 @@
-import { h, signal } from "meowjsx";
+import { h } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { PresentationText } from "meowslides";
 
 const effect = signal<"editorial" | "marker">("editorial");

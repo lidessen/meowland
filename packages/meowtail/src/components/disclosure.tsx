@@ -1,4 +1,5 @@
-import { h, type Child, type MaybeSignal, type Props, type Context } from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
+import { type MaybeSignal } from "meowjsx/signal";
 import { Icon } from "../icons/icon";
 
 export interface DisclosureProps extends Props {

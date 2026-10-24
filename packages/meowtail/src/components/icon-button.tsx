@@ -1,5 +1,6 @@
 import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
-import { h, type MaybeSignal, type Props, type Context } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
+import { type MaybeSignal } from "meowjsx/signal";
 
 import { iconButtonOptions } from "./icon-button.options";
 export { iconButtonOptions } from "./icon-button.options";

@@ -1,12 +1,5 @@
-import {
-  h,
-  mapSignal,
-  unwrap,
-  useContext,
-  type Context,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { h, useContext, type Context, type Props } from "meowjsx";
+import { mapSignal, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import {
   PresentationActivity,
   PresentationSlide,
@@ -41,7 +34,7 @@ export function Reveal(
   );
   const activity = activitySignal(context, () => parent.value && revealed.value);
   let element: HTMLElement | undefined;
-  const concealed = context.signal(!revealed.value);
+  const concealed = signal(!revealed.value);
   const motion = entranceMotion(context, activity);
   let wasRevealed = revealed.value;
   context.effect(() => {

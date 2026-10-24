@@ -1,14 +1,6 @@
 import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
-import {
-  derived,
-  h,
-  keyed,
-  unwrap,
-  type Child,
-  type MaybeSignal,
-  type Props,
-  type Context,
-} from "meowjsx";
+import { h, keyed, type Child, type Props, type Context } from "meowjsx";
+import { derived, unwrap, type MaybeSignal } from "meowjsx/signal";
 
 import { metaRowOptions } from "./meta-row.options";
 export { metaRowOptions } from "./meta-row.options";

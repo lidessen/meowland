@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { h, signal, type VNode } from "meowjsx";
+import { h, type VNode } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { renderToHtml } from "meowjsx/web";
 import { createJsonView, describeJsonCatalog, parseJsonView } from "meowjsx/json";
 import { AssistantView } from "../../../src/chat/assistant";

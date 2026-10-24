@@ -25,6 +25,10 @@
       "types": "./dist/src/runtime.d.ts",
       "import": "./dist/src/runtime.js"
     },
+    "./signal": {
+      "types": "./dist/src/signal.d.ts",
+      "import": "./dist/src/signal.js"
+    },
     "./renderer": {
       "types": "./dist/src/renderer.d.ts",
       "import": "./dist/src/renderer.js"

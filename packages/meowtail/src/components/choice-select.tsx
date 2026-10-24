@@ -1,4 +1,5 @@
-import { derived, h, keyed, unwrap, type MaybeSignal, type Props, type Context } from "meowjsx";
+import { h, keyed, type Props, type Context } from "meowjsx";
+import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Popover, type PopoverTriggerBindings } from "./popover";
 import { Icon } from "../icons/icon";
 import { elementByIdInRoot } from "../shared/dom-root";
@@ -57,14 +58,14 @@ export function ChoiceSelect(
   }: ChoiceSelectProps,
   context: Context<typeof ChoiceSelect>,
 ) {
-  const local = context.signal(defaultValue);
+  const local = signal(defaultValue);
   const current = value !== undefined ? value : local;
   const readValue = () => unwrap(current);
   const readOptions = () => unwrap(options);
-  const open = context.signal(false);
-  const invalid = context.signal<string | undefined>(undefined);
-  const validation = context.signal("");
-  const query = context.signal("");
+  const open = signal(false);
+  const invalid = signal<string | undefined>(undefined);
+  const validation = signal("");
+  const query = signal("");
   let searchElement: HTMLInputElement | null = null;
   let triggerElement: HTMLButtonElement | null = null;
   let nativeElement: HTMLSelectElement | null = null;

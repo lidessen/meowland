@@ -1,4 +1,5 @@
-import { defaultRuntime, signal, type ReadableSignal } from "meowjsx";
+import { defaultRuntime } from "meowjsx";
+import { signal, type ReadableSignal } from "meowjsx/signal";
 import { createJsonView, parseJsonView } from "meowjsx/json";
 import { render } from "meowjsx/web";
 import { AssistantView, installMeowUI } from "meowtail";

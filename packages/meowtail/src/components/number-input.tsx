@@ -1,4 +1,5 @@
-import { derived, h, unwrap, type MaybeSignal, type Props, type Context } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
+import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Icon } from "../icons/icon";
 
 export interface NumberInputProps extends Props {
@@ -79,13 +80,11 @@ export function NumberInput(
   const lower = min ?? Number.NEGATIVE_INFINITY;
   const upper = max ?? Number.POSITIVE_INFINITY;
   const origin = Number.isFinite(lower) ? lower : 0;
-  const local = context.signal<number | undefined>(
-    value === undefined ? defaultValue : unwrap(value),
-  );
+  const local = signal<number | undefined>(value === undefined ? defaultValue : unwrap(value));
   const current = value !== undefined ? value : local;
   const readValue = () => unwrap(current);
-  const editing = context.signal(false);
-  const draft = context.signal("");
+  const editing = signal(false);
+  const draft = signal("");
   const formatted = (next: number | undefined) =>
     next === undefined ? "" : formatNumber(next, places);
   const text = derived(() => (editing.value ? draft.value : formatted(readValue())));

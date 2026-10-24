@@ -4,7 +4,8 @@
 
 ```ts
 import { createJsonView, defineJsonComponent, jsonSchema, parseJsonView } from "meowjsx/json";
-import { h, signal, type MaybeSignal } from "meowjsx";
+import { h } from "meowjsx";
+import { signal, type MaybeSignal } from "meowjsx/signal";
 
 const Label = (props: { text: MaybeSignal<string> }) => h("span", null, props.text);
 const catalog = new Map([

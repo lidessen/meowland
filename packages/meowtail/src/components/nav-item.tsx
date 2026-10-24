@@ -1,12 +1,5 @@
-import {
-  h,
-  derived,
-  unwrap,
-  type Child,
-  type MaybeSignal,
-  type Props,
-  type Context,
-} from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
+import { derived, unwrap, type MaybeSignal } from "meowjsx/signal";
 
 export interface NavItemProps extends Props {
   label: Child;

@@ -26,7 +26,7 @@ describe("browser slides build and command line", () => {
       await writeFile(join(directory, "tone.wav"), "local-media-fixture");
       await writeFile(
         join(directory, "QuickCheck.tsx"),
-        'import {h,signal} from "meowjsx"; export const createSession=()=>({answer:signal(0)}); export function QuickCheck({session}){return <button onClick={()=>session.answer.value++}>{session.answer}</button>}',
+        'import { h } from "meowjsx"; import { signal } from "meowjsx/signal"; export const createSession=()=>({answer:signal(0)}); export function QuickCheck({session}){return <button onClick={()=>session.answer.value++}>{session.answer}</button>}',
       );
       await writeFile(join(directory, "SOURCES.md"), "Local test fixture.");
       await writeFile(join(directory, "assets/NOTICES.md"), "Fixture author.");

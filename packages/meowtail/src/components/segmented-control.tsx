@@ -1,4 +1,5 @@
-import { derived, unwrap, type MaybeSignal, type Props, type Context, h } from "meowjsx";
+import { type Props, type Context, h } from "meowjsx";
+import { derived, unwrap, type MaybeSignal } from "meowjsx/signal";
 export interface SegmentedControlOption {
   value: string;
   label: string;

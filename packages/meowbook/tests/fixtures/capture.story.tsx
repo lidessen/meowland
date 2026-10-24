@@ -1,4 +1,5 @@
-import { createContext, h, signal, useContext } from "meowjsx";
+import { createContext, h, useContext } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { defineStory, replaceComponent, type ComponentMetadata } from "meowbook";
 import { readCaptureFacts } from "../../src/web/capture-facts";
 import {

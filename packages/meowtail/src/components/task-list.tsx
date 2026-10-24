@@ -1,13 +1,5 @@
-import {
-  derived,
-  h,
-  keyed,
-  unwrap,
-  type Child,
-  type Context,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { h, keyed, type Child, type Context, type Props } from "meowjsx";
+import { derived, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Icon } from "../icons/icon";
 import { executionStateLabel, type ChatExecutionState } from "../shared/execution-state";
 import { Badge } from "./badge";

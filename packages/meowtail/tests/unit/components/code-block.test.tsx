@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { createRuntime, h, signal, unwrap, type Props } from "meowjsx";
+import { createRuntime, h, type Props } from "meowjsx";
+import { unwrap, signal } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
 import { CodeBlock } from "../../../src/components/code-block";
 import { installMeowUI, meowUIComponents } from "../../../src/registry";

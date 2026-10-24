@@ -4,17 +4,8 @@
  * This module merges them so one typecheck covers both, and it imports uiTokens from
  * this file's location. Teaching fixtures only: not registered, not exported from the package.
  */
-import {
-  h,
-  isSignal,
-  mapSignal,
-  signal,
-  unwrap,
-  type Child,
-  type Context,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { h, type Child, type Context, type Props } from "meowjsx";
+import { isSignal, mapSignal, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { defineOptions } from "meowcss";
 import { css, defineStyleProps, parts, type ThemedProps } from "meowcss/meowjsx";
 import { uiTokens } from "../../src/theme/tokens";
@@ -41,7 +32,7 @@ export function Toggle(
   }: ToggleProps,
   context: Context<typeof Toggle>,
 ) {
-  const local = context.signal(defaultPressed);
+  const local = signal(defaultPressed);
   // Presence decides the owner. false is a controlled value.
   const current = pressed !== undefined ? pressed : local;
   const ariaPressed = isSignal(current)

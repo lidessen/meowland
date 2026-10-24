@@ -1,4 +1,5 @@
-import type { Child, MaybeSignal, Props, ReadableSignal, WritableSignal } from "meowjsx";
+import type { Child, Props } from "meowjsx";
+import type { MaybeSignal, ReadableSignal, WritableSignal } from "meowjsx/signal";
 import type { PresentationTransition } from "./transition";
 
 export interface SlidePosition {

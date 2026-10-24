@@ -1,4 +1,5 @@
-import { derived, h, keyed, type Context, type Signal } from "meowjsx";
+import { h, keyed, type Context } from "meowjsx";
+import { derived, signal, type Signal } from "meowjsx/signal";
 // Fragment is required by the classic JSX transform for question actions.
 // eslint-disable-next-line no-unused-vars
 import { Fragment } from "meowjsx";
@@ -27,9 +28,9 @@ export function AssistantQuestionView(
   context: Context<typeof AssistantQuestionView>,
 ) {
   const assistantCopy = { ...defaultAssistantCopy, ...labels };
-  const answer = context.signal("");
-  const sending = context.signal(false);
-  const error = context.signal("");
+  const answer = signal("");
+  const sending = signal(false);
+  const error = signal("");
   const disabled = derived(() => sending.value || value.value.state !== "open" || !onAnswer);
   let disposed = false;
   context.onCleanup(() => {

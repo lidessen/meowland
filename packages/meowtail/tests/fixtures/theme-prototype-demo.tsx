@@ -1,4 +1,5 @@
-import { h, type Context, type MaybeSignal, type Props, type Runtime } from "meowjsx";
+import { h, type Context, type Props, type Runtime } from "meowjsx";
+import { signal, type MaybeSignal } from "meowjsx/signal";
 import { Button } from "../../src/components/button";
 import { Field } from "../../src/components/field";
 import { Input } from "../../src/components/input";
@@ -203,13 +204,11 @@ export const prototypeTheme = defineTheme({
 });
 export const prototypeCSS = prototypeTheme.cssText;
 
-export function PrototypeDemo(_props: Props, context: Context<typeof PrototypeDemo>) {
-  const application = context.signal<Selection>(
-    appOptions.select({ scheme: "light", density: "normal" }),
-  );
-  const local = context.signal<Selection>(appOptions.select({}));
-  const variant = context.signal<"quiet" | "outline" | undefined>("outline");
-  const clicks = context.signal(0);
+export function PrototypeDemo(_props: Props) {
+  const application = signal<Selection>(appOptions.select({ scheme: "light", density: "normal" }));
+  const local = signal<Selection>(appOptions.select({}));
+  const variant = signal<"quiet" | "outline" | undefined>("outline");
+  const clicks = signal(0);
   return (
     <Theme theme={prototypeTheme} config={application} id="scope-root" className="pt-app">
       <h1>Parameterized theme prototype</h1>

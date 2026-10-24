@@ -1,13 +1,5 @@
-import {
-  derived,
-  isSignal,
-  unwrap,
-  type Child,
-  type MaybeSignal,
-  type Props,
-  type Context,
-  h,
-} from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
+import { derived, isSignal, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { autoUpdate, computePosition, offset, flip, shift, size } from "@floating-ui/dom";
 import { activeElementInRoot, elementByIdInRoot } from "../shared/dom-root";
 
@@ -63,7 +55,7 @@ export function Popover(
   }: PopoverProps,
   context: Context<typeof Popover>,
 ) {
-  const local = context.signal(defaultOpen);
+  const local = signal(defaultOpen);
   // A signal object is controlled even when its current value is false.
   const state = open !== undefined ? open : local;
   const expanded = derived(() => String(unwrap(state)));

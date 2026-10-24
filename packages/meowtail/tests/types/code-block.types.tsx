@@ -1,4 +1,5 @@
-import { h, signal, type Child } from "meowjsx";
+import { h, type Child } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { Button } from "../../src/components/button";
 import { CodeBlock } from "../../src/components/code-block";
 

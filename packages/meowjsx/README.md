@@ -79,9 +79,12 @@ meowjsx (this package: core + JSX contract)
 
 ## Exports
 
-- `.`, `./runtime`: `h`, `Fragment`, `raw`, `signal`/`batch`/`mapSignal`/`derived`,
-  `createRuntime`, `defaultRuntime`, `defineShadow`, `createThemePlugin`, part descriptor helpers,
-  plus VNode/Signal/metadata, `Context` and generic ref types.
+- `.`, `./runtime`: `h`, `Fragment`, `raw`, `createRuntime`, `defaultRuntime`, `defineShadow`,
+  `createThemePlugin`, part descriptor helpers, plus VNode/metadata, `Context` and generic ref types.
+  Existing reactive exports remain available and share the implementation below.
+- `./signal`: `signal`, `batch`, `mapSignal`, `derived`, `isSignal`, `unwrap`, and the
+  `ReadableSignal`, `WritableSignal`, `Signal` and `MaybeSignal` types. This DOM-free entry loads
+  the reactive implementation without creating a runtime or renderer.
 - `./renderer`: `RenderStrategy<TNode>`, `createRenderer()`, `Renderer`/`Rendered`/
   `RendererOptions`, `ComponentObserver`/`ObservedComponent` and other target-seam types. `createRenderer()` injects component lifecycle,
   render hooks, overrides and `key`/`componentPart` identity; the target only implements node and attribute placement.
@@ -119,6 +122,9 @@ empty strings. They do not merge conflicting classes or interpret objects as cla
 The native `class` attribute follows the same runtime normalization.
 
 ```tsx
+import { h } from "meowjsx";
+import { signal } from "meowjsx/signal";
+
 const stateClass = signal("is-idle");
 <div className={["panel", [false, stateClass], "host-panel"]} />;
 stateClass.value = "is-active";
@@ -134,7 +140,11 @@ public `ClassValue` type is available to components that forward `className`.
 Components are ordinary functions. A static `meta` declares their stable name and finite parts;
 `Context<typeof Component>` supplies the lifecycle and a typed `parts` map. Use
 `Context<typeof Component, ComponentProps>` when setup also needs the declared types of
-`context.props`. Setup runs once per mount, and Signals carry later changes.
+`context.props`. Setup runs once per mount, and Signals carry later changes. Import `signal`
+directly from `meowjsx/signal` and create local state inside setup; each mount creates its own Signals.
+`context.effect` and `context.onCleanup` manage effects and cleanup for that mount. Signals have no
+dispose operation; the renderer releases its binding subscriptions on unmount. Register any manual
+subscription's unsubscribe function with `context.onCleanup`.
 
 ```tsx
 import { h, type Context, type Props } from "meowjsx";
@@ -200,6 +210,35 @@ its lifecycle is managed by the consumer, and no global observation tree is crea
 Public JS artifacts preserve module relationships: the root, runtime, automatic JSX and Web entries reference the same core.
 Release builds must not copy a defaultRuntime, Context or reactive scheduler per entry.
 
+## Signal interoperability
+
+Import reactive functions and types from `meowjsx/signal`:
+
+```ts
+import { signal, mapSignal, derived, batch, type ReadableSignal } from "meowjsx/signal";
+```
+
+JSX bindings accept any object that satisfies this structural contract; no MeowJSX constructor or
+brand is required:
+
+```ts
+interface ReadableSignal<T> {
+  readonly value: T;
+  subscribe(listener: (value: T) => void): () => void;
+}
+```
+
+`value` returns the current value. `subscribe` reports changed values and returns an unsubscribe
+function. The renderer reads the initial value, subscribes for updates and unsubscribes on unmount.
+`mapSignal(source, map)` also subscribes explicitly, so it works with external implementations.
+A third-party API with a different shape needs an adapter to this contract.
+
+Automatic dependency tracking in `context.effect` and `derived` requires getters from the shared
+MeowJSX reactive implementation. Reading an external Signal's `.value` alone does not register it as
+a dependency; this also applies to component logic that uses those computations. Use `mapSignal`
+for an explicit source, or subscribe directly and register the unsubscribe function with
+`context.onCleanup`. The root, runtime and signal entries share one reactive module and scheduler.
+
 ## Derived signals
 
 `derived(read)` is a read-only signal. `read` runs again when any signal it read changes, and subscribers hear the value when `Object.is` says it changed. `read` must not write signals. One source can also use `mapSignal`. A computation is not stored by writing another signal from `effect`.
@@ -210,6 +249,9 @@ Release builds must not copy a defaultRuntime, Context or reactive scheduler per
 a deletion releases that row's lifecycle, and reordering moves the existing range. Whole-replacement semantics for plain arrays and Signals are unchanged.
 
 ```ts
+import { h, keyed } from "meowjsx";
+import { mapSignal, signal } from "meowjsx/signal";
+
 const items = signal([{ id: "one", label: "First" }]);
 const rows = keyed(
   items,

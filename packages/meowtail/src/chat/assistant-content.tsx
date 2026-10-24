@@ -1,4 +1,5 @@
-import { derived, h, keyed, unwrap, type Child, type Context, type Signal } from "meowjsx";
+import { h, keyed, type Child, type Context } from "meowjsx";
+import { derived, signal, unwrap, type Signal } from "meowjsx/signal";
 // Fragment is required by the classic JSX transform for process status content.
 // eslint-disable-next-line no-unused-vars
 import { Fragment } from "meowjsx";
@@ -191,7 +192,7 @@ function AssistantReplyActions(
   },
   context: Context<typeof AssistantReplyActions>,
 ) {
-  const copied = context.signal(false);
+  const copied = signal(false);
   let timer: ReturnType<typeof setTimeout> | undefined;
   context.onCleanup(() => clearTimeout(timer));
   const text = () =>

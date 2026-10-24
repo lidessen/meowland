@@ -1,4 +1,5 @@
-import { h, unwrap, type Child, type MaybeSignal, type Props, type Context } from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
+import { signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Menu, type MenuEntry } from "./menu";
 
 export interface ContextMenuProps extends Props {
@@ -15,7 +16,7 @@ export function ContextMenu(
   { id, items, open, onOpenChange, className, children, ...props }: ContextMenuProps,
   context: Context<typeof ContextMenu>,
 ) {
-  const local = context.signal(false);
+  const local = signal(false);
   const state = open !== undefined ? open : local;
   let point = { x: 0, y: 0 };
   const request = (next: boolean) => {

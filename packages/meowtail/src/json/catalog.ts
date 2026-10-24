@@ -1,4 +1,4 @@
-import type { MaybeSignal } from "meowjsx";
+import type { MaybeSignal } from "meowjsx/signal";
 import {
   defineJsonComponent,
   jsonSchema as s,

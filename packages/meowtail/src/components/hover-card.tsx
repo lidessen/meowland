@@ -1,4 +1,5 @@
 import { h, type Child, type Props, type Context } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { Popover, type PopoverTriggerBindings } from "./popover";
 import { copyTextToClipboard } from "../clipboard";
 
@@ -37,7 +38,7 @@ export function HoverCard(
   }: HoverCardProps,
   context: Context<typeof HoverCard>,
 ) {
-  const open = context.signal(false);
+  const open = signal(false);
   let timer: ReturnType<typeof setTimeout> | undefined;
   let hovered = false;
   let focused = false;
@@ -47,7 +48,7 @@ export function HoverCard(
   let copying = false;
   let copySession = {};
   let feedbackTimer: ReturnType<typeof setTimeout> | undefined;
-  const feedback = context.signal("");
+  const feedback = signal("");
   const clear = () => {
     if (timer !== undefined) clearTimeout(timer);
     timer = undefined;

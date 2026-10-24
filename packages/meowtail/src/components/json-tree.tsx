@@ -1,4 +1,5 @@
 import { h, type Child, type Props, type Context } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { copyTextToClipboard } from "../clipboard";
 import { Icon } from "../icons/icon";
 
@@ -26,8 +27,8 @@ export function JsonTree(
   context: Context<typeof JsonTree>,
 ) {
   const container = data !== null && typeof data === "object";
-  const feedback = context.signal("");
-  const children = context.signal<Child>(null);
+  const feedback = signal("");
+  const children = signal<Child>(null);
   let loaded = false;
   let alive = true;
   context.onCleanup(() => {

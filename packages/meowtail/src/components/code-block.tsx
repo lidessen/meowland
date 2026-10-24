@@ -1,12 +1,5 @@
-import {
-  derived,
-  h,
-  unwrap,
-  type Child,
-  type MaybeSignal,
-  type Props,
-  type Context,
-} from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
+import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Button } from "./button";
 import { copyTextToClipboard } from "../clipboard";
 
@@ -61,10 +54,10 @@ export function CodeBlock(
   context: Context<typeof CodeBlock>,
 ) {
   // These are enumerated attributes, not native boolean attributes such as disabled.
-  const wrap = context.signal(defaultWrap ? "true" : "false");
-  const copying = context.signal(false);
-  const feedback = context.signal("");
-  const highlighted = context.signal<Child>(unwrap(code));
+  const wrap = signal(defaultWrap ? "true" : "false");
+  const copying = signal(false);
+  const feedback = signal("");
+  const highlighted = signal<Child>(unwrap(code));
   const languageLabel = derived(() => unwrap(language)?.trim() || "Code");
   let disposed = false;
   context.onCleanup(() => {

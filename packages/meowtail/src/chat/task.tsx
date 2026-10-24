@@ -1,12 +1,5 @@
-import {
-  derived,
-  h,
-  unwrap,
-  type Child,
-  type Context,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { h, type Child, type Context, type Props } from "meowjsx";
+import { derived, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Progress } from "../components/progress";
 import { StatusDot } from "../components/status-dot";
 import {

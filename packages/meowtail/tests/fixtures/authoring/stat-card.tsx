@@ -1,5 +1,6 @@
-import { h, type MaybeSignal, type Props, type Context } from "meowjsx";
-import { isSignal, mapSignal } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
+import { type MaybeSignal } from "meowjsx/signal";
+import { isSignal, mapSignal } from "meowjsx/signal";
 import { css, parts } from "meowcss/meowjsx";
 import { ui, uiTokens } from "meowtail/theme";
 

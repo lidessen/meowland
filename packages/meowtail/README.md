@@ -691,12 +691,13 @@ Static visuals use CSS. Use a shadow only when real DOM, instance state, listene
 
 ```ts
 // Web shadow: context.element is a real Element.
+import { signal } from "meowjsx/signal";
 import { defineShadow } from "meowjsx/web";
 
 runtime.use({
   shadows: [
     defineShadow(Button, "root", (props, context) => {
-      const active = context.signal(false);
+      const active = signal(false);
       context.effect(() => {
         context.element.classList.toggle("is-active", active.value);
       });
@@ -717,7 +718,7 @@ runtime.use({
 });
 ```
 
-Register centrally; do not generate wrapper components. A shadow shares the signal/effect/onCleanup lifecycle API with components.
+Register centrally; do not generate wrapper components. Shadows and components import `signal` from `meowjsx/signal` and share the `effect`/`onCleanup` lifecycle API.
 Plugin uninstall blocks later application; instance cleanup for existing elements is handled by the unmount of their mount. Do not use
 renderToHtml + innerHTML instead of browser mounting that needs a lifecycle.
 

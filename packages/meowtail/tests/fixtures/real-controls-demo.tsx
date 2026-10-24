@@ -1,4 +1,5 @@
-import { h, type Context, type Props } from "meowjsx";
+import { h, type Props } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { Alert } from "../../src/components/alert";
 import { Button } from "../../src/components/button";
 import { alertOptions } from "../../src/components/alert.options";
@@ -174,12 +175,12 @@ export const controlsTheme = defineTheme({
   `,
 });
 
-export function RealControlsDemo(_props: Props, context: Context<typeof RealControlsDemo>) {
-  const config = context.signal<Selection>(controlsOptions.select({}));
-  const local = context.signal<Selection>(controlsOptions.select({}));
-  const variant = context.signal<"primary" | "quiet" | "outline" | undefined>("outline");
-  const tone = context.signal<"info" | "danger" | undefined>("danger");
-  const submitted = context.signal(0);
+export function RealControlsDemo(_props: Props) {
+  const config = signal<Selection>(controlsOptions.select({}));
+  const local = signal<Selection>(controlsOptions.select({}));
+  const variant = signal<"primary" | "quiet" | "outline" | undefined>("outline");
+  const tone = signal<"info" | "danger" | undefined>("danger");
+  const submitted = signal(0);
   return (
     <Theme
       theme={controlsTheme}

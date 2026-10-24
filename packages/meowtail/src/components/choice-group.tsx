@@ -1,4 +1,5 @@
-import { derived, unwrap, type MaybeSignal, type Props, type Context, h } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
+import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 
 export interface ChoiceGroupOption {
   value: string;
@@ -44,7 +45,7 @@ export function ChoiceGroup(
   }: ChoiceGroupProps,
   context: Context<typeof ChoiceGroup>,
 ) {
-  const local = context.signal(defaultValue);
+  const local = signal(defaultValue);
   const current = value !== undefined ? value : local;
   const readValue = () => unwrap(current);
   const inputs = new Map<string, HTMLInputElement>();

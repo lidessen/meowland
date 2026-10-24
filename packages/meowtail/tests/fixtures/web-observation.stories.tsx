@@ -2,11 +2,11 @@ import {
   createComponentObservation,
   createRuntime,
   h,
-  signal,
   type Child,
   type Context,
   type Props,
 } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { createSkeletonController, createWebRenderer, useWebObservation } from "meowjsx/web";
 import { defineStory } from "meowbook";
 

@@ -1,12 +1,5 @@
-import {
-  isSignal,
-  mapSignal,
-  type Child,
-  type MaybeSignal,
-  type Props,
-  type Context,
-  h,
-} from "meowjsx";
+import { type Child, type Props, type Context, h } from "meowjsx";
+import { isSignal, mapSignal, type MaybeSignal } from "meowjsx/signal";
 
 export interface IconRailProps extends Props {
   /** Accessible name of the navigation. */

@@ -1,4 +1,5 @@
-import { derived, h, keyed, type Context, type MaybeSignal, type Props } from "meowjsx";
+import { h, keyed, type Context, type Props } from "meowjsx";
+import { derived, type MaybeSignal } from "meowjsx/signal";
 import { Icon } from "../icons/icon";
 import { FileTypeIcon, fileExtension } from "../icons/file-type-icon";
 import { ImagePreview } from "../components/image-preview";

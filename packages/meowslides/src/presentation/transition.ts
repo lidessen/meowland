@@ -1,4 +1,5 @@
-import type { LifecycleScope, ReadableSignal } from "meowjsx";
+import type { LifecycleScope } from "meowjsx";
+import type { ReadableSignal } from "meowjsx/signal";
 
 export type PresentationTransitionEffect = "none" | "fade" | "slide" | "zoom";
 export type PresentationTransitionDirection = "left" | "right" | "up" | "down";

@@ -1,4 +1,5 @@
-import { h, signal, type Child } from "meowjsx";
+import { h, type Child } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { defineStory } from "meowbook";
 import {
   Button,

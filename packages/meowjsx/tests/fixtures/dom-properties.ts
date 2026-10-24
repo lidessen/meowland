@@ -1,4 +1,5 @@
-import { createRuntime, h, signal } from "meowjsx";
+import { createRuntime, h } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
 
 export interface DOMPropertyFixture {

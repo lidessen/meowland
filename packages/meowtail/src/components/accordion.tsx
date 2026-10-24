@@ -1,12 +1,5 @@
-import {
-  derived,
-  unwrap,
-  h,
-  type Child,
-  type MaybeSignal,
-  type Props,
-  type Context,
-} from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
+import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Disclosure } from "./disclosure";
 
 export interface AccordionItem {
@@ -71,7 +64,7 @@ export function Accordion(
   }: AccordionProps,
   context: Context<typeof Accordion>,
 ) {
-  const local = context.signal<AccordionValue>(defaultValue ?? (type === "single" ? "" : []));
+  const local = signal<AccordionValue>(defaultValue ?? (type === "single" ? "" : []));
   const current = value !== undefined ? value : local;
   const readValue = () => unwrap(current);
   const opened = items.map((item) => derived(() => isOpen(readValue(), type, item.id)));

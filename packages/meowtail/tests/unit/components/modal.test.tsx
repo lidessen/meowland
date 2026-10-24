@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
-import { createRuntime, h, signal, type MaybeSignal, type Props } from "meowjsx";
+import { createRuntime, h, type Props } from "meowjsx";
+import { signal, type MaybeSignal } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
 import { Button } from "../../../src/components/button";
 import { Modal } from "../../../src/components/modal";

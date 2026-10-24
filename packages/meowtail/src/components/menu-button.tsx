@@ -1,4 +1,5 @@
-import { h, type Child, type MaybeSignal } from "meowjsx";
+import { h, type Child } from "meowjsx";
+import { type MaybeSignal } from "meowjsx/signal";
 import { Button, type ButtonProps } from "./button";
 import { Icon } from "../icons/icon";
 import { Menu, type MenuEntry } from "./menu";

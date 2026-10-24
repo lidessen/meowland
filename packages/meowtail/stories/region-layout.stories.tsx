@@ -1,4 +1,5 @@
-import { h, signal, mapSignal } from "meowjsx";
+import { h } from "meowjsx";
+import { signal, mapSignal } from "meowjsx/signal";
 import { render } from "meowjsx/web";
 import { defineStory } from "meowbook";
 import {

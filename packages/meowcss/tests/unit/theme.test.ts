@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { signal } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { applyTheme } from "meowcss/web";
 import { themeAttributes } from "meowcss";
 import { defineTheme } from "meowcss/meowjsx";

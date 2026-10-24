@@ -1,4 +1,5 @@
-import { derived, h, keyed, unwrap, type Context, type Signal } from "meowjsx";
+import { h, keyed, type Context } from "meowjsx";
+import { derived, signal, unwrap, type Signal } from "meowjsx/signal";
 // Fragment is required by the classic JSX transform for header actions.
 // eslint-disable-next-line no-unused-vars
 import { Fragment } from "meowjsx";
@@ -124,11 +125,11 @@ export function AssistantView(options: AssistantViewProps, context: Context<type
   const work = derived(() => unwrap(options.work ?? []));
   const questions = derived(() => unwrap(options.questions ?? []));
   const activity = derived(() => unwrap(options.activity));
-  const panelOpen = context.signal(false);
-  const selected = context.signal("");
+  const panelOpen = signal(false);
+  const selected = signal("");
   const selectedWork = derived(() => work.value.find((item) => item.id === selected.value));
-  const latestHidden = context.signal(true);
-  const historyOpen = context.signal(false);
+  const latestHidden = signal(true);
+  const historyOpen = signal(false);
   const asked = derived(() =>
     messages.value.flatMap((message) => {
       if (message.role !== "user") return [];

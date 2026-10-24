@@ -13,6 +13,7 @@
     "types": [],
     "paths": {
       "meowjsx": ["./src/index.ts"],
+      "meowjsx/signal": ["./src/signal.ts"],
       "meowjsx/web": ["./web/index.ts"],
       "meowjsx/json": ["./src/json/index.ts"]
     }

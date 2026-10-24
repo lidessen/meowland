@@ -1,4 +1,5 @@
-import { derived, h, isSignal, unwrap, type Child, type Context } from "meowjsx";
+import { h, type Child, type Context } from "meowjsx";
+import { derived, isSignal, signal, unwrap } from "meowjsx/signal";
 // Fragment is required by the classic JSX transform for conditional attachment controls.
 // eslint-disable-next-line no-unused-vars
 import { Fragment } from "meowjsx";
@@ -22,14 +23,12 @@ export function AssistantComposer(
   const controlled = options.draft !== undefined;
   if (controlled && !options.onDraftChange && !options.readOnly)
     throw new Error("A controlled Assistant draft requires onDraftChange or readOnly");
-  const local = context.signal<AssistantDraft>(
-    options.defaultDraft ?? { text: "", attachments: [] },
-  );
+  const local = signal<AssistantDraft>(options.defaultDraft ?? { text: "", attachments: [] });
   const draft = derived(() => (controlled ? unwrap(options.draft!) : local.value));
   const text = derived(() => draft.value.text);
-  const pending = context.signal(false);
-  const attaching = context.signal(false);
-  const feedback = context.signal("");
+  const pending = signal(false);
+  const attaching = signal(false);
+  const feedback = signal("");
   const disabled = derived(() => options.readOnly || unwrap(options.disabled ?? false));
   const submitDisabled = derived(
     () =>
@@ -107,8 +106,8 @@ export function AssistantComposer(
     disposed = true;
     for (const url of urls) URL.revokeObjectURL(url);
   });
-  const localModel = context.signal(unwrap(options.models ?? [])[0]?.value ?? "");
-  const localReasoning = context.signal(unwrap(options.reasoningOptions ?? [])[0]?.value ?? "");
+  const localModel = signal(unwrap(options.models ?? [])[0]?.value ?? "");
+  const localReasoning = signal(unwrap(options.reasoningOptions ?? [])[0]?.value ?? "");
   const modelsLive =
     options.models !== undefined && (isSignal(options.models) || options.models.length > 0);
   const reasoningLive =

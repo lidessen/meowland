@@ -1,5 +1,6 @@
 import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
-import { type Props, type Context, h } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
+import { signal } from "meowjsx/signal";
 
 import { avatarOptions } from "./avatar.options";
 export { avatarOptions } from "./avatar.options";
@@ -30,7 +31,7 @@ export function Avatar(
   { name, src, alt, className, ...props }: AvatarProps,
   context: Context<typeof Avatar>,
 ) {
-  const failed = context.signal(false);
+  const failed = signal(false);
   return (
     <span
       {...props}

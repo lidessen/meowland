@@ -168,7 +168,7 @@ describe("createRenderer", () => {
 
   test("mounts host nodes and replaces signal regions in the target tree", () => {
     const strategy = fakeStrategy();
-    const renderer = createRenderer(strategy);
+    const renderer = createRuntime().createRenderer(strategy);
     const root = renderer.createElement("root");
     let current = "before";
     const listeners = new Set<(value: string) => void>();
@@ -208,6 +208,7 @@ describe("createRenderer", () => {
     ]);
 
     view.unmount();
+    expect(listeners.size).toBe(0);
     expect(root.children).toEqual([]);
   });
 

@@ -1,12 +1,5 @@
-import {
-  isSignal,
-  mapSignal,
-  unwrap,
-  type MaybeSignal,
-  type Props,
-  type Context,
-  h,
-} from "meowjsx";
+import { type Props, type Context, h } from "meowjsx";
+import { isSignal, mapSignal, unwrap, type MaybeSignal } from "meowjsx/signal";
 
 interface NativeToggleProps extends Props {
   checked?: MaybeSignal<boolean>;

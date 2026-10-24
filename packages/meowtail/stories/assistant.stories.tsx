@@ -1,4 +1,5 @@
-import { createContext, h, signal, useContext, type Child } from "meowjsx";
+import { createContext, h, useContext, type Child } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { defineStory } from "meowbook";
 import {
   AssistantView,

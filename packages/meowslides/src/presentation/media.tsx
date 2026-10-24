@@ -1,13 +1,5 @@
-import {
-  h,
-  mapSignal,
-  unwrap,
-  type Child,
-  type Context,
-  type MaybeSignal,
-  type Props,
-  type RefBinding,
-} from "meowjsx";
+import { h, type Child, type Context, type Props, type RefBinding } from "meowjsx";
+import { mapSignal, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Button } from "meowtail";
 import { usePresentationActivity } from "./context";
 
@@ -52,8 +44,8 @@ function mediaComponent<T extends HTMLMediaElement>(
   } = props;
   const parts = context.parts;
   const activity = usePresentationActivity();
-  const state = context.signal<"loading" | "ready" | "failed">("loading");
-  const feedback = context.signal("");
+  const state = signal<"loading" | "ready" | "failed">("loading");
+  const feedback = signal("");
   let media: T | undefined;
   let mounted = true;
   let generation = 0;

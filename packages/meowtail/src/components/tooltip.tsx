@@ -1,4 +1,5 @@
 import { h, type Child, type Context, type Props } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { Popover } from "./popover";
 
 export interface TooltipTriggerBindings {
@@ -18,7 +19,7 @@ export function Tooltip(
   { id, content, trigger, delay = 350, className, ref }: TooltipProps,
   context: Context<typeof Tooltip>,
 ) {
-  const open = context.signal(false);
+  const open = signal(false);
   let timer: ReturnType<typeof setTimeout> | undefined;
   let hovered = false;
   let focused = false;

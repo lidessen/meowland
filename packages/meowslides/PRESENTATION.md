@@ -38,7 +38,8 @@ A local implementation does not mean published; the current public version and i
 follow the root README and the receipt for that round.
 
 ```tsx
-import { h, signal } from "meowjsx";
+import { h } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { Presentation, Reveal, type SlideDefinition, type SlidePosition } from "meowslides";
 
 // Create these once per work instance, outside each slide's render callback.

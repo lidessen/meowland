@@ -1,4 +1,5 @@
-import { h, type Child, type Context, type MaybeSignal, type Props } from "meowjsx";
+import { h, type Child, type Context, type Props } from "meowjsx";
+import { type MaybeSignal } from "meowjsx/signal";
 import { Icon } from "../icons/icon";
 import { StatusDot, type StatusDotState } from "./status-dot";
 

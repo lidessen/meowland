@@ -1,41 +1,29 @@
-// A host port of a shadcn `cva` badge. Public entry points only, as an application would write it.
-import { defineComponent, type Props } from "meowjsx";
-import { defineOptions } from "meowcss";
-import {
-  css,
-  defineStyleProps,
-  partSelector,
-  type StyledComponentContract,
-  type ThemedProps,
-} from "meowcss/meowjsx";
+import { h, type Context, type Props } from "meowjsx";
+import { defineStyleProps, type ThemedProps, parts, css } from "meowcss/meowjsx";
 import { uiTokens } from "meowtail/theme";
+import { planBadgeOptions } from "./plan-badge.options";
 
-// cva variants become one option axis. The `app-` prefix keeps the contract out of Meowtail's names.
-export const planBadgeOptions = defineOptions("app-plan-badge", {
-  tone: ["free", "pro", "trial"],
-});
+export interface PlanBadgeProps extends Props, ThemedProps<typeof planBadgeOptions> {}
 
-export const planBadgeContract = {
+export function PlanBadge(
+  { children, className, ...props }: PlanBadgeProps,
+  context: Context<typeof PlanBadge>,
+) {
+  return (
+    <span {...props} className={className} ref={context.parts.root}>
+      {children}
+    </span>
+  );
+}
+PlanBadge.meta = {
   name: "app-plan-badge",
   parts: ["root"],
-  styleProps: defineStyleProps(planBadgeOptions, { defaults: { tone: "free" } }),
-} as const satisfies StyledComponentContract;
+  style: defineStyleProps(planBadgeOptions, { defaults: { tone: "free" } }),
+} as const;
 
-export interface PlanBadgeProps extends Props, ThemedProps<typeof planBadgeOptions> {
-  className?: string;
-}
-
-/** Parts and options only; planBadgeStyles paints them. */
-export const PlanBadge = defineComponent<PlanBadgeProps, "app-plan-badge", "root">(
-  planBadgeContract,
-  ({ children, className, ...props }, context) =>
-    context.part("root", "span", { ...props, className }, children),
-);
-
-const root = partSelector(planBadgeContract, "root");
-
+const badge = parts<typeof PlanBadge>("app-plan-badge");
 export const planBadgeStyles = css`
-  ${root} {
+  ${badge.root} {
     display: inline-flex;
     align-items: center;
     gap: 4px;

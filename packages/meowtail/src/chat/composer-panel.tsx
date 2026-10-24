@@ -1,31 +1,31 @@
-import { defineComponent, h, type Child, type ComponentContract } from "meowjsx";
+import { h, type Child, type Context } from "meowjsx";
 import { ChatComposer, type ChatComposerProps } from "./composer";
 
-export const composerPanelContract = {
-  name: "composer-panel",
-  parts: ["root", "surface", "meta"],
-} as const satisfies ComponentContract;
-
-export interface ComposerPanelProps extends Omit<ChatComposerProps, "surface" | "className"> {
+export interface ComposerPanelProps extends ChatComposerProps {
   /** Page-level facts below the writing surface, usually a MetaRow. */
   meta?: Child;
-  className?: string;
 }
 
 /**
  * A ChatComposer and optional page-level meta row. The composer keeps its single
  * writing surface and external hint; this panel owns the surrounding composition.
  */
-export const ComposerPanel = defineComponent<
-  ComposerPanelProps,
-  typeof composerPanelContract.name,
-  (typeof composerPanelContract.parts)[number]
->(composerPanelContract, ({ meta, className, ...props }, context) =>
-  context.part(
-    "root",
-    "div",
-    { className, "data-pattern": "composer-panel" },
-    context.part("surface", "div", null, h(ChatComposer, props)),
-    meta !== undefined && meta !== null ? context.part("meta", "div", null, meta) : null,
-  ),
-);
+export function ComposerPanel(
+  { meta, className, ref, ...props }: ComposerPanelProps,
+  context: Context<typeof ComposerPanel>,
+) {
+  const parts = context.parts;
+  return (
+    <div className={className} data-pattern="composer-panel" ref={[parts.root, ref]}>
+      <div ref={parts.surface}>
+        <ChatComposer {...props} />
+      </div>
+      {meta !== undefined && meta !== null ? <div ref={parts.meta}>{meta}</div> : null}
+    </div>
+  );
+}
+
+ComposerPanel.meta = {
+  name: "composer-panel",
+  parts: ["root", "surface", "meta"],
+} as const;

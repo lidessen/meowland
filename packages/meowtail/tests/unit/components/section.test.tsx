@@ -1,13 +1,13 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { installMeowUI } from "../../../src/registry";
+import { installMeowUI, meowUIComponents } from "../../../src/registry";
 import { Button, Card, Page, Section } from "../../../src/components";
 import { standardTheme, uiTokens } from "../../../src/theme";
 
 function web() {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   return createWebRenderer(runtime);
 }
 

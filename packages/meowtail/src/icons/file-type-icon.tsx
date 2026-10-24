@@ -1,4 +1,4 @@
-import { h, type Child } from "meowjsx";
+import { h, type Child, type ClassValue } from "meowjsx";
 
 // Adapted from DeepSeek Harness ui-primitives/FileTypeIcon.tsx (MIT).
 // Original artwork and palette; attribution in ../../THIRD_PARTY_NOTICES.md.
@@ -15,8 +15,8 @@ export type FileTypeKind =
   | "video"
   | "word";
 type ClassifiedFileType = Exclude<FileTypeKind, "folder">;
-type GlyphProps = { size?: number; className?: string; color?: string };
-export type FileTypeIconProps = { size?: number; className?: string } & (
+type GlyphProps = { size?: number; className?: ClassValue; color?: string };
+export type FileTypeIconProps = { size?: number; className?: ClassValue } & (
   | { path: string }
   | { kind: FileTypeKind }
 );
@@ -245,7 +245,7 @@ function SpreadsheetGlyph({ size, className, color }: GlyphProps): Child {
   );
 }
 
-function glyph(type: FileTypeKind, size: number, className: string | undefined): Child {
+function glyph(type: FileTypeKind, size: number, className: ClassValue): Child {
   const color = FILE_COLORS[type];
   switch (type) {
     case "code":

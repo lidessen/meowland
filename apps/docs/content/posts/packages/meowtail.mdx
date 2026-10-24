@@ -6,32 +6,78 @@ Networking, execution, permissions and persistence stay with the host.
 
 ## A component declares, the theme paints
 
-A component names its parts and its style axes. It does not carry CSS.
+The component is an ordinary function with typed `.meta`; style declarations stay on the metadata object while selectors use the CSS part descriptors.
 
 ```tsx
-import { defineComponent, type Props } from "meowjsx";
-import { defineOptions } from "meowcss";
-import { defineStyleProps, type StyledComponentContract } from "meowcss/meowjsx";
+import { type Context, type Props, createRuntime, h } from "meowjsx";
+import "meowjsx/web";
+import { createWebRenderer } from "meowjsx/web";
+import { cx, defineOptions } from "meowcss";
+import { applyTheme, mountStyles } from "meowcss/web";
+import { css, defineStyleProps, parts, type ThemedProps } from "meowcss/meowjsx";
+import { createMeowUI } from "meowtail";
+import { extendStandardTheme, ui, uiTokens } from "meowtail/theme";
 
 export const calloutOptions = defineOptions("callout", {
   tone: ["neutral", "accent"],
 });
 
-export const calloutContract = {
+export interface CalloutProps extends Props, ThemedProps<typeof calloutOptions> {
+  title: string;
+}
+
+export function Callout(
+  { title, children, ref, className, ...props }: CalloutProps,
+  context: Context<typeof Callout>,
+) {
+  return (
+    <aside
+      {...props}
+      className={cx(className, ui.bg.fill, ui.text.secondary)}
+      ref={[context.parts.root, ref]}
+    >
+      <strong ref={context.parts.title}>{title}</strong>
+      {children}
+    </aside>
+  );
+}
+Callout.meta = {
   name: "callout",
   parts: ["root", "title"],
-  styleProps: defineStyleProps(calloutOptions, { defaults: { tone: "neutral" } }),
-} as const satisfies StyledComponentContract;
+  style: defineStyleProps(calloutOptions, { defaults: { tone: "neutral" } }),
+} as const;
 
-export const Callout = defineComponent<Props, "callout", "root" | "title">(
-  calloutContract,
-  ({ title, children, ...props }, context) =>
-    context.part("root", "aside", props, context.part("title", "strong", null, title), children),
+const callout = parts<typeof Callout>("callout");
+export const calloutTheme = extendStandardTheme({
+  styles: [
+    css`
+      ${callout.root} {
+        border-radius: ${uiTokens.radius.lg};
+        padding: ${uiTokens.space.group};
+        border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+      }
+      ${callout.root}[${calloutOptions.attribute("tone")}="accent"] {
+        ${uiTokens.accent.line};
+      }
+      ${callout.title} {
+        font-weight: ${uiTokens.type.weight.semibold};
+      }
+    `,
+  ],
+});
+
+const calloutRuntime = createRuntime({ plugins: [createMeowUI({ components: [Callout] })] });
+const calloutRenderer = createWebRenderer(calloutRuntime);
+const document = globalThis.document;
+mountStyles(document, calloutTheme.cssText);
+applyTheme(document.documentElement, calloutTheme);
+calloutRenderer.render(
+  h(Callout, { title: "Saved", tone: "accent" }, "Your changes are ready."),
+  document.querySelector("#callout"),
 );
 ```
 
-The theme file paints those parts. The component never writes a `data-meowui-part` or a
-`data-option-tone` attribute by hand: the style plugin writes them when the component is registered.
+The component binds its finite parts with `context.parts`, and the theme selects them with typed CSS descriptors. `cx` composes class values from `ui`; the standard theme includes those utility declarations. The style plugin writes the part and option attributes during rendering, so components never set those attributes by hand.
 
 ## Three steps to a working page
 
@@ -41,11 +87,13 @@ the theme stylesheet mounted, and the theme root bound to the document.
 ```tsx
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Button, createMeowUI } from "meowtail";
+import { Button, createMeowUI, meowUIComponents } from "meowtail";
 import { standardTheme } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 
-const runtime = createRuntime({ plugins: [createMeowUI()] });
+const runtime = createRuntime({
+  plugins: [createMeowUI({ components: meowUIComponents })],
+});
 const renderer = createWebRenderer(runtime);
 const document = globalThis.document;
 

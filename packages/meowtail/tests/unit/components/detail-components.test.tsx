@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { h } from "meowjsx";
+import { h, defaultRuntime } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
 import { DetailSection } from "../../../src/components/detail-section";
 import { Drawer } from "../../../src/components/drawer";
@@ -8,9 +8,9 @@ import { PageHeader } from "../../../src/components/page-header";
 import { ResourceCard } from "../../../src/components/resource-card";
 import { ResourceLink } from "../../../src/components/resource-link";
 import { Timeline, TimelineItem } from "../../../src/components/timeline";
-import { installMeowUI } from "../../../src/registry";
+import { installMeowUI, meowUIComponents } from "../../../src/registry";
 
-installMeowUI();
+installMeowUI({ components: meowUIComponents }, defaultRuntime);
 
 test("detail sections keep a heading, an optional aside and their body", () => {
   const html = renderToHtml(

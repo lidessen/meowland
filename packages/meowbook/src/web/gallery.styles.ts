@@ -1,8 +1,12 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { tokenRef } from "meowcss";
 import { uiTokens } from "meowtail/theme";
-import { buttonContract, buttonOptions, disclosureContract } from "meowtail";
+import type { Button, Disclosure } from "meowtail";
+import { buttonOptions } from "meowtail";
 export const inspectionHeight = tokenRef("workshop", "inspection", "height");
+
+const button = parts<typeof Button>("button");
+const disclosure = parts<typeof Disclosure>("disclosure");
 
 export const galleryStyles = css`
 :root {
@@ -250,7 +254,7 @@ a {
   border-radius: calc(${uiTokens.radius.md} + ${uiTokens.control.trackInset});
   background: ${uiTokens.surface.fill};
 }
-.workshop-viewport ${partSelector(buttonContract, "root")}:where([${buttonOptions.attribute("variant")}="quiet"]) {
+.workshop-viewport ${button.root}:where([${buttonOptions.attribute("variant")}="quiet"]) {
   color: ${uiTokens.ink.secondary};
 }
 .workshop-viewport button[aria-pressed="true"] {
@@ -320,7 +324,7 @@ a {
   font-weight: ${uiTokens.type.weight.medium};
   color: ${uiTokens.ink.primary};
 }
-.workshop-observations > summary > ${partSelector(disclosureContract, "icon")} {
+.workshop-observations > summary > ${disclosure.icon} {
   margin-left: auto;
   order: 1;
 }
@@ -490,7 +494,7 @@ a {
     gap: 5px;
     padding: 0 12px;
   }
-  .workshop-viewport ${partSelector(buttonContract, "root")}:where([${buttonOptions.attribute("variant")}="quiet"]) {
+  .workshop-viewport ${button.root}:where([${buttonOptions.attribute("variant")}="quiet"]) {
     padding: 0 8px;
   }
   .viewport-size {
@@ -545,7 +549,7 @@ a {
   .viewport-size {
     display: none;
   }
-  .workshop-viewport ${partSelector(buttonContract, "root")}:where([${buttonOptions.attribute("variant")}="quiet"]) {
+  .workshop-viewport ${button.root}:where([${buttonOptions.attribute("variant")}="quiet"]) {
     padding-inline: 8px;
   }
 }

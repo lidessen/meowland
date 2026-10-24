@@ -1,22 +1,18 @@
-import { defineComponent, type ComponentContract, type Props } from "meowjsx";
-
-export const linkContract = {
-  name: "link",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+import { h, type Props, type Context } from "meowjsx";
 
 export interface LinkProps extends Props {
   href: string;
-  className?: string;
+  className?: Props["className"];
 }
 
 /**
  * Themed inline text link. Whole-row references to an openable object stay with ResourceLink.
  */
-export const Link = defineComponent<
-  LinkProps,
-  typeof linkContract.name,
-  (typeof linkContract.parts)[number]
->(linkContract, ({ className, children, ...props }, context) =>
-  context.part("root", "a", { ...props, className }, children),
-);
+export function Link({ className, children, ...props }: LinkProps, context: Context<typeof Link>) {
+  return (
+    <a {...props} className={className} ref={[context.parts.root, props.ref]}>
+      {children}
+    </a>
+  );
+}
+Link.meta = { name: "link", parts: ["root"] } as const;

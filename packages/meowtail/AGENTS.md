@@ -17,12 +17,12 @@ fixtures are not registered and are not product components.
 
 ## Component model: MeowJSX is not React
 
-A `defineComponent` body is setup. It runs once for that mount. Nothing runs it again: there is no
+A component function body is setup. It runs once for that mount. Nothing runs it again: there is no
 re-render and no hook order. A later change reaches the DOM only through a Signal that setup bound
 to a prop, an attribute, a text node, or a child.
 
 `context.signal`, `context.effect`, and `context.onCleanup` belong to that mount. They come from the
-same `meowjsx` entry as `defineComponent`, `isSignal`, `mapSignal`, `derived`, `unwrap`, `keyed`,
+same `meowjsx` entry as `Context`, `isSignal`, `mapSignal`, `derived`, `unwrap`, `keyed`,
 and `useContext`. There is no `useState`, `useEffect`, `useMemo`, `useCallback`, or `useRef`. Do not add
 a helper with that shape.
 
@@ -43,19 +43,14 @@ a helper with that shape.
 
 ```tsx
 import {
-  defineComponent,
+  h,
   isSignal,
   mapSignal,
   unwrap,
-  type ComponentContract,
+  type Context,
   type MaybeSignal,
   type Props,
 } from "meowjsx";
-
-export const toggleContract = {
-  name: "toggle",
-  parts: ["root"],
-} as const satisfies ComponentContract;
 
 export interface ToggleProps extends Props {
   /** Controlled when provided; a Signal keeps it live. */
@@ -66,36 +61,42 @@ export interface ToggleProps extends Props {
 }
 
 /** Setup runs once; only the bound Signals below change after mount. */
-export const Toggle = defineComponent<ToggleProps, "toggle", "root">(
-  toggleContract,
-  (
-    { pressed, defaultPressed = false, disabled = false, onPressedChange, children, ...props },
-    context,
-  ) => {
-    const local = context.signal(defaultPressed);
-    // Presence decides the owner. false is a controlled value.
-    const current = pressed !== undefined ? pressed : local;
-    const ariaPressed = isSignal(current)
-      ? mapSignal(current, (value) => String(value))
-      : String(current);
-    return context.part(
-      "root",
-      "button",
-      {
-        ...props,
-        type: "button",
-        "aria-pressed": ariaPressed,
-        disabled,
-        onClick: () => {
-          const next = !unwrap(current);
-          if (pressed === undefined) local.value = next;
-          onPressedChange?.(next);
-        },
-      },
-      children,
-    );
-  },
-);
+export function Toggle(
+  {
+    pressed,
+    defaultPressed = false,
+    disabled = false,
+    onPressedChange,
+    children,
+    ref,
+    ...props
+  }: ToggleProps,
+  context: Context<typeof Toggle>,
+) {
+  const local = context.signal(defaultPressed);
+  // Presence decides the owner. false is a controlled value.
+  const current = pressed !== undefined ? pressed : local;
+  const ariaPressed = isSignal(current)
+    ? mapSignal(current, (value) => String(value))
+    : String(current);
+  return (
+    <button
+      {...props}
+      ref={[context.parts.root, ref]}
+      type="button"
+      aria-pressed={ariaPressed}
+      disabled={disabled}
+      onClick={() => {
+        const next = !unwrap(current);
+        if (pressed === undefined) local.value = next;
+        onPressedChange?.(next);
+      }}
+    >
+      {children}
+    </button>
+  );
+}
+Toggle.meta = { name: "toggle", parts: ["root"] } as const;
 ```
 
 Before handoff, check three things. Does a setup-time `unwrap`, or a branch on a prop, have to stay
@@ -103,21 +104,23 @@ live? Does a `context.effect` only write another signal? Does a Signal's value r
 
 ## Styling: MeowCSS is not ordinary CSS
 
-The component names parts and style options. The standard theme paints them. A `defineComponent`
-body does not carry the visual rules, and a host class name is not the implementation of the look.
+The component names parts and style options in its static `meta`. The standard theme paints them.
+A component function does not carry the visual rules. A host `className` can compose built-in `ui`
+values or application classes, while the component's default look remains in the theme.
 
 Put the rules in `src/theme/<area>/<responsibility>.styles.ts`, one family in one file, using the
-`css` template from `meowcss/meowjsx`. Select a part with `partSelector(contract, part)`. That value
-is `:where([data-meowui-part="<name>/<part>"])`, so it does not fight a host rule. Declare axes with
-`defineOptions` from `meowcss` and attach them with `defineStyleProps` on the contract. The option
-attribute is written on the parts named in `defineStyleProps` (`root` when `parts` is omitted), so
-`options.when({ tone: "accent" })` belongs on a selector for one of those parts. Hover rules in
-`button.styles.ts` interpolate `options.attribute` when the selector itself has to name the variant.
-`createMeowUI` writes `data-meowui-part` and the option attribute for a
-contract it has registered. Declaring the contract does not register it: a new family is added to
-`meowUIComponents` and its fragment is included in `standardThemeStyles`. The component does not set
-those attribute strings. Importing the styles module does not insert CSS. The host mounts
-`standardTheme.cssText`.
+`css` template from `meowcss/meowjsx`. Type-import the component and construct `parts<typeof Button>("button")`;
+its members emit `:where([data-meowui-part="<name>/<part>"])`. Declare axes with `defineOptions` in an
+implementation-free `*.options.ts` module, shared by the component and its theme. Attach
+`style: defineStyleProps(...)` to `meta`. Option attributes are written on the carrier parts named
+in that binding (`root` when omitted), so `options.when({ tone: "accent" })` belongs on one of those
+parts. Hover rules can interpolate `options.attribute` when the selector names the variant.
+
+`createMeowUI({ components })` registers component functions and the style-props adapter. The
+explicit `meowUIComponents` catalog covers the full library; a selective host supplies its own list.
+A new library family goes in that catalog, and its fragment goes in `standardThemeStyles`.
+Components do not hand-write generated marker or option attributes. Importing a styles module does
+not insert CSS; the host mounts `standardTheme.cssText`.
 
 ### Design system
 
@@ -234,11 +237,13 @@ and the Meowbook gallery use the same tokens and roles as the library.
   the field-surface ring instead.
 - Every ad hoc gap and padding sits on the 4px grid; tracking comes from the two tracking roles.
 
-Theme files take shared rules from `src/theme/recipes.ts` (`surface`, `text`, `interactive`,
-`focusRing`) instead of restating them, and `standardAuditRules` keeps the standard theme free of
+Theme files take shared class values from `src/theme/utilities.ts`: `ui.surface.raised`,
+`ui.text.body`, finite `ui.interactive` values and `ui.focus.ring`/`inset`. The same values work in
+`className` and expand to declarations in `css`; public `cx` from `meowcss` composes them. Preserve
+their nested state and reduced-motion rules. `standardAuditRules` keeps the standard theme free of
 literal colors, durations, font sizes and radii (`tests/unit/theme/authoring.test.tsx`). The
-foundation fragment is first in `standardThemeStyles`; an extended theme keeps it first. Host-facing
-guidance lives in [AUTHORING.md](AUTHORING.md).
+foundation fragment is first and the shared `utilityStyles` fragment is last and once in standard,
+extended and presentation assembly. Host-facing guidance lives in [AUTHORING.md](AUTHORING.md).
 
 Do not use `light-dark()`: it follows CSS `color-scheme`, not the theme's own scheme boundary.
 
@@ -248,8 +253,8 @@ Arrange siblings with `Stack`, `Inline`, or `Grid` and a `gap` of `none`, `compa
 
 | Do                                                                                                                                                                                                          | Don't                                                                                                                                                                               |
 | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Style each part from its contract with `partSelector`, in the theme file for that family.                                                                                                                   | Add a `.css` file, a CSS module, styled-components, Emotion, or Tailwind utilities.                                                                                                 |
-| Put variant axes on the contract (`defineOptions`, `defineStyleProps`) and branch with `options.when` or `options.attribute`.                                                                               | Hand-write `data-meowui-part` or `data-option-*`, or select a raw prop name such as `[variant="accent"]`. The style plugin removes the option prop and writes the option attribute. |
+| Style each part through `parts<typeof Component>(name)`, in the theme file for that family.                                                                                                                 | Add a `.css` file, a CSS module, styled-components, Emotion, or Tailwind utilities.                                                                                                 |
+| Put variant axes in shared options and `meta.style` (`defineOptions`, `defineStyleProps`); branch with `options.when` or `options.attribute`.                                                               | Hand-write `data-meowui-part` or `data-option-*`, or select a raw prop name such as `[variant="accent"]`. The style plugin removes the option prop and writes the option attribute. |
 | Take every color, type size, radius, shadow, duration and spacing step from a `uiTokens` role. A length that belongs to one part stays next to that part's selector in the theme file.                      | Hardcode a hex color or a second spacing ramp in the component.                                                                                                                     |
 | Forward a host `className` on the root part. The component looks finished without it.                                                                                                                       | Build the look from a variant class string, or from story-only CSS.                                                                                                                 |
 | Compose siblings with `Stack`, `Inline`, or `Grid`. Those primitives set structural layout (`display`, flex, or grid) through `layoutStyle`; their gap still comes from style props and `layout.styles.ts`. | Copy that inline `style` object onto a visual component for color, font, radius, or padding.                                                                                        |
@@ -257,7 +262,7 @@ Arrange siblings with `Stack`, `Inline`, or `Grid` and a `gap` of `none`, `compa
 
 A parent stylesheet addresses that component's own parts. An anonymous node inside the part, such as
 the `svg` in a button, may use a descendant selector from that part. Another component keeps its own
-contract; do not reach into it with a descendant class or tag selector.
+identity; do not reach into it with a descendant class or tag selector.
 
 ### Canonical styles
 
@@ -269,57 +274,61 @@ component.
 Component, next to the other components:
 
 ```tsx
-import { defineComponent, type Props } from "meowjsx";
+// callout.options.ts: shared by the component and the theme.
 import { defineOptions } from "meowcss";
-import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
+export const calloutOptions = defineOptions("callout", { tone: ["neutral", "accent"] });
 
-export const calloutOptions = defineOptions("callout", {
-  tone: ["neutral", "accent"],
-});
-
-export const calloutContract = {
-  name: "callout",
-  parts: ["root", "title"],
-  styleProps: defineStyleProps(calloutOptions, {
-    defaults: { tone: "neutral" },
-  }),
-} as const satisfies StyledComponentContract;
+// callout.tsx
+import { h, type Context, type Props } from "meowjsx";
+import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
+import { calloutOptions } from "./callout.options";
 
 export interface CalloutProps extends Props, ThemedProps<typeof calloutOptions> {
   title: string;
 }
 
 /** Parts and options only. The look lives in calloutStyles. */
-export const Callout = defineComponent<
-  CalloutProps,
-  typeof calloutContract.name,
-  (typeof calloutContract.parts)[number]
->(calloutContract, ({ title, children, ...props }, context) =>
-  context.part("root", "aside", props, context.part("title", "strong", null, title), children),
-);
+export function Callout(
+  { title, children, ref, ...props }: CalloutProps,
+  context: Context<typeof Callout>,
+) {
+  return (
+    <aside {...props} ref={[context.parts.root, ref]}>
+      <strong ref={context.parts.title}>{title}</strong>
+      {children}
+    </aside>
+  );
+}
+Callout.meta = {
+  name: "callout",
+  parts: ["root", "title"],
+  style: defineStyleProps(calloutOptions, { defaults: { tone: "neutral" } }),
+} as const;
 ```
 
 Theme file, `src/theme/components/callout.styles.ts`:
 
 ```tsx
-import { css, partSelector } from "meowcss/meowjsx";
-import { calloutContract, calloutOptions } from "../../components/callout";
-import { text } from "../recipes";
+import { css, parts } from "meowcss/meowjsx";
+import type { Callout } from "../../components/callout";
+import { calloutOptions } from "../../components/callout.options";
+import { ui } from "../utilities";
 import { uiTokens } from "../tokens";
 
+const callout = parts<typeof Callout>("callout");
 export const calloutStyles = css`
-  ${partSelector(calloutContract, "root")} {
+  ${callout.root} {
     display: grid;
     gap: ${uiTokens.space.group};
     padding: ${uiTokens.space.group};
-    ${text("body")}
+    ${ui.text.body}
     background: ${uiTokens.surface.fill};
     border-radius: ${uiTokens.radius.lg};
   }
-  ${partSelector(calloutContract, "title")} {
+  ${callout.title} {
     font-weight: ${uiTokens.type.weight.medium};
   }
-  ${partSelector(calloutContract, "root")} {
+  ${callout.root} {
     ${calloutOptions.when({ tone: "accent" })} {
       color: ${uiTokens.action.primary};
       background: ${uiTokens.action.soft};
@@ -328,9 +337,9 @@ export const calloutStyles = css`
 `;
 ```
 
-`partSelector` only accepts a part listed on the contract. `defineStyleProps` only accepts defaults
-that are real choices. Passing `String(fragment)` into `defineTheme` drops the part dependency; pass
-the fragment itself.
+The descriptor map exposes only parts declared in the component's `meta`. `defineStyleProps` only
+accepts defaults that are real choices. Component metadata remains outside the fragment; the JSX
+adapter binds conditional component tokens through their generated option attributes.
 
 File names, registration, and `mountStyles` / `applyTheme` / `Theme` stay in
 [Style implementation](#style-implementation).
@@ -349,7 +358,7 @@ File names, registration, and `mountStyles` / `applyTheme` / `Theme` stay in
   component and then splice it onto existing controls. Distinguish headings by semantics and font
   weight; not every question or field label uses the page-title font size. Specific sizes are decided
   by the theme; do not treat one set of numbers as universal aesthetics.
-- Set type with one style of the ramp: the `text(role)` recipe, or the `uiTokens.type` size with its
+- Set type with one style of the ramp: `ui.text[role]`, or the `uiTokens.type` size with its
   `type.line.*` box and a `type.weight.*` role ([which text style where](README.md#which-text-style-where)).
   Body copy that other sizes nest inside keeps the unitless `type.leading`; a fixed line box uses
   `line.*`. `line-height: 1` and `0` stay for boxes around a glyph. The audit rejects literal
@@ -482,11 +491,13 @@ for the full rules and current organization.
 
 The shared style mechanism comes from `meowcss`; do not maintain a second implementation in this
 package. Import typed part composition from `meowcss/meowjsx` and DOM theme binding from
-`meowcss/web`. Theme source uses the TS `css` template. Reference `uiTokens` and
-`partSelector(contract, part)`, and use options.when for component option conditions; do not hand-write
-generated variable names or build another visual class-name mapping.
-Components declare style options and defaults through contracts, wired by the `createMeowUI` adapter.
-A contract that theme styles or the registry import lives in a module that does not load an optional engine. The syntax highlighter stays in the code-surface components; those components import their contracts and do not re-export them. Importing the theme or installing the registry therefore does not bundle Shiki. `sideEffects: false` lets a bundler drop the unused component modules from the package barrel.
+`meowcss/web`. Theme source uses the TS `css` template. Reference `uiTokens`, `ui` and typed part descriptors, and use options.when for component option
+conditions; do not hand-write generated variable names or build another visual class-name mapping.
+Components declare style options and defaults on `meta.style`, wired by the `createMeowUI` adapter.
+Themes type-import components and runtime-import only implementation-free options modules. The
+selective registration factory imports no complete component catalog. The syntax highlighter stays
+in the code-surface components, so a host registering only Button does not retain its engine graph.
+`sideEffects: false` lets a bundler drop unused component modules from the package barrel.
 `standardTheme.cssText` is handed to the host for explicit composition: static builds generate CSS
 assets, dynamic documents use `mountStyles` and clean up; root configuration uses `Theme`,
 `applyTheme`, or `themeAttributes`.

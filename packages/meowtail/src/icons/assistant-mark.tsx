@@ -1,7 +1,7 @@
-import { h, type Child } from "meowjsx";
+import { h, type Child, type ClassValue } from "meowjsx";
 
 export interface AssistantMarkProps {
-  className?: string;
+  className?: ClassValue;
 }
 
 /**
@@ -11,7 +11,7 @@ export interface AssistantMarkProps {
 export function AssistantMark({ className }: AssistantMarkProps = {}): Child {
   return (
     <svg
-      className={className ? `meow-assistant-mark ${className}` : "meow-assistant-mark"}
+      className={["meow-assistant-mark", className]}
       viewBox="0 0 100 100"
       aria-hidden="true"
       focusable="false"

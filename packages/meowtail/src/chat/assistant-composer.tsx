@@ -1,4 +1,7 @@
-import { defineComponent, derived, h, isSignal, unwrap, type Child } from "meowjsx";
+import { derived, h, isSignal, unwrap, type Child, type Context } from "meowjsx";
+// Fragment is required by the classic JSX transform for conditional attachment controls.
+// eslint-disable-next-line no-unused-vars
+import { Fragment } from "meowjsx";
 import { ChatComposer } from "./composer";
 import { ChatAttachments } from "./attachments";
 import { IconButton } from "../components/icon-button";
@@ -11,15 +14,10 @@ import {
   type AssistantViewProps,
 } from "./assistant-types";
 
-export const assistantComposerContract = {
-  name: "assistant-composer",
-  parts: ["root", "choices", "feedback", "file"],
-} as const;
-export const AssistantComposer = defineComponent<
-  { options: AssistantViewProps; trailing?: Child },
-  "assistant-composer",
-  (typeof assistantComposerContract.parts)[number]
->(assistantComposerContract, ({ options, trailing }, context) => {
+export function AssistantComposer(
+  { options, trailing }: { options: AssistantViewProps; trailing?: Child },
+  context: Context<typeof AssistantComposer>,
+) {
   const assistantCopy = { ...defaultAssistantCopy, ...options.labels };
   const controlled = options.draft !== undefined;
   if (controlled && !options.onDraftChange && !options.readOnly)
@@ -76,8 +74,9 @@ export const AssistantComposer = defineComponent<
     }
   };
   const attach = async (event: Event) => {
-    const files = [...((event.currentTarget as HTMLInputElement).files ?? [])];
-    (event.currentTarget as HTMLInputElement).value = "";
+    const input = event.currentTarget as HTMLInputElement;
+    const files = [...(input.files ?? [])];
+    input.value = "";
     if (!files.length || disabled.value || attaching.value) return;
     attaching.value = true;
     feedback.value = "";
@@ -115,116 +114,122 @@ export const AssistantComposer = defineComponent<
   const reasoningLive =
     options.reasoningOptions !== undefined &&
     (isSignal(options.reasoningOptions) || options.reasoningOptions.length > 0);
-  const choices = context.part(
-    "choices",
-    "div",
-    null,
-    modelsLive
-      ? h(ChoiceSelect, {
-          hidden: derived(() => unwrap(options.models ?? []).length === 0),
-          options: derived(() => unwrap(options.models ?? [])),
-          value: options.model ?? localModel,
-          "aria-label": assistantCopy.model,
-          onValueChange: (value: string) => {
+  const choices = (
+    <div ref={context.parts.choices}>
+      {modelsLive ? (
+        <ChoiceSelect
+          hidden={derived(() => unwrap(options.models ?? []).length === 0)}
+          options={derived(() => unwrap(options.models ?? []))}
+          value={options.model ?? localModel}
+          aria-label={assistantCopy.model}
+          onValueChange={(value: string) => {
             if (options.model === undefined) localModel.value = value;
             options.onModelChange?.(value);
-          },
-          placement: "top",
-          matchTriggerWidth: false,
-        })
-      : null,
-    reasoningLive
-      ? h(ChoiceSelect, {
-          hidden: derived(() => unwrap(options.reasoningOptions ?? []).length === 0),
-          options: derived(() => unwrap(options.reasoningOptions ?? [])),
-          value: options.reasoning ?? localReasoning,
-          "aria-label": assistantCopy.reasoning,
-          onValueChange: (value: string) => {
+          }}
+          placement="top"
+          matchTriggerWidth={false}
+        />
+      ) : null}
+      {reasoningLive ? (
+        <ChoiceSelect
+          hidden={derived(() => unwrap(options.reasoningOptions ?? []).length === 0)}
+          options={derived(() => unwrap(options.reasoningOptions ?? []))}
+          value={options.reasoning ?? localReasoning}
+          aria-label={assistantCopy.reasoning}
+          onValueChange={(value: string) => {
             if (options.reasoning === undefined) localReasoning.value = value;
             options.onReasoningChange?.(value);
-          },
-          placement: "top",
-          matchTriggerWidth: false,
-        })
-      : null,
-    options.composerTrailing,
-    trailing,
+          }}
+          placement="top"
+          matchTriggerWidth={false}
+        />
+      ) : null}
+      {options.composerTrailing}
+      {trailing}
+    </div>
   );
-  return context.part(
-    "root",
-    "div",
-    null,
-    h(ChatComposer, {
-      layout: "bar",
-      value: text,
-      placeholder: assistantCopy.placeholder,
-      inputLabel: assistantCopy.composer,
-      submitLabel: assistantCopy.send,
-      disabled,
-      readOnly: Boolean(options.readOnly),
-      submitDisabled,
-      trailing: choices,
-      attachments: h(ChatAttachments, {
-        hidden: derived(() => draft.value.attachments.length === 0),
-        items: derived(() =>
-          draft.value.attachments.map((attachment) => ({
-            ...attachment,
-            onRemove: disabled.value
-              ? undefined
-              : () =>
-                  change({
-                    ...draft.value,
-                    attachments: draft.value.attachments.filter(
-                      (item) => item.id !== attachment.id,
-                    ),
-                  }),
-          })),
-        ),
-      }),
-      hint: derived(() => unwrap(options.disabledReason ?? "")),
-      onSubmit: send,
-      onInput: (event: Event) => {
-        textVersion++;
-        change({ ...draft.value, text: (event.target as HTMLTextAreaElement).value });
-      },
-      onKeyDown: (event: KeyboardEvent) => {
-        const target = event.target;
-        if (
-          target instanceof HTMLTextAreaElement &&
-          target.dataset.chatInput !== undefined &&
-          event.key === "Enter" &&
-          !event.shiftKey &&
-          !event.isComposing &&
-          event.keyCode !== 229
-        )
-          void send(event);
-      },
-      children:
-        options.allowAttachments === false
-          ? []
-          : [
-              h(IconButton, {
-                label: assistantCopy.attach,
-                disabled: derived(() => disabled.value || attaching.value),
-                onClick: () => fileInput?.click(),
-                children: h(Icon, { name: "paperclip" }),
-              }),
-              context.part("file", "input", {
-                type: "file",
-                multiple: true,
-                hidden: true,
-                onChange: attach,
-                ref: (element: HTMLInputElement) => {
+  return (
+    <div ref={context.parts.root}>
+      <ChatComposer
+        layout="bar"
+        value={text}
+        placeholder={assistantCopy.placeholder}
+        inputLabel={assistantCopy.composer}
+        submitLabel={assistantCopy.send}
+        disabled={disabled}
+        readOnly={Boolean(options.readOnly)}
+        submitDisabled={submitDisabled}
+        trailing={choices}
+        attachments={
+          <ChatAttachments
+            hidden={derived(() => draft.value.attachments.length === 0)}
+            items={derived(() =>
+              draft.value.attachments.map((attachment) => ({
+                ...attachment,
+                onRemove: disabled.value
+                  ? undefined
+                  : () =>
+                      change({
+                        ...draft.value,
+                        attachments: draft.value.attachments.filter(
+                          (item) => item.id !== attachment.id,
+                        ),
+                      }),
+              })),
+            )}
+          />
+        }
+        hint={derived(() => unwrap(options.disabledReason ?? ""))}
+        onSubmit={send}
+        onInput={(event: Event) => {
+          textVersion++;
+          change({ ...draft.value, text: (event.target as HTMLTextAreaElement).value });
+        }}
+        onKeyDown={(event: KeyboardEvent) => {
+          const target = event.target;
+          if (
+            target instanceof HTMLTextAreaElement &&
+            target.dataset.chatInput !== undefined &&
+            event.key === "Enter" &&
+            !event.shiftKey &&
+            !event.isComposing &&
+            event.keyCode !== 229
+          )
+            void send(event);
+        }}
+      >
+        {options.allowAttachments === false ? null : (
+          <>
+            <IconButton
+              label={assistantCopy.attach}
+              disabled={derived(() => disabled.value || attaching.value)}
+              onClick={() => fileInput?.click()}
+            >
+              <Icon name="paperclip" />
+            </IconButton>
+            <input
+              type="file"
+              multiple
+              hidden
+              onChange={attach}
+              ref={[
+                context.parts.file,
+                (element: HTMLInputElement) => {
                   fileInput = element;
                 },
-              }),
-            ],
-    }),
-    context.part(
-      "feedback",
-      "p",
-      { role: "status", hidden: derived(() => !feedback.value) },
-      feedback,
-    ),
+              ]}
+            />
+          </>
+        )}
+      </ChatComposer>
+      <p role="status" hidden={derived(() => !feedback.value)} ref={context.parts.feedback}>
+        {feedback}
+      </p>
+    </div>
   );
-});
+}
+
+AssistantComposer.meta = {
+  name: "assistant-composer",
+  parts: ["root", "choices", "feedback", "file"],
+} as const;

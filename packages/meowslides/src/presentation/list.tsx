@@ -1,29 +1,30 @@
-import { defineComponent, type Child, type ComponentContract, type Props } from "meowjsx";
+import { h, type Child, type Context, type Props } from "meowjsx";
 
 export interface PresentationListProps extends Props {
   as?: "ul" | "ol";
   /** Item content; static null, undefined and boolean entries are omitted. */
   items: readonly Child[];
-  className?: string;
 }
 
-export const presentationListContract = {
+/** Native list semantics at the presentation's reading scale. */
+export function PresentationList(
+  { as = "ul", items, className, ref, ...props }: PresentationListProps,
+  context: Context<typeof PresentationList>,
+) {
+  const parts = context.parts;
+  const Root = as;
+  return (
+    <Root {...props} ref={[parts.root, ref]} className={className}>
+      {items
+        .filter((item) => item !== null && item !== undefined && typeof item !== "boolean")
+        .map((item) => (
+          <li ref={parts.item}>{item}</li>
+        ))}
+    </Root>
+  );
+}
+
+PresentationList.meta = {
   name: "presentation-list",
   parts: ["root", "item"],
-} as const satisfies ComponentContract;
-
-/** Native list semantics at the presentation's reading scale. */
-export const PresentationList = defineComponent<
-  PresentationListProps,
-  "presentation-list",
-  (typeof presentationListContract.parts)[number]
->(presentationListContract, ({ as = "ul", items, className, ...props }, context) =>
-  context.part(
-    "root",
-    as,
-    { ...props, className },
-    items
-      .filter((item) => item !== null && item !== undefined && typeof item !== "boolean")
-      .map((item) => context.part("item", "li", null, item)),
-  ),
-);
+} as const;

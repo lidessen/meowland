@@ -1,10 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { text } from "../recipes";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { sectionContract } from "../../components/section";
 
-const section = (part: (typeof sectionContract.parts)[number]) =>
-  partSelector(sectionContract, part);
+import type { Section } from "../../components/section";
+import { ui } from "../utilities";
+const sectionPartRefs = parts<typeof Section>("section");
+const section = (part: keyof typeof sectionPartRefs) => sectionPartRefs[part];
 
 export const sectionStyles = css`
   ${section("root")} {
@@ -30,7 +30,7 @@ export const sectionStyles = css`
     flex: 1 1 var(${uiTokens.layout.gridCompact.name}, 160px);
     min-width: 0;
     margin: 0;
-    ${text("title")}
+    ${ui.text.title}
     overflow-wrap: anywhere;
   }
   /* A nested section reads as a subheading under the section that contains it: body size, still

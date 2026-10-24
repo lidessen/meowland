@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h, signal } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Progress, installMeowUI } from "../../../src/index";
+import { Progress, installMeowUI, meowUIComponents } from "../../../src/index";
 
 function html(view: unknown) {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   return createWebRenderer(runtime).renderToHtml(view as never);
 }
 
@@ -29,7 +29,7 @@ test("omitting value leaves an indeterminate native progress", () => {
 test("progress values accept signals", () => {
   const value = signal(1);
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const app = createWebRenderer(runtime);
   const view = <Progress label="Copying" value={value} max={4} />;
   expect(app.renderToHtml(view)).toContain('value="1"');

@@ -1,9 +1,9 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { detailSectionContract } from "../../components/detail-section";
 
-const section = (part: (typeof detailSectionContract.parts)[number]) =>
-  partSelector(detailSectionContract, part);
+import type { DetailSection } from "../../components/detail-section";
+const detailSectionPartRefs = parts<typeof DetailSection>("detail-section");
+const section = (part: keyof typeof detailSectionPartRefs) => detailSectionPartRefs[part];
 
 export const detailSectionStyles = css`
   ${section("root")} {

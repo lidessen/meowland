@@ -1,12 +1,14 @@
 import type { ContextScope } from "./context";
 import { isKeyedChild, readKeyedEntries, type KeyedChild } from "./keyed";
 import { signal } from "./reactive";
+import { normalizeClassName } from "./style";
+import { isNormalizedRef, mountRefBindings, type NormalizedRef } from "./parts";
 export {
   createComponentObservation,
   type ComponentObservation,
   type ComponentObservationOptions,
 } from "./observation";
-import type { ComponentContract, ComponentMetadata } from "./types";
+import type { ComponentMeta, ComponentMetadata } from "./types";
 
 /** A target-owned cleanup operation. */
 export type RendererCleanup = () => void;
@@ -45,7 +47,7 @@ export type RenderableProps = Record<string, unknown> & {
  */
 export type RenderableComponent = {
   (...args: never[]): RenderableChild;
-  readonly contract?: ComponentContract;
+  readonly meta?: ComponentMeta;
   metadata?: ComponentMetadata;
 };
 
@@ -792,8 +794,13 @@ export function createRenderer<TNode>(
     let observed = false;
 
     try {
-      for (const [name, value] of Object.entries(vnode.props)) {
+      for (const [name, prop] of Object.entries(vnode.props)) {
         if (name === "children" || name === "key") continue;
+        const value = name === "className" || name === "class" ? normalizeClassName(prop) : prop;
+        if (name === "ref" && isNormalizedRef(value)) {
+          propertyCleanups.push(mountRefBindings(value as NormalizedRef<TNode>, element));
+          continue;
+        }
 
         if (isSignal(value)) {
           let propertyCleanup = cleanupResult(strategy.setProperty(element, name, value.value));

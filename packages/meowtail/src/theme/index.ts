@@ -17,6 +17,7 @@ import { hoverCardStyles } from "./components/hover-card.styles";
 import { menuStyles } from "./components/menu.styles";
 import { toastStyles } from "./components/toast.styles";
 import { standardOptions, uiTokens, chatTokens, alertTokens } from "./tokens";
+import { utilityStyles } from "./utilities";
 import { choiceSelectStyles } from "./components/choice-select.styles";
 import { tooltipStyles } from "./components/tooltip.styles";
 import { alertStyles } from "./components/alert.styles";
@@ -102,6 +103,7 @@ import { accordionStyles } from "./components/accordion.styles";
 import { contextMenuStyles } from "./components/context-menu.styles";
 
 export { standardOptions, uiTokens, chatTokens, logoTokens } from "./tokens";
+export { ui, utilityStyles } from "./utilities";
 export { chartTokens } from "./shared/chart.tokens";
 
 export const standardThemeTokens = [
@@ -217,6 +219,8 @@ export const standardThemeStyles = [
   // The complete Assistant composes the chat families above, so it follows them.
   assistantStyles,
   baseStyles,
+  // The utility catalog follows every component rule so explicit className values remain overridable.
+  utilityStyles,
 ] as const;
 
 export const standardTheme = defineTheme({
@@ -228,8 +232,6 @@ export const standardTheme = defineTheme({
 
 /** The floor every Meowland region starts from; an extended theme places it first. */
 export { foundationStyles as standardFoundationStyles } from "./base.styles";
-export { surface, text, focusRing, interactive } from "./recipes";
-export type { SurfaceRung, TextRole, InteractiveOptions } from "./recipes";
 export { standardAuditRules } from "./audit";
 
 /**
@@ -246,6 +248,10 @@ export function extendStandardTheme(extension: {
     options: standardOptions,
     defaults: { scheme: "auto" },
     tokens: [...standardThemeTokens, ...(extension.tokens ?? [])],
-    styles: [...standardThemeStyles, ...(extension.styles ?? [])],
+    styles: [
+      ...standardThemeStyles.filter((style) => style !== utilityStyles),
+      ...(extension.styles ?? []),
+      utilityStyles,
+    ],
   });
 }

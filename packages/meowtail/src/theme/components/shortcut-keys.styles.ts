@@ -1,9 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { shortcutKeysContract } from "../../components/shortcut-keys";
 
+import type { ShortcutKeys } from "../../components/shortcut-keys";
+const shortcutKeysPartRefs = parts<typeof ShortcutKeys>("shortcut-keys");
 export const shortcutKeysStyles = css`
-  ${partSelector(shortcutKeysContract, "root")} {
+  ${shortcutKeysPartRefs.root} {
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -12,20 +13,20 @@ export const shortcutKeysStyles = css`
     white-space: nowrap;
     flex: none;
   }
-  ${partSelector(shortcutKeysContract, "key")} {
+  ${shortcutKeysPartRefs.key} {
     box-sizing: border-box;
     display: inline-flex;
     align-items: center;
     justify-content: center;
     font: inherit;
   }
-  ${partSelector(shortcutKeysContract, "root")}[data-variant="tooltip"] {
+  ${shortcutKeysPartRefs.root}[data-variant="tooltip"] {
     color: inherit;
     font-size: ${uiTokens.type.micro};
     line-height: ${uiTokens.type.line.micro};
     gap: 2px;
   }
-  ${partSelector(shortcutKeysContract, "root")}[data-variant="tooltip"] ${partSelector(shortcutKeysContract, "key")}:not([data-separator]) {
+  ${shortcutKeysPartRefs.root}[data-variant="tooltip"] ${shortcutKeysPartRefs.key}:not([data-separator]) {
     min-width: 16px;
     height: 16px;
     padding: 0 2px;

@@ -1,12 +1,13 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { sliderContract } from "../../components/slider";
 
-const root = partSelector(sliderContract, "root");
-const control = partSelector(sliderContract, "control");
-const track = partSelector(sliderContract, "track");
-const thumb = partSelector(sliderContract, "thumb");
-const value = partSelector(sliderContract, "value");
+import type { Slider } from "../../components/slider";
+const sliderPartRefs = parts<typeof Slider>("slider");
+const root = sliderPartRefs.root;
+const control = sliderPartRefs.control;
+const track = sliderPartRefs.track;
+const thumb = sliderPartRefs.thumb;
+const value = sliderPartRefs.value;
 const fill = `linear-gradient(to right, ${uiTokens.accent.base} 0%, ${uiTokens.accent.base} var(--slider-fill, 0%), ${uiTokens.surface.fill} var(--slider-fill, 0%), ${uiTokens.surface.fill} 100%)`;
 const mutedFill = `linear-gradient(to right, ${uiTokens.ink.secondary} 0%, ${uiTokens.ink.secondary} var(--slider-fill, 0%), ${uiTokens.surface.fill} var(--slider-fill, 0%), ${uiTokens.surface.fill} 100%)`;
 

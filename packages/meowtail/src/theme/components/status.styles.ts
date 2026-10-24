@@ -1,7 +1,8 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { statusContract } from "../../components/status";
+import { css, parts } from "meowcss/meowjsx";
 
-const label = partSelector(statusContract, "label");
+import type { Status } from "../../components/status";
+const statusPartRefs = parts<typeof Status>("status");
+const label = statusPartRefs.label;
 
 export const statusStyles = css`
   /* The badge itself comes from shared/state-badge.styles.ts. */

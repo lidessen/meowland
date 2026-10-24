@@ -1,554 +1,484 @@
-import { chatTaskContract } from "../chat/task";
-import { defaultRuntime, type ComponentContract, type Runtime, type RuntimePlugin } from "meowjsx";
-import { pillContract } from "../components/pill";
-import { pageFrameContract } from "../components/page-frame";
-import { appBarContract } from "../components/app-bar";
-import { regionLayoutContract } from "../components/region-layout";
-import { imagePreviewContract } from "../components/image-preview";
-import { createStylePropsPlugin } from "meowcss/meowjsx";
-import {
-  segmentedControlContract,
-  textShimmerContract,
-  riskConfirmationContract,
-  webBlockContract,
-  jsonTreeContract,
-  jsonBlockContract,
-  imageLightboxContract,
-  shortcutKeysContract,
-  pathLabelContract,
-  stateDotContract,
-  hoverCardContract,
-} from "../components";
-import { menuContract, toastContract, contextMenuContract } from "../components";
-import { outputBlockContract } from "../components/output-block";
-import {
-  terminalBlockContract,
-  readBlockContract,
-  diffBlockContract,
-  searchBlockContract,
-} from "../components";
-import {
-  codeBlockContract,
-  mermaidDiagramContract,
-  itemContract,
-  fieldGroupContract,
-  tabsContract,
-  breadcrumbContract,
-  alertContract,
-  skeletonContract,
-  skeletonBoundaryContract,
-  spinnerContract,
-  stackContract,
-  layoutItemContract,
-  descriptionListContract,
-  descriptionItemContract,
-  inlineContract,
-  gridContract,
-  containerContract,
-  cardHeaderContract,
-  cardTitleContract,
-  cardDescriptionContract,
-  cardContentContract,
-  cardFooterContract,
-  cardActionContract,
-  aspectRatioContract,
-  tooltipContract,
-  badgeContract,
-  buttonContract,
-  cardContract,
-  dialogActionsContract,
-  dialogContract,
-  dialogHeaderContract,
-  dialogPanelContract,
-  emptyStateContract,
-  fieldContract,
-  iconButtonContract,
-  toolbarContract,
-  actionRailContract,
-  actionRowContract,
-  metaRowContract,
-  inputContract,
-  numberInputContract,
-  checkboxContract,
-  switchContract,
-  sliderContract,
-  progressContract,
-  avatarContract,
-  linkContract,
-  textContract,
-  proseContract,
-  taskListContract,
-  accordionContract,
-  tableContract,
-  selectContract,
-  choiceSelectContract,
-  choiceGroupContract,
-  popoverContract,
-  searchInputContract,
-  pathPickerContract,
-  disclosureContract,
-  navItemContract,
-  separatorContract,
-  textareaContract,
-  statusDotContract,
-  statusContract,
-  tagContract,
-  processGroupContract,
-  processStepContract,
-  workCardContract,
-  iconRailContract,
-  railItemContract,
-  railSectionContract,
-  detailSectionContract,
-  timelineContract,
-  timelineItemContract,
-  resourceLinkContract,
-  pageContract,
-  pageHeaderContract,
-  sectionContract,
-  navListContract,
-  modalContract,
-  windowTitleBarContract,
-  listGroupContract,
-  listRowContract,
-  resourceCardContract,
-  drawerContract,
-} from "../components";
-import {
-  assistantViewContract,
-  chatBubbleContract,
-  chatConversationContract,
-  chatAttachmentsContract,
-  chatProcessContract,
-  chatReasoningContract,
-  chatQuestionContract,
-  chatSourcesContract,
-  chatComposerContract,
-  composerPanelContract,
-  chatFrameContract,
-  chatHeaderContract,
-  chatMessageActionsContract,
-  chatMessageContract,
-  chatMessageListContract,
-  chatStatusContract,
-  chatToolCallContract,
-} from "../chat";
-import { assistantStepsContract } from "../chat/assistant-steps.contract";
-import { assistantMarkdownContract } from "../chat/assistant-markdown";
-import { assistantComposerContract } from "../chat/assistant-composer";
-import { assistantQuestionContract } from "../chat/assistant-question";
+import * as Components from "../components";
+import * as Chat from "../chat";
+import { AssistantComposer } from "../chat/assistant-composer";
+import { AssistantMarkdown } from "../chat/assistant-markdown";
+import { AssistantQuestionView } from "../chat/assistant-question";
+import { AssistantSteps } from "../chat/assistant-content";
+import { OutputBlock } from "../components/output-block";
+import { RegionLayoutShell } from "../components/region-layout";
+import type { RegisteredComponent } from "meowjsx";
+export {
+  createMeowUI,
+  installMeowUI,
+  type MeowUIOptions,
+  type MeowUIRegisteredComponent,
+} from "./factory";
 
 export const MeowUIComponent = {
-  PageFrame: pageFrameContract.name,
-  AppBar: appBarContract.name,
-  RegionLayout: regionLayoutContract.name,
-  Pill: pillContract.name,
-  ImagePreview: imagePreviewContract.name,
-  SegmentedControl: segmentedControlContract.name,
-  TextShimmer: textShimmerContract.name,
-  RiskConfirmation: riskConfirmationContract.name,
-  WebBlock: webBlockContract.name,
-  JsonTree: jsonTreeContract.name,
-  JsonBlock: jsonBlockContract.name,
-  ImageLightbox: imageLightboxContract.name,
-  ShortcutKeys: shortcutKeysContract.name,
-  PathLabel: pathLabelContract.name,
-  StateDot: stateDotContract.name,
-  HoverCard: hoverCardContract.name,
-  Menu: menuContract.name,
-  ContextMenu: contextMenuContract.name,
-  Toast: toastContract.name,
-  TerminalBlock: terminalBlockContract.name,
-  ReadBlock: readBlockContract.name,
-  DiffBlock: diffBlockContract.name,
-  SearchBlock: searchBlockContract.name,
-  CodeBlock: codeBlockContract.name,
-  MermaidDiagram: mermaidDiagramContract.name,
-  Item: itemContract.name,
-  ChatBubble: chatBubbleContract.name,
-  ChatConversation: chatConversationContract.name,
-  Tabs: tabsContract.name,
-  Breadcrumb: breadcrumbContract.name,
-  Alert: alertContract.name,
-  Skeleton: skeletonContract.name,
-  SkeletonBoundary: skeletonBoundaryContract.name,
-  Spinner: spinnerContract.name,
-  Stack: stackContract.name,
-  LayoutItem: layoutItemContract.name,
-  Inline: inlineContract.name,
-  Grid: gridContract.name,
-  Container: containerContract.name,
-  CardHeader: cardHeaderContract.name,
-  CardTitle: cardTitleContract.name,
-  CardDescription: cardDescriptionContract.name,
-  CardContent: cardContentContract.name,
-  CardFooter: cardFooterContract.name,
-  CardAction: cardActionContract.name,
-  FieldGroup: fieldGroupContract.name,
-  AspectRatio: aspectRatioContract.name,
-  Tooltip: tooltipContract.name,
-  Button: buttonContract.name,
-  IconButton: iconButtonContract.name,
-  Toolbar: toolbarContract.name,
-  ActionRail: actionRailContract.name,
-  ActionRow: actionRowContract.name,
-  MetaRow: metaRowContract.name,
-  EmptyState: emptyStateContract.name,
-  Card: cardContract.name,
-  Badge: badgeContract.name,
-  Input: inputContract.name,
-  NumberInput: numberInputContract.name,
-  Checkbox: checkboxContract.name,
-  Switch: switchContract.name,
-  Slider: sliderContract.name,
-  Progress: progressContract.name,
-  Avatar: avatarContract.name,
-  Link: linkContract.name,
-  Text: textContract.name,
-  Prose: proseContract.name,
-  TaskList: taskListContract.name,
-  ChatReasoning: chatReasoningContract.name,
-  Select: selectContract.name,
-  ChoiceSelect: choiceSelectContract.name,
-  ChoiceGroup: choiceGroupContract.name,
-  Popover: popoverContract.name,
-  SearchInput: searchInputContract.name,
-  PathPicker: pathPickerContract.name,
-  Disclosure: disclosureContract.name,
-  Accordion: accordionContract.name,
-  Table: tableContract.name,
-  Textarea: textareaContract.name,
-  Field: fieldContract.name,
-  Separator: separatorContract.name,
-  Dialog: dialogContract.name,
-  DialogPanel: dialogPanelContract.name,
-  DialogHeader: dialogHeaderContract.name,
-  DialogActions: dialogActionsContract.name,
-  NavItem: navItemContract.name,
-  ChatFrame: chatFrameContract.name,
-  AssistantView: assistantViewContract.name,
-  ChatAttachments: chatAttachmentsContract.name,
-  ChatProcess: chatProcessContract.name,
-  ChatQuestion: chatQuestionContract.name,
-  ChatSources: chatSourcesContract.name,
-  ChatHeader: chatHeaderContract.name,
-  ChatStatus: chatStatusContract.name,
-  ChatMessageList: chatMessageListContract.name,
-  ChatMessage: chatMessageContract.name,
-  ChatMessageActions: chatMessageActionsContract.name,
-  ChatComposer: chatComposerContract.name,
-  ComposerPanel: composerPanelContract.name,
-  ChatToolCall: chatToolCallContract.name,
-  ChatTask: chatTaskContract.name,
-  StatusDot: statusDotContract.name,
-  Status: statusContract.name,
-  Tag: tagContract.name,
-  ProcessGroup: processGroupContract.name,
-  ProcessStep: processStepContract.name,
-  WorkCard: workCardContract.name,
-  IconRail: iconRailContract.name,
-  RailItem: railItemContract.name,
-  RailSection: railSectionContract.name,
-  DetailSection: detailSectionContract.name,
-  DescriptionList: descriptionListContract.name,
-  DescriptionItem: descriptionItemContract.name,
-  Timeline: timelineContract.name,
-  TimelineItem: timelineItemContract.name,
-  ResourceLink: resourceLinkContract.name,
-  Page: pageContract.name,
-  PageHeader: pageHeaderContract.name,
-  Section: sectionContract.name,
-  NavList: navListContract.name,
-  Modal: modalContract.name,
-  WindowTitleBar: windowTitleBarContract.name,
-  ListGroup: listGroupContract.name,
-  ListRow: listRowContract.name,
-  ResourceCard: resourceCardContract.name,
-  Drawer: drawerContract.name,
-} as const;
+  PageFrame: "page-frame",
+  AppBar: "app-bar",
+  RegionLayout: "region-layout",
+  Pill: "pill",
+  ImagePreview: "image-preview",
+  SegmentedControl: "segmented-control",
+  TextShimmer: "text-shimmer",
+  RiskConfirmation: "risk-confirmation",
+  WebBlock: "web-block",
+  JsonTree: "json-tree",
+  JsonBlock: "json-block",
+  ImageLightbox: "image-lightbox",
+  ShortcutKeys: "shortcut-keys",
+  PathLabel: "path-label",
+  StateDot: "state-dot",
+  HoverCard: "hover-card",
+  Menu: "menu",
+  ContextMenu: "context-menu",
+  Toast: "toast",
+  TerminalBlock: "terminal-block",
+  ReadBlock: "read-block",
+  DiffBlock: "diff-block",
+  SearchBlock: "search-block",
+  CodeBlock: "code-block",
+  MermaidDiagram: "mermaid-diagram",
+  Item: "item",
+  ChatBubble: "chat-bubble",
+  ChatConversation: "chat-conversation",
+  Tabs: "tabs",
+  Breadcrumb: "breadcrumb",
+  Alert: "alert",
+  Skeleton: "skeleton",
+  SkeletonBoundary: "skeleton-boundary",
+  Spinner: "spinner",
+  Stack: "stack",
+  LayoutItem: "layout-item",
+  Inline: "inline",
+  Grid: "grid",
+  Container: "container",
+  CardHeader: "card-header",
+  CardTitle: "card-title",
+  CardDescription: "card-description",
+  CardContent: "card-content",
+  CardFooter: "card-footer",
+  CardAction: "card-action",
+  FieldGroup: "field-group",
+  AspectRatio: "aspect-ratio",
+  Tooltip: "tooltip",
+  Button: "button",
+  IconButton: "icon-button",
+  Toolbar: "toolbar",
+  ActionRail: "action-rail",
+  ActionRow: "action-row",
+  MetaRow: "meta-row",
+  EmptyState: "empty-state",
+  Card: "card",
+  Badge: "badge",
+  Input: "input",
+  NumberInput: "number-input",
+  Checkbox: "checkbox",
+  Switch: "switch",
+  Slider: "slider",
+  Progress: "progress",
+  Avatar: "avatar",
+  Link: "link",
+  Text: "text",
+  Prose: "prose",
+  TaskList: "task-list",
+  ChatReasoning: "chat-reasoning",
+  Select: "select",
+  ChoiceSelect: "choice-select",
+  ChoiceGroup: "choice-group",
+  Popover: "popover",
+  SearchInput: "search-input",
+  PathPicker: "path-picker",
+  Disclosure: "disclosure",
+  Accordion: "accordion",
+  Table: "table",
+  Textarea: "textarea",
+  Field: "field",
+  Separator: "separator",
+  Dialog: "dialog",
+  DialogPanel: "dialog-panel",
+  DialogHeader: "dialog-header",
+  DialogActions: "dialog-actions",
+  NavItem: "nav-item",
+  ChatFrame: "chat-frame",
+  AssistantView: "assistant-view",
+  ChatAttachments: "chat-attachments",
+  ChatProcess: "chat-process",
+  ChatQuestion: "chat-question",
+  ChatSources: "chat-sources",
+  ChatHeader: "chat-header",
+  ChatStatus: "chat-status",
+  ChatMessageList: "chat-message-list",
+  ChatMessage: "chat-message",
+  ChatMessageActions: "chat-message-actions",
+  ChatComposer: "chat-composer",
+  ComposerPanel: "composer-panel",
+  ChatToolCall: "chat-tool-call",
+  ChatTask: "chat-task",
+  StatusDot: "status-dot",
+  Status: "status",
+  Tag: "tag",
+  ProcessGroup: "process-group",
+  ProcessStep: "process-step",
+  WorkCard: "work-card",
+  IconRail: "icon-rail",
+  RailItem: "rail-item",
+  RailSection: "rail-section",
+  DetailSection: "detail-section",
+  DescriptionList: "description-list",
+  DescriptionItem: "description-item",
+  Timeline: "timeline",
+  TimelineItem: "timeline-item",
+  ResourceLink: "resource-link",
+  Page: "page",
+  PageHeader: "page-header",
+  Section: "section",
+  NavList: "nav-list",
+  Modal: "modal",
+  WindowTitleBar: "window-title-bar",
+  ListGroup: "list-group",
+  ListRow: "list-row",
+  ResourceCard: "resource-card",
+  Drawer: "drawer",
+} as const satisfies Record<string, string>;
 
+/** The full built-in catalog, separated from the selective plugin factory. */
 export const meowUIComponents = [
-  pageFrameContract,
-  appBarContract,
-  regionLayoutContract,
-  pillContract,
-  imagePreviewContract,
-  segmentedControlContract,
-  textShimmerContract,
-  riskConfirmationContract,
-  webBlockContract,
-  jsonTreeContract,
-  jsonBlockContract,
-  imageLightboxContract,
-  shortcutKeysContract,
-  pathLabelContract,
-  stateDotContract,
-  hoverCardContract,
-  menuContract,
-  contextMenuContract,
-  toastContract,
-  outputBlockContract,
-  terminalBlockContract,
-  readBlockContract,
-  diffBlockContract,
-  searchBlockContract,
-  checkboxContract,
-  switchContract,
-  sliderContract,
-  progressContract,
-  avatarContract,
-  linkContract,
-  textContract,
-  proseContract,
-  taskListContract,
-  accordionContract,
-  tableContract,
-  numberInputContract,
-  codeBlockContract,
-  mermaidDiagramContract,
-  choiceGroupContract,
-  chatQuestionContract,
-  itemContract,
-  chatBubbleContract,
-  chatConversationContract,
-  tabsContract,
-  breadcrumbContract,
-  alertContract,
-  skeletonContract,
-  skeletonBoundaryContract,
-  spinnerContract,
-  stackContract,
-  layoutItemContract,
-  descriptionListContract,
-  descriptionItemContract,
-  inlineContract,
-  gridContract,
-  containerContract,
-  cardHeaderContract,
-  cardTitleContract,
-  cardDescriptionContract,
-  cardContentContract,
-  cardFooterContract,
-  cardActionContract,
-  fieldGroupContract,
-  aspectRatioContract,
-  tooltipContract,
-  buttonContract,
-  iconButtonContract,
-  toolbarContract,
-  actionRailContract,
-  actionRowContract,
-  metaRowContract,
-  emptyStateContract,
-  cardContract,
-  badgeContract,
-  inputContract,
-  selectContract,
-  choiceSelectContract,
-  popoverContract,
-  searchInputContract,
-  pathPickerContract,
-  disclosureContract,
-  textareaContract,
-  fieldContract,
-  separatorContract,
-  dialogContract,
-  dialogPanelContract,
-  dialogHeaderContract,
-  dialogActionsContract,
-  navItemContract,
-  chatFrameContract,
-  assistantViewContract,
-  assistantStepsContract,
-  assistantMarkdownContract,
-  assistantComposerContract,
-  assistantQuestionContract,
-  chatAttachmentsContract,
-  chatProcessContract,
-  chatReasoningContract,
-  chatSourcesContract,
-  chatHeaderContract,
-  chatStatusContract,
-  chatMessageListContract,
-  chatMessageContract,
-  chatMessageActionsContract,
-  chatComposerContract,
-  composerPanelContract,
-  chatToolCallContract,
-  chatTaskContract,
-  statusDotContract,
-  statusContract,
-  tagContract,
-  processGroupContract,
-  processStepContract,
-  workCardContract,
-  iconRailContract,
-  railItemContract,
-  railSectionContract,
-  detailSectionContract,
-  timelineContract,
-  timelineItemContract,
-  resourceLinkContract,
-  pageContract,
-  pageHeaderContract,
-  sectionContract,
-  navListContract,
-  modalContract,
-  windowTitleBarContract,
-  listGroupContract,
-  listRowContract,
-  resourceCardContract,
-  drawerContract,
-] as const satisfies readonly ComponentContract[];
+  Components.PageFrame,
+  Components.AppBar,
+  RegionLayoutShell,
+  Components.Pill,
+  Components.ImagePreview,
+  Components.SegmentedControl,
+  Components.TextShimmer,
+  Components.RiskConfirmation,
+  Components.WebBlock,
+  Components.JsonTree,
+  Components.JsonBlock,
+  Components.ImageLightbox,
+  Components.ShortcutKeys,
+  Components.PathLabel,
+  Components.StateDot,
+  Components.HoverCard,
+  Components.Menu,
+  Components.ContextMenu,
+  Components.Toast,
+  OutputBlock,
+  Components.TerminalBlock,
+  Components.ReadBlock,
+  Components.DiffBlock,
+  Components.SearchBlock,
+  Components.Checkbox,
+  Components.Switch,
+  Components.Slider,
+  Components.Progress,
+  Components.Avatar,
+  Components.Link,
+  Components.Text,
+  Components.Prose,
+  Components.TaskList,
+  Components.Accordion,
+  Components.Table,
+  Components.NumberInput,
+  Components.CodeBlock,
+  Components.MermaidDiagram,
+  Components.ChoiceGroup,
+  Chat.ChatQuestion,
+  Components.Item,
+  Chat.ChatBubble,
+  Chat.ChatConversation,
+  Components.Tabs,
+  Components.Breadcrumb,
+  Components.Alert,
+  Components.Skeleton,
+  Components.SkeletonBoundary,
+  Components.Spinner,
+  Components.Stack,
+  Components.LayoutItem,
+  Components.DescriptionList,
+  Components.DescriptionItem,
+  Components.Inline,
+  Components.Grid,
+  Components.Container,
+  Components.CardHeader,
+  Components.CardTitle,
+  Components.CardDescription,
+  Components.CardContent,
+  Components.CardFooter,
+  Components.CardAction,
+  Components.FieldGroup,
+  Components.AspectRatio,
+  Components.Tooltip,
+  Components.Button,
+  Components.IconButton,
+  Components.Toolbar,
+  Components.ActionRail,
+  Components.ActionRow,
+  Components.MetaRow,
+  Components.EmptyState,
+  Components.Card,
+  Components.Badge,
+  Components.Input,
+  Components.Select,
+  Components.ChoiceSelect,
+  Components.Popover,
+  Components.SearchInput,
+  Components.PathPicker,
+  Components.Disclosure,
+  Components.Textarea,
+  Components.Field,
+  Components.Separator,
+  Components.Dialog,
+  Components.DialogPanel,
+  Components.DialogHeader,
+  Components.DialogActions,
+  Components.NavItem,
+  Chat.ChatFrame,
+  Chat.AssistantView,
+  AssistantSteps,
+  AssistantMarkdown,
+  AssistantComposer,
+  AssistantQuestionView,
+  Chat.ChatAttachments,
+  Chat.ChatProcess,
+  Chat.ChatReasoning,
+  Chat.ChatSources,
+  Chat.ChatHeader,
+  Chat.ChatStatus,
+  Chat.ChatMessageList,
+  Chat.ChatMessage,
+  Chat.ChatMessageActions,
+  Chat.ChatComposer,
+  Chat.ComposerPanel,
+  Chat.ChatToolCall,
+  Chat.ChatTask,
+  Components.StatusDot,
+  Components.Status,
+  Components.Tag,
+  Components.ProcessGroup,
+  Components.ProcessStep,
+  Components.WorkCard,
+  Components.IconRail,
+  Components.RailItem,
+  Components.RailSection,
+  Components.DetailSection,
+  Components.Timeline,
+  Components.TimelineItem,
+  Components.ResourceLink,
+  Components.Page,
+  Components.PageHeader,
+  Components.Section,
+  Components.NavList,
+  Components.Modal,
+  Components.WindowTitleBar,
+  Components.ListGroup,
+  Components.ListRow,
+  Components.ResourceCard,
+  Components.Drawer,
+] as const satisfies readonly RegisteredComponent[];
+
+type ComponentParts<C> = C extends {
+  readonly meta: { readonly parts: readonly (infer Part extends string)[] };
+}
+  ? Part
+  : never;
 
 declare module "meowjsx" {
   interface ComponentRegistryMap {
-    "page-frame": { parts: (typeof pageFrameContract.parts)[number] };
-    "app-bar": { parts: (typeof appBarContract.parts)[number] };
-    "region-layout": { parts: (typeof regionLayoutContract.parts)[number] };
-    pill: { parts: "root" };
-    "image-preview": { parts: (typeof imagePreviewContract.parts)[number] };
-    "segmented-control": { parts: (typeof segmentedControlContract.parts)[number] };
-    "text-shimmer": { parts: (typeof textShimmerContract.parts)[number] };
-    "risk-confirmation": { parts: (typeof riskConfirmationContract.parts)[number] };
-    "web-block": { parts: (typeof webBlockContract.parts)[number] };
-    "json-tree": { parts: (typeof jsonTreeContract.parts)[number] };
-    "json-block": { parts: (typeof jsonBlockContract.parts)[number] };
-    "image-lightbox": { parts: (typeof imageLightboxContract.parts)[number] };
-    "shortcut-keys": { parts: (typeof shortcutKeysContract.parts)[number] };
-    "path-label": { parts: (typeof pathLabelContract.parts)[number] };
-    "state-dot": { parts: (typeof stateDotContract.parts)[number] };
-    "hover-card": { parts: (typeof hoverCardContract.parts)[number] };
-    menu: { parts: (typeof menuContract.parts)[number] };
-    "context-menu": { parts: (typeof contextMenuContract.parts)[number] };
-    toast: { parts: (typeof toastContract.parts)[number] };
-    "output-block": { parts: (typeof outputBlockContract.parts)[number] };
-    "terminal-block": { parts: (typeof terminalBlockContract.parts)[number] };
-    "read-block": { parts: (typeof readBlockContract.parts)[number] };
-    "diff-block": { parts: (typeof diffBlockContract.parts)[number] };
-    "search-block": { parts: (typeof searchBlockContract.parts)[number] };
-    "code-block": { parts: (typeof codeBlockContract.parts)[number] };
-    "mermaid-diagram": { parts: (typeof mermaidDiagramContract.parts)[number] };
-    tabs: { parts: (typeof tabsContract.parts)[number] };
-    breadcrumb: { parts: (typeof breadcrumbContract.parts)[number] };
-    alert: { parts: (typeof alertContract.parts)[number] };
-    skeleton: { parts: "root" };
-    "skeleton-boundary": { parts: (typeof skeletonBoundaryContract.parts)[number] };
-    spinner: { parts: (typeof spinnerContract.parts)[number] };
-    stack: { parts: "root" };
-    "layout-item": { parts: "root" };
-    inline: { parts: "root" };
-    grid: { parts: "root" };
-    container: { parts: "root" };
-    "card-header": { parts: "root" };
-    "card-title": { parts: "root" };
-    "card-description": { parts: "root" };
-    "card-content": { parts: "root" };
-    "card-footer": { parts: "root" };
-    "card-action": { parts: "root" };
-    "field-group": { parts: (typeof fieldGroupContract.parts)[number] };
-    "aspect-ratio": { parts: "root" };
-    tooltip: { parts: (typeof tooltipContract.parts)[number] };
-    "chat-sources": { parts: (typeof chatSourcesContract.parts)[number] };
-    "chat-process": { parts: (typeof chatProcessContract.parts)[number] };
-    "chat-question": { parts: (typeof chatQuestionContract.parts)[number] };
-    button: { parts: (typeof buttonContract.parts)[number] };
-    "icon-button": { parts: (typeof iconButtonContract.parts)[number] };
-    toolbar: { parts: (typeof toolbarContract.parts)[number] };
-    "action-rail": { parts: (typeof actionRailContract.parts)[number] };
-    "action-row": { parts: (typeof actionRowContract.parts)[number] };
-    "meta-row": { parts: (typeof metaRowContract.parts)[number] };
-    "empty-state": { parts: (typeof emptyStateContract.parts)[number] };
-    card: { parts: "root" };
-    badge: { parts: "root" };
-    input: { parts: "root" };
-    "number-input": { parts: (typeof numberInputContract.parts)[number] };
-    checkbox: { parts: (typeof checkboxContract.parts)[number] };
-    switch: { parts: (typeof switchContract.parts)[number] };
-    slider: { parts: (typeof sliderContract.parts)[number] };
-    progress: { parts: (typeof progressContract.parts)[number] };
-    avatar: { parts: (typeof avatarContract.parts)[number] };
-    link: { parts: (typeof linkContract.parts)[number] };
-    text: { parts: "root" };
-    prose: { parts: "root" };
-    "task-list": { parts: (typeof taskListContract.parts)[number] };
-    "chat-reasoning": { parts: (typeof chatReasoningContract.parts)[number] };
-    select: { parts: "root" };
-    "choice-select": { parts: (typeof choiceSelectContract.parts)[number] };
-    "choice-group": { parts: (typeof choiceGroupContract.parts)[number] };
-    popover: { parts: (typeof popoverContract.parts)[number] };
-    "search-input": { parts: (typeof searchInputContract.parts)[number] };
-    "path-picker": { parts: (typeof pathPickerContract.parts)[number] };
-    disclosure: { parts: (typeof disclosureContract.parts)[number] };
-    accordion: { parts: (typeof accordionContract.parts)[number] };
-    table: { parts: (typeof tableContract.parts)[number] };
-    textarea: { parts: "root" };
-    field: { parts: (typeof fieldContract.parts)[number] };
-    separator: { parts: "root" };
-    dialog: { parts: "root" };
-    "dialog-panel": { parts: (typeof dialogPanelContract.parts)[number] };
-    "dialog-header": { parts: (typeof dialogHeaderContract.parts)[number] };
-    "dialog-actions": { parts: "root" };
-    item: { parts: (typeof itemContract.parts)[number] };
-    "nav-item": { parts: (typeof navItemContract.parts)[number] };
-    "chat-frame": { parts: "root" };
-    "assistant-view": { parts: (typeof assistantViewContract.parts)[number] };
-    "assistant-steps": { parts: (typeof assistantStepsContract.parts)[number] };
-    "assistant-markdown": { parts: (typeof assistantMarkdownContract.parts)[number] };
-    "assistant-composer": { parts: (typeof assistantComposerContract.parts)[number] };
-    "assistant-question": { parts: (typeof assistantQuestionContract.parts)[number] };
+    "page-frame": { parts: ComponentParts<typeof import("../components/page-frame").PageFrame> };
+    "app-bar": { parts: ComponentParts<typeof import("../components/app-bar").AppBar> };
+    "region-layout": {
+      parts: ComponentParts<typeof import("../components/region-layout").RegionLayoutShell>;
+    };
+    pill: { parts: ComponentParts<typeof import("../components/pill").Pill> };
+    "image-preview": {
+      parts: ComponentParts<typeof import("../components/image-preview").ImagePreview>;
+    };
+    "segmented-control": {
+      parts: ComponentParts<typeof import("../components/segmented-control").SegmentedControl>;
+    };
+    "text-shimmer": {
+      parts: ComponentParts<typeof import("../components/text-shimmer").TextShimmer>;
+    };
+    "risk-confirmation": {
+      parts: ComponentParts<typeof import("../components/risk-confirmation").RiskConfirmation>;
+    };
+    "web-block": { parts: ComponentParts<typeof import("../components/web-block").WebBlock> };
+    "json-tree": { parts: ComponentParts<typeof import("../components/json-tree").JsonTree> };
+    "json-block": { parts: ComponentParts<typeof import("../components/json-block").JsonBlock> };
+    "image-lightbox": {
+      parts: ComponentParts<typeof import("../components/image-lightbox").ImageLightbox>;
+    };
+    "shortcut-keys": {
+      parts: ComponentParts<typeof import("../components/shortcut-keys").ShortcutKeys>;
+    };
+    "path-label": { parts: ComponentParts<typeof import("../components/path-label").PathLabel> };
+    "state-dot": { parts: ComponentParts<typeof import("../components/state-dot").StateDot> };
+    "hover-card": { parts: ComponentParts<typeof import("../components/hover-card").HoverCard> };
+    menu: { parts: ComponentParts<typeof import("../components/menu").Menu> };
+    "context-menu": {
+      parts: ComponentParts<typeof import("../components/context-menu").ContextMenu>;
+    };
+    toast: { parts: ComponentParts<typeof import("../components/toast").Toast> };
+    "output-block": {
+      parts: ComponentParts<typeof import("../components/output-block").OutputBlock>;
+    };
+    "terminal-block": {
+      parts: ComponentParts<typeof import("../components/terminal-block").TerminalBlock>;
+    };
+    "read-block": { parts: ComponentParts<typeof import("../components/read-block").ReadBlock> };
+    "diff-block": { parts: ComponentParts<typeof import("../components/diff-block").DiffBlock> };
+    "search-block": {
+      parts: ComponentParts<typeof import("../components/search-block").SearchBlock>;
+    };
+    "code-block": { parts: ComponentParts<typeof import("../components/code-block").CodeBlock> };
+    "mermaid-diagram": {
+      parts: ComponentParts<typeof import("../components/mermaid-diagram").MermaidDiagram>;
+    };
+    tabs: { parts: ComponentParts<typeof import("../components/tabs").Tabs> };
+    breadcrumb: { parts: ComponentParts<typeof import("../components/breadcrumb").Breadcrumb> };
+    alert: { parts: ComponentParts<typeof import("../components/alert").Alert> };
+    skeleton: { parts: ComponentParts<typeof import("../components/skeleton").Skeleton> };
+    "skeleton-boundary": {
+      parts: ComponentParts<typeof import("../components/skeleton-boundary").SkeletonBoundary>;
+    };
+    spinner: { parts: ComponentParts<typeof import("../components/spinner").Spinner> };
+    stack: { parts: ComponentParts<typeof import("../components/stack").Stack> };
+    "layout-item": { parts: ComponentParts<typeof import("../components/layout-item").LayoutItem> };
+    inline: { parts: ComponentParts<typeof import("../components/inline").Inline> };
+    grid: { parts: ComponentParts<typeof import("../components/grid").Grid> };
+    container: { parts: ComponentParts<typeof import("../components/container").Container> };
+    "card-header": { parts: ComponentParts<typeof import("../components/card-header").CardHeader> };
+    "card-title": { parts: ComponentParts<typeof import("../components/card-title").CardTitle> };
+    "card-description": {
+      parts: ComponentParts<typeof import("../components/card-description").CardDescription>;
+    };
+    "card-content": {
+      parts: ComponentParts<typeof import("../components/card-content").CardContent>;
+    };
+    "card-footer": { parts: ComponentParts<typeof import("../components/card-footer").CardFooter> };
+    "card-action": { parts: ComponentParts<typeof import("../components/card-action").CardAction> };
+    "field-group": { parts: ComponentParts<typeof import("../components/field-group").FieldGroup> };
+    "aspect-ratio": {
+      parts: ComponentParts<typeof import("../components/aspect-ratio").AspectRatio>;
+    };
+    tooltip: { parts: ComponentParts<typeof import("../components/tooltip").Tooltip> };
+    button: { parts: ComponentParts<typeof import("../components/button").Button> };
+    "icon-button": { parts: ComponentParts<typeof import("../components/icon-button").IconButton> };
+    toolbar: { parts: ComponentParts<typeof import("../components/toolbar").Toolbar> };
+    "action-rail": { parts: ComponentParts<typeof import("../components/action-rail").ActionRail> };
+    "action-row": { parts: ComponentParts<typeof import("../components/action-row").ActionRow> };
+    "meta-row": { parts: ComponentParts<typeof import("../components/meta-row").MetaRow> };
+    "empty-state": { parts: ComponentParts<typeof import("../components/empty-state").EmptyState> };
+    card: { parts: ComponentParts<typeof import("../components/card").Card> };
+    badge: { parts: ComponentParts<typeof import("../components/badge").Badge> };
+    input: { parts: ComponentParts<typeof import("../components/input").Input> };
+    "number-input": {
+      parts: ComponentParts<typeof import("../components/number-input").NumberInput>;
+    };
+    checkbox: { parts: ComponentParts<typeof import("../components/checkbox").Checkbox> };
+    switch: { parts: ComponentParts<typeof import("../components/switch").Switch> };
+    slider: { parts: ComponentParts<typeof import("../components/slider").Slider> };
+    progress: { parts: ComponentParts<typeof import("../components/progress").Progress> };
+    avatar: { parts: ComponentParts<typeof import("../components/avatar").Avatar> };
+    link: { parts: ComponentParts<typeof import("../components/link").Link> };
+    text: { parts: ComponentParts<typeof import("../components/text").Text> };
+    prose: { parts: ComponentParts<typeof import("../components/prose").Prose> };
+    "task-list": { parts: ComponentParts<typeof import("../components/task-list").TaskList> };
+    "chat-reasoning": { parts: ComponentParts<typeof import("../chat/reasoning").ChatReasoning> };
+    select: { parts: ComponentParts<typeof import("../components/select").Select> };
+    "choice-select": {
+      parts: ComponentParts<typeof import("../components/choice-select").ChoiceSelect>;
+    };
+    "choice-group": {
+      parts: ComponentParts<typeof import("../components/choice-group").ChoiceGroup>;
+    };
+    popover: { parts: ComponentParts<typeof import("../components/popover").Popover> };
+    "search-input": {
+      parts: ComponentParts<typeof import("../components/search-input").SearchInput>;
+    };
+    "path-picker": { parts: ComponentParts<typeof import("../components/path-picker").PathPicker> };
+    disclosure: { parts: ComponentParts<typeof import("../components/disclosure").Disclosure> };
+    accordion: { parts: ComponentParts<typeof import("../components/accordion").Accordion> };
+    table: { parts: ComponentParts<typeof import("../components/table").Table> };
+    textarea: { parts: ComponentParts<typeof import("../components/textarea").Textarea> };
+    field: { parts: ComponentParts<typeof import("../components/field").Field> };
+    separator: { parts: ComponentParts<typeof import("../components/separator").Separator> };
+    dialog: { parts: ComponentParts<typeof import("../components/dialog").Dialog> };
+    "dialog-panel": { parts: ComponentParts<typeof import("../components/dialog").DialogPanel> };
+    "dialog-header": { parts: ComponentParts<typeof import("../components/dialog").DialogHeader> };
+    "dialog-actions": {
+      parts: ComponentParts<typeof import("../components/dialog").DialogActions>;
+    };
+    "nav-item": { parts: ComponentParts<typeof import("../components/nav-item").NavItem> };
+    "chat-frame": { parts: ComponentParts<typeof import("../chat/frame").ChatFrame> };
+    "assistant-view": { parts: ComponentParts<typeof import("../chat/assistant").AssistantView> };
     "chat-attachments": {
-      parts: (typeof chatAttachmentsContract.parts)[number];
+      parts: ComponentParts<typeof import("../chat/attachments").ChatAttachments>;
     };
-    "chat-header": {
-      parts: (typeof chatHeaderContract.parts)[number];
-    };
-    "chat-status": { parts: (typeof chatStatusContract.parts)[number] };
+    "chat-process": { parts: ComponentParts<typeof import("../chat/process").ChatProcess> };
+    "chat-question": { parts: ComponentParts<typeof import("../chat/question").ChatQuestion> };
+    "chat-sources": { parts: ComponentParts<typeof import("../chat/sources").ChatSources> };
+    "chat-header": { parts: ComponentParts<typeof import("../chat/header").ChatHeader> };
+    "chat-status": { parts: ComponentParts<typeof import("../chat/status").ChatStatus> };
     "chat-message-list": {
-      parts: (typeof chatMessageListContract.parts)[number];
+      parts: ComponentParts<typeof import("../chat/message-list").ChatMessageList>;
     };
-    "chat-bubble": { parts: (typeof chatBubbleContract.parts)[number] };
-    "chat-conversation": { parts: (typeof chatConversationContract.parts)[number] };
-    "chat-message": { parts: (typeof chatMessageContract.parts)[number] };
-    "chat-message-actions": { parts: "root" };
-    "chat-composer": {
-      parts: (typeof chatComposerContract.parts)[number];
+    "chat-message": { parts: ComponentParts<typeof import("../chat/message").ChatMessage> };
+    "chat-message-actions": {
+      parts: ComponentParts<typeof import("../chat/message-actions").ChatMessageActions>;
     };
-    "composer-panel": { parts: (typeof composerPanelContract.parts)[number] };
-    "chat-tool-call": { parts: (typeof chatToolCallContract.parts)[number] };
-    "chat-task": { parts: (typeof chatTaskContract.parts)[number] };
-    "status-dot": { parts: (typeof statusDotContract.parts)[number] };
-    status: { parts: (typeof statusContract.parts)[number] };
-    tag: { parts: (typeof tagContract.parts)[number] };
-    "process-group": { parts: (typeof processGroupContract.parts)[number] };
-    "process-step": { parts: (typeof processStepContract.parts)[number] };
-    "work-card": { parts: (typeof workCardContract.parts)[number] };
-    "icon-rail": { parts: (typeof iconRailContract.parts)[number] };
-    "rail-item": { parts: (typeof railItemContract.parts)[number] };
-    "rail-section": { parts: (typeof railSectionContract.parts)[number] };
-    "detail-section": { parts: (typeof detailSectionContract.parts)[number] };
-    "description-list": { parts: (typeof descriptionListContract.parts)[number] };
-    "description-item": { parts: (typeof descriptionItemContract.parts)[number] };
-    timeline: { parts: (typeof timelineContract.parts)[number] };
-    "timeline-item": { parts: (typeof timelineItemContract.parts)[number] };
-    "resource-link": { parts: (typeof resourceLinkContract.parts)[number] };
-    "page-header": { parts: (typeof pageHeaderContract.parts)[number] };
-    page: { parts: (typeof pageContract.parts)[number] };
-    section: { parts: (typeof sectionContract.parts)[number] };
-    "nav-list": { parts: (typeof navListContract.parts)[number] };
-    modal: { parts: (typeof modalContract.parts)[number] };
-    "window-title-bar": { parts: (typeof windowTitleBarContract.parts)[number] };
-    "list-group": { parts: (typeof listGroupContract.parts)[number] };
-    "list-row": { parts: (typeof listRowContract.parts)[number] };
-    "resource-card": { parts: (typeof resourceCardContract.parts)[number] };
-    drawer: { parts: (typeof drawerContract.parts)[number] };
+    "chat-composer": { parts: ComponentParts<typeof import("../chat/composer").ChatComposer> };
+    "composer-panel": {
+      parts: ComponentParts<typeof import("../chat/composer-panel").ComposerPanel>;
+    };
+    "chat-tool-call": { parts: ComponentParts<typeof import("../chat/tool-call").ChatToolCall> };
+    "chat-task": { parts: ComponentParts<typeof import("../chat/task").ChatTask> };
+    "status-dot": { parts: ComponentParts<typeof import("../components/status-dot").StatusDot> };
+    status: { parts: ComponentParts<typeof import("../components/status").Status> };
+    tag: { parts: ComponentParts<typeof import("../components/tag").Tag> };
+    "process-group": {
+      parts: ComponentParts<typeof import("../components/process-group").ProcessGroup>;
+    };
+    "process-step": {
+      parts: ComponentParts<typeof import("../components/process-step").ProcessStep>;
+    };
+    "work-card": { parts: ComponentParts<typeof import("../components/work-card").WorkCard> };
+    "icon-rail": { parts: ComponentParts<typeof import("../components/icon-rail").IconRail> };
+    "rail-item": { parts: ComponentParts<typeof import("../components/rail-item").RailItem> };
+    "rail-section": {
+      parts: ComponentParts<typeof import("../components/rail-section").RailSection>;
+    };
+    "detail-section": {
+      parts: ComponentParts<typeof import("../components/detail-section").DetailSection>;
+    };
+    "description-list": {
+      parts: ComponentParts<typeof import("../components/description-list").DescriptionList>;
+    };
+    "description-item": {
+      parts: ComponentParts<typeof import("../components/description-list").DescriptionItem>;
+    };
+    timeline: { parts: ComponentParts<typeof import("../components/timeline").Timeline> };
+    "timeline-item": {
+      parts: ComponentParts<typeof import("../components/timeline").TimelineItem>;
+    };
+    "resource-link": {
+      parts: ComponentParts<typeof import("../components/resource-link").ResourceLink>;
+    };
+    page: { parts: ComponentParts<typeof import("../components/page").Page> };
+    "page-header": { parts: ComponentParts<typeof import("../components/page-header").PageHeader> };
+    section: { parts: ComponentParts<typeof import("../components/section").Section> };
+    "nav-list": { parts: ComponentParts<typeof import("../components/nav-list").NavList> };
+    modal: { parts: ComponentParts<typeof import("../components/modal").Modal> };
+    "window-title-bar": {
+      parts: ComponentParts<typeof import("../components/window-title-bar").WindowTitleBar>;
+    };
+    "list-group": { parts: ComponentParts<typeof import("../components/list-group").ListGroup> };
+    "list-row": { parts: ComponentParts<typeof import("../components/list-group").ListRow> };
+    "resource-card": {
+      parts: ComponentParts<typeof import("../components/resource-card").ResourceCard>;
+    };
+    drawer: { parts: ComponentParts<typeof import("../components/drawer").Drawer> };
   }
-}
-
-export function createMeowUI(): RuntimePlugin {
-  return { ...createStylePropsPlugin(), name: "meow-ui", components: meowUIComponents };
-}
-
-export function installMeowUI(runtime: Runtime = defaultRuntime): () => void {
-  return runtime.use(createMeowUI());
 }

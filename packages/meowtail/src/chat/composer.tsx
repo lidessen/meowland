@@ -1,43 +1,20 @@
-import { defineOptions } from "meowcss";
-import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
+import { defineStyleProps } from "meowcss/meowjsx";
 import {
-  defineComponent,
   derived,
   h,
   unwrap,
   type Child,
+  type Context,
   type MaybeSignal,
   type Props,
 } from "meowjsx";
+import { chatComposerOptions } from "./composer.options";
 import { Icon } from "../icons/icon";
-
-export const chatComposerOptions = defineOptions("chat-composer", {
-  layout: ["stacked", "inline", "hero", "bar"],
-  surface: ["default", "none"],
-});
-
-export const chatComposerContract = {
-  name: "chat-composer",
-  parts: [
-    "root",
-    "surface",
-    "attachments",
-    "field",
-    "input",
-    "hint",
-    "actions",
-    "trailing",
-    "submit",
-  ],
-  styleProps: defineStyleProps(chatComposerOptions, {
-    defaults: { layout: "stacked", surface: "default" },
-  }),
-} as const satisfies StyledComponentContract;
 
 export type ChatComposerSubmit = (event: SubmitEvent) => void;
 export type ChatComposerInput = (event: Event) => void;
 
-export interface ChatComposerProps extends Props, ThemedProps<typeof chatComposerOptions> {
+export interface ChatComposerProps extends Props {
   value?: MaybeSignal<string>;
   placeholder?: string;
   inputLabel?: string;
@@ -59,120 +36,120 @@ export interface ChatComposerProps extends Props, ThemedProps<typeof chatCompose
   submitDisabled?: MaybeSignal<boolean>;
   onSubmit?: ChatComposerSubmit;
   onInput?: ChatComposerInput;
-  className?: string;
 }
 
 /** The message input of a conversation, with attachments, model choice and send. */
-export const ChatComposer = defineComponent<
-  ChatComposerProps,
-  typeof chatComposerContract.name,
-  (typeof chatComposerContract.parts)[number]
->(
-  chatComposerContract,
-  (
-    {
-      value = "",
-      placeholder = "Write a message…",
-      inputLabel = "Message",
-      attachments,
-      trailing,
-      hint,
-      hintId,
-      submitLabel = "Send",
-      submitContent,
-      disabled = false,
-      readOnly = false,
-      submitDisabled = false,
-      onSubmit,
-      onInput,
-      children,
-      className,
-      ...props
-    },
-    context,
-  ) => {
-    const submitBlocked =
-      disabled === true
-        ? true
-        : typeof disabled === "boolean"
-          ? submitDisabled
-          : derived(() => Boolean(unwrap(disabled)) || Boolean(unwrap(submitDisabled)));
-    let field: HTMLTextAreaElement | undefined;
-    const resize = () => {
-      if (!field?.isConnected) return;
-      field.style.height = "auto";
-      field.style.height = `${field.scrollHeight}px`;
+export function ChatComposer(
+  {
+    value = "",
+    placeholder = "Write a message…",
+    inputLabel = "Message",
+    attachments,
+    trailing,
+    hint,
+    hintId,
+    submitLabel = "Send",
+    submitContent,
+    disabled = false,
+    readOnly = false,
+    submitDisabled = false,
+    onSubmit,
+    onInput,
+    children,
+    className,
+    ref,
+    ...props
+  }: ChatComposerProps,
+  context: Context<typeof ChatComposer>,
+) {
+  const submitBlocked =
+    disabled === true
+      ? true
+      : typeof disabled === "boolean"
+        ? submitDisabled
+        : derived(() => Boolean(unwrap(disabled)) || Boolean(unwrap(submitDisabled)));
+  let field: HTMLTextAreaElement | undefined;
+  const resize = () => {
+    if (!field?.isConnected) return;
+    field.style.height = "auto";
+    field.style.height = `${field.scrollHeight}px`;
+  };
+  const parts = context.parts;
+  const inputRef = (textarea: HTMLTextAreaElement) => {
+    field = textarea;
+    const stop = context.effect(() => {
+      unwrap(value);
+      resize();
+    });
+    const onResizeInput = () => resize();
+    textarea.addEventListener("input", onResizeInput);
+    const observer = typeof ResizeObserver === "function" ? new ResizeObserver(resize) : undefined;
+    observer?.observe(textarea);
+    queueMicrotask(() => {
+      if (textarea.isConnected) resize();
+    });
+    return () => {
+      stop();
+      textarea.removeEventListener("input", onResizeInput);
+      observer?.disconnect();
+      field = undefined;
     };
-    return context.part(
-      "root",
-      "form",
-      {
-        ...props,
-        className,
-        onSubmit,
-      },
-      context.part(
-        "surface",
-        "div",
-        null,
-        attachments ? context.part("attachments", "div", null, attachments) : null,
-        context.part(
-          "field",
-          "div",
-          null,
-          context.part("input", "textarea", {
-            "data-chat-input": true,
-            name: "message",
-            rows: 1,
-            value,
-            placeholder,
-            "aria-label": inputLabel,
-            "aria-describedby": hint && hintId ? hintId : undefined,
-            disabled,
-            readOnly,
-            onInput,
-            ref: (textarea: HTMLTextAreaElement) => {
-              field = textarea;
-              const stop = context.effect(() => {
-                unwrap(value);
-                resize();
-              });
-              const onResizeInput = () => resize();
-              textarea.addEventListener("input", onResizeInput);
-              const observer =
-                typeof ResizeObserver === "function" ? new ResizeObserver(resize) : undefined;
-              observer?.observe(textarea);
-              queueMicrotask(() => {
-                if (textarea.isConnected) resize();
-              });
-              return () => {
-                stop();
-                textarea.removeEventListener("input", onResizeInput);
-                observer?.disconnect();
-                field = undefined;
-              };
-            },
-          }),
-        ),
-        context.part(
-          "actions",
-          "div",
-          null,
-          children,
-          trailing ? context.part("trailing", "div", null, trailing) : null,
-          context.part(
-            "submit",
-            "button",
-            {
-              type: "submit",
-              disabled: submitBlocked,
-              "aria-label": submitLabel,
-            },
-            submitContent ?? <Icon name="arrow-up" />,
-          ),
-        ),
-      ),
-      hint ? context.part("hint", "span", hintId ? { id: hintId } : null, hint) : null,
-    );
-  },
-);
+  };
+  return (
+    <form {...props} className={className} onSubmit={onSubmit} ref={[parts.root, ref]}>
+      <div ref={parts.surface}>
+        {attachments ? <div ref={parts.attachments}>{attachments}</div> : null}
+        <div ref={parts.field}>
+          <textarea
+            data-chat-input
+            name="message"
+            rows={1}
+            value={value}
+            placeholder={placeholder}
+            aria-label={inputLabel}
+            aria-describedby={hint && hintId ? hintId : undefined}
+            disabled={disabled}
+            readOnly={readOnly}
+            onInput={onInput}
+            ref={[parts.input, inputRef]}
+          />
+        </div>
+        <div ref={parts.actions}>
+          {children}
+          {trailing ? <div ref={parts.trailing}>{trailing}</div> : null}
+          <button
+            type="submit"
+            disabled={submitBlocked}
+            aria-label={submitLabel}
+            ref={parts.submit}
+          >
+            {submitContent ?? <Icon name="arrow-up" />}
+          </button>
+        </div>
+      </div>
+      {hint ? (
+        <span id={hintId} ref={parts.hint}>
+          {hint}
+        </span>
+      ) : null}
+    </form>
+  );
+}
+
+ChatComposer.meta = {
+  name: "chat-composer",
+  parts: [
+    "root",
+    "surface",
+    "attachments",
+    "field",
+    "input",
+    "hint",
+    "actions",
+    "trailing",
+    "submit",
+  ],
+  style: defineStyleProps(chatComposerOptions, {
+    defaults: { layout: "stacked", surface: "default" },
+  }),
+} as const;

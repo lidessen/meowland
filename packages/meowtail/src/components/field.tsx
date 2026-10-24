@@ -1,20 +1,15 @@
 import {
-  defineComponent,
   derived,
   isSignal,
   mapSignal,
   unwrap,
   type Child,
-  type ComponentContract,
   type MaybeSignal,
   type Props,
   type VNode,
+  type Context,
+  h,
 } from "meowjsx";
-
-export const fieldContract = {
-  name: "field",
-  parts: ["root", "label", "description", "error", "control"],
-} as const satisfies ComponentContract;
 
 export interface FieldProps extends Props {
   label: Child;
@@ -25,88 +20,100 @@ export interface FieldProps extends Props {
   errorId?: string;
   /** Explicit state takes precedence over the live error message. */
   invalid?: MaybeSignal<boolean>;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** A labelled form control with optional help text and an error message. */
-export const Field = defineComponent<
-  FieldProps,
-  typeof fieldContract.name,
-  (typeof fieldContract.parts)[number]
->(
-  fieldContract,
-  (
-    { label, description, error, htmlFor, descriptionId, errorId, invalid, children, className },
-    context,
-  ) => {
-    const hasDescription = isSignal(description)
-      ? mapSignal(description, hasMessage)
-      : hasMessage(description);
-    const hasError = isSignal(error) ? mapSignal(error, hasMessage) : hasMessage(error);
-    const mountDescription = isSignal(description) || hasDescription;
-    const mountError = isSignal(error) || hasError;
-    const resolvedDescriptionId = mountDescription
-      ? (descriptionId ?? (htmlFor ? `${htmlFor}-description` : undefined))
-      : undefined;
-    const resolvedErrorId = mountError
-      ? (errorId ?? (htmlFor ? `${htmlFor}-error` : undefined))
-      : undefined;
-    const readDescribedBy = () =>
-      [
-        unwrap(hasDescription) ? resolvedDescriptionId : undefined,
-        unwrap(hasError) ? resolvedErrorId : undefined,
-      ]
-        .filter(Boolean)
-        .join(" ");
-    const describedBy =
-      isSignal(hasDescription) || isSignal(hasError) ? derived(readDescribedBy) : readDescribedBy();
-    const invalidState = invalid ?? hasError;
-    const control = enhanceControl(children, {
-      describedBy,
-      invalid: invalidState,
-      setInvalid: invalid !== undefined || error !== undefined,
-    });
+export function Field(
+  {
+    label,
+    description,
+    error,
+    htmlFor,
+    descriptionId,
+    errorId,
+    invalid,
+    children,
+    className,
+    ref,
+    ...props
+  }: FieldProps,
+  context: Context<typeof Field>,
+) {
+  const hasDescription = isSignal(description)
+    ? mapSignal(description, hasMessage)
+    : hasMessage(description);
+  const hasError = isSignal(error) ? mapSignal(error, hasMessage) : hasMessage(error);
+  const mountDescription = isSignal(description) || hasDescription;
+  const mountError = isSignal(error) || hasError;
+  const resolvedDescriptionId = mountDescription
+    ? (descriptionId ?? (htmlFor ? `${htmlFor}-description` : undefined))
+    : undefined;
+  const resolvedErrorId = mountError
+    ? (errorId ?? (htmlFor ? `${htmlFor}-error` : undefined))
+    : undefined;
+  const readDescribedBy = () =>
+    [
+      unwrap(hasDescription) ? resolvedDescriptionId : undefined,
+      unwrap(hasError) ? resolvedErrorId : undefined,
+    ]
+      .filter(Boolean)
+      .join(" ");
+  const describedBy =
+    isSignal(hasDescription) || isSignal(hasError) ? derived(readDescribedBy) : readDescribedBy();
+  const invalidState = invalid ?? hasError;
+  const control = enhanceControl(children, {
+    describedBy,
+    invalid: invalidState,
+    setInvalid: invalid !== undefined || error !== undefined,
+  });
 
-    return context.part(
-      "root",
-      "div",
-      {
-        className,
-        "data-invalid": isSignal(invalidState)
+  return (
+    <div
+      {...props}
+      className={className}
+      data-invalid={
+        isSignal(invalidState)
           ? mapSignal(invalidState, (value) => (value ? "true" : undefined))
           : invalidState
             ? "true"
-            : undefined,
-      },
-      context.part("label", "label", { htmlFor }, label),
-      mountDescription
-        ? context.part(
-            "description",
-            "span",
-            {
-              id: resolvedDescriptionId,
-              hidden: isSignal(hasDescription)
-                ? mapSignal(hasDescription, (value) => !value)
-                : !hasDescription,
-            },
-            description,
-          )
-        : null,
-      context.part("control", "div", null, control),
-      mountError
-        ? context.part(
-            "error",
-            "span",
-            {
-              id: resolvedErrorId,
-              hidden: isSignal(hasError) ? mapSignal(hasError, (value) => !value) : !hasError,
-            },
-            error,
-          )
-        : null,
-    );
-  },
-);
+            : undefined
+      }
+      ref={[context.parts.root, ref]}
+    >
+      <label htmlFor={htmlFor} ref={context.parts.label}>
+        {label}
+      </label>
+      {mountDescription ? (
+        <span
+          id={resolvedDescriptionId}
+          hidden={
+            isSignal(hasDescription)
+              ? mapSignal(hasDescription, (value) => !value)
+              : !hasDescription
+          }
+          ref={context.parts.description}
+        >
+          {description}
+        </span>
+      ) : null}
+      <div ref={context.parts.control}>{control}</div>
+      {mountError ? (
+        <span
+          id={resolvedErrorId}
+          hidden={isSignal(hasError) ? mapSignal(hasError, (value) => !value) : !hasError}
+          ref={context.parts.error}
+        >
+          {error}
+        </span>
+      ) : null}
+    </div>
+  );
+}
+Field.meta = {
+  name: "field",
+  parts: ["root", "label", "description", "error", "control"],
+} as const;
 
 function enhanceControl(
   children: Child | undefined,

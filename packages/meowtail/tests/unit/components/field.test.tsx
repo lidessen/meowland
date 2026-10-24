@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { Window } from "happy-dom";
 import { createRuntime, h, signal, type Child } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Field, Input, installMeowUI } from "../../../src/index";
+import { Field, Input, installMeowUI, meowUIComponents } from "../../../src/index";
 
 const dom = new Window() as unknown as Record<string, unknown>;
 for (const key of ["document", "HTMLElement", "HTMLInputElement", "Element", "Node"]) {
@@ -15,7 +15,7 @@ for (const key of ["document", "HTMLElement", "HTMLInputElement", "Element", "No
 
 function mount(node: Child) {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const host = document.createElement("div");
   document.body.append(host);
   const mounted = createWebRenderer(runtime).mount(node, host);

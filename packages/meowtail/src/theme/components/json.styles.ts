@@ -1,12 +1,14 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
 import { codeHighlightTokens } from "../shared/code-highlight.tokens";
-import { jsonTreeContract as json } from "../../components/json-tree";
-import { jsonBlockContract as block } from "../../components/json-block.contract";
 
+import type { JsonBlock } from "../../components/json-block";
+import type { JsonTree } from "../../components/json-tree";
+import { ui } from "../utilities";
+const jsonBlockPartRefs = parts<typeof JsonBlock>("json-block");
+const jsonTreePartRefs = parts<typeof JsonTree>("json-tree");
 export const jsonStyles = css`
-  ${partSelector(json, "root")} {
+  ${jsonTreePartRefs.root} {
     position: relative;
     min-width: 0;
     padding: 6px 8px 8px;
@@ -14,7 +16,7 @@ export const jsonStyles = css`
     background: transparent;
     font: ${uiTokens.type.code} / ${uiTokens.type.line.micro} ${uiTokens.type.mono};
   }
-  ${partSelector(json, "summary")} {
+  ${jsonTreePartRefs.summary} {
     position: relative;
     min-height: 16px;
     padding: 0 22px 0 14px;
@@ -22,49 +24,49 @@ export const jsonStyles = css`
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
-  summary${partSelector(json, "summary")} {
+  summary${jsonTreePartRefs.summary} {
     cursor: pointer;
   }
-  ${partSelector(json, "summary")}::-webkit-details-marker {
+  ${jsonTreePartRefs.summary}::-webkit-details-marker {
     display: none;
   }
-  ${partSelector(json, "summary")}:hover,
-  ${partSelector(json, "summary")}:focus-visible {
+  ${jsonTreePartRefs.summary}:hover,
+  ${jsonTreePartRefs.summary}:focus-visible {
     background: ${uiTokens.state.hover};
   }
-  ${partSelector(json, "property")} {
+  ${jsonTreePartRefs.property} {
     color: ${codeHighlightTokens.function};
   }
-  ${partSelector(json, "punctuation")} {
+  ${jsonTreePartRefs.punctuation} {
     color: ${uiTokens.ink.primary};
   }
-  ${partSelector(json, "expander")} {
+  ${jsonTreePartRefs.expander} {
     position: absolute;
     inset-inline-start: 0;
     top: 2px;
     display: inline-flex;
     color: ${uiTokens.ink.secondary};
   }
-  details[open] > ${partSelector(json, "summary")} > ${partSelector(json, "expander")} {
+  details[open] > ${jsonTreePartRefs.summary} > ${jsonTreePartRefs.expander} {
     transform: rotate(90deg);
   }
-  ${partSelector(json, "children")} {
+  ${jsonTreePartRefs.children} {
     padding-left: 14px;
   }
-  ${partSelector(json, "children")} > ${partSelector(json, "root")} {
+  ${jsonTreePartRefs.children} > ${jsonTreePartRefs.root} {
     padding: 0;
   }
-  ${partSelector(json, "value")} {
+  ${jsonTreePartRefs.value} {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
-  ${partSelector(json, "value")}[data-json-type="string"] {
+  ${jsonTreePartRefs.value}[data-json-type="string"] {
     color: ${codeHighlightTokens.string};
   }
-  ${partSelector(json, "value")}:is([data-json-type="number"], [data-json-type="boolean"], [data-json-type="null"]) {
+  ${jsonTreePartRefs.value}:is([data-json-type="number"], [data-json-type="boolean"], [data-json-type="null"]) {
     color: ${codeHighlightTokens.constant};
   }
-  ${partSelector(json, "copy")} {
+  ${jsonTreePartRefs.copy} {
     position: absolute;
     right: 8px;
     top: 6px;
@@ -82,62 +84,62 @@ export const jsonStyles = css`
     pointer-events: none;
     cursor: pointer;
   }
-  ${partSelector(json, "children")} > ${partSelector(json, "root")} > ${partSelector(json, "copy")} {
+  ${jsonTreePartRefs.children} > ${jsonTreePartRefs.root} > ${jsonTreePartRefs.copy} {
     top: 0;
     right: 0;
   }
-  ${partSelector(json, "root")}:hover:not(:has(${partSelector(json, "children")}:hover)) > ${partSelector(json, "copy")},
-  ${partSelector(json, "root")}:has(> details > ${partSelector(json, "summary")}:focus-visible) > ${partSelector(json, "copy")},
-  ${partSelector(json, "copy")}:focus-visible {
+  ${jsonTreePartRefs.root}:hover:not(:has(${jsonTreePartRefs.children}:hover)) > ${jsonTreePartRefs.copy},
+  ${jsonTreePartRefs.root}:has(> details > ${jsonTreePartRefs.summary}:focus-visible) > ${jsonTreePartRefs.copy},
+  ${jsonTreePartRefs.copy}:focus-visible {
     opacity: 1;
     pointer-events: auto;
   }
-  ${partSelector(json, "copy")}:hover {
+  ${jsonTreePartRefs.copy}:hover {
     background: ${uiTokens.state.active};
   }
   @media (hover: none) {
-    ${partSelector(json, "copy")} {
+    ${jsonTreePartRefs.copy} {
       opacity: 1;
       pointer-events: auto;
     }
   }
-  ${partSelector(json, "feedback")} {
+  ${jsonTreePartRefs.feedback} {
     font: ${uiTokens.type.micro} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
     color: ${uiTokens.ink.secondary};
   }
-  ${partSelector(block, "root")} {
+  ${jsonBlockPartRefs.root} {
     padding: 8px;
     border-radius: ${uiTokens.radius.xl};
     background: ${uiTokens.surface.fill};
   }
-  ${partSelector(block, "summary")} {
+  ${jsonBlockPartRefs.summary} {
     cursor: pointer;
     color: ${uiTokens.ink.secondary};
     font: ${uiTokens.type.label} / ${uiTokens.type.line.reading} ${uiTokens.type.sans};
   }
-  ${partSelector(block, "body")} {
+  ${jsonBlockPartRefs.body} {
     max-height: 420px;
     overflow: auto;
   }
-  ${partSelector(block, "error")} {
+  ${jsonBlockPartRefs.error} {
     color: ${uiTokens.status.danger};
     font: ${uiTokens.type.label} / ${uiTokens.type.line.label} ${uiTokens.type.sans};
   }
-  ${partSelector(json, "copy")}:focus-visible, ${partSelector(json, "summary")}:focus-visible {
-    ${focusRing()}
+  ${jsonTreePartRefs.copy}:focus-visible, ${jsonTreePartRefs.summary}:focus-visible {
+    ${ui.focus.ring}
   }
 
   /* Native summaries draw the same rotating chevron as Disclosure. */
-  :where(${partSelector(block, "summary")}) {
+  :where(${jsonBlockPartRefs.summary}) {
     display: flex;
     align-items: center;
     gap: 6px;
     list-style: none;
   }
-  :where(${partSelector(block, "summary")})::-webkit-details-marker {
+  :where(${jsonBlockPartRefs.summary})::-webkit-details-marker {
     display: none;
   }
-  :where(${partSelector(block, "summary")})::before {
+  :where(${jsonBlockPartRefs.summary})::before {
     content: "";
     flex: none;
     width: 14px;
@@ -146,11 +148,11 @@ export const jsonStyles = css`
     mask: ${uiTokens.glyph.chevron} center / 14px 14px no-repeat;
     transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
-  :where(details[open] > ${partSelector(block, "summary")})::before {
+  :where(details[open] > ${jsonBlockPartRefs.summary})::before {
     transform: rotate(90deg);
   }
   @media (prefers-reduced-motion: reduce) {
-    :where(${partSelector(block, "summary")})::before {
+    :where(${jsonBlockPartRefs.summary})::before {
       transition: none;
     }
   }

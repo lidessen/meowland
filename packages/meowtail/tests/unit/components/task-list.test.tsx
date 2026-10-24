@@ -4,7 +4,7 @@ import { createRuntime, h, signal } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { ChatReasoning } from "../../../src/chat/reasoning";
 import { TaskList, type TaskListEntry } from "../../../src/components/task-list";
-import { installMeowUI } from "../../../src/registry";
+import { installMeowUI, meowUIComponents } from "../../../src/registry";
 
 const dom = new Window() as unknown as Record<string, unknown>;
 for (const key of ["document", "HTMLElement", "Element", "Node", "MutationObserver"]) {
@@ -13,7 +13,7 @@ for (const key of ["document", "HTMLElement", "Element", "Node", "MutationObserv
 
 function mount(node: unknown) {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const host = document.createElement("div");
   document.body.append(host);
   const mounted = createWebRenderer(runtime).mount(node as never, host);

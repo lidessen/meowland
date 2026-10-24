@@ -4,6 +4,7 @@ import {
   standardOptions,
   standardThemeTokens,
   standardThemeStyles,
+  utilityStyles,
 } from "meowtail/theme";
 import { mdxSlideStyles } from "./mdx.styles";
 import { presentationStyles } from "./presentation/presentation.styles";
@@ -17,16 +18,19 @@ export { presentationTokens } from "./presentation/presentation.tokens";
 /** The same options object as Meowtail's standard theme, including local scheme inheritance. */
 export const presentationOptions = standardOptions;
 export const presentationThemeTokens = [...standardThemeTokens, presentationTokens] as const;
-// The floor comes first, so presentation rules placed before the standard families still win their ties.
+// The floor comes first, then presentation rules, then shared utilities at the end.
 export const presentationThemeStyles = [
   standardFoundationStyles,
+  ...standardThemeStyles.filter(
+    (fragment) => fragment !== standardFoundationStyles && fragment !== utilityStyles,
+  ),
   presentationStyles,
   presentationLayoutStyles,
   presentationTextStyles,
   presentationListStyles,
-  ...standardThemeStyles.filter((fragment) => fragment !== standardFoundationStyles),
   presentationImageStyles,
   mdxSlideStyles,
+  utilityStyles,
 ] as const;
 
 /** One complete theme, assembled from the original UI token and fragment objects. */

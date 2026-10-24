@@ -1,12 +1,7 @@
-import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
 import { Container } from "./container";
 import { PageHeader } from "./page-header";
 import { sectionLevelContext } from "./section";
-
-export const pageContract = {
-  name: "page",
-  parts: ["root", "header", "eyebrow", "toolbar", "notice", "content"],
-} as const satisfies ComponentContract;
 
 export type PageWidth = "narrow" | "content" | "wide" | "full";
 
@@ -44,7 +39,7 @@ export interface PageProps extends Props {
    * key or remount to switch widths.
    */
   width?: PageWidth;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** True when a slot was given; `false` and `null` mean the slot is omitted. */
@@ -61,56 +56,49 @@ function hasSlot(slot: Child): boolean {
  * the mount: presence decides whether a region renders, while a Signal passed as
  * slot content still updates its text.
  */
-export const Page = defineComponent<
-  PageProps,
-  typeof pageContract.name,
-  (typeof pageContract.parts)[number]
->(
-  pageContract,
-  (
-    {
-      title,
-      description,
-      eyebrow,
-      actions,
-      leading,
-      header,
-      toolbar,
-      notice,
-      width = "content",
-      className,
-      children,
-      ...props
-    },
-    context,
-  ) => {
-    const identity = hasSlot(header)
-      ? context.part("header", "div", null, header)
-      : hasSlot(title)
-        ? context.part(
-            "header",
-            "div",
-            null,
-            hasSlot(eyebrow) ? context.part("eyebrow", "p", null, eyebrow) : null,
-            h(PageHeader, { title, description, actions, leading }),
-          )
-        : null;
-    return context.part(
-      "root",
-      "div",
-      { ...props, className },
-      h(
+export function Page(
+  {
+    title,
+    description,
+    eyebrow,
+    actions,
+    leading,
+    header,
+    toolbar,
+    notice,
+    width = "content",
+    className,
+    children,
+    ...props
+  }: PageProps,
+  context: Context<typeof Page>,
+) {
+  const identity = hasSlot(header) ? (
+    <div ref={[context.parts.header]}>{header}</div>
+  ) : hasSlot(title) ? (
+    <div ref={[context.parts.header]}>
+      {hasSlot(eyebrow) ? <p ref={[context.parts.eyebrow]}>{eyebrow}</p> : null}
+      {h(PageHeader, { title, description, actions, leading })}
+    </div>
+  ) : null;
+  return (
+    <div {...props} className={className} ref={[context.parts.root, props.ref]}>
+      {h(
         Container,
         { width },
         h(
           sectionLevelContext.Provider,
           { value: 1 },
           identity,
-          hasSlot(toolbar) ? context.part("toolbar", "div", null, toolbar) : null,
-          hasSlot(notice) ? context.part("notice", "div", null, notice) : null,
-          context.part("content", "div", null, children),
+          hasSlot(toolbar) ? <div ref={[context.parts.toolbar]}>{toolbar}</div> : null,
+          hasSlot(notice) ? <div ref={[context.parts.notice]}>{notice}</div> : null,
+          <div ref={[context.parts.content]}>{children}</div>,
         ),
-      ),
-    );
-  },
-);
+      )}
+    </div>
+  );
+}
+Page.meta = {
+  name: "page",
+  parts: ["root", "header", "eyebrow", "toolbar", "notice", "content"],
+} as const;

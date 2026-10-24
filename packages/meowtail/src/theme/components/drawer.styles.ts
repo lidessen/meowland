@@ -1,10 +1,13 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { drawerContract } from "../../components/drawer";
-import { uiTokens } from "../tokens";
-import { pageFrameContract } from "../../components/page-frame";
+import { css, parts } from "meowcss/meowjsx";
 
-const root = partSelector(drawerContract, "root");
-const panel = partSelector(drawerContract, "panel");
+import { uiTokens } from "../tokens";
+
+import type { Drawer } from "../../components/drawer";
+import type { PageFrame } from "../../components/page-frame";
+const drawerPartRefs = parts<typeof Drawer>("drawer");
+const pageFramePartRefs = parts<typeof PageFrame>("page-frame");
+const root = drawerPartRefs.root;
+const panel = drawerPartRefs.panel;
 
 /** A start-edge drawer over a scrim. The dialog spans the screen so the scrim click is its own. */
 export const drawerStyles = css`
@@ -46,7 +49,7 @@ export const drawerStyles = css`
     transform: translateX(-100%);
     transition: transform ${uiTokens.motion.draw} ${uiTokens.motion.enter};
   }
-  ${panel} > ${partSelector(pageFrameContract, "root")} {
+  ${panel} > ${pageFramePartRefs.root} {
     flex: 1;
   }
   ${root}[open] ${panel} {

@@ -1,12 +1,19 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { inputContract } from "../../components/input";
-import { textareaContract } from "../../components/textarea";
-import { selectContract } from "../../components/select";
-import { choiceSelectContract } from "../../components/choice-select";
-import { searchInputContract } from "../../components/search-input";
-import { numberInputContract } from "../../components/number-input";
+import { selectorForPart } from "../selectors";
 
+import type { ChoiceSelect } from "../../components/choice-select";
+import type { Input } from "../../components/input";
+import type { NumberInput } from "../../components/number-input";
+import type { SearchInput } from "../../components/search-input";
+import type { Select } from "../../components/select";
+import type { Textarea } from "../../components/textarea";
+const choiceSelectPartRefs = parts<typeof ChoiceSelect>("choice-select");
+const inputPartRefs = parts<typeof Input>("input");
+const numberInputPartRefs = parts<typeof NumberInput>("number-input");
+const searchInputPartRefs = parts<typeof SearchInput>("search-input");
+const selectPartRefs = parts<typeof Select>("select");
+const textareaPartRefs = parts<typeof Textarea>("textarea");
 /*
  * One surface for every place a reader types or picks a value. Each family
  * keeps its own layout in its own file; the resting box, the single-line
@@ -15,12 +22,12 @@ import { numberInputContract } from "../../components/number-input";
  * Every selector has zero specificity, so source order decides: rest, hover,
  * read-only, focus, invalid, disabled.
  */
-const input = partSelector(inputContract, "root");
-const textarea = partSelector(textareaContract, "root");
-const select = partSelector(selectContract, "root");
-const choice = partSelector(choiceSelectContract, "trigger");
-const search = partSelector(searchInputContract, "root");
-const number = partSelector(numberInputContract, "root");
+const input = selectorForPart(inputPartRefs.root);
+const textarea = selectorForPart(textareaPartRefs.root);
+const select = selectorForPart(selectPartRefs.root);
+const choice = selectorForPart(choiceSelectPartRefs.trigger);
+const search = selectorForPart(searchInputPartRefs.root);
+const number = selectorForPart(numberInputPartRefs.root);
 
 const surfaces = `:where(${input}, ${textarea}, ${select}, ${choice}, ${search}, ${number})`;
 const singleLine = `:where(${input}, ${select}:not([multiple]):is(:not([size]), [size="0"], [size="1"]), ${choice}, ${search}, ${number})`;

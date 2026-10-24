@@ -1,59 +1,68 @@
-import { defaultRuntime, type ComponentContract, type Runtime, type RuntimePlugin } from "meowjsx";
-import { mdxSlideContract } from "./mdx-contract";
 import {
-  presentationContract,
-  presentationLayoutContract,
-  presentationTextContract,
-  presentationListContract,
-  presentationImageContract,
-  revealContract,
-  presentationVideoContract,
-  presentationAudioContract,
+  defaultRuntime,
+  type RegisteredComponent,
+  type Runtime,
+  type RuntimePlugin,
+} from "meowjsx";
+import { MDXSlide } from "./mdx";
+import {
+  Presentation,
+  PresentationImage,
+  PresentationLayout,
+  PresentationList,
+  PresentationText,
+  PresentationVideo,
+  PresentationAudio,
+  Reveal,
 } from "./presentation";
 
 export const MeowSlidesComponent = {
-  MDXSlide: mdxSlideContract.name,
-  Presentation: presentationContract.name,
-  PresentationLayout: presentationLayoutContract.name,
-  PresentationText: presentationTextContract.name,
-  PresentationList: presentationListContract.name,
-  PresentationImage: presentationImageContract.name,
-  Reveal: revealContract.name,
-  PresentationVideo: presentationVideoContract.name,
-  PresentationAudio: presentationAudioContract.name,
+  MDXSlide: MDXSlide.meta.name,
+  Presentation: Presentation.meta.name,
+  PresentationLayout: PresentationLayout.meta.name,
+  PresentationText: PresentationText.meta.name,
+  PresentationList: PresentationList.meta.name,
+  PresentationImage: PresentationImage.meta.name,
+  Reveal: Reveal.meta.name,
+  PresentationVideo: PresentationVideo.meta.name,
+  PresentationAudio: PresentationAudio.meta.name,
 } as const;
 
 export const meowSlidesComponents = [
-  mdxSlideContract,
-  presentationContract,
-  presentationLayoutContract,
-  presentationTextContract,
-  presentationListContract,
-  presentationImageContract,
-  revealContract,
-  presentationVideoContract,
-  presentationAudioContract,
-] as const satisfies readonly ComponentContract[];
+  MDXSlide,
+  Presentation,
+  PresentationLayout,
+  PresentationText,
+  PresentationList,
+  PresentationImage,
+  Reveal,
+  PresentationVideo,
+  PresentationAudio,
+] as const satisfies readonly RegisteredComponent[];
 
 declare module "meowjsx" {
   interface ComponentRegistryMap {
-    "mdx-slide": { parts: (typeof mdxSlideContract.parts)[number] };
-    presentation: { parts: (typeof presentationContract.parts)[number] };
-    "presentation-layout": { parts: (typeof presentationLayoutContract.parts)[number] };
-    "presentation-text": { parts: (typeof presentationTextContract.parts)[number] };
-    "presentation-list": { parts: (typeof presentationListContract.parts)[number] };
-    "presentation-image": { parts: (typeof presentationImageContract.parts)[number] };
-    "presentation-reveal": { parts: (typeof revealContract.parts)[number] };
-    "presentation-video": { parts: (typeof presentationVideoContract.parts)[number] };
-    "presentation-audio": { parts: (typeof presentationAudioContract.parts)[number] };
+    "mdx-slide": { parts: (typeof MDXSlide.meta.parts)[number] };
+    presentation: { parts: (typeof Presentation.meta.parts)[number] };
+    "presentation-layout": { parts: (typeof PresentationLayout.meta.parts)[number] };
+    "presentation-text": { parts: (typeof PresentationText.meta.parts)[number] };
+    "presentation-list": { parts: (typeof PresentationList.meta.parts)[number] };
+    "presentation-image": { parts: (typeof PresentationImage.meta.parts)[number] };
+    "presentation-reveal": { parts: (typeof Reveal.meta.parts)[number] };
+    "presentation-video": { parts: (typeof PresentationVideo.meta.parts)[number] };
+    "presentation-audio": { parts: (typeof PresentationAudio.meta.parts)[number] };
   }
 }
 
 /** Register slides only. The host installs Meowtail's shared UI and style adapter separately. */
-export function createMeowSlides(): RuntimePlugin {
-  return { name: "meow-slides", components: meowSlidesComponents };
+export function createMeowSlides({
+  components = meowSlidesComponents,
+}: {
+  components?: readonly RegisteredComponent[];
+} = {}): RuntimePlugin {
+  return { name: "meow-slides", components };
 }
 
 export function installMeowSlides(runtime: Runtime = defaultRuntime): () => void {
-  return runtime.use(createMeowSlides());
+  return runtime.use(createMeowSlides({ components: meowSlidesComponents }));
 }

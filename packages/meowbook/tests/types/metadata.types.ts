@@ -1,17 +1,30 @@
-import { defineComponent, type Component } from "meowjsx";
-import type { ComponentMetadata } from "meowbook";
+import type { ComponentMetadata, ComponentMeta } from "meowjsx";
 
-declare const Typed: Component<{ label: string }>;
+interface TypedComponent {
+  (props: { label: string }): null;
+  meta: ComponentMeta<"capture-metadata", readonly []>;
+  metadata?: ComponentMetadata;
+}
+
+declare const Typed: TypedComponent;
 Typed.metadata = { capture: { transparent: true } };
 // @ts-expect-error Capture transparency requires a boolean.
 Typed.metadata = { capture: { transparent: "true" } };
 // @ts-expect-error Capture metadata rejects misspelled fields.
 Typed.metadata = { capture: { transparant: true } };
 
-const Defined = defineComponent({ name: "CaptureMetadata", parts: [] } as const, () => null);
+function Defined() {
+  return null;
+}
+Defined.meta = { name: "capture-metadata", parts: [] } as const;
 Defined.metadata = { capture: { transparent: false } };
-// @ts-expect-error defineComponent retains the capture metadata extension.
-Defined.metadata = { capture: { transparent: 1 } };
+const InvalidMeta: ComponentMeta = {
+  name: "capture-metadata",
+  parts: [],
+  // @ts-expect-error Capture metadata remains a separate extension.
+  capture: { transparent: 1 },
+};
+void InvalidMeta;
 
 function Plain() {
   return null;

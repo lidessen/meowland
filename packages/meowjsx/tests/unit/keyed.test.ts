@@ -2,12 +2,12 @@ import { expect, test } from "bun:test";
 import {
   createContext,
   createRuntime,
-  defineComponent,
   h,
   keyed,
   mapSignal,
   signal,
   useContext,
+  type Context,
   type ReadableSignal,
 } from "../../src/index";
 import type { ObservedComponent, RenderStrategy } from "../../src/renderer";
@@ -74,22 +74,21 @@ test("keyed rows retain their nodes, context, observation parents and local stat
   const mounted: string[] = [],
     cleaned: string[] = [];
   const observed = new Set<ObservedComponent<Node>>();
-  const Row = defineComponent<{ item: ReadableSignal<{ id: string; label: string }> }>(
-    { name: "keyed-row", parts: [] },
-    ({ item }, context) => {
-      const id = item.value.id;
-      mounted.push(id);
-      context.onCleanup(() => {
-        cleaned.push(id);
-      });
-      const environment = useContext(Environment);
-      return h(
-        "article",
-        { id },
-        mapSignal(item, (value) => environment + value.label),
-      );
-    },
-  );
+  type RowProps = { item: ReadableSignal<{ id: string; label: string }> };
+  function Row({ item }: RowProps, context: Context<typeof Row, RowProps>) {
+    const id = item.value.id;
+    mounted.push(id);
+    context.onCleanup(() => {
+      cleaned.push(id);
+    });
+    const environment = useContext(Environment);
+    return h(
+      "article",
+      { id },
+      mapSignal(item, (value) => environment + value.label),
+    );
+  }
+  Row.meta = { name: "keyed-row", parts: [] } as const;
   const List = () =>
     keyed(
       items,
@@ -209,17 +208,16 @@ test("keyed cleanup releases every row and its source subscription when a row cl
     },
   };
   const cleaned: string[] = [];
-  const Row = defineComponent<{ item: ReadableSignal<string> }>(
-    { name: "cleanup-row", parts: [] },
-    ({ item }, context) => {
-      const id = item.value;
-      context.onCleanup(() => {
-        cleaned.push(id);
-        if (id === "a") throw new Error("cleanup failed");
-      });
-      return h("p", {}, id);
-    },
-  );
+  type RowProps = { item: ReadableSignal<string> };
+  function Row({ item }: RowProps, context: Context<typeof Row, RowProps>) {
+    const id = item.value;
+    context.onCleanup(() => {
+      cleaned.push(id);
+      if (id === "a") throw new Error("cleanup failed");
+    });
+    return h("p", {}, id);
+  }
+  Row.meta = { name: "cleanup-row", parts: [] } as const;
   const mount = createRuntime()
     .createRenderer(strategy)
     .mount(

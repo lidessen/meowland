@@ -1,10 +1,11 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { chatConversationContract } from "../../chat/conversation";
 
+import { ui } from "../utilities";
+import type { ChatConversation } from "../../chat/conversation";
+const chatConversationPartRefs = parts<typeof ChatConversation>("chat-conversation");
 export const chatConversationStyles = css`
-  ${partSelector(chatConversationContract, "root")} {
+  ${chatConversationPartRefs.root} {
     position: relative;
     display: flex;
     flex-direction: column;
@@ -13,17 +14,17 @@ export const chatConversationStyles = css`
     font-family: ${uiTokens.type.sans};
     font-size: ${uiTokens.type.body};
   }
-  ${partSelector(chatConversationContract, "viewport")} {
+  ${chatConversationPartRefs.viewport} {
     flex: 1 1 0;
     min-height: 0;
     min-width: 0;
     scrollbar-gutter: stable;
     overscroll-behavior-y: contain;
   }
-  ${partSelector(chatConversationContract, "viewport")}:focus-visible {
-    ${focusRing({ inset: true })}
+  ${chatConversationPartRefs.viewport}:focus-visible {
+    ${ui.focus.inset}
   }
-  ${partSelector(chatConversationContract, "latest")} {
+  ${chatConversationPartRefs.latest} {
     display: inline-flex;
     align-items: center;
     gap: 6px;
@@ -48,17 +49,17 @@ export const chatConversationStyles = css`
     box-shadow: ${uiTokens.shadow.float};
     cursor: pointer;
   }
-  ${partSelector(chatConversationContract, "latest")}[hidden] {
+  ${chatConversationPartRefs.latest}[hidden] {
     display: none;
   }
-  ${partSelector(chatConversationContract, "latest")}:hover {
+  ${chatConversationPartRefs.latest}:hover {
     background: ${uiTokens.state.hover};
   }
-  ${partSelector(chatConversationContract, "latest")}:focus-visible {
-    ${focusRing()}
+  ${chatConversationPartRefs.latest}:focus-visible {
+    ${ui.focus.ring}
   }
   @media (pointer: coarse) {
-    ${partSelector(chatConversationContract, "latest")} {
+    ${chatConversationPartRefs.latest} {
       min-height: ${uiTokens.control.regular};
     }
   }

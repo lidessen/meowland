@@ -1,20 +1,13 @@
-export {
-  ChatAttachments,
-  type ChatAttachmentItem,
-  type ChatAttachmentsProps,
-  chatAttachmentsContract,
-} from "./attachments";
+export { ChatAttachments, type ChatAttachmentItem, type ChatAttachmentsProps } from "./attachments";
 export {
   ChatComposer,
   type ChatComposerProps,
   type ChatComposerInput,
   type ChatComposerSubmit,
-  chatComposerContract,
-  chatComposerOptions,
 } from "./composer";
-export { ComposerPanel, type ComposerPanelProps, composerPanelContract } from "./composer-panel";
-export { ChatFrame, type ChatFrameProps, chatFrameContract } from "./frame";
-export { assistantViewContract } from "./assistant.contract";
+export { chatComposerOptions } from "./composer.options";
+export { ComposerPanel, type ComposerPanelProps } from "./composer-panel";
+export { ChatFrame, type ChatFrameProps } from "./frame";
 export {
   AssistantView,
   assistantCopy,
@@ -33,19 +26,14 @@ export {
   type AssistantChoice,
   type AssistantLabels,
 } from "./assistant";
-export { ChatHeader, type ChatHeaderProps, chatHeaderContract } from "./header";
+export { ChatHeader, type ChatHeaderProps } from "./header";
 export {
   ChatMessage,
   type ChatMessageProps,
   type ChatMessageRole,
   type ChatMessageStatus,
-  chatMessageContract,
 } from "./message";
-export {
-  ChatMessageActions,
-  type ChatMessageActionsProps,
-  chatMessageActionsContract,
-} from "./message-actions";
+export { ChatMessageActions, type ChatMessageActionsProps } from "./message-actions";
 export {
   ChatMessageList,
   ChatMessageListContent,
@@ -54,37 +42,25 @@ export {
   type ChatMessageListContentProps,
   type ChatMessageListDateProps,
   type ChatMessageListProps,
-  chatMessageListContract,
 } from "./message-list";
-export {
-  ChatStatus,
-  type ChatStatusProps,
-  type ChatStatusTone,
-  chatStatusContract,
-  chatStatusOptions,
-} from "./status";
+export { ChatStatus, type ChatStatusProps, type ChatStatusTone } from "./status";
+export { chatStatusOptions } from "./status.options";
 export {
   ChatToolCall,
   type ChatToolCallProps,
   type ChatToolCallState,
   type ChatToolCallLabels,
-  chatToolCallContract,
 } from "./tool-call";
-export { ChatTask, chatTaskContract, type ChatTaskProps, type ChatTaskProgress } from "./task";
+export { ChatTask, type ChatTaskProps, type ChatTaskProgress } from "./task";
 export type { ChatExecutionState } from "../shared/execution-state";
-export { ChatProcess, chatProcessContract, type ChatProcessProps } from "./process";
-export { ChatReasoning, chatReasoningContract, type ChatReasoningProps } from "./reasoning";
-export { ChatQuestion, chatQuestionContract, type ChatQuestionProps } from "./question";
-export {
-  ChatSources,
-  chatSourcesContract,
-  type ChatSourcesProps,
-  type ChatSource,
-} from "./sources";
-export { ChatBubble, chatBubbleContract, chatBubbleOptions, type ChatBubbleProps } from "./bubble";
+export { ChatProcess, type ChatProcessProps } from "./process";
+export { ChatReasoning, type ChatReasoningProps } from "./reasoning";
+export { ChatQuestion, type ChatQuestionProps } from "./question";
+export { ChatSources, type ChatSourcesProps, type ChatSource } from "./sources";
+export { ChatBubble, type ChatBubbleProps } from "./bubble";
+export { chatBubbleOptions } from "./bubble.options";
 export {
   ChatConversation,
   ChatConversationLatest,
   type ChatConversationProps,
-  chatConversationContract,
 } from "./conversation";

@@ -2,7 +2,7 @@
 
 `meowslides` is a standalone presentation package that owns the player, pages and steps, activity
 permission, reveals, the media lifecycle, presentation layouts and themes, and the trusted local MDX
-authoring entry point. The package is currently preparing the public candidate `0.1.0-alpha.0` and is
+authoring entry point. The package is currently preparing the public candidate `0.1.0-alpha.1` and is
 not yet published to npm; release wiring and out-of-package acceptance do not imply actual
 authorization to publish.
 
@@ -18,18 +18,20 @@ The root entry point exports `Presentation`, `Reveal`, `PresentationLayout`, `Pr
 other types.
 
 `createMeowSlides` and `installMeowSlides` from `meowslides/registry` register only presentation
-contracts. The host separately installs the generic `createMeowUI`; do not create a new Runtime for
+components. The host separately installs the generic `createMeowUI`; do not create a new Runtime for
 every page.
 
 ```tsx
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { applyTheme, mountStyles } from "meowcss/web";
-import { createMeowUI } from "meowtail";
+import { createMeowUI, meowUIComponents } from "meowtail";
 import { Presentation, Reveal, createMeowSlides, type SlideDefinition } from "meowslides";
 import { presentationTheme } from "meowslides/theme";
 
-const runtime = createRuntime({ plugins: [createMeowUI(), createMeowSlides()] });
+const runtime = createRuntime({
+  plugins: [createMeowUI({ components: meowUIComponents }), createMeowSlides()],
+});
 const slides: readonly SlideDefinition[] = [
   {
     id: "observation",

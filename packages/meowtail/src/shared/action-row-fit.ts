@@ -50,14 +50,7 @@ export function observeActionRowFit(row: HTMLElement): () => void {
   };
 }
 
-/** A ref that fits an action row and still calls the host's own ref. */
-export function actionRowRef(hostRef: unknown) {
-  return (row: HTMLElement) => {
-    const hostCleanup = typeof hostRef === "function" ? hostRef(row) : undefined;
-    const cleanup = observeActionRowFit(row);
-    return () => {
-      cleanup();
-      if (typeof hostCleanup === "function") hostCleanup();
-    };
-  };
+/** A local ref that fits an action row; callers compose it with their own ref binding. */
+export function actionRowRef() {
+  return (row: HTMLElement) => observeActionRowFit(row);
 }

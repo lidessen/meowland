@@ -1,13 +1,19 @@
-import { defineComponent, h, mapSignal, type ReadableSignal } from "meowjsx";
+import { h, mapSignal, type Context, type ReadableSignal } from "meowjsx";
+import type { WebRef } from "meowjsx/web";
+import "meowjsx/web";
 import { Button } from "meowtail";
 import { usePresentationActivity } from "meowslides";
 import { bytesLabel, imageFacts, transferSeconds } from "./assets";
 
-export const TransferEstimate = defineComponent<
-  { speed: ReadableSignal<number> },
-  "image-talk-transfer",
-  "root"
->({ name: "image-talk-transfer", parts: ["root"] }, ({ speed }, context) => {
+export interface TransferEstimateProps {
+  speed: ReadableSignal<number>;
+  ref?: WebRef<HTMLElement>;
+}
+
+export function TransferEstimate(
+  { speed, ref }: TransferEstimateProps,
+  context: Context<typeof TransferEstimate>,
+) {
   const active = usePresentationActivity();
   const progress = context.signal(1);
   const replay = context.signal(0);
@@ -39,43 +45,45 @@ export const TransferEstimate = defineComponent<
     return () => cancelAnimationFrame(frame);
   });
   const compactRatio = imageFacts.originalBytes / imageFacts.deliveryBytes;
-  return context.part(
-    "root",
-    "section",
-    { "aria-label": "Illustrative transfer comparison", "data-transfer-active": active },
-    [
-      <p className="fine-print">Same connection · animation follows the estimate</p>,
+  return (
+    <section
+      aria-label="Illustrative transfer comparison"
+      data-transfer-active={active}
+      ref={[context.parts.root, ref]}
+    >
+      <p className="fine-print">Same connection · animation follows the estimate</p>
       <div className="transfer-name">
         <span>Original PNG</span>
         <span>{bytesLabel(imageFacts.originalBytes)}</span>
-      </div>,
+      </div>
       <div className="transfer-track">
         <div
           className="transfer-fill"
           style={{ width: mapSignal(progress, (p) => `${p * 100}%`) }}
         />
-      </div>,
+      </div>
       <div className="transfer-name">
         <span>Delivery JPEG</span>
         <span>{bytesLabel(imageFacts.deliveryBytes)}</span>
-      </div>,
+      </div>
       <div className="transfer-track">
         <div
           className="transfer-fill delivery"
           style={{ width: mapSignal(progress, (p) => `${Math.min(1, p * compactRatio) * 100}%`) }}
         />
-      </div>,
+      </div>
       <Button
         variant="outline"
         onClick={() => replay.update((v) => v + 1)}
         disabled={mapSignal(active, (value) => !value)}
       >
         Replay estimate
-      </Button>,
+      </Button>
       <p className="fine-print">
         Animation is an illustration, not a live network measurement. Reduced motion shows the
         complete bars.
-      </p>,
-    ],
+      </p>
+    </section>
   );
-});
+}
+TransferEstimate.meta = { name: "image-talk-transfer", parts: ["root"] } as const;

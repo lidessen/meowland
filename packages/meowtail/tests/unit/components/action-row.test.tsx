@@ -1,11 +1,18 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { renderToHtmlWithRuntime } from "meowjsx/web";
-import { ActionRow, Button, CardFooter, createMeowUI, DialogActions } from "meowtail";
+import {
+  ActionRow,
+  Button,
+  CardFooter,
+  createMeowUI,
+  DialogActions,
+  meowUIComponents,
+} from "meowtail";
 
 test("action rows render as plain rows; only a client measurement stacks them", () => {
   const html = renderToHtmlWithRuntime(
-    createRuntime({ plugins: [createMeowUI()] }),
+    createRuntime({ plugins: [createMeowUI({ components: meowUIComponents })] }),
     h("div", null, [
       h(ActionRow, { align: "end" }, [
         h(Button, { variant: "quiet" }, "Cancel"),

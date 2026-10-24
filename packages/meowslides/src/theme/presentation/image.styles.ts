@@ -1,11 +1,14 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { imagePreviewContract as preview } from "meowtail";
-import { presentationImageContract as image } from "../../presentation/image";
-import { uiTokens } from "meowtail/theme";
+import { css, parts } from "meowcss/meowjsx";
+import type { ImagePreview } from "meowtail";
+import type { PresentationImage } from "../../presentation/image";
+import { ui } from "meowtail/theme";
 import { presentationTokens } from "./presentation.tokens";
 
+const image = parts<typeof PresentationImage>("presentation-image");
+const preview = parts<typeof ImagePreview>("image-preview");
+
 export const presentationImageStyles = css`
-  ${partSelector(image, "root")} {
+  ${image.root} {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -15,25 +18,25 @@ export const presentationImageStyles = css`
     margin: 0;
     gap: ${presentationTokens.spaceGroup};
   }
-  ${partSelector(image, "root")}[data-sizing="fill"] {
+  ${image.root}[data-sizing="fill"] {
     height: 100%;
   }
-  ${partSelector(image, "root")}[data-sizing="ratio"] {
+  ${image.root}[data-sizing="ratio"] {
     align-self: start;
   }
-  ${partSelector(image, "frame")} {
+  ${image.frame} {
     position: relative;
     flex: 1 1 auto;
     width: 100%;
     min-width: 0;
     min-height: 0;
-    border-radius: ${uiTokens.radius.md};
+    ${ui.radius.md}
     background: ${presentationTokens.paper};
   }
-  ${partSelector(image, "root")}[data-sizing="ratio"] > ${partSelector(image, "frame")} {
+  ${image.root}[data-sizing="ratio"] > ${image.frame} {
     flex-grow: 0;
   }
-  ${partSelector(image, "frame")} > ${partSelector(preview, "root")} {
+  ${image.frame} > ${preview.root} {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -46,19 +49,19 @@ export const presentationImageStyles = css`
     object-fit: inherit;
     object-position: inherit;
   }
-  ${partSelector(image, "frame")} ${partSelector(preview, "image")} {
+  ${image.frame} ${preview.image} {
     border-radius: inherit;
     object-fit: inherit;
     object-position: inherit;
   }
-  ${partSelector(image, "frame")} ${partSelector(preview, "status")} {
+  ${image.frame} ${preview.status} {
     overflow-wrap: anywhere;
     color: ${presentationTokens.muted};
     font: inherit;
     font-size: ${presentationTokens.fontCaption};
     line-height: ${presentationTokens.lineHeight};
   }
-  ${partSelector(image, "caption")} {
+  ${image.caption} {
     flex: none;
     min-width: 0;
     overflow-wrap: anywhere;

@@ -1,13 +1,21 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { statusContract } from "../../components/status";
-import { statusDotContract } from "../../components/status-dot";
-import { chatToolCallContract } from "../../chat/tool-call";
-import { chatTaskContract } from "../../chat/task";
-import { chatStatusContract } from "../../chat/status";
-import { chatMessageContract } from "../../chat/message";
-import { terminalBlockContract } from "../../components/terminal-block";
 
+import type { ChatMessage } from "../../chat/message";
+import type { ChatStatus } from "../../chat/status";
+import type { ChatTask } from "../../chat/task";
+import type { ChatToolCall } from "../../chat/tool-call";
+import type { Status } from "../../components/status";
+import type { StatusDot } from "../../components/status-dot";
+import type { TerminalBlock } from "../../components/terminal-block";
+import { selectorForPart } from "../selectors";
+const chatMessagePartRefs = parts<typeof ChatMessage>("chat-message");
+const chatStatusPartRefs = parts<typeof ChatStatus>("chat-status");
+const chatTaskPartRefs = parts<typeof ChatTask>("chat-task");
+const chatToolCallPartRefs = parts<typeof ChatToolCall>("chat-tool-call");
+const statusPartRefs = parts<typeof Status>("status");
+const statusDotPartRefs = parts<typeof StatusDot>("status-dot");
+const terminalBlockPartRefs = parts<typeof TerminalBlock>("terminal-block");
 /*
  * One state badge for every place a state sits on a title line: Status, a tool row, a task
  * header. A dot is the state mark and a word names it, on a soft tint of the state's ink; the
@@ -16,14 +24,14 @@ import { terminalBlockContract } from "../../components/terminal-block";
  * state it shows.
  */
 const badges = `:where(${[
-  partSelector(statusContract, "root"),
-  partSelector(chatToolCallContract, "status"),
-  partSelector(chatTaskContract, "status"),
-  partSelector(chatStatusContract, "root"),
-  partSelector(chatMessageContract, "status"),
-  partSelector(terminalBlockContract, "status"),
+  selectorForPart(statusPartRefs.root),
+  selectorForPart(chatToolCallPartRefs.status),
+  selectorForPart(chatTaskPartRefs.status),
+  selectorForPart(chatStatusPartRefs.root),
+  selectorForPart(chatMessagePartRefs.status),
+  selectorForPart(terminalBlockPartRefs.status),
 ].join(", ")})`;
-const dot = partSelector(statusDotContract, "root");
+const dot = statusDotPartRefs.root;
 const tone = (name: string) => `:where(${badges}[data-tone="${name}"])`;
 
 export const stateBadgeStyles = css`
@@ -47,7 +55,7 @@ export const stateBadgeStyles = css`
     letter-spacing: 0;
     overflow-wrap: anywhere;
   }
-  ${badges} > ${dot} {
+  ${badges} > ${selectorForPart(dot)} {
     flex: 0 0 auto;
     align-self: flex-start;
     width: 6px;

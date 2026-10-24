@@ -1,49 +1,63 @@
 import { describe, expect, test } from "bun:test";
-import { compileTokens, css, defineOptions, defineTokens, tokenRef } from "meowcss/meowjsx";
-import { partSelector } from "meowcss/meowjsx";
+import { compileTokens, defineOptions, defineTokens, tokenRef } from "meowcss";
+import { css, parts } from "meowcss/meowjsx";
 
 describe("parameterized theme values", () => {
-  test("CSS composition retains typed component dependencies without parsing text", () => {
-    const contract = { name: "button", parts: ["root", "label"] } as const;
-    const other = { name: "alert", parts: ["root"] } as const;
+  test("CSS composition expands component part descriptors without retaining dependencies", () => {
+    function Button() {
+      return null;
+    }
+    Button.meta = { name: "button", parts: ["root", "label"] } as const;
+    function Alert() {
+      return null;
+    }
+    Alert.meta = { name: "alert", parts: ["root"] } as const;
+    const button = parts<typeof Button>("button");
+    const alert = parts<typeof Alert>("alert");
     const fragment = css`
-      ${partSelector(contract, "root")} {
+      ${button.root} {
         color: red;
       }
     `;
     const composed = css`
-      ${fragment} ${partSelector(contract, "label")} {
+      ${fragment} ${button.label} {
         padding: ${4}px;
       }
-      ${partSelector(other, "root")} {
+      ${alert.root} {
         display: flex;
       }
     `;
-    expect(composed.dependencies).toEqual([contract, other]);
-    expect(composed.text).toContain(String(partSelector(contract, "root")));
+    expect("dependencies" in composed).toBe(false);
+    expect(composed.text).toContain(':where([data-meowui-part="button/root"])');
     expect(String(composed)).toBe(composed.text);
-    expect(
-      css`
-        ${String(fragment)}
-      `.dependencies,
-    ).toEqual([]);
-    const conflict = { ...contract };
-    expect(
-      css`
-        ${partSelector(contract, "root")} ${partSelector(conflict, "root")}
-      `.dependencies,
-    ).toEqual([contract, conflict]);
+    const conflict = css`
+      ${button.root} ${button.root}
+    `;
+    expect(conflict.text.match(/data-meowui-part/g)).toHaveLength(2);
   });
-  test("aggregate compilation rejects token collisions across independent groups", () => {
-    const first = defineTokens("same", { height: "1px" });
-    const second = defineTokens("same", { height: "2px" });
-    expect(() => compileTokens([first, second], { constants: ".root", sources: [] })).toThrow(
-      "collision",
-    );
+  test("conditional source definitions with the same option attribute must match", () => {
+    const source = defineOptions("app", { density: ["compact", "normal"] });
+    const conflicting = defineOptions("app", { density: ["compact", "wide"] });
+    const first = defineTokens("first", {
+      gap: source.by.density(["4px", "8px"]),
+    });
+    const second = defineTokens("second", {
+      gap: conflicting.by.density(["4px", "12px"]),
+    });
+    expect(() =>
+      compileTokens([first, second], {
+        constants: ".theme",
+        sources: [{ options: source, selector: ".theme" }],
+      }),
+    ).toThrow("Conflicting source definition");
   });
+
   test("explicit constant scopes reset instance values while source-dependent values remain regional", () => {
     const global = defineTokens("ui", { radius: "4px" });
-    const local = defineTokens("button", { radius: "8px", foreground: ["black", "white"] });
+    const local = defineTokens("button", {
+      radius: "8px",
+      foreground: ["black", "white"],
+    });
     const output = compileTokens([global, local], {
       constants: ".theme-root",
       constantScopes: new Map([[local, ".button"]]),
@@ -147,7 +161,10 @@ describe("parameterized theme values", () => {
       select: ["one", "two"],
       when: ["on", "off"],
     });
-    expect(options.by.select(["1", "2"]).values).toEqual({ one: "1", two: "2" });
+    expect(options.by.select(["1", "2"]).values).toEqual({
+      one: "1",
+      two: "2",
+    });
     expect(options.select({ when: "on" }).attributes).toHaveProperty("data-option-safe-when", "on");
   });
   test("untyped inputs fail rather than fall back or silently collide", () => {

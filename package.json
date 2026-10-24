@@ -16,7 +16,7 @@
     "format:check": "bun node_modules/oxfmt/bin/oxfmt --check .",
     "format": "bun node_modules/oxfmt/bin/oxfmt --write .",
     "check": "bun run format:check && bun run lint && bun run typecheck && bun run test",
-    "test": "bun test ./packages/meowjsx/tests ./packages/meowcss/tests ./packages/meowtail/tests/unit ./packages/meowslides/tests/unit ./packages/meowslides/tests/build ./packages/meowbook/src/bun ./packages/meowbook/tests ./packages/meowpress/tests/unit ./apps/docs/tests ./scripts",
+    "test": "bun test ./packages/meowjsx/tests ./packages/meowcss/tests ./packages/meowtail/tests/unit ./packages/meowslides/tests/unit ./packages/meowslides/tests/build ./packages/meowbook/src/bun ./packages/meowbook/tests/unit ./packages/meowbook/tests/lifecycle.test.ts ./packages/meowpress/tests/unit ./apps/docs/tests ./scripts",
     "test:presentation": "bun node_modules/@playwright/test/cli.js test --config packages/meowslides/tests/browser/presentation/playwright.config.ts",
     "dev": "bun run --filter @meowland/showcase dev",
     "release:dispatch": "bun scripts/release-dispatch.ts"

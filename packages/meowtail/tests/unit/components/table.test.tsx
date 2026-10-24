@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h, type Props } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Table, installMeowUI } from "../../../src/index";
+import { Table, installMeowUI, meowUIComponents } from "../../../src/index";
 
 const columns = [
   { id: "name", header: "Name", sortable: true, width: 160 },
@@ -14,7 +14,7 @@ const rows = [
 
 test("table names the grid and marks the active sort", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const html = createWebRenderer(runtime).renderToHtml(
     <Table
       label="Workspace files"
@@ -54,7 +54,7 @@ test("sortable headers report the next direction to the caller", () => {
 
 test("selectable tables toggle rows and the header mixed state", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const html = createWebRenderer(runtime).renderToHtml(
     <Table label="Files" selectable columns={columns} rows={rows} defaultSelected={["alpha"]} />,
   );
@@ -65,7 +65,7 @@ test("selectable tables toggle rows and the header mixed state", () => {
 
 test("the last column fills the row while the table keeps a minimum width", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const html = createWebRenderer(runtime).renderToHtml(
     <Table
       label="Files"

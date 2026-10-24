@@ -137,6 +137,27 @@ test("pointer-opened dialogs close and leave the main actions usable", async ({ 
   }
 });
 
+test("an initially open drawer enters the modal layer and keeps controlled dismissal live", async ({
+  page,
+}) => {
+  const errors: string[] = [];
+  page.on("pageerror", (error) => errors.push(error.message));
+  await page.goto("/canvas.html?story=drawer-initially-open");
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  const drawer = page.getByRole("dialog", { name: "Initially open navigation" });
+  await expect(drawer).toBeVisible();
+  expect(await drawer.evaluate((node) => node.matches(":modal"))).toBe(true);
+  await page.keyboard.press("Escape");
+  await expect(drawer).toBeHidden();
+  const trigger = page.getByRole("button", { name: "Reopen drawer", exact: true });
+  await trigger.click();
+  await expect(drawer).toBeVisible();
+  await drawer.getByRole("button", { name: "Current workspace", exact: true }).click();
+  await expect(drawer).toBeHidden();
+  await expect(trigger).toBeFocused();
+  expect(errors).toEqual([]);
+});
+
 test("shared drawer keeps title and close above the independently scrolling navigation", async ({
   page,
 }) => {

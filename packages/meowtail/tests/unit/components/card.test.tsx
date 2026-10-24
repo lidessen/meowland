@@ -11,11 +11,12 @@ import {
   CardTitle,
   Button,
   installMeowUI,
+  meowUIComponents,
 } from "meowtail";
 
 test("composed cards retain heading hierarchy, host semantics and actions without a runtime visual plugin", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const web = createWebRenderer(runtime);
   const view = (
     <Card as="article" aria-labelledby="project-title" className="host">
@@ -54,7 +55,7 @@ test("composed cards retain heading hierarchy, host semantics and actions withou
 
 test("Card children keep their structure without requiring composition slots", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const web = createWebRenderer(runtime);
   const plain = web.renderToHtml(
     <Card>
@@ -68,7 +69,7 @@ test("Card children keep their structure without requiring composition slots", (
 
 test("Card depth follows ancestor context across wrappers and leaves siblings and explicit surfaces independent", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const web = createWebRenderer(runtime);
   const Wrapped = () => (
     <div>

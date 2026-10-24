@@ -1,5 +1,6 @@
+import { defaultRuntime } from "meowjsx";
 import { render } from "meowjsx/web";
-import { installMeowUI } from "meowtail";
+import { ImagePreview, Inline, Stack, installMeowUI } from "meowtail";
 import { installMeowSlides } from "meowslides";
 import { presentationOptions, presentationTheme } from "meowslides/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
@@ -8,7 +9,7 @@ import { lessonCss } from "./lesson.styles";
 
 const root = document.querySelector<HTMLElement>("#app");
 if (!root) throw new Error("Lesson mount point is missing");
-const uninstall = installMeowUI();
+const uninstall = installMeowUI({ components: [ImagePreview, Inline, Stack] }, defaultRuntime);
 const uninstallSlides = installMeowSlides();
 const restore = applyTheme(
   document.documentElement,

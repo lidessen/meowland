@@ -1,12 +1,12 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Alert, installMeowUI } from "meowtail";
+import { Alert, installMeowUI, meowUIComponents } from "meowtail";
 import { standardTheme } from "../../../src/theme";
 
 function web() {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   return createWebRenderer(runtime);
 }
 

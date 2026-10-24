@@ -1,29 +1,18 @@
-export { Presentation, presentationContract } from "./presentation";
-export { Reveal, revealContract, type RevealProps } from "./reveal";
-export { PresentationList, presentationListContract, type PresentationListProps } from "./list";
+export { Presentation } from "./presentation";
+export { Reveal, type RevealProps } from "./reveal";
+export { PresentationList, type PresentationListProps } from "./list";
 export {
   PresentationImage,
-  presentationImageContract,
   type PresentationImageProps,
   type PresentationImagePosition,
 } from "./image";
-export {
-  PresentationLayout,
-  presentationLayoutContract,
-  type PresentationLayoutProps,
-} from "./layout";
-export {
-  PresentationText,
-  presentationTextContract,
-  presentationTextOptions,
-  type PresentationTextProps,
-} from "./presentation-text";
+export { PresentationLayout, type PresentationLayoutProps } from "./layout";
+export { PresentationText, type PresentationTextProps } from "./presentation-text";
+export { presentationTextOptions } from "./presentation-text.options";
 export { usePresentationActivity } from "./context";
 export {
   PresentationVideo,
   PresentationAudio,
-  presentationVideoContract,
-  presentationAudioContract,
   type PresentationMediaProps,
   type PresentationVideoProps,
   type PresentationAudioProps,

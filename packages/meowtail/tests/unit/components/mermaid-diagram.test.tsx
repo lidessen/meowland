@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { renderToHtmlWithRuntime } from "meowjsx/web";
-import { createMeowUI, MermaidDiagram } from "meowtail";
+import { createMeowUI, MermaidDiagram, meowUIComponents } from "meowtail";
 
 test("server output shows the source as text and draws nothing", () => {
   const html = renderToHtmlWithRuntime(
-    createRuntime({ plugins: [createMeowUI()] }),
+    createRuntime({ plugins: [createMeowUI({ components: meowUIComponents })] }),
     h(MermaidDiagram, { title: "Release flow", source: "flowchart LR\n  A[Draft] --> B[Publish]" }),
   );
   expect(html).toContain('data-meowui-part="mermaid-diagram/root"');

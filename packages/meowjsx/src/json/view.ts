@@ -43,13 +43,13 @@ export type JsonPropsDefinition<P> = {
 };
 type Property = JsonValueProperty<any> | JsonActionProperty<Callback>;
 export interface JsonComponentDefinition<P extends object = any> {
-  readonly component: Component<P, any, any>;
+  readonly component: Component<P, any>;
   readonly props: JsonPropsDefinition<P>;
 }
 export type JsonCatalog = ReadonlyMap<string, JsonComponentDefinition<any>>;
 
 export function defineJsonComponent<P extends object>(
-  component: Component<P, any, any>,
+  component: Component<P, any>,
   props: JsonPropsDefinition<NoInfer<P>>,
 ): JsonComponentDefinition<P> {
   const fields: Record<string, Property> = Object.create(null);

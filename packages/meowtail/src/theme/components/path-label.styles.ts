@@ -1,9 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { pathLabelContract } from "../../components/path-label";
 
+import type { PathLabel } from "../../components/path-label";
+const pathLabelPartRefs = parts<typeof PathLabel>("path-label");
 export const pathLabelStyles = css`
-  ${partSelector(pathLabelContract, "root")} {
+  ${pathLabelPartRefs.root} {
     display: flex;
     flex: 1 1 auto;
     justify-content: flex-end;
@@ -12,17 +13,17 @@ export const pathLabelStyles = css`
     white-space: nowrap;
     font-size: ${uiTokens.type.caption};
   }
-  ${partSelector(pathLabelContract, "root")}[data-path-clipped] {
+  ${pathLabelPartRefs.root}[data-path-clipped] {
     mask-image: linear-gradient(to right, transparent, black 28px);
   }
-  ${partSelector(pathLabelContract, "text")} {
+  ${pathLabelPartRefs.text} {
     flex: none;
     margin-right: auto;
   }
-  ${partSelector(pathLabelContract, "directory")} {
+  ${pathLabelPartRefs.directory} {
     color: ${uiTokens.ink.tertiary};
   }
-  ${partSelector(pathLabelContract, "name")} {
+  ${pathLabelPartRefs.name} {
     color: ${uiTokens.ink.primary};
   }
 `;

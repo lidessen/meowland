@@ -1,21 +1,23 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { css, defineOptions, defineTokens } from "meowcss/meowjsx";
-import { defineStyleProps, partSelector } from "meowcss/meowjsx";
-import { defineTheme } from "meowcss/meowjsx";
+import { css, defineOptions, defineTokens } from "meowcss";
+import { css as adapterCSS, defineStyleProps, parts, defineTheme } from "meowcss/meowjsx";
 import { Theme } from "meowcss/web";
-import { css as plainCSS, defineTokens as createCoreTokens } from "meowcss";
 
-const buttonOptions = defineOptions("button", { size: ["small", "default", "large"] });
-const buttonContract = {
+const buttonOptions = defineOptions("button", {
+  size: ["small", "default", "large"],
+});
+const Button = (_props: Record<string, unknown>) => null;
+Button.meta = {
   name: "button",
   parts: ["root"],
-  styleProps: defineStyleProps(buttonOptions, { defaults: { size: "default" } }),
+  style: defineStyleProps(buttonOptions, { defaults: { size: "default" } }),
 } as const;
-
-const options = defineOptions("assembly-test", { density: ["compact", "normal"] });
-const root = partSelector(buttonContract, "root");
+const root = parts<typeof Button>("button").root;
+const options = defineOptions("assembly-test", {
+  density: ["compact", "normal"],
+});
 const tokens = defineTokens("assembly-test", {
   surface: ["white", "black"],
   gap: options.by.density(["4px", "8px"]),
@@ -24,7 +26,7 @@ const instance = defineTokens("assembly-button", {
   borderWidth: "1px",
   height: buttonOptions.by.size(["24px", "28px", "32px"]),
 });
-const buttonCSS = css`
+const buttonCSS = adapterCSS`
   ${root} {
     min-height: ${instance.height};
   }
@@ -33,33 +35,39 @@ const config = {
   options,
   defaults: { scheme: "light", density: "normal" },
   tokens: [tokens, { at: root, values: instance }],
-  styles: css`
+  styles: adapterCSS`
     ${buttonCSS}
   `,
 } as const;
 
 test("root-created token definitions and plain fragments share the adapter's module identity", () => {
-  const shared = createCoreTokens("shared-entry", { ink: "navy" });
-  const plain = plainCSS`body { color: ${shared.ink}; }`;
+  const shared = defineTokens("shared-entry", { ink: "navy" });
+  const plain = css`
+    body {
+      color: ${shared.ink};
+    }
+  `;
   const theme = defineTheme({
     ...config,
     tokens: [shared],
-    styles: css`
+    styles: adapterCSS`
       ${plain} ${root} {
         color: ${shared.ink};
       }
     `,
   });
   expect(theme.cssText).toContain("--shared-entry-ink: navy;");
-  expect(theme.cssText).toContain("body { color: var(--shared-entry-ink); }");
-  expect(theme.cssText).toContain(String(root));
+  expect(theme.cssText).toContain("color: var(--shared-entry-ink);");
+  expect(theme.cssText).toContain(':where([data-meowui-part="button/root"]) {');
 });
 
 test("assembly derives sources through nested CSS without duplicate component lists", () => {
   const theme = defineTheme(config);
   expect(theme.cssText).toContain('[data-option-button-size="small"]');
   expect(theme.cssText).toContain("--assembly-button-height: 24px");
-  expect(theme.cssText).toContain(`${root} {\n  --assembly-button-border-width: 1px;`);
+  expect(theme.cssText).toContain(
+    ':where([data-meowui-part="button/root"]) {\n  --assembly-button-border-width: 1px;',
+  );
   expect(theme.cssText).toContain('[data-option-assembly-test-density="compact"]');
   expect(theme.defaults.attributes[options.attribute("density")]).toBe("normal");
 });
@@ -68,11 +76,11 @@ test("root applies defaults and partial configuration; local scope only emits ex
   const theme = defineTheme(config);
   const web = createWebRenderer(createRuntime());
   const html = web.renderToHtml(
-    <Theme theme={theme} config={options.select({ scheme: "dark" })}>
-      <Theme config={options.select({ density: "compact" })} id="local">
-        Local
-      </Theme>
-    </Theme>,
+    h(
+      Theme,
+      { theme, config: options.select({ scheme: "dark" }) },
+      h(Theme, { config: options.select({ density: "compact" }), id: "local" }, "Local"),
+    ),
   );
   expect(html).toContain('data-meowui-color-scheme="dark"');
   expect(html).toContain('data-option-assembly-test-density="normal"');
@@ -80,7 +88,7 @@ test("root applies defaults and partial configuration; local scope only emits ex
   expect(local).toContain('data-option-assembly-test-density="compact"');
   expect(local).not.toContain("data-meowui-color-scheme");
   expect(local).not.toContain("data-meowui-theme-root");
-  const defaults = web.renderToHtml(<Theme theme={theme}>Root</Theme>);
+  const defaults = web.renderToHtml(h(Theme, { theme }, "Root"));
   expect(defaults).toContain('data-meowui-color-scheme="light"');
 });
 
@@ -89,10 +97,16 @@ test("assembly rejects missing defaults and collisions across token collections"
     "Missing theme default: density",
   );
   expect(() =>
-    defineTheme({ ...config, defaults: { scheme: "light", density: "dense" } } as never),
+    defineTheme({
+      ...config,
+      defaults: { scheme: "light", density: "dense" },
+    } as never),
   ).toThrow("Invalid selection");
   expect(() =>
-    defineTheme({ ...config, tokens: [tokens, defineTokens("assembly-test", { gap: "5px" })] }),
+    defineTheme({
+      ...config,
+      tokens: [tokens, defineTokens("assembly-test", { gap: "5px" })],
+    }),
   ).toThrow("Token name collision");
   expect(() =>
     defineTheme({
@@ -103,11 +117,17 @@ test("assembly rejects missing defaults and collisions across token collections"
         }
       `,
     }),
-  ).toThrow("Missing source binding");
+  ).not.toThrow();
+  expect(defineTheme({ ...config, tokens: [instance] }).cssText).toContain(
+    '[data-option-button-size="small"]',
+  );
 });
 
 test("ordinary token paths cannot be mistaken for assembly descriptors", () => {
-  const named = defineTokens("named", { at: { contract: "1px" }, values: "2px" });
+  const named = defineTokens("named", {
+    at: { contract: "1px" },
+    values: "2px",
+  });
   const theme = defineTheme({ ...config, tokens: [named] });
   expect(theme.cssText).toContain("--named-at-contract: 1px");
   expect(theme.cssText).toContain("--named-values: 2px");
@@ -116,23 +136,41 @@ test("ordinary token paths cannot be mistaken for assembly descriptors", () => {
 test("shared component option definitions collect every carrier without duplicating declarations", () => {
   const shared = defineOptions("shared-layout", { gap: ["small", "large"] });
   const stack = {
+    style: defineStyleProps(shared, { defaults: { gap: "small" } }),
+  };
+  const inline = { style: stack.style };
+  const spacing = defineTokens("shared-layout", {
+    gap: shared.by.gap(["4px", "8px"]),
+  });
+  function Stack() {
+    return null;
+  }
+  Stack.meta = {
     name: "test-stack",
     parts: ["root"],
-    styleProps: defineStyleProps(shared, { defaults: { gap: "small" } }),
+    style: stack.style,
   } as const;
-  const inline = { name: "test-inline", parts: ["root"], styleProps: stack.styleProps } as const;
-  const spacing = defineTokens("shared-layout", { gap: shared.by.gap(["4px", "8px"]) });
+  function Inline() {
+    return null;
+  }
+  Inline.meta = {
+    name: "test-inline",
+    parts: ["root"],
+    style: inline.style,
+  } as const;
+  const stackRoot = parts<typeof Stack>("test-stack").root;
+  const inlineRoot = parts<typeof Inline>("test-inline").root;
   const theme = defineTheme({
     ...config,
     tokens: [spacing],
-    styles: css`
-      ${partSelector(stack, "root")}, ${partSelector(inline, "root")} {
+    styles: adapterCSS`
+      ${stackRoot}, ${inlineRoot} {
         gap: ${spacing.gap};
       }
     `,
   });
-  expect(theme.cssText).toContain("test-stack/root");
-  expect(theme.cssText).toContain("test-inline/root");
+  expect(theme.cssText).toContain('[data-meowui-part="test-stack/root"]');
+  expect(theme.cssText).toContain('[data-meowui-part="test-inline/root"]');
   expect(theme.cssText.match(/--shared-layout-gap: 4px/g)).toHaveLength(1);
 });
 
@@ -143,6 +181,9 @@ function checkAssemblyTypes() {
   // @ts-expect-error Invalid default value cannot widen the declared options.
   defineTheme({ ...config, defaults: { scheme: "light", density: "dense" } });
   // @ts-expect-error Unknown default field.
-  defineTheme({ ...config, defaults: { scheme: "light", density: "normal", size: "small" } });
+  defineTheme({
+    ...config,
+    defaults: { scheme: "light", density: "normal", size: "small" },
+  });
 }
 void checkAssemblyTypes;

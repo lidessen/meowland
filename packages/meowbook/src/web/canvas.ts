@@ -174,15 +174,15 @@ export async function bootCanvas(options: CanvasOptions): Promise<() => void> {
     diagnostics.hidden = replacements.length === 0;
     const showHits = () => {
       captureReplacements = replacements.map((entry, index) => ({
-        component: entry.component.contract?.name || entry.component.name || "anonymous",
-        replacement: entry.replacement.contract?.name || entry.replacement.name || "anonymous",
+        component: entry.component.meta?.name || entry.component.name || "anonymous",
+        replacement: entry.replacement.meta?.name || entry.replacement.name || "anonymous",
         hits: hits[index]!,
       }));
       summary.textContent = `Component replacement log · ${hits.reduce((sum, count) => sum + count, 0)} hits`;
       diagnostics.textContent = JSON.stringify(
         replacements.map((entry, index) => ({
           index,
-          component: entry.component.contract?.name ?? entry.component.name ?? "anonymous",
+          component: entry.component.meta?.name ?? entry.component.name ?? "anonymous",
           hits: hits[index],
         })),
       );

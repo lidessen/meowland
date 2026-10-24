@@ -1,8 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { toastContract } from "../../components/toast";
+import { css, parts } from "meowcss/meowjsx";
+
 import { uiTokens } from "../tokens";
+import type { Toast } from "../../components/toast";
+const toastPartRefs = parts<typeof Toast>("toast");
 export const toastStyles = css`
-  ${partSelector(toastContract, "root")} {
+  ${toastPartRefs.root} {
     display: flex;
     align-items: center;
     gap: 10px;
@@ -25,25 +27,25 @@ export const toastStyles = css`
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(toastContract, "root")} {
+    ${toastPartRefs.root} {
       animation: none;
     }
   }
-  ${partSelector(toastContract, "message")} {
+  ${toastPartRefs.message} {
     min-width: 0;
     overflow-wrap: anywhere;
   }
-  ${partSelector(toastContract, "icon")} {
+  ${toastPartRefs.icon} {
     display: flex;
     flex: none;
   }
-  ${partSelector(toastContract, "actions")} {
+  ${toastPartRefs.actions} {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     gap: 8px;
   }
-  ${partSelector(toastContract, "actions")} :is(button, a) {
+  ${toastPartRefs.actions} :is(button, a) {
     min-height: 0;
     padding: 0;
     margin-inline: 4px;
@@ -54,7 +56,7 @@ export const toastStyles = css`
     text-decoration: none;
     cursor: pointer;
   }
-  ${partSelector(toastContract, "actions")} :is(button, a):hover:not(:disabled) {
+  ${toastPartRefs.actions} :is(button, a):hover:not(:disabled) {
     background: transparent;
     opacity: 0.8;
   }

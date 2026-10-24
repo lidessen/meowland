@@ -1,43 +1,42 @@
-import { defineComponent, h, type ComponentContract, type Props } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
 import { Icon } from "../icons/icon";
 export type StateDotState = "done" | "warning" | "ongoing" | "error" | "idle";
-export const stateDotContract = {
-  name: "state-dot",
-  parts: ["root", "motion"],
-} as const satisfies ComponentContract;
+
 export interface StateDotProps extends Props {
   state: StateDotState;
   appearance?: "dot" | "step";
   size?: number;
-  className?: string;
+  className?: Props["className"];
 }
 /**
  * A small dot that marks a state beside its text. It is decorative: the owner supplies the
  * adjacent accessible status text.
  */
-export const StateDot = defineComponent<StateDotProps, "state-dot", "root" | "motion">(
-  stateDotContract,
-  (
-    { state, appearance = "dot", size = state === "ongoing" ? 14 : 10, className, ...props },
-    context,
-  ) =>
-    context.part(
-      "root",
-      "span",
-      {
-        ...props,
-        className,
-        "data-state": state,
-        "data-appearance": appearance,
-        "aria-hidden": "true",
-        style: { width: `${size}px`, height: `${size}px` },
-      },
-      state === "ongoing" ? (
-        context.part(
-          "motion",
-          "span",
-          {
-            ref: (element: HTMLElement) => {
+export function StateDot(
+  {
+    state,
+    appearance = "dot",
+    size = state === "ongoing" ? 14 : 10,
+    className,
+    ...props
+  }: StateDotProps,
+  context: Context<typeof StateDot>,
+) {
+  return (
+    <span
+      {...props}
+      className={className}
+      data-state={state}
+      data-appearance={appearance}
+      aria-hidden={"true"}
+      style={{ width: `${size}px`, height: `${size}px` }}
+      ref={[context.parts.root, props.ref]}
+    >
+      {state === "ongoing" ? (
+        <span
+          ref={[
+            context.parts.motion,
+            (element: HTMLElement) => {
               let alive = true;
               queueMicrotask(() => {
                 if (alive)
@@ -47,13 +46,16 @@ export const StateDot = defineComponent<StateDotProps, "state-dot", "root" | "mo
                 alive = false;
               };
             },
-          },
-          <Icon name="loader-circle" size={size} />,
-        )
+          ]}
+        >
+          {<Icon name="loader-circle" size={size} />}
+        </span>
       ) : appearance === "step" && state === "done" ? (
         <svg viewBox="0 0 12 12" width={size} height={size}>
           <path d="m3 6 2 2 4-4" fill="none" stroke="currentColor" stroke-width="1.5" />
         </svg>
-      ) : null,
-    ),
-);
+      ) : null}
+    </span>
+  );
+}
+StateDot.meta = { name: "state-dot", parts: ["root", "motion"] } as const;

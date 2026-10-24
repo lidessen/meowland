@@ -1,10 +1,12 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { chatStatusContract, chatStatusOptions } from "../../chat/status";
 
+import type { ChatStatus } from "../../chat/status";
+import { chatStatusOptions } from "../../chat/status.options";
+const chatStatusPartRefs = parts<typeof ChatStatus>("chat-status");
 /* ChatStatus is the state badge (shared/state-badge.styles.ts); its own dot takes the badge's ink. */
 export const chatStatusStyles = css`
-  ${partSelector(chatStatusContract, "dot")} {
+  ${chatStatusPartRefs.dot} {
     display: block;
     flex: 0 0 auto;
     align-self: flex-start;
@@ -15,7 +17,7 @@ export const chatStatusStyles = css`
     corner-shape: round;
     background: currentColor;
   }
-  ${partSelector(chatStatusContract, "root")}[${chatStatusOptions.attribute("tone")}="busy"] ${partSelector(chatStatusContract, "dot")} {
+  ${chatStatusPartRefs.root}[${chatStatusOptions.attribute("tone")}="busy"] ${chatStatusPartRefs.dot} {
     animation: meowui-pulse ${uiTokens.motion.loop} infinite ${uiTokens.motion.ease};
   }
   @keyframes meowui-pulse {
@@ -24,7 +26,7 @@ export const chatStatusStyles = css`
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(chatStatusContract, "dot")} {
+    ${chatStatusPartRefs.dot} {
       animation: none;
     }
   }

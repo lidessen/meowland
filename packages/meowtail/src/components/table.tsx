@@ -1,34 +1,17 @@
 import {
-  defineComponent,
   derived,
   h,
   keyed,
   unwrap,
   type Child,
-  type ComponentContract,
   type MaybeSignal,
   type Props,
+  type Context,
 } from "meowjsx";
-import { tokenRef } from "meowcss";
 import { Checkbox } from "./checkbox";
 import { Icon } from "../icons/icon";
-
-export const tableContract = {
-  name: "table",
-  parts: [
-    "root",
-    "scroller",
-    "table",
-    "header",
-    "heading",
-    "sort",
-    "resize",
-    "body",
-    "row",
-    "cell",
-    "select",
-  ],
-} as const satisfies ComponentContract;
+import { tableMinWidth } from "./table.options";
+export { tableMinWidth } from "./table.options";
 
 export type TableSortDirection = "asc" | "desc";
 
@@ -36,9 +19,6 @@ export interface TableSort {
   columnId: string;
   direction: TableSortDirection;
 }
-
-/** Sum of the column widths, so a narrow container scrolls instead of crushing a column. */
-export const tableMinWidth = tokenRef("table", "min-width");
 
 export interface TableColumn {
   id: string;
@@ -73,7 +53,7 @@ export interface TableProps extends Props {
   defaultSelected?: readonly string[];
   onSelectedChange?: (ids: readonly string[]) => void;
   selectable?: boolean;
-  className?: string;
+  className?: Props["className"];
 }
 
 const defaultMinWidth = 80;
@@ -92,266 +72,263 @@ function ariaSort(column: TableColumn, current: TableSort | undefined): string |
 }
 
 /** Data table. Sorting and selection are reported; row order and records stay with the caller. */
-export const Table = defineComponent<
-  TableProps,
-  typeof tableContract.name,
-  (typeof tableContract.parts)[number]
->(
-  tableContract,
-  (
-    {
-      label,
-      columns,
-      rows,
-      sort,
-      defaultSort,
-      onSortChange,
-      selected,
-      defaultSelected = [],
-      onSelectedChange,
-      selectable = false,
-      className,
-      ...props
-    },
-    context,
-  ) => {
-    const localSort = context.signal<TableSort | undefined>(defaultSort);
-    const localSelected = context.signal<readonly string[]>(defaultSelected);
-    const rowsView = derived(() => unwrap(rows));
-    const sortState = derived(() => (sort === undefined ? localSort.value : unwrap(sort)));
-    const selectedState = derived(() =>
-      selected === undefined ? localSelected.value : unwrap(selected),
-    );
-    const widths = context.signal<Record<string, number>>(
-      Object.fromEntries(
-        columns.flatMap((column) =>
-          column.width !== undefined ? [[column.id, column.width]] : [],
-        ),
-      ),
-    );
-    const requestSort = (column: TableColumn) => {
-      const next = sortFor(column, sortState.value);
-      if (!next) return;
-      if (sort === undefined) localSort.value = next;
-      onSortChange?.(next);
-    };
-    const requestSelected = (ids: readonly string[]) => {
-      if (selected === undefined) localSelected.value = ids;
-      onSelectedChange?.(ids);
-    };
-    const toggleRow = (id: string, checked: boolean) => {
-      const next = new Set(selectedState.value);
-      if (checked) next.add(id);
-      else next.delete(id);
-      requestSelected([...next]);
-    };
-    const enabledIds = () => rowsView.value.filter((row) => !row.disabled).map((row) => row.id);
-    let resize: { id: string; startX: number; startWidth: number; minWidth: number } | undefined;
-    const onResizeMove = (event: PointerEvent) => {
-      if (!resize) return;
-      const delta = event.clientX - resize.startX;
-      const next = Math.max(resize.minWidth, resize.startWidth + delta);
-      widths.value = { ...widths.value, [resize.id]: next };
-    };
-    const onResizeUp = (event: PointerEvent) => {
-      if (!resize) return;
-      (event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId);
-      resize = undefined;
-    };
-    const lastColumn = columns.at(-1);
-    const columnWidth = (column: TableColumn) =>
-      widths.value[column.id] ?? column.width ?? column.minWidth ?? defaultMinWidth;
-    const minTableWidth = derived(
-      () =>
-        `${columns.reduce((sum, column) => sum + columnWidth(column), selectable ? selectColumnWidth : 0)}px`,
-    );
-    const headerCell = (column: TableColumn) => {
-      const heading = column.sortable
-        ? context.part(
-            "sort",
-            "button",
-            {
-              type: "button",
-              onClick: () => requestSort(column),
-            },
-            column.header,
-            <span
-              hidden={derived(
-                () =>
-                  sortState.value?.columnId !== column.id || sortState.value.direction !== "asc",
-              )}
-            >
-              <Icon name="arrow-up" size={12} />
-            </span>,
-            <span
-              hidden={derived(
-                () =>
-                  sortState.value?.columnId !== column.id || sortState.value.direction !== "desc",
-              )}
-            >
-              <Icon name="arrow-down" size={12} />
-            </span>,
-          )
-        : column.header;
-      return context.part(
-        "heading",
-        "th",
+export function Table(
+  {
+    label,
+    columns,
+    rows,
+    sort,
+    defaultSort,
+    onSortChange,
+    selected,
+    defaultSelected = [],
+    onSelectedChange,
+    selectable = false,
+    className,
+    ...props
+  }: TableProps,
+  context: Context<typeof Table>,
+) {
+  const localSort = context.signal<TableSort | undefined>(defaultSort);
+  const localSelected = context.signal<readonly string[]>(defaultSelected);
+  const rowsView = derived(() => unwrap(rows));
+  const sortState = derived(() => (sort === undefined ? localSort.value : unwrap(sort)));
+  const selectedState = derived(() =>
+    selected === undefined ? localSelected.value : unwrap(selected),
+  );
+  const widths = context.signal<Record<string, number>>(
+    Object.fromEntries(
+      columns.flatMap((column) => (column.width !== undefined ? [[column.id, column.width]] : [])),
+    ),
+  );
+  const requestSort = (column: TableColumn) => {
+    const next = sortFor(column, sortState.value);
+    if (!next) return;
+    if (sort === undefined) localSort.value = next;
+    onSortChange?.(next);
+  };
+  const requestSelected = (ids: readonly string[]) => {
+    if (selected === undefined) localSelected.value = ids;
+    onSelectedChange?.(ids);
+  };
+  const toggleRow = (id: string, checked: boolean) => {
+    const next = new Set(selectedState.value);
+    if (checked) next.add(id);
+    else next.delete(id);
+    requestSelected([...next]);
+  };
+  const enabledIds = () => rowsView.value.filter((row) => !row.disabled).map((row) => row.id);
+  let resize: { id: string; startX: number; startWidth: number; minWidth: number } | undefined;
+  const onResizeMove = (event: PointerEvent) => {
+    if (!resize) return;
+    const delta = event.clientX - resize.startX;
+    const next = Math.max(resize.minWidth, resize.startWidth + delta);
+    widths.value = { ...widths.value, [resize.id]: next };
+  };
+  const onResizeUp = (event: PointerEvent) => {
+    if (!resize) return;
+    (event.currentTarget as HTMLElement).releasePointerCapture(event.pointerId);
+    resize = undefined;
+  };
+  const lastColumn = columns.at(-1);
+  const columnWidth = (column: TableColumn) =>
+    widths.value[column.id] ?? column.width ?? column.minWidth ?? defaultMinWidth;
+  const minTableWidth = derived(
+    () =>
+      `${columns.reduce((sum, column) => sum + columnWidth(column), selectable ? selectColumnWidth : 0)}px`,
+  );
+  const headerCell = (column: TableColumn) => {
+    const heading = column.sortable ? (
+      <button type={"button"} onClick={() => requestSort(column)} ref={[context.parts.sort]}>
+        {column.header}
         {
-          scope: "col",
-          "aria-sort": derived(() => ariaSort(column, sortState.value)),
-          "data-align": column.align,
-          // The last column takes the space the fixed widths leave; otherwise
-          // a fixed layout scales every column, the selection column included.
-          style: derived(() =>
+          <span
+            hidden={derived(
+              () => sortState.value?.columnId !== column.id || sortState.value.direction !== "asc",
+            )}
+          >
+            <Icon name="arrow-up" size={12} />
+          </span>
+        }
+        {
+          <span
+            hidden={derived(
+              () => sortState.value?.columnId !== column.id || sortState.value.direction !== "desc",
+            )}
+          >
+            <Icon name="arrow-down" size={12} />
+          </span>
+        }
+      </button>
+    ) : (
+      column.header
+    );
+    return (
+      <th
+        scope={"col"}
+        aria-sort={derived(() => ariaSort(column, sortState.value))}
+        data-align={column.align}
+        /* The last column takes the space the fixed widths leave; otherwise */ /* a fixed layout scales every column, the selection column included. */ style={derived(
+          () =>
             column !== lastColumn && widths.value[column.id] !== undefined
               ? { width: `${widths.value[column.id]}px` }
               : undefined,
-          ),
-        },
-        heading,
-        column.resizable === false
-          ? null
-          : context.part("resize", "span", {
-              role: "separator",
-              "aria-orientation": "vertical",
-              "aria-label": "Resize column",
-              onPointerDown: (event: PointerEvent) => {
-                if (event.button !== 0) return;
-                event.preventDefault();
-                (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
-                const startWidth = widths.value[column.id] ?? column.width ?? defaultMinWidth;
-                resize = {
-                  id: column.id,
-                  startX: event.clientX,
-                  startWidth,
-                  minWidth: column.minWidth ?? defaultMinWidth,
-                };
-              },
-              onPointerMove: onResizeMove,
-              onPointerUp: onResizeUp,
-              onPointerCancel: onResizeUp,
-            }),
-      );
-    };
-    return context.part(
-      "root",
-      "div",
-      { ...props, className },
-      context.part(
-        "scroller",
-        "div",
-        null,
-        context.part(
-          "table",
-          "table",
-          {
-            "aria-label": label,
-            style: derived(() => ({ [tableMinWidth.name]: minTableWidth.value })),
-          },
-          context.part(
-            "header",
-            "thead",
-            null,
-            context.part(
-              "row",
-              "tr",
-              null,
-              selectable
-                ? context.part(
-                    "heading",
-                    "th",
-                    { scope: "col" },
-                    context.part(
-                      "select",
-                      "div",
-                      null,
-                      <Checkbox
-                        label="Select all rows"
-                        labelHidden
-                        checked={derived(() => {
-                          const enabled = enabledIds();
-                          const chosen = selectedState.value;
-                          return enabled.length > 0 && enabled.every((id) => chosen.includes(id));
-                        })}
-                        indeterminate={derived(() => {
-                          const enabled = enabledIds();
-                          const count = enabled.filter((id) =>
-                            selectedState.value.includes(id),
-                          ).length;
-                          return count > 0 && count < enabled.length;
-                        })}
-                        onChange={(event: Event) => {
-                          const box = event.currentTarget as HTMLInputElement;
-                          requestSelected(box.checked ? enabledIds() : []);
-                        }}
-                      />,
-                    ),
-                  )
-                : null,
-              ...columns.map(headerCell),
-            ),
-          ),
-          context.part(
-            "body",
-            "tbody",
-            null,
-            keyed(
-              rowsView,
-              (row) => row.id,
-              (row) =>
-                context.part(
-                  "row",
-                  "tr",
-                  {
-                    "data-row-id": derived(() => row.value.id),
-                    "data-selected": derived(() =>
-                      selectedState.value.includes(row.value.id) ? "true" : undefined,
-                    ),
-                  },
-                  selectable
-                    ? context.part(
-                        "cell",
-                        "td",
-                        { "data-table-select": "" },
-                        context.part(
-                          "select",
-                          "div",
-                          null,
-                          <Checkbox
-                            label={derived(() => {
-                              const current = row.value;
-                              if (current.label) return current.label;
-                              const index = rowsView.value.findIndex(
-                                (item) => item.id === current.id,
-                              );
-                              return `Select row ${index + 1}`;
-                            })}
-                            labelHidden
-                            disabled={derived(() => Boolean(row.value.disabled))}
-                            checked={derived(() => selectedState.value.includes(row.value.id))}
-                            onChange={(event: Event) => {
-                              toggleRow(
-                                row.value.id,
-                                (event.currentTarget as HTMLInputElement).checked,
-                              );
-                            }}
-                          />,
-                        ),
-                      )
-                    : null,
-                  ...columns.map((column, index) =>
-                    context.part(
-                      "cell",
-                      "td",
-                      { "data-align": column.align },
-                      derived(() => row.value.cells[index]),
-                    ),
-                  ),
-                ),
-            ),
-          ),
-        ),
-      ),
+        )}
+        ref={[context.parts.heading]}
+      >
+        {heading}
+        {column.resizable === false ? null : (
+          <span
+            role={"separator"}
+            aria-orientation={"vertical"}
+            aria-label={"Resize column"}
+            onPointerDown={(event: PointerEvent) => {
+              if (event.button !== 0) return;
+              event.preventDefault();
+              (event.currentTarget as HTMLElement).setPointerCapture(event.pointerId);
+              const startWidth = widths.value[column.id] ?? column.width ?? defaultMinWidth;
+              resize = {
+                id: column.id,
+                startX: event.clientX,
+                startWidth,
+                minWidth: column.minWidth ?? defaultMinWidth,
+              };
+            }}
+            onPointerMove={onResizeMove}
+            onPointerUp={onResizeUp}
+            onPointerCancel={onResizeUp}
+            ref={[context.parts.resize]}
+          ></span>
+        )}
+      </th>
     );
-  },
-);
+  };
+  return (
+    <div {...props} className={className} ref={[context.parts.root, props.ref]}>
+      {
+        <div ref={[context.parts.scroller]}>
+          {
+            <table
+              aria-label={label}
+              style={derived(() => ({ [tableMinWidth.name]: minTableWidth.value }))}
+              ref={[context.parts.table]}
+            >
+              {
+                <thead ref={[context.parts.header]}>
+                  {
+                    <tr ref={[context.parts.row]}>
+                      {selectable ? (
+                        <th scope={"col"} ref={[context.parts.heading]}>
+                          {
+                            <div ref={[context.parts.select]}>
+                              {
+                                <Checkbox
+                                  label="Select all rows"
+                                  labelHidden
+                                  checked={derived(() => {
+                                    const enabled = enabledIds();
+                                    const chosen = selectedState.value;
+                                    return (
+                                      enabled.length > 0 &&
+                                      enabled.every((id) => chosen.includes(id))
+                                    );
+                                  })}
+                                  indeterminate={derived(() => {
+                                    const enabled = enabledIds();
+                                    const count = enabled.filter((id) =>
+                                      selectedState.value.includes(id),
+                                    ).length;
+                                    return count > 0 && count < enabled.length;
+                                  })}
+                                  onChange={(event: Event) => {
+                                    const box = event.currentTarget as HTMLInputElement;
+                                    requestSelected(box.checked ? enabledIds() : []);
+                                  }}
+                                />
+                              }
+                            </div>
+                          }
+                        </th>
+                      ) : null}
+                      {columns.map(headerCell)}
+                    </tr>
+                  }
+                </thead>
+              }
+              {
+                <tbody ref={[context.parts.body]}>
+                  {keyed(
+                    rowsView,
+                    (row) => row.id,
+                    (row) => (
+                      <tr
+                        data-row-id={derived(() => row.value.id)}
+                        data-selected={derived(() =>
+                          selectedState.value.includes(row.value.id) ? "true" : undefined,
+                        )}
+                        ref={[context.parts.row]}
+                      >
+                        {selectable ? (
+                          <td data-table-select={""} ref={[context.parts.cell]}>
+                            {
+                              <div ref={[context.parts.select]}>
+                                {
+                                  <Checkbox
+                                    label={derived(() => {
+                                      const current = row.value;
+                                      if (current.label) return current.label;
+                                      const index = rowsView.value.findIndex(
+                                        (item) => item.id === current.id,
+                                      );
+                                      return `Select row ${index + 1}`;
+                                    })}
+                                    labelHidden
+                                    disabled={derived(() => Boolean(row.value.disabled))}
+                                    checked={derived(() =>
+                                      selectedState.value.includes(row.value.id),
+                                    )}
+                                    onChange={(event: Event) => {
+                                      toggleRow(
+                                        row.value.id,
+                                        (event.currentTarget as HTMLInputElement).checked,
+                                      );
+                                    }}
+                                  />
+                                }
+                              </div>
+                            }
+                          </td>
+                        ) : null}
+                        {columns.map((column, index) => (
+                          <td data-align={column.align} ref={[context.parts.cell]}>
+                            {derived(() => row.value.cells[index])}
+                          </td>
+                        ))}
+                      </tr>
+                    ),
+                  )}
+                </tbody>
+              }
+            </table>
+          }
+        </div>
+      }
+    </div>
+  );
+}
+Table.meta = {
+  name: "table",
+  parts: [
+    "root",
+    "scroller",
+    "table",
+    "header",
+    "heading",
+    "sort",
+    "resize",
+    "body",
+    "row",
+    "cell",
+    "select",
+  ],
+} as const;

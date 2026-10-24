@@ -1,11 +1,17 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h, signal, type Props } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Field, PathPicker, installMeowUI, type PathPickerProps } from "../../../src/index";
+import {
+  Field,
+  PathPicker,
+  installMeowUI,
+  meowUIComponents,
+  type PathPickerProps,
+} from "../../../src/index";
 
 function fixture(options: Partial<PathPickerProps> = {}) {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   let input: Props = {};
   let button: Props = {};
   let status: unknown;

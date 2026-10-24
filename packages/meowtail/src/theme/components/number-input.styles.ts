@@ -1,11 +1,12 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { numberInputContract } from "../../components/number-input";
-
-const root = partSelector(numberInputContract, "root");
-const control = partSelector(numberInputContract, "control");
-const stepper = `:where(${partSelector(numberInputContract, "decrement")}, ${partSelector(numberInputContract, "increment")})`;
+import type { NumberInput } from "../../components/number-input";
+import { ui } from "../utilities";
+import { selectorForPart } from "../selectors";
+const numberInputPartRefs = parts<typeof NumberInput>("number-input");
+const root = numberInputPartRefs.root;
+const control = numberInputPartRefs.control;
+const stepper = `:where(${selectorForPart(numberInputPartRefs.decrement)}, ${selectorForPart(numberInputPartRefs.increment)})`;
 
 export const numberInputStyles = css`
   /* Surface, height and states come from the shared field surface. The
@@ -69,7 +70,7 @@ export const numberInputStyles = css`
     background: ${uiTokens.state.active};
   }
   ${stepper}:focus-visible {
-    ${focusRing()}
+    ${ui.focus.ring}
   }
   ${root}:has(${control}:disabled) ${stepper},
   ${stepper}:disabled {

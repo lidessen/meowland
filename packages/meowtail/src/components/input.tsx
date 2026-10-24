@@ -1,20 +1,15 @@
-import { defineComponent, type ComponentContract, type Props } from "meowjsx";
-
-export const inputContract = {
-  name: "input",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+import { h, type Props, type Context } from "meowjsx";
 
 export interface InputProps extends Props {
   type?: string;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** A single-line text input. */
-export const Input = defineComponent<
-  InputProps,
-  typeof inputContract.name,
-  (typeof inputContract.parts)[number]
->(inputContract, ({ className, type = "text", ...props }, context) =>
-  context.part("root", "input", { ...props, type, className }),
-);
+export function Input(
+  { className, type = "text", ref, ...props }: InputProps,
+  context: Context<typeof Input>,
+) {
+  return <input {...props} type={type} className={className} ref={[context.parts.root, ref]} />;
+}
+Input.meta = { name: "input", parts: ["root"] } as const;

@@ -1,7 +1,7 @@
-import { h, type Child } from "meowjsx";
+import { h, type Child, type ClassValue } from "meowjsx";
 
 export interface EmptyStackProps {
-  className?: string;
+  className?: ClassValue;
 }
 
 /**
@@ -12,7 +12,7 @@ export interface EmptyStackProps {
 export function EmptyStack({ className }: EmptyStackProps = {}): Child {
   return (
     <svg
-      className={className ? `meow-empty-stack ${className}` : "meow-empty-stack"}
+      className={["meow-empty-stack", className]}
       viewBox="0 0 128 96"
       aria-hidden="true"
       focusable="false"

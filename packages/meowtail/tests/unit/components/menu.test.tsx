@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 import { createRuntime, h, type Props } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { Menu, type MenuTriggerBindings } from "../../../src/components/menu";
+import { mountComponent } from "./mount";
 
 test("menu names groups and actions, blocks disabled callbacks and reports closure before action", () => {
   const runtime = createRuntime();
@@ -102,68 +103,59 @@ test("nested actions close their root before invoking the selected leaf", () => 
 });
 
 test("menu keyboard walks enabled rows and typeahead excludes shortcut text", () => {
-  let props: Props | undefined;
   const changes: boolean[] = [];
-  const runtime = createRuntime();
-  runtime.use({
-    render({ vnode }, next) {
-      if (vnode.props.role === "menu") props = vnode.props;
-      return next(vnode);
-    },
-  });
-  createWebRenderer(runtime).renderToHtml(
+  let clicked = "";
+  const view = mountComponent(
     <Menu
       id="walk"
       trigger={(bindings) => <button {...bindings}>Actions</button>}
-      items={[]}
+      items={[
+        { id: "alpha", label: "Alpha", shortcut: "B", onSelect: () => (clicked = "Alpha") },
+        { id: "locked", label: "Blocked", disabled: true },
+        { id: "beta", label: "Beta", onSelect: () => (clicked = "Beta") },
+        { id: "charlie", label: "Charlie", onSelect: () => (clicked = "Charlie") },
+      ]}
       onOpenChange={(next) => changes.push(next)}
     />,
   );
-  const doc: {
-    activeElement: object | null;
-    addEventListener: () => void;
-    removeEventListener: () => void;
-  } = { activeElement: null, addEventListener() {}, removeEventListener() {} };
-  let clicked = "";
-  let menuRoot: object;
-  const rows = ["Alpha", "Beta", "Charlie"].map((label) => ({
-    dataset: { menuLabel: label },
-    closest: () => menuRoot,
-    focus() {
-      doc.activeElement = this;
-    },
-    click() {
-      clicked = label;
-    },
-  }));
-  menuRoot = { ownerDocument: doc, getRootNode: () => doc, querySelectorAll: () => rows };
-  (props!.ref as (node: object) => void)(menuRoot);
+  const menuRoot = view.host.querySelector('[role="menu"]')!;
+  const doc = menuRoot.ownerDocument;
+  const rows = menuRoot.querySelectorAll('button[role="menuitem"]:not(:disabled)');
   const key = (value: string, shiftKey = false) => {
-    const observed = { prevented: false, stopped: false };
-    (props!.onKeyDown as (event: KeyboardEvent) => void)({
+    const event = new doc.defaultView!.KeyboardEvent("keydown", {
       key: value,
       shiftKey,
-      preventDefault() {
-        observed.prevented = true;
-      },
-      stopPropagation() {
-        observed.stopped = true;
-      },
-    } as KeyboardEvent);
-    return observed;
+      bubbles: true,
+      cancelable: true,
+    });
+    let propagated = false;
+    const observe = () => {
+      propagated = true;
+    };
+    view.host.addEventListener("keydown", observe);
+    try {
+      menuRoot.dispatchEvent(event);
+      return { prevented: event.defaultPrevented, stopped: !propagated };
+    } finally {
+      view.host.removeEventListener("keydown", observe);
+    }
   };
-  key("ArrowUp");
-  expect(doc.activeElement).toBe(rows[2]);
-  key("ArrowDown");
-  expect(doc.activeElement).toBe(rows[0]);
-  key("End");
-  expect(doc.activeElement).toBe(rows[2]);
-  key("Home");
-  expect(doc.activeElement).toBe(rows[0]);
-  key("b");
-  expect(doc.activeElement).toBe(rows[1]);
-  expect(key("Tab")).toEqual({ prevented: false, stopped: true });
-  expect(key("Tab", true)).toEqual({ prevented: false, stopped: true });
-  expect(changes).toEqual([false, false]);
-  expect(clicked).toBe("");
+  try {
+    key("ArrowUp");
+    expect(doc.activeElement).toBe(rows[2]);
+    key("ArrowDown");
+    expect(doc.activeElement).toBe(rows[0]);
+    key("End");
+    expect(doc.activeElement).toBe(rows[2]);
+    key("Home");
+    expect(doc.activeElement).toBe(rows[0]);
+    key("b");
+    expect(doc.activeElement).toBe(rows[1]);
+    expect(key("Tab")).toEqual({ prevented: false, stopped: true });
+    expect(key("Tab", true)).toEqual({ prevented: false, stopped: true });
+    expect(changes).toEqual([false, false]);
+    expect(clicked).toBe("");
+  } finally {
+    view.unmount();
+  }
 });

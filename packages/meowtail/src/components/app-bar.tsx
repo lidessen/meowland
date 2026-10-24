@@ -1,38 +1,34 @@
-import { defineComponent, type Child, type ComponentContract, type Props } from "meowjsx";
-
-export const appBarContract = {
-  name: "app-bar",
-  parts: ["root", "identity", "title", "status", "actions"],
-} as const satisfies ComponentContract;
+import { type Child, type Props, type Context, h } from "meowjsx";
 
 export interface AppBarProps extends Props {
   title: Child;
   /** A short status line under the title, typically ChatStatus. */
   status?: Child;
   actions?: Child;
-  className?: string;
+  className?: Props["className"];
 }
 
 /**
  * Compact application chrome: one title, one optional status line, and the
  * actions that belong to the whole screen. The page body keeps its own scroll.
  */
-export const AppBar = defineComponent<
-  AppBarProps,
-  typeof appBarContract.name,
-  (typeof appBarContract.parts)[number]
->(appBarContract, ({ title, status, actions, className, ...props }, context) =>
-  context.part(
-    "root",
-    "header",
-    { ...props, className },
-    context.part(
-      "identity",
-      "div",
-      null,
-      context.part("title", "h1", null, title),
-      status !== undefined && status !== null ? context.part("status", "div", null, status) : null,
-    ),
-    actions ? context.part("actions", "div", null, actions) : null,
-  ),
-);
+export function AppBar(
+  { title, status, actions, className, ...props }: AppBarProps,
+  context: Context<typeof AppBar>,
+) {
+  return (
+    <header {...props} className={className} ref={[context.parts.root, props.ref]}>
+      <div ref={[context.parts.identity]}>
+        <h1 ref={[context.parts.title]}>{title}</h1>
+        {status !== undefined && status !== null ? (
+          <div ref={[context.parts.status]}>{status}</div>
+        ) : null}
+      </div>
+      {actions ? <div ref={[context.parts.actions]}>{actions}</div> : null}
+    </header>
+  );
+}
+AppBar.meta = {
+  name: "app-bar",
+  parts: ["root", "identity", "title", "status", "actions"],
+} as const;

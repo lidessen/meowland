@@ -1,9 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { progressContract } from "../../components/progress";
 
-const root = partSelector(progressContract, "root");
-const bar = partSelector(progressContract, "bar");
+import type { Progress } from "../../components/progress";
+const progressPartRefs = parts<typeof Progress>("progress");
+const root = progressPartRefs.root;
+const bar = progressPartRefs.bar;
 const native = `progress[data-meowui-part="progress/bar"]`;
 
 export const progressStyles = css`

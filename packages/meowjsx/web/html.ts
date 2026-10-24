@@ -14,6 +14,7 @@ import {
 import { ATTRIBUTE_NAMES, VOID_ELEMENTS, isRecord } from "./html-facts";
 import { isKeyedChild, readKeyedEntries } from "../src/keyed";
 import { signal } from "../src/reactive";
+import { classText } from "../src/style";
 
 function escapeHtml(value: string): string {
   return value
@@ -39,6 +40,10 @@ function renderAttributes(props: Props): string {
       const resolved = unwrap(value);
       if (resolved === false || resolved === null || resolved === undefined) return "";
       const attributeName = ATTRIBUTE_NAMES[name] ?? name;
+      if (name === "className" || name === "class") {
+        const serialized = classText(resolved);
+        return serialized ? ` ${attributeName}="${escapeHtml(serialized)}"` : "";
+      }
       if (name === "style") {
         const serialized = styleText(resolved);
         return serialized ? ` ${attributeName}="${escapeHtml(serialized)}"` : "";
@@ -68,7 +73,7 @@ function renderHostHtml(node: VNode, runtime: Runtime, contextScope?: ContextSco
 }
 
 function renderComponentHtml(
-  component: Component<any, any, any>,
+  component: Component<any, any>,
   props: Props,
   runtime: Runtime,
   contextScope?: ContextScope,

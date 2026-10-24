@@ -1,4 +1,4 @@
-import { defineComponent, h, type Child, type ComponentContract } from "meowjsx";
+import { h, type Child, type Context } from "meowjsx";
 import { ImagePreview, type ImagePreviewProps } from "meowtail";
 import type { SlideBackgroundImage } from "./types";
 
@@ -14,52 +14,39 @@ export interface PresentationImageProps extends ImagePreviewProps {
   children?: never;
 }
 
-export const presentationImageContract = {
-  name: "presentation-image",
-  parts: ["root", "frame", "caption"],
-} as const satisfies ComponentContract;
-
 /** A passive presentation figure; ImagePreview owns loading and failure feedback. */
-export const PresentationImage = defineComponent<
-  PresentationImageProps,
-  "presentation-image",
-  (typeof presentationImageContract.parts)[number]
->(
-  presentationImageContract,
-  (
-    {
-      src,
-      alt,
-      ratio = 16 / 9,
-      fit = "contain",
-      position = "center",
-      caption,
-      loading = "eager",
-      loadingLabel,
-      failedLabel,
-      onLoad,
-      onError,
-      children: _children,
-      ...props
-    },
-    context,
-  ) => {
-    if (ratio !== "fill" && (!Number.isFinite(ratio) || ratio <= 0))
-      throw new Error("PresentationImage requires a finite positive ratio or fill");
-    return context.part(
-      "root",
-      "figure",
-      { ...props, "data-sizing": ratio === "fill" ? "fill" : "ratio" },
-      context.part(
-        "frame",
-        "div",
-        {
-          style: {
-            ...(ratio === "fill" ? {} : { aspectRatio: String(ratio) }),
-            objectFit: fit,
-            objectPosition: position,
-          },
-        },
+export function PresentationImage(
+  {
+    src,
+    alt,
+    ratio = 16 / 9,
+    fit = "contain",
+    position = "center",
+    caption,
+    loading = "eager",
+    loadingLabel,
+    failedLabel,
+    onLoad,
+    onError,
+    children: _children,
+    ref,
+    ...props
+  }: PresentationImageProps,
+  context: Context<typeof PresentationImage>,
+) {
+  const parts = context.parts;
+  if (ratio !== "fill" && (!Number.isFinite(ratio) || ratio <= 0))
+    throw new Error("PresentationImage requires a finite positive ratio or fill");
+  return (
+    <figure {...props} data-sizing={ratio === "fill" ? "fill" : "ratio"} ref={[parts.root, ref]}>
+      <div
+        ref={parts.frame}
+        style={{
+          ...(ratio === "fill" ? {} : { aspectRatio: String(ratio) }),
+          objectFit: fit,
+          objectPosition: position,
+        }}
+      >
         <ImagePreview
           src={src}
           alt={alt}
@@ -68,11 +55,16 @@ export const PresentationImage = defineComponent<
           failedLabel={failedLabel}
           onLoad={onLoad}
           onError={onError}
-        />,
-      ),
-      caption !== undefined && caption !== null
-        ? context.part("caption", "figcaption", null, caption)
-        : null,
-    );
-  },
-);
+        />
+      </div>
+      {caption !== undefined && caption !== null ? (
+        <figcaption ref={parts.caption}>{caption}</figcaption>
+      ) : null}
+    </figure>
+  );
+}
+
+PresentationImage.meta = {
+  name: "presentation-image",
+  parts: ["root", "frame", "caption"],
+} as const;

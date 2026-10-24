@@ -1,17 +1,18 @@
-import { defineComponent, type ComponentContract, type Props } from "meowjsx";
-
-export const cardHeaderContract = {
-  name: "card-header",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+import { h, type Props, type Context } from "meowjsx";
 
 export interface CardHeaderProps extends Props {
-  className?: string;
+  className?: Props["className"];
 }
 
 /** The top of a card: its title, description and actions. */
-export const CardHeader = defineComponent<CardHeaderProps, "card-header", "root">(
-  cardHeaderContract,
-  ({ children, className, ...props }, context) =>
-    context.part("root", "div", { ...props, className }, children),
-);
+export function CardHeader(
+  { children, className, ref, ...props }: CardHeaderProps,
+  context: Context<typeof CardHeader>,
+) {
+  return (
+    <div {...props} className={className} ref={[context.parts.root, ref]}>
+      {children}
+    </div>
+  );
+}
+CardHeader.meta = { name: "card-header", parts: ["root"] } as const;

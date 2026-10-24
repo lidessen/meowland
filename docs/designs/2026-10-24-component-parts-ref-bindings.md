@@ -1,18 +1,24 @@
 # Component parts through composable ref bindings
 
-Status: selected authoring direction, pending implementation and type validation. This design covers
-MeowJSX component implementations, their host nodes and how themes address parts. It is a breaking
-change with no compatibility layer for the old authoring surface; see
-[Breaking changes](#breaking-changes). Existing runtime APIs and published packages still use
-`context.part(...)` and `partSelector(...)` until it lands; the examples below describe the target
-API.
+Status: implemented and locally accepted on 2026-10-24; see the
+[implementation receipt](../records/2026-10-24-authoring-migration.md). This design covers MeowJSX
+component implementations, their host nodes and how themes address parts. It is a breaking change
+with no compatibility layer for the old authoring surface; see [Breaking changes](#breaking-changes).
+Published packages still use the previous APIs until a separately authorized release.
 
 Component authors write ordinary functions and native JSX. A part is a binding supplied through
 `ref`, and `ref` accepts multiple bindings when the component and its caller both need the node.
 
 ```tsx
-// Target syntax. Context and Web ref type names remain to be finalized.
-export function Panel({ title, children, ref, ...props }, ctx) {
+import { h, type Context, type Props } from "meowjsx";
+import type { WebRef } from "meowjsx/web";
+
+interface PanelProps extends Props {
+  title: string;
+  ref?: WebRef<HTMLElement>;
+}
+
+export function Panel({ title, children, ref, ...props }: PanelProps, ctx: Context<typeof Panel>) {
   const p = ctx.parts;
 
   return (
@@ -22,6 +28,7 @@ export function Panel({ title, children, ref, ...props }, ctx) {
     </section>
   );
 }
+Panel.meta = { name: "panel", parts: ["root", "heading", "body"] } as const;
 ```
 
 The setup body still runs once per mount. Signals continue to carry later updates; changing the
@@ -152,28 +159,29 @@ refs:
   ref={[
     ctx.parts.control,
     (element) => {
-      // The Web type surface should infer HTMLInputElement here.
+      // The explicit Web type surface infers HTMLInputElement here.
       element.select();
     },
   ]}
 />
 ```
 
-Current intrinsic JSX props use an open string index and do not provide this precise host typing.
-That example is an acceptance target, not a claim about current inference. Readonly and nested
-arrays, optional forwarded refs, invalid callback node types and callback cleanup returns all need
-compiler cases before the ref type is finalized. Part bindings must not widen callback inference to
-`any` or make incompatible node callbacks valid.
+The explicit `meowjsx/web` entry augments native JSX with Web node types. Readonly and nested
+arrays, optional forwarded refs, invalid callback node types and callback cleanup returns require
+compiler cases. Part bindings must not widen callback inference to `any` or make incompatible node
+callbacks valid.
 
-Core binding and callback types remain generic over the target's node handle. DOM node types and
-HTML/SVG mappings belong to the explicit Web type surface. Changing ref typing must not import DOM
-types into the MeowJSX root. The exact Web typing entry and public type names remain open.
+Core `RefBinding<TNode>`, `RefCallback<TNode>` and `RefCleanup` types remain generic over the target's
+node handle. The Web entry exports `WebRef<TElement>` and its callback/cleanup types, alongside the
+HTML/SVG mappings. Changing ref typing must not import DOM types into the MeowJSX root.
 
-Ordinary component functions should be accepted as JSX tags with a required, typed context. Current
-`Component` and `JSX.ElementType` types do not support that signature together. Resolve their
-compatibility in the type prototype; do not require every author to add an optional-context guard
-or use `any`. Direct function invocation does not create a renderer-owned mount and does not gain
-an implicit context through this design.
+Ordinary component functions are JSX tags with a required, typed context. `Component` and
+`JSX.ElementType` accept that signature together; authors do not add optional-context guards or use
+`any`. Direct function invocation does not create a renderer-owned mount and does not gain an
+implicit context through this design. `Context<typeof Component>` uses the general `Props` view
+for `context.props`; authors who read precisely typed original props use the optional second type
+argument, `Context<typeof Component, ComponentProps>`. Inferring that argument from the same
+function signature introduces a TypeScript self-reference, so it is not required for typed parts.
 
 ## Contracts and component forwarding
 
@@ -184,7 +192,6 @@ definer. A component is an ordinary function declaration, and its identity is a 
 that function:
 
 ```tsx
-// Working names: `meta` and `Context`.
 export function Card({ title, children, ref, ...props }: CardProps, ctx: Context<typeof Card>) {
   return (
     <section {...props} ref={[ctx.parts.root, ref]}>
@@ -231,33 +238,52 @@ descriptors from the name through one universal adapter:
 
 ```ts
 import type { Card } from "../../components/card";
+import { cx } from "meowcss";
 import { css, parts } from "meowcss/meowjsx";
+import { ui } from "../utilities";
 
 const card = parts<typeof Card>("card");
 
 export const cardStyles = css`
   ${card.root} {
-    ${ui.cx(ui.p.panel, ui.bg.raised)}
+    ${cx(ui.p.panel, ui.bg.raised)}
   }
 `;
 ```
 
-- `import type` is erased, so a theme module loads no component code, and the JSON catalog, docs
-  and build scripts keep importing only what they use.
+- `import type` is erased, so constructing a theme's part descriptors loads no component code.
+  Shared runtime options also live outside component implementations, as described below.
 - The argument is typed as the component's name literal, so `parts<typeof Card>("crad")` does not
   compile, and the editor offers `"card"`. Members are typed as the component's part names.
 - At runtime the adapter needs only the name: `card.root` is a descriptor equal to the one
   `ctx.parts.root` binds, by component name and part name. It is created on access, so the adapter
-  holds no part list; the type is the check. A theme can still be checked against the registered
-  components when it is assembled.
+  holds no part list; the type is the check. Theme assembly does not receive a runtime component
+  registry and does not claim to validate these descriptors against one.
 - The `css` template in `meowcss/meowjsx` recognizes a descriptor through a MeowJSX guard and emits
   the part selector `:where([data-meowui-part="card/root"])`. The MeowJSX core gains no CSS text.
 
+Components and themes import each shared `defineOptions` result from one implementation-free
+module, for example `button.options.ts`. That module imports neither the component implementation
+nor the assembled theme. A theme's `buttonOptions.when(...)` and conditional tokens therefore do
+not reintroduce a runtime component import after the part reference becomes type-only. The
+component's `meta.style` and the theme use the same options object; a theme does not reconstruct an
+option schema from its name.
+
 Because a theme no longer holds component contracts, `defineTheme` no longer infers option
-carriers from them. A conditional token bound to a component option resolves on the element that
-carries the option attribute: `:where([data-option-alert-tone="warning"])`. The style-props plugin
-already writes that attribute only on the carrier parts, so the computed result is the same, and
-the explicit `sources` binding is no longer needed for component options.
+carriers from them. The JSX adapter binds component-option token sources by their option attribute:
+a conditional token resolves on `:where([data-option-alert-tone="warning"])`, where the style-props
+plugin writes that attribute only on the carrier parts. Scheme and root configuration keep their
+regional bindings. This change removes inferred component `sources`; the pure MeowCSS root retains
+its explicit selector/source API and does not assume every source is a component option.
+
+Removing fragment dependencies also retires the assembly diagnostic that compared a theme's option
+schema with a fragment's component contract. There is no hidden registry input or replacement
+contract list. Token assembly still rejects conflicting definitions for the same option attribute
+among the token sources it receives; component registration separately validates metadata, defaults
+and carrier parts. Neither check proves that an independently authored theme and component use the
+same schema. Sharing the options object avoids that split, and package acceptance must exercise
+conditional tokens through the actual component. Hosts supplying their own JavaScript definitions
+are responsible for matching those definitions.
 
 Styles themselves stay independent of parts: the descriptor is where a theme associates a style
 with a part, as the [utility styles design](2026-10-24-utility-styles.md) describes.
@@ -277,8 +303,10 @@ affected package takes a breaking version bump under the [release contract](../r
 - `partSelector(contract, part)` is removed from `meowcss/meowjsx`. Themes use `parts<typeof X>(name)`
   descriptors. `ScopedTokens.at` takes a descriptor.
 - `defineTheme` in `meowcss/meowjsx` no longer reads contract dependencies from fragments to infer
-  carriers; option tokens bind by option attribute. `CSSFragment` no longer carries component
-  dependencies.
+  carriers; component-option tokens bind by option attribute. `CSSFragment` no longer carries
+  component dependencies, and assembly no longer compares those contracts with token option
+  schemas. Shared runtime options move to implementation-free modules; registration and token
+  assembly retain their own validation as described above.
 - `props.ref` on a component may be a composed array, not only a callback. Wrappers that call it as
   a function break and must forward it instead.
 
@@ -301,13 +329,23 @@ plugin's behavior.
 The independent syntax challenge identified native ref coexistence, static identity extraction,
 extra component observation layers and polymorphic typing as the consequential boundaries. The
 selected direction addresses coexistence through ref arrays and identity through VNode creation.
-Failure cleanup and contextual typing still need the implementation checks below.
+Failure cleanup and contextual typing are covered by the implementation checks below and the
+[local acceptance receipt](../records/2026-10-24-authoring-migration.md).
 
 ## Implementation and verification
 
+The bounded implementation challenge on 2026-10-24 retained the selected surface. It identified two
+early gates: precise Web ref typing without DOM types in core, and a selective registration factory
+that does not retain optional code and diagram engines. The implementation uses explicit component
+lists for `createMeowUI({ components })`; the complete `meowUIComponents` catalog remains an explicit
+choice for hosts that need it. Ref composition keeps the existing property-mount timing, and the
+shared utility fragment stays last and once in each theme assembly. These choices add no replacement
+contract list, condition language or compatibility aliases.
+
 1. Prototype the public types for ordinary functions, finite `ctx.parts` names and composed refs.
-   Compile inline callbacks, nested readonly arrays, forwarded refs and wrong-node cases. Check the
-   DOM-free core environment independently from Web typing. Stop and revise the type surface if
+   Compile inline callbacks, nested readonly arrays, forwarded refs and wrong-node cases. Include
+   separate negative cases for async ref callbacks and for callbacks returning async cleanup. Check
+   the DOM-free core environment independently from Web typing. Stop and revise the type surface if
    basic examples require casts or lose callback inference.
 2. Add host-VNode normalization shared by `h` and automatic JSX. Verify part identity, original
    props, raw behavior, static HTML, style-option Signals and component forwarding through existing
@@ -320,12 +358,18 @@ Failure cleanup and contextual typing still need the implementation checks below
    drafts in the relevant real scenarios; unchanged observation depth and shadow behavior need
    focused contract checks.
 5. Add the `parts<typeof X>(name)` adapter and descriptor support in the `meowcss/meowjsx` `css`
-   template; bind option tokens by attribute. Migrate every `partSelector` call and contract import
-   in themes to type-only imports, then remove `partSelector`. Confirm the generated `cssText` gives
-   unchanged computed styles.
-6. Update component authoring guidance, migrate the remaining components and wrappers, and remove
-   `context.part`, `defineComponent` and the `*Contract` exports in the same release. There is no compatibility
-   period.
+   template; bind component-option tokens by attribute while retaining regional scheme/root bindings
+   and the pure root's explicit sources. Extract shared options into implementation-free modules.
+   Migrate theme references to type-only component imports and shared runtime options, then remove
+   `partSelector`. Verify conflicting token-source definitions and metadata validation separately,
+   and exercise conditional tokens with their real component carriers. Confirm unchanged computed
+   styles and no runtime component imports from themes.
+6. Migrate registration and catalog readers to component metadata. Verify that theme and plugin
+   imports preserve the existing optional-engine boundary, including a host that renders only Button.
+7. Update component authoring guidance, migrate the remaining components and wrappers, and remove
+   `context.part`, `defineComponent` and the `*Contract` exports in the same release. There is no
+   compatibility period.
 
-Use [development checks](../development-checks.md) for commands and coverage. No runtime, type,
-browser or installed-package acceptance is established by this design-only change.
+Use [development checks](../development-checks.md) for commands and coverage. The
+[implementation receipt](../records/2026-10-24-authoring-migration.md) records the completed runtime,
+type, browser and installed-package checks, the exact local tarballs and the remaining release boundary.

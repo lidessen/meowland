@@ -1,16 +1,23 @@
 import type { StoryEntry } from "meowbook";
-import type { ComponentContract } from "meowjsx";
 import { MeowUIComponent, meowUIComponents } from "meowtail/registry";
 
-/** The style binding of a contract, when the component declares one. */
-export interface ContractStyleProps {
+/** The style binding of component metadata, when it declares one. */
+export interface CatalogStyleProps {
   readonly options: { readonly axes: Readonly<Record<string, readonly string[]>> };
   readonly defaults: Readonly<Record<string, string>>;
 }
 
-/** A component contract, with the style binding optional. */
-export interface CatalogContract extends ComponentContract {
-  readonly styleProps?: ContractStyleProps;
+/** The stable identity and display metadata attached to an ordinary component function. */
+export interface CatalogMeta {
+  readonly name: string;
+  readonly parts: readonly string[];
+  readonly style?: CatalogStyleProps;
+}
+
+/** A registered component as the catalog needs to display it. */
+export interface CatalogRegistryEntry {
+  readonly name: string;
+  readonly meta: CatalogMeta;
 }
 
 /** One component the site documents. */
@@ -25,13 +32,10 @@ export interface CatalogComponent {
   group: string;
   /** Stories that show the component. */
   stories: StoryEntry[];
-  /**
-   * Stories of other components whose example draws this one, for a component without stories
-   * of its own; the most focused first.
-   */
+  /** Stories of other components whose example draws this one, for a component without stories of its own. */
   usedIn: StoryEntry[];
-  /** The registry contract, when the component has one. */
-  contract?: CatalogContract;
+  /** Component metadata, when the component is registered. */
+  meta?: CatalogMeta;
   /** One line describing the component, taken from the first story that has one. */
   summary?: string;
 }
@@ -91,31 +95,25 @@ export function kebabCase(name: string): string {
     .toLowerCase();
 }
 
-/** Registry contracts by their kebab name. */
-function contractsByName(): Map<string, CatalogContract> {
-  const contracts = new Map<string, CatalogContract>();
-  for (const contract of meowUIComponents) {
-    const styleProps = "styleProps" in contract ? contract.styleProps : undefined;
-    contracts.set(contract.name, { name: contract.name, parts: contract.parts, styleProps });
-  }
-  return contracts;
+/** Registered components with finite metadata, projected without importing implementation types. */
+function registeredComponents(): CatalogRegistryEntry[] {
+  return (
+    meowUIComponents as unknown as readonly {
+      meta: CatalogMeta;
+    }[]
+  ).map((component) => ({
+    name:
+      Object.entries(MeowUIComponent).find(([, name]) => name === component.meta.name)?.[0] ??
+      component.meta.name,
+    meta: component.meta,
+  }));
 }
 
-/** Registry contracts by the display name the stories use. */
-function contractsByTitle(contracts: Map<string, CatalogContract>): Map<string, CatalogContract> {
-  const byTitle = new Map<string, CatalogContract>();
-  for (const [title, name] of Object.entries(MeowUIComponent)) {
-    const contract = contracts.get(name);
-    if (contract) byTitle.set(title, contract);
-  }
-  return byTitle;
-}
-
-/** The display name of a registry contract, when the registry spells one. */
-function displayNames(): Map<string, string> {
+/** The display name of a registered function, keyed by its stable metadata name. */
+function displayNames(components: readonly CatalogRegistryEntry[]): Map<string, string> {
   const names = new Map<string, string>();
-  for (const [title, name] of Object.entries(MeowUIComponent)) {
-    if (!names.has(name)) names.set(name, title);
+  for (const component of components) {
+    if (!names.has(component.meta.name)) names.set(component.meta.name, component.name);
   }
   return names;
 }
@@ -171,16 +169,17 @@ function groupOrders(stories: readonly StoryEntry[]): Map<string, number> {
 }
 
 /**
- * Build the component reference from the story manifest and the component
- * registry. The manifest decides what is shown and in which group; the registry
- * supplies the style axes and the DOM parts.
+ * Build the component reference from the story manifest and ordinary component metadata. The
+ * manifest decides what is shown and in which group; `.meta` supplies stable names, style axes and
+ * DOM parts.
  */
 export function buildCatalog(
   stories: readonly StoryEntry[],
   sourceOf: (story: StoryEntry) => string | undefined = () => undefined,
+  registry: readonly CatalogRegistryEntry[] = registeredComponents(),
 ): Catalog {
-  const contracts = contractsByName();
-  const byTitle = contractsByTitle(contracts);
+  const byName = new Map(registry.map((component) => [component.meta.name, component]));
+  const byTitle = new Map(registry.map((component) => [component.name, component]));
   const orders = groupOrders(stories);
 
   const components: CatalogComponent[] = [];
@@ -203,8 +202,8 @@ export function buildCatalog(
     }
     if (seen.has(story.component)) continue;
     seen.add(story.component);
-    const contract = byTitle.get(story.component);
-    const base = contract?.name ?? kebabCase(story.component);
+    const registered = byTitle.get(story.component);
+    const base = registered?.meta.name ?? kebabCase(story.component);
     let slug = base;
     let suffix = 2;
     while (usedSlugs.has(slug)) slug = `${base}-${suffix++}`;
@@ -216,7 +215,7 @@ export function buildCatalog(
       group: story.group ?? UNCATEGORIZED_GROUP,
       stories: [],
       usedIn: [],
-      contract,
+      meta: registered?.meta,
     });
   }
 
@@ -230,18 +229,17 @@ export function buildCatalog(
     component.summary = component.stories.find((story) => story.description)?.description;
   }
 
-  // Components the stories do not cover still have a contract worth documenting.
-  const covered = new Set(components.map((component) => component.contract?.name));
-  const titles = displayNames();
-  for (const contract of meowUIComponents) {
-    if (covered.has(contract.name)) continue;
-    const name: string = contract.name;
+  // Registered components the stories do not cover still have metadata worth documenting.
+  const covered = new Set(components.map((component) => component.meta?.name));
+  const titles = displayNames(registry);
+  for (const registered of registry) {
+    const name = registered.meta.name;
+    if (covered.has(name)) continue;
     let slug = name;
     let suffix = 2;
     while (usedSlugs.has(slug)) slug = `${name}-${suffix++}`;
     usedSlugs.add(slug);
-    const entry = contracts.get(name);
-    const title = titles.get(name) ?? name;
+    const title = titles.get(name) ?? registered.name;
     const usedIn = storiesUsing(title, stories, sourceOf);
     components.push({
       slug,
@@ -250,7 +248,7 @@ export function buildCatalog(
       group: usedIn[0]?.group ?? UNCATEGORIZED_GROUP,
       stories: [],
       usedIn,
-      contract: entry,
+      meta: byName.get(name)?.meta,
     });
   }
 
@@ -304,18 +302,16 @@ export function buildCatalog(
   };
 }
 
-/** The style axes of a contract, with the choices each axis allows. */
-export function styleAxes(contract?: CatalogContract): {
+/** The style axes of component metadata, with the choices each axis allows. */
+export function styleAxes(style?: CatalogStyleProps): {
   axis: string;
   choices: readonly string[];
   default: string;
 }[] {
-  const styleProps = contract?.styleProps;
-  if (!styleProps) return [];
-  const axes = styleProps.options.axes;
-  return Object.entries(axes).map(([axis, choices]) => ({
+  if (!style) return [];
+  return Object.entries(style.options.axes).map(([axis, choices]) => ({
     axis,
     choices,
-    default: String(styleProps.defaults[axis]),
+    default: String(style.defaults[axis]),
   }));
 }

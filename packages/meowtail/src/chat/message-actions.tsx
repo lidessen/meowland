@@ -1,19 +1,22 @@
-import { defineComponent, type ComponentContract, type Props } from "meowjsx";
-
-export const chatMessageActionsContract = {
-  name: "chat-message-actions",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+import { h, type Context, type Props } from "meowjsx";
 
 export interface ChatMessageActionsProps extends Props {
-  className?: string;
+  className?: Props["className"];
 }
 
 /** The row of actions under a message, such as copy or retry. */
-export const ChatMessageActions = defineComponent<
-  ChatMessageActionsProps,
-  typeof chatMessageActionsContract.name,
-  (typeof chatMessageActionsContract.parts)[number]
->(chatMessageActionsContract, ({ children, className, ...props }, context) =>
-  context.part("root", "div", { ...props, className }, children),
-);
+export function ChatMessageActions(
+  { children, className, ref, ...props }: ChatMessageActionsProps,
+  context: Context<typeof ChatMessageActions>,
+) {
+  return (
+    <div {...props} className={className} ref={[context.parts.root, ref]}>
+      {children}
+    </div>
+  );
+}
+
+ChatMessageActions.meta = {
+  name: "chat-message-actions",
+  parts: ["root"],
+} as const;

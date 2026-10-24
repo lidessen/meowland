@@ -1,18 +1,6 @@
-import {
-  defineComponent,
-  h,
-  type Child,
-  type MaybeSignal,
-  type ComponentContract,
-  type Props,
-} from "meowjsx";
+import { h, type Child, type Context, type MaybeSignal, type Props } from "meowjsx";
 import { Icon } from "../icons/icon";
 import { StatusDot, type StatusDotState } from "./status-dot";
-
-export const workCardContract = {
-  name: "work-card",
-  parts: ["root", "icon", "copy", "title", "status", "statusText", "detail", "action"],
-} as const satisfies ComponentContract;
 
 export interface WorkCardProps extends Props {
   title: Child;
@@ -25,52 +13,51 @@ export interface WorkCardProps extends Props {
   icon?: Child;
   /** Label of the open affordance; the whole card is the control. */
   action?: Child;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** A work reference inside a conversation: one control that opens the work's details. */
-export const WorkCard = defineComponent<
-  WorkCardProps,
-  typeof workCardContract.name,
-  (typeof workCardContract.parts)[number]
->(
-  workCardContract,
-  (
-    {
-      title,
-      state = "unknown",
-      status,
-      detail,
-      icon,
-      action = "Details",
-      className,
-      children,
-      ...props
-    },
-    context,
-  ) =>
-    context.part(
-      "root",
-      "button",
-      { type: "button", ...props, className },
-      context.part("icon", "span", { "aria-hidden": "true" }, icon ?? <Icon name="file-text" />),
-      context.part(
-        "copy",
-        "span",
-        null,
-        context.part("title", "strong", null, title),
-        status !== undefined || detail !== undefined
-          ? context.part(
-              "status",
-              "span",
-              null,
-              <StatusDot state={state} size={6} />,
-              context.part("statusText", "span", { "data-work-card-status": true }, status),
-              detail ? context.part("detail", "span", null, detail) : null,
-            )
-          : null,
-        children,
-      ),
-      context.part("action", "span", null, action, <Icon name="chevron-right" size={14} />),
-    ),
-);
+export function WorkCard(
+  {
+    title,
+    state = "unknown",
+    status,
+    detail,
+    icon,
+    action = "Details",
+    className,
+    children,
+    ref,
+    ...props
+  }: WorkCardProps,
+  context: Context<typeof WorkCard>,
+) {
+  return (
+    <button type="button" {...props} className={className} ref={[context.parts.root, ref]}>
+      <span aria-hidden="true" ref={context.parts.icon}>
+        {icon ?? <Icon name="file-text" />}
+      </span>
+      <span ref={context.parts.copy}>
+        <strong ref={context.parts.title}>{title}</strong>
+        {status !== undefined || detail !== undefined ? (
+          <span ref={context.parts.status}>
+            <StatusDot state={state} size={6} />
+            <span data-work-card-status ref={context.parts.statusText}>
+              {status}
+            </span>
+            {detail ? <span ref={context.parts.detail}>{detail}</span> : null}
+          </span>
+        ) : null}
+        {children}
+      </span>
+      <span ref={context.parts.action}>
+        {action}
+        <Icon name="chevron-right" size={14} />
+      </span>
+    </button>
+  );
+}
+WorkCard.meta = {
+  name: "work-card",
+  parts: ["root", "icon", "copy", "title", "status", "statusText", "detail", "action"],
+} as const;

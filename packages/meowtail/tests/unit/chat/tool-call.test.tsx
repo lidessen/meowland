@@ -7,11 +7,11 @@ import {
   executionStateTone,
   type ChatExecutionState,
 } from "../../../src/shared/execution-state";
-import { installMeowUI } from "../../../src/registry";
+import { installMeowUI, meowUIComponents } from "../../../src/registry";
 
 const render = (props: Parameters<typeof ChatToolCall>[0]) => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   return createWebRenderer(runtime).renderToHtml(<ChatToolCall {...props} />);
 };
 

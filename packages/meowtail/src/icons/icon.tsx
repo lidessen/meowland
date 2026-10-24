@@ -1,6 +1,6 @@
 // Fragment is required by the classic JSX transform for the local settings group.
 // eslint-disable-next-line no-unused-vars
-import { h, Fragment, type Child } from "meowjsx";
+import { h, Fragment, type Child, type ClassValue } from "meowjsx";
 import {
   ArrowDown,
   ArrowLeft,
@@ -126,7 +126,7 @@ export const iconNames = Object.keys(shapes) as IconName[];
 export interface IconProps {
   name: IconName;
   size?: number;
-  className?: string;
+  className?: ClassValue;
   /** Omit for decorative icons. Icon-only controls should label the control itself. */
   label?: string;
 }

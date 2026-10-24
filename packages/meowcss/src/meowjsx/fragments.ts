@@ -1,14 +1,20 @@
-import type { ComponentContract } from "meowjsx";
+import { isPartDescriptor, type PartDescriptor } from "meowjsx";
 import { css as composeCSS, type CSSFragment as Fragment } from "../fragments";
+import type { ClassValue } from "../class-values";
 import type { Condition, TokenRef } from "../values";
-import type { PartSelector } from "./parts";
 
-export type CSSFragment = Fragment<ComponentContract>;
+export type CSSFragment = Fragment;
 
-/** The core preserves opaque dependencies; this adapter types them as component contracts. */
+/** CSS composition emits part selectors while leaving theme assembly registry-free. */
 export function css(
   strings: TemplateStringsArray,
-  ...values: (string | number | TokenRef | Condition | PartSelector | CSSFragment)[]
+  ...values: (string | number | TokenRef | Condition | PartDescriptor | ClassValue | CSSFragment)[]
 ): CSSFragment {
-  return composeCSS(strings, ...values) as CSSFragment;
+  const rendered = values.map((value) => {
+    if (isPartDescriptor(value)) {
+      return `:where([data-meowui-part=${JSON.stringify(`${value.component}/${value.part}`)}])`;
+    }
+    return value;
+  });
+  return composeCSS(strings, ...rendered);
 }

@@ -1,10 +1,5 @@
-import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
 import { StatusDot, type StatusDotProps } from "./status-dot";
-
-export const statusContract = {
-  name: "status",
-  parts: ["root", "label"],
-} as const satisfies ComponentContract;
 
 export interface StatusProps extends Props {
   state?: StatusDotProps["state"];
@@ -12,20 +7,24 @@ export interface StatusProps extends Props {
   label: Exclude<Child, null | undefined | boolean>;
   size?: never;
   halo?: never;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** The state badge: a decorative dot and the state in a word or two, on a soft tint of the state's ink. Use as slot content; composed markers remain owned by WorkCard and Timeline. */
-export const Status = defineComponent<
-  StatusProps,
-  typeof statusContract.name,
-  (typeof statusContract.parts)[number]
->(statusContract, ({ state, label, className, children: _children, ...props }, context) =>
-  context.part(
-    "root",
-    "span",
-    { ...props, className, "data-tone": state ?? "unknown" },
-    <StatusDot state={state} />,
-    context.part("label", "span", null, label),
-  ),
-);
+export function Status(
+  { state, label, className, children: _children, ...props }: StatusProps,
+  context: Context<typeof Status>,
+) {
+  return (
+    <span
+      {...props}
+      className={className}
+      data-tone={state ?? "unknown"}
+      ref={[context.parts.root, props.ref]}
+    >
+      {<StatusDot state={state} />}
+      {<span ref={[context.parts.label]}>{label}</span>}
+    </span>
+  );
+}
+Status.meta = { name: "status", parts: ["root", "label"] } as const;

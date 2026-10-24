@@ -1,22 +1,8 @@
-import { defineComponent, h, type ComponentContract, type Props } from "meowjsx";
+import { h, type Context, type Props } from "meowjsx";
 import { OutputBlock } from "./output-block";
 import { StatusDot } from "./status-dot";
 import { StateDot } from "./state-dot";
 
-export const terminalBlockContract = {
-  name: "terminal-block",
-  parts: [
-    "root",
-    "prompt",
-    "promptLine",
-    "cwd",
-    "runState",
-    "runStateLabel",
-    "command",
-    "status",
-    "span",
-  ],
-} as const satisfies ComponentContract;
 export interface TerminalBlockProps extends Props {
   command: string;
   cwd?: string;
@@ -73,85 +59,76 @@ export function terminalSpans(text: string): TerminalSpan[][] {
   return rows;
 }
 /** A command and its output, with the exit status. */
-export const TerminalBlock = defineComponent<
-  TerminalBlockProps,
-  "terminal-block",
-  (typeof terminalBlockContract.parts)[number]
->(
-  terminalBlockContract,
-  (
-    {
-      command,
-      cwd,
-      output = "",
-      running = false,
-      exitCode,
-      signal,
-      maxLines,
-      copyText,
-      onCopy,
-      ...props
-    },
-    context,
-  ) => {
-    const status = running
-      ? "Running"
-      : signal
-        ? `Signal ${signal}`
-        : exitCode === 0
-          ? "Completed"
-          : typeof exitCode === "number"
-            ? `Exit code ${exitCode}`
-            : "Unknown exit status";
-    const failed =
-      !running && (Boolean(signal) || (typeof exitCode === "number" && exitCode !== 0));
-    const state = running ? "ongoing" : failed ? "error" : exitCode === 0 ? "done" : "warning";
-    const rows = output ? terminalSpans(output) : [];
-    const hasBody = !running || rows.some((row) => row.some((span) => span.text.trim() !== ""));
-    const commandLines = (command.endsWith("\n") ? command.slice(0, -1) : command).split("\n");
-    const directory =
-      cwd
-        ?.replace(/[/\\]+$/, "")
-        .split(/[/\\]/)
-        .pop() ||
-      cwd ||
-      "$";
-    return context.part(
-      "root",
-      "div",
-      { ...props, "data-terminal-body": hasBody ? "true" : "false" },
+export function TerminalBlock(
+  {
+    command,
+    cwd,
+    output = "",
+    running = false,
+    exitCode,
+    signal,
+    maxLines,
+    copyText,
+    onCopy,
+    ref,
+    ...props
+  }: TerminalBlockProps,
+  context: Context<typeof TerminalBlock>,
+) {
+  const status = running
+    ? "Running"
+    : signal
+      ? `Signal ${signal}`
+      : exitCode === 0
+        ? "Completed"
+        : typeof exitCode === "number"
+          ? `Exit code ${exitCode}`
+          : "Unknown exit status";
+  const failed = !running && (Boolean(signal) || (typeof exitCode === "number" && exitCode !== 0));
+  const state = running ? "ongoing" : failed ? "error" : exitCode === 0 ? "done" : "warning";
+  const rows = output ? terminalSpans(output) : [];
+  const hasBody = !running || rows.some((row) => row.some((span) => span.text.trim() !== ""));
+  const commandLines = (command.endsWith("\n") ? command.slice(0, -1) : command).split("\n");
+  const directory =
+    cwd
+      ?.replace(/[/\\]+$/, "")
+      .split(/[/\\]/)
+      .pop() ||
+    cwd ||
+    "$";
+  return (
+    <div {...props} data-terminal-body={hasBody ? "true" : "false"} ref={[context.parts.root, ref]}>
       <OutputBlock
         title={
           <div>
-            {context.part("prompt", "div", {}, [
-              context.part("runStateLabel", "span", {}, status),
-              ...commandLines.map((line, index) =>
-                context.part("promptLine", "div", {}, [
-                  index === 0
-                    ? context.part("runState", "span", {}, <StateDot state={state} />)
-                    : null,
-                  context.part(
-                    "cwd",
-                    "span",
-                    index === 0 && cwd ? { title: cwd } : {},
-                    index === 0 ? directory : "$",
-                  ),
-                  context.part("command", "span", { title: line }, line || "\u200b"),
-                ]),
-              ),
-            ])}
-            {!running && (failed || exitCode !== 0)
-              ? context.part(
-                  "status",
-                  "span",
-                  {
-                    "data-terminal-error": failed ? "true" : undefined,
-                    "data-tone": failed ? "danger" : "unknown",
-                  },
-                  <StatusDot state={failed ? "danger" : "unknown"} />,
-                  status,
-                )
-              : null}
+            <div ref={context.parts.prompt}>
+              <span ref={context.parts.runStateLabel}>{status}</span>
+              {commandLines.map((line, index) => (
+                <div ref={context.parts.promptLine}>
+                  {index === 0 ? (
+                    <span ref={context.parts.runState}>
+                      <StateDot state={state} />
+                    </span>
+                  ) : null}
+                  <span title={index === 0 && cwd ? cwd : undefined} ref={context.parts.cwd}>
+                    {index === 0 ? directory : "$"}
+                  </span>
+                  <span title={line} ref={context.parts.command}>
+                    {line || "​"}
+                  </span>
+                </div>
+              ))}
+            </div>
+            {!running && (failed || exitCode !== 0) ? (
+              <span
+                data-terminal-error={failed ? "true" : undefined}
+                data-tone={failed ? "danger" : "unknown"}
+                ref={context.parts.status}
+              >
+                <StatusDot state={failed ? "danger" : "unknown"} />
+                {status}
+              </span>
+            ) : null}
           </div>
         }
         copyText={copyText ?? output}
@@ -161,21 +138,33 @@ export const TerminalBlock = defineComponent<
         rows={
           rows.length
             ? rows.map((row) =>
-                row.map((span) =>
-                  context.part(
-                    "span",
-                    "span",
-                    {
-                      "data-ansi-color": span.color,
-                      "data-ansi-bold": span.bold ? "true" : undefined,
-                    },
-                    span.text,
-                  ),
-                ),
+                row.map((span) => (
+                  <span
+                    data-ansi-color={span.color}
+                    data-ansi-bold={span.bold ? "true" : undefined}
+                    ref={context.parts.span}
+                  >
+                    {span.text}
+                  </span>
+                )),
               )
             : []
         }
-      />,
-    );
-  },
-);
+      />
+    </div>
+  );
+}
+TerminalBlock.meta = {
+  name: "terminal-block",
+  parts: [
+    "root",
+    "prompt",
+    "promptLine",
+    "cwd",
+    "runState",
+    "runStateLabel",
+    "command",
+    "status",
+    "span",
+  ],
+} as const;

@@ -1,10 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { text } from "../recipes";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { pageHeaderContract } from "../../components/page-header";
 
-const header = (part: (typeof pageHeaderContract.parts)[number]) =>
-  partSelector(pageHeaderContract, part);
+import type { PageHeader } from "../../components/page-header";
+import { ui } from "../utilities";
+const pageHeaderPartRefs = parts<typeof PageHeader>("page-header");
+const header = (part: keyof typeof pageHeaderPartRefs) => pageHeaderPartRefs[part];
 
 export const pageHeaderStyles = css`
   ${header("root")} {
@@ -45,7 +45,7 @@ export const pageHeaderStyles = css`
   ${header("title")} {
     margin: 0;
     min-width: 0;
-    ${text("pageTitle")}
+    ${ui.text.pageTitle}
     overflow-wrap: anywhere;
   }
   ${header("description")} {

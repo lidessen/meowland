@@ -52,6 +52,8 @@ for (const mode of ["sloppy-iife", "strict-iife", "esm"] as const) {
     await expect(svg).toHaveAttribute("width", "24");
     await expect(svg).toHaveAttribute("height", "24");
     await expect(svg).toHaveAttribute("fill", "navy");
+    await expect(svg).toHaveClass("vector initial-class");
+    await expect(page.locator("#text")).toHaveClass("field initial-class");
     expect(await svg.evaluate(svgValues)).toEqual({ width: 100, height: 100, length: 24 });
     await expect(page.locator("#text")).toHaveValue("initial");
     await expect(page.locator("#check")).not.toBeChecked();
@@ -61,6 +63,8 @@ for (const mode of ["sloppy-iife", "strict-iife", "esm"] as const) {
     await expect(svg).toHaveAttribute("viewBox", "0 0 200 150");
     await expect(svg).toHaveAttribute("width", "48");
     await expect(svg).toHaveAttribute("fill", "teal");
+    await expect(svg).toHaveClass("vector updated-class");
+    await expect(page.locator("#text")).toHaveClass("field updated-class");
     expect(await svg.evaluate(svgValues)).toEqual({ width: 200, height: 150, length: 48 });
     await expect(page.locator("#text")).toHaveValue("updated");
     await expect(page.locator("#check")).toBeChecked();

@@ -1,10 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { workCardContract } from "../../components/work-card";
-import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
+import { css, parts } from "meowcss/meowjsx";
 
-const part = (name: (typeof workCardContract.parts)[number]) =>
-  partSelector(workCardContract, name);
+import { uiTokens } from "../tokens";
+import type { WorkCard } from "../../components/work-card";
+import { ui } from "../utilities";
+const workCardPartRefs = parts<typeof WorkCard>("work-card");
+const part = (name: keyof typeof workCardPartRefs) => workCardPartRefs[name];
 
 export const workCardStyles = css`
   ${part("root")} {
@@ -32,7 +32,7 @@ export const workCardStyles = css`
     box-shadow: ${uiTokens.shadow.raised};
   }
   ${part("root")}:focus-visible {
-    ${focusRing()}
+    ${ui.focus.ring}
   }
   ${part("icon")} {
     display: grid;

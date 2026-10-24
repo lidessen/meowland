@@ -17,8 +17,8 @@ export interface EnvironmentContext {
 export type StoryContainer = (children: Child, context: StoryContext) => Child;
 export type PreviewEnvironment = (context: EnvironmentContext) => Runtime | Promise<Runtime>;
 export interface ComponentReplacement {
-  component: Component<any, any, any>;
-  replacement: Component<any, any, any>;
+  component: Component<any, any>;
+  replacement: Component<any, any>;
 }
 export interface Story {
   id: string;

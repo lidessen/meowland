@@ -1,10 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { codeBlockContract } from "../../components/code-block.contract";
-
+import type { CodeBlock } from "../../components/code-block";
+import { ui } from "../utilities";
+const codeBlockPartRefs = parts<typeof CodeBlock>("code-block");
 export const codeBlockStyles = css`
-  ${partSelector(codeBlockContract, "root")} {
+  ${codeBlockPartRefs.root} {
     min-width: 0;
     max-width: 100%;
     margin: 0;
@@ -15,7 +15,7 @@ export const codeBlockStyles = css`
     font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     overflow: hidden;
   }
-  ${partSelector(codeBlockContract, "header")} {
+  ${codeBlockPartRefs.header} {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -26,28 +26,28 @@ export const codeBlockStyles = css`
     border-bottom: 0;
     background: ${uiTokens.surface.fill};
   }
-  ${partSelector(codeBlockContract, "title")} {
+  ${codeBlockPartRefs.title} {
     min-width: 0;
     color: ${uiTokens.ink.primary};
     font: ${uiTokens.type.weight.medium} ${uiTokens.type.caption} / ${uiTokens.type.leading}
       ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
-  ${partSelector(codeBlockContract, "caption")} {
+  ${codeBlockPartRefs.caption} {
     min-width: 0;
     color: ${uiTokens.ink.tertiary};
     font: ${uiTokens.type.weight.regular} ${uiTokens.type.caption} / ${uiTokens.type.leading}
       ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
-  ${partSelector(codeBlockContract, "language")} {
+  ${codeBlockPartRefs.language} {
     font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  ${partSelector(codeBlockContract, "actions")} {
+  ${codeBlockPartRefs.actions} {
     display: flex;
     flex-wrap: wrap;
     justify-content: flex-end;
@@ -57,11 +57,11 @@ export const codeBlockStyles = css`
     margin-inline-start: auto;
     font: ${uiTokens.type.micro} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
   }
-  ${partSelector(codeBlockContract, "actions")} [aria-pressed="true"] {
+  ${codeBlockPartRefs.actions} [aria-pressed="true"] {
     background: ${uiTokens.action.soft};
     color: ${uiTokens.action.primary};
   }
-  ${partSelector(codeBlockContract, "root")} ${partSelector(codeBlockContract, "content")} {
+  ${codeBlockPartRefs.root} ${codeBlockPartRefs.content} {
     margin: 0;
     padding: 16px;
     overflow: auto;
@@ -72,30 +72,30 @@ export const codeBlockStyles = css`
     white-space: pre;
     overflow-wrap: normal;
   }
-  ${partSelector(codeBlockContract, "content")}[data-wrap="true"] {
+  ${codeBlockPartRefs.content}[data-wrap="true"] {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
-  ${partSelector(codeBlockContract, "root")} ${partSelector(codeBlockContract, "code")} {
+  ${codeBlockPartRefs.root} ${codeBlockPartRefs.code} {
     padding: 0;
     background: transparent;
     font: inherit;
     white-space: inherit;
   }
-  ${partSelector(codeBlockContract, "feedback")} {
+  ${codeBlockPartRefs.feedback} {
     display: block;
     padding: ${uiTokens.space.group} ${uiTokens.space.section};
     font-size: ${uiTokens.type.caption};
   }
-  ${partSelector(codeBlockContract, "feedback")}:empty {
+  ${codeBlockPartRefs.feedback}:empty {
     display: none;
   }
-  ${partSelector(codeBlockContract, "content")}:focus-visible {
-    ${focusRing({ inset: true })}
+  ${codeBlockPartRefs.content}:focus-visible {
+    ${ui.focus.inset}
   }
 
   @media (pointer: coarse) {
-    ${partSelector(codeBlockContract, "actions")}[data-meowui-part] > * {
+    ${codeBlockPartRefs.actions}[data-meowui-part] > * {
       min-width: 44px;
       min-height: 44px;
     }

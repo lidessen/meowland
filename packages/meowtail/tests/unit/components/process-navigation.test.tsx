@@ -1,5 +1,5 @@
 import { expect, test } from "bun:test";
-import { h } from "meowjsx";
+import { h, defaultRuntime } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
 import { IconRail } from "../../../src/components/icon-rail";
 import { ProcessGroup } from "../../../src/components/process-group";
@@ -9,9 +9,9 @@ import { RailSection } from "../../../src/components/rail-section";
 import { StatusDot, statusDotOptions } from "../../../src/components/status-dot";
 import { Tag } from "../../../src/components/tag";
 import { WorkCard } from "../../../src/components/work-card";
-import { installMeowUI } from "../../../src/registry";
+import { installMeowUI, meowUIComponents } from "../../../src/registry";
 
-installMeowUI();
+installMeowUI({ components: meowUIComponents }, defaultRuntime);
 
 test("status dots are decorative and carry exactly one state", () => {
   for (const state of statusDotOptions.axes.state) {

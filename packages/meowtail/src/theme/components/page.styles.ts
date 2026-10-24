@@ -1,8 +1,9 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { pageContract } from "../../components/page";
 
-const page = (part: (typeof pageContract.parts)[number]) => partSelector(pageContract, part);
+import type { Page } from "../../components/page";
+const pagePartRefs = parts<typeof Page>("page");
+const page = (part: keyof typeof pagePartRefs) => pagePartRefs[part];
 
 export const pageStyles = css`
   ${page("root")} {

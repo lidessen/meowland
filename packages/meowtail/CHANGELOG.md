@@ -1,5 +1,26 @@
 # Changelog
 
+## 0.3.0-alpha.0
+
+Local breaking authoring candidate; no npm release is implied. It includes the previous unreleased
+candidate and requires MeowJSX and MeowCSS `^0.2.0-alpha.0`.
+
+- Components become ordinary functions with static `meta` and finite `Context<typeof Component>.parts`.
+  Bind parts through native JSX `ref`; nested ref arrays compose caller refs and local callbacks.
+- Registration takes component functions. `createMeowUI({ components })` and
+  `installMeowUI({ components }, runtime)` require explicit selection; `meowUIComponents` is the
+  complete catalog for hosts that want it. The selective factory retains no complete catalog or
+  optional engine graph.
+- Themes use type-only component imports with `parts<typeof Component>(name)` and share options from
+  implementation-free modules. Component tokens bind through option attributes.
+- `ui` from `meowtail/theme` supplies built-in class values. Public `cx` from `meowcss` composes values
+  that can be used in `className` or expanded into declarations in `css`. The shared utility fragment
+  is last and once in standard, extended and presentation theme assembly.
+- Remove the old `*Contract` exports, component definer/part-construction authoring surface,
+  `partSelector`, and `surface`/`text`/`interactive`/`focusRing` recipe functions and types without aliases.
+  Components forward class lists and composed refs while preserving their existing identities,
+  options, Signal updates and lifecycle.
+
 ## 0.2.0-alpha.3
 
 Candidate for the next alpha publish. This version is not on npm until the manual release workflow runs.

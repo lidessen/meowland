@@ -34,7 +34,7 @@ describe("the props reader", () => {
     ]);
   });
 
-  test("pairs a defineComponent with its props interface and setup defaults", () => {
+  test("pairs an ordinary function declaration with its props interface and setup defaults", () => {
     const interfaces = new Map();
     const components = new Map();
     readPropsSource(
@@ -42,10 +42,10 @@ describe("the props reader", () => {
         /** Shown above the body. */
         title?: Child;
       }
-      export const Card = defineComponent<
-        CardProps,
-        "card"
-      >(cardContract, ({ title = "Untitled", children }, context) => children);`,
+      export function Card({ title = "Untitled", children }: CardProps, context: Context<typeof Card>) {
+        return children;
+      }
+      Card.meta = { name: "card", parts: ["root"] } as const;`,
       interfaces,
       components,
     );

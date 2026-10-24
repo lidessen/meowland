@@ -1,10 +1,11 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { itemContract, itemOptions } from "../../components/item";
-
+import type { Item } from "../../components/item";
+import { itemOptions } from "../../components/item.options";
+import { ui } from "../utilities";
+const itemPartRefs = parts<typeof Item>("item");
 export const itemStyles = css`
-  ${partSelector(itemContract, "root")} {
+  ${itemPartRefs.root} {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -22,7 +23,7 @@ export const itemStyles = css`
     line-height: ${uiTokens.type.leading};
     text-align: start;
   }
-  ${partSelector(itemContract, "root")} {
+  ${itemPartRefs.root} {
     ${itemOptions.when({ size: "small" })} {
       min-height: 34px;
       padding: 6px 8px;
@@ -30,68 +31,68 @@ export const itemStyles = css`
       line-height: ${uiTokens.type.line.label};
     }
   }
-  ${partSelector(itemContract, "root")} {
+  ${itemPartRefs.root} {
     ${itemOptions.when({ variant: "outline" })} {
       border-color: ${uiTokens.line.edge};
       background: ${uiTokens.surface.raised};
     }
   }
-  button${partSelector(itemContract, "root")} {
+  button${itemPartRefs.root} {
     cursor: pointer;
     transition:
       background-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
       border-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
-  button${partSelector(itemContract, "root")}:hover:not(:disabled, [data-selected="true"]) {
+  button${itemPartRefs.root}:hover:not(:disabled, [data-selected="true"]) {
     background: ${uiTokens.state.hover};
   }
   /* Selected takes the one selection tint used by navigation, tables and choices; an open
      disclosure is a pressed state, not a selection. */
-  ${partSelector(itemContract, "root")}[data-selected="true"] {
+  ${itemPartRefs.root}[data-selected="true"] {
     background: ${uiTokens.accent.selected};
   }
-  button${partSelector(itemContract, "root")}[aria-expanded="true"] {
+  button${itemPartRefs.root}[aria-expanded="true"] {
     background: ${uiTokens.state.active};
   }
-  button${partSelector(itemContract, "root")}:focus-visible {
-    ${focusRing()}
+  button${itemPartRefs.root}:focus-visible {
+    ${ui.focus.ring}
   }
-  button${partSelector(itemContract, "root")}:disabled {
+  button${itemPartRefs.root}:disabled {
     opacity: 0.5;
     cursor: not-allowed;
   }
-  ${partSelector(itemContract, "leading")},
-  ${partSelector(itemContract, "trailing")} {
+  ${itemPartRefs.leading},
+  ${itemPartRefs.trailing} {
     display: inline-flex;
     align-items: center;
     gap: ${uiTokens.space.group};
     flex: 0 0 auto;
     color: ${uiTokens.ink.secondary};
   }
-  ${partSelector(itemContract, "leading")} {
+  ${itemPartRefs.leading} {
     align-self: flex-start;
     padding-top: 2px;
   }
-  ${partSelector(itemContract, "content")} {
+  ${itemPartRefs.content} {
     display: grid;
     gap: 2px;
     flex: 1 1 auto;
     min-width: 0;
     overflow-wrap: anywhere;
   }
-  ${partSelector(itemContract, "title")} {
+  ${itemPartRefs.title} {
     font-weight: ${uiTokens.type.weight.medium};
   }
-  ${partSelector(itemContract, "meta")},
-  ${partSelector(itemContract, "description")},
-  ${partSelector(itemContract, "trailing")} {
+  ${itemPartRefs.meta},
+  ${itemPartRefs.description},
+  ${itemPartRefs.trailing} {
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
   }
-  ${partSelector(itemContract, "meta")} {
+  ${itemPartRefs.meta} {
     font-weight: ${uiTokens.type.weight.medium};
   }
-  ${partSelector(itemContract, "trailing")} {
+  ${itemPartRefs.trailing} {
     max-width: 40%;
     min-width: 0;
     overflow-wrap: anywhere;
@@ -99,7 +100,7 @@ export const itemStyles = css`
     justify-content: flex-end;
   }
   @media (prefers-reduced-motion: reduce) {
-    button${partSelector(itemContract, "root")} {
+    button${itemPartRefs.root} {
       transition: none;
     }
   }

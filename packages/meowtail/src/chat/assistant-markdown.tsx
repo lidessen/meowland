@@ -1,4 +1,4 @@
-import { defineComponent, derived, type Signal } from "meowjsx";
+import { derived, h, type Context, type Props, type Signal } from "meowjsx";
 import { Marked, Renderer } from "marked";
 
 const escape = (text: string) =>
@@ -32,13 +32,16 @@ const markdown = new Marked({ renderer, gfm: true, breaks: true });
 export const assistantMarkdown = (text: string): string =>
   markdown.parse(text, { async: false }) as string;
 
-export const assistantMarkdownContract = { name: "assistant-markdown", parts: ["root"] } as const;
-export const AssistantMarkdown = defineComponent<
-  { text: Signal<string> },
-  "assistant-markdown",
-  "root"
->(assistantMarkdownContract, ({ text }, context) =>
-  context.part("root", "div", {
-    dangerouslySetInnerHTML: derived(() => ({ __html: assistantMarkdown(text.value) })),
-  }),
-);
+export function AssistantMarkdown(
+  { text, ref }: { text: Signal<string>; ref?: Props["ref"] },
+  context: Context<typeof AssistantMarkdown>,
+) {
+  return (
+    <div
+      dangerouslySetInnerHTML={derived(() => ({ __html: assistantMarkdown(text.value) }))}
+      ref={[context.parts.root, ref]}
+    />
+  );
+}
+
+AssistantMarkdown.meta = { name: "assistant-markdown", parts: ["root"] } as const;

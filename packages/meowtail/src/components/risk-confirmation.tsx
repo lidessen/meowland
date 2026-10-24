@@ -1,20 +1,8 @@
-import {
-  defineComponent,
-  derived,
-  h,
-  isSignal,
-  unwrap,
-  type ComponentContract,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { derived, h, isSignal, unwrap, type MaybeSignal, type Props, type Context } from "meowjsx";
 import { Dialog, DialogPanel, DialogHeader, DialogActions } from "./dialog";
 import { Checkbox } from "./checkbox";
 import { Button } from "./button";
-export const riskConfirmationContract = {
-  name: "risk-confirmation",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+
 export interface RiskConfirmationProps extends Props {
   id: string;
   open: MaybeSignal<boolean>;
@@ -28,91 +16,90 @@ export interface RiskConfirmationProps extends Props {
   onAcknowledgedChange: (value: boolean) => void;
   onCancel: () => void;
   onConfirm: () => void;
-  className?: string;
+  className?: Props["className"];
 }
 /** One host-requested acknowledgement; it never decides which actions need confirmation. */
-export const RiskConfirmation = defineComponent<RiskConfirmationProps, "risk-confirmation", "root">(
-  riskConfirmationContract,
-  (
-    {
-      id,
-      open,
-      title,
-      description,
-      acknowledgeLabel,
-      cancelLabel,
-      confirmLabel,
-      acknowledged,
-      disabled = false,
-      onAcknowledgedChange,
-      onCancel,
-      onConfirm,
-      className,
-    },
-    context,
-  ) => {
-    const blocked = derived(() => unwrap(disabled) || !unwrap(acknowledged));
-    return context.part(
-      "root",
-      "div",
-      { className },
-      <Dialog
-        labelledBy={`${id}-title`}
-        describedBy={`${id}-description`}
-        onCancel={(event: Event) => {
-          event.preventDefault();
-          onCancel();
-        }}
-        ref={(dialog: HTMLDialogElement) => {
-          let alive = true;
-          const sync = () => {
-            if (!alive || !dialog.isConnected) return;
-            if (unwrap(open) && !dialog.open) dialog.showModal();
-            else if (!unwrap(open) && dialog.open) dialog.close();
-          };
-          const stop = isSignal(open) ? open.subscribe(sync) : () => {};
-          queueMicrotask(sync);
-          return () => {
-            alive = false;
-            stop();
-            if (dialog.open) dialog.close();
-          };
-        }}
-      >
-        <DialogPanel
-          header={
-            <DialogHeader
-              title={title}
-              titleId={`${id}-title`}
-              description={description}
-              descriptionId={`${id}-description`}
-            />
-          }
+export function RiskConfirmation(
+  {
+    id,
+    open,
+    title,
+    description,
+    acknowledgeLabel,
+    cancelLabel,
+    confirmLabel,
+    acknowledged,
+    disabled = false,
+    onAcknowledgedChange,
+    onCancel,
+    onConfirm,
+    className,
+  }: RiskConfirmationProps,
+  context: Context<typeof RiskConfirmation>,
+) {
+  const blocked = derived(() => unwrap(disabled) || !unwrap(acknowledged));
+  return (
+    <div className={className} ref={[context.parts.root]}>
+      {
+        <Dialog
+          labelledBy={`${id}-title`}
+          describedBy={`${id}-description`}
+          onCancel={(event: Event) => {
+            event.preventDefault();
+            onCancel();
+          }}
+          ref={(dialog: HTMLDialogElement) => {
+            let alive = true;
+            const sync = () => {
+              if (!alive || !dialog.isConnected) return;
+              if (unwrap(open) && !dialog.open) dialog.showModal();
+              else if (!unwrap(open) && dialog.open) dialog.close();
+            };
+            const stop = isSignal(open) ? open.subscribe(sync) : () => {};
+            queueMicrotask(sync);
+            return () => {
+              alive = false;
+              stop();
+              if (dialog.open) dialog.close();
+            };
+          }}
         >
-          <Checkbox
-            label={acknowledgeLabel}
-            checked={acknowledged}
-            disabled={disabled}
-            autofocus
-            onChange={(event) =>
-              onAcknowledgedChange((event.currentTarget as HTMLInputElement).checked)
+          <DialogPanel
+            header={
+              <DialogHeader
+                title={title}
+                titleId={`${id}-title`}
+                description={description}
+                descriptionId={`${id}-description`}
+              />
             }
-          />
-          <DialogActions>
-            <Button variant="outline" onClick={onCancel}>
-              {cancelLabel}
-            </Button>
-            <Button
-              disabled={blocked}
-              onClick={() => {
-                if (!unwrap(disabled) && unwrap(acknowledged)) onConfirm();
-              }}
-            >
-              {confirmLabel}
-            </Button>
-          </DialogActions>
-        </DialogPanel>
-      </Dialog>,
-    );
-  },
-);
+          >
+            <Checkbox
+              label={acknowledgeLabel}
+              checked={acknowledged}
+              disabled={disabled}
+              autofocus
+              onChange={(event) =>
+                onAcknowledgedChange((event.currentTarget as HTMLInputElement).checked)
+              }
+            />
+            <DialogActions>
+              <Button variant="outline" onClick={onCancel}>
+                {cancelLabel}
+              </Button>
+              <Button
+                disabled={blocked}
+                onClick={() => {
+                  if (!unwrap(disabled) && unwrap(acknowledged)) onConfirm();
+                }}
+              >
+                {confirmLabel}
+              </Button>
+            </DialogActions>
+          </DialogPanel>
+        </Dialog>
+      }
+    </div>
+  );
+}
+RiskConfirmation.meta = { name: "risk-confirmation", parts: ["root"] } as const;

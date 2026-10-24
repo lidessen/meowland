@@ -1,35 +1,26 @@
-import { defineOptions } from "meowcss";
-import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
-import { defineComponent, type Props } from "meowjsx";
+import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
+import { h, type Props, type Context } from "meowjsx";
 
-export const badgeOptions = defineOptions("badge", {
-  tone: ["neutral", "accent", "success", "warning", "danger", "outline", "solid", "quiet"],
-  size: ["small", "default"],
-});
-
-export const badgeContract = {
-  name: "badge",
-  parts: ["root"],
-  styleProps: defineStyleProps(badgeOptions, { defaults: { tone: "neutral", size: "default" } }),
-} as const satisfies StyledComponentContract;
+import { badgeOptions } from "./badge.options";
+export { badgeOptions } from "./badge.options";
 
 export interface BadgeProps extends Props, ThemedProps<typeof badgeOptions> {
-  className?: string;
+  className?: Props["className"];
 }
 
 /** A small label that names a category, such as a version or a release stage. */
-export const Badge = defineComponent<
-  BadgeProps,
-  typeof badgeContract.name,
-  (typeof badgeContract.parts)[number]
->(badgeContract, ({ children, className, ...props }, context) =>
-  context.part(
-    "root",
-    "span",
-    {
-      ...props,
-      className,
-    },
-    children,
-  ),
-);
+export function Badge(
+  { children, className, ref, ...props }: BadgeProps,
+  context: Context<typeof Badge>,
+) {
+  return (
+    <span {...props} className={className} ref={[context.parts.root, ref]}>
+      {children}
+    </span>
+  );
+}
+Badge.meta = {
+  name: "badge",
+  parts: ["root"],
+  style: defineStyleProps(badgeOptions, { defaults: { tone: "neutral", size: "default" } }),
+} as const;

@@ -1,14 +1,6 @@
-import {
-  createRuntime,
-  defineComponent,
-  h,
-  mapSignal,
-  signal,
-  type Child,
-  type VNode,
-} from "meowjsx";
+import { createRuntime, h, mapSignal, signal, type Child, type Context, type VNode } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Button, createMeowUI } from "meowtail";
+import { Button, createMeowUI, meowUIComponents } from "meowtail";
 import { applyTheme, mountStyles } from "meowcss/web";
 import { presentationOptions, presentationTheme } from "meowslides/theme";
 import {
@@ -48,22 +40,23 @@ declare global {
   }
 }
 
-const timers = defineComponent<{ facts: DeckFacts; nested?: boolean }, "test-clock", never>(
-  { name: "test-clock", parts: [] },
-  ({ facts, nested }, context) => {
-    const activity = usePresentationActivity();
-    context.effect(() => {
-      if (!activity.value) return;
-      const timer = setInterval(() => {
-        if (nested) facts.nestedTicks++;
-        else facts.ticks++;
-      }, 20);
-      return () => clearInterval(timer);
-    });
-    context.onCleanup(() => facts.disposed++);
-    return <span>{nested ? "Nested timer" : "Page timer"}</span>;
-  },
-);
+function timers(
+  { facts, nested }: { facts: DeckFacts; nested?: boolean },
+  context: Context<typeof timers>,
+) {
+  const activity = usePresentationActivity();
+  context.effect(() => {
+    if (!activity.value) return;
+    const timer = setInterval(() => {
+      if (nested) facts.nestedTicks++;
+      else facts.ticks++;
+    }, 20);
+    return () => clearInterval(timer);
+  });
+  context.onCleanup(() => facts.disposed++);
+  return <span>{nested ? "Nested timer" : "Page timer"}</span>;
+}
+timers.meta = { name: "test-clock", parts: [] } as const;
 const Clock = timers;
 
 function createDeck(instance: number) {
@@ -229,31 +222,37 @@ if (new URL(location.href).searchParams.get("sample") === "reordered") {
   });
   const view = talk.view as VNode;
   const slides = view.props.slides as readonly SlideDefinition[];
-  // Reuse the actual authored page functions and state; only change their order.
   const reordered = [
     slides.find((slide) => slide.id === "experiment")!,
     ...slides.filter((slide) => slide.id !== "experiment"),
   ];
-  content = h(view.type, { ...view.props, slides: reordered });
+  content = { ...view, props: { ...view.props, slides: reordered } };
 }
 if (query.get("chrome") === "long") {
   root.style.height = "100dvh";
   const deck = decks[0]!.node as VNode;
   const slides = deck.props.slides as readonly SlideDefinition[];
-  content = h(deck.type, {
-    ...deck.props,
-    title:
-      "A long presentation title / A realistic title for checking that the outline and toolbar shrink",
-    slides: slides.map((slide, index) => ({
-      ...slide,
+  content = {
+    ...deck,
+    props: {
+      ...deck.props,
       title:
-        index === 0
-          ? "A long multi-line slide title / keeps the complete outline name while the toolbar remains usable"
-          : `${slide.title} — ${"UnbrokenSlideTitle".repeat(12)}`,
-    })),
-  });
+        "A long presentation title / A realistic title for checking that the outline and toolbar shrink",
+      slides: slides.map((slide, index) => ({
+        ...slide,
+        title:
+          index === 0
+            ? "A long multi-line slide title / keeps the complete outline name while the toolbar remains usable"
+            : `${slide.title} — ${"UnbrokenSlideTitle".repeat(12)}`,
+      })),
+    },
+  };
 }
-const web = createWebRenderer(createRuntime({ plugins: [createMeowUI(), createMeowSlides()] }));
+const web = createWebRenderer(
+  createRuntime({
+    plugins: [createMeowUI({ components: meowUIComponents }), createMeowSlides()],
+  }),
+);
 const mounted = web.render(content, root);
 const referenceRoot = document.createElement("div");
 referenceRoot.hidden = true;

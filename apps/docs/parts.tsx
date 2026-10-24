@@ -2,7 +2,7 @@ import { Fragment, h, type Child } from "meowjsx";
 import "./runtime";
 import { Badge, Card, CodeBlock, Inline, Stack, Table } from "meowtail";
 import { Icon } from "meowtail/icons";
-import { styleAxes, type CatalogContract } from "./catalog";
+import { styleAxes, type CatalogStyleProps } from "./catalog";
 import { splitTopLevel } from "./code";
 import type { ComponentProps } from "./props";
 
@@ -193,10 +193,10 @@ function inheritedSentence(element: boolean, others: readonly string[]): Child |
  * declares, each with its type, its default and the JSDoc written on it.
  */
 export function PropsTable({
-  contract,
+  style,
   props,
 }: {
-  contract?: CatalogContract;
+  style?: CatalogStyleProps;
   props?: ComponentProps;
 }): Child {
   const rows: {
@@ -205,7 +205,7 @@ export function PropsTable({
     default?: string;
     required?: boolean;
     note?: string;
-  }[] = styleAxes(contract).map((entry) => ({
+  }[] = styleAxes(style).map((entry) => ({
     name: entry.axis,
     type: entry.choices.map((choice) => JSON.stringify(choice)).join(" | "),
     default: JSON.stringify(entry.default),
@@ -258,11 +258,11 @@ export function PropsTable({
 }
 
 /** The DOM parts a component paints. */
-export function PartList({ contract }: { contract?: CatalogContract }): Child {
-  if (!contract) return <p className="docs-note">This component has no registry contract.</p>;
+export function PartList({ meta }: { meta?: { readonly parts: readonly string[] } }): Child {
+  if (!meta) return <p className="docs-note">This component has no registry metadata.</p>;
   return (
     <Inline gap="compact" wrap>
-      {contract.parts.map((part) => (
+      {meta.parts.map((part) => (
         <Badge tone="quiet" size="small">
           {part}
         </Badge>

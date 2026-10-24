@@ -1,9 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { appBarContract } from "../../components/app-bar";
 
+import type { AppBar } from "../../components/app-bar";
+const appBarPartRefs = parts<typeof AppBar>("app-bar");
 export const appBarStyles = css`
-  ${partSelector(appBarContract, "root")} {
+  ${appBarPartRefs.root} {
     display: flex;
     align-items: center;
     gap: ${uiTokens.space.group};
@@ -13,13 +14,13 @@ export const appBarStyles = css`
     border-bottom: 1px solid ${uiTokens.line.edge};
     background: ${uiTokens.surface.canvas};
   }
-  ${partSelector(appBarContract, "identity")} {
+  ${appBarPartRefs.identity} {
     display: grid;
     gap: 2px;
     flex: 1;
     min-width: 0;
   }
-  ${partSelector(appBarContract, "title")} {
+  ${appBarPartRefs.title} {
     margin: 0;
     overflow-wrap: anywhere;
     color: ${uiTokens.ink.primary};
@@ -28,13 +29,13 @@ export const appBarStyles = css`
     line-height: ${uiTokens.type.line.title};
     letter-spacing: ${uiTokens.type.trackingTight};
   }
-  ${partSelector(appBarContract, "status")} {
+  ${appBarPartRefs.status} {
     min-width: 0;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
     line-height: ${uiTokens.type.line.caption};
   }
-  ${partSelector(appBarContract, "actions")} {
+  ${appBarPartRefs.actions} {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -42,7 +43,7 @@ export const appBarStyles = css`
   }
 
   @media (pointer: coarse) {
-    ${partSelector(appBarContract, "actions")} > * {
+    ${appBarPartRefs.actions} > * {
       min-width: 44px;
       min-height: 44px;
     }

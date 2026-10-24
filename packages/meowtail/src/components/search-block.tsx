@@ -1,10 +1,6 @@
-import { defineComponent, h, type ComponentContract, type Props } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
 import { OutputBlock, outputWindow } from "./output-block";
 
-export const searchBlockContract = {
-  name: "search-block",
-  parts: ["root", "file", "path", "match", "number"],
-} as const satisfies ComponentContract;
 export interface SearchFileGroup {
   path: string;
   matches: readonly { lineNumber: number; line: string }[];
@@ -32,11 +28,7 @@ export function searchBlockText(props: SearchBlockProps) {
         .join("\n\n");
 }
 /** Search matches grouped by file, with line numbers. */
-export const SearchBlock = defineComponent<
-  SearchBlockProps,
-  "search-block",
-  (typeof searchBlockContract.parts)[number]
->(searchBlockContract, (props, context) => {
+export function SearchBlock(props: SearchBlockProps, context: Context<typeof SearchBlock>) {
   const {
     kind,
     total,
@@ -51,39 +43,50 @@ export const SearchBlock = defineComponent<
     kind === "paths"
       ? props.paths.length
       : props.files.reduce((sum, file) => sum + file.matches.length, 0);
-  const renderMatch = (match: SearchFileGroup["matches"][number]) =>
-    context.part("match", "div", {}, [
-      context.part("number", "span", {}, `${match.lineNumber}: `),
-      match.line,
-    ]);
+  const renderMatch = (match: SearchFileGroup["matches"][number]) => (
+    <div ref={[context.parts.match]}>
+      {[<span ref={[context.parts.number]}>{`${match.lineNumber}: `}</span>, match.line]}
+    </div>
+  );
   const rows =
     kind === "paths"
-      ? props.paths.map((path) => context.part("path", "div", {}, path))
+      ? props.paths.map((path) => <div ref={[context.parts.path]}>{path}</div>)
       : props.files.map((file) => {
           const { head, tail, hidden } = outputWindow(file.matches.length, maxLines);
-          return context.part("file", "details", { open: true }, [
-            context.part("path", "summary", {}, `${file.path} · ${file.matches.length}`),
-            ...(hidden ? file.matches.slice(0, head) : file.matches).map(renderMatch),
-            hidden ? (
-              <details>
-                <summary>{hidden} matches in the middle</summary>
-                {file.matches.slice(head, file.matches.length - tail).map(renderMatch)}
-              </details>
-            ) : null,
-            ...(hidden ? file.matches.slice(file.matches.length - tail) : []).map(renderMatch),
-          ]);
+          return (
+            <details open={true} ref={[context.parts.file]}>
+              {[
+                <summary
+                  ref={[context.parts.path]}
+                >{`${file.path} · ${file.matches.length}`}</summary>,
+                ...(hidden ? file.matches.slice(0, head) : file.matches).map(renderMatch),
+                hidden ? (
+                  <details>
+                    <summary>{hidden} matches in the middle</summary>
+                    {file.matches.slice(head, file.matches.length - tail).map(renderMatch)}
+                  </details>
+                ) : null,
+                ...(hidden ? file.matches.slice(file.matches.length - tail) : []).map(renderMatch),
+              ]}
+            </details>
+          );
         });
-  return context.part(
-    "root",
-    "div",
-    rest,
-    <OutputBlock
-      title={`Search · showing ${shown} / ${total}${truncated ? " · results truncated" : ""}`}
-      rows={rows}
-      copyText={searchBlockText(props)}
-      maxLines={maxLines}
-      onCopy={onCopy}
-      emptyText="No results"
-    />,
+  return (
+    <div {...rest} ref={[context.parts.root, rest.ref]}>
+      {
+        <OutputBlock
+          title={`Search · showing ${shown} / ${total}${truncated ? " · results truncated" : ""}`}
+          rows={rows}
+          copyText={searchBlockText(props)}
+          maxLines={maxLines}
+          onCopy={onCopy}
+          emptyText="No results"
+        />
+      }
+    </div>
   );
-});
+}
+SearchBlock.meta = {
+  name: "search-block",
+  parts: ["root", "file", "path", "match", "number"],
+} as const;

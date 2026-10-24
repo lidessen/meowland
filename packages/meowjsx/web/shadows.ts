@@ -3,7 +3,7 @@ import {
   defineShadow as defineTargetShadow,
   type Cleanup,
   type Component,
-  type ComponentContract,
+  type ComponentMeta,
   type Props,
   type Runtime,
   type ShadowContext,
@@ -34,7 +34,7 @@ export function runShadows(runtime: Runtime, vnode: VNode, element: Element): Cl
   const identity = vnode.componentPart;
   if (!identity || !runtime.registry.has(identity.component)) return () => {};
   const shadows = runtime.shadowRegistry.list().filter((shadow) => {
-    return shadow.contract.name === identity.component && shadow.part === identity.part;
+    return shadow.component.meta.name === identity.component && shadow.part === identity.part;
   });
   if (shadows.length === 0) return () => {};
 
@@ -92,14 +92,18 @@ export function runShadows(runtime: Runtime, vnode: VNode, element: Element): Cl
  * shadow can work with the element the renderer mounted.
  */
 export function defineShadow<
-  PropsType extends object,
-  Name extends string,
-  AllPart extends string,
-  Part extends AllPart,
+  C extends Component<any, any> & { readonly meta: ComponentMeta },
+  Part extends C["meta"]["parts"][number],
 >(
-  target: Component<PropsType, Name, AllPart> | ComponentContract<Name, AllPart>,
+  target: C,
   part: Part,
-  setup: ShadowSetup<PropsType, Name, Part, Element>,
-): ShadowDefinition<PropsType, Name, AllPart, Part, Element> {
-  return defineTargetShadow<PropsType, Name, AllPart, Part, Element>(target, part, setup);
+  setup: ShadowSetup<Parameters<C>[0], C["meta"]["name"], Part, Element>,
+): ShadowDefinition<
+  Parameters<C>[0],
+  C["meta"]["name"],
+  C["meta"]["parts"][number],
+  Part,
+  Element
+> {
+  return defineTargetShadow(target, part, setup);
 }

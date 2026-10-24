@@ -1,9 +1,4 @@
-import { defineComponent, type ComponentContract, type Props, type MaybeSignal } from "meowjsx";
-
-export const selectContract = {
-  name: "select",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+import { h, type Props, type MaybeSignal, type Context } from "meowjsx";
 
 /** Native options, selection, keyboard interaction and form behavior. */
 export interface SelectProps extends Props {
@@ -14,14 +9,15 @@ export interface SelectProps extends Props {
   multiple?: boolean;
   size?: number;
   onChange?: (event: Event) => void;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** A native select menu, themed. */
-export const Select = defineComponent<
-  SelectProps,
-  typeof selectContract.name,
-  (typeof selectContract.parts)[number]
->(selectContract, ({ children, ...props }, context) =>
-  context.part("root", "select", props, children),
-);
+export function Select({ children, ...props }: SelectProps, context: Context<typeof Select>) {
+  return (
+    <select {...props} ref={[context.parts.root, props.ref]}>
+      {children}
+    </select>
+  );
+}
+Select.meta = { name: "select", parts: ["root"] } as const;

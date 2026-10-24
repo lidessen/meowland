@@ -3,11 +3,12 @@ import { createRuntime, h, signal, type MaybeSignal, type Props } from "meowjsx"
 import { createWebRenderer } from "meowjsx/web";
 import { Button } from "../../../src/components/button";
 import { Modal } from "../../../src/components/modal";
-import { installMeowUI } from "../../../src/registry";
+import { installMeowUI, meowUIComponents } from "../../../src/registry";
+import { mountComponent } from "./mount";
 
 function web() {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   return createWebRenderer(runtime);
 }
 
@@ -102,22 +103,24 @@ function captureDialog(open: MaybeSignal<boolean>, dismissible = true) {
     },
   });
   const changes: boolean[] = [];
-  createWebRenderer(runtime).renderToHtml(
-    Modal({
-      open,
-      onOpenChange: (next) => changes.push(next),
-      title: "Review",
-      actions: <Button>Keep</Button>,
-      dismissible,
-      children: <p>Body copy</p>,
-    }),
+  const view = mountComponent(
+    <Modal
+      open={open}
+      onOpenChange={(next) => changes.push(next)}
+      title="Review"
+      actions={<Button>Keep</Button>}
+      dismissible={dismissible}
+    >
+      <p>Body copy</p>
+    </Modal>,
+    runtime,
   );
-  return { dialog: dialogs[0]!, buttons, changes };
+  return { dialog: dialogs[0]!, buttons, changes, unmount: view.unmount };
 }
 
 test("close entry, Escape, backdrop and native close route through onOpenChange", () => {
   const open = signal(false);
-  const { dialog, buttons, changes } = captureDialog(open);
+  const { dialog, buttons, changes, unmount } = captureDialog(open);
   const close = buttons.find((button) => button["aria-label"] === "Close");
   expect(close).toBeDefined();
   (close!.onClick as () => void)();
@@ -155,10 +158,11 @@ test("close entry, Escape, backdrop and native close route through onOpenChange"
   open.value = true;
   (dialog.onClose as () => void)();
   expect(changes).toEqual([false, false, false, false]);
+  unmount();
 });
 
 test("a non-dismissible modal ignores Escape and backdrop dismissal", () => {
-  const { dialog, buttons, changes } = captureDialog(false, false);
+  const { dialog, buttons, changes, unmount } = captureDialog(false, false);
   expect(buttons.find((button) => button["aria-label"] === "Close")).toBeUndefined();
   let prevented = false;
   (dialog.onCancel as (event: Event) => void)({
@@ -173,4 +177,5 @@ test("a non-dismissible modal ignores Escape and backdrop dismissal", () => {
     currentTarget: backdrop,
   } as unknown as MouseEvent);
   expect(changes).toEqual([]);
+  unmount();
 });

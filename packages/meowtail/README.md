@@ -16,9 +16,10 @@ Application authors writing their own components (the shadcn/ui and Tailwind equ
 
 ## Runtime compatibility
 
-The current alpha requires `meowjsx@^0.1.1-alpha.1`: live component props use its public
-`derived` signal primitive. Earlier JSX stable and alpha builds do not provide that export.
-The existing MeowCSS peer range remains compatible.
+The local `0.3.0-alpha.0` candidate requires `meowjsx@^0.2.0-alpha.0` and
+`meowcss@^0.2.0-alpha.0`. It uses ordinary components with static `meta`, composed part/ref bindings
+and the class-value theme API. Earlier package generations do not implement that authoring contract.
+These are local candidate versions; the published releases remain listed in the root README.
 
 ## Minimal browser integration
 
@@ -35,7 +36,7 @@ import { applyTheme, mountStyles } from "meowcss/web";
 const root = document.querySelector<HTMLElement>("#app");
 if (!root) throw new Error("Missing app root");
 const runtime = createRuntime();
-const uninstall = runtime.use(createMeowUI());
+const uninstall = runtime.use(createMeowUI({ components: [Button, Inline, Stack] }));
 const removeStyles = mountStyles(root.ownerDocument, standardTheme.cssText);
 const removeTheme = applyTheme(root, standardTheme, standardOptions.select({ scheme: "light" }));
 const mounted = createWebRenderer(runtime).render(
@@ -72,7 +73,7 @@ src/
   components/   # Base components such as Button, Card, Input, and Dialog; one component per file
   chat/         # Conversation components such as ChatFrame, ChatMessage, and ChatComposer
   icons/        # Brand marks and small icons; one icon per file
-  registry/     # Contract aggregation, meowjsx type declarations, and the installation entry point
+  registry/     # Component catalog, meowjsx type declarations, and the installation entry point
   shared/       # Small utilities shared inside components
   theme/        # Standard theme token definitions and TS styles organized by part
 tests/
@@ -391,7 +392,7 @@ The default `size="default"` keeps the full-page empty state; loading and failur
 The caller provides URLs, and the component does not fetch data. Images are shown by default as accessible new-window links with lazy-loaded previews and become preview buttons when `onPreview` is provided;
 file links download with the original file name and show B / KB / MB when a valid size is available.
 The theme uses the `root/entry/image/preview/file/icon/details/name/size/previewButton/remove` parts of `chat-attachments`
-through `partSelector(chatAttachmentsContract, part)`.
+through `parts<typeof ChatAttachments>("chat-attachments")` descriptors.
 Each item can provide `onRemove`, passed only when a draft needs a remove action; upload, file deletion, and URL lifecycles still belong to the host.
 
 `ComposerPanel` composes one `ChatComposer` and an optional page-level meta row, usually a `MetaRow`. It refines the same internal writing surface rather than wrapping the whole form in a second surface. Draft, actions, submission and the external supporting hint stay in `ChatComposer`. Narrow composition stays with `ChatComposer`'s own layout and the page/footer edge; the panel has no device variant.
@@ -488,7 +489,7 @@ validation, correction, and save sequence. These are composition references, not
 #### Which text style where
 
 Every piece of text is one style of the type ramp. A style binds a size to its line box, weight and
-tracking; apply it with the `text(role)` recipe from `meowtail/theme`, or with the matching
+tracking; apply it with `ui.text[role]` from `meowtail/theme`, or with the matching
 `uiTokens.type` size, `type.line.*` and `type.weight.*` tokens where a part sets them one by one.
 All text uses `uiTokens.type.sans`; code uses `uiTokens.type.mono`. The standard audit rules reject
 literal font sizes, line heights and weights, including inside the `font` shorthand.
@@ -565,8 +566,10 @@ These relationships inform composition; theme values and component behavior are 
 
 ### Component installation and style delivery
 
-Component installation and style loading are two explicit steps. `createMeowUI()` registers components and style prop adapters;
-`standardTheme.cssText` provides the complete CSS with variable declarations and component rules. A dynamic host can assemble it like this:
+Component installation and style loading are two explicit steps. `createMeowUI({ components })` registers
+an explicit list of component functions and the style-props adapter. `standardTheme.cssText` provides
+the complete CSS with variable declarations, component rules and built-in utility classes. A dynamic
+host can assemble it like this:
 
 ```tsx
 import { createRuntime, h } from "meowjsx";
@@ -575,7 +578,7 @@ import { Button, createMeowUI } from "meowtail";
 import { standardTheme, standardOptions } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 
-const runtime = createRuntime({ plugins: [createMeowUI()] });
+const runtime = createRuntime({ plugins: [createMeowUI({ components: [Button] })] });
 const web = createWebRenderer(runtime);
 const removeStyles = mountStyles(container.ownerDocument, standardTheme.cssText);
 const removeTheme = applyTheme(
@@ -591,9 +594,13 @@ removeTheme();
 removeStyles();
 ```
 
-When using defaultRuntime, call `installMeowUI(defaultRuntime)` and use the same runtime for the initial render and dynamic controls.
-No separate standard theme plugin needs to be installed. Valid values, defaults, and carrying parts for style props
-are declared by the component contract's `defineStyleProps`; the adapter consumes the props so style options such as variant are not passed through as ordinary DOM attributes.
+When using defaultRuntime, call `installMeowUI({ components: [Button] }, defaultRuntime)` and use the
+same runtime for the initial render and dynamic controls. Hosts that need the complete catalog import
+`meowUIComponents` and pass it explicitly; selective registration does not import that catalog into the
+factory. Register the component families rendered by the host and its compositions on that runtime.
+No separate standard theme plugin needs to be installed. Valid values, defaults and carrier parts for
+style props are declared by `meta.style: defineStyleProps(...)`; the adapter consumes the props so
+style options such as variant are not passed through as ordinary DOM attributes.
 `ThemedProps` provides union types and Signal inputs; components keep open native Props and therefore do not promise to reject all unknown attributes.
 
 A static host composes `standardTheme.cssText` with application CSS at build time, writes a `.css` file loaded by HTML,
@@ -628,15 +635,32 @@ inheritance, and component instances and drafts do not need rebuilding. Existing
 
 ### Styles and component options
 
+Built-in theme values work directly on instances and also expand into declarations inside `css`:
+
+```tsx
+import { cx } from "meowcss";
+import { ui } from "meowtail/theme";
+
+<div className={[ui.p.panel, ui.bg.raised, ui.radius.xl]} />;
+<Card className={cx(ui.p.group, ui.bg.fill)}>Content</Card>;
+```
+
+`cx` joins classes and preserves their declarations for reuse in theme rules. It ignores false and
+nullish inputs; nested lists and Signals also work directly in `className`. Class order does not
+resolve conflicts: the stylesheet and ordinary CSS cascade decide. Hover, focus and responsive
+rules remain CSS. The built-in `ui` catalog is theme data, and another theme can supply its own.
+
 Ordinary CSS keeps the template form; tokens and parts are referenced in TypeScript to avoid hand-writing generated names:
 
 ```ts
-import { buttonContract, buttonOptions } from "meowtail";
-import { css, partSelector } from "meowcss/meowjsx";
+import type { Button } from "meowtail";
+import { buttonOptions } from "meowtail";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "meowtail/theme";
 
+const button = parts<typeof Button>("button");
 const applicationStyles = css`
-  .toolbar ${partSelector(buttonContract, "root")} {
+  .toolbar ${button.root} {
     border-radius: ${uiTokens.radius.lg};
     ${buttonOptions.when({ variant: "quiet" })} {
       color: ${uiTokens.status.info};
@@ -649,9 +673,11 @@ The host explicitly composes CSS in the order of standard theme, application bas
 continue to be handled by CSS; native states match on native attributes, and component style options use `when`. `className` and
 `style` remain application extension entry points, and business layout does not enter the standard theme.
 
-Custom tokens use `defineTokens`, and `defineTheme` composes options, complete defaults, token
-sets, and CSS fragments in one call. Component bindings come from typed part references in the fragment; do not convert the fragment to a string early and
-lose that information. Measurement variables without defaults use `tokenRef`, whose `.name` is passed to `setProperty`.
+Custom tokens use `defineTokens`, and `defineTheme` composes options, complete defaults, token sets
+and CSS fragments in one call. Typed descriptors address parts without loading their implementation.
+The JSX adapter binds conditional component tokens by option attribute; root and scheme configuration
+remain regional. Measurement variables without defaults use `tokenRef`, whose `.name` is passed to
+`setProperty`.
 See [MeowCSS](../meowcss/README.md) for pure generation and typed adapter usage and scope boundaries.
 
 After building and installing the local package, run `bunx --no-install meowbook serve --config packages/meowtail/meowbook.config.ts` from the repository root to

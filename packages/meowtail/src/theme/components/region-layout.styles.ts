@@ -1,10 +1,11 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { regionLayoutContract } from "../../components/region-layout";
-import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
+import { css, parts } from "meowcss/meowjsx";
 
+import { uiTokens } from "../tokens";
+import type { RegionLayoutShell } from "../../components/region-layout";
+import { ui } from "../utilities";
+const regionLayoutPartRefs = parts<typeof RegionLayoutShell>("region-layout");
 export const regionLayoutStyles = css`
-  ${partSelector(regionLayoutContract, "root")} {
+  ${regionLayoutPartRefs.root} {
     display: flex;
     flex-direction: column;
     width: 100%;
@@ -13,33 +14,33 @@ export const regionLayoutStyles = css`
     min-height: 0;
     overflow: hidden;
   }
-  ${partSelector(regionLayoutContract, "grid")} {
+  ${regionLayoutPartRefs.grid} {
     display: grid;
     flex: 1;
     min-width: 0;
     min-height: 0;
     overflow: hidden;
   }
-  ${partSelector(regionLayoutContract, "region")} {
+  ${regionLayoutPartRefs.region} {
     min-width: 0;
     min-height: 0;
     overflow: hidden;
     contain: layout paint;
   }
-  ${partSelector(regionLayoutContract, "region")}[hidden],
-  ${partSelector(regionLayoutContract, "back")}[hidden] {
+  ${regionLayoutPartRefs.region}[hidden],
+  ${regionLayoutPartRefs.back}[hidden] {
     display: none;
   }
-  ${partSelector(regionLayoutContract, "content")} > * {
+  ${regionLayoutPartRefs.content} > * {
     flex-shrink: 0;
     min-width: 0;
     max-width: 100%;
   }
-  ${partSelector(regionLayoutContract, "content")}[data-scroll-owner="content"] > * {
+  ${regionLayoutPartRefs.content}[data-scroll-owner="content"] > * {
     flex: 1;
     min-height: 0;
   }
-  ${partSelector(regionLayoutContract, "back")} {
+  ${regionLayoutPartRefs.back} {
     align-self: start;
     flex-shrink: 0;
     min-height: ${uiTokens.control.regular};
@@ -52,7 +53,7 @@ export const regionLayoutStyles = css`
     font: inherit;
     cursor: pointer;
   }
-  ${partSelector(regionLayoutContract, "back")}:focus-visible {
-    ${focusRing({ inset: true })}
+  ${regionLayoutPartRefs.back}:focus-visible {
+    ${ui.focus.inset}
   }
 `;

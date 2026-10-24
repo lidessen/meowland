@@ -242,7 +242,7 @@ function HomePage({ state }: { state: DocsState }): Child {
       <Section
         id="architecture"
         title="How the pieces fit"
-        description="One rendering graph, one theme assembly, one set of contracts."
+        description="One rendering graph, one theme assembly, one set of component metadata."
       >
         <Prose measure="fill">
           <p>
@@ -308,7 +308,7 @@ function usageFor(
   return { importLine };
 }
 
-/** What a component's JSDoc says after its first sentence: the contract notes. */
+/** What a component's JSDoc says after its first sentence: the component notes. */
 function notesFor(props: ComponentProps | undefined): Child {
   const rest = props?.summary ? splitSummary(props.summary).rest : undefined;
   return rest ? <InlineCodeNote text={rest} /> : null;
@@ -463,22 +463,22 @@ function ComponentPage({
         {notesFor(state.props?.get(component.title))}
         <div>
           <h3 className="docs-example-title">Props</h3>
-          <PropsTable contract={component.contract} props={state.props?.get(component.title)} />
+          <PropsTable style={component.meta?.style} props={state.props?.get(component.title)} />
         </div>
         <div>
           <h3 className="docs-example-title">DOM parts</h3>
-          <PartList contract={component.contract} />
+          <PartList meta={component.meta} />
         </div>
         <div>
           <h3 className="docs-example-title">Registry</h3>
-          {component.contract ? (
+          {component.meta ? (
             <Note>
-              The component is registered as <code>{component.contract.name}</code> in the meowtail
+              The component is registered as <code>{component.meta.name}</code> in the meowtail
               component registry.
             </Note>
           ) : (
             <Note>
-              This component has no registry contract. It is a story that shows several components
+              This component has no registry metadata. It is a story that shows several components
               together.
             </Note>
           )}

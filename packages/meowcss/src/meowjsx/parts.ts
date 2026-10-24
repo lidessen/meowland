@@ -1,31 +1,29 @@
 import {
+  createPartDescriptor,
   isSignal,
-  type ComponentContract,
+  type Component,
+  type ComponentMeta,
   type MaybeSignal,
+  type PartDescriptor,
   type Props,
   type ReadableSignal,
   type RuntimePlugin,
 } from "meowjsx";
 import type { Options } from "../values";
-import type { CSSFragment } from "../fragments";
 
 export type ThemedProps<O extends Options<any>> = {
   [K in keyof O["axes"]]?: MaybeSignal<O["axes"][K][number] | undefined>;
 };
 
-type Selected<O extends Options<any>> = { [K in keyof O["axes"]]: O["axes"][K][number] };
+type Selected<O extends Options<any>> = {
+  [K in keyof O["axes"]]: O["axes"][K][number];
+};
 export interface StylePropsBinding<O extends Options<any> = Options<any>> {
   readonly options: O;
   readonly defaults: Selected<O>;
   readonly parts: readonly string[];
 }
-/** Web styling metadata on the platform-neutral component identity. */
-export interface StyledComponentContract<
-  Name extends string = string,
-  Part extends string = string,
-> extends ComponentContract<Name, Part> {
-  readonly styleProps: StylePropsBinding;
-}
+
 export function defineStyleProps<O extends Options<any>>(
   options: O,
   config: {
@@ -47,23 +45,30 @@ export function defineStyleProps<O extends Options<any>>(
   });
 }
 
-export interface PartSelector extends CSSFragment<ComponentContract> {
-  readonly contract: ComponentContract;
-  readonly part: string;
-  toString(): string;
+type ComponentWithMeta = Component<any, any> & {
+  readonly meta: ComponentMeta;
+};
+type ComponentName<C> = C extends {
+  readonly meta: { readonly name: infer Name extends string };
 }
-export function partSelector<Part extends string>(
-  contract: ComponentContract<string, Part>,
-  part: NoInfer<Part>,
-): PartSelector {
-  if (!contract.parts.includes(part)) throw new Error(`Unknown part: ${part}`);
-  const text = `:where([data-meowui-part=${JSON.stringify(`${contract.name}/${part}`)}])`;
-  return Object.freeze({
-    contract,
-    part,
-    text,
-    dependencies: Object.freeze([contract]),
-    toString: () => text,
+  ? Name
+  : never;
+type ComponentParts<C> = C extends {
+  readonly meta: { readonly parts: readonly (infer Part extends string)[] };
+}
+  ? Part
+  : never;
+export type Parts<C> = {
+  readonly [Part in ComponentParts<C>]: PartDescriptor<ComponentName<C>, Part>;
+};
+
+/** Creates type-checked, runtime-lazy descriptors for a component's declared parts. */
+export function parts<C extends ComponentWithMeta>(componentName: ComponentName<C>): Parts<C> {
+  return new Proxy(Object.create(null) as Parts<C>, {
+    get(_target, property) {
+      if (typeof property !== "string") return undefined;
+      return createPartDescriptor(componentName, property);
+    },
   });
 }
 
@@ -88,6 +93,7 @@ function derived<T>(sources: readonly unknown[], read: () => T): MaybeSignal<T> 
     },
   } as ReadableSignal<T>;
 }
+
 function selectedValue(
   explicit: unknown,
   original: unknown,
@@ -105,32 +111,30 @@ function selectedValue(
   });
 }
 
-/** Reads contracts already registered by components; no second component registry. */
+/** Reads component metadata registered by MeowJSX; no second component registry. */
 export function createStylePropsPlugin(): RuntimePlugin {
-  const checked = new WeakSet<object>();
+  const checked = new WeakSet<Function>();
   return {
     name: "meowui-style-props",
     enforce: "pre",
     render({ vnode, runtime }, next) {
       const identity = vnode.componentPart;
       if (!identity) return next(vnode);
-      // A second installed copy must not overwrite what the first already resolved:
-      // the first removed the option prop, so a rerun would only see the default.
       if (vnode.props?.["data-meowui-part"] !== undefined) return next(vnode);
-      const contract = runtime.registry.get(identity.component) as
-        | (ComponentContract & { styleProps?: StylePropsBinding })
-        | undefined;
-      const binding = contract?.styleProps;
-      if (!contract) return next(vnode);
+      const component = runtime.registry.get(identity.component);
+      const metadata = component?.meta;
+      if (!component || !metadata) return next(vnode);
+      const binding = metadata.style as StylePropsBinding | undefined;
       const props = {
         ...vnode.props,
         "data-meowui-part": `${identity.component}/${identity.part}`,
       } as Props;
       if (!binding) return next({ ...vnode, props });
-      if (!checked.has(contract)) {
+      if (!checked.has(component)) {
+        const declared = new Set(metadata.parts);
         for (const part of binding.parts)
-          if (!contract.parts.includes(part)) throw new Error(`Unknown bound part: ${part}`);
-        checked.add(contract);
+          if (!declared.has(part)) throw new Error(`Unknown bound part: ${part}`);
+        checked.add(component);
       }
       const bound = binding.parts.includes(identity.part);
       for (const [field, choices] of Object.entries(binding.options.axes)) {
@@ -149,3 +153,5 @@ export function createStylePropsPlugin(): RuntimePlugin {
     },
   };
 }
+
+export type { PartDescriptor };

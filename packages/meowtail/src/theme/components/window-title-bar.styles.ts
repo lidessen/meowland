@@ -1,9 +1,12 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { windowTitleBarContract } from "../../components/window-title-bar";
+import { css, parts } from "meowcss/meowjsx";
+
 import { uiTokens } from "../tokens";
 
-const bar = (part: (typeof windowTitleBarContract.parts)[number]) =>
-  partSelector(windowTitleBarContract, part);
+import type { WindowTitleBar } from "../../components/window-title-bar";
+import { selectorForPart } from "../selectors";
+const windowTitleBarPartRefs = parts<typeof WindowTitleBar>("window-title-bar");
+const bar = (part: keyof typeof windowTitleBarPartRefs) =>
+  selectorForPart(windowTitleBarPartRefs[part]);
 
 // Controls inside the bar must not start a window drag.
 const controls = `${bar("root")} :is(button, a[href], input, select, textarea, label, summary, [role="button"], [role="tab"], [role="menuitem"], [contenteditable])`;

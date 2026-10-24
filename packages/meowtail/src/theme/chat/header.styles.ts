@@ -1,9 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { chatHeaderContract } from "../../chat/header";
 
+import type { ChatHeader } from "../../chat/header";
+const chatHeaderPartRefs = parts<typeof ChatHeader>("chat-header");
 export const chatHeaderStyles = css`
-  ${partSelector(chatHeaderContract, "root")} {
+  ${chatHeaderPartRefs.root} {
     display: flex;
     flex-wrap: wrap;
     gap: ${uiTokens.space.section};
@@ -12,13 +13,13 @@ export const chatHeaderStyles = css`
     border-bottom: 1px solid ${uiTokens.line.edge};
   }
 
-  ${partSelector(chatHeaderContract, "identity")} {
+  ${chatHeaderPartRefs.identity} {
     min-width: 0;
     flex: 1 1 240px;
     overflow-wrap: anywhere;
   }
 
-  ${partSelector(chatHeaderContract, "controls")} {
+  ${chatHeaderPartRefs.controls} {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -27,7 +28,7 @@ export const chatHeaderStyles = css`
     min-width: 0;
   }
 
-  ${partSelector(chatHeaderContract, "eyebrow")} {
+  ${chatHeaderPartRefs.eyebrow} {
     display: block;
     margin-bottom: 4px;
     color: ${uiTokens.ink.tertiary};
@@ -36,14 +37,14 @@ export const chatHeaderStyles = css`
     font-weight: ${uiTokens.type.weight.regular};
   }
 
-  ${partSelector(chatHeaderContract, "title")} {
+  ${chatHeaderPartRefs.title} {
     margin: 0;
     font-size: ${uiTokens.type.body};
     font-weight: ${uiTokens.type.weight.medium};
     line-height: ${uiTokens.type.line.bodyCompact};
   }
 
-  ${partSelector(chatHeaderContract, "description")} {
+  ${chatHeaderPartRefs.description} {
     max-width: 560px;
     margin: 4px 0 0;
     color: ${uiTokens.ink.tertiary};
@@ -51,42 +52,42 @@ export const chatHeaderStyles = css`
     line-height: ${uiTokens.type.line.label};
   }
 
-  ${partSelector(chatHeaderContract, "status")} {
+  ${chatHeaderPartRefs.status} {
     white-space: nowrap;
   }
 
-  ${partSelector(chatHeaderContract, "actions")} {
+  ${chatHeaderPartRefs.actions} {
     display: flex;
     align-items: center;
   }
 
   @media (max-width: 680px) {
-    ${partSelector(chatHeaderContract, "root")} {
+    ${chatHeaderPartRefs.root} {
       gap: ${uiTokens.space.group};
       padding: ${uiTokens.space.section};
     }
 
-    ${partSelector(chatHeaderContract, "controls")} {
+    ${chatHeaderPartRefs.controls} {
       width: 100%;
       justify-content: space-between;
     }
 
-    ${partSelector(chatHeaderContract, "description")} {
+    ${chatHeaderPartRefs.description} {
       font-size: ${uiTokens.type.caption};
     }
   }
 
   @media (max-width: 360px) and (max-height: 700px) {
-    ${partSelector(chatHeaderContract, "root")} {
+    ${chatHeaderPartRefs.root} {
       gap: ${uiTokens.space.group};
       padding: ${uiTokens.space.section};
     }
 
-    ${partSelector(chatHeaderContract, "title")} {
+    ${chatHeaderPartRefs.title} {
       font-size: ${uiTokens.type.body};
     }
 
-    ${partSelector(chatHeaderContract, "description")} {
+    ${chatHeaderPartRefs.description} {
       font-size: ${uiTokens.type.caption};
       line-height: ${uiTokens.type.line.caption};
     }

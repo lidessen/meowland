@@ -1,10 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { taskListContract } from "../../components/task-list";
-
-const part = (name: (typeof taskListContract.parts)[number]) =>
-  partSelector(taskListContract, name);
+import type { TaskList } from "../../components/task-list";
+import { ui } from "../utilities";
+import { selectorForPart } from "../selectors";
+const taskListPartRefs = parts<typeof TaskList>("task-list");
+const part = (name: keyof typeof taskListPartRefs) => selectorForPart(taskListPartRefs[name]);
 const row = (states: string) =>
   `${part("item")}:is(${states
     .split(" ")
@@ -46,7 +46,7 @@ export const taskListStyles = css`
     display: none;
   }
   ${part("summary")}:focus-visible {
-    ${focusRing({ inset: true })}
+    ${ui.focus.inset}
     border-radius: ${uiTokens.radius.xl};
   }
   ${part("title")} {

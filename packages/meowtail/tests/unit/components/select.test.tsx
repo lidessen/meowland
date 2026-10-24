@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Field, Select, installMeowUI } from "../../../src/index";
+import { Field, Select, installMeowUI, meowUIComponents } from "../../../src/index";
 
 test("Select preserves native form semantics and change callback without a runtime visual plugin", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const onChange = (_event: Event) => {};
   let handler: unknown;
   runtime.use({

@@ -6,7 +6,7 @@ import { ReadBlock } from "../../../src/components/read-block";
 import { DiffBlock, diffBlockText } from "../../../src/components/diff-block";
 import { SearchBlock, searchBlockText } from "../../../src/components/search-block";
 import { TerminalBlock, terminalSpans } from "../../../src/components/terminal-block";
-import { installMeowUI } from "../../../src/registry";
+import { installMeowUI, meowUIComponents } from "../../../src/registry";
 
 test("output cap keeps head and tail, with a native expandable middle", () => {
   expect(outputWindow(23, 16)).toEqual({ head: 8, tail: 8, hidden: 7 });
@@ -119,7 +119,7 @@ test("terminal SGR state crosses lines, resets and preserves unsupported control
 test("terminal presents one truthful call state and preserves multiline prompt whitespace", () => {
   const html = (props: Parameters<typeof TerminalBlock>[0]) => {
     const runtime = createRuntime();
-    installMeowUI(runtime);
+    installMeowUI({ components: meowUIComponents }, runtime);
     return createWebRenderer(runtime).renderToHtml(<TerminalBlock {...props} />);
   };
   const running = html({

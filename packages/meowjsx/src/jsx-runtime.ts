@@ -28,7 +28,9 @@ export type JSXDevFactory = (
 function createJSX(runtime: Runtime, type: ElementType, props: Props | null, key?: Key): VNode {
   const { children, ...rest } = props ?? {};
   if (key !== undefined) rest.key = key;
-  return children === undefined ? runtime.h(type, rest) : runtime.h(type, rest, children);
+  return children === undefined
+    ? runtime.h(type as any, rest as any)
+    : runtime.h(type as any, rest as any, children);
 }
 
 export function createJSXRuntime(runtime: Runtime): JSXRuntime {

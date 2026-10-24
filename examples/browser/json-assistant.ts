@@ -1,7 +1,7 @@
-import { signal, type ReadableSignal } from "meowjsx";
+import { defaultRuntime, signal, type ReadableSignal } from "meowjsx";
 import { createJsonView, parseJsonView } from "meowjsx/json";
 import { render } from "meowjsx/web";
-import { installMeowUI } from "meowtail";
+import { AssistantView, installMeowUI } from "meowtail";
 import type { AssistantDraft, AssistantMessage } from "meowtail/chat";
 import { createMeowUICatalog } from "meowtail/json";
 import { standardTheme } from "meowtail/theme";
@@ -78,7 +78,7 @@ const child = createJsonView(description, {
     ],
   ]),
 });
-const uninstall = installMeowUI();
+const uninstall = installMeowUI({ components: [AssistantView] }, defaultRuntime);
 const restoreTheme = applyTheme(document.documentElement, standardTheme);
 const removeStyles = mountStyles(document, standardTheme.cssText);
 const mounted = render(child, root);

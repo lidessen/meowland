@@ -1,9 +1,9 @@
-import { h, type Child } from "meowjsx";
+import { h, type Child, type ClassValue } from "meowjsx";
 
 /** Shared SVG frame for functional icons; the theme owns its optical stroke. */
 export interface IconFrameProps {
   size?: number;
-  className?: string;
+  className?: ClassValue;
   /** Omit for decorative icons. Icon-only controls should label the control itself. */
   label?: string;
   dataIcon?: string;
@@ -19,7 +19,7 @@ export function IconFrame({
 }: IconFrameProps): Child {
   return (
     <svg
-      className={["meow-icon", className].filter(Boolean).join(" ")}
+      className={["meow-icon", className]}
       data-icon={dataIcon}
       width={size}
       height={size}

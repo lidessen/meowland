@@ -1,11 +1,18 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { ChatBubble, ChatMessage, ChatProcess, ChatSources, installMeowUI } from "meowtail";
+import {
+  ChatBubble,
+  ChatMessage,
+  ChatProcess,
+  ChatSources,
+  installMeowUI,
+  meowUIComponents,
+} from "meowtail";
 
 test("message role travels through wrappers to independent bubbles without leaking to siblings", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const web = createWebRenderer(runtime);
   const Wrapped = () => (
     <div>
@@ -34,7 +41,7 @@ test("message role travels through wrappers to independent bubbles without leaki
 
 test("default messages retain a single automatic surface and datetime while custom header replaces metadata", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const web = createWebRenderer(runtime);
   const html = web.renderToHtml(
     <ChatMessage role="user" author="You" timestamp="14:20" dateTime="2026-09-21T14:20:00+08:00">
@@ -61,7 +68,7 @@ test("default messages retain a single automatic surface and datetime while cust
 
 test("process and sources retain native disclosures and reject unsafe source URLs", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const web = createWebRenderer(runtime);
   const html = web.renderToHtml([
     <ChatProcess label="Investigation process" open>

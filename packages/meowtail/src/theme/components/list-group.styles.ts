@@ -1,9 +1,11 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { listGroupContract, listRowContract } from "../../components/list-group";
 
-const group = partSelector(listGroupContract, "root");
-const row = (part: (typeof listRowContract.parts)[number]) => partSelector(listRowContract, part);
+import type { ListGroup, ListRow } from "../../components/list-group";
+const listGroupPartRefs = parts<typeof ListGroup>("list-group");
+const listRowPartRefs = parts<typeof ListRow>("list-row");
+const group = listGroupPartRefs.root;
+const row = (part: keyof typeof listRowPartRefs) => listRowPartRefs[part];
 
 export const listGroupStyles = css`
   ${group} {

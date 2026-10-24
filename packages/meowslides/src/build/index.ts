@@ -23,14 +23,15 @@ export interface BuildSlidesResult {
 
 const host = `import { h, createRuntime } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { createMeowUI } from "meowtail";
+import { createMeowUI, meowUIComponents } from "meowtail";
 import { applyTheme, mountStyles } from "meowcss/web";
-import { Presentation, createMeowSlides } from "meowslides";
+import { Presentation } from "meowslides";
+import { createMeowSlides, meowSlidesComponents } from "meowslides/registry";
 import { presentationTheme } from "meowslides/theme";
 import { createDeck } from "meowslides:deck";
 const runtime = createRuntime();
-const uninstallUI = runtime.use(createMeowUI());
-const uninstallSlides = runtime.use(createMeowSlides());
+const uninstallUI = runtime.use(createMeowUI({ components: meowUIComponents }));
+const uninstallSlides = runtime.use(createMeowSlides({ components: meowSlidesComponents }));
 const root = document.getElementById("app");
 const removeStyles = mountStyles(document, presentationTheme.cssText);
 const restoreTheme = applyTheme(document.documentElement, presentationTheme);

@@ -2,6 +2,7 @@ import { h, createRuntime, type MountResult } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import {
   installMeowUI,
+  meowUIComponents,
   Button,
   NavList,
   SearchInput,
@@ -16,7 +17,7 @@ import { applyTheme } from "meowcss/web";
 
 /** The catalog rebuilds on search/selection, so it keeps its own long-lived runtime. */
 const catalogRuntime = createRuntime();
-installMeowUI(catalogRuntime);
+installMeowUI({ components: meowUIComponents }, catalogRuntime);
 const catalogRenderer = createWebRenderer(catalogRuntime);
 let mountedCatalog: MountResult | undefined;
 
@@ -58,7 +59,7 @@ export function mountCatalog({ groups, activeId, emptyMessage }: CatalogView) {
 /** Only tool composition lives here; controls, icons and theme are Meowtail. */
 export function mountGallery() {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   applyTheme(document.documentElement, standardTheme);
   createWebRenderer(runtime).render(
     <div className="workshop-shell">

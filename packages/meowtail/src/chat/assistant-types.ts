@@ -176,7 +176,6 @@ export interface AssistantViewProps extends Props {
   renderWorkDetail?: (work: AssistantWork) => Child | undefined;
   composerTrailing?: Child;
   headerActions?: Child;
-  className?: string;
   labels?: Partial<AssistantLabels>;
 }
 

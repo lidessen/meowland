@@ -1,15 +1,31 @@
 import {
-  defineComponent,
+  createContext,
+  useContext,
   defineShadow,
   h,
   keyed,
   mapSignal,
   signal,
   type Child,
+  type ClassValue,
   type Component,
+  type Context,
+  type Props,
+  type ThemeStyle,
   type RuntimePlugin,
   type RuntimePluginOption,
 } from "../../src/runtime";
+
+const classList: ClassValue = ["base", [false, null, undefined, signal("active")]] as const;
+const classProps: Props = { className: signal<ClassValue>(classList) };
+const themeClasses: ThemeStyle = { className: [classList, { toString: () => "surface" }] };
+const classNode = <div className={classList} />;
+void classProps;
+void themeClasses;
+void classNode;
+// @ts-expect-error Class lists accept false as an omission, not true.
+const invalidClass: ClassValue = true;
+void invalidClass;
 
 type Assert<T extends true> = T;
 const rows = signal<readonly { id: string; label: string }[]>([]);
@@ -55,6 +71,8 @@ const typedStreamComponent: Component<{ label: string }> = async function* (prop
   yield <span>{props.label}</span>;
 };
 
+const noPropsNode = h(() => "constant", {});
+void noPropsNode;
 const syncNode = h(syncComponent, { label: "sync" });
 const asyncNode = h(asyncComponent, { label: "promise" });
 const streamNode = h(streamComponent, { label: "stream" });
@@ -113,16 +131,19 @@ const cardContract = {
 
 type CardProps = { title: string };
 
-const Card = defineComponent<
-  CardProps,
-  typeof cardContract.name,
-  (typeof cardContract.parts)[number]
->(cardContract, ({ title }, context) =>
-  context.part("root", "article", null, context.part("title", "h2", null, title)),
-);
+function Card({ title }: CardProps, context: Context<typeof Card>): Child {
+  // @ts-expect-error The one-argument context still exposes only declared parts.
+  void context.parts.description;
+  return (
+    <article ref={context.parts.root}>
+      <h2 ref={context.parts.title}>{title}</h2>
+    </article>
+  );
+}
+Card.meta = cardContract;
 const CardRootShadow = defineShadow(Card, "root", (props, { component, element, effect }) => {
   const name: "card" = component.component;
-  const part: "root" = component.part;
+  const part: "root" | "title" = component.part;
   // Core owns the shadow contract, not a target node: the host handle stays
   // target-neutral until a target package narrows it.
   const handle: unknown = element;
@@ -134,10 +155,23 @@ const CardRootShadow = defineShadow(Card, "root", (props, { component, element, 
   void part;
 });
 
-// @ts-expect-error Shadows can only target parts declared by their component contract.
+// @ts-expect-error Shadows can only target metadata-declared parts.
 const _invalidCardShadow = defineShadow(Card, "description", () => {});
+void _invalidCardShadow;
 
 const cardNode: JSX.Element = <Card title="Typed card" />;
+const cardFactoryNode = h(Card, { title: "Factory card" });
+// @ts-expect-error h preserves props for a component with a required typed context.
+const invalidCardFactoryNode = h(Card, { title: 42 });
+void cardFactoryNode;
+void invalidCardFactoryNode;
+const ComponentValue = createContext(Card);
+const componentProvider = (
+  <ComponentValue.Provider value={Card}>{cardNode}</ComponentValue.Provider>
+);
+const providedComponent: typeof Card = useContext(ComponentValue);
+void componentProvider;
+void providedComponent;
 void CardRootShadow;
 void cardNode;
 

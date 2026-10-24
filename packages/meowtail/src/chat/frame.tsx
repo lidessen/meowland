@@ -1,19 +1,22 @@
-import { defineComponent, type ComponentContract, type Props } from "meowjsx";
-
-export const chatFrameContract = {
-  name: "chat-frame",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+import { h, type Context, type Props } from "meowjsx";
 
 export interface ChatFrameProps extends Props {
-  className?: string;
+  className?: Props["className"];
 }
 
 /** The outer surface of a conversation that holds its header, messages and composer. */
-export const ChatFrame = defineComponent<
-  ChatFrameProps,
-  typeof chatFrameContract.name,
-  (typeof chatFrameContract.parts)[number]
->(chatFrameContract, ({ children, className, ...props }, context) =>
-  context.part("root", "section", { ...props, className }, children),
-);
+export function ChatFrame(
+  { children, className, ref, ...props }: ChatFrameProps,
+  context: Context<typeof ChatFrame>,
+) {
+  return (
+    <section {...props} className={className} ref={[context.parts.root, ref]}>
+      {children}
+    </section>
+  );
+}
+
+ChatFrame.meta = {
+  name: "chat-frame",
+  parts: ["root"],
+} as const;

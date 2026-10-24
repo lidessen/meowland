@@ -1,8 +1,11 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { tagContract, tagOptions } from "../../components/tag";
+import { css, parts } from "meowcss/meowjsx";
+
 import { uiTokens } from "../tokens";
 
-const root = partSelector(tagContract, "root");
+import type { Tag } from "../../components/tag";
+import { tagOptions } from "../../components/tag.options";
+const tagPartRefs = parts<typeof Tag>("tag");
+const root = tagPartRefs.root;
 
 export const tagStyles = css`
   ${root} {

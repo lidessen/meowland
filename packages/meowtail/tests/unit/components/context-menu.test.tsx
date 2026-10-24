@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h, type Props } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { ContextMenu, MenuButton, installMeowUI } from "../../../src/index";
+import { ContextMenu, MenuButton, installMeowUI, meowUIComponents } from "../../../src/index";
 
 test("context menu reuses menu items and opens from the surface", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   let surface: Props | undefined;
   const events: string[] = [];
   runtime.use({
@@ -42,7 +42,7 @@ test("context menu reuses menu items and opens from the surface", () => {
 
 test("menu button composes a labeled trigger with the existing menu", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const html = createWebRenderer(runtime).renderToHtml(
     <MenuButton id="export" variant="outline" items={[{ id: "text", label: "Plain text" }]}>
       Export

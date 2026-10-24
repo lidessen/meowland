@@ -3,11 +3,12 @@ import { createReactiveEffect, derived } from "../../src/reactive";
 import {
   batch,
   createRuntime,
-  defineComponent,
   defineShadow,
+  h,
   isAsyncIterable,
   isPromiseLike,
   signal,
+  type Context,
 } from "../../src/runtime";
 import type { RenderStrategy } from "../../src/renderer";
 
@@ -263,12 +264,15 @@ test("runtime can bind its component and Signal semantics to a target renderer",
 });
 
 test("target renderers preserve component parts and declare shadow mount capability", () => {
-  const contract = { name: "target-card", parts: ["root"] } as const;
-  const Card = defineComponent(contract, (_props, context) =>
-    context.part("root", "article", null, "ready"),
-  );
+  function Card(
+    _props: Record<string, never>,
+    context: Context<typeof Card, Record<string, never>>,
+  ) {
+    return h("article", { ref: context.parts.root }, "ready");
+  }
+  Card.meta = { name: "target-card", parts: ["root"] } as const;
   const shadow = defineShadow(Card, "root", () => {});
-  const runtime = createRuntime({ components: [contract], shadows: [shadow] });
+  const runtime = createRuntime({ components: [Card], shadows: [shadow] });
   const strategy: RenderStrategy<TestNode> = {
     createText: (value) => new TestText(value),
     createElement: (type) => new TestHostNode(type),
@@ -351,26 +355,32 @@ test("runtime.use accepts nested presets and returns a grouped cleanup", () => {
 });
 
 test("plugin setup receives registered contributions and owns cleanup", () => {
-  const contract = { name: "plugin-card", parts: ["root"] } as const;
-  const pluginShadow = defineShadow(contract, "root", () => {});
+  function Card(
+    _props: Record<string, never>,
+    context: Context<typeof Card, Record<string, never>>,
+  ) {
+    return h("article", { ref: context.parts.root });
+  }
+  Card.meta = { name: "plugin-card", parts: ["root"] } as const;
+  const pluginShadow = defineShadow(Card, "root", () => {});
   const events: string[] = [];
   const runtime = createRuntime();
   const dispose = runtime.use({
     name: "lifecycle-plugin",
-    components: [contract],
+    components: [Card],
     shadows: [pluginShadow],
     setup({ runtime: setupRuntime, registry, shadowRegistry, onCleanup }) {
       events.push(
-        `setup:${setupRuntime === runtime}:${registry.has(contract.name)}:${shadowRegistry.list().includes(pluginShadow)}`,
+        `setup:${setupRuntime === runtime}:${registry.has(Card.meta.name)}:${shadowRegistry.list().includes(pluginShadow)}`,
       );
       onCleanup(() => {
         events.push(
-          `registered-cleanup:${registry.has(contract.name)}:${shadowRegistry.list().includes(pluginShadow)}`,
+          `registered-cleanup:${registry.has(Card.meta.name)}:${shadowRegistry.list().includes(pluginShadow)}`,
         );
       });
       return () => {
         events.push(
-          `returned-cleanup:${registry.has(contract.name)}:${shadowRegistry.list().includes(pluginShadow)}`,
+          `returned-cleanup:${registry.has(Card.meta.name)}:${shadowRegistry.list().includes(pluginShadow)}`,
         );
       };
     },
@@ -385,6 +395,6 @@ test("plugin setup receives registered contributions and owns cleanup", () => {
     "returned-cleanup:true:true",
     "registered-cleanup:true:true",
   ]);
-  expect(runtime.registry.has(contract.name)).toBe(false);
+  expect(runtime.registry.has(Card.meta.name)).toBe(false);
   expect(runtime.shadowRegistry.list()).toEqual([]);
 });

@@ -1,9 +1,9 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { resourceCardContract } from "../../components/resource-card";
 
-const card = (part: (typeof resourceCardContract.parts)[number]) =>
-  partSelector(resourceCardContract, part);
+import type { ResourceCard } from "../../components/resource-card";
+const resourceCardPartRefs = parts<typeof ResourceCard>("resource-card");
+const card = (part: keyof typeof resourceCardPartRefs) => resourceCardPartRefs[part];
 
 export const resourceCardStyles = css`
   ${card("root")} {

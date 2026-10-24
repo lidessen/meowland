@@ -1,9 +1,4 @@
-import { defineComponent, type Child, type ComponentContract, type Props } from "meowjsx";
-
-export const railItemContract = {
-  name: "rail-item",
-  parts: ["root", "icon", "dot", "label", "meta"],
-} as const satisfies ComponentContract;
+import { type Child, type Props, type Context, h } from "meowjsx";
 
 export interface RailItemProps extends Props {
   label: Child;
@@ -21,33 +16,34 @@ export interface RailItemProps extends Props {
   metaTone?: "accent";
   /** A route renders an anchor; an action renders a button. */
   href?: string;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** One destination in an IconRail: an icon alone when collapsed, icon and label when expanded. */
-export const RailItem = defineComponent<
-  RailItemProps,
-  typeof railItemContract.name,
-  (typeof railItemContract.parts)[number]
->(
-  railItemContract,
-  ({ label, icon, current = false, dot, meta, metaTone, href, className, ...props }, context) =>
-    context.part(
-      "root",
-      href !== undefined ? "a" : "button",
-      {
-        ...props,
-        ...(href !== undefined ? { href } : { type: props.type ?? "button" }),
-        className,
-        "aria-current": current ? "page" : undefined,
-        "data-dot": dot,
-        "data-meta-tone": metaTone,
-      },
-      context.part("icon", "span", { "aria-hidden": "true" }, icon),
-      context.part("dot", "span", { "aria-hidden": "true" }),
-      context.part("label", "span", null, label),
-      meta !== undefined && meta !== null && meta !== false
-        ? context.part("meta", "span", null, meta)
-        : null,
-    ),
-);
+export function RailItem(
+  { label, icon, current = false, dot, meta, metaTone, href, className, ...props }: RailItemProps,
+  context: Context<typeof RailItem>,
+) {
+  const Tag = href !== undefined ? "a" : "button";
+  return (
+    <Tag
+      {...props}
+      {...(href !== undefined ? { href } : { type: props.type ?? "button" })}
+      className={className}
+      aria-current={current ? "page" : undefined}
+      data-dot={dot}
+      data-meta-tone={metaTone}
+      ref={[context.parts.root, props.ref]}
+    >
+      <span aria-hidden="true" ref={[context.parts.icon]}>
+        {icon}
+      </span>
+      <span aria-hidden="true" ref={[context.parts.dot]}></span>
+      <span ref={[context.parts.label]}>{label}</span>
+      {meta !== undefined && meta !== null && meta !== false ? (
+        <span ref={[context.parts.meta]}>{meta}</span>
+      ) : null}
+    </Tag>
+  );
+}
+RailItem.meta = { name: "rail-item", parts: ["root", "icon", "dot", "label", "meta"] } as const;

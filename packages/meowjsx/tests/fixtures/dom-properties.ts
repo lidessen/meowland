@@ -23,6 +23,7 @@ const width = signal("24");
 const fill = signal("navy");
 const value = signal("initial");
 const checked = signal(false);
+const className = signal("initial-class");
 let mounted = 0;
 let cleaned = 0;
 let clicks = 0;
@@ -35,11 +36,19 @@ const rendered = createWebRenderer(runtime).render(
     null,
     h(
       "svg",
-      { viewBox, width, height: "24", fill, "aria-label": "Property vector" },
+      {
+        viewBox,
+        width,
+        height: "24",
+        fill,
+        "aria-label": "Property vector",
+        className: ["vector", [false, null, className]],
+      },
       h("path", { d: "M10 10h80v80H10Z" }),
     ),
     h("input", {
       id: "text",
+      className: ["field", className],
       value,
       ref: () => {
         mounted++;
@@ -74,6 +83,7 @@ window.domPropertyFixture = {
     fill.value = "teal";
     value.value = "updated";
     checked.value = true;
+    className.value = "updated-class";
   },
   counts: () => ({ mounted, cleaned, clicks, inputs }),
   unmount: () => rendered.unmount(),

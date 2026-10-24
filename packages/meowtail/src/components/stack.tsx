@@ -1,34 +1,35 @@
-import { defineStyleProps, type StyledComponentContract } from "meowcss/meowjsx";
-import { layoutOptions } from "./layout-types";
-import { defineComponent } from "meowjsx";
-import { justifyStyle, type LayoutProps } from "./layout-types";
+import { defineStyleProps } from "meowcss/meowjsx";
+import { h, type Context } from "meowjsx";
+import { layoutOptions, justifyStyle, type LayoutProps } from "./layout-types";
 import { layoutStyle } from "../shared/layout-style";
-export const stackContract = {
-  name: "stack",
-  parts: ["root"],
-  styleProps: defineStyleProps(layoutOptions, {
-    defaults: { gap: "normal", rowGap: "auto", columnGap: "auto" },
-  }),
-} as const satisfies StyledComponentContract;
+
 export interface StackProps extends LayoutProps {}
 /** Lays out children in a column, with a gap from the spacing scale. */
-export const Stack = defineComponent<StackProps, "stack", "root">(
-  stackContract,
-  ({ as = "div", align = "stretch", justify = "start", children, ...props }, context) =>
-    context.part(
-      "root",
-      as,
-      {
-        ...props,
-        style: layoutStyle(props.style, {
-          display: "flex",
-          flexDirection: "column",
-          alignItems: align,
-          justifyContent: justifyStyle(justify),
-          minWidth: 0,
-          minHeight: 0,
-        }),
-      },
-      children,
-    ),
-);
+export function Stack(
+  { as = "div", align = "stretch", justify = "start", children, ...props }: StackProps,
+  context: Context<typeof Stack>,
+) {
+  return h(
+    as,
+    {
+      ...props,
+      ref: [context.parts.root, props.ref],
+      style: layoutStyle(props.style, {
+        display: "flex",
+        flexDirection: "column",
+        alignItems: align,
+        justifyContent: justifyStyle(justify),
+        minWidth: 0,
+        minHeight: 0,
+      }),
+    },
+    children,
+  );
+}
+Stack.meta = {
+  name: "stack",
+  parts: ["root"],
+  style: defineStyleProps(layoutOptions, {
+    defaults: { gap: "normal", rowGap: "auto", columnGap: "auto" },
+  }),
+} as const;

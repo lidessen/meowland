@@ -1,19 +1,18 @@
-import { defineComponent, type ComponentContract, type Props } from "meowjsx";
-
-export const textareaContract = {
-  name: "textarea",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+import { h, type Context, type Props } from "meowjsx";
 
 export interface TextareaProps extends Props {
-  className?: string;
+  className?: Props["className"];
 }
 
 /** A multi-line text input. */
-export const Textarea = defineComponent<
-  TextareaProps,
-  typeof textareaContract.name,
-  (typeof textareaContract.parts)[number]
->(textareaContract, ({ children, className, ...props }, context) =>
-  context.part("root", "textarea", { ...props, className }, children),
-);
+export function Textarea(
+  { children, className, ref, ...props }: TextareaProps,
+  context: Context<typeof Textarea>,
+) {
+  return (
+    <textarea {...props} className={className} ref={[context.parts.root, ref]}>
+      {children}
+    </textarea>
+  );
+}
+Textarea.meta = { name: "textarea", parts: ["root"] } as const;

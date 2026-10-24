@@ -1,13 +1,14 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { chatAttachmentsContract } from "../../chat/attachments";
-import { chatComposerContract } from "../../chat/composer";
-
+import type { ChatAttachments } from "../../chat/attachments";
+import type { ChatComposer } from "../../chat/composer";
+import { ui } from "../utilities";
+const chatAttachmentsPartRefs = parts<typeof ChatAttachments>("chat-attachments");
+const chatComposerPartRefs = parts<typeof ChatComposer>("chat-composer");
 export const chatAttachmentsStyles = css`
   /* Inherit the host's chat palette; do not reset it at the attachment root. */
 
-  ${partSelector(chatAttachmentsContract, "root")} {
+  ${chatAttachmentsPartRefs.root} {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
@@ -15,7 +16,7 @@ export const chatAttachmentsStyles = css`
     margin-top: ${uiTokens.space.section};
   }
 
-  ${partSelector(chatAttachmentsContract, "image")} {
+  ${chatAttachmentsPartRefs.image} {
     display: block;
     width: fit-content;
     max-width: min(220px, 100%);
@@ -29,7 +30,7 @@ export const chatAttachmentsStyles = css`
     cursor: zoom-in;
   }
 
-  ${partSelector(chatAttachmentsContract, "preview")} {
+  ${chatAttachmentsPartRefs.preview} {
     display: block;
     width: auto;
     height: auto;
@@ -38,7 +39,7 @@ export const chatAttachmentsStyles = css`
     object-fit: contain;
   }
 
-  ${partSelector(chatAttachmentsContract, "file")} {
+  ${chatAttachmentsPartRefs.file} {
     display: inline-flex;
     min-width: 0;
     max-width: 100%;
@@ -56,11 +57,11 @@ export const chatAttachmentsStyles = css`
     text-decoration: none;
   }
 
-  ${partSelector(chatAttachmentsContract, "file")}:hover {
+  ${chatAttachmentsPartRefs.file}:hover {
     color: ${uiTokens.ink.primary};
   }
 
-  ${partSelector(chatAttachmentsContract, "icon")} {
+  ${chatAttachmentsPartRefs.icon} {
     display: grid;
     width: 28px;
     height: 28px;
@@ -72,20 +73,20 @@ export const chatAttachmentsStyles = css`
     font-size: ${uiTokens.type.caption};
   }
 
-  ${partSelector(chatAttachmentsContract, "details")} {
+  ${chatAttachmentsPartRefs.details} {
     display: grid;
     flex: 1;
     min-width: 0;
     gap: 0;
   }
 
-  ${partSelector(chatAttachmentsContract, "size")} {
+  ${chatAttachmentsPartRefs.size} {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  ${partSelector(chatAttachmentsContract, "name")} {
+  ${chatAttachmentsPartRefs.name} {
     max-width: 190px;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -95,12 +96,12 @@ export const chatAttachmentsStyles = css`
     line-height: ${uiTokens.type.line.body};
   }
 
-  ${partSelector(chatAttachmentsContract, "size")} {
+  ${chatAttachmentsPartRefs.size} {
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.caption};
     line-height: ${uiTokens.type.line.caption};
   }
-  ${partSelector(chatAttachmentsContract, "entry")} {
+  ${chatAttachmentsPartRefs.entry} {
     position: relative;
     display: flex;
     min-width: 0;
@@ -108,7 +109,7 @@ export const chatAttachmentsStyles = css`
     gap: ${uiTokens.space.group};
     max-width: 100%;
   }
-  ${partSelector(chatAttachmentsContract, "remove")} {
+  ${chatAttachmentsPartRefs.remove} {
     position: absolute;
     top: 6px;
     right: 6px;
@@ -127,18 +128,18 @@ export const chatAttachmentsStyles = css`
     transition: opacity ${uiTokens.motion.response} ${uiTokens.motion.ease};
     cursor: pointer;
   }
-  ${partSelector(chatAttachmentsContract, "entry")}:hover ${partSelector(chatAttachmentsContract, "remove")},
-  ${partSelector(chatAttachmentsContract, "entry")}:focus-within ${partSelector(chatAttachmentsContract, "remove")} {
+  ${chatAttachmentsPartRefs.entry}:hover ${chatAttachmentsPartRefs.remove},
+  ${chatAttachmentsPartRefs.entry}:focus-within ${chatAttachmentsPartRefs.remove} {
     opacity: 1;
   }
-  ${partSelector(chatAttachmentsContract, "entry")}:has(${partSelector(chatAttachmentsContract, "remove")}):is(:hover, :focus-within) ${partSelector(chatAttachmentsContract, "name")} {
+  ${chatAttachmentsPartRefs.entry}:has(${chatAttachmentsPartRefs.remove}):is(:hover, :focus-within) ${chatAttachmentsPartRefs.name} {
     padding-right: 18px;
   }
-  ${partSelector(chatAttachmentsContract, "remove")} svg {
+  ${chatAttachmentsPartRefs.remove} svg {
     width: ${uiTokens.icon.size};
     height: ${uiTokens.icon.size};
   }
-  ${partSelector(chatAttachmentsContract, "entry")}[data-kind="image"] ${partSelector(chatAttachmentsContract, "remove")} {
+  ${chatAttachmentsPartRefs.entry}[data-kind="image"] ${chatAttachmentsPartRefs.remove} {
     position: absolute;
     top: 4px;
     right: 4px;
@@ -150,16 +151,16 @@ export const chatAttachmentsStyles = css`
     color: ${uiTokens.action.onPrimary};
     box-shadow: none;
   }
-  ${partSelector(chatAttachmentsContract, "remove")}:focus-visible {
-    ${focusRing()}
+  ${chatAttachmentsPartRefs.remove}:focus-visible {
+    ${ui.focus.ring}
   }
   @media (hover: hover) {
-    ${partSelector(chatAttachmentsContract, "remove")}:hover {
+    ${chatAttachmentsPartRefs.remove}:hover {
       background: ${uiTokens.state.hover};
       color: ${uiTokens.ink.primary};
     }
   }
-  ${partSelector(chatAttachmentsContract, "previewButton")} {
+  ${chatAttachmentsPartRefs.previewButton} {
     flex: 0 0 auto;
     border: 0;
     background: transparent;
@@ -175,78 +176,78 @@ export const chatAttachmentsStyles = css`
       box-shadow ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   @media (hover: hover) {
-    ${partSelector(chatAttachmentsContract, "previewButton")}:hover:not(:disabled) {
+    ${chatAttachmentsPartRefs.previewButton}:hover:not(:disabled) {
       background: ${uiTokens.state.hover};
     }
   }
-  ${partSelector(chatAttachmentsContract, "previewButton")}:active:not(:disabled) {
+  ${chatAttachmentsPartRefs.previewButton}:active:not(:disabled) {
     background: ${uiTokens.state.active};
     box-shadow: ${uiTokens.shadow.pressed};
     transition-duration: ${uiTokens.motion.instant};
   }
-  ${partSelector(chatAttachmentsContract, "previewButton")}:focus-visible {
-    ${focusRing()}
+  ${chatAttachmentsPartRefs.previewButton}:focus-visible {
+    ${ui.focus.ring}
   }
-  ${partSelector(chatAttachmentsContract, "root")} {
+  ${chatAttachmentsPartRefs.root} {
     font-family: ${uiTokens.type.sans};
   }
-  ${partSelector(chatAttachmentsContract, "file")} {
+  ${chatAttachmentsPartRefs.file} {
     transition:
       border-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
       background-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
-  ${partSelector(chatAttachmentsContract, "file")}:hover {
+  ${chatAttachmentsPartRefs.file}:hover {
     /* The hover overlay sits on the raised card instead of replacing it. */
     background-image: linear-gradient(${uiTokens.state.hover}, ${uiTokens.state.hover});
   }
-  ${partSelector(chatAttachmentsContract, "image")}:focus-visible,
-  ${partSelector(chatAttachmentsContract, "file")}:focus-visible {
-    ${focusRing()}
+  ${chatAttachmentsPartRefs.image}:focus-visible,
+  ${chatAttachmentsPartRefs.file}:focus-visible {
+    ${ui.focus.ring}
   }
-  ${partSelector(chatAttachmentsContract, "icon")} svg {
+  ${chatAttachmentsPartRefs.icon} svg {
     width: 28px;
     height: 28px;
   }
   @media (pointer: coarse) {
-    ${partSelector(chatAttachmentsContract, "remove")},
-    ${partSelector(chatAttachmentsContract, "entry")}[data-kind="image"] ${partSelector(chatAttachmentsContract, "remove")} {
+    ${chatAttachmentsPartRefs.remove},
+    ${chatAttachmentsPartRefs.entry}[data-kind="image"] ${chatAttachmentsPartRefs.remove} {
       min-height: 44px;
       min-width: 44px;
       opacity: 1;
     }
-    ${partSelector(chatAttachmentsContract, "file")},
-    ${partSelector(chatAttachmentsContract, "previewButton")} {
+    ${chatAttachmentsPartRefs.file},
+    ${chatAttachmentsPartRefs.previewButton} {
       min-height: 44px;
       min-width: 44px;
       box-sizing: border-box;
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(chatAttachmentsContract, "remove")},
-    ${partSelector(chatAttachmentsContract, "file")},
-    ${partSelector(chatAttachmentsContract, "previewButton")} {
+    ${chatAttachmentsPartRefs.remove},
+    ${chatAttachmentsPartRefs.file},
+    ${chatAttachmentsPartRefs.previewButton} {
       transition: none;
     }
   }
   /* Composer thumbnails form a rail; sent-message media retains its natural preview. */
-  ${partSelector(chatComposerContract, "attachments")} ${partSelector(chatAttachmentsContract, "root")} {
+  ${chatComposerPartRefs.attachments} ${chatAttachmentsPartRefs.root} {
     margin-top: 0;
     flex-wrap: nowrap;
     gap: 10px;
     overflow-x: auto;
     scrollbar-width: none;
   }
-  ${partSelector(chatComposerContract, "attachments")} ${partSelector(chatAttachmentsContract, "root")}::-webkit-scrollbar {
+  ${chatComposerPartRefs.attachments} ${chatAttachmentsPartRefs.root}::-webkit-scrollbar {
     display: none;
   }
-  ${partSelector(chatComposerContract, "attachments")} ${partSelector(chatAttachmentsContract, "entry")} {
+  ${chatComposerPartRefs.attachments} ${chatAttachmentsPartRefs.entry} {
     flex: none;
   }
-  ${partSelector(chatComposerContract, "attachments")} ${partSelector(chatAttachmentsContract, "file")} {
+  ${chatComposerPartRefs.attachments} ${chatAttachmentsPartRefs.file} {
     border-radius: ${uiTokens.radius.xl};
   }
-  ${partSelector(chatComposerContract, "attachments")} ${partSelector(chatAttachmentsContract, "image")},
-  ${partSelector(chatComposerContract, "attachments")} ${partSelector(chatAttachmentsContract, "preview")} {
+  ${chatComposerPartRefs.attachments} ${chatAttachmentsPartRefs.image},
+  ${chatComposerPartRefs.attachments} ${chatAttachmentsPartRefs.preview} {
     width: 64px;
     height: 64px;
     max-width: 64px;

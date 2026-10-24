@@ -1,9 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { chatTaskContract } from "../../chat/task";
+import { css, parts } from "meowcss/meowjsx";
+
 import { uiTokens } from "../tokens";
 
-const part = (name: (typeof chatTaskContract.parts)[number]) =>
-  partSelector(chatTaskContract, name);
+import type { ChatTask } from "../../chat/task";
+const chatTaskPartRefs = parts<typeof ChatTask>("chat-task");
+const part = (name: keyof typeof chatTaskPartRefs) => chatTaskPartRefs[name];
 
 export const chatTaskStyles = css`
   ${part("root")} {

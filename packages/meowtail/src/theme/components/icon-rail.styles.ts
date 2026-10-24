@@ -1,22 +1,23 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { iconRailContract } from "../../components/icon-rail";
-import { railItemContract } from "../../components/rail-item";
-import { railSectionContract } from "../../components/rail-section";
+import { css, parts } from "meowcss/meowjsx";
+
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
+import type { IconRail } from "../../components/icon-rail";
+import type { RailItem } from "../../components/rail-item";
+import type { RailSection } from "../../components/rail-section";
+import { ui } from "../utilities";
+import { selectorForPart } from "../selectors";
 
-const rail = (part: (typeof iconRailContract.parts)[number]) =>
-  partSelector(iconRailContract, part);
-const item = (part: (typeof railItemContract.parts)[number]) =>
-  partSelector(railItemContract, part);
-const section = (part: (typeof railSectionContract.parts)[number]) =>
-  partSelector(railSectionContract, part);
-
+const iconRailPartRefs = parts<typeof IconRail>("icon-rail");
+const railItemPartRefs = parts<typeof RailItem>("rail-item");
+const railSectionPartRefs = parts<typeof RailSection>("rail-section");
+const rail = (part: keyof typeof iconRailPartRefs) => selectorForPart(iconRailPartRefs[part]);
+const item = (part: keyof typeof railItemPartRefs) => selectorForPart(railItemPartRefs[part]);
+const section = (part: keyof typeof railSectionPartRefs) =>
+  selectorForPart(railSectionPartRefs[part]);
 // Expanded while hovered, while keyboard focus is inside, or when the host pins it.
 const open = `${rail("root")}:is(:hover, :has(:focus-visible)) ${rail("drawer")}, ${rail("drawer")}[data-expanded="true"]`;
-const openWithin = (selector: string) =>
-  `${rail("root")}:is(:hover, :has(:focus-visible)) ${rail("drawer")} ${selector}, ${rail("drawer")}[data-expanded="true"] ${selector}`;
-
+const openWithin = (nestedSelector: string) =>
+  `${rail("root")}:is(:hover, :has(:focus-visible)) ${rail("drawer")} ${nestedSelector}, ${rail("drawer")}[data-expanded="true"] ${nestedSelector}`;
 export const iconRailStyles = css`
   ${rail("root")} {
     position: relative;
@@ -106,7 +107,7 @@ export const iconRailStyles = css`
     color: ${uiTokens.ink.primary};
   }
   ${item("root")}:focus-visible {
-    ${focusRing({ inset: true })}
+    ${ui.focus.inset}
   }
   ${item("root")}[aria-current="page"],
   ${section("root")}:has(${section("items")} ${item("root")}[aria-current="page"]) ${section("shortcut")} ${item("root")} {

@@ -1,0 +1,16 @@
+{
+  "extends": "./tsconfig.web.json",
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "meowjsx",
+    "jsxFactory": null,
+    "jsxFragmentFactory": null,
+    "paths": {
+      "meowjsx": ["./src/index.ts"],
+      "meowjsx/jsx-runtime": ["./src/jsx-runtime.ts"],
+      "meowjsx/jsx-dev-runtime": ["./src/jsx-dev-runtime.ts"],
+      "meowjsx/web": ["./web/index.ts"]
+    }
+  },
+  "include": ["tests/types/web.types.tsx", "web/**/*.ts"]
+}

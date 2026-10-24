@@ -12,11 +12,12 @@ import {
   ChatStatus,
   ChatToolCall,
   installMeowUI,
+  meowUIComponents,
 } from "meowtail";
 
 test("real chat parts expose stable selectors while retaining caller markup", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const web = createWebRenderer(runtime);
   const view = (
     <ChatFrame className="host">
@@ -114,7 +115,7 @@ test("real chat parts expose stable selectors while retaining caller markup", ()
 
 test("theme variants use original props while components retain semantic state", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const web = createWebRenderer(runtime);
   for (const role of ["user", "assistant", "system", "tool"] as const) {
     const html = web.renderToHtml(<ChatMessage role={role} author="Author" />);
@@ -139,7 +140,7 @@ test("theme variants use original props while components retain semantic state",
 
 test("individual metadata parts can be themed without touching nested caller content", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const web = createWebRenderer(runtime);
   runtime.use(
     createThemePlugin({

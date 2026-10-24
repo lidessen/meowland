@@ -3,7 +3,7 @@ import { createRuntime, h, unwrap } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { ChatComposer } from "../../../src/chat/composer";
 import { ChatAttachments } from "../../../src/chat/attachments";
-import { installMeowUI } from "meowtail";
+import { installMeowUI, meowUIComponents } from "meowtail";
 
 test("composer places supplied attachments within the form without owning uploads", () => {
   const html = createWebRenderer(createRuntime()).renderToHtml(
@@ -50,7 +50,7 @@ test("draft images expose distinct preview and removal callbacks while sent imag
 
 test("composer keeps writing controls on one surface and its hint after the surface", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const html = createWebRenderer(runtime).renderToHtml(
     <ChatComposer
       inputLabel="Work draft"

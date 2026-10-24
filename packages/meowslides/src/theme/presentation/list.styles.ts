@@ -1,9 +1,8 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { presentationListContract } from "../../presentation/list";
+import { css, parts } from "meowcss/meowjsx";
+import type { PresentationList } from "../../presentation/list";
 import { presentationTokens as tokens } from "./presentation.tokens";
 
-const root = partSelector(presentationListContract, "root");
-const item = partSelector(presentationListContract, "item");
+const { root, item } = parts<typeof PresentationList>("presentation-list");
 
 export const presentationListStyles = css`
   ${root} {

@@ -1,10 +1,12 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { iconButtonContract } from "../../components/icon-button";
-import { toolbarContract } from "../../components/toolbar";
 
+import type { IconButton } from "../../components/icon-button";
+import type { Toolbar } from "../../components/toolbar";
+const iconButtonPartRefs = parts<typeof IconButton>("icon-button");
+const toolbarPartRefs = parts<typeof Toolbar>("toolbar");
 export const toolbarStyles = css`
-  ${partSelector(toolbarContract, "root")} {
+  ${toolbarPartRefs.root} {
     display: flex;
     flex-wrap: wrap;
     min-width: 0;
@@ -12,17 +14,17 @@ export const toolbarStyles = css`
     gap: ${uiTokens.space.group};
   }
 
-  :where(${partSelector(toolbarContract, "root")}[aria-orientation="vertical"]) {
+  :where(${toolbarPartRefs.root}[aria-orientation="vertical"]) {
     flex-direction: column;
     align-items: stretch;
   }
 
-  :where(${partSelector(toolbarContract, "root")} > ${partSelector(iconButtonContract, "root")}) {
+  :where(${toolbarPartRefs.root} > ${iconButtonPartRefs.root}) {
     flex: 0 0 auto;
   }
 
   @media (pointer: coarse) {
-    ${partSelector(toolbarContract, "root")}[data-meowui-part] button {
+    ${toolbarPartRefs.root}[data-meowui-part] button {
       min-width: 44px;
       min-height: 44px;
     }

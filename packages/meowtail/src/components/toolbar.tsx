@@ -1,16 +1,11 @@
-import { defineComponent, type ComponentContract, type Props } from "meowjsx";
+import { h, type Context, type Props } from "meowjsx";
 import { activeElementInRoot } from "../shared/dom-root";
-
-export const toolbarContract = {
-  name: "toolbar",
-  parts: ["root"],
-} as const satisfies ComponentContract;
 
 export interface ToolbarProps extends Props {
   /** Every toolbar needs an accessible name, even when its controls are icon-only. */
   label: string;
   orientation?: "horizontal" | "vertical";
-  className?: string;
+  className?: Props["className"];
 }
 
 const actionSelector =
@@ -141,28 +136,22 @@ function mountToolbar(root: HTMLElement) {
 }
 
 /** A group of related controls that shares one Tab stop; the arrow keys move between them. */
-export const Toolbar = defineComponent<ToolbarProps, "toolbar", "root">(
-  toolbarContract,
-  ({ children, label, orientation = "horizontal", className, ...props }, context) =>
-    context.part(
-      "root",
-      "div",
-      {
-        ...props,
-        className,
-        role: "toolbar",
-        "aria-label": label,
-        "aria-orientation": orientation,
-        "data-orientation": orientation,
-        ref: (root: HTMLElement) => {
-          const hostCleanup = typeof props.ref === "function" ? props.ref(root) : undefined;
-          const cleanup = mountToolbar(root);
-          return () => {
-            cleanup();
-            if (typeof hostCleanup === "function") hostCleanup();
-          };
-        },
-      },
-      children,
-    ),
-);
+export function Toolbar(
+  { children, label, orientation = "horizontal", className, ref, ...props }: ToolbarProps,
+  context: Context<typeof Toolbar>,
+) {
+  return (
+    <div
+      {...props}
+      className={className}
+      role="toolbar"
+      aria-label={label}
+      aria-orientation={orientation}
+      data-orientation={orientation}
+      ref={[context.parts.root, ref, (root: HTMLElement) => mountToolbar(root)]}
+    >
+      {children}
+    </div>
+  );
+}
+Toolbar.meta = { name: "toolbar", parts: ["root"] } as const;

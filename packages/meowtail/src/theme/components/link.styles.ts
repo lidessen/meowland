@@ -1,9 +1,9 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { linkContract } from "../../components/link";
-
-const root = partSelector(linkContract, "root");
+import type { Link } from "../../components/link";
+import { ui } from "../utilities";
+const linkPartRefs = parts<typeof Link>("link");
+const root = linkPartRefs.root;
 
 export const linkStyles = css`
   ${root} {
@@ -23,7 +23,7 @@ export const linkStyles = css`
     text-decoration-color: ${uiTokens.ink.primary};
   }
   ${root}:focus-visible {
-    ${focusRing()}
+    ${ui.focus.ring}
     border-radius: ${uiTokens.radius.xs};
   }
   @media (prefers-reduced-motion: reduce) {

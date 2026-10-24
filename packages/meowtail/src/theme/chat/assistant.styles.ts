@@ -1,31 +1,46 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens, chatTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { assistantViewContract } from "../../chat/assistant.contract";
-import { assistantStepsContract } from "../../chat/assistant-steps.contract";
-import { assistantMarkdownContract } from "../../chat/assistant-markdown";
-import { assistantComposerContract } from "../../chat/assistant-composer";
-import { assistantQuestionContract } from "../../chat/assistant-question";
-import { chatHeaderContract } from "../../chat/header";
-import { pageFrameContract } from "../../components/page-frame";
-import { chatComposerContract } from "../../chat/composer";
-import { workCardContract } from "../../components/work-card";
-import { buttonContract } from "../../components/button";
-import { iconButtonContract } from "../../components/icon-button";
-import { chatMessageContract } from "../../chat/message";
-import { chatMessageListContract } from "../../chat/message-list";
-import { chatMessageActionsContract } from "../../chat/message-actions";
-
-const root = partSelector(assistantViewContract, "root");
-const layout = partSelector(assistantViewContract, "layout");
-const messages = partSelector(assistantViewContract, "messages");
-const viewport = partSelector(assistantViewContract, "viewport");
-const content = partSelector(assistantViewContract, "content");
-const composer = partSelector(assistantViewContract, "composer");
-const panel = `${root} [data-assistant-panel]`;
-const history = partSelector(assistantViewContract, "history");
-const historyItem = partSelector(assistantViewContract, "historyItem");
-const trigger = partSelector(assistantViewContract, "historyTrigger");
+import type { AssistantView } from "../../chat/assistant";
+import type { AssistantComposer } from "../../chat/assistant-composer";
+import type { AssistantMarkdown } from "../../chat/assistant-markdown";
+import type { AssistantQuestionView } from "../../chat/assistant-question";
+import type { AssistantSteps } from "../../chat/assistant-content";
+import type { ChatComposer } from "../../chat/composer";
+import type { ChatHeader } from "../../chat/header";
+import type { ChatMessage } from "../../chat/message";
+import type { ChatMessageActions } from "../../chat/message-actions";
+import type { ChatMessageList } from "../../chat/message-list";
+import type { Button } from "../../components/button";
+import type { IconButton } from "../../components/icon-button";
+import type { PageFrame } from "../../components/page-frame";
+import type { WorkCard } from "../../components/work-card";
+import { ui } from "../utilities";
+import { selectorForPart } from "../selectors";
+const assistantComposerPartRefs = parts<typeof AssistantComposer>("assistant-composer");
+const assistantMarkdownPartRefs = parts<typeof AssistantMarkdown>("assistant-markdown");
+const assistantQuestionPartRefs = parts<typeof AssistantQuestionView>("assistant-question");
+const assistantStepsPartRefs = parts<typeof AssistantSteps>("assistant-steps");
+const assistantViewPartRefs = parts<typeof AssistantView>("assistant-view");
+const buttonPartRefs = parts<typeof Button>("button");
+const chatComposerPartRefs = parts<typeof ChatComposer>("chat-composer");
+const chatHeaderPartRefs = parts<typeof ChatHeader>("chat-header");
+const chatMessageActionsPartRefs = parts<typeof ChatMessageActions>("chat-message-actions");
+const chatMessagePartRefs = parts<typeof ChatMessage>("chat-message");
+const chatMessageListPartRefs = parts<typeof ChatMessageList>("chat-message-list");
+const iconButtonPartRefs = parts<typeof IconButton>("icon-button");
+const pageFramePartRefs = parts<typeof PageFrame>("page-frame");
+const workCardPartRefs = parts<typeof WorkCard>("work-card");
+const root = assistantViewPartRefs.root;
+const rootSelector = selectorForPart(root);
+const layout = assistantViewPartRefs.layout;
+const messages = assistantViewPartRefs.messages;
+const viewport = assistantViewPartRefs.viewport;
+const content = assistantViewPartRefs.content;
+const composer = assistantViewPartRefs.composer;
+const panel = `${rootSelector} [data-assistant-panel]`;
+const history = assistantViewPartRefs.history;
+const historyItem = assistantViewPartRefs.historyItem;
+const trigger = assistantViewPartRefs.historyTrigger;
 
 /** The complete composition belongs to the shared theme, never a demo stylesheet. */
 export const assistantStyles = css`
@@ -37,10 +52,10 @@ export const assistantStyles = css`
     background: ${uiTokens.surface.reading};
     font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
-  ${root} > ${partSelector(pageFrameContract, "root")} {
+  ${root} > ${pageFramePartRefs.root} {
     height: 100%;
   }
-  ${root} ${partSelector(chatHeaderContract, "root")} {
+  ${root} ${chatHeaderPartRefs.root} {
     padding: ${uiTokens.space.group} ${uiTokens.space.section};
   }
   ${layout} {
@@ -80,7 +95,7 @@ export const assistantStyles = css`
       opacity ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
   ${viewport}:focus-visible {
-    ${focusRing({ inset: true })}
+    ${ui.focus.inset}
   }
   ${content} {
     max-width: ${uiTokens.layout.containerContent};
@@ -89,7 +104,7 @@ export const assistantStyles = css`
     box-sizing: border-box;
   }
   /* The content column already holds the reading inset and scroll; the list only stacks turns. */
-  ${content} ${partSelector(chatMessageListContract, "root")} {
+  ${content} ${chatMessageListPartRefs.root} {
     gap: 0;
     padding: 0;
     overflow: visible;
@@ -99,7 +114,7 @@ export const assistantStyles = css`
   ${content} [data-assistant-message-id] {
     padding-block: calc(${chatTokens.listGap} / 2);
   }
-  ${content} [data-assistant-message-id] ${partSelector(chatMessageContract, "header")} {
+  ${content} [data-assistant-message-id] ${chatMessagePartRefs.header} {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -107,31 +122,31 @@ export const assistantStyles = css`
     clip-path: inset(50%);
     white-space: nowrap;
   }
-  ${content} [data-assistant-role="assistant"] ${partSelector(chatMessageContract, "actions")} {
+  ${content} [data-assistant-role="assistant"] ${chatMessagePartRefs.actions} {
     margin-top: ${uiTokens.space.group};
     margin-inline-start: -6px;
     opacity: 1;
   }
-  ${content} [data-assistant-actions] ${partSelector(chatMessageActionsContract, "root")} {
+  ${content} [data-assistant-actions] ${chatMessageActionsPartRefs.root} {
     gap: 2px;
   }
-  ${content} [data-assistant-actions] ${partSelector(iconButtonContract, "root")} .assistant-copy-done,
-  ${content} [data-assistant-actions] ${partSelector(iconButtonContract, "root")}[data-copied="true"] .assistant-copy-idle {
+  ${content} [data-assistant-actions] ${iconButtonPartRefs.root} .assistant-copy-done,
+  ${content} [data-assistant-actions] ${iconButtonPartRefs.root}[data-copied="true"] .assistant-copy-idle {
     display: none;
   }
-  ${content} [data-assistant-actions] ${partSelector(iconButtonContract, "root")}[data-copied="true"] .assistant-copy-done {
+  ${content} [data-assistant-actions] ${iconButtonPartRefs.root}[data-copied="true"] .assistant-copy-done {
     display: block;
   }
   /* Parts stack on the message content's prose gap, like paragraphs of one reply. */
   ${content} [data-assistant-part-id] {
     overflow-wrap: anywhere;
   }
-  ${root} ${partSelector(assistantMarkdownContract, "root")} {
+  ${root} ${assistantMarkdownPartRefs.root} {
     font-size: ${chatTokens.fontBody};
     line-height: ${chatTokens.leading};
     overflow-wrap: anywhere;
   }
-  ${partSelector(assistantViewContract, "latest")} {
+  ${assistantViewPartRefs.latest} {
     display: flex;
     justify-content: center;
     flex-shrink: 0;
@@ -141,7 +156,7 @@ export const assistantStyles = css`
     padding: ${uiTokens.space.group} ${uiTokens.space.panel};
     box-sizing: border-box;
   }
-  ${partSelector(assistantViewContract, "latest")} > ${partSelector(buttonContract, "root")} {
+  ${assistantViewPartRefs.latest} > ${buttonPartRefs.root} {
     min-width: 0;
     max-width: 100%;
     white-space: normal;
@@ -158,20 +173,20 @@ export const assistantStyles = css`
     min-width: 0;
   }
   /* A docked bar: the fill rung with a faint lift off the reading surface. */
-  ${composer} ${partSelector(chatComposerContract, "surface")} {
+  ${composer} ${chatComposerPartRefs.surface} {
     box-shadow: ${uiTokens.shadow.dock};
   }
   ${trigger} {
     display: contents;
   }
-  ${trigger} ${partSelector(iconButtonContract, "root")} .assistant-history-open,
-  ${trigger} ${partSelector(iconButtonContract, "root")}[aria-expanded="true"] .assistant-history-closed {
+  ${trigger} ${iconButtonPartRefs.root} .assistant-history-open,
+  ${trigger} ${iconButtonPartRefs.root}[aria-expanded="true"] .assistant-history-closed {
     display: none;
   }
-  ${trigger} ${partSelector(iconButtonContract, "root")}[aria-expanded="true"] .assistant-history-open {
+  ${trigger} ${iconButtonPartRefs.root}[aria-expanded="true"] .assistant-history-open {
     display: block;
   }
-  ${trigger} ${partSelector(iconButtonContract, "root")}[aria-expanded="true"] {
+  ${trigger} ${iconButtonPartRefs.root}[aria-expanded="true"] {
     background: ${uiTokens.state.active};
     color: ${uiTokens.ink.primary};
   }
@@ -247,7 +262,7 @@ export const assistantStyles = css`
     }
   }
   ${historyItem}:focus-visible {
-    ${focusRing()}
+    ${ui.focus.ring}
   }
   @media (prefers-reduced-motion: reduce) {
     ${viewport},
@@ -256,36 +271,36 @@ export const assistantStyles = css`
       transition: none;
     }
   }
-  ${composer} ${partSelector(chatComposerContract, "input")} {
+  ${composer} ${chatComposerPartRefs.input} {
     min-height: 1.6em;
     max-height: min(30dvh, 240px);
     overflow-y: auto;
   }
-  ${root} ${partSelector(assistantComposerContract, "choices")} {
+  ${root} ${assistantComposerPartRefs.choices} {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
     min-width: 0;
     gap: ${uiTokens.space.group};
   }
-  ${root} ${partSelector(assistantComposerContract, "feedback")}, ${partSelector(assistantViewContract, "feedback")} {
+  ${root} ${assistantComposerPartRefs.feedback}, ${assistantViewPartRefs.feedback} {
     margin: ${uiTokens.space.group} 0;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
   }
-  ${partSelector(assistantViewContract, "empty")} {
+  ${assistantViewPartRefs.empty} {
     padding-block: ${uiTokens.space.panel};
   }
-  ${partSelector(assistantViewContract, "empty")} h2 {
+  ${assistantViewPartRefs.empty} h2 {
     font-size: ${uiTokens.type.pageTitle};
     margin-block: ${uiTokens.space.section};
   }
-  ${partSelector(assistantStepsContract, "root")} {
+  ${assistantStepsPartRefs.root} {
     list-style: none;
     margin: 0;
     padding: 0;
   }
-  ${partSelector(assistantStepsContract, "step")} {
+  ${assistantStepsPartRefs.step} {
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     align-items: baseline;
@@ -293,12 +308,12 @@ export const assistantStyles = css`
     padding-block: ${uiTokens.space.group};
     font-size: ${uiTokens.type.body};
   }
-  ${partSelector(assistantStepsContract, "description")} {
+  ${assistantStepsPartRefs.description} {
     margin: 0;
     color: ${uiTokens.ink.secondary};
     white-space: pre-wrap;
   }
-  ${partSelector(assistantStepsContract, "status")} {
+  ${assistantStepsPartRefs.status} {
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
   }
@@ -323,7 +338,7 @@ export const assistantStyles = css`
     display: flex;
     flex-direction: column;
   }
-  ${partSelector(assistantViewContract, "activityHeader")} {
+  ${assistantViewPartRefs.activityHeader} {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
@@ -332,36 +347,36 @@ export const assistantStyles = css`
     border-bottom: 1px solid ${uiTokens.line.divider};
     flex: 0 0 auto;
   }
-  ${partSelector(assistantViewContract, "activityHeader")} h2 {
+  ${assistantViewPartRefs.activityHeader} h2 {
     flex: 1;
     margin: 0;
     font-size: ${uiTokens.type.title};
   }
-  ${partSelector(assistantViewContract, "activityBody")}, ${partSelector(assistantViewContract, "workDetail")} {
+  ${assistantViewPartRefs.activityBody}, ${assistantViewPartRefs.workDetail} {
     min-height: 0;
     overflow-y: auto;
     padding: ${uiTokens.space.section};
   }
-  ${partSelector(assistantViewContract, "section")} + ${partSelector(assistantViewContract, "section")} {
+  ${assistantViewPartRefs.section} + ${assistantViewPartRefs.section} {
     margin-top: ${uiTokens.space.panel};
   }
-  ${partSelector(assistantViewContract, "section")} h3 {
+  ${assistantViewPartRefs.section} h3 {
     font-size: ${uiTokens.type.body};
     margin: 0 0 ${uiTokens.space.group};
   }
-  ${partSelector(assistantViewContract, "status")} {
+  ${assistantViewPartRefs.status} {
     display: flex;
     align-items: center;
     gap: ${uiTokens.space.group};
   }
-  ${panel} ${partSelector(workCardContract, "root")} {
+  ${panel} ${workCardPartRefs.root} {
     width: 100%;
     margin-block: ${uiTokens.space.group};
   }
-  ${root} ${partSelector(assistantQuestionContract, "root")} {
+  ${root} ${assistantQuestionPartRefs.root} {
     margin-block: ${uiTokens.space.section};
   }
-  ${root} ${partSelector(assistantQuestionContract, "answer")} {
+  ${root} ${assistantQuestionPartRefs.answer} {
     box-sizing: border-box;
     width: 100%;
     resize: vertical;
@@ -373,7 +388,7 @@ export const assistantStyles = css`
     background: ${uiTokens.surface.field};
     padding: ${uiTokens.space.group};
   }
-  ${root} ${partSelector(assistantQuestionContract, "options")} {
+  ${root} ${assistantQuestionPartRefs.options} {
     margin-bottom: ${uiTokens.space.group};
   }
   ${root} [hidden] {
@@ -398,7 +413,7 @@ export const assistantStyles = css`
     ${history} {
       padding-inline: ${uiTokens.space.pageInlineCompact};
     }
-    ${partSelector(assistantViewContract, "latest")} {
+    ${assistantViewPartRefs.latest} {
       padding-inline: ${uiTokens.space.pageInlineCompact};
     }
   }

@@ -1,17 +1,17 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { disclosureContract } from "../../components/disclosure";
-
+import type { Disclosure } from "../../components/disclosure";
+import { ui } from "../utilities";
+const disclosurePartRefs = parts<typeof Disclosure>("disclosure");
 export const disclosureStyles = css`
-  ${partSelector(disclosureContract, "root")} {
+  ${disclosurePartRefs.root} {
     min-width: 0;
     color: ${uiTokens.ink.primary};
     font-family: ${uiTokens.type.sans};
     font-size: ${uiTokens.type.label};
   }
 
-  ${partSelector(disclosureContract, "summary")} {
+  ${disclosurePartRefs.summary} {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -27,22 +27,22 @@ export const disclosureStyles = css`
     transition: color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
 
-  ${partSelector(disclosureContract, "summary")}::-webkit-details-marker {
+  ${disclosurePartRefs.summary}::-webkit-details-marker {
     display: none;
   }
-  ${partSelector(disclosureContract, "summary")}::marker {
+  ${disclosurePartRefs.summary}::marker {
     content: "";
   }
   @media (hover: hover) {
-    ${partSelector(disclosureContract, "summary")}:hover {
+    ${disclosurePartRefs.summary}:hover {
       color: ${uiTokens.ink.secondary};
     }
   }
-  ${partSelector(disclosureContract, "summary")}:focus-visible {
-    ${focusRing()}
+  ${disclosurePartRefs.summary}:focus-visible {
+    ${ui.focus.ring}
   }
 
-  ${partSelector(disclosureContract, "icon")} {
+  ${disclosurePartRefs.icon} {
     display: inline-flex;
     flex: 0 0 auto;
     width: ${uiTokens.icon.size};
@@ -51,15 +51,15 @@ export const disclosureStyles = css`
     justify-content: center;
     transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
-  ${partSelector(disclosureContract, "icon")} > svg {
+  ${disclosurePartRefs.icon} > svg {
     width: ${uiTokens.icon.small};
     height: ${uiTokens.icon.small};
   }
-  ${partSelector(disclosureContract, "root")}[open] > ${partSelector(disclosureContract, "summary")} > ${partSelector(disclosureContract, "icon")} {
+  ${disclosurePartRefs.root}[open] > ${disclosurePartRefs.summary} > ${disclosurePartRefs.icon} {
     transform: rotate(90deg);
   }
 
-  ${partSelector(disclosureContract, "content")} {
+  ${disclosurePartRefs.content} {
     min-width: 0;
     padding: 4px 0 4px 22px;
     overflow-wrap: anywhere;
@@ -67,13 +67,13 @@ export const disclosureStyles = css`
   }
 
   @media (pointer: coarse) {
-    ${partSelector(disclosureContract, "summary")} {
+    ${disclosurePartRefs.summary} {
       min-height: 44px;
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(disclosureContract, "summary")},
-    ${partSelector(disclosureContract, "icon")} {
+    ${disclosurePartRefs.summary},
+    ${disclosurePartRefs.icon} {
       transition: none;
     }
   }

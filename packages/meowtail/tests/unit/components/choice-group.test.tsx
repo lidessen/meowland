@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 import { createRuntime, h, signal, type Props } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { ChoiceGroup } from "../../../src/components/choice-group";
+import { mountComponent } from "./mount";
 
 const options = [
   { value: "draft", label: "Keep the draft for now", description: "Not published" },
@@ -54,7 +55,7 @@ test("uncontrolled selection updates while a controlled caller can reject native
       },
     });
     const value = signal("draft");
-    createWebRenderer(runtime).renderToHtml(
+    const view = mountComponent(
       <ChoiceGroup
         label="Delivery method"
         options={options}
@@ -62,18 +63,22 @@ test("uncontrolled selection updates while a controlled caller can reject native
         value={controlled ? value : undefined}
         onValueChange={(next) => changes.push(next)}
       />,
+      runtime,
     );
-    const input = { checked: true } as HTMLInputElement;
-    (radios.get("review")!.ref as (input: HTMLInputElement) => void)(input);
-    input.checked = true;
-    (radios.get("review")!.onChange as (event: Event) => void)({
-      currentTarget: input,
-    } as unknown as Event);
-    expect(changes).toEqual(["review"]);
-    expect(input.checked).toBe(!controlled);
-    (radios.get("locked")!.onChange as (event: Event) => void)({
-      currentTarget: { checked: true },
-    } as unknown as Event);
-    expect(changes).toEqual(["review"]);
+    try {
+      const input = view.host.querySelector<HTMLInputElement>('input[value="review"]')!;
+      input.checked = true;
+      (radios.get("review")!.onChange as (event: Event) => void)({
+        currentTarget: input,
+      } as unknown as Event);
+      expect(changes).toEqual(["review"]);
+      expect(input.checked).toBe(!controlled);
+      (radios.get("locked")!.onChange as (event: Event) => void)({
+        currentTarget: view.host.querySelector('input[value="locked"]'),
+      } as unknown as Event);
+      expect(changes).toEqual(["review"]);
+    } finally {
+      view.unmount();
+    }
   }
 });

@@ -1,9 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { stateDotContract } from "../../components/state-dot";
 
+import type { StateDot } from "../../components/state-dot";
+const stateDotPartRefs = parts<typeof StateDot>("state-dot");
 export const stateDotStyles = css`
-  ${partSelector(stateDotContract, "root")} {
+  ${stateDotPartRefs.root} {
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -14,7 +15,7 @@ export const stateDotStyles = css`
     background: transparent;
     color: ${uiTokens.ink.tertiary};
   }
-  ${partSelector(stateDotContract, "root")}[data-appearance="dot"]:not([data-state="ongoing"])::after {
+  ${stateDotPartRefs.root}[data-appearance="dot"]:not([data-state="ongoing"])::after {
     content: "";
     position: absolute;
     inset: 20%;
@@ -22,37 +23,37 @@ export const stateDotStyles = css`
     corner-shape: round;
     background: currentColor;
   }
-  ${partSelector(stateDotContract, "root")}[data-state="idle"] {
+  ${stateDotPartRefs.root}[data-state="idle"] {
     color: ${uiTokens.status.unknown};
   }
-  ${partSelector(stateDotContract, "root")}[data-state="done"] {
+  ${stateDotPartRefs.root}[data-state="done"] {
     color: ${uiTokens.status.success};
   }
-  ${partSelector(stateDotContract, "root")}[data-state="warning"] {
+  ${stateDotPartRefs.root}[data-state="warning"] {
     color: ${uiTokens.status.warning};
   }
-  ${partSelector(stateDotContract, "root")}[data-state="error"] {
+  ${stateDotPartRefs.root}[data-state="error"] {
     color: ${uiTokens.status.danger};
   }
-  ${partSelector(stateDotContract, "root")}[data-state="ongoing"] {
+  ${stateDotPartRefs.root}[data-state="ongoing"] {
     background: transparent;
   }
-  ${partSelector(stateDotContract, "root")}[data-appearance="step"] {
+  ${stateDotPartRefs.root}[data-appearance="step"] {
     background: transparent;
     border: 1.5px solid ${uiTokens.ink.tertiary};
     box-sizing: border-box;
   }
-  ${partSelector(stateDotContract, "root")}[data-appearance="step"]:is([data-state="done"], [data-state="error"]) {
+  ${stateDotPartRefs.root}[data-appearance="step"]:is([data-state="done"], [data-state="error"]) {
     border-color: currentColor;
     background: currentColor;
   }
-  ${partSelector(stateDotContract, "root")}[data-appearance="step"][data-state="warning"] {
+  ${stateDotPartRefs.root}[data-appearance="step"][data-state="warning"] {
     border-color: currentColor;
   }
-  ${partSelector(stateDotContract, "root")}[data-appearance="step"][data-state="done"] > svg {
+  ${stateDotPartRefs.root}[data-appearance="step"][data-state="done"] > svg {
     color: ${uiTokens.action.onPrimary};
   }
-  ${partSelector(stateDotContract, "motion")} {
+  ${stateDotPartRefs.motion} {
     display: flex;
     animation: ui-state-dot-spin ${uiTokens.motion.loop} linear infinite;
   }
@@ -62,7 +63,7 @@ export const stateDotStyles = css`
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(stateDotContract, "motion")} {
+    ${stateDotPartRefs.motion} {
       animation: none;
     }
   }

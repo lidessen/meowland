@@ -192,6 +192,16 @@ test("dynamic text waits for Reveal movement before diagnosing logical overflow"
       fontSize: "14px",
       lineHeight: "20px",
     });
+    // Remove native button chrome so the 24px allocation is a real fit.
+    Object.assign(element.querySelector("button")!.style, {
+      boxSizing: "border-box",
+      height: "24px",
+      minHeight: "0",
+      padding: "0",
+      border: "0",
+      lineHeight: "20px",
+      verticalAlign: "top",
+    });
   });
   await jump(page, "experiment", 2);
   await expect.poll(() => reveal.evaluate((element) => element.getAnimations().length)).toBe(1);

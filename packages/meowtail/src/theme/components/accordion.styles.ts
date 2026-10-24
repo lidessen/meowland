@@ -1,14 +1,16 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { accordionContract } from "../../components/accordion";
-import { disclosureContract } from "../../components/disclosure";
 
-const root = partSelector(accordionContract, "root");
-const item = partSelector(accordionContract, "item");
-const disclosure = partSelector(disclosureContract, "root");
-const summary = partSelector(disclosureContract, "summary");
-const icon = partSelector(disclosureContract, "icon");
-const content = partSelector(disclosureContract, "content");
+import type { Accordion } from "../../components/accordion";
+import type { Disclosure } from "../../components/disclosure";
+const accordionPartRefs = parts<typeof Accordion>("accordion");
+const disclosurePartRefs = parts<typeof Disclosure>("disclosure");
+const root = accordionPartRefs.root;
+const item = accordionPartRefs.item;
+const disclosure = disclosurePartRefs.root;
+const summary = disclosurePartRefs.summary;
+const icon = disclosurePartRefs.icon;
+const content = disclosurePartRefs.content;
 
 export const accordionStyles = css`
   ${root} {

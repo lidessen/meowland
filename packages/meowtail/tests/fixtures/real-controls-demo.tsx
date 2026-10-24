@@ -1,14 +1,10 @@
-import { defineComponent, h } from "meowjsx";
-import {
-  Alert,
-  Button,
-  alertContract,
-  alertOptions,
-  buttonContract,
-  buttonOptions,
-} from "../../src/components";
-import { css, defineTheme, partSelector } from "meowcss/meowjsx";
+import { h, type Context, type Props } from "meowjsx";
+import { Alert } from "../../src/components/alert";
+import { Button } from "../../src/components/button";
+import { alertOptions } from "../../src/components/alert.options";
+import { buttonOptions } from "../../src/components/button.options";
 import { defineOptions, defineTokens, type Selection } from "meowcss";
+import { css, defineTheme, parts } from "meowcss/meowjsx";
 import { Theme } from "meowcss/web";
 
 export const controlsOptions = defineOptions("controls-trial", { density: ["compact", "normal"] });
@@ -45,14 +41,11 @@ const alertTokens = defineTokens("controls-alert", {
     danger: `${ui.danger}`,
   }),
 });
-const button = partSelector(buttonContract, "root");
-const alert = partSelector(alertContract, "root");
-const title = partSelector(alertContract, "title");
-const body = partSelector(alertContract, "body");
-const actions = partSelector(alertContract, "actions");
+const button = parts<typeof Button>("button");
+const alert = parts<typeof Alert>("alert");
 
 const buttonCSS = css`
-  ${button} {
+  ${button.root} {
     box-sizing: border-box;
     display: inline-flex;
     align-items: center;
@@ -96,7 +89,7 @@ const buttonCSS = css`
   }
 `;
 const alertCSS = css`
-  ${alert} {
+  ${alert.root} {
     display: grid;
     gap: 8px;
     padding: 12px;
@@ -106,14 +99,14 @@ const alertCSS = css`
     color: ${ui.text};
     overflow-wrap: anywhere;
   }
-  ${title} {
+  ${alert.title} {
     color: ${alertTokens.accent};
     font-weight: 600;
   }
-  ${body} {
+  ${alert.body} {
     line-height: 1.6;
   }
-  ${actions} {
+  ${alert.actions} {
     display: flex;
     gap: 8px;
     flex-wrap: wrap;
@@ -123,7 +116,7 @@ const alertCSS = css`
 export const controlsTheme = defineTheme({
   options: controlsOptions,
   defaults: { scheme: "light", density: "normal" },
-  tokens: [ui, { at: button, values: buttonTokens }, alertTokens],
+  tokens: [ui, { at: button.root, values: buttonTokens }, alertTokens],
   styles: css`
     ${buttonCSS}
     ${alertCSS}
@@ -181,132 +174,130 @@ export const controlsTheme = defineTheme({
   `,
 });
 
-export const RealControlsDemo = defineComponent(
-  { name: "real-controls-demo", parts: [] },
-  (_props: object, context) => {
-    const config = context.signal<Selection>(controlsOptions.select({}));
-    const local = context.signal<Selection>(controlsOptions.select({}));
-    const variant = context.signal<"primary" | "quiet" | "outline" | undefined>("outline");
-    const tone = context.signal<"info" | "danger" | undefined>("danger");
-    const submitted = context.signal(0);
-    return (
-      <Theme
-        theme={controlsTheme}
-        config={config}
-        id="real-root"
-        className="real-controls real-stack"
-      >
-        <header>
-          <h1>Real components · Parameterized theme</h1>
-          <p>
-            Button and Alert share one set of component contracts; root defaults, conditional
-            sources, and part bindings are assembled by the theme.
-          </p>
-        </header>
-        <nav className="real-row">
+export function RealControlsDemo(_props: Props, context: Context<typeof RealControlsDemo>) {
+  const config = context.signal<Selection>(controlsOptions.select({}));
+  const local = context.signal<Selection>(controlsOptions.select({}));
+  const variant = context.signal<"primary" | "quiet" | "outline" | undefined>("outline");
+  const tone = context.signal<"info" | "danger" | undefined>("danger");
+  const submitted = context.signal(0);
+  return (
+    <Theme
+      theme={controlsTheme}
+      config={config}
+      id="real-root"
+      className="real-controls real-stack"
+    >
+      <header>
+        <h1>Real components · Parameterized theme</h1>
+        <p>
+          Button and Alert share one set of component metadata; root defaults, conditional sources,
+          and part bindings are assembled by the theme.
+        </p>
+      </header>
+      <nav className="real-row">
+        <Button
+          variant="outline"
+          onClick={() => config.set(controlsOptions.select({ scheme: "dark" }))}
+        >
+          Switch to dark
+        </Button>
+        <Button
+          variant="outline"
+          onClick={() => config.set(controlsOptions.select({ density: "compact" }))}
+        >
+          Switch to compact
+        </Button>
+        <Button variant="outline" onClick={() => config.set(controlsOptions.select({}))}>
+          Restore theme defaults
+        </Button>
+        <a href="/">Original prototype</a>
+      </nav>
+      <section className="real-panel real-stack">
+        <h2>Real Button: style options and form behavior</h2>
+        <form
+          className="real-row"
+          onSubmit={(event: Event) => {
+            event.preventDefault();
+            submitted.update((n) => n + 1);
+          }}
+        >
+          <input
+            id="real-draft"
+            aria-label="Real draft"
+            name="draft"
+            placeholder="Type, then switch configuration"
+          />
+          <Button id="real-button" type="submit" variant={variant}>
+            Submit
+          </Button>
+          <Button id="real-disabled" disabled type="submit">
+            Disabled submit
+          </Button>
+          <output id="real-submitted">{submitted}</output>
+        </form>
+        <div className="real-row">
+          <Button variant="quiet" onClick={() => variant.set("quiet")}>
+            Use quiet
+          </Button>
+          <Button variant="quiet" onClick={() => variant.set(undefined)}>
+            Restore Button defaults
+          </Button>
+          <Button id="real-small" size="small">
+            Small size
+          </Button>
+          <Button size="large">Large size</Button>
+        </div>
+        <div className="real-token-override">
+          <Button id="real-reset" variant="outline">
+            Instance constants do not inherit outer overrides
+          </Button>
+        </div>
+      </section>
+      <section className="real-panel real-stack">
+        <h2>Local override covers density only</h2>
+        <div className="real-row">
           <Button
-            variant="outline"
-            onClick={() => config.set(controlsOptions.select({ scheme: "dark" }))}
+            variant="quiet"
+            onClick={() => local.set(controlsOptions.select({ density: "compact" }))}
           >
-            Switch to dark
+            Local compact
           </Button>
-          <Button
-            variant="outline"
-            onClick={() => config.set(controlsOptions.select({ density: "compact" }))}
-          >
-            Switch to compact
+          <Button variant="quiet" onClick={() => local.set(controlsOptions.select({}))}>
+            Remove local configuration
           </Button>
-          <Button variant="outline" onClick={() => config.set(controlsOptions.select({}))}>
-            Restore theme defaults
+        </div>
+        <Theme config={local} id="real-local">
+          <Button id="real-local-button">Local button</Button>
+        </Theme>
+      </section>
+      <section className="real-stack">
+        <h2>Real Alert: multiple parts and nested instances</h2>
+        <div className="real-row">
+          <Button variant="quiet" onClick={() => tone.set("info")}>
+            Outer tone to info
           </Button>
-          <a href="/">Original prototype</a>
-        </nav>
-        <section className="real-panel real-stack">
-          <h2>Real Button: style options and form behavior</h2>
-          <form
-            className="real-row"
-            onSubmit={(event: Event) => {
-              event.preventDefault();
-              submitted.update((n) => n + 1);
-            }}
-          >
-            <input
-              id="real-draft"
-              aria-label="Real draft"
-              name="draft"
-              placeholder="Type, then switch configuration"
-            />
-            <Button id="real-button" type="submit" variant={variant}>
-              Submit
+          <Button variant="quiet" onClick={() => tone.set(undefined)}>
+            Restore Alert defaults
+          </Button>
+        </div>
+        <Alert
+          id="real-outer"
+          tone={tone}
+          title="Outer alert"
+          role="alert"
+          actions={
+            <Button size="small" variant="outline">
+              View details
             </Button>
-            <Button id="real-disabled" disabled type="submit">
-              Disabled submit
-            </Button>
-            <output id="real-submitted">{submitted}</output>
-          </form>
-          <div className="real-row">
-            <Button variant="quiet" onClick={() => variant.set("quiet")}>
-              Use quiet
-            </Button>
-            <Button variant="quiet" onClick={() => variant.set(undefined)}>
-              Restore Button defaults
-            </Button>
-            <Button id="real-small" size="small">
-              Small size
-            </Button>
-            <Button size="large">Large size</Button>
-          </div>
-          <div className="real-token-override">
-            <Button id="real-reset" variant="outline">
-              Instance constants do not inherit outer overrides
-            </Button>
-          </div>
-        </section>
-        <section className="real-panel real-stack">
-          <h2>Local override covers density only</h2>
-          <div className="real-row">
-            <Button
-              variant="quiet"
-              onClick={() => local.set(controlsOptions.select({ density: "compact" }))}
-            >
-              Local compact
-            </Button>
-            <Button variant="quiet" onClick={() => local.set(controlsOptions.select({}))}>
-              Remove local configuration
-            </Button>
-          </div>
-          <Theme config={local} id="real-local">
-            <Button id="real-local-button">Local button</Button>
-          </Theme>
-        </section>
-        <section className="real-stack">
-          <h2>Real Alert: multiple parts and nested instances</h2>
-          <div className="real-row">
-            <Button variant="quiet" onClick={() => tone.set("info")}>
-              Outer tone to info
-            </Button>
-            <Button variant="quiet" onClick={() => tone.set(undefined)}>
-              Restore Alert defaults
-            </Button>
-          </div>
-          <Alert
-            id="real-outer"
-            tone={tone}
-            title="Outer alert"
-            role="alert"
-            actions={
-              <Button size="small" variant="outline">
-                View details
-              </Button>
-            }
-          >
-            <p>The outer emphasis does not override the inner default tone.</p>
-            <Alert id="real-inner" title="Inner default notice">
-              Keeps its own default value and status semantics.
-            </Alert>
+          }
+        >
+          <p>The outer emphasis does not override the inner default tone.</p>
+          <Alert id="real-inner" title="Inner default notice">
+            Keeps its own default value and status semantics.
           </Alert>
-        </section>
-      </Theme>
-    );
-  },
-);
+        </Alert>
+      </section>
+    </Theme>
+  );
+}
+RealControlsDemo.meta = { name: "real-controls-demo", parts: [] } as const;

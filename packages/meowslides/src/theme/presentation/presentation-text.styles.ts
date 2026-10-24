@@ -1,12 +1,9 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import {
-  presentationTextContract,
-  presentationTextOptions,
-} from "../../presentation/presentation-text";
+import { css, parts } from "meowcss/meowjsx";
+import type { PresentationText } from "../../presentation/presentation-text";
+import { presentationTextOptions } from "../../presentation/presentation-text.options";
 import { presentationTokens } from "./presentation.tokens";
 
-const root = partSelector(presentationTextContract, "root");
-const content = partSelector(presentationTextContract, "content");
+const { root, content } = parts<typeof PresentationText>("presentation-text");
 
 export const presentationTextStyles = css`
   ${root} {

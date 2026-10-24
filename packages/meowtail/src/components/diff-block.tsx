@@ -1,10 +1,6 @@
-import { defineComponent, h, type ComponentContract, type Props } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
 import { OutputBlock } from "./output-block";
 
-export const diffBlockContract = {
-  name: "diff-block",
-  parts: ["root", "line", "path"],
-} as const satisfies ComponentContract;
 export interface DiffBlockLine {
   kind: "added" | "removed" | "context";
   text: string;
@@ -30,11 +26,10 @@ export function diffBlockText(files: readonly DiffBlockFile[]) {
  * A file diff: removed and added lines with their context. Hosts provide semantic diff rows; this
  * view does not infer changes or apply patches.
  */
-export const DiffBlock = defineComponent<
-  DiffBlockProps,
-  "diff-block",
-  (typeof diffBlockContract.parts)[number]
->(diffBlockContract, ({ files, maxLines, onCopy, ...props }, context) => {
+export function DiffBlock(
+  { files, maxLines, onCopy, ...props }: DiffBlockProps,
+  context: Context<typeof DiffBlock>,
+) {
   const added = files.reduce(
     (sum, file) => sum + file.lines.filter((line) => line.kind === "added").length,
     0,
@@ -43,24 +38,25 @@ export const DiffBlock = defineComponent<
     (sum, file) => sum + file.lines.filter((line) => line.kind === "removed").length,
     0,
   );
-  return context.part(
-    "root",
-    "div",
-    props,
-    <OutputBlock
-      title={`Changes · +${added} −${removed}`}
-      maxLines={maxLines}
-      onCopy={onCopy}
-      copyText={diffBlockText(files)}
-      rows={files.flatMap((file) => [
-        context.part("path", "div", {}, file.path),
-        ...file.lines.map((line) =>
-          context.part("line", "div", { "data-diff-kind": line.kind }, [
-            marker[line.kind],
-            line.text,
-          ]),
-        ),
-      ])}
-    />,
+  return (
+    <div {...props} ref={[context.parts.root, props.ref]}>
+      {
+        <OutputBlock
+          title={`Changes · +${added} −${removed}`}
+          maxLines={maxLines}
+          onCopy={onCopy}
+          copyText={diffBlockText(files)}
+          rows={files.flatMap((file) => [
+            <div ref={[context.parts.path]}>{file.path}</div>,
+            ...file.lines.map((line) => (
+              <div data-diff-kind={line.kind} ref={[context.parts.line]}>
+                {[marker[line.kind], line.text]}
+              </div>
+            )),
+          ])}
+        />
+      }
+    </div>
   );
-});
+}
+DiffBlock.meta = { name: "diff-block", parts: ["root", "line", "path"] } as const;

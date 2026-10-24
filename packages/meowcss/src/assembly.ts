@@ -24,14 +24,16 @@ export interface ScopedTokens {
   readonly values: TokenSet;
 }
 
-/** Pure CSS assembly. Component-aware carrier inference belongs to the JSX adapter. */
-export function defineTheme<O extends Options<any>>(config: {
-  options: O;
-  defaults: Defaults<NoInfer<O>>;
-  tokens: readonly (TokenSet | ScopedTokens)[];
-  styles: CSSFragment | readonly CSSFragment[];
-  sources?: TokenBinding["sources"];
-}): ThemeDefinition {
+function assembleTheme<O extends Options<any>>(
+  config: {
+    options: O;
+    defaults: Defaults<NoInfer<O>>;
+    tokens: readonly (TokenSet | ScopedTokens)[];
+    styles: CSSFragment | readonly CSSFragment[];
+    sources?: TokenBinding["sources"];
+  },
+  resolveSource?: TokenBinding["resolveSource"],
+): ThemeDefinition {
   for (const field of ["scheme", ...Object.keys(config.options.axes)]) {
     if (!Object.hasOwn(config.defaults, field)) throw new Error(`Missing theme default: ${field}`);
   }
@@ -54,6 +56,7 @@ export function defineTheme<O extends Options<any>>(config: {
       { options: "scheme", selector: scope },
       ...(config.sources ?? []),
     ],
+    resolveSource,
   });
   return Object.freeze({
     name: config.options.name,
@@ -73,4 +76,28 @@ export function themeAttributes(
     ...theme?.defaults.attributes,
     ...config?.attributes,
   };
+}
+
+export function defineTheme<O extends Options<any>>(config: {
+  options: O;
+  defaults: Defaults<NoInfer<O>>;
+  tokens: readonly (TokenSet | ScopedTokens)[];
+  styles: CSSFragment | readonly CSSFragment[];
+  sources?: TokenBinding["sources"];
+}): ThemeDefinition {
+  return assembleTheme(config);
+}
+
+/** Internal bridge for the JSX adapter's option-attribute source lookup. */
+export function defineThemeWithSourceResolver<O extends Options<any>>(
+  config: {
+    options: O;
+    defaults: Defaults<NoInfer<O>>;
+    tokens: readonly (TokenSet | ScopedTokens)[];
+    styles: CSSFragment | readonly CSSFragment[];
+    sources?: TokenBinding["sources"];
+  },
+  resolver: NonNullable<TokenBinding["resolveSource"]>,
+): ThemeDefinition {
+  return assembleTheme(config, resolver);
 }

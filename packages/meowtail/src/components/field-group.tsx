@@ -1,45 +1,43 @@
-import { defineComponent, type Child, type ComponentContract, type Props } from "meowjsx";
+import { type Child, type Props, type Context, h } from "meowjsx";
 
-export const fieldGroupContract = {
-  name: "field-group",
-  parts: ["root", "legend", "description", "content"],
-} as const satisfies ComponentContract;
 export interface FieldGroupProps extends Props {
   legend: Child;
   description?: Child;
   descriptionId?: string;
   disabled?: boolean;
-  className?: string;
+  className?: Props["className"];
 }
 let nextFieldGroupId = 0;
 /** A titled set of related fields, as a native fieldset. */
-export const FieldGroup = defineComponent<
-  FieldGroupProps,
-  "field-group",
-  (typeof fieldGroupContract.parts)[number]
->(
-  fieldGroupContract,
-  ({ legend, description, descriptionId, disabled, children, className, ...props }, context) => {
-    const hasDescription =
-      description !== undefined && description !== null && description !== false;
-    const resolvedDescriptionId = hasDescription
-      ? (descriptionId ?? `field-group-${++nextFieldGroupId}-description`)
-      : undefined;
-    return context.part(
-      "root",
-      "fieldset",
-      {
-        ...props,
-        disabled,
-        className,
-        "aria-describedby":
-          [props["aria-describedby"], resolvedDescriptionId].filter(Boolean).join(" ") || undefined,
-      },
-      context.part("legend", "legend", null, legend),
-      hasDescription
-        ? context.part("description", "p", { id: resolvedDescriptionId }, description)
-        : null,
-      context.part("content", "div", null, children),
-    );
-  },
-);
+export function FieldGroup(
+  { legend, description, descriptionId, disabled, children, className, ...props }: FieldGroupProps,
+  context: Context<typeof FieldGroup>,
+) {
+  const hasDescription = description !== undefined && description !== null && description !== false;
+  const resolvedDescriptionId = hasDescription
+    ? (descriptionId ?? `field-group-${++nextFieldGroupId}-description`)
+    : undefined;
+  return (
+    <fieldset
+      {...props}
+      disabled={disabled}
+      className={className}
+      aria-describedby={
+        [props["aria-describedby"], resolvedDescriptionId].filter(Boolean).join(" ") || undefined
+      }
+      ref={[context.parts.root, props.ref]}
+    >
+      <legend ref={[context.parts.legend]}>{legend}</legend>
+      {hasDescription ? (
+        <p id={resolvedDescriptionId} ref={[context.parts.description]}>
+          {description}
+        </p>
+      ) : null}
+      <div ref={[context.parts.content]}>{children}</div>
+    </fieldset>
+  );
+}
+FieldGroup.meta = {
+  name: "field-group",
+  parts: ["root", "legend", "description", "content"],
+} as const;

@@ -1,11 +1,14 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { codeBlockContract } from "../../components/code-block.contract";
-import { readBlockContract } from "../../components/read-block.contract";
+
 import { codeHighlightTokens } from "./code-highlight.tokens";
 
+import type { CodeBlock } from "../../components/code-block";
+import type { ReadBlock } from "../../components/read-block";
+const codeBlockPartRefs = parts<typeof CodeBlock>("code-block");
+const readBlockPartRefs = parts<typeof ReadBlock>("read-block");
 export const codeHighlightStyles = css`
-  ${partSelector(codeBlockContract, "root")}, ${partSelector(readBlockContract, "root")} {
+  ${codeBlockPartRefs.root}, ${readBlockPartRefs.root} {
     --meowui-code-foreground: ${uiTokens.ink.primary};
     --meowui-code-background: ${uiTokens.surface.fill};
     --meowui-code-token-constant: ${codeHighlightTokens.constant};

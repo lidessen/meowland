@@ -1,16 +1,18 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { actionRailContract } from "../../components/action-rail";
-import { buttonContract } from "../../components/button";
 
+import type { ActionRail } from "../../components/action-rail";
+import type { Button } from "../../components/button";
+const actionRailPartRefs = parts<typeof ActionRail>("action-rail");
+const buttonPartRefs = parts<typeof Button>("button");
 export const actionRailStyles = css`
-  ${partSelector(actionRailContract, "root")} {
+  ${actionRailPartRefs.root} {
     display: flex;
     align-items: center;
     gap: ${uiTokens.space.group};
     min-width: 0;
   }
-  ${partSelector(actionRailContract, "leading")} {
+  ${actionRailPartRefs.leading} {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -18,7 +20,7 @@ export const actionRailStyles = css`
     flex-wrap: wrap;
     min-width: min-content;
   }
-  ${partSelector(actionRailContract, "trailing")} {
+  ${actionRailPartRefs.trailing} {
     display: flex;
     align-items: center;
     justify-content: flex-end;
@@ -27,20 +29,20 @@ export const actionRailStyles = css`
     gap: 6px;
     min-width: min-content;
   }
-  :is(${partSelector(actionRailContract, "leading")}, ${partSelector(actionRailContract, "trailing")}) > ${partSelector(buttonContract, "root")} {
+  :is(${actionRailPartRefs.leading}, ${actionRailPartRefs.trailing}) > ${buttonPartRefs.root} {
     min-width: 0;
     max-width: 100%;
     white-space: normal;
     overflow-wrap: anywhere;
   }
-  ${partSelector(actionRailContract, "submit")} {
+  ${actionRailPartRefs.submit} {
     display: flex;
     align-items: center;
     flex: none;
   }
 
   @media (pointer: coarse) {
-    ${partSelector(actionRailContract, "root")} button {
+    ${actionRailPartRefs.root} button {
       min-width: 44px;
       min-height: 44px;
     }

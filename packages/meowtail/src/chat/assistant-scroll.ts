@@ -56,7 +56,15 @@ export function assistantScroll(
   };
   viewport.addEventListener("scroll", scroll, { passive: true });
   viewport.addEventListener("click", inspectDisclosure);
-  const observer = new ResizeObserver(restore);
+  let frame = 0;
+  const scheduleRestore = () => {
+    if (frame) return;
+    frame = requestAnimationFrame(() => {
+      frame = 0;
+      restore();
+    });
+  };
+  const observer = new ResizeObserver(scheduleRestore);
   observer.observe(viewport);
   observer.observe(content);
   restore();
@@ -84,6 +92,7 @@ export function assistantScroll(
       viewport.focus({ preventScroll: true });
     },
     dispose() {
+      if (frame) cancelAnimationFrame(frame);
       observer.disconnect();
       viewport.removeEventListener("scroll", scroll);
       viewport.removeEventListener("click", inspectDisclosure);

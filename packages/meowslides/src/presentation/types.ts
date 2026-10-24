@@ -61,8 +61,6 @@ export interface PresentationProps extends Props {
   /** Deck default. Omitted or "theme" uses the theme's paper and text. */
   background?: MaybeSignal<SlideBackground | undefined>;
   soundtrack?: Child;
-  /** Styles the surrounding player, including its header and controls. */
-  className?: string;
   /** Styles only the logical slide canvas and its authored content. */
   slideClassName?: string;
 }

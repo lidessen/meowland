@@ -6,12 +6,10 @@ without re-rendering the tree.
 
 ## Setup runs once
 
-A component body is setup, not a render function. It runs once for that mount, and nothing runs it
-again. There is no re-render, no hook order and no `useState`. A later change reaches the DOM only
-through a signal that setup bound to a prop, an attribute, a text node or a child.
+A component uses an ordinary function declaration, types its context as `Context<typeof Toggle>`, and attaches the finite part list as `.meta`. Binding the root descriptor with native `ref` keeps the host element in normal JSX.
 
 ```tsx
-import { defineComponent, mapSignal, type MaybeSignal, type Props } from "meowjsx";
+import { mapSignal, type Context, type MaybeSignal, type Props } from "meowjsx";
 
 export interface ToggleProps extends Props {
   /** Controlled when provided; a signal keeps it live. */
@@ -19,22 +17,26 @@ export interface ToggleProps extends Props {
   onPressedChange?: (pressed: boolean) => void;
 }
 
-export const Toggle = defineComponent<ToggleProps, "toggle", "root">(
-  { name: "toggle", parts: ["root"] },
-  ({ pressed = false, onPressedChange, children, ...props }, context) =>
-    context.part(
-      "root",
-      "button",
-      {
-        ...props,
-        type: "button",
-        "aria-pressed": mapSignal(pressed, (value) => String(value)),
-        onClick: () => onPressedChange?.(!pressed),
-      },
-      children,
-    ),
-);
+export function Toggle(
+  { pressed = false, onPressedChange, children, ref, ...props }: ToggleProps,
+  context: Context<typeof Toggle>,
+) {
+  return (
+    <button
+      {...props}
+      type="button"
+      aria-pressed={mapSignal(pressed, (value) => String(value))}
+      onClick={() => onPressedChange?.(!pressed)}
+      ref={[context.parts.root, ref]}
+    >
+      {children}
+    </button>
+  );
+}
+Toggle.meta = { name: "toggle", parts: ["root"] } as const;
 ```
+
+The setup body still runs once for that mount; `.meta` supplies stable component identity and the finite parts available through `context.parts`.
 
 ## The pieces
 

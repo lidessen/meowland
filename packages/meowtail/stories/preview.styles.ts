@@ -1,6 +1,8 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
+import type { Field } from "../src/components/field";
 import { uiTokens, logoTokens } from "meowtail/theme";
-import { fieldContract } from "meowtail";
+
+const fieldPartRefs = parts<typeof Field>("field");
 
 export const previewStyles = css`
   /* Fixture layout only; the components use the production MeowUI theme. */
@@ -103,7 +105,7 @@ export const previewStyles = css`
     justify-items: start;
   }
   .workshop-stack > section,
-  .workshop-stack > ${partSelector(fieldContract, "root")} {
+  .workshop-stack > ${fieldPartRefs.root} {
     width: 100%;
   }
   .workshop-stack p,
@@ -153,7 +155,7 @@ export const previewStyles = css`
     margin: 0;
     font-size: ${uiTokens.type.body};
   }
-  ${partSelector(fieldContract, "root")} + .workshop-document {
+  ${fieldPartRefs.root} + .workshop-document {
     margin-top: 12px;
   }
   .workshop-row {

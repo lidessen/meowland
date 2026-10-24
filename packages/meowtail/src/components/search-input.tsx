@@ -1,10 +1,5 @@
-import { defineComponent, h, type ComponentContract, type MaybeSignal, type Props } from "meowjsx";
+import { h, type MaybeSignal, type Props, type Context } from "meowjsx";
 import { Icon } from "../icons/icon";
-
-export const searchInputContract = {
-  name: "search-input",
-  parts: ["root", "icon", "control"],
-} as const satisfies ComponentContract;
 
 export interface SearchInputProps extends Props {
   /** Accessible name; placeholder text is only a hint. */
@@ -14,31 +9,31 @@ export interface SearchInputProps extends Props {
   disabled?: boolean;
   readOnly?: boolean;
   onInput?: (event: Event) => void;
-  className?: string;
-  inputClassName?: string;
+  className?: Props["className"];
+  inputClassName?: Props["className"];
 }
 
 /**
  * A text input for search, with a search icon. Native search editing and form semantics; filtering
  * belongs to the consumer.
  */
-export const SearchInput = defineComponent<
-  SearchInputProps,
-  typeof searchInputContract.name,
-  (typeof searchInputContract.parts)[number]
->(
-  searchInputContract,
-  ({ label, className, inputClassName, children: _children, ...props }, context) =>
-    context.part(
-      "root",
-      "div",
-      { className },
-      context.part("icon", "span", { "aria-hidden": "true" }, h(Icon, { name: "search" })),
-      context.part("control", "input", {
-        ...props,
-        type: "search",
-        "aria-label": label,
-        className: inputClassName,
-      }),
-    ),
-);
+export function SearchInput(
+  { label, className, inputClassName, children: _children, ref, ...props }: SearchInputProps,
+  context: Context<typeof SearchInput>,
+) {
+  return (
+    <div className={className} ref={context.parts.root}>
+      <span aria-hidden="true" ref={context.parts.icon}>
+        <Icon name="search" />
+      </span>
+      <input
+        {...props}
+        type="search"
+        aria-label={label}
+        className={inputClassName}
+        ref={[context.parts.control, ref]}
+      />
+    </div>
+  );
+}
+SearchInput.meta = { name: "search-input", parts: ["root", "icon", "control"] } as const;

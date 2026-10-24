@@ -1,5 +1,6 @@
 import { isSignal, unwrap } from "./reactive";
 import type {
+  ClassValue,
   MaybeSignal,
   Props,
   ReadableSignal,
@@ -40,16 +41,86 @@ function deriveMaybeValue<T>(
   };
 }
 
-function mergeClassNames(
-  first: MaybeSignal<string | null | undefined>,
-  second: MaybeSignal<string | null | undefined>,
-): MaybeSignal<string | undefined> {
-  return deriveMaybeValue([first, second], (values) => {
-    const classes = values.filter(
-      (value): value is string => typeof value === "string" && value.trim().length > 0,
-    );
-    return classes.length > 0 ? classes.join(" ") : undefined;
-  });
+function readClasses(value: unknown): { text: string; sources: Set<ReadableSignal<unknown>> } {
+  const classes: string[] = [];
+  const sources = new Set<ReadableSignal<unknown>>();
+  const active = new Set<unknown>();
+  const visit = (entry: unknown): void => {
+    if (entry === false || entry === null || entry === undefined) return;
+    if (isSignal(entry) || Array.isArray(entry)) {
+      if (active.has(entry)) throw new Error("Cyclic className value");
+      active.add(entry);
+      try {
+        if (isSignal(entry)) {
+          sources.add(entry);
+          visit(entry.value);
+        } else {
+          for (const child of entry as readonly unknown[]) visit(child);
+        }
+      } finally {
+        active.delete(entry);
+      }
+      return;
+    }
+    const text = String(entry);
+    if (text.trim()) classes.push(text);
+  };
+  visit(value);
+  return { text: classes.join(" "), sources };
+}
+
+/** Shared class-list serialization; static output only reads current Signal values. */
+export function classText(value: unknown): string {
+  return readClasses(value).text;
+}
+
+/** Keep nested class Signals on the renderer's ordinary reactive property path. */
+export function normalizeClassName(value: unknown): string | ReadableSignal<string> {
+  const initial = readClasses(value);
+  if (initial.sources.size === 0) return initial.text;
+  return {
+    get value() {
+      return classText(value);
+    },
+    subscribe(listener) {
+      const subscriptions = new Map<ReadableSignal<unknown>, () => void>();
+      let current: string;
+      let stopped = false;
+      const refresh = (): void => {
+        if (stopped) return;
+        const next = readClasses(value);
+        const acquired: ReadableSignal<unknown>[] = [];
+        try {
+          for (const source of next.sources) {
+            if (subscriptions.has(source)) continue;
+            subscriptions.set(source, source.subscribe(refresh));
+            acquired.push(source);
+          }
+        } catch (error) {
+          for (const source of acquired) {
+            subscriptions.get(source)!();
+            subscriptions.delete(source);
+          }
+          throw error;
+        }
+        for (const [source, unsubscribe] of subscriptions) {
+          if (next.sources.has(source)) continue;
+          unsubscribe();
+          subscriptions.delete(source);
+        }
+        const changed = next.text !== current;
+        current = next.text;
+        if (changed) listener(current);
+      };
+      current = classText(value);
+      refresh();
+      return () => {
+        stopped = true;
+        for (const unsubscribe of subscriptions.values()) unsubscribe();
+        subscriptions.clear();
+      };
+    },
+  };
 }
 
 /**
@@ -90,10 +161,7 @@ function mergeStyles(
 function applyThemeStyle(props: Props, style: ThemeStyle): Props {
   const themed: Props = { ...props, ...style.props };
   if (style.className !== undefined) {
-    themed.className = mergeClassNames(
-      props.className as MaybeSignal<string | null | undefined>,
-      style.className,
-    );
+    themed.className = [props.className as ClassValue, style.className];
   }
   if (style.style !== undefined) {
     themed.style = mergeStyles(

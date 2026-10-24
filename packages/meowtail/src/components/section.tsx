@@ -1,12 +1,4 @@
-import {
-  createContext,
-  defineComponent,
-  h,
-  useContext,
-  type Child,
-  type ComponentContract,
-  type Props,
-} from "meowjsx";
+import { createContext, h, useContext, type Child, type Props, type Context } from "meowjsx";
 import { Card } from "./card";
 
 /**
@@ -16,11 +8,6 @@ import { Card } from "./card";
  * through unchanged, and a section mounted outside a page falls back to 1.
  */
 export const sectionLevelContext = createContext(1);
-
-export const sectionContract = {
-  name: "section",
-  parts: ["root", "header", "title", "description", "actions", "content", "footer"],
-} as const satisfies ComponentContract;
 
 export type SectionVariant = "plain" | "card";
 
@@ -45,7 +32,7 @@ export interface SectionProps extends Props {
    * mounts, so pass a new key or remount to switch variants.
    */
   variant?: SectionVariant;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** True when a slot was given; `false` and `null` mean the slot is omitted. */
@@ -58,49 +45,57 @@ function hasSlot(slot: Child): boolean {
  * mount: presence decides whether the header or footer renders, while a Signal
  * passed as slot content still updates the text it carries.
  */
-export const Section = defineComponent<
-  SectionProps,
-  typeof sectionContract.name,
-  (typeof sectionContract.parts)[number]
->(
-  sectionContract,
-  (
-    { title, description, actions, footer, variant = "plain", className, children, ...props },
-    context,
-  ) => {
-    // The context reads once at setup. Only a section that renders a heading
-    // consumes a level; a grouping wrapper passes the parent level through, so
-    // its titled children keep the surrounding depth (Page h1 -> grouped h2)
-    // instead of skipping a level.
-    const parentLevel = useContext(sectionLevelContext);
-    const hasTitle = hasSlot(title);
-    const level = hasTitle ? Math.min(parentLevel + 1, 6) : parentLevel;
-    const heading = `h${level}`;
-    const header = hasTitle || hasSlot(description) || hasSlot(actions);
-    const content = h(
-      sectionLevelContext.Provider,
-      { value: level },
-      context.part("content", "div", null, children),
-      hasSlot(footer) ? context.part("footer", "footer", null, footer) : null,
-    );
-    const section = context.part(
-      "root",
-      "section",
-      { ...props, "data-variant": variant, className },
-      header
-        ? context.part(
-            "header",
-            "header",
-            null,
-            hasTitle ? context.part("title", heading, null, title) : null,
-            hasSlot(description) ? context.part("description", "p", null, description) : null,
-            hasSlot(actions) ? context.part("actions", "div", null, actions) : null,
-          )
-        : null,
-      content,
-    );
-    // The card variant only adds the Card surface around the plain section; the
-    // section keeps its own parts and the surface keeps its single owner.
-    return variant === "card" ? h(Card, { variant: "surface" }, section) : section;
-  },
-);
+export function Section(
+  {
+    title,
+    description,
+    actions,
+    footer,
+    variant = "plain",
+    className,
+    children,
+    ref,
+    ...props
+  }: SectionProps,
+  context: Context<typeof Section>,
+) {
+  // The context reads once at setup. Only a section that renders a heading
+  // consumes a level; a grouping wrapper passes the parent level through, so
+  // its titled children keep the surrounding depth (Page h1 -> grouped h2)
+  // instead of skipping a level.
+  const parentLevel = useContext(sectionLevelContext);
+  const hasTitle = hasSlot(title);
+  const level = hasTitle ? Math.min(parentLevel + 1, 6) : parentLevel;
+  const heading = `h${level}`;
+  const header = hasTitle || hasSlot(description) || hasSlot(actions);
+  const content = (
+    <sectionLevelContext.Provider value={level}>
+      <div ref={context.parts.content}>{children}</div>
+      {hasSlot(footer) ? <footer ref={context.parts.footer}>{footer}</footer> : null}
+    </sectionLevelContext.Provider>
+  );
+  const section = (
+    <section
+      {...props}
+      data-variant={variant}
+      className={className}
+      ref={[context.parts.root, ref]}
+    >
+      {header ? (
+        <header ref={context.parts.header}>
+          {hasTitle ? h(heading, { ref: context.parts.title }, title) : null}
+          {hasSlot(description) ? <p ref={context.parts.description}>{description}</p> : null}
+          {hasSlot(actions) ? <div ref={context.parts.actions}>{actions}</div> : null}
+        </header>
+      ) : null}
+      {content}
+    </section>
+  );
+  // The card variant only adds the Card surface around the plain section; the
+  // section keeps its own parts and the surface keeps its single owner.
+  return variant === "card" ? h(Card, { variant: "surface" }, section) : section;
+}
+Section.meta = {
+  name: "section",
+  parts: ["root", "header", "title", "description", "actions", "content", "footer"],
+} as const;

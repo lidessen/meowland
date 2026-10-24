@@ -1,11 +1,18 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { actionRowContract, actionRowOptions } from "../../components/action-row";
-import { cardFooterContract } from "../../components/card-footer";
-import { dialogActionsContract } from "../../components/dialog";
-import { iconButtonContract } from "../../components/icon-button";
-import { chatQuestionContract } from "../../chat/question";
 
+import type { ChatQuestion } from "../../chat/question";
+import type { ActionRow } from "../../components/action-row";
+import type { CardFooter } from "../../components/card-footer";
+import type { DialogActions } from "../../components/dialog";
+import type { IconButton } from "../../components/icon-button";
+import { actionRowOptions } from "../../components/action-row.options";
+import { selectorForPart } from "../selectors";
+const actionRowPartRefs = parts<typeof ActionRow>("action-row");
+const cardFooterPartRefs = parts<typeof CardFooter>("card-footer");
+const chatQuestionPartRefs = parts<typeof ChatQuestion>("chat-question");
+const dialogActionsPartRefs = parts<typeof DialogActions>("dialog-actions");
+const iconButtonPartRefs = parts<typeof IconButton>("icon-button");
 /*
  * One rule for every row of actions: it stays on one line while it fits and stacks whole when
  * it does not (see observeActionRowFit). Stacked, each text action is a full-width line in DOM
@@ -13,12 +20,12 @@ import { chatQuestionContract } from "../../chat/question";
  * action alone. Header action clusters and toolbars keep their own compact rules.
  */
 const rows = `:where(${[
-  partSelector(actionRowContract, "root"),
-  partSelector(cardFooterContract, "root"),
-  partSelector(dialogActionsContract, "root"),
-  partSelector(chatQuestionContract, "actions"),
+  selectorForPart(actionRowPartRefs.root),
+  selectorForPart(cardFooterPartRefs.root),
+  selectorForPart(dialogActionsPartRefs.root),
+  selectorForPart(chatQuestionPartRefs.actions),
 ].join(", ")})`;
-const row = partSelector(actionRowContract, "root");
+const row = actionRowPartRefs.root;
 
 export const actionRowStyles = css`
   ${row} {
@@ -46,7 +53,7 @@ export const actionRowStyles = css`
     flex: 1 0 100%;
     min-width: 0;
   }
-  ${rows}[data-stacked] > :where(${partSelector(iconButtonContract, "root")}) {
+  ${rows}[data-stacked] > :where(${selectorForPart(iconButtonPartRefs.root)}) {
     flex: none;
   }
 `;

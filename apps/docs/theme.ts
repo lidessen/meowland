@@ -1,16 +1,16 @@
 import { defineTokens } from "meowcss";
-import { css, defineTheme, partSelector } from "meowcss/meowjsx";
-import {
-  breadcrumbContract,
-  cardContract,
-  codeBlockContract,
-  navListContract,
-  pageContract,
-  pageHeaderContract,
-  proseContract,
-  searchInputContract,
-  sectionContract,
-  tableContract,
+import { css, defineTheme, parts } from "meowcss/meowjsx";
+import type {
+  Breadcrumb,
+  Card,
+  CodeBlock,
+  NavList,
+  Page,
+  PageHeader,
+  Prose,
+  SearchInput,
+  Section,
+  Table,
 } from "meowtail";
 import {
   standardOptions,
@@ -18,6 +18,17 @@ import {
   standardThemeTokens,
   uiTokens,
 } from "meowtail/theme";
+
+const breadcrumb = parts<typeof Breadcrumb>("breadcrumb");
+const card = parts<typeof Card>("card");
+const codeBlock = parts<typeof CodeBlock>("code-block");
+const navList = parts<typeof NavList>("nav-list");
+const page = parts<typeof Page>("page");
+const pageHeader = parts<typeof PageHeader>("page-header");
+const prose = parts<typeof Prose>("prose");
+const searchInput = parts<typeof SearchInput>("search-input");
+const section = parts<typeof Section>("section");
+const table = parts<typeof Table>("table");
 
 /** Measurements owned by the documentation layout. */
 export const docsTokens = defineTokens("docs", {
@@ -30,7 +41,7 @@ export const docsTokens = defineTokens("docs", {
   codeHeight: "480px",
 });
 
-/** A reading environment built from the shared palette and component contracts. */
+/** A reading environment built from the shared palette and component metadata. */
 export const docsStyles = css`
   html,
   body {
@@ -50,7 +61,7 @@ export const docsStyles = css`
   * {
     box-sizing: border-box;
   }
-  .docs-shell a:not(:where([data-meowui-part="link/root"], ${partSelector(proseContract, "root")} a)) {
+  .docs-shell a:not(:where([data-meowui-part="link/root"], ${prose.root} a)) {
     color: inherit;
     text-decoration: none;
   }
@@ -111,7 +122,7 @@ export const docsStyles = css`
     margin-bottom: 4px;
   }
   /* The sidebar search is the library SearchInput as-is: same surface, states and ring. */
-  .docs-search ${partSelector(searchInputContract, "control")} {
+  .docs-search ${searchInput.control} {
     font-size: ${uiTokens.type.label};
   }
   .docs-catalog-label {
@@ -141,21 +152,21 @@ export const docsStyles = css`
   }
   /* NavList keeps its own rows, group titles, radius and selection; the
      sidebar only sets density. */
-  .docs-catalog ${partSelector(navListContract, "root")} {
+  .docs-catalog ${navList.root} {
     gap: 20px;
     font-size: ${uiTokens.type.label};
   }
-  .docs-catalog ${partSelector(navListContract, "group")} {
+  .docs-catalog ${navList.group} {
     gap: 2px;
   }
-  .docs-catalog ${partSelector(navListContract, "groupTitle")} {
+  .docs-catalog ${navList.groupTitle} {
     padding-block: 0 6px;
   }
-  .docs-catalog ${partSelector(navListContract, "item")} {
+  .docs-catalog ${navList.item} {
     min-height: 32px;
     color: ${uiTokens.ink.secondary};
   }
-  .docs-catalog ${partSelector(navListContract, "item")}[aria-current="page"] {
+  .docs-catalog ${navList.item}[aria-current="page"] {
     color: ${uiTokens.ink.primary};
   }
   .docs-catalog-empty {
@@ -389,7 +400,7 @@ export const docsStyles = css`
   .docs-search-wrap:focus-within .docs-search-key {
     display: none;
   }
-  .docs-search-wrap ${partSelector(searchInputContract, "control")} {
+  .docs-search-wrap ${searchInput.control} {
     padding-right: 36px;
   }
   /* The one way out to the workbench: a quiet labeled link, not an unnamed glyph. */
@@ -411,11 +422,11 @@ export const docsStyles = css`
     background: ${uiTokens.surface.fill};
     color: ${uiTokens.ink.primary};
   }
-  .docs-header ${partSelector(breadcrumbContract, "item")}:not(:last-child) ${partSelector(breadcrumbContract, "current")} {
+  .docs-header ${breadcrumb.item}:not(:last-child) ${breadcrumb.current} {
     color: ${uiTokens.ink.secondary};
     font-weight: ${uiTokens.type.weight.regular};
   }
-  .docs-header ${partSelector(breadcrumbContract, "current")} {
+  .docs-header ${breadcrumb.current} {
     font-size: ${uiTokens.type.caption};
     font-weight: ${uiTokens.type.weight.medium};
   }
@@ -431,53 +442,53 @@ export const docsStyles = css`
     min-width: 0;
     margin-inline: auto;
   }
-  .docs-article ${partSelector(pageContract, "root")}, .docs-article ${partSelector(sectionContract, "root")} {
+  .docs-article ${page.root}, .docs-article ${section.root} {
     font-size: ${uiTokens.type.body};
     line-height: ${uiTokens.type.line.reading};
   }
-  .docs-article ${partSelector(pageContract, "header")} {
+  .docs-article ${page.header} {
     margin-bottom: 32px;
     gap: 12px;
   }
-  .docs-article ${partSelector(pageContract, "eyebrow")} {
+  .docs-article ${page.eyebrow} {
     font-size: ${uiTokens.type.micro};
     letter-spacing: 0.08em;
     text-transform: uppercase;
   }
-  .docs-article ${partSelector(pageHeaderContract, "copy")} {
+  .docs-article ${pageHeader.copy} {
     gap: 14px;
   }
-  .docs-article ${partSelector(pageHeaderContract, "title")} {
+  .docs-article ${pageHeader.title} {
     font-size: ${uiTokens.type.hero};
     line-height: ${uiTokens.type.line.hero};
     font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: -0.035em;
   }
-  .docs-article ${partSelector(pageHeaderContract, "description")} {
+  .docs-article ${pageHeader.description} {
     max-width: 62ch;
     font-size: ${uiTokens.type.title};
     line-height: ${uiTokens.type.line.title};
   }
-  .docs-article ${partSelector(pageContract, "content")}, .docs-sections {
+  .docs-article ${page.content}, .docs-sections {
     display: grid;
     gap: 40px;
     min-width: 0;
   }
-  .docs-article ${partSelector(sectionContract, "root")} {
+  .docs-article ${section.root} {
     gap: 16px;
     scroll-margin-top: 88px;
   }
-  .docs-article ${partSelector(sectionContract, "title")} {
+  .docs-article ${section.title} {
     font-size: ${uiTokens.type.heading};
     font-weight: ${uiTokens.type.weight.semibold};
     line-height: ${uiTokens.type.line.heading};
     letter-spacing: -0.02em;
   }
-  .docs-article ${partSelector(sectionContract, "description")} {
+  .docs-article ${section.description} {
     font-size: ${uiTokens.type.body};
     line-height: ${uiTokens.type.line.reading};
   }
-  .docs-article ${partSelector(sectionContract, "content")} {
+  .docs-article ${section.content} {
     gap: 16px;
   }
   .docs-reading-layout {
@@ -559,7 +570,7 @@ export const docsStyles = css`
     background: ${uiTokens.surface.raised};
     box-shadow: ${uiTokens.shadow.raised};
   }
-  ${partSelector(cardContract, "root")}.docs-preview-card {
+  ${card.root}.docs-preview-card {
     padding: 0;
     overflow: hidden;
     border: 0;
@@ -578,17 +589,17 @@ export const docsStyles = css`
   }
 
   /* Code scrolls locally. Static pages omit actions that require a runtime. */
-  .docs-article ${partSelector(codeBlockContract, "root")} {
+  .docs-article ${codeBlock.root} {
     border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     border-radius: ${uiTokens.radius.xl};
   }
-  .docs-specimen ${partSelector(codeBlockContract, "root")} {
+  .docs-specimen ${codeBlock.root} {
     border: 0;
     border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
     border-radius: 0;
   }
   /* Once tabs show one panel at a time, the code fills the frame on its own. */
-  [data-docs-tabs="ready"] .docs-specimen ${partSelector(codeBlockContract, "root")} {
+  [data-docs-tabs="ready"] .docs-specimen ${codeBlock.root} {
     border-top: 0;
   }
   [data-docs-panel][hidden] {
@@ -661,19 +672,19 @@ export const docsStyles = css`
     border-bottom-color: ${uiTokens.ink.primary};
     color: ${uiTokens.ink.primary};
   }
-  .docs-article ${partSelector(codeBlockContract, "header")} {
+  .docs-article ${codeBlock.header} {
     padding: 10px 16px;
     border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
     background: transparent;
   }
   /* The code actions need script; they appear once the page wires them. */
-  .docs-article ${partSelector(codeBlockContract, "actions")} {
+  .docs-article ${codeBlock.actions} {
     display: none;
   }
-  [data-docs-code-actions] .docs-article ${partSelector(codeBlockContract, "actions")} {
+  [data-docs-code-actions] .docs-article ${codeBlock.actions} {
     display: flex;
   }
-  .docs-article ${partSelector(codeBlockContract, "content")} {
+  .docs-article ${codeBlock.content} {
     max-height: ${docsTokens.codeHeight};
     padding: 16px;
     font-size: ${uiTokens.type.code};
@@ -753,14 +764,14 @@ export const docsStyles = css`
     letter-spacing: 0.12em;
     text-transform: uppercase;
   }
-  .docs-home-intro ${partSelector(pageHeaderContract, "title")} {
+  .docs-home-intro ${pageHeader.title} {
     max-width: 17ch;
     font-size: ${uiTokens.type.hero};
     line-height: ${uiTokens.type.line.hero};
     letter-spacing: -0.04em;
     text-wrap: balance;
   }
-  .docs-home-intro ${partSelector(pageHeaderContract, "description")} {
+  .docs-home-intro ${pageHeader.description} {
     max-width: 46ch;
     margin-top: 8px;
     font-size: ${uiTokens.type.title};
@@ -843,7 +854,7 @@ export const docsStyles = css`
     text-decoration: underline;
     text-underline-offset: 4px;
   }
-  .docs-home-page ${partSelector(pageContract, "content")} {
+  .docs-home-page ${page.content} {
     gap: 48px;
   }
   .docs-package-grid {
@@ -930,11 +941,11 @@ export const docsStyles = css`
 
   /* Reading content uses the library's Prose rhythm; the docs only set their
      reading size and keep headings clear of the sticky header. */
-  .docs-article ${partSelector(proseContract, "root")} {
+  .docs-article ${prose.root} {
     font-size: ${uiTokens.type.body};
     line-height: ${uiTokens.type.line.reading};
   }
-  .docs-article ${partSelector(proseContract, "root")} > :where(h2, h3, h4) {
+  .docs-article ${prose.root} > :where(h2, h3, h4) {
     scroll-margin-top: 88px;
   }
   /* MDX callouts are recessed notes inside the reading flow. */
@@ -953,15 +964,15 @@ export const docsStyles = css`
     background: color-mix(in srgb, ${uiTokens.status.warning} 9%, transparent);
     color: ${uiTokens.ink.primary};
   }
-  .docs-article ${partSelector(tableContract, "root")} {
+  .docs-article ${table.root} {
     max-width: 100%;
     font-size: ${uiTokens.type.label};
   }
-  .docs-article ${partSelector(tableContract, "scroller")} {
+  .docs-article ${table.scroller} {
     border-color: ${uiTokens.line.edge};
     background: ${uiTokens.surface.canvas};
   }
-  .docs-article ${partSelector(tableContract, "heading")}, .docs-article ${partSelector(tableContract, "cell")} {
+  .docs-article ${table.heading}, .docs-article ${table.cell} {
     padding: 12px 16px;
   }
   /* Previous and next pages: two quiet cards at the end of the reading column. */
@@ -1041,7 +1052,7 @@ export const docsStyles = css`
     .docs-article:has(.docs-reference-page) {
       max-width: 928px;
     }
-    .docs-reference-page > * > ${partSelector(pageContract, "header")} {
+    .docs-reference-page > * > ${page.header} {
       max-width: ${docsTokens.readingWidth};
     }
     .docs-reading-layout {
@@ -1082,7 +1093,7 @@ export const docsStyles = css`
       grid-template-columns: minmax(0, 1fr);
       gap: 36px;
     }
-    .docs-home-intro ${partSelector(pageHeaderContract, "title")} {
+    .docs-home-intro ${pageHeader.title} {
       max-width: 16ch;
     }
     .docs-home-route {
@@ -1168,7 +1179,7 @@ export const docsStyles = css`
     .docs-sidebar > .docs-brand {
       display: none;
     }
-    .docs-catalog ${partSelector(navListContract, "item")} {
+    .docs-catalog ${navList.item} {
       min-height: 40px;
     }
     .docs-header {
@@ -1178,17 +1189,17 @@ export const docsStyles = css`
     .docs-content {
       padding: 32px 20px 0;
     }
-    .docs-article ${partSelector(pageHeaderContract, "title")} {
+    .docs-article ${pageHeader.title} {
       font-size: ${uiTokens.type.pageTitle};
       line-height: ${uiTokens.type.line.pageTitle};
     }
-    .docs-article ${partSelector(pageHeaderContract, "description")} {
+    .docs-article ${pageHeader.description} {
       font-size: ${uiTokens.type.body};
     }
-    .docs-article ${partSelector(pageContract, "header")} {
+    .docs-article ${page.header} {
       margin-bottom: 24px;
     }
-    .docs-article ${partSelector(sectionContract, "title")} {
+    .docs-article ${section.title} {
       font-size: ${uiTokens.type.heading};
     }
     .docs-reading-layout {
@@ -1205,7 +1216,7 @@ export const docsStyles = css`
     .docs-home-eyebrow {
       margin-bottom: 20px;
     }
-    .docs-home-intro ${partSelector(pageHeaderContract, "title")} {
+    .docs-home-intro ${pageHeader.title} {
       max-width: 14ch;
     }
     .docs-home-route ol {
@@ -1221,7 +1232,7 @@ export const docsStyles = css`
     .docs-package-link {
       padding-block: 20px;
     }
-    .docs-article ${partSelector(codeBlockContract, "content")} {
+    .docs-article ${codeBlock.content} {
       padding: 16px;
     }
     .docs-footer {

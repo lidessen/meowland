@@ -1,9 +1,4 @@
-import { defineComponent, type Child, type ComponentContract, type Props } from "meowjsx";
-
-export const windowTitleBarContract = {
-  name: "window-title-bar",
-  parts: ["root", "leading", "title", "trailing"],
-} as const satisfies ComponentContract;
+import { h, type Child, type Context, type Props } from "meowjsx";
 
 export interface WindowTitleBarProps extends Props {
   /** Window or page name, centred between the slots. Part of the drag area. */
@@ -12,7 +7,7 @@ export interface WindowTitleBarProps extends Props {
   leading?: Child;
   /** Window-level actions at the far edge. Interactive children stay clickable. */
   trailing?: Child;
-  className?: string;
+  className?: Props["className"];
 }
 
 /**
@@ -25,17 +20,19 @@ export interface WindowTitleBarProps extends Props {
  * The component does not detect the platform: the host renders it only where the shell exists,
  * and in a browser tab the variables fall back to a plain bar.
  */
-export const WindowTitleBar = defineComponent<
-  WindowTitleBarProps,
-  typeof windowTitleBarContract.name,
-  (typeof windowTitleBarContract.parts)[number]
->(windowTitleBarContract, ({ title, leading, trailing, className, ...props }, context) =>
-  context.part(
-    "root",
-    "header",
-    { ...props, className },
-    context.part("leading", "div", null, leading),
-    context.part("title", "div", null, title),
-    context.part("trailing", "div", null, trailing),
-  ),
-);
+export function WindowTitleBar(
+  { title, leading, trailing, className, ref, ...props }: WindowTitleBarProps,
+  context: Context<typeof WindowTitleBar>,
+) {
+  return (
+    <header {...props} className={className} ref={[context.parts.root, ref]}>
+      <div ref={context.parts.leading}>{leading}</div>
+      <div ref={context.parts.title}>{title}</div>
+      <div ref={context.parts.trailing}>{trailing}</div>
+    </header>
+  );
+}
+WindowTitleBar.meta = {
+  name: "window-title-bar",
+  parts: ["root", "leading", "title", "trailing"],
+} as const;

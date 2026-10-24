@@ -1,10 +1,9 @@
 import {
-  defineComponent,
   derived,
   h,
   unwrap,
   type Child,
-  type ComponentContract,
+  type Context,
   type MaybeSignal,
   type Props,
 } from "meowjsx";
@@ -15,25 +14,6 @@ import {
   executionStateTone,
   type ChatExecutionState,
 } from "../shared/execution-state";
-
-export const chatTaskContract = {
-  name: "chat-task",
-  parts: [
-    "root",
-    "header",
-    "title",
-    "status",
-    "fact",
-    "description",
-    "execution",
-    "reply",
-    "progress",
-    "progressLabel",
-    "progressBar",
-    "body",
-    "footer",
-  ],
-} as const satisfies ComponentContract;
 
 export interface ChatTaskProgress {
   value: number;
@@ -55,7 +35,6 @@ export interface ChatTaskProps extends Props {
   progress?: MaybeSignal<ChatTaskProgress | undefined>;
   /** Compose ordinary buttons and resource links outside the task's content. */
   footer?: Child;
-  className?: string;
 }
 
 function checkedProgress(value: ChatTaskProgress | undefined) {
@@ -75,94 +54,100 @@ function checkedProgress(value: ChatTaskProgress | undefined) {
 }
 
 /** A task record, not an executable task or a whole-card control. */
-export const ChatTask = defineComponent<
-  ChatTaskProps,
-  typeof chatTaskContract.name,
-  (typeof chatTaskContract.parts)[number]
->(
-  chatTaskContract,
-  (
-    {
-      title,
-      state = "unknown",
-      statusLabel,
-      description,
-      executionText,
-      replyText,
-      progress,
-      footer,
-      children,
-      className,
-      ...props
-    },
-    context,
+export function ChatTask(
+  {
+    title,
+    state = "unknown",
+    statusLabel,
+    description,
+    executionText,
+    replyText,
+    progress,
+    footer,
+    children,
+    ref,
+    ...props
+  }: ChatTaskProps,
+  context: Context<typeof ChatTask>,
+) {
+  const currentProgress = derived(() => checkedProgress(unwrap(progress)));
+  const parts = context.parts;
+  const text = (
+    part: "description" | "execution" | "reply",
+    value: MaybeSignal<string | undefined> | undefined,
   ) => {
-    const currentProgress = derived(() => checkedProgress(unwrap(progress)));
-    const text = (
-      part: "description" | "execution" | "reply",
-      value: MaybeSignal<string | undefined> | undefined,
-    ) =>
-      context.part(
-        part,
-        "p",
-        { hidden: derived(() => !unwrap(value)) },
-        derived(() => unwrap(value) ?? ""),
+    const content = derived(() => unwrap(value) ?? "");
+    const hidden = derived(() => !unwrap(value));
+    if (part === "description")
+      return (
+        <p hidden={hidden} ref={parts.description}>
+          {content}
+        </p>
       );
-    return context.part(
-      "root",
-      "section",
-      {
-        ...props,
-        className,
-        "aria-label": props["aria-label"] ?? title,
-        "data-execution-state": state,
-      },
-      context.part(
-        "header",
-        "div",
-        null,
-        context.part("title", "strong", null, title),
-        context.part(
-          "status",
-          "span",
-          { "data-tone": derived(() => executionStateTone(unwrap(state))) },
-          h(StatusDot, { state: derived(() => executionStateTone(unwrap(state))) }),
-          derived(() => executionStateLabel(unwrap(state))),
-        ),
-        // The host's account of the state, under the title; the badge keeps one word.
-        context.part(
-          "fact",
-          "span",
-          { hidden: derived(() => !unwrap(statusLabel)) },
-          derived(() => unwrap(statusLabel) ?? ""),
-        ),
-      ),
-      text("description", description),
-      text("execution", executionText),
-      text("reply", replyText),
-      context.part(
-        "progress",
-        "div",
-        { hidden: derived(() => currentProgress.value === undefined) },
-        context.part(
-          "progressLabel",
-          "span",
-          null,
-          derived(() => currentProgress.value?.label ?? ""),
-        ),
-        context.part(
-          "progressBar",
-          "div",
-          null,
-          h(Progress, {
-            value: derived(() => currentProgress.value?.value ?? 0),
-            max: derived(() => currentProgress.value?.max ?? 1),
-            label: derived(() => currentProgress.value?.label ?? ""),
-          }),
-        ),
-      ),
-      context.part("body", "div", null, children),
-      context.part("footer", "div", null, footer),
+    if (part === "execution")
+      return (
+        <p hidden={hidden} ref={parts.execution}>
+          {content}
+        </p>
+      );
+    return (
+      <p hidden={hidden} ref={parts.reply}>
+        {content}
+      </p>
     );
-  },
-);
+  };
+  const stateTone = derived(() => executionStateTone(unwrap(state)));
+  return (
+    <section
+      {...props}
+      aria-label={props["aria-label"] ?? title}
+      data-execution-state={state}
+      ref={[parts.root, ref]}
+    >
+      <div ref={parts.header}>
+        <strong ref={parts.title}>{title}</strong>
+        <span data-tone={stateTone} ref={parts.status}>
+          <StatusDot state={stateTone} />
+          {derived(() => executionStateLabel(unwrap(state)))}
+        </span>
+        <span hidden={derived(() => !unwrap(statusLabel))} ref={parts.fact}>
+          {derived(() => unwrap(statusLabel) ?? "")}
+        </span>
+      </div>
+      {text("description", description)}
+      {text("execution", executionText)}
+      {text("reply", replyText)}
+      <div hidden={derived(() => currentProgress.value === undefined)} ref={parts.progress}>
+        <span ref={parts.progressLabel}>{derived(() => currentProgress.value?.label ?? "")}</span>
+        <div ref={parts.progressBar}>
+          <Progress
+            value={derived(() => currentProgress.value?.value ?? 0)}
+            max={derived(() => currentProgress.value?.max ?? 1)}
+            label={derived(() => currentProgress.value?.label ?? "")}
+          />
+        </div>
+      </div>
+      <div ref={parts.body}>{children}</div>
+      <div ref={parts.footer}>{footer}</div>
+    </section>
+  );
+}
+
+ChatTask.meta = {
+  name: "chat-task",
+  parts: [
+    "root",
+    "header",
+    "title",
+    "status",
+    "fact",
+    "description",
+    "execution",
+    "reply",
+    "progress",
+    "progressLabel",
+    "progressBar",
+    "body",
+    "footer",
+  ],
+} as const;

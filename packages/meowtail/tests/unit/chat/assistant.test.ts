@@ -4,7 +4,7 @@ import { assistantMarkdown } from "../../../src/chat/assistant-markdown";
 import { AssistantView } from "../../../src/chat/assistant";
 import { createRuntime, h, signal } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { installMeowUI } from "meowtail";
+import { installMeowUI, meowUIComponents } from "meowtail";
 
 describe("Assistant draft acceptance", () => {
   const sent = { id: "a", name: "sent.txt", url: "https://example.com/a", mediaType: "text/plain" };
@@ -87,7 +87,7 @@ describe("Assistant safe rich text", () => {
 describe("Assistant public composition", () => {
   const render = (props: Parameters<typeof AssistantView>[0]) => {
     const runtime = createRuntime();
-    installMeowUI(runtime);
+    installMeowUI({ components: meowUIComponents }, runtime);
     return createWebRenderer(runtime).renderToHtml(h(AssistantView, props));
   };
   test("a controlled draft requires its host change callback or explicit read-only mode", () => {
@@ -139,6 +139,28 @@ describe("Assistant public composition", () => {
       html.indexOf("Question text"),
     );
     expect(html.indexOf("Question text")).toBeLessThan(html.indexOf("Reply text"));
+  });
+
+  test("Assistant steps keep one title and questions place actions in the shared action row", () => {
+    const html = render({
+      messages: [],
+      activity: {
+        title: "Reviewing",
+        statusText: "Reading source files",
+        steps: [{ id: "read", title: "Read source", tone: "processing" }],
+      },
+      questions: [{ id: "scope", title: "Review scope", state: "open" }],
+      onAnswer: () => undefined,
+    });
+    expect(html.split(">Read source<")).toHaveLength(2);
+    expect(html).toContain('data-meowui-part="status-dot/root"');
+    expect(html).toContain('aria-hidden="true"');
+    const questionRoot = html.indexOf('data-meowui-part="assistant-question/root"');
+    const actionRow = html.indexOf('data-meowui-part="chat-question/actions"');
+    const answerButton = html.indexOf(">Answer</button>");
+    expect(questionRoot).toBeGreaterThanOrEqual(0);
+    expect(actionRow).toBeGreaterThan(questionRoot);
+    expect(answerButton).toBeGreaterThan(actionRow);
   });
 
   test("normalized attachments remain usable when local file selection is unavailable", () => {

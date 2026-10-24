@@ -1,9 +1,9 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { navListContract } from "../../components/nav-list";
-
-const list = (part: (typeof navListContract.parts)[number]) => partSelector(navListContract, part);
+import type { NavList } from "../../components/nav-list";
+import { ui } from "../utilities";
+const navListPartRefs = parts<typeof NavList>("nav-list");
+const list = (part: keyof typeof navListPartRefs) => navListPartRefs[part];
 
 export const navListStyles = css`
   ${list("root")} {
@@ -71,7 +71,7 @@ export const navListStyles = css`
     cursor: pointer;
   }
   ${list("item")}:focus-visible {
-    ${focusRing()}
+    ${ui.focus.ring}
   }
   ${list("item")}[aria-current="page"] {
     color: ${uiTokens.ink.primary};

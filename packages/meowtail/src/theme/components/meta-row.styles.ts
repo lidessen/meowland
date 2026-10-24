@@ -1,9 +1,11 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { metaRowContract, metaRowOptions } from "../../components/meta-row";
 
+import type { MetaRow } from "../../components/meta-row";
+import { metaRowOptions } from "../../components/meta-row.options";
+const metaRowPartRefs = parts<typeof MetaRow>("meta-row");
 export const metaRowStyles = css`
-  ${partSelector(metaRowContract, "root")} {
+  ${metaRowPartRefs.root} {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
@@ -12,40 +14,40 @@ export const metaRowStyles = css`
     color: ${uiTokens.ink.secondary};
     font: ${uiTokens.type.caption} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
   }
-  ${partSelector(metaRowContract, "root")}[${metaRowOptions.attribute("align")}="center"] {
+  ${metaRowPartRefs.root}[${metaRowOptions.attribute("align")}="center"] {
     justify-content: center;
   }
-  ${partSelector(metaRowContract, "item")} {
+  ${metaRowPartRefs.item} {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     min-width: 0;
   }
-  ${partSelector(metaRowContract, "icon")} {
+  ${metaRowPartRefs.icon} {
     display: inline-flex;
     align-items: center;
     flex: none;
   }
-  ${partSelector(metaRowContract, "icon")} svg {
+  ${metaRowPartRefs.icon} svg {
     width: ${uiTokens.icon.small};
     height: ${uiTokens.icon.small};
     flex: none;
   }
-  ${partSelector(metaRowContract, "label")} {
+  ${metaRowPartRefs.label} {
     min-width: 0;
     overflow-wrap: anywhere;
   }
-  ${partSelector(metaRowContract, "separator")} {
+  ${metaRowPartRefs.separator} {
     color: ${uiTokens.line.control};
   }
-  ${partSelector(metaRowContract, "progress")} {
+  ${metaRowPartRefs.progress} {
     display: inline-flex;
     align-items: center;
     gap: 4px;
     flex: none;
     font-variant-numeric: tabular-nums;
   }
-  ${partSelector(metaRowContract, "progress")}::before {
+  ${metaRowPartRefs.progress}::before {
     content: "";
     width: 14px;
     height: 14px;
@@ -58,7 +60,7 @@ export const metaRowStyles = css`
     -webkit-mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black 0);
     mask: radial-gradient(farthest-side, transparent calc(100% - 3px), black 0);
   }
-  ${partSelector(metaRowContract, "root")}[${metaRowOptions.attribute("progressTone")}="accent"] ${partSelector(metaRowContract, "progress")}::before {
+  ${metaRowPartRefs.root}[${metaRowOptions.attribute("progressTone")}="accent"] ${metaRowPartRefs.progress}::before {
     background: conic-gradient(
       ${uiTokens.status.info} var(--meta-progress, 0%),
       ${uiTokens.line.control} var(--meta-progress, 0%)

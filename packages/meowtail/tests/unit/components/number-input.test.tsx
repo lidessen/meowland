@@ -7,6 +7,7 @@ import {
   formatNumber,
   numberPrecision,
   installMeowUI,
+  meowUIComponents,
 } from "../../../src/index";
 
 test("step precision and clamping format a committed number", () => {
@@ -18,7 +19,7 @@ test("step precision and clamping format a committed number", () => {
 
 test("number input names its steppers and shows a committed default", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const html = createWebRenderer(runtime).renderToHtml(
     <NumberInput id="copies" name="copies" defaultValue={2} min={1} max={12} />,
   );

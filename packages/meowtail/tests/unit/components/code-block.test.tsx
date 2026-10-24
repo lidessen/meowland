@@ -2,7 +2,8 @@ import { expect, test } from "bun:test";
 import { createRuntime, h, signal, unwrap, type Props } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { CodeBlock } from "../../../src/components/code-block";
-import { installMeowUI } from "../../../src/registry";
+import { installMeowUI, meowUIComponents } from "../../../src/registry";
+import { mountComponent } from "./mount";
 
 test("code blocks escape executable markup and retain exact whitespace", () => {
   const html = createWebRenderer(createRuntime()).renderToHtml(
@@ -23,53 +24,46 @@ test("code blocks escape executable markup and retain exact whitespace", () => {
 
 test("copy preserves raw code, prevents concurrent requests and exposes failures", async () => {
   for (const fail of [false, true]) {
-    const runtime = createRuntime();
-    const buttons: Props[] = [];
-    let status: unknown;
-    let pre: Props = {};
-    runtime.use({
-      render({ vnode }, next) {
-        if (vnode.type === "button") buttons.push(vnode.props);
-        if (vnode.type === "pre") pre = vnode.props;
-        if (vnode.props.role === "status")
-          status = Array.isArray(vnode.props.children)
-            ? vnode.props.children[0]
-            : vnode.props.children;
-        return next(vnode);
-      },
-    });
     const copied: string[] = [];
     const code = "  raw\nline  ";
-    createWebRenderer(runtime).renderToHtml(
-      CodeBlock({
-        code,
-        onCopy: async (value) => {
+    const view = mountComponent(
+      <CodeBlock
+        code={code}
+        onCopy={async (value) => {
           copied.push(value);
           if (fail) throw new Error("denied");
-        },
-      }),
+        }}
+      />,
     );
-    (buttons[0].onClick as () => void)();
-    expect(unwrap(pre["data-wrap"])).toBe("true");
-    expect(unwrap(buttons[0]["aria-pressed"])).toBe("true");
-    (buttons[0].onClick as () => void)();
-    expect(unwrap(pre["data-wrap"])).toBe("false");
-    expect(unwrap(buttons[0]["aria-pressed"])).toBe("false");
-    const copy = buttons[1].onClick as () => Promise<void>;
-    const pending = copy();
-    await copy();
-    await pending;
-    expect(copied).toEqual([code]);
-    expect(unwrap(status)).toBe(
-      fail ? "Copy failed; select the code and copy it manually." : "Copied",
-    );
-    expect(unwrap(buttons[1].disabled)).toBe(false);
+    try {
+      const [wrapButton, copyButton] = view.host.querySelectorAll("button");
+      const pre = view.host.querySelector("pre")!;
+      wrapButton!.click();
+      await Promise.resolve();
+      expect(pre.getAttribute("data-wrap")).toBe("true");
+      expect(wrapButton!.getAttribute("aria-pressed")).toBe("true");
+      wrapButton!.click();
+      await Promise.resolve();
+      expect(pre.getAttribute("data-wrap")).toBe("false");
+      expect(wrapButton!.getAttribute("aria-pressed")).toBe("false");
+      const copy = copyButton!.onclick as () => Promise<void>;
+      const pending = copy();
+      await copy();
+      await pending;
+      expect(copied).toEqual([code]);
+      expect(view.host.querySelector('[role="status"]')!.textContent).toBe(
+        fail ? "Copy failed; select the code and copy it manually." : "Copied",
+      );
+      expect(copyButton!.disabled).toBe(false);
+    } finally {
+      view.unmount();
+    }
   }
 });
 
 test("title and caption parts appear in the header only when provided", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const renderer = createWebRenderer(runtime);
   const plain = renderer.renderToHtml(<CodeBlock language="typescript" code="const value = 1;" />);
   expect(plain).not.toContain('data-meowui-part="code-block/title"');

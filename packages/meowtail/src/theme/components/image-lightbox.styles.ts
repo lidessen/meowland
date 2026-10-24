@@ -1,10 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { imageLightboxContract as image } from "../../components/image-lightbox";
-
+import type { ImageLightbox } from "../../components/image-lightbox";
+import { ui } from "../utilities";
+const imageLightboxPartRefs = parts<typeof ImageLightbox>("image-lightbox");
 export const imageLightboxStyles = css`
-  ${partSelector(image, "trigger")} {
+  ${imageLightboxPartRefs.trigger} {
     border: 1px solid ${uiTokens.line.control};
     border-radius: ${uiTokens.radius.lg};
     padding: 6px 12px;
@@ -13,7 +13,7 @@ export const imageLightboxStyles = css`
     font: ${uiTokens.type.body} / ${uiTokens.type.line.body} ${uiTokens.type.sans};
     cursor: pointer;
   }
-  ${partSelector(image, "dialog")} {
+  ${imageLightboxPartRefs.dialog} {
     border: 0;
     padding: 40px;
     max-width: 100vw;
@@ -25,16 +25,16 @@ export const imageLightboxStyles = css`
     color: ${uiTokens.inverse.ink};
     margin: 0;
   }
-  ${partSelector(image, "dialog")}[open] {
+  ${imageLightboxPartRefs.dialog}[open] {
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
   }
-  ${partSelector(image, "dialog")}::backdrop {
+  ${imageLightboxPartRefs.dialog}::backdrop {
     background: ${uiTokens.surface.scrim};
   }
-  ${partSelector(image, "image")} {
+  ${imageLightboxPartRefs.image} {
     max-width: min(100%, 1600px);
     max-height: calc(100dvh - 140px);
     object-fit: contain;
@@ -42,11 +42,11 @@ export const imageLightboxStyles = css`
     background: ${uiTokens.surface.raised};
     box-shadow: ${uiTokens.shadow.float};
   }
-  ${partSelector(image, "caption")} {
+  ${imageLightboxPartRefs.caption} {
     font: ${uiTokens.type.body} / ${uiTokens.type.line.body} ${uiTokens.type.sans};
     text-align: center;
   }
-  ${partSelector(image, "close")} {
+  ${imageLightboxPartRefs.close} {
     position: absolute;
     right: 20px;
     top: 20px;
@@ -62,7 +62,7 @@ export const imageLightboxStyles = css`
     font: ${uiTokens.type.pageTitle} / 1 ${uiTokens.type.sans};
     cursor: pointer;
   }
-  ${partSelector(image, "close")}:focus-visible, ${partSelector(image, "trigger")}:focus-visible {
-    ${focusRing()}
+  ${imageLightboxPartRefs.close}:focus-visible, ${imageLightboxPartRefs.trigger}:focus-visible {
+    ${ui.focus.ring}
   }
 `;

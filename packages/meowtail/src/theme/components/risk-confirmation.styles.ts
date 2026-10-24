@@ -1,9 +1,11 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { riskConfirmationContract } from "../../components/risk-confirmation";
-import { dialogPanelContract } from "../../components/dialog";
+import { css, parts } from "meowcss/meowjsx";
 
+import type { DialogPanel } from "../../components/dialog";
+import type { RiskConfirmation } from "../../components/risk-confirmation";
+const dialogPanelPartRefs = parts<typeof DialogPanel>("dialog-panel");
+const riskConfirmationPartRefs = parts<typeof RiskConfirmation>("risk-confirmation");
 export const riskConfirmationStyles = css`
-  ${partSelector(riskConfirmationContract, "root")} ${partSelector(dialogPanelContract, "root")} {
+  ${riskConfirmationPartRefs.root} ${dialogPanelPartRefs.root} {
     display: grid;
     gap: 20px;
   }

@@ -1,13 +1,15 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { popoverContract } from "../../components/popover";
-import { menuContract } from "../../components/menu";
 
+import type { Menu } from "../../components/menu";
+import type { Popover } from "../../components/popover";
+const menuPartRefs = parts<typeof Menu>("menu");
+const popoverPartRefs = parts<typeof Popover>("popover");
 export const popoverStyles = css`
-  ${partSelector(popoverContract, "root")} {
+  ${popoverPartRefs.root} {
     min-width: 0;
   }
-  ${partSelector(popoverContract, "panel")} {
+  ${popoverPartRefs.panel} {
     box-sizing: border-box;
     width: 300px;
     padding: 8px;
@@ -20,16 +22,16 @@ export const popoverStyles = css`
     font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     transform-origin: top center;
   }
-  ${partSelector(popoverContract, "panel")}:has(> ${partSelector(menuContract, "root")}) {
+  ${popoverPartRefs.panel}:has(> ${menuPartRefs.root}) {
     width: max-content;
     min-width: 144px;
     max-width: min(360px, calc(100vw - 24px));
     padding: 6px;
   }
-  ${partSelector(popoverContract, "panel")}[data-side="top"] {
+  ${popoverPartRefs.panel}[data-side="top"] {
     transform-origin: bottom center;
   }
-  ${partSelector(popoverContract, "panel")}:popover-open {
+  ${popoverPartRefs.panel}:popover-open {
     animation: ui-popover-enter ${uiTokens.motion.settle} ${uiTokens.motion.enter};
   }
   @keyframes ui-popover-enter {
@@ -43,7 +45,7 @@ export const popoverStyles = css`
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(popoverContract, "panel")}:popover-open {
+    ${popoverPartRefs.panel}:popover-open {
       animation: none;
     }
   }

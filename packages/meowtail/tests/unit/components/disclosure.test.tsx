@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Disclosure, installMeowUI } from "meowtail";
+import { Disclosure, installMeowUI, meowUIComponents } from "meowtail";
 
 test("Disclosure retains native semantics and host slots through its stable part contract", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const web = createWebRenderer(runtime);
   const view = (
     <Disclosure

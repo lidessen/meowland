@@ -1,12 +1,7 @@
-import { defineComponent, h, type ComponentContract } from "meowjsx";
+import { h, type Context } from "meowjsx";
 import { render } from "meowjsx/web";
 import { uiTokens } from "../theme/tokens";
 import { validateRegionLayout, type RegionLayoutDescription } from "./region-layout-types";
-
-export const regionLayoutContract = {
-  name: "region-layout",
-  parts: ["root", "back", "grid", "region", "content"],
-} as const satisfies ComponentContract;
 
 export type RegionRoots = Readonly<Record<string, HTMLElement>>;
 export interface RegionLayoutSurface {
@@ -53,87 +48,100 @@ interface ShellProps {
   onBack(): void;
 }
 
-const RegionLayoutShell = defineComponent<
-  ShellProps,
-  "region-layout",
-  (typeof regionLayoutContract.parts)[number]
->(regionLayoutContract, ({ layout, names, options, capture, onBack }, context) =>
-  context.part(
-    "root",
-    "div",
-    {
-      ref: (root: HTMLElement) => {
-        capture.root = root;
-      },
-    },
-    context.part(
-      "back",
-      "button",
-      {
-        type: "button",
-        hidden: true,
-        onClick: onBack,
-        ref: (button: HTMLButtonElement) => {
-          capture.back = button;
+export function RegionLayoutShell(
+  { layout, names, options, capture, onBack }: ShellProps,
+  context: Context<typeof RegionLayoutShell>,
+) {
+  return (
+    <div
+      ref={[
+        context.parts.root,
+        (root: HTMLElement) => {
+          capture.root = root;
         },
-      },
-      options.backLabel ?? "Back",
-    ),
-    context.part(
-      "grid",
-      "div",
+      ]}
+    >
       {
-        ref: (grid: HTMLElement) => {
-          capture.grid = grid;
-        },
-      },
-      names.map((name) =>
-        context.part("region", "div", {
-          "data-region": name,
-          ref: (container: HTMLElement) => {
-            capture.containers[name] = container;
-            const target = options.isolateContent
-              ? container.attachShadow({ mode: "open" })
-              : container;
-            const content = container.ownerDocument.createElement("div");
-            content.dataset.meowuiPart = "region-layout/content";
-            content.dataset.regionContent = name;
-            const description = layout.regions[name]!;
-            const inline = description.direction === "inline";
-            Object.assign(content.style, {
-              boxSizing: "border-box",
-              minWidth: "0",
-              minHeight: "0",
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              flexDirection: inline ? "row" : "column",
-              flexWrap: inline ? "wrap" : "nowrap",
-              alignItems: description.align ?? (inline ? "baseline" : "stretch"),
-              gap: gapValue(description.gap),
-              overflow: description.scrollOwner === "content" ? "hidden" : "auto",
-              overscrollBehavior: "contain",
-              position: "relative",
-              contain: "layout paint",
-            });
-            if (description.scrollOwner === "content") content.dataset.scrollOwner = "content";
-            else {
-              content.dataset.scrollOwner = "layout";
-              content.tabIndex = 0;
-            }
-            const label = options.regionLabels?.[name];
-            if (label) {
-              content.setAttribute("role", "region");
-              content.setAttribute("aria-label", label);
-            }
-            target.append(content);
-            capture.roots[name] = content;
-          },
-        }),
-      ),
-    ),
-  ),
-);
+        <button
+          type={"button"}
+          hidden={true}
+          onClick={onBack}
+          ref={[
+            context.parts.back,
+            (button: HTMLButtonElement) => {
+              capture.back = button;
+            },
+          ]}
+        >
+          {options.backLabel ?? "Back"}
+        </button>
+      }
+      {
+        <div
+          ref={[
+            context.parts.grid,
+            (grid: HTMLElement) => {
+              capture.grid = grid;
+            },
+          ]}
+        >
+          {names.map((name) => (
+            <div
+              data-region={name}
+              ref={[
+                context.parts.region,
+                (container: HTMLElement) => {
+                  capture.containers[name] = container;
+                  const target = options.isolateContent
+                    ? container.attachShadow({ mode: "open" })
+                    : container;
+                  const content = container.ownerDocument.createElement("div");
+                  content.dataset.meowuiPart = "region-layout/content";
+                  content.dataset.regionContent = name;
+                  const description = layout.regions[name]!;
+                  const inline = description.direction === "inline";
+                  Object.assign(content.style, {
+                    boxSizing: "border-box",
+                    minWidth: "0",
+                    minHeight: "0",
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    flexDirection: inline ? "row" : "column",
+                    flexWrap: inline ? "wrap" : "nowrap",
+                    alignItems: description.align ?? (inline ? "baseline" : "stretch"),
+                    gap: gapValue(description.gap),
+                    overflow: description.scrollOwner === "content" ? "hidden" : "auto",
+                    overscrollBehavior: "contain",
+                    position: "relative",
+                    contain: "layout paint",
+                  });
+                  if (description.scrollOwner === "content")
+                    content.dataset.scrollOwner = "content";
+                  else {
+                    content.dataset.scrollOwner = "layout";
+                    content.tabIndex = 0;
+                  }
+                  const label = options.regionLabels?.[name];
+                  if (label) {
+                    content.setAttribute("role", "region");
+                    content.setAttribute("aria-label", label);
+                  }
+                  target.append(content);
+                  capture.roots[name] = content;
+                },
+              ]}
+            ></div>
+          ))}
+        </div>
+      }
+    </div>
+  );
+}
+RegionLayoutShell.meta = {
+  name: "region-layout",
+  parts: ["root", "back", "grid", "region", "content"],
+} as const;
 
 /** One renderer owns area geometry for built-in pages and isolated Extension leaves. */
 export function mountRegionLayout(

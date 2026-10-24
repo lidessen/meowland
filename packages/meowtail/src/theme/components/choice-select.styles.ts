@@ -1,15 +1,17 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { choiceSelectContract } from "../../components/choice-select";
-import { popoverContract } from "../../components/popover";
 
+import type { ChoiceSelect } from "../../components/choice-select";
+import type { Popover } from "../../components/popover";
+const choiceSelectPartRefs = parts<typeof ChoiceSelect>("choice-select");
+const popoverPartRefs = parts<typeof Popover>("popover");
 export const choiceSelectStyles = css`
-  ${partSelector(choiceSelectContract, "root")} {
+  ${choiceSelectPartRefs.root} {
     position: relative;
     min-width: 0;
   }
   /* Surface, height and states come from the shared field surface. */
-  ${partSelector(choiceSelectContract, "trigger")} {
+  ${choiceSelectPartRefs.trigger} {
     display: flex;
     align-items: center;
     gap: 6px;
@@ -19,29 +21,29 @@ export const choiceSelectStyles = css`
     text-align: start;
     cursor: pointer;
   }
-  ${partSelector(choiceSelectContract, "value")} {
+  ${choiceSelectPartRefs.value} {
     flex: 1;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  ${partSelector(choiceSelectContract, "indicator")} {
+  ${choiceSelectPartRefs.indicator} {
     display: flex;
     color: ${uiTokens.ink.secondary};
   }
-  ${partSelector(choiceSelectContract, "indicator")} svg {
+  ${choiceSelectPartRefs.indicator} svg {
     width: ${uiTokens.icon.small};
     height: ${uiTokens.icon.small};
   }
-  ${partSelector(popoverContract, "panel")}:has(> ${partSelector(choiceSelectContract, "list")}) {
+  ${popoverPartRefs.panel}:has(> ${choiceSelectPartRefs.list}) {
     padding: 6px;
   }
-  ${partSelector(choiceSelectContract, "list")} {
+  ${choiceSelectPartRefs.list} {
     display: grid;
     gap: 0;
   }
-  ${partSelector(choiceSelectContract, "search")} {
+  ${choiceSelectPartRefs.search} {
     box-sizing: border-box;
     width: 100%;
     min-height: 32px;
@@ -53,25 +55,25 @@ export const choiceSelectStyles = css`
     color: ${uiTokens.ink.primary};
     font: ${uiTokens.type.body} / ${uiTokens.type.line.body} ${uiTokens.type.sans};
   }
-  ${partSelector(choiceSelectContract, "search")}:focus-visible {
+  ${choiceSelectPartRefs.search}:focus-visible {
     border-color: ${uiTokens.state.focus};
     outline: none;
   }
-  ${partSelector(choiceSelectContract, "search")}::placeholder {
+  ${choiceSelectPartRefs.search}::placeholder {
     color: ${uiTokens.ink.secondary};
   }
-  ${partSelector(choiceSelectContract, "empty")} {
+  ${choiceSelectPartRefs.empty} {
     margin: 0;
     padding: ${uiTokens.space.section} ${uiTokens.control.inset};
     color: ${uiTokens.ink.secondary};
   }
-  ${partSelector(choiceSelectContract, "option")}[hidden],
-  ${partSelector(choiceSelectContract, "group")}[hidden],
-  ${partSelector(choiceSelectContract, "empty")}[hidden] {
+  ${choiceSelectPartRefs.option}[hidden],
+  ${choiceSelectPartRefs.group}[hidden],
+  ${choiceSelectPartRefs.empty}[hidden] {
     display: none;
   }
   /* Group labels and separators match Menu: small uppercase heading, full-bleed band. */
-  ${partSelector(choiceSelectContract, "group")} {
+  ${choiceSelectPartRefs.group} {
     padding: 8px 10px 4px;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.micro};
@@ -79,12 +81,12 @@ export const choiceSelectStyles = css`
     letter-spacing: ${uiTokens.type.trackingCaps};
     text-transform: uppercase;
   }
-  ${partSelector(choiceSelectContract, "group")}:not(:first-child) {
+  ${choiceSelectPartRefs.group}:not(:first-child) {
     border-top: 1px solid ${uiTokens.line.divider};
     margin: 4px -6px 0;
     padding-inline: 16px;
   }
-  ${partSelector(choiceSelectContract, "option")} {
+  ${choiceSelectPartRefs.option} {
     box-sizing: border-box;
     display: flex;
     align-items: center;
@@ -102,26 +104,26 @@ export const choiceSelectStyles = css`
     cursor: pointer;
     overflow-wrap: anywhere;
   }
-  ${partSelector(choiceSelectContract, "option")}::after {
+  ${choiceSelectPartRefs.option}::after {
     content: "";
     width: 12px;
     flex: 0 0 12px;
   }
-  ${partSelector(choiceSelectContract, "option")}[aria-selected="true"]::after {
+  ${choiceSelectPartRefs.option}[aria-selected="true"]::after {
     content: "✓";
   }
-  ${partSelector(choiceSelectContract, "option")}[aria-selected="true"] {
+  ${choiceSelectPartRefs.option}[aria-selected="true"] {
     font-weight: ${uiTokens.type.weight.regular};
   }
-  ${partSelector(choiceSelectContract, "option")}:focus {
+  ${choiceSelectPartRefs.option}:focus {
     background: ${uiTokens.state.hover};
     outline: none;
   }
-  ${partSelector(choiceSelectContract, "option")}:disabled {
+  ${choiceSelectPartRefs.option}:disabled {
     color: ${uiTokens.ink.tertiary};
     cursor: not-allowed;
   }
-  ${partSelector(choiceSelectContract, "native")} {
+  ${choiceSelectPartRefs.native} {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -131,33 +133,33 @@ export const choiceSelectStyles = css`
     clip-path: inset(50%);
     white-space: nowrap;
   }
-  ${partSelector(choiceSelectContract, "validation")} {
+  ${choiceSelectPartRefs.validation} {
     display: block;
     margin-top: ${uiTokens.space.group};
     color: ${uiTokens.status.danger};
     font-size: ${uiTokens.type.caption};
   }
-  ${partSelector(choiceSelectContract, "validation")}:empty {
+  ${choiceSelectPartRefs.validation}:empty {
     display: none;
   }
   @media (hover: hover) {
-    ${partSelector(choiceSelectContract, "trigger")}:hover:not(:disabled):not([aria-invalid="true"]) {
+    ${choiceSelectPartRefs.trigger}:hover:not(:disabled):not([aria-invalid="true"]) {
       border-color: ${uiTokens.ink.secondary};
     }
-    ${partSelector(choiceSelectContract, "option")}:hover:not(:disabled) {
+    ${choiceSelectPartRefs.option}:hover:not(:disabled) {
       background: ${uiTokens.state.hover};
     }
   }
   @media (pointer: coarse) {
-    ${partSelector(choiceSelectContract, "trigger")},
-    ${partSelector(choiceSelectContract, "search")},
-    ${partSelector(choiceSelectContract, "option")} {
+    ${choiceSelectPartRefs.trigger},
+    ${choiceSelectPartRefs.search},
+    ${choiceSelectPartRefs.option} {
       min-height: 44px;
       font-size: ${uiTokens.type.touchField};
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(choiceSelectContract, "trigger")} {
+    ${choiceSelectPartRefs.trigger} {
       transition: none;
     }
   }

@@ -1,9 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { spinnerContract } from "../../components/spinner";
 
+import type { Spinner } from "../../components/spinner";
+const spinnerPartRefs = parts<typeof Spinner>("spinner");
 export const spinnerStyles = css`
-  ${partSelector(spinnerContract, "root")} {
+  ${spinnerPartRefs.root} {
     display: inline-flex;
     align-items: center;
     gap: ${uiTokens.space.group};
@@ -11,7 +12,7 @@ export const spinnerStyles = css`
     font-family: ${uiTokens.type.sans};
     font-size: ${uiTokens.type.caption};
   }
-  ${partSelector(spinnerContract, "icon")} {
+  ${spinnerPartRefs.icon} {
     display: inline-flex;
     animation: ui-spinner-turn ${uiTokens.motion.loop} linear infinite;
   }
@@ -21,7 +22,7 @@ export const spinnerStyles = css`
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(spinnerContract, "icon")} {
+    ${spinnerPartRefs.icon} {
       animation: none;
     }
   }

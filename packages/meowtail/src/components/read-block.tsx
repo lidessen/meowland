@@ -1,6 +1,6 @@
-import { defineComponent, h, type Child, type Props } from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
 import { OutputBlock } from "./output-block";
-import { readBlockContract } from "./read-block.contract";
+
 import { highlightCode, type HighlightSpan } from "../syntax-highlight";
 export interface ReadBlockLine {
   number: number;
@@ -28,26 +28,23 @@ export function readHighlightLines(spans: readonly HighlightSpan[]): HighlightSp
   return rows;
 }
 /** Displays a supplied file window; never opens the named path. */
-export const ReadBlock = defineComponent<
-  ReadBlockProps,
-  "read-block",
-  (typeof readBlockContract.parts)[number]
->(
-  readBlockContract,
-  ({ label = "File content", lines, totalLines, lang, maxLines, onCopy, ...props }, context) => {
-    const raw = lines.map((line) => line.text).join("\n");
-    const content = lines.map((line) => context.signal<Child>(line.text || "\u200b"));
-    let disposed = false;
-    context.onCleanup(() => {
-      disposed = true;
-    });
-    return context.part(
-      "root",
-      "div",
-      {
-        ...props,
-        ref: (element: HTMLElement) => {
-          const hostCleanup = typeof props.ref === "function" ? props.ref(element) : undefined;
+export function ReadBlock(
+  { label = "File content", lines, totalLines, lang, maxLines, onCopy, ...props }: ReadBlockProps,
+  context: Context<typeof ReadBlock>,
+) {
+  const raw = lines.map((line) => line.text).join("\n");
+  const content = lines.map((line) => context.signal<Child>(line.text || "\u200b"));
+  let disposed = false;
+  context.onCleanup(() => {
+    disposed = true;
+  });
+  return (
+    <div
+      {...props}
+      ref={[
+        context.parts.root,
+        props.ref,
+        (element: HTMLElement) => {
           let active = true;
           let started = false;
           let observer: IntersectionObserver | undefined;
@@ -93,27 +90,34 @@ export const ReadBlock = defineComponent<
           return () => {
             active = false;
             observer?.disconnect();
-            if (typeof hostCleanup === "function") hostCleanup();
           };
         },
-      },
-      <OutputBlock
-        title={
-          <span>
-            {label}
-            {totalLines !== undefined ? ` · Showing ${lines.length} / ${totalLines} lines` : ""}
-          </span>
-        }
-        maxLines={maxLines}
-        onCopy={onCopy}
-        copyText={raw}
-        rows={lines.map((line, index) => (
-          <div data-read-highlight={line.highlighted ? "true" : undefined}>
-            {context.part("number", "span", { "aria-hidden": "true" }, String(line.number))}
-            {context.part("text", "span", {}, content[index]!)}
-          </div>
-        ))}
-      />,
-    );
-  },
-);
+      ]}
+    >
+      {
+        <OutputBlock
+          title={
+            <span>
+              {label}
+              {totalLines !== undefined ? ` · Showing ${lines.length} / ${totalLines} lines` : ""}
+            </span>
+          }
+          maxLines={maxLines}
+          onCopy={onCopy}
+          copyText={raw}
+          rows={lines.map((line, index) => (
+            <div data-read-highlight={line.highlighted ? "true" : undefined}>
+              {
+                <span aria-hidden={"true"} ref={[context.parts.number]}>
+                  {String(line.number)}
+                </span>
+              }
+              {<span ref={[context.parts.text]}>{content[index]!}</span>}
+            </div>
+          ))}
+        />
+      }
+    </div>
+  );
+}
+ReadBlock.meta = { name: "read-block", parts: ["root", "number", "text"] } as const;

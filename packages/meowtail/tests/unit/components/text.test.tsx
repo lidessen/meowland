@@ -2,11 +2,11 @@ import { expect, test } from "bun:test";
 import { createRuntime, h, signal } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { standardTheme } from "../../../src/theme/index";
-import { Prose, Text, installMeowUI } from "../../../src/index";
+import { Prose, Text, installMeowUI, meowUIComponents } from "../../../src/index";
 
 function render(child: Parameters<ReturnType<typeof createWebRenderer>["renderToHtml"]>[0]) {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   return createWebRenderer(runtime).renderToHtml(child);
 }
 
@@ -30,7 +30,7 @@ test("text is a paragraph in the body role unless the caller picks a role and el
 
 test("text roles accept a signal", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const variant = signal<"secondary" | "caption">("secondary");
   const host = createWebRenderer(runtime).renderToHtml(<Text variant={variant}>Note</Text>);
   expect(host).toContain('data-option-text-variant="secondary"');

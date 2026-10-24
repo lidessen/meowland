@@ -91,16 +91,6 @@ export function patternDefaults(pattern: string): Map<string, string> {
   return defaults;
 }
 
-/** The destructuring pattern that opens at or after `from`, without its braces. */
-function patternAfter(source: string, from: number): string | undefined {
-  const open = /\(\s*\{/g;
-  open.lastIndex = from;
-  const match = open.exec(source);
-  if (!match) return undefined;
-  const brace = source.indexOf("{", match.index);
-  return source.slice(brace + 1, blockEnd(source, brace) - 1);
-}
-
 /** Read the props interfaces and component defaults of one source file. */
 export function readPropsSource(
   source: string,
@@ -128,15 +118,6 @@ export function readPropsSource(
       extends: parts
         .filter((part) => !part.startsWith("{"))
         .map((part) => part.replace(/\s+/g, " ")),
-    });
-  }
-  const defined = /export const ([\w$]+)\s*=\s*defineComponent<\s*([\w$]+)/g;
-  for (const match of source.matchAll(defined)) {
-    const pattern = patternAfter(source, match.index + match[0].length);
-    components.set(match[1]!, {
-      propsName: match[2]!,
-      defaults: pattern ? patternDefaults(pattern) : new Map(),
-      summary: docBefore(source, match.index),
     });
   }
   const declared = /export function ([A-Z][\w$]*)\s*\(\s*\{/g;

@@ -1,12 +1,15 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { buttonContract, buttonOptions } from "../../components/button";
-import { iconButtonContract, iconButtonOptions } from "../../components/icon-button";
-
+import type { Button } from "../../components/button";
+import type { IconButton } from "../../components/icon-button";
+import { buttonOptions } from "../../components/button.options";
+import { iconButtonOptions } from "../../components/icon-button.options";
+import { ui } from "../utilities";
+const buttonPartRefs = parts<typeof Button>("button");
+const iconButtonPartRefs = parts<typeof IconButton>("icon-button");
 export const buttonStyles = css`
 /* Visual rules only. Low specificity leaves host layout composable. */
-:where(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")}) {
+:where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}) {
   box-sizing: border-box;
   display: inline-flex;
   align-items: center;
@@ -29,10 +32,10 @@ export const buttonStyles = css`
   -webkit-tap-highlight-color: transparent;
 }
 /* A press settles the action half a pixel, so a click is felt, not only seen. */
-:where(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")}):active:not(:disabled) {
+:where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}):active:not(:disabled) {
   transform: translateY(0.5px);
 }
-${partSelector(iconButtonContract, "root")} {
+${iconButtonPartRefs.root} {
   width: ${uiTokens.control.regular};
   min-width: ${uiTokens.control.regular};
   height: ${uiTokens.control.regular};
@@ -40,26 +43,26 @@ ${partSelector(iconButtonContract, "root")} {
   flex-shrink: 0;
   color: ${uiTokens.ink.secondary};
 }
-:where(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")}) svg {
+:where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}) svg {
   width: ${uiTokens.icon.size};
   height: ${uiTokens.icon.size};
   flex-shrink: 0;
 }
-${partSelector(buttonContract, "root")} {
+${buttonPartRefs.root} {
   ${buttonOptions.when({ variant: "primary" })} {
     background: ${uiTokens.action.primary};
     color: ${uiTokens.action.onPrimary};
     box-shadow: ${uiTokens.shadow.filled};
   }
 }
-${partSelector(buttonContract, "root")} {
+${buttonPartRefs.root} {
   ${buttonOptions.when({ variant: "danger" })} {
     background: ${uiTokens.action.danger};
     color: ${uiTokens.action.onDanger};
     box-shadow: ${uiTokens.shadow.filled};
   }
 }
-${partSelector(buttonContract, "root")} {
+${buttonPartRefs.root} {
   ${buttonOptions.when({ variant: "outline" })} {
     border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     background: ${uiTokens.surface.raised};
@@ -67,54 +70,54 @@ ${partSelector(buttonContract, "root")} {
     box-shadow: ${uiTokens.shadow.action};
   }
 }
-${partSelector(buttonContract, "root")} {
+${buttonPartRefs.root} {
   ${buttonOptions.when({ variant: "accent" })} {
     background: ${uiTokens.accent.soft};
     color: ${uiTokens.accent.ink};
     font-weight: ${uiTokens.type.weight.medium};
   }
 }
-${partSelector(buttonContract, "root")} {
+${buttonPartRefs.root} {
   ${buttonOptions.when({ variant: "stop" })} {
     color: ${uiTokens.status.danger};
   }
 }
 @media (hover: hover) {
   :where(
-      ${partSelector(iconButtonContract, "root")},
-      ${partSelector(buttonContract, "root")}[${buttonOptions.attribute("variant")}="quiet"],
-      ${partSelector(buttonContract, "root")}[${buttonOptions.attribute("variant")}="outline"]
+      ${iconButtonPartRefs.root},
+      ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="quiet"],
+      ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="outline"]
     ):hover:not(:disabled) {
     background: ${uiTokens.state.hover};
     color: ${uiTokens.ink.primary};
   }
-  ${partSelector(buttonContract, "root")}[${buttonOptions.attribute("variant")}="primary"]:hover:not(:disabled) {
+  ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="primary"]:hover:not(:disabled) {
     background: ${uiTokens.action.primaryHover};
   }
-  ${partSelector(buttonContract, "root")}[${buttonOptions.attribute("variant")}="danger"]:hover:not(:disabled) {
+  ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="danger"]:hover:not(:disabled) {
     background: color-mix(in srgb, ${uiTokens.action.danger} 88%, ${uiTokens.ink.primary});
   }
-  ${partSelector(buttonContract, "root")}[${buttonOptions.attribute("variant")}="accent"]:hover:not(:disabled) {
+  ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="accent"]:hover:not(:disabled) {
     background: color-mix(in srgb, ${uiTokens.accent.base} 14%, ${uiTokens.accent.soft});
   }
-  ${partSelector(buttonContract, "root")}[${buttonOptions.attribute("variant")}="stop"]:hover:not(:disabled) {
+  ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="stop"]:hover:not(:disabled) {
     background: color-mix(in srgb, ${uiTokens.status.danger} 8%, transparent);
   }
 }
-:where(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")}[${buttonOptions.attribute("variant")}="quiet"], ${partSelector(buttonContract, "root")}[${buttonOptions.attribute("variant")}="outline"]):active:not(:disabled) {
+:where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="quiet"], ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="outline"]):active:not(:disabled) {
   background: ${uiTokens.state.active};
 }
-:where(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")}):focus-visible {
-  ${focusRing()}
+:where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}):focus-visible {
+  ${ui.focus.ring}
 }
-:where(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")}):disabled {
+:where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}):disabled {
   cursor: not-allowed;
   opacity: 0.4;
 }
-${partSelector(buttonContract, "root")}:disabled {
+${buttonPartRefs.root}:disabled {
   box-shadow: none;
 }
-${partSelector(buttonContract, "root")} {
+${buttonPartRefs.root} {
   ${buttonOptions.when({ size: "small" })} {
     min-height: ${uiTokens.control.small};
     padding-inline: 10px;
@@ -123,13 +126,13 @@ ${partSelector(buttonContract, "root")} {
     line-height: ${uiTokens.type.line.caption};
   }
 }
-${partSelector(buttonContract, "root")} {
+${buttonPartRefs.root} {
   ${buttonOptions.when({ size: "large" })} {
     min-height: ${uiTokens.control.large};
     padding-inline: 20px;
   }
 }
-${partSelector(iconButtonContract, "root")} {
+${iconButtonPartRefs.root} {
   ${iconButtonOptions.when({ size: "small" })} {
     width: ${uiTokens.control.small};
     min-width: ${uiTokens.control.small};
@@ -138,7 +141,7 @@ ${partSelector(iconButtonContract, "root")} {
     border-radius: ${uiTokens.radius.md};
   }
 }
-${partSelector(iconButtonContract, "root")} {
+${iconButtonPartRefs.root} {
   ${iconButtonOptions.when({ size: "large" })} {
     width: ${uiTokens.control.large};
     min-width: ${uiTokens.control.large};
@@ -146,17 +149,17 @@ ${partSelector(iconButtonContract, "root")} {
     min-height: ${uiTokens.control.large};
   }
 }
-${partSelector(buttonContract, "root")} svg {
+${buttonPartRefs.root} svg {
   transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
 }
-${partSelector(buttonContract, "root")}[aria-expanded="true"] svg:last-child {
+${buttonPartRefs.root}[aria-expanded="true"] svg:last-child {
   transform: rotate(180deg);
 }
 @media (prefers-reduced-motion: reduce) {
-  :where(${partSelector(iconButtonContract, "root")}, ${partSelector(buttonContract, "root")}) {
+  :where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}) {
     transition: none;
   }
-  ${partSelector(buttonContract, "root")} svg {
+  ${buttonPartRefs.root} svg {
     transition: none;
   }
 }

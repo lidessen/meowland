@@ -1,41 +1,31 @@
-import { defineOptions } from "meowcss";
-import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
-import { defineComponent, type Props } from "meowjsx";
-
-export const chatStatusOptions = defineOptions("chat-status", {
-  tone: ["online", "busy", "waiting", "error", "idle"],
-});
-
-export const chatStatusContract = {
-  name: "chat-status",
-  parts: ["root", "dot", "label"],
-  styleProps: defineStyleProps(chatStatusOptions, { defaults: { tone: "idle" } }),
-} as const satisfies StyledComponentContract;
+import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
+import { h, type Context, type Props } from "meowjsx";
+import { chatStatusOptions } from "./status.options";
 
 export type ChatStatusTone = (typeof chatStatusOptions.axes.tone)[number];
 
 export interface ChatStatusProps extends Props, ThemedProps<typeof chatStatusOptions> {
   label: string;
-  className?: string;
 }
 
 /** The connection or activity state of a conversation, as a dot and a word. */
-export const ChatStatus = defineComponent<
-  ChatStatusProps,
-  typeof chatStatusContract.name,
-  (typeof chatStatusContract.parts)[number]
->(chatStatusContract, ({ label, className, tone, ...props }, context) =>
-  context.part(
-    "root",
-    "span",
-    {
-      ...props,
-      tone,
-      className,
-      role: "status",
-      "data-tone": tone ?? "idle",
-    },
-    context.part("dot", "i", { "aria-hidden": "true" }),
-    context.part("label", "span", { "data-chat-status-label": true }, label),
-  ),
-);
+export function ChatStatus(
+  { label, tone, ref, ...props }: ChatStatusProps,
+  context: Context<typeof ChatStatus>,
+) {
+  const parts = context.parts;
+  return (
+    <span {...props} tone={tone} role="status" data-tone={tone ?? "idle"} ref={[parts.root, ref]}>
+      <i aria-hidden="true" ref={parts.dot} />
+      <span data-chat-status-label ref={parts.label}>
+        {label}
+      </span>
+    </span>
+  );
+}
+
+ChatStatus.meta = {
+  name: "chat-status",
+  parts: ["root", "dot", "label"],
+  style: defineStyleProps(chatStatusOptions, { defaults: { tone: "idle" } }),
+} as const;

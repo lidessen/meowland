@@ -2,7 +2,7 @@ import { expect, test } from "@playwright/test";
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { themeAttributes } from "meowcss";
-import { Button, Input, Stack, createMeowUI } from "meowtail";
+import { Button, Input, Stack, createMeowUI, meowUIComponents } from "meowtail";
 import { standardOptions, standardTheme } from "meowtail/theme";
 
 const rootAttributes = themeAttributes(standardTheme, standardOptions.select({ scheme: "light" }));
@@ -11,7 +11,7 @@ const attributes = Object.entries(rootAttributes)
   .join(" ");
 
 function content() {
-  const runtime = createRuntime({ plugins: [createMeowUI()] });
+  const runtime = createRuntime({ plugins: [createMeowUI({ components: meowUIComponents })] });
   return createWebRenderer(runtime).renderToHtml(
     <Stack>
       <p id="plain">Plain explanatory text beside shared controls.</p>

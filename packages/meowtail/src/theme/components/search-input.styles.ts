@@ -1,21 +1,22 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { searchInputContract } from "../../components/search-input";
 
+import type { SearchInput } from "../../components/search-input";
+const searchInputPartRefs = parts<typeof SearchInput>("search-input");
 export const searchInputStyles = css`
   /* Surface, height and states come from the shared field surface. */
-  ${partSelector(searchInputContract, "root")} {
+  ${searchInputPartRefs.root} {
     display: flex;
     align-items: center;
     gap: ${uiTokens.space.group};
     padding-inline: ${uiTokens.control.fieldInset};
   }
-  ${partSelector(searchInputContract, "icon")} {
+  ${searchInputPartRefs.icon} {
     display: flex;
     flex: none;
     color: ${uiTokens.ink.tertiary};
   }
-  ${partSelector(searchInputContract, "control")} {
+  ${searchInputPartRefs.control} {
     box-sizing: border-box;
     min-width: 0;
     width: 100%;
@@ -30,13 +31,13 @@ export const searchInputStyles = css`
     outline: none;
     box-shadow: none;
   }
-  ${partSelector(searchInputContract, "control")}::placeholder {
+  ${searchInputPartRefs.control}::placeholder {
     color: ${uiTokens.ink.secondary};
   }
-  ${partSelector(searchInputContract, "control")}:focus-visible {
+  ${searchInputPartRefs.control}:focus-visible {
     outline: none;
   }
-  ${partSelector(searchInputContract, "root")}:has(:disabled) :where(${partSelector(searchInputContract, "control")}, ${partSelector(searchInputContract, "icon")}) {
+  ${searchInputPartRefs.root}:has(:disabled) :where(${searchInputPartRefs.control}, ${searchInputPartRefs.icon}) {
     color: inherit;
     cursor: not-allowed;
   }

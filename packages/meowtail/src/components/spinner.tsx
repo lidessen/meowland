@@ -1,23 +1,24 @@
-import { defineComponent, h, type ComponentContract, type Props } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
 import { Icon } from "../icons/icon";
 
-export const spinnerContract = {
-  name: "spinner",
-  parts: ["root", "icon", "label"],
-} as const satisfies ComponentContract;
 export interface SpinnerProps extends Props {
   label: string;
-  className?: string;
+  className?: Props["className"];
 }
 /** An indeterminate loading indicator with a label that says what is loading. */
-export const Spinner = defineComponent<SpinnerProps, "spinner", "root" | "icon" | "label">(
-  spinnerContract,
-  ({ label, className, ...props }, context) =>
-    context.part(
-      "root",
-      "span",
-      { ...props, className, role: "status" },
-      context.part("icon", "span", { "aria-hidden": "true" }, <Icon name="loader-circle" />),
-      context.part("label", "span", null, label),
-    ),
-);
+export function Spinner(
+  { label, className, ...props }: SpinnerProps,
+  context: Context<typeof Spinner>,
+) {
+  return (
+    <span {...props} className={className} role={"status"} ref={[context.parts.root, props.ref]}>
+      {
+        <span aria-hidden={"true"} ref={[context.parts.icon]}>
+          {<Icon name="loader-circle" />}
+        </span>
+      }
+      {<span ref={[context.parts.label]}>{label}</span>}
+    </span>
+  );
+}
+Spinner.meta = { name: "spinner", parts: ["root", "icon", "label"] } as const;

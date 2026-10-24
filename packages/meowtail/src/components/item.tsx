@@ -1,17 +1,8 @@
-import { defineOptions } from "meowcss";
-import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
-import { defineComponent, type Child, type Props } from "meowjsx";
+import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
+import { type Child, type Props, type Context, h } from "meowjsx";
 
-export const itemOptions = defineOptions("item", {
-  size: ["small", "medium"],
-  variant: ["plain", "outline"],
-});
-
-export const itemContract = {
-  name: "item",
-  parts: ["root", "leading", "content", "meta", "title", "description", "trailing"],
-  styleProps: defineStyleProps(itemOptions, { defaults: { size: "medium", variant: "plain" } }),
-} as const satisfies StyledComponentContract;
+import { itemOptions } from "./item.options";
+export { itemOptions } from "./item.options";
 
 export interface ItemProps extends Props, ThemedProps<typeof itemOptions> {
   as?: "div" | "button";
@@ -21,46 +12,47 @@ export interface ItemProps extends Props, ThemedProps<typeof itemOptions> {
   trailing?: Child;
   meta?: Child;
   selected?: boolean;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** A single readable destination. Button content must not contain nested controls. */
-export const Item = defineComponent<ItemProps, "item", (typeof itemContract.parts)[number]>(
-  itemContract,
-  (
-    {
-      as = "div",
-      title,
-      description,
-      leading,
-      trailing,
-      meta,
-      selected,
-      className,
-      children,
-      ...props
-    },
-    context,
-  ) =>
-    context.part(
-      "root",
-      as,
-      {
-        type: as === "button" ? "button" : undefined,
-        ...props,
-        className,
-        "data-selected": selected ? "true" : undefined,
-      },
-      leading != null ? context.part("leading", "span", null, leading) : null,
-      context.part(
-        "content",
-        "span",
-        null,
-        meta != null ? context.part("meta", "span", null, meta) : null,
-        context.part("title", "span", null, title),
-        description != null ? context.part("description", "span", null, description) : null,
-        children,
-      ),
-      trailing != null ? context.part("trailing", "span", null, trailing) : null,
-    ),
-);
+export function Item(
+  {
+    as = "div",
+    title,
+    description,
+    leading,
+    trailing,
+    meta,
+    selected,
+    className,
+    children,
+    ...props
+  }: ItemProps,
+  context: Context<typeof Item>,
+) {
+  const Tag = as;
+  return (
+    <Tag
+      type={as === "button" ? "button" : undefined}
+      {...props}
+      className={className}
+      data-selected={selected ? "true" : undefined}
+      ref={[context.parts.root, props.ref]}
+    >
+      {leading != null ? <span ref={[context.parts.leading]}>{leading}</span> : null}
+      <span ref={[context.parts.content]}>
+        {meta != null ? <span ref={[context.parts.meta]}>{meta}</span> : null}
+        <span ref={[context.parts.title]}>{title}</span>
+        {description != null ? <span ref={[context.parts.description]}>{description}</span> : null}
+        {children}
+      </span>
+      {trailing != null ? <span ref={[context.parts.trailing]}>{trailing}</span> : null}
+    </Tag>
+  );
+}
+Item.meta = {
+  name: "item",
+  parts: ["root", "leading", "content", "meta", "title", "description", "trailing"],
+  style: defineStyleProps(itemOptions, { defaults: { size: "medium", variant: "plain" } }),
+} as const;

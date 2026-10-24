@@ -1,8 +1,10 @@
 import { uiTokens } from "../tokens";
-import { css, partSelector } from "meowcss/meowjsx";
-import { statusDotContract, statusDotOptions } from "../../components/status-dot";
+import { css, parts } from "meowcss/meowjsx";
 
-const root = partSelector(statusDotContract, "root");
+import type { StatusDot } from "../../components/status-dot";
+import { statusDotOptions } from "../../components/status-dot.options";
+const statusDotPartRefs = parts<typeof StatusDot>("status-dot");
+const root = statusDotPartRefs.root;
 
 export const statusDotStyles = css`
   ${root} {

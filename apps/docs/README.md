@@ -82,7 +82,7 @@ dist/
   the same ground, the generated page wins.
 - The [Meowtail component catalog](../../packages/meowtail/COMPONENTS.md) owns the maintained
   component list and planned additions. This app generates the current reference from stories and
-  registry contracts; it does not maintain another planning inventory.
+  component metadata; it does not maintain another planning inventory.
 - Vercel deploys this static site from the repository configuration. The GitHub build-and-lint
   workflow does not publish it, and the npm release workflow remains separate.
 

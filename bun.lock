@@ -43,7 +43,7 @@
     },
     "packages/meowbook": {
       "name": "meowbook",
-      "version": "0.1.2-alpha.1",
+      "version": "0.2.0-alpha.0",
       "bin": {
         "meowbook": "./dist/src/cli.js",
       },
@@ -63,19 +63,19 @@
         "meowtail": "workspace:*",
       },
       "peerDependencies": {
-        "meowcss": "^0.1.0 || ^0.1.1-alpha.0",
-        "meowjsx": "^0.1.0 || ^0.1.1-alpha.0",
-        "meowtail": "^0.1.0 || ^0.2.0-alpha.0",
+        "meowcss": "^0.2.0-alpha.0",
+        "meowjsx": "^0.2.0-alpha.0",
+        "meowtail": "^0.3.0-alpha.0",
       },
     },
     "packages/meowcss": {
       "name": "meowcss",
-      "version": "0.1.1-alpha.0",
+      "version": "0.2.0-alpha.0",
       "devDependencies": {
         "meowjsx": "workspace:*",
       },
       "peerDependencies": {
-        "meowjsx": "^0.1.0 || ^0.1.1-alpha.0",
+        "meowjsx": "^0.2.0-alpha.0",
       },
       "optionalPeers": [
         "meowjsx",
@@ -83,11 +83,11 @@
     },
     "packages/meowjsx": {
       "name": "meowjsx",
-      "version": "0.1.1-alpha.1",
+      "version": "0.2.0-alpha.0",
     },
     "packages/meowpress": {
       "name": "meowpress",
-      "version": "0.1.1-alpha.1",
+      "version": "0.2.0-alpha.0",
       "bin": {
         "meowpress": "./dist/src/cli.js",
       },
@@ -104,13 +104,13 @@
         "meowjsx": "workspace:*",
       },
       "peerDependencies": {
-        "meowcss": "^0.1.0 || ^0.1.1-alpha.0",
-        "meowjsx": "^0.1.0 || ^0.1.1-alpha.0",
+        "meowcss": "^0.2.0-alpha.0",
+        "meowjsx": "^0.2.0-alpha.0",
       },
     },
     "packages/meowslides": {
       "name": "meowslides",
-      "version": "0.1.0-alpha.0",
+      "version": "0.1.0-alpha.1",
       "bin": {
         "meowslides": "./dist/src/cli.js",
       },
@@ -127,14 +127,14 @@
         "meowtail": "workspace:*",
       },
       "peerDependencies": {
-        "meowcss": "^0.1.0 || ^0.1.1-alpha.0",
-        "meowjsx": "^0.1.0 || ^0.1.1-alpha.0",
-        "meowtail": "^0.2.0-alpha.0",
+        "meowcss": "^0.2.0-alpha.0",
+        "meowjsx": "^0.2.0-alpha.0",
+        "meowtail": "^0.3.0-alpha.0",
       },
     },
     "packages/meowtail": {
       "name": "meowtail",
-      "version": "0.2.0-alpha.3",
+      "version": "0.3.0-alpha.0",
       "dependencies": {
         "@floating-ui/dom": "^1.8.0",
         "@shikijs/langs": "4.3.1",
@@ -149,8 +149,8 @@
         "meowjsx": "workspace:*",
       },
       "peerDependencies": {
-        "meowcss": "^0.1.0 || ^0.1.1-alpha.0",
-        "meowjsx": "^0.1.1-alpha.1",
+        "meowcss": "^0.2.0-alpha.0",
+        "meowjsx": "^0.2.0-alpha.0",
       },
     },
   },

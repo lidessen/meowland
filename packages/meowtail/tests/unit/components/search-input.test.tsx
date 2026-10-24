@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Field, SearchInput, installMeowUI } from "../../../src/index";
+import { Field, SearchInput, installMeowUI, meowUIComponents } from "../../../src/index";
 
 test("SearchInput keeps native input semantics and Field associations without a runtime visual plugin", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const onInput = (_event: Event) => {};
   let inputProps: Record<string, unknown> | undefined;
   runtime.use({

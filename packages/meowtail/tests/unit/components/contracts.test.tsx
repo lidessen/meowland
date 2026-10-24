@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { createRuntime, createThemePlugin, h, signal, type Child } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { installMeowUI } from "../../../src/registry";
+import { installMeowUI, meowUIComponents } from "../../../src/registry";
 import {
   AddButton,
   Alert,
@@ -28,7 +28,7 @@ import {
 
 function web() {
   const result = createRuntime();
-  installMeowUI(result);
+  installMeowUI({ components: meowUIComponents }, result);
   return createWebRenderer(result);
 }
 

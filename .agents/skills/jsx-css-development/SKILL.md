@@ -13,7 +13,7 @@ Start from the actual consumer failure or new usage to locate the responsible la
 
 Core values, reactivity, Context and the target-neutral renderer seam stay in the `meowjsx` root; DOM/event/HTML/mount stay in `meowjsx/web`. A subpath of the same package does not mean the root may import Web back, and publicly declared type dependencies are also environment boundaries.
 
-The MeowCSS root keeps pure tokens/options, parameter fragments and CSS/theme generation; `meowcss/meowjsx` carries component contracts/registry/carrier, and `meowcss/web` carries DOM lifecycle. Concrete UI token values, parts instances, themes and semantic layouts belong to Meowtail. Do not convert typed fragments to strings early to bypass types or component bindings.
+The MeowCSS root keeps pure tokens/options, parameter fragments and CSS/theme generation; `meowcss/meowjsx` carries typed part descriptors and metadata/registry/carrier adaptation, and `meowcss/web` carries DOM lifecycle. Concrete UI token values, parts instances, themes and semantic layouts belong to Meowtail. Do not convert typed fragments to strings early to bypass types or component bindings.
 
 Follow the real import graph to confirm the root, runtime, JSX runtime, Web and CSS adapters reference the same internal implementation. Two physical copies of the same version can still split Context or token identity; do not patch this with a global singleton, and do not forbid legitimate multiple explicit Runtimes.
 

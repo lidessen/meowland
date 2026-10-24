@@ -1,11 +1,7 @@
-import { defineOptions } from "meowcss";
 import { type ThemedProps } from "meowcss/meowjsx";
 import type { Props } from "meowjsx";
-export const layoutOptions = defineOptions("layout", {
-  gap: ["none", "compact", "normal", "relaxed"],
-  rowGap: ["auto", "none", "compact", "normal", "relaxed"],
-  columnGap: ["auto", "none", "compact", "normal", "relaxed"],
-});
+import { layoutOptions } from "./layout.options";
+export { layoutOptions } from "./layout.options";
 export type LayoutElement =
   | "div"
   | "span"
@@ -24,7 +20,6 @@ export interface LayoutProps extends Props, ThemedProps<typeof layoutOptions> {
   as?: LayoutElement;
   align?: LayoutAlign;
   justify?: LayoutJustify;
-  className?: string;
 }
 export function justifyStyle(value: LayoutJustify) {
   return value === "between"

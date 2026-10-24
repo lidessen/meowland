@@ -1,11 +1,15 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { chatProcessContract } from "../../chat/process";
-import { chatSourcesContract } from "../../chat/sources";
-import { chatToolCallContract } from "../../chat/tool-call";
-import { outputBlockContract } from "../../components/output-block";
 
+import { ui } from "../utilities";
+import type { ChatProcess } from "../../chat/process";
+import type { ChatSources } from "../../chat/sources";
+import type { ChatToolCall } from "../../chat/tool-call";
+import type { OutputBlock } from "../../components/output-block";
+const chatProcessPartRefs = parts<typeof ChatProcess>("chat-process");
+const chatSourcesPartRefs = parts<typeof ChatSources>("chat-sources");
+const chatToolCallPartRefs = parts<typeof ChatToolCall>("chat-tool-call");
+const outputBlockPartRefs = parts<typeof OutputBlock>("output-block");
 /** How far the chat type scale sits above the 14px body the row metrics were drawn at. */
 const rowDelta = "--chat-row-delta";
 /** Where a row's label begins; anything the row owns rather than sits beside starts here. */
@@ -18,9 +22,9 @@ export const chatRecordsStyles = css`
   box, the glyph, the line box and the label indent together instead of leaving fixed boxes
   around larger text. The pitch between rows stays the list's business. */
   :is(
-  ${partSelector(chatToolCallContract, "root")},
-  ${partSelector(chatProcessContract, "root")},
-  ${partSelector(chatSourcesContract, "root")}
+  ${chatToolCallPartRefs.root},
+  ${chatProcessPartRefs.root},
+  ${chatSourcesPartRefs.root}
   ) {
     ${rowDelta}: calc(${chatTokens.fontBody} - 14px);
     /* Where a row's own label begins. What a row owns rather than sits beside — its
@@ -30,9 +34,9 @@ export const chatRecordsStyles = css`
   }
 
   :is(
-  ${partSelector(chatToolCallContract, "header")},
-  ${partSelector(chatProcessContract, "summary")},
-  ${partSelector(chatSourcesContract, "summary")}
+  ${chatToolCallPartRefs.header},
+  ${chatProcessPartRefs.summary},
+  ${chatSourcesPartRefs.summary}
   ) {
     display: flex;
     align-items: center;
@@ -44,10 +48,10 @@ export const chatRecordsStyles = css`
   }
 
   :is(
-  ${partSelector(chatToolCallContract, "icon")},
-  ${partSelector(chatProcessContract, "icon")},
-  ${partSelector(chatProcessContract, "expandedIcon")},
-  ${partSelector(chatSourcesContract, "icon")}
+  ${chatToolCallPartRefs.icon},
+  ${chatProcessPartRefs.icon},
+  ${chatProcessPartRefs.expandedIcon},
+  ${chatSourcesPartRefs.icon}
   ) {
     display: grid;
     place-items: center;
@@ -59,18 +63,18 @@ export const chatRecordsStyles = css`
   /* Registered glyphs render two px under their box: the CSS edge overrides each svg's own
   size, so one row keeps one optical glyph size whatever icon the caller passes. */
   :is(
-  ${partSelector(chatToolCallContract, "icon")},
-  ${partSelector(chatProcessContract, "icon")},
-  ${partSelector(chatProcessContract, "expandedIcon")},
-  ${partSelector(chatSourcesContract, "icon")},
-  ${partSelector(chatToolCallContract, "chevron")}
+  ${chatToolCallPartRefs.icon},
+  ${chatProcessPartRefs.icon},
+  ${chatProcessPartRefs.expandedIcon},
+  ${chatSourcesPartRefs.icon},
+  ${chatToolCallPartRefs.chevron}
   )
   svg {
     width: calc(14px + var(${rowDelta}, 0px));
     height: calc(14px + var(${rowDelta}, 0px));
   }
 
-  ${partSelector(chatToolCallContract, "root")} {
+  ${chatToolCallPartRefs.root} {
     container-type: inline-size;
     min-width: 0;
     display: grid;
@@ -84,11 +88,11 @@ export const chatRecordsStyles = css`
     font-size: ${uiTokens.type.body};
   }
 
-  ${partSelector(chatToolCallContract, "header")} {
+  ${chatToolCallPartRefs.header} {
     min-width: 0;
   }
 
-  ${partSelector(chatToolCallContract, "icon")} {
+  ${chatToolCallPartRefs.icon} {
     position: relative;
     border-radius: ${uiTokens.radius.xs};
     color: ${uiTokens.ink.tertiary};
@@ -98,16 +102,16 @@ export const chatRecordsStyles = css`
   }
 
   /* The state badge comes from shared/state-badge.styles.ts; the row only places it. */
-  ${partSelector(chatToolCallContract, "status")} {
+  ${chatToolCallPartRefs.status} {
     margin-left: 6px;
   }
 
   /* The host's account of the state: a second header line, aligned with the label. */
-  ${partSelector(chatToolCallContract, "header")}:has(> ${partSelector(chatToolCallContract, "fact")}:not([hidden])) {
+  ${chatToolCallPartRefs.header}:has(> ${chatToolCallPartRefs.fact}:not([hidden])) {
     flex-wrap: wrap;
     row-gap: 0;
   }
-  ${partSelector(chatToolCallContract, "fact")} {
+  ${chatToolCallPartRefs.fact} {
     flex: 1 0 100%;
     margin: -4px 0 2px;
     padding-inline-start: var(${rowIndent});
@@ -118,7 +122,7 @@ export const chatRecordsStyles = css`
     overflow-wrap: anywhere;
   }
 
-  ${partSelector(chatToolCallContract, "label")} {
+  ${chatToolCallPartRefs.label} {
     flex: 0 1 auto;
     min-width: 0;
     overflow-wrap: anywhere;
@@ -128,59 +132,59 @@ export const chatRecordsStyles = css`
   }
 
   /* Beside a target the verb keeps its words; the target is what yields and truncates. */
-  ${partSelector(chatToolCallContract, "header")}:has(> ${partSelector(chatToolCallContract, "summary")}) > ${partSelector(chatToolCallContract, "label")} {
+  ${chatToolCallPartRefs.header}:has(> ${chatToolCallPartRefs.summary}) > ${chatToolCallPartRefs.label} {
     flex-shrink: 0;
     max-width: 50%;
   }
 
-  ${partSelector(chatToolCallContract, "detail")},
-  ${partSelector(chatToolCallContract, "body")} {
+  ${chatToolCallPartRefs.detail},
+  ${chatToolCallPartRefs.body} {
     min-width: 0;
     margin: 0;
     color: ${uiTokens.ink.secondary};
     font: ${uiTokens.type.body} / ${uiTokens.type.line.reading} ${uiTokens.type.sans};
   }
 
-  ${partSelector(chatToolCallContract, "detail")} {
+  ${chatToolCallPartRefs.detail} {
     padding-inline-start: var(${rowIndent});
   }
 
-  ${partSelector(chatToolCallContract, "body")} {
+  ${chatToolCallPartRefs.body} {
     margin-block: ${uiTokens.space.group};
     margin-inline-start: var(${rowIndent});
   }
 
-  ${partSelector(chatToolCallContract, "body")} {
+  ${chatToolCallPartRefs.body} {
     display: grid;
     gap: ${uiTokens.space.group};
     overflow-wrap: anywhere;
   }
-  ${partSelector(chatToolCallContract, "root")} [hidden] {
+  ${chatToolCallPartRefs.root} [hidden] {
     display: none;
   }
-  ${partSelector(chatToolCallContract, "outputSummary")} {
+  ${chatToolCallPartRefs.outputSummary} {
     margin: 0;
     color: ${uiTokens.ink.primary};
   }
-  ${partSelector(chatToolCallContract, "actions")} {
+  ${chatToolCallPartRefs.actions} {
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     gap: ${uiTokens.space.group};
   }
-  ${partSelector(chatToolCallContract, "input")} ${partSelector(outputBlockContract, "body")},
-  ${partSelector(chatToolCallContract, "output")} ${partSelector(outputBlockContract, "body")} {
+  ${chatToolCallPartRefs.input} ${outputBlockPartRefs.body},
+  ${chatToolCallPartRefs.output} ${outputBlockPartRefs.body} {
     max-height: 24rem;
   }
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="running"] {
+  ${chatToolCallPartRefs.root}[data-tool-state="running"] {
     color: ${uiTokens.ink.tertiary};
   }
 
-  ${partSelector(chatToolCallContract, "root")}[data-tool-state="error"] {
+  ${chatToolCallPartRefs.root}[data-tool-state="error"] {
     color: ${uiTokens.ink.tertiary};
   }
 
-  ${partSelector(chatProcessContract, "root")} {
+  ${chatProcessPartRefs.root} {
     min-width: 0;
     border: 0;
     background: transparent;
@@ -188,7 +192,7 @@ export const chatRecordsStyles = css`
     font-size: ${uiTokens.type.body};
   }
 
-  ${partSelector(chatProcessContract, "summary")} {
+  ${chatProcessPartRefs.summary} {
     display: flex;
     width: fit-content;
     max-width: 100%;
@@ -200,53 +204,53 @@ export const chatRecordsStyles = css`
     -webkit-tap-highlight-color: transparent;
   }
 
-  ${partSelector(chatProcessContract, "label")} {
+  ${chatProcessPartRefs.label} {
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
 
-  ${partSelector(chatProcessContract, "summary")}::-webkit-details-marker {
+  ${chatProcessPartRefs.summary}::-webkit-details-marker {
     display: none;
   }
 
-  ${partSelector(chatProcessContract, "icon")},
-  ${partSelector(chatProcessContract, "expandedIcon")},
-  ${partSelector(chatSourcesContract, "icon")} {
+  ${chatProcessPartRefs.icon},
+  ${chatProcessPartRefs.expandedIcon},
+  ${chatSourcesPartRefs.icon} {
     transform: rotate(0deg);
     transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
 
-  ${partSelector(chatProcessContract, "root")}[open]:not([data-process-icon="custom"]) > ${partSelector(chatProcessContract, "summary")} > ${partSelector(chatProcessContract, "icon")},
-  ${partSelector(chatSourcesContract, "root")}[open] > ${partSelector(chatSourcesContract, "summary")} > ${partSelector(chatSourcesContract, "icon")} {
+  ${chatProcessPartRefs.root}[open]:not([data-process-icon="custom"]) > ${chatProcessPartRefs.summary} > ${chatProcessPartRefs.icon},
+  ${chatSourcesPartRefs.root}[open] > ${chatSourcesPartRefs.summary} > ${chatSourcesPartRefs.icon} {
     transform: rotate(90deg);
   }
 
-  ${partSelector(chatProcessContract, "expandedIcon")} {
+  ${chatProcessPartRefs.expandedIcon} {
     display: none;
   }
 
-  ${partSelector(chatProcessContract, "root")}[open][data-process-icon="custom"] > ${partSelector(chatProcessContract, "summary")} > ${partSelector(chatProcessContract, "icon")} {
+  ${chatProcessPartRefs.root}[open][data-process-icon="custom"] > ${chatProcessPartRefs.summary} > ${chatProcessPartRefs.icon} {
     display: none;
   }
 
-  ${partSelector(chatProcessContract, "root")}[open] > ${partSelector(chatProcessContract, "summary")} > ${partSelector(chatProcessContract, "expandedIcon")} {
+  ${chatProcessPartRefs.root}[open] > ${chatProcessPartRefs.summary} > ${chatProcessPartRefs.expandedIcon} {
     display: grid;
   }
 
-  ${partSelector(chatProcessContract, "summary")}:hover {
+  ${chatProcessPartRefs.summary}:hover {
     color: ${uiTokens.ink.secondary};
   }
 
-  ${partSelector(chatProcessContract, "summary")}:focus-visible {
-    ${focusRing()}
+  ${chatProcessPartRefs.summary}:focus-visible {
+    ${ui.focus.ring}
   }
 
   /* A group's contents belong to its row, so they hang under its label instead of lining up
   with it; the step the summary keeps above them is the same "attached" step a row keeps
   before its own body. */
-  ${partSelector(chatProcessContract, "body")} {
+  ${chatProcessPartRefs.body} {
     margin: 0 0 ${uiTokens.space.group};
     padding-block: ${uiTokens.space.group};
     padding-inline: var(${rowIndent}) 0;
@@ -254,19 +258,19 @@ export const chatRecordsStyles = css`
     line-height: ${uiTokens.type.line.reading};
   }
 
-  ${partSelector(chatProcessContract, "body")} > :first-child {
+  ${chatProcessPartRefs.body} > :first-child {
     margin-top: 0;
   }
 
-  ${partSelector(chatProcessContract, "body")} > :last-child {
+  ${chatProcessPartRefs.body} > :last-child {
     margin-bottom: 0;
   }
 
-  ${partSelector(chatProcessContract, "body")} > p + p {
+  ${chatProcessPartRefs.body} > p + p {
     margin-top: ${uiTokens.space.group};
   }
 
-  ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] {
+  ${chatToolCallPartRefs.root}[data-tool-interactive="true"] {
     margin: 0;
     padding: 0;
     border: 0;
@@ -275,13 +279,13 @@ export const chatRecordsStyles = css`
     box-shadow: none;
   }
 
-  ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] + ${partSelector(chatToolCallContract, "root")} {
+  ${chatToolCallPartRefs.root}[data-tool-interactive="true"] + ${chatToolCallPartRefs.root} {
     margin-top: 0;
   }
 
   /* An interactive row is a summary or an action button, and both start from the same chrome:
   the row's own text, no control surface of their own, and one focus stop. */
-  ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] > ${partSelector(chatToolCallContract, "header")} {
+  ${chatToolCallPartRefs.root}[data-tool-interactive="true"] > ${chatToolCallPartRefs.header} {
     position: relative;
     width: 100%;
     max-width: 100%;
@@ -300,7 +304,7 @@ export const chatRecordsStyles = css`
 
   /* The chevron swaps with the leading glyph, so it centres in the row whatever height the
   row takes — a coarse pointer raises it, and a wrapping label grows it. */
-  ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "chevron")} {
+  ${chatToolCallPartRefs.root}[data-tool-interactive="true"] ${chatToolCallPartRefs.chevron} {
     position: absolute;
     left: 0;
     inset-block: 0;
@@ -315,41 +319,41 @@ export const chatRecordsStyles = css`
       transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
 
-  ${partSelector(chatToolCallContract, "root")}[open] ${partSelector(chatToolCallContract, "chevron")} {
+  ${chatToolCallPartRefs.root}[open] ${chatToolCallPartRefs.chevron} {
     transform: rotate(90deg);
   }
 
-  ${partSelector(chatToolCallContract, "header")}:is(:hover, :focus-visible) > ${partSelector(chatToolCallContract, "chevron")} {
+  ${chatToolCallPartRefs.header}:is(:hover, :focus-visible) > ${chatToolCallPartRefs.chevron} {
     opacity: 1;
   }
 
-  ${partSelector(chatToolCallContract, "header")}:is(:hover, :focus-visible) > ${partSelector(chatToolCallContract, "icon")} {
+  ${chatToolCallPartRefs.header}:is(:hover, :focus-visible) > ${chatToolCallPartRefs.icon} {
     opacity: 0;
   }
 
-  ${partSelector(chatToolCallContract, "root")}[data-tool-collapsible="true"] > ${partSelector(chatToolCallContract, "header")}::-webkit-details-marker {
+  ${chatToolCallPartRefs.root}[data-tool-collapsible="true"] > ${chatToolCallPartRefs.header}::-webkit-details-marker {
     display: none;
   }
 
-  ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "icon")} {
+  ${chatToolCallPartRefs.root}[data-tool-interactive="true"] ${chatToolCallPartRefs.icon} {
     border-radius: 0;
     font-size: 0;
     transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
 
-  ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "label")} {
+  ${chatToolCallPartRefs.root}[data-tool-interactive="true"] ${chatToolCallPartRefs.label} {
     overflow-wrap: anywhere;
   }
 
-  ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] > ${partSelector(chatToolCallContract, "header")}:hover ${partSelector(chatToolCallContract, "label")} {
+  ${chatToolCallPartRefs.root}[data-tool-interactive="true"] > ${chatToolCallPartRefs.header}:hover ${chatToolCallPartRefs.label} {
     color: ${uiTokens.ink.primary};
   }
 
-  ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] > ${partSelector(chatToolCallContract, "header")}:hover {
+  ${chatToolCallPartRefs.root}[data-tool-interactive="true"] > ${chatToolCallPartRefs.header}:hover {
     color: ${uiTokens.ink.secondary};
   }
 
-  ${partSelector(chatToolCallContract, "summary")} {
+  ${chatToolCallPartRefs.summary} {
     display: block;
     min-width: 0;
     overflow: hidden;
@@ -360,7 +364,7 @@ export const chatRecordsStyles = css`
     color: ${uiTokens.ink.tertiary};
   }
 
-  ${partSelector(chatToolCallContract, "root")}[data-tool-default-complete="true"] ${partSelector(chatToolCallContract, "status")} {
+  ${chatToolCallPartRefs.root}[data-tool-default-complete="true"] ${chatToolCallPartRefs.status} {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -373,13 +377,13 @@ export const chatRecordsStyles = css`
 
   /* A narrow host gives each fact a readable line instead of making two thin text columns. */
   @container (max-width: 400px) {
-    ${partSelector(chatToolCallContract, "header")} {
+    ${chatToolCallPartRefs.header} {
       display: grid;
       grid-template-columns: calc(${uiTokens.icon.size} + var(${rowDelta}, 0px)) minmax(0, 1fr);
       align-items: start;
       row-gap: 0;
     }
-    ${partSelector(chatToolCallContract, "icon")} {
+    ${chatToolCallPartRefs.icon} {
       grid-column: 1;
       grid-row: 1;
       align-self: start;
@@ -391,22 +395,22 @@ export const chatRecordsStyles = css`
           2
       );
     }
-    ${partSelector(chatToolCallContract, "label")},
-    ${partSelector(chatToolCallContract, "summary")},
-    ${partSelector(chatToolCallContract, "status")} {
+    ${chatToolCallPartRefs.label},
+    ${chatToolCallPartRefs.summary},
+    ${chatToolCallPartRefs.status} {
       grid-column: 2;
       margin-inline-start: 0;
     }
-    ${partSelector(chatToolCallContract, "status")} {
+    ${chatToolCallPartRefs.status} {
       justify-self: start;
       margin-block: 2px;
     }
-    ${partSelector(chatToolCallContract, "fact")} {
+    ${chatToolCallPartRefs.fact} {
       grid-column: 2;
       margin: 0;
       padding-inline-start: 0;
     }
-    ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "chevron")} {
+    ${chatToolCallPartRefs.root}[data-tool-interactive="true"] ${chatToolCallPartRefs.chevron} {
       inset-block: auto;
       top: calc(
         (
@@ -420,16 +424,16 @@ export const chatRecordsStyles = css`
   }
 
   @media (pointer: coarse) {
-    ${partSelector(chatProcessContract, "summary")},
-    ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] > ${partSelector(chatToolCallContract, "header")} {
+    ${chatProcessPartRefs.summary},
+    ${chatToolCallPartRefs.root}[data-tool-interactive="true"] > ${chatToolCallPartRefs.header} {
       min-height: ${uiTokens.control.regular};
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(chatProcessContract, "icon")},
-    ${partSelector(chatSourcesContract, "icon")},
-    ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] ${partSelector(chatToolCallContract, "icon")} {
+    ${chatProcessPartRefs.icon},
+    ${chatSourcesPartRefs.icon},
+    ${chatToolCallPartRefs.root}[data-tool-interactive="true"] ${chatToolCallPartRefs.icon} {
       transition: none;
     }
   }
@@ -474,20 +478,20 @@ export const chatRecordsStyles = css`
     overflow-wrap: anywhere;
   }
 
-  ${partSelector(chatSourcesContract, "summary")}:focus-visible {
-    ${focusRing()}
+  ${chatSourcesPartRefs.summary}:focus-visible {
+    ${ui.focus.ring}
   }
 
-  ${partSelector(chatToolCallContract, "root")}[data-tool-interactive="true"] > ${partSelector(chatToolCallContract, "header")}:focus-visible {
+  ${chatToolCallPartRefs.root}[data-tool-interactive="true"] > ${chatToolCallPartRefs.header}:focus-visible {
     outline: none;
   }
 
-  ${partSelector(chatToolCallContract, "header")}:focus-visible > ${partSelector(chatToolCallContract, "chevron")} {
-    ${focusRing()}
+  ${chatToolCallPartRefs.header}:focus-visible > ${chatToolCallPartRefs.chevron} {
+    ${ui.focus.ring}
     border-radius: ${uiTokens.radius.xs};
   }
 
-  ${partSelector(chatSourcesContract, "root")} {
+  ${chatSourcesPartRefs.root} {
     margin-top: 16px;
     padding-top: 0;
     border-top: 0;
@@ -495,20 +499,20 @@ export const chatRecordsStyles = css`
     font-size: calc(${chatTokens.fontBody} - 1px);
   }
 
-  ${partSelector(chatSourcesContract, "summary")} {
+  ${chatSourcesPartRefs.summary} {
     list-style: none;
     cursor: pointer;
   }
 
-  ${partSelector(chatSourcesContract, "summary")}::-webkit-details-marker {
+  ${chatSourcesPartRefs.summary}::-webkit-details-marker {
     display: none;
   }
 
-  ${partSelector(chatSourcesContract, "summary")}::marker {
+  ${chatSourcesPartRefs.summary}::marker {
     content: "";
   }
 
-  ${partSelector(chatSourcesContract, "list")} {
+  ${chatSourcesPartRefs.list} {
     display: grid;
     gap: 10px;
     margin: 8px 0 0;
@@ -518,13 +522,13 @@ export const chatRecordsStyles = css`
     overflow-y: auto;
   }
 
-  ${partSelector(chatSourcesContract, "item")} {
+  ${chatSourcesPartRefs.item} {
     display: grid;
     gap: 2px;
     min-width: 0;
   }
 
-  ${partSelector(chatSourcesContract, "link")} {
+  ${chatSourcesPartRefs.link} {
     color: ${uiTokens.status.info};
     font-size: ${uiTokens.type.body};
     font-weight: ${uiTokens.type.weight.medium};
@@ -534,23 +538,23 @@ export const chatRecordsStyles = css`
     text-underline-offset: 3px;
   }
 
-  ${partSelector(chatSourcesContract, "link")}:is(:hover, :focus-visible) {
+  ${chatSourcesPartRefs.link}:is(:hover, :focus-visible) {
     text-decoration: underline dotted;
   }
 
-  ${partSelector(chatSourcesContract, "description")} {
+  ${chatSourcesPartRefs.description} {
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.label};
     line-height: ${uiTokens.type.line.label};
     overflow-wrap: anywhere;
   }
 
-  ${partSelector(chatToolCallContract, "body")} {
+  ${chatToolCallPartRefs.body} {
     min-width: 0;
     overflow-wrap: anywhere;
   }
 
-  ${partSelector(chatToolCallContract, "body")} pre {
+  ${chatToolCallPartRefs.body} pre {
     margin: 4px 0;
     padding: 12px 16px;
     max-width: 100%;
@@ -564,13 +568,13 @@ export const chatRecordsStyles = css`
   }
 
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(chatToolCallContract, "chevron")} {
+    ${chatToolCallPartRefs.chevron} {
       transition: none;
     }
   }
 
   @media (pointer: coarse) {
-    ${partSelector(chatSourcesContract, "summary")} {
+    ${chatSourcesPartRefs.summary} {
       min-height: ${uiTokens.control.regular};
     }
   }

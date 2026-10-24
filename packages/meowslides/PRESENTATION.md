@@ -32,7 +32,7 @@ replaces the decorative layer.
 After an image fails, the base color, overlay and text light/dark remain, and the author must ensure
 the page is still readable without the image; images that need description and alternative text stay
 in the body.
-The host installs `createMeowUI()` and `createMeowSlides()` in the same Runtime and loads the complete
+The host installs `createMeowUI({ components: meowUIComponents })` and `createMeowSlides()` in the same Runtime and loads the complete
 `presentationTheme` from `meowslides/theme` to get the default presentation structure and visuals.
 A local implementation does not mean published; the current public version and install acceptance
 follow the root README and the receipt for that round.

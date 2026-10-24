@@ -1,5 +1,6 @@
+import { defaultRuntime } from "meowjsx";
 import { render } from "meowjsx/web";
-import { installMeowUI } from "meowtail";
+import { Button, Grid, ImagePreview, Inline, Stack, installMeowUI } from "meowtail";
 import { installMeowSlides } from "meowslides";
 import { presentationOptions, presentationTheme } from "meowslides/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
@@ -8,7 +9,10 @@ import { imageLoadingCss } from "./styles";
 
 const root = document.querySelector<HTMLElement>("#app");
 if (!root) throw new Error("Presentation mount point is missing");
-const uninstall = installMeowUI();
+const uninstall = installMeowUI(
+  { components: [Button, Grid, ImagePreview, Inline, Stack] },
+  defaultRuntime,
+);
 const uninstallSlides = installMeowSlides();
 const restoreTheme = applyTheme(
   document.documentElement,

@@ -44,6 +44,8 @@ test("accepted submission consumes its own snapshot while newer text and files r
 test("same-tree updates preserve ancestor context, process disclosure and reading anchors", async ({
   page,
 }) => {
+  const pageErrors: string[] = [];
+  page.on("pageerror", (error) => pageErrors.push(error.message));
   const viewport = page.locator('[data-meowui-part="assistant-view/viewport"]');
   const oldRow = page.locator('[data-assistant-message-id="message-7"]');
   const disclosure = oldRow.locator("details");
@@ -53,11 +55,22 @@ test("same-tree updates preserve ancestor context, process disclosure and readin
   await page
     .getByRole("button", { name: "Append result" })
     .evaluate((button: HTMLButtonElement) => button.click());
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  await expect(page.locator("#story-state")).not.toContainText("The scenario ran into a problem");
   await expect(disclosure.locator("summary")).toBeFocused();
   await expect(disclosure).toHaveAttribute("open", "");
   await expect(disclosure.locator("summary")).toBeInViewport();
   await expect(page.locator("[data-assistant-context]")).toHaveText("Ancestor context retained");
   await page.screenshot({ path: test.info().outputPath("assistant-wide-process.png") });
+  await page.evaluate(
+    () =>
+      new Promise<void>((resolve) =>
+        requestAnimationFrame(() => requestAnimationFrame(() => resolve())),
+      ),
+  );
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  await expect(page.locator("#story-state")).not.toContainText("The scenario ran into a problem");
+  expect(pageErrors).toEqual([]);
 
   await viewport.evaluate((element) => {
     element.scrollTop = 350;

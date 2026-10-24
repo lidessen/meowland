@@ -1,7 +1,7 @@
-import { h, type Child } from "meowjsx";
+import { h, type Child, type ClassValue } from "meowjsx";
 
 export interface MeowlandMarkProps {
-  className?: string;
+  className?: ClassValue;
 }
 
 export function MeowlandMark({ className }: MeowlandMarkProps = {}): Child {

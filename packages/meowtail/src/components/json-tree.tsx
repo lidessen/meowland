@@ -1,4 +1,4 @@
-import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
 import { copyTextToClipboard } from "../clipboard";
 import { Icon } from "../icons/icon";
 
@@ -9,20 +9,7 @@ export type JsonValue =
   | string
   | readonly JsonValue[]
   | { readonly [key: string]: JsonValue };
-export const jsonTreeContract = {
-  name: "json-tree",
-  parts: [
-    "root",
-    "summary",
-    "children",
-    "property",
-    "punctuation",
-    "expander",
-    "value",
-    "copy",
-    "feedback",
-  ],
-} as const satisfies ComponentContract;
+
 export interface JsonTreeProps extends Props {
   data: JsonValue;
   label?: string;
@@ -34,11 +21,10 @@ export interface JsonTreeProps extends Props {
  * A JSON value as an expandable tree. Children are materialized only when their branch is first
  * expanded.
  */
-export const JsonTree = defineComponent<
-  JsonTreeProps,
-  "json-tree",
-  (typeof jsonTreeContract.parts)[number]
->(jsonTreeContract, ({ data, label = "JSON", defaultOpen = true, onCopy, ...props }, context) => {
+export function JsonTree(
+  { data, label = "JSON", defaultOpen = true, onCopy, ...props }: JsonTreeProps,
+  context: Context<typeof JsonTree>,
+) {
   const container = data !== null && typeof data === "object";
   const feedback = context.signal("");
   const children = context.signal<Child>(null);
@@ -63,55 +49,76 @@ export const JsonTree = defineComponent<
       if (alive) feedback.value = "Copy failed";
     }
   };
-  const copyButton = context.part(
-    "copy",
-    "button",
-    {
-      type: "button",
-      onClick: (event: Event) => {
+  const copyButton = (
+    <button
+      type={"button"}
+      onClick={(event: Event) => {
         event.stopPropagation();
         void copy();
-      },
-      "aria-label": `Copy ${label}`,
-    },
-    <Icon name="copy" size={12} />,
+      }}
+      aria-label={`Copy ${label}`}
+      ref={[context.parts.copy]}
+    >
+      {<Icon name="copy" size={12} />}
+    </button>
   );
   const summary = container
     ? `${Array.isArray(data) ? "Array" : "Object"}(${Object.keys(data).length})`
     : JSON.stringify(data);
   const row = [
-    context.part("property", "span", {}, label),
-    context.part("punctuation", "span", {}, ": "),
-    context.part(
-      "value",
-      "span",
-      { "data-json-type": container ? "object" : data === null ? "null" : typeof data },
-      summary,
-    ),
+    <span ref={[context.parts.property]}>{label}</span>,
+    <span ref={[context.parts.punctuation]}>{": "}</span>,
+    <span
+      data-json-type={container ? "object" : data === null ? "null" : typeof data}
+      ref={[context.parts.value]}
+    >
+      {summary}
+    </span>,
   ];
-  return context.part("root", "div", props, [
-    container ? (
-      <details
-        open={defaultOpen}
-        onToggle={(event: Event) => {
-          if ((event.currentTarget as HTMLDetailsElement).open) load();
-        }}
-      >
-        {context.part("summary", "summary", {}, [
-          context.part(
-            "expander",
-            "span",
-            { "aria-hidden": "true" },
-            <Icon name="chevron-right" size={12} />,
-          ),
-          ...row,
-        ])}
-        {context.part("children", "div", {}, children)}
-      </details>
-    ) : (
-      context.part("summary", "div", {}, row)
-    ),
-    copyButton,
-    context.part("feedback", "span", { role: "status", "aria-live": "polite" }, feedback),
-  ]);
-});
+  return (
+    <div {...props} ref={[context.parts.root, props.ref]}>
+      {[
+        container ? (
+          <details
+            open={defaultOpen}
+            onToggle={(event: Event) => {
+              if ((event.currentTarget as HTMLDetailsElement).open) load();
+            }}
+          >
+            {
+              <summary ref={[context.parts.summary]}>
+                {[
+                  <span aria-hidden={"true"} ref={[context.parts.expander]}>
+                    {<Icon name="chevron-right" size={12} />}
+                  </span>,
+                  ...row,
+                ]}
+              </summary>
+            }
+            {<div ref={[context.parts.children]}>{children}</div>}
+          </details>
+        ) : (
+          <div ref={[context.parts.summary]}>{row}</div>
+        ),
+        copyButton,
+        <span role={"status"} aria-live={"polite"} ref={[context.parts.feedback]}>
+          {feedback}
+        </span>,
+      ]}
+    </div>
+  );
+}
+JsonTree.meta = {
+  name: "json-tree",
+  parts: [
+    "root",
+    "summary",
+    "children",
+    "property",
+    "punctuation",
+    "expander",
+    "value",
+    "copy",
+    "feedback",
+  ],
+} as const;

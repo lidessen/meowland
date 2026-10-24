@@ -8,6 +8,7 @@ import {
   DialogHeader,
   Menu,
   PageFrame,
+  meowUIComponents,
   mountRegionLayout,
   installMeowUI,
 } from "meowtail";
@@ -180,8 +181,8 @@ function InspectorApp() {
 export const Inspector = defineStory({
   id: "capture/inspector",
   render: () => <InspectorApp />,
-  setup({ root, onCleanup }) {
-    onCleanup(installMeowUI());
+  setup({ root, runtime, onCleanup }) {
+    onCleanup(installMeowUI({ components: meowUIComponents }, runtime));
     const host = root.querySelector<HTMLElement>("[data-inspector-shadow]")!;
     const layout = mountRegionLayout(
       host,

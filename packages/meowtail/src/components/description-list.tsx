@@ -1,41 +1,37 @@
-import { defineComponent, type Child, type ComponentContract, type Props } from "meowjsx";
-
-export const descriptionListContract = {
-  name: "description-list",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+import { type Child, type Props, type Context, h } from "meowjsx";
 
 export interface DescriptionListProps extends Props {
-  className?: string;
+  className?: Props["className"];
 }
 
 /** Related terms and values share a natural label column within the available width. */
-export const DescriptionList = defineComponent<DescriptionListProps, "description-list", "root">(
-  descriptionListContract,
-  ({ children, ...props }, context) => context.part("root", "dl", props, children),
-);
-
-export const descriptionItemContract = {
-  name: "description-item",
-  parts: ["root", "term", "value"],
-} as const satisfies ComponentContract;
+export function DescriptionList(
+  { children, ...props }: DescriptionListProps,
+  context: Context<typeof DescriptionList>,
+) {
+  return (
+    <dl {...props} ref={[context.parts.root, props.ref]}>
+      {children}
+    </dl>
+  );
+}
+DescriptionList.meta = { name: "description-list", parts: ["root"] } as const;
 
 export interface DescriptionItemProps extends Props {
   term: Child;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** A native description group; its value can compose text and existing layout components. */
-export const DescriptionItem = defineComponent<
-  DescriptionItemProps,
-  "description-item",
-  (typeof descriptionItemContract.parts)[number]
->(descriptionItemContract, ({ term, children, ...props }, context) =>
-  context.part(
-    "root",
-    "div",
-    props,
-    context.part("term", "dt", null, term),
-    context.part("value", "dd", null, children),
-  ),
-);
+export function DescriptionItem(
+  { term, children, ...props }: DescriptionItemProps,
+  context: Context<typeof DescriptionItem>,
+) {
+  return (
+    <div {...props} ref={[context.parts.root, props.ref]}>
+      <dt ref={[context.parts.term]}>{term}</dt>
+      <dd ref={[context.parts.value]}>{children}</dd>
+    </div>
+  );
+}
+DescriptionItem.meta = { name: "description-item", parts: ["root", "term", "value"] } as const;

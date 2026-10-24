@@ -1,22 +1,27 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
 import { codeHighlightTokens } from "../shared/code-highlight.tokens";
-import { outputBlockContract as block } from "../../components/output-block";
-import { readBlockContract as read } from "../../components/read-block.contract";
-import { diffBlockContract as diff } from "../../components/diff-block";
-import { searchBlockContract as search } from "../../components/search-block";
-import { terminalBlockContract as terminal } from "../../components/terminal-block";
 
+import type { DiffBlock } from "../../components/diff-block";
+import type { OutputBlock } from "../../components/output-block";
+import type { ReadBlock } from "../../components/read-block";
+import type { SearchBlock } from "../../components/search-block";
+import type { TerminalBlock } from "../../components/terminal-block";
+import { ui } from "../utilities";
+const outputBlockPartRefs = parts<typeof OutputBlock>("output-block");
+const diffBlockPartRefs = parts<typeof DiffBlock>("diff-block");
+const readBlockPartRefs = parts<typeof ReadBlock>("read-block");
+const searchBlockPartRefs = parts<typeof SearchBlock>("search-block");
+const terminalBlockPartRefs = parts<typeof TerminalBlock>("terminal-block");
 export const outputBlockStyles = css`
-  ${partSelector(block, "root")} {
+  ${outputBlockPartRefs.root} {
     min-width: 0;
     overflow: hidden;
     border-radius: ${uiTokens.radius.xl};
     background: ${uiTokens.surface.fill};
     color: ${uiTokens.ink.primary};
   }
-  ${partSelector(block, "header")} {
+  ${outputBlockPartRefs.header} {
     display: flex;
     align-items: start;
     gap: 12px;
@@ -24,12 +29,12 @@ export const outputBlockStyles = css`
     background: ${uiTokens.surface.fill};
     font: ${uiTokens.type.micro} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
   }
-  ${partSelector(block, "title")} {
+  ${outputBlockPartRefs.title} {
     min-width: 0;
     flex: 1;
     overflow-wrap: anywhere;
   }
-  ${partSelector(block, "actions")}, ${partSelector(block, "toggle")} {
+  ${outputBlockPartRefs.actions}, ${outputBlockPartRefs.toggle} {
     border: 0;
     background: transparent;
     color: ${uiTokens.ink.secondary};
@@ -37,41 +42,41 @@ export const outputBlockStyles = css`
     cursor: pointer;
     padding: 0;
   }
-  ${partSelector(block, "body")} {
+  ${outputBlockPartRefs.body} {
     padding: 12px 14px;
     overflow: auto;
     font: ${uiTokens.type.code} / ${uiTokens.type.line.body} ${uiTokens.type.mono};
   }
-  ${partSelector(block, "line")} {
+  ${outputBlockPartRefs.line} {
     min-height: 22px;
     white-space: pre;
   }
-  ${partSelector(block, "root")}[data-output-wrap="true"] ${partSelector(block, "line")},
-  ${partSelector(block, "root")}[data-output-wrap="true"] ${partSelector(block, "fold")} {
+  ${outputBlockPartRefs.root}[data-output-wrap="true"] ${outputBlockPartRefs.line},
+  ${outputBlockPartRefs.root}[data-output-wrap="true"] ${outputBlockPartRefs.fold} {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
-  ${partSelector(block, "fold")}[hidden] {
+  ${outputBlockPartRefs.fold}[hidden] {
     display: none;
   }
-  ${partSelector(block, "fold")} {
+  ${outputBlockPartRefs.fold} {
     white-space: pre;
   }
-  ${partSelector(block, "fold")}:not([open]) [data-fold-open], ${partSelector(block, "fold")}[open] [data-fold-closed] {
+  ${outputBlockPartRefs.fold}:not([open]) [data-fold-open], ${outputBlockPartRefs.fold}[open] [data-fold-closed] {
     display: none;
   }
-  ${partSelector(block, "feedback")} {
+  ${outputBlockPartRefs.feedback} {
     display: block;
     padding: 4px 14px;
     font: ${uiTokens.type.caption} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
   }
-  ${partSelector(block, "feedback")}:empty {
+  ${outputBlockPartRefs.feedback}:empty {
     display: none;
   }
-  ${partSelector(block, "actions")}:focus-visible, ${partSelector(block, "toggle")}:focus-visible, ${partSelector(block, "body")}:focus-visible {
-    ${focusRing({ inset: true })}
+  ${outputBlockPartRefs.actions}:focus-visible, ${outputBlockPartRefs.toggle}:focus-visible, ${outputBlockPartRefs.body}:focus-visible {
+    ${ui.focus.inset}
   }
-  ${partSelector(read, "number")} {
+  ${readBlockPartRefs.number} {
     display: inline-block;
     min-width: 4ch;
     margin-right: 12px;
@@ -79,69 +84,69 @@ export const outputBlockStyles = css`
     color: ${uiTokens.ink.tertiary};
     user-select: none;
   }
-  ${partSelector(read, "root")} [data-read-highlight="true"] {
+  ${readBlockPartRefs.root} [data-read-highlight="true"] {
     background: ${uiTokens.state.hover};
     box-shadow: inset 3px 0 ${uiTokens.status.info};
   }
-  ${partSelector(diff, "line")}[data-diff-kind="added"] {
+  ${diffBlockPartRefs.line}[data-diff-kind="added"] {
     color: ${uiTokens.status.success};
     background: color-mix(in srgb, ${uiTokens.status.success} 10%, transparent);
     box-shadow: inset 3px 0 ${uiTokens.status.success};
   }
-  ${partSelector(diff, "line")}[data-diff-kind="removed"] {
+  ${diffBlockPartRefs.line}[data-diff-kind="removed"] {
     color: ${uiTokens.status.danger};
     background: color-mix(in srgb, ${uiTokens.status.danger} 10%, transparent);
     box-shadow: inset 3px 0 ${uiTokens.status.danger};
   }
-  ${partSelector(diff, "path")}, ${partSelector(search, "path")} {
+  ${diffBlockPartRefs.path}, ${searchBlockPartRefs.path} {
     font-weight: ${uiTokens.type.weight.medium};
   }
-  :where(${partSelector(read, "root")}, ${partSelector(diff, "root")}) ${partSelector(block, "header")} {
+  :where(${readBlockPartRefs.root}, ${diffBlockPartRefs.root}) ${outputBlockPartRefs.header} {
     padding: 10px 18px 8px 22px;
     color: ${uiTokens.ink.secondary};
   }
-  :where(${partSelector(read, "root")}, ${partSelector(diff, "root")}) ${partSelector(block, "body")} {
+  :where(${readBlockPartRefs.root}, ${diffBlockPartRefs.root}) ${outputBlockPartRefs.body} {
     padding: 6px 22px 20px;
     font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
   }
-  :where(${partSelector(read, "root")}, ${partSelector(diff, "root")}) ${partSelector(block, "line")} {
+  :where(${readBlockPartRefs.root}, ${diffBlockPartRefs.root}) ${outputBlockPartRefs.line} {
     min-height: 19px;
   }
-  ${partSelector(diff, "root")} ${partSelector(block, "body")} {
+  ${diffBlockPartRefs.root} ${outputBlockPartRefs.body} {
     padding-inline: 0;
     display: grid;
     grid-template-columns: minmax(max-content, 1fr);
   }
-  ${partSelector(diff, "line")}, ${partSelector(diff, "path")}, ${partSelector(diff, "root")} ${partSelector(block, "toggle")} {
+  ${diffBlockPartRefs.line}, ${diffBlockPartRefs.path}, ${diffBlockPartRefs.root} ${outputBlockPartRefs.toggle} {
     padding-inline: 22px;
   }
-  ${partSelector(diff, "line")}[data-diff-kind="context"] {
+  ${diffBlockPartRefs.line}[data-diff-kind="context"] {
     color: ${uiTokens.ink.secondary};
   }
-  ${partSelector(search, "root")} ${partSelector(block, "header")} {
+  ${searchBlockPartRefs.root} ${outputBlockPartRefs.header} {
     align-items: center;
     font: ${uiTokens.type.label} / ${uiTokens.type.line.label} ${uiTokens.type.sans};
     color: ${uiTokens.ink.secondary};
   }
-  ${partSelector(search, "root")} ${partSelector(block, "title")} {
+  ${searchBlockPartRefs.root} ${outputBlockPartRefs.title} {
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  ${partSelector(search, "root")} ${partSelector(block, "body")} {
+  ${searchBlockPartRefs.root} ${outputBlockPartRefs.body} {
     padding: 8px 14px 12px 0;
     font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
   }
-  ${partSelector(search, "root")} ${partSelector(block, "line")} {
+  ${searchBlockPartRefs.root} ${outputBlockPartRefs.line} {
     padding-left: 14px;
   }
-  ${partSelector(search, "path")}:is(summary) {
+  ${searchBlockPartRefs.path}:is(summary) {
     cursor: pointer;
   }
-  ${partSelector(search, "number")} {
+  ${searchBlockPartRefs.number} {
     color: ${uiTokens.ink.tertiary};
   }
-  ${partSelector(terminal, "command")} {
+  ${terminalBlockPartRefs.command} {
     margin: 0;
     min-width: 0;
     overflow: hidden;
@@ -149,35 +154,35 @@ export const outputBlockStyles = css`
     white-space: pre;
     font: ${uiTokens.type.code} / ${uiTokens.type.line.body} ${uiTokens.type.mono};
   }
-  ${partSelector(terminal, "root")} ${partSelector(block, "header")} {
+  ${terminalBlockPartRefs.root} ${outputBlockPartRefs.header} {
     padding-left: 30px;
     max-height: 150px;
     overflow-y: auto;
     background: ${uiTokens.surface.fill};
   }
-  ${partSelector(terminal, "root")} ${partSelector(block, "title")} > div {
+  ${terminalBlockPartRefs.root} ${outputBlockPartRefs.title} > div {
     display: flex;
     align-items: flex-start;
     gap: 12px;
     min-width: 0;
   }
-  ${partSelector(terminal, "root")}[data-terminal-body="true"] ${partSelector(block, "header")} {
+  ${terminalBlockPartRefs.root}[data-terminal-body="true"] ${outputBlockPartRefs.header} {
     border-bottom: 1px solid ${uiTokens.line.divider};
   }
-  ${partSelector(terminal, "root")} ${partSelector(block, "body")} {
+  ${terminalBlockPartRefs.root} ${outputBlockPartRefs.body} {
     padding-left: 30px;
     max-height: var(--ui-terminal-output-max-height, none);
   }
-  ${partSelector(terminal, "root")}[data-terminal-body="false"] ${partSelector(block, "body")} {
+  ${terminalBlockPartRefs.root}[data-terminal-body="false"] ${outputBlockPartRefs.body} {
     display: none;
   }
-  ${partSelector(terminal, "prompt")} {
+  ${terminalBlockPartRefs.prompt} {
     display: flex;
     flex-direction: column;
     min-width: 0;
     flex: 1;
   }
-  ${partSelector(terminal, "promptLine")} {
+  ${terminalBlockPartRefs.promptLine} {
     position: relative;
     display: flex;
     align-items: baseline;
@@ -185,18 +190,18 @@ export const outputBlockStyles = css`
     min-width: 0;
     font: ${uiTokens.type.code} / ${uiTokens.type.line.body} ${uiTokens.type.mono};
   }
-  ${partSelector(terminal, "cwd")} {
+  ${terminalBlockPartRefs.cwd} {
     flex: none;
     color: ${uiTokens.ink.tertiary};
   }
-  ${partSelector(terminal, "runState")} {
+  ${terminalBlockPartRefs.runState} {
     position: absolute;
     left: -22px;
     top: 50%;
     transform: translateY(-50%);
     display: flex;
   }
-  ${partSelector(terminal, "runStateLabel")} {
+  ${terminalBlockPartRefs.runStateLabel} {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -205,34 +210,34 @@ export const outputBlockStyles = css`
     white-space: nowrap;
   }
   /* The finished-but-not-clean state is the shared badge; the prompt's own dot steps aside for it. */
-  ${partSelector(terminal, "prompt")}:has(+ ${partSelector(terminal, "status")}) ${partSelector(terminal, "runState")} {
+  ${terminalBlockPartRefs.prompt}:has(+ ${terminalBlockPartRefs.status}) ${terminalBlockPartRefs.runState} {
     display: none;
   }
-  ${partSelector(terminal, "span")}[data-ansi-bold="true"] {
+  ${terminalBlockPartRefs.span}[data-ansi-bold="true"] {
     font-weight: ${uiTokens.type.weight.semibold};
   }
-  ${partSelector(terminal, "span")}:is([data-ansi-color="31"], [data-ansi-color="91"]) {
+  ${terminalBlockPartRefs.span}:is([data-ansi-color="31"], [data-ansi-color="91"]) {
     color: ${uiTokens.status.danger};
   }
-  ${partSelector(terminal, "span")}:is([data-ansi-color="32"], [data-ansi-color="92"]) {
+  ${terminalBlockPartRefs.span}:is([data-ansi-color="32"], [data-ansi-color="92"]) {
     color: ${uiTokens.status.success};
   }
-  ${partSelector(terminal, "span")}:is([data-ansi-color="33"], [data-ansi-color="93"]) {
+  ${terminalBlockPartRefs.span}:is([data-ansi-color="33"], [data-ansi-color="93"]) {
     color: ${uiTokens.status.warning};
   }
-  ${partSelector(terminal, "span")}:is([data-ansi-color="34"], [data-ansi-color="94"], [data-ansi-color="36"], [data-ansi-color="96"]) {
+  ${terminalBlockPartRefs.span}:is([data-ansi-color="34"], [data-ansi-color="94"], [data-ansi-color="36"], [data-ansi-color="96"]) {
     color: ${uiTokens.status.info};
   }
-  ${partSelector(terminal, "span")}:is([data-ansi-color="35"], [data-ansi-color="95"]) {
+  ${terminalBlockPartRefs.span}:is([data-ansi-color="35"], [data-ansi-color="95"]) {
     color: ${codeHighlightTokens.function};
   }
-  ${partSelector(terminal, "span")}[data-ansi-color="90"] {
+  ${terminalBlockPartRefs.span}[data-ansi-color="90"] {
     color: ${uiTokens.ink.tertiary};
   }
 
   @media (pointer: coarse) {
-    ${partSelector(block, "actions")}[data-meowui-part],
-    ${partSelector(block, "toggle")}[data-meowui-part] {
+    ${outputBlockPartRefs.actions}[data-meowui-part],
+    ${outputBlockPartRefs.toggle}[data-meowui-part] {
       min-width: 44px;
       min-height: 44px;
       padding: 0 6px;
@@ -240,16 +245,16 @@ export const outputBlockStyles = css`
   }
 
   /* Native summaries draw the same rotating chevron as Disclosure. */
-  :where(${partSelector(block, "toggle")}) {
+  :where(${outputBlockPartRefs.toggle}) {
     display: flex;
     align-items: center;
     gap: 6px;
     list-style: none;
   }
-  :where(${partSelector(block, "toggle")})::-webkit-details-marker {
+  :where(${outputBlockPartRefs.toggle})::-webkit-details-marker {
     display: none;
   }
-  :where(${partSelector(block, "toggle")})::before {
+  :where(${outputBlockPartRefs.toggle})::before {
     content: "";
     flex: none;
     width: 14px;
@@ -258,11 +263,11 @@ export const outputBlockStyles = css`
     mask: ${uiTokens.glyph.chevron} center / 14px 14px no-repeat;
     transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
-  :where(details[open] > ${partSelector(block, "toggle")})::before {
+  :where(details[open] > ${outputBlockPartRefs.toggle})::before {
     transform: rotate(90deg);
   }
   @media (prefers-reduced-motion: reduce) {
-    :where(${partSelector(block, "toggle")})::before {
+    :where(${outputBlockPartRefs.toggle})::before {
       transition: none;
     }
   }

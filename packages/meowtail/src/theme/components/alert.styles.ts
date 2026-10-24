@@ -1,9 +1,11 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { alertTokens, uiTokens } from "../tokens";
-import { alertContract, alertOptions } from "../../components/alert";
 
+import type { Alert } from "../../components/alert";
+import { alertOptions } from "../../components/alert.options";
+const alertPartRefs = parts<typeof Alert>("alert");
 export const alertStyles = css`
-  ${partSelector(alertContract, "root")} {
+  ${alertPartRefs.root} {
     display: grid;
     /* Title and body read as one statement; actions keep a group gap. */
     gap: 4px;
@@ -18,13 +20,13 @@ export const alertStyles = css`
     font-family: ${uiTokens.type.sans};
     font-size: ${uiTokens.type.body};
   }
-  ${partSelector(alertContract, "title")} {
+  ${alertPartRefs.title} {
     font-weight: ${uiTokens.type.weight.semibold};
   }
-  ${partSelector(alertContract, "body")} {
+  ${alertPartRefs.body} {
     line-height: ${uiTokens.type.leading};
   }
-  ${partSelector(alertContract, "actions")} {
+  ${alertPartRefs.actions} {
     display: flex;
     flex-wrap: wrap;
     gap: ${uiTokens.space.group};
@@ -33,7 +35,7 @@ export const alertStyles = css`
 
   /* A page notice is one compact line with an optional end action; the block
      alert keeps the title/body/action stack for outcomes that need reading. */
-  ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"] {
+  ${alertPartRefs.root}[${alertOptions.attribute("layout")}="bar"] {
     display: flex;
     align-items: center;
     gap: ${uiTokens.space.group};
@@ -43,7 +45,7 @@ export const alertStyles = css`
     font-size: ${uiTokens.type.label};
     line-height: ${uiTokens.type.line.label};
   }
-  ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"]::before {
+  ${alertPartRefs.root}[${alertOptions.attribute("layout")}="bar"]::before {
     content: "";
     width: 8px;
     height: 8px;
@@ -51,18 +53,18 @@ export const alertStyles = css`
     border-radius: 50%;
     background: ${alertTokens.accent};
   }
-  ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"][${alertOptions.attribute("marker")}="none"]::before {
+  ${alertPartRefs.root}[${alertOptions.attribute("layout")}="bar"][${alertOptions.attribute("marker")}="none"]::before {
     content: none;
   }
-  ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"] ${partSelector(alertContract, "title")} {
+  ${alertPartRefs.root}[${alertOptions.attribute("layout")}="bar"] ${alertPartRefs.title} {
     flex: none;
   }
-  ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"] ${partSelector(alertContract, "body")} {
+  ${alertPartRefs.root}[${alertOptions.attribute("layout")}="bar"] ${alertPartRefs.body} {
     flex: 1;
     min-width: 0;
     line-height: ${uiTokens.type.line.label};
   }
-  ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"] ${partSelector(alertContract, "actions")} {
+  ${alertPartRefs.root}[${alertOptions.attribute("layout")}="bar"] ${alertPartRefs.actions} {
     flex: none;
     margin-top: 0;
     margin-left: auto;
@@ -70,7 +72,7 @@ export const alertStyles = css`
   }
 
   @media (pointer: coarse) {
-    ${partSelector(alertContract, "root")}[${alertOptions.attribute("layout")}="bar"] ${partSelector(alertContract, "actions")} > * {
+    ${alertPartRefs.root}[${alertOptions.attribute("layout")}="bar"] ${alertPartRefs.actions} > * {
       min-width: 44px;
       min-height: 44px;
     }

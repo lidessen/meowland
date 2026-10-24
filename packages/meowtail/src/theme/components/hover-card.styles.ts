@@ -1,48 +1,49 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { hoverCardContract } from "../../components/hover-card";
-import { popoverContract } from "../../components/popover";
-
+import type { HoverCard } from "../../components/hover-card";
+import type { Popover } from "../../components/popover";
+import { ui } from "../utilities";
+const hoverCardPartRefs = parts<typeof HoverCard>("hover-card");
+const popoverPartRefs = parts<typeof Popover>("popover");
 export const hoverCardStyles = css`
-  ${partSelector(hoverCardContract, "root")} {
+  ${hoverCardPartRefs.root} {
     display: block;
     min-width: 0;
   }
-  ${partSelector(popoverContract, "panel")}:has(> ${partSelector(hoverCardContract, "content")}) {
+  ${popoverPartRefs.panel}:has(> ${hoverCardPartRefs.content}) {
     padding: 0;
     width: 244px;
     background: ${uiTokens.inverse.surface};
     color: ${uiTokens.inverse.ink};
     backdrop-filter: none;
   }
-  ${partSelector(popoverContract, "panel")}:has(> ${partSelector(hoverCardContract, "content")}[data-variant="preview"]) {
+  ${popoverPartRefs.panel}:has(> ${hoverCardPartRefs.content}[data-variant="preview"]) {
     background: ${uiTokens.surface.overlay};
     color: ${uiTokens.ink.primary};
   }
-  ${partSelector(hoverCardContract, "content")} {
+  ${hoverCardPartRefs.content} {
     position: relative;
     padding: 12px 16px;
     max-height: 420px;
     overflow: auto;
     overflow-wrap: anywhere;
   }
-  ${partSelector(hoverCardContract, "content")}[data-variant="preview"] {
+  ${hoverCardPartRefs.content}[data-variant="preview"] {
     padding: 0;
     max-height: min(420px, calc(100dvh - 32px));
   }
-  ${partSelector(hoverCardContract, "content")}[role="button"] {
+  ${hoverCardPartRefs.content}[role="button"] {
     cursor: pointer;
   }
-  ${partSelector(hoverCardContract, "content")} a {
+  ${hoverCardPartRefs.content} a {
     color: inherit;
     text-underline-offset: 3px;
   }
-  ${partSelector(hoverCardContract, "content")}:focus-visible {
-    ${focusRing({ inset: true })}
+  ${hoverCardPartRefs.content}:focus-visible {
+    ${ui.focus.inset}
     border-radius: ${uiTokens.radius.md};
   }
-  ${partSelector(hoverCardContract, "feedback")} {
+  ${hoverCardPartRefs.feedback} {
     position: absolute;
     inset: 0;
     display: grid;
@@ -54,7 +55,7 @@ export const hoverCardStyles = css`
     color: ${uiTokens.inverse.ink};
     font: ${uiTokens.type.body} / ${uiTokens.type.line.bodyCompact} ${uiTokens.type.sans};
   }
-  ${partSelector(hoverCardContract, "feedback")}:empty {
+  ${hoverCardPartRefs.feedback}:empty {
     display: none;
   }
 `;

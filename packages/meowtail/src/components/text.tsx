@@ -1,6 +1,5 @@
-import { defineOptions } from "meowcss";
-import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
-import { defineComponent, type Props } from "meowjsx";
+import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
+import { h, type Context, type Props } from "meowjsx";
 
 /**
  * The text roles a host places between components. Each role is one the theme
@@ -9,30 +8,32 @@ import { defineComponent, type Props } from "meowjsx";
  * eyebrow that labels a group. Field labels stay with Field, headings with
  * Section and PageHeader, and code with the code components.
  */
-export const textOptions = defineOptions("text", {
-  variant: ["body", "secondary", "label", "caption", "eyebrow"],
-});
-
-export const textContract = {
-  name: "text",
-  parts: ["root"],
-  styleProps: defineStyleProps(textOptions, { defaults: { variant: "body" } }),
-} as const satisfies StyledComponentContract;
+import { textOptions } from "./text.options";
+export { textOptions } from "./text.options";
 
 export interface TextProps extends Props, ThemedProps<typeof textOptions> {
   /** A paragraph by default; `span` for a run inside a line, `div` for a block that holds other blocks. */
   as?: "p" | "span" | "div";
-  className?: string;
+  className?: Props["className"];
 }
 
 /**
  * One run of copy in a theme text role. Emphasis and fine print keep their
  * native elements (`strong`, `em`, `small`) inside it.
  */
-export const Text = defineComponent<
-  TextProps,
-  typeof textContract.name,
-  (typeof textContract.parts)[number]
->(textContract, ({ as = "p", className, children, ...props }, context) =>
-  context.part("root", as, { ...props, className }, children),
-);
+export function Text(
+  { as = "p", className, children, ref, ...props }: TextProps,
+  context: Context<typeof Text>,
+) {
+  const Tag = as;
+  return (
+    <Tag {...props} className={className} ref={[context.parts.root, ref]}>
+      {children}
+    </Tag>
+  );
+}
+Text.meta = {
+  name: "text",
+  parts: ["root"],
+  style: defineStyleProps(textOptions, { defaults: { variant: "body" } }),
+} as const;

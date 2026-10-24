@@ -19,7 +19,7 @@ import { RiskConfirmation } from "../../../src/components/risk-confirmation";
 import { SegmentedControl } from "../../../src/components/segmented-control";
 import { Slider } from "../../../src/components/slider";
 import { TextShimmer } from "../../../src/components/text-shimmer";
-import { installMeowUI } from "../../../src/registry";
+import { installMeowUI, meowUIComponents } from "../../../src/registry";
 
 const dom = new Window() as unknown as Record<string, unknown>;
 for (const key of [
@@ -42,7 +42,7 @@ for (const key of [
 
 function mount(node: unknown) {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const host = document.createElement("div");
   document.body.append(host);
   const mounted = createWebRenderer(runtime).mount(node as never, host);

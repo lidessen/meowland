@@ -1,15 +1,16 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { contextMenuContract } from "../../components/context-menu";
-import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
+import { css, parts } from "meowcss/meowjsx";
 
+import { uiTokens } from "../tokens";
+import type { ContextMenu } from "../../components/context-menu";
+import { ui } from "../utilities";
+const contextMenuPartRefs = parts<typeof ContextMenu>("context-menu");
 export const contextMenuStyles = css`
-  ${partSelector(contextMenuContract, "root")} {
+  ${contextMenuPartRefs.root} {
     min-width: 0;
     cursor: context-menu;
   }
-  ${partSelector(contextMenuContract, "root")}:focus-visible {
-    ${focusRing()}
+  ${contextMenuPartRefs.root}:focus-visible {
+    ${ui.focus.ring}
     border-radius: ${uiTokens.radius.lg};
   }
 `;

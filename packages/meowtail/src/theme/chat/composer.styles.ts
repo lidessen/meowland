@@ -1,16 +1,23 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { chatAttachmentsContract } from "../../chat/attachments";
-import { chatComposerContract, chatComposerOptions } from "../../chat/composer";
-import { chatFrameContract } from "../../chat/frame";
-import { iconButtonContract } from "../../components/icon-button";
-import { selectContract } from "../../components/select";
-import { choiceSelectContract } from "../../components/choice-select";
-import { popoverContract } from "../../components/popover";
-
+import type { ChatAttachments } from "../../chat/attachments";
+import type { ChatComposer } from "../../chat/composer";
+import type { ChatFrame } from "../../chat/frame";
+import type { ChoiceSelect } from "../../components/choice-select";
+import type { IconButton } from "../../components/icon-button";
+import type { Popover } from "../../components/popover";
+import type { Select } from "../../components/select";
+import { chatComposerOptions } from "../../chat/composer.options";
+import { ui } from "../utilities";
+const chatAttachmentsPartRefs = parts<typeof ChatAttachments>("chat-attachments");
+const chatComposerPartRefs = parts<typeof ChatComposer>("chat-composer");
+const chatFramePartRefs = parts<typeof ChatFrame>("chat-frame");
+const choiceSelectPartRefs = parts<typeof ChoiceSelect>("choice-select");
+const iconButtonPartRefs = parts<typeof IconButton>("icon-button");
+const popoverPartRefs = parts<typeof Popover>("popover");
+const selectPartRefs = parts<typeof Select>("select");
 export const chatComposerStyles = css`
-  ${partSelector(chatComposerContract, "trailing")} {
+  ${chatComposerPartRefs.trailing} {
     display: flex;
     align-items: center;
     margin-left: auto;
@@ -18,7 +25,7 @@ export const chatComposerStyles = css`
     max-width: min(280px, 60%);
   }
 
-  ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "trigger")} {
+  ${chatComposerPartRefs.trailing} ${choiceSelectPartRefs.trigger} {
     min-height: 28px;
     border: 0;
     border-radius: ${uiTokens.radius.md};
@@ -28,36 +35,36 @@ export const chatComposerStyles = css`
     line-height: ${uiTokens.type.line.label};
   }
 
-  ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "trigger")}:hover:not(:disabled) {
+  ${chatComposerPartRefs.trailing} ${choiceSelectPartRefs.trigger}:hover:not(:disabled) {
     background: ${uiTokens.state.hover};
     color: ${uiTokens.ink.primary};
   }
   /* Open, the quiet trigger holds the active overlay that anchors its menu. */
-  ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "trigger")}[aria-expanded="true"]:not(:disabled) {
+  ${chatComposerPartRefs.trailing} ${choiceSelectPartRefs.trigger}[aria-expanded="true"]:not(:disabled) {
     background: ${uiTokens.state.active};
     color: ${uiTokens.ink.primary};
   }
 
-  ${partSelector(chatComposerContract, "trailing")} ${partSelector(popoverContract, "panel")} {
+  ${chatComposerPartRefs.trailing} ${popoverPartRefs.panel} {
     width: 248px;
   }
 
-  ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "group")}:not(:first-child) {
+  ${chatComposerPartRefs.trailing} ${choiceSelectPartRefs.group}:not(:first-child) {
     border: 0;
     margin-top: 0;
   }
 
-  ${partSelector(chatComposerContract, "trailing")} ${partSelector(choiceSelectContract, "option")} {
+  ${chatComposerPartRefs.trailing} ${choiceSelectPartRefs.option} {
     padding: 6px;
     font-size: ${uiTokens.type.body};
     line-height: ${uiTokens.type.line.body};
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="hero"] ${partSelector(chatComposerContract, "input")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="hero"] ${chatComposerPartRefs.input} {
     min-height: 52px;
   }
 
-  ${partSelector(chatComposerContract, "actions")} ${partSelector(selectContract, "root")} {
+  ${chatComposerPartRefs.actions} ${selectPartRefs.root} {
     width: auto;
     max-width: min(220px, 55%);
     height: 28px;
@@ -77,12 +84,12 @@ export const chatComposerStyles = css`
     cursor: pointer;
   }
 
-  ${partSelector(chatComposerContract, "actions")} ${partSelector(selectContract, "root")}:hover:not(:disabled) {
+  ${chatComposerPartRefs.actions} ${selectPartRefs.root}:hover:not(:disabled) {
     background-color: ${uiTokens.state.hover};
   }
 
   /* The form groups the writing surface and its external supporting instructions. */
-  ${partSelector(chatComposerContract, "root")} {
+  ${chatComposerPartRefs.root} {
     position: relative;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
@@ -94,7 +101,7 @@ export const chatComposerStyles = css`
     box-shadow: none;
   }
 
-  ${partSelector(chatComposerContract, "surface")} {
+  ${chatComposerPartRefs.surface} {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 12px;
@@ -108,7 +115,7 @@ export const chatComposerStyles = css`
   }
 
   /* The frame owns its direct writing surface; a footer or card owns its own inset. */
-  ${partSelector(chatFrameContract, "root")} > ${partSelector(chatComposerContract, "root")} {
+  ${chatFramePartRefs.root} > ${chatComposerPartRefs.root} {
     flex: 0 0 auto;
     box-sizing: border-box;
     width: calc(100% - 2 * ${chatTokens.readingInset});
@@ -116,11 +123,11 @@ export const chatComposerStyles = css`
     margin: ${uiTokens.space.section} auto max(${uiTokens.space.section}, env(safe-area-inset-bottom));
   }
 
-  ${partSelector(chatComposerContract, "field")} {
+  ${chatComposerPartRefs.field} {
     display: contents;
   }
 
-  ${partSelector(chatComposerContract, "attachments")} {
+  ${chatComposerPartRefs.attachments} {
     grid-row: 1;
     min-width: 0;
     padding: 2px 10px 0;
@@ -128,30 +135,30 @@ export const chatComposerStyles = css`
   }
 
   /* Hosts may retain a hidden mount point while their attachment list is empty. */
-  ${partSelector(chatComposerContract, "attachments")}:empty,
-  ${partSelector(chatComposerContract, "attachments")}:has(> [hidden]:only-child) {
+  ${chatComposerPartRefs.attachments}:empty,
+  ${chatComposerPartRefs.attachments}:has(> [hidden]:only-child) {
     display: none;
   }
 
-  ${partSelector(chatComposerContract, "surface")}:has(> ${partSelector(chatComposerContract, "attachments")}:not(:empty)):not(
-  :has(> ${partSelector(chatComposerContract, "attachments")} > [hidden]:only-child)
+  ${chatComposerPartRefs.surface}:has(> ${chatComposerPartRefs.attachments}:not(:empty)):not(
+  :has(> ${chatComposerPartRefs.attachments} > [hidden]:only-child)
   )
-  ${partSelector(chatComposerContract, "input")} {
+  ${chatComposerPartRefs.input} {
     grid-row: 2;
   }
 
-  ${partSelector(chatComposerContract, "surface")}:has(> ${partSelector(chatComposerContract, "attachments")}:not(:empty)):not(
-  :has(> ${partSelector(chatComposerContract, "attachments")} > [hidden]:only-child)
+  ${chatComposerPartRefs.surface}:has(> ${chatComposerPartRefs.attachments}:not(:empty)):not(
+  :has(> ${chatComposerPartRefs.attachments} > [hidden]:only-child)
   )
-  ${partSelector(chatComposerContract, "actions")} {
+  ${chatComposerPartRefs.actions} {
     grid-row: 3;
   }
 
-  ${partSelector(chatComposerContract, "attachments")} ${partSelector(chatAttachmentsContract, "file")} {
+  ${chatComposerPartRefs.attachments} ${chatAttachmentsPartRefs.file} {
     min-height: 64px;
   }
 
-  ${partSelector(chatComposerContract, "input")} {
+  ${chatComposerPartRefs.input} {
     color: ${uiTokens.ink.primary};
     font-family: ${uiTokens.type.sans};
     box-sizing: border-box;
@@ -173,51 +180,51 @@ export const chatComposerStyles = css`
   }
 
   /* Focus paint stays inside the surface when an embedding form clips overflow. */
-  ${partSelector(chatComposerContract, "surface")}:has(${partSelector(chatComposerContract, "input")}:focus:not(:disabled)) {
+  ${chatComposerPartRefs.surface}:has(${chatComposerPartRefs.input}:focus:not(:disabled)) {
     outline: 1px solid color-mix(in srgb, ${uiTokens.action.primary} 45%, transparent);
     outline-offset: -1px;
   }
 
   @media (hover: hover) {
-    ${partSelector(chatComposerContract, "surface")}:has(${partSelector(chatComposerContract, "input")}:hover:not(:disabled):not(:focus)) {
+    ${chatComposerPartRefs.surface}:has(${chatComposerPartRefs.input}:hover:not(:disabled):not(:focus)) {
       border-color: transparent;
     }
   }
 
-  ${partSelector(chatComposerContract, "submit")}:focus-visible {
-    ${focusRing()}
+  ${chatComposerPartRefs.submit}:focus-visible {
+    ${ui.focus.ring}
   }
 
-  ${partSelector(chatComposerContract, "input")}:focus-visible {
+  ${chatComposerPartRefs.input}:focus-visible {
     outline: none;
   }
 
-  ${partSelector(chatComposerContract, "surface")}:has(${partSelector(chatComposerContract, "input")}:focus-visible) {
-    ${focusRing({ inset: true })}
+  ${chatComposerPartRefs.surface}:has(${chatComposerPartRefs.input}:focus-visible) {
+    ${ui.focus.inset}
   }
 
   @supports (field-sizing: content) {
-    ${partSelector(chatComposerContract, "input")} {
+    ${chatComposerPartRefs.input} {
       field-sizing: content;
     }
   }
 
-  ${partSelector(chatComposerContract, "input")}::placeholder {
+  ${chatComposerPartRefs.input}::placeholder {
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.body};
   }
 
-  ${partSelector(chatComposerContract, "input")}:disabled {
+  ${chatComposerPartRefs.input}:disabled {
     cursor: not-allowed;
     color: ${uiTokens.ink.tertiary};
   }
 
-  ${partSelector(chatComposerContract, "surface")}:has(${partSelector(chatComposerContract, "input")}:disabled) {
+  ${chatComposerPartRefs.surface}:has(${chatComposerPartRefs.input}:disabled) {
     background: ${uiTokens.surface.fill};
     box-shadow: none;
   }
 
-  ${partSelector(chatComposerContract, "hint")} {
+  ${chatComposerPartRefs.hint} {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -227,7 +234,7 @@ export const chatComposerStyles = css`
     white-space: nowrap;
   }
 
-  ${partSelector(chatComposerContract, "actions")} {
+  ${chatComposerPartRefs.actions} {
     grid-row: 2;
     display: flex;
     flex-wrap: wrap;
@@ -237,7 +244,7 @@ export const chatComposerStyles = css`
     min-height: 32px;
   }
 
-  ${partSelector(chatComposerContract, "submit")} {
+  ${chatComposerPartRefs.submit} {
     display: grid;
     place-items: center;
     margin-left: auto;
@@ -264,16 +271,16 @@ export const chatComposerStyles = css`
     box-shadow: none;
   }
 
-  ${partSelector(chatComposerContract, "submit")} svg {
+  ${chatComposerPartRefs.submit} svg {
     width: ${uiTokens.icon.large};
     height: ${uiTokens.icon.large};
   }
 
-  ${partSelector(chatComposerContract, "trailing")} + ${partSelector(chatComposerContract, "submit")} {
+  ${chatComposerPartRefs.trailing} + ${chatComposerPartRefs.submit} {
     margin-left: 0;
   }
 
-  ${partSelector(chatComposerContract, "actions")} > ${partSelector(iconButtonContract, "root")} {
+  ${chatComposerPartRefs.actions} > ${iconButtonPartRefs.root} {
     width: 28px;
     height: 28px;
     min-width: 28px;
@@ -284,11 +291,11 @@ export const chatComposerStyles = css`
     color: ${uiTokens.ink.primary};
   }
 
-  ${partSelector(chatComposerContract, "submit")}:hover:not(:disabled) {
+  ${chatComposerPartRefs.submit}:hover:not(:disabled) {
     background: ${uiTokens.action.primaryHover};
   }
 
-  ${partSelector(chatComposerContract, "submit")}:disabled {
+  ${chatComposerPartRefs.submit}:disabled {
     cursor: not-allowed;
     border-color: transparent;
     opacity: 0.4;
@@ -296,17 +303,17 @@ export const chatComposerStyles = css`
   }
 
   @media (max-width: 680px) {
-    ${partSelector(chatComposerContract, "surface")} {
+    ${chatComposerPartRefs.surface} {
       grid-template-columns: minmax(0, 1fr);
       padding: 8px 0 0;
     }
 
-    ${partSelector(chatComposerContract, "hint")} {
+    ${chatComposerPartRefs.hint} {
       font-size: ${uiTokens.type.caption};
     }
   }
 
-  ${partSelector(chatComposerContract, "submit")}:active:not(:disabled) {
+  ${chatComposerPartRefs.submit}:active:not(:disabled) {
     box-shadow: ${uiTokens.shadow.pressed};
     transition-duration: ${uiTokens.motion.instant};
   }
@@ -315,73 +322,73 @@ export const chatComposerStyles = css`
   The inline row keeps the one-line text and the send action on the optical
   center: equal block padding around the 24px line, a symmetric action row, and
   no base-layout nudge on the submit button. */
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] > ${partSelector(chatComposerContract, "surface")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="inline"] > ${chatComposerPartRefs.surface} {
     grid-template-columns: minmax(0, 1fr) auto;
     align-items: center;
     padding: ${uiTokens.control.inset} ${uiTokens.space.section};
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] ${partSelector(chatComposerContract, "input")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="inline"] ${chatComposerPartRefs.input} {
     grid-column: 1;
     grid-row: 1;
     min-height: 40px;
     padding-block: 8px;
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] ${partSelector(chatComposerContract, "actions")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="inline"] ${chatComposerPartRefs.actions} {
     grid-column: 2;
     grid-row: 1;
     flex-wrap: nowrap;
     padding-block: 4px;
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] ${partSelector(chatComposerContract, "submit")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="inline"] ${chatComposerPartRefs.submit} {
     transform: none;
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] ${partSelector(chatComposerContract, "attachments")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="inline"] ${chatComposerPartRefs.attachments} {
     grid-column: 1 / -1;
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"] > ${partSelector(chatComposerContract, "surface")}:has(> ${partSelector(chatComposerContract, "attachments")}:not(:empty)):not(
-  :has(> ${partSelector(chatComposerContract, "attachments")} > [hidden]:only-child)
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="inline"] > ${chatComposerPartRefs.surface}:has(> ${chatComposerPartRefs.attachments}:not(:empty)):not(
+  :has(> ${chatComposerPartRefs.attachments} > [hidden]:only-child)
   )
-  :is(${partSelector(chatComposerContract, "input")}, ${partSelector(chatComposerContract, "actions")}) {
+  :is(${chatComposerPartRefs.input}, ${chatComposerPartRefs.actions}) {
     grid-row: 2;
   }
 
   @media (pointer: coarse) {
-    ${partSelector(chatComposerContract, "input")} {
+    ${chatComposerPartRefs.input} {
       font-size: max(${uiTokens.type.touchField}, ${uiTokens.type.body});
     }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(chatComposerContract, "surface")},
-    ${partSelector(chatComposerContract, "input")},
-    ${partSelector(chatComposerContract, "submit")} {
+    ${chatComposerPartRefs.surface},
+    ${chatComposerPartRefs.input},
+    ${chatComposerPartRefs.submit} {
       transition: none;
     }
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] > ${partSelector(chatComposerContract, "surface")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] > ${chatComposerPartRefs.surface} {
     position: relative;
     gap: 4px;
     padding: 12px 12px 10px;
     border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "input")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.input} {
     padding: 2px 6px 6px;
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} {
     gap: 6px;
     padding: 0;
     min-height: 34px;
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(iconButtonContract, "root")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} > ${iconButtonPartRefs.root} {
     width: 32px;
     height: 32px;
     min-width: 32px;
@@ -392,27 +399,27 @@ export const chatComposerStyles = css`
     color: ${uiTokens.ink.secondary};
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(iconButtonContract, "root")}:hover:not(:disabled) {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} > ${iconButtonPartRefs.root}:hover:not(:disabled) {
     background: ${uiTokens.state.hover};
     color: ${uiTokens.ink.primary};
   }
 
   /* The model and its supporting choices stay beside send, not stranded after attach. */
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(chatComposerContract, "trailing")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} > ${chatComposerPartRefs.trailing} {
     margin-left: auto;
     min-width: 0;
     max-width: min(360px, 70%);
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(chatComposerContract, "submit")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} > ${chatComposerPartRefs.submit} {
     margin-left: 0;
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")}:not(:has(> ${partSelector(chatComposerContract, "trailing")})) > ${partSelector(chatComposerContract, "submit")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions}:not(:has(> ${chatComposerPartRefs.trailing})) > ${chatComposerPartRefs.submit} {
     margin-left: auto;
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "submit")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.submit} {
     width: 34px;
     height: 34px;
     min-width: 34px;
@@ -423,17 +430,17 @@ export const chatComposerStyles = css`
     transform: none;
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "submit")}:hover:not(:disabled) {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.submit}:hover:not(:disabled) {
     background: ${uiTokens.action.primaryHover};
   }
 
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "submit")}:disabled {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.submit}:disabled {
     opacity: 0.35;
   }
 
   /* Supporting text is outside the writing surface and never joins its action grid. */
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] > ${partSelector(chatComposerContract, "hint")},
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="inline"]:focus-within > ${partSelector(chatComposerContract, "hint")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] > ${chatComposerPartRefs.hint},
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="inline"]:focus-within > ${chatComposerPartRefs.hint} {
     position: static;
     min-width: 0;
     width: auto;
@@ -451,7 +458,7 @@ export const chatComposerStyles = css`
 
   /* A phone writes on one row: attach, text, send. The model choice keeps a quiet row beneath. */
   @media (max-width: 768px) {
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] > ${partSelector(chatComposerContract, "surface")} {
+    ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] > ${chatComposerPartRefs.surface} {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr) auto;
       align-items: end;
@@ -460,12 +467,12 @@ export const chatComposerStyles = css`
       border-radius: ${chatTokens.composerRadius};
       }
 
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "attachments")} {
+    ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.attachments} {
       grid-column: 1 / -1;
       grid-row: 1;
     }
 
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "input")} {
+    ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.input} {
       grid-column: 2;
       grid-row: 2;
       min-height: 36px;
@@ -474,11 +481,11 @@ export const chatComposerStyles = css`
       line-height: ${uiTokens.type.line.reading};
     }
 
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} {
+    ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} {
       display: contents;
     }
 
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(iconButtonContract, "root")} {
+    ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} > ${iconButtonPartRefs.root} {
       grid-column: 1;
       grid-row: 2;
       width: 36px;
@@ -491,7 +498,7 @@ export const chatComposerStyles = css`
       color: ${uiTokens.ink.primary};
     }
 
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(chatComposerContract, "trailing")} {
+    ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} > ${chatComposerPartRefs.trailing} {
       grid-column: 2 / -1;
       grid-row: 3;
       margin-left: 0;
@@ -500,7 +507,7 @@ export const chatComposerStyles = css`
       justify-content: flex-start;
     }
 
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="stacked"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(chatComposerContract, "submit")} {
+    ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} > ${chatComposerPartRefs.submit} {
       grid-column: 3;
       grid-row: 2;
       width: 36px;
@@ -515,7 +522,7 @@ export const chatComposerStyles = css`
 
   /* Explicit bare embedding removes only the writing surface chrome. The form
      and external supporting instructions keep their normal layout. */
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("surface")}="none"] > ${partSelector(chatComposerContract, "surface")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("surface")}="none"] > ${chatComposerPartRefs.surface} {
     padding: 0;
     border: 0;
     border-radius: 0;
@@ -524,7 +531,7 @@ export const chatComposerStyles = css`
   }
 
   /* Bar: one rounded row (attach, text, trailing choices, send) that grows with the draft. */
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] > ${partSelector(chatComposerContract, "surface")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] > ${chatComposerPartRefs.surface} {
     grid-template-columns: auto minmax(0, 1fr) auto auto;
     align-items: end;
     gap: 0 ${uiTokens.space.group};
@@ -532,23 +539,23 @@ export const chatComposerStyles = css`
     border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     border-radius: ${chatTokens.composerRadius};
   }
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "attachments")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] ${chatComposerPartRefs.attachments} {
     grid-column: 1 / -1;
     grid-row: 1;
     padding: 4px 4px ${uiTokens.space.group};
   }
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "input")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] ${chatComposerPartRefs.input} {
     grid-column: 2;
     grid-row: 2;
     min-height: ${uiTokens.control.regular};
     padding: 6px 4px;
     line-height: ${uiTokens.type.line.reading};
   }
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "actions")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] ${chatComposerPartRefs.actions} {
     display: contents;
   }
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(iconButtonContract, "root")},
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "trailing")} ${partSelector(iconButtonContract, "root")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] ${chatComposerPartRefs.actions} > ${iconButtonPartRefs.root},
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] ${chatComposerPartRefs.trailing} ${iconButtonPartRefs.root} {
     width: ${uiTokens.control.regular};
     height: ${uiTokens.control.regular};
     min-width: ${uiTokens.control.regular};
@@ -559,18 +566,18 @@ export const chatComposerStyles = css`
     background: transparent;
     color: ${uiTokens.ink.secondary};
   }
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(iconButtonContract, "root")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] ${chatComposerPartRefs.actions} > ${iconButtonPartRefs.root} {
     grid-column: 1;
     grid-row: 2;
   }
   @media (hover: hover) {
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "actions")} > ${partSelector(iconButtonContract, "root")}:hover:not(:disabled),
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "trailing")} ${partSelector(iconButtonContract, "root")}:hover:not(:disabled) {
+    ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] ${chatComposerPartRefs.actions} > ${iconButtonPartRefs.root}:hover:not(:disabled),
+    ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] ${chatComposerPartRefs.trailing} ${iconButtonPartRefs.root}:hover:not(:disabled) {
       background: ${uiTokens.state.hover};
       color: ${uiTokens.ink.primary};
     }
   }
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "trailing")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] ${chatComposerPartRefs.trailing} {
     grid-column: 3;
     grid-row: 2;
     display: flex;
@@ -579,7 +586,7 @@ export const chatComposerStyles = css`
     min-width: 0;
     min-height: ${uiTokens.control.regular};
   }
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "submit")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] ${chatComposerPartRefs.submit} {
     grid-column: 4;
     grid-row: 2;
     width: ${uiTokens.control.regular};
@@ -593,10 +600,10 @@ export const chatComposerStyles = css`
     color: ${uiTokens.action.onPrimary};
     transform: none;
   }
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "submit")}:disabled {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] ${chatComposerPartRefs.submit}:disabled {
     opacity: 0.35;
   }
-  ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] > ${partSelector(chatComposerContract, "hint")} {
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] > ${chatComposerPartRefs.hint} {
     position: static;
     width: auto;
     height: auto;
@@ -609,7 +616,7 @@ export const chatComposerStyles = css`
   }
   /* In a narrow container the choices take a quiet row under the text. */
   @container (max-width: 480px) {
-    ${partSelector(chatComposerContract, "root")}[${chatComposerOptions.attribute("layout")}="bar"] ${partSelector(chatComposerContract, "trailing")}:has(${partSelector(choiceSelectContract, "trigger")}:not([hidden])) {
+    ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] ${chatComposerPartRefs.trailing}:has(${choiceSelectPartRefs.trigger}:not([hidden])) {
       grid-column: 2 / 4;
       grid-row: 3;
     }

@@ -1,24 +1,24 @@
 import { describe, expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { renderToHtmlWithRuntime } from "meowjsx/web";
-import { auditCSS } from "meowcss";
-import { css, partSelector } from "meowcss/meowjsx";
+import { auditCSS, cx } from "meowcss";
+import { css, parts } from "meowcss/meowjsx";
 import { createMeowUI } from "meowtail";
 import {
-  interactive,
   standardAuditRules,
   standardFoundationStyles,
   standardTheme,
   standardThemeStyles,
-  surface,
+  ui,
   uiTokens,
+  utilityStyles,
 } from "meowtail/theme";
 import { appComponents, appStyles, appTheme } from "../../fixtures/authoring/app-theme";
 import { ListRow } from "../../fixtures/authoring/list-row";
-import { PlanBadge, planBadgeContract } from "../../fixtures/authoring/plan-badge";
+import { PlanBadge } from "../../fixtures/authoring/plan-badge";
 import { StatCard } from "../../fixtures/authoring/stat-card";
 
-const runtime = () => createRuntime({ plugins: [createMeowUI(), appComponents] });
+const runtime = () => createRuntime({ plugins: [createMeowUI({ components: appComponents })] });
 
 describe("host authoring floor", () => {
   test("host components get their parts and options through the one installed plugin", () => {
@@ -39,13 +39,25 @@ describe("host authoring floor", () => {
     expect(html).toContain('aria-current="true"');
   });
 
+  test("host className values preserve recursively composed utility and app classes", () => {
+    const html = renderToHtmlWithRuntime(
+      runtime(),
+      h(PlanBadge, {
+        className: [ui.p.group, [false, cx("host-class", [ui.radius.lg])]],
+        children: "Pro",
+        tone: "pro",
+      }),
+    );
+    expect(html).toContain('class="ui-p-group host-class ui-radius-lg"');
+  });
+
   test("the worked ports hold to the standard scales", () => {
     for (const fragment of appStyles) expect(auditCSS(fragment, standardAuditRules)).toEqual([]);
     expect(auditCSS(standardTheme.cssText, standardAuditRules)).toEqual([]);
   });
 
   test("drift is reported where it was written", () => {
-    const root = partSelector(planBadgeContract, "root");
+    const root = parts<typeof PlanBadge>("app-plan-badge").root;
     const drifted = css`
       ${root} {
         color: #333;
@@ -68,8 +80,8 @@ describe("host authoring floor", () => {
     ]);
   });
 
-  test("type ramp roles, the unitless leading and glyph boxes pass the type rules", () => {
-    const root = partSelector(planBadgeContract, "root");
+  test("type ramp roles and glyph boxes pass the type rules", () => {
+    const root = parts<typeof PlanBadge>("app-plan-badge").root;
     const onRamp = css`
       ${root} {
         font: ${uiTokens.type.weight.medium} ${uiTokens.type.label} / ${uiTokens.type.line.label}
@@ -85,20 +97,36 @@ describe("host authoring floor", () => {
     expect(auditCSS(onRamp, standardAuditRules)).toEqual([]);
   });
 
-  test("the floor comes first and host fragments come after every standard family", () => {
+  test("the floor comes first and host fragments precede the shared utility catalog", () => {
     expect(standardThemeStyles[0]).toBe(standardFoundationStyles);
+    expect(standardThemeStyles.at(-1)).toBe(utilityStyles);
     const sheet = appTheme.cssText;
     const lastStandard = sheet.lastIndexOf('data-meowui-part="assistant-view/root"');
+    const host = sheet.indexOf('data-meowui-part="app-plan-badge/root"');
+    const utilities = sheet.indexOf(".ui-p-group");
     expect(lastStandard).toBeGreaterThan(-1);
-    expect(sheet.indexOf('data-meowui-part="app-plan-badge/root"')).toBeGreaterThan(lastStandard);
+    expect(host).toBeGreaterThan(lastStandard);
+    expect(utilities).toBeGreaterThan(host);
   });
 
-  test("recipes carry the rule, not only the value", () => {
-    expect(String(surface("raised"))).toContain(uiTokens.line.edge.name);
-    expect(String(surface("fill"))).not.toContain(uiTokens.line.edge.name);
-    const flat = String(interactive({ on: "flat" }));
+  test("theme utilities carry material and interaction declarations", () => {
+    const raised = css`
+      ${ui.surface.raised}
+    `.text;
+    expect(raised).toContain(`border: ${uiTokens.line.width} solid ${uiTokens.line.edge};`);
+    expect(raised).toContain(`background: ${uiTokens.surface.raised};`);
+    const flat = css`
+      ${ui.interactive.flat}
+    `.text;
     expect(flat).toContain("@media (hover: hover)");
     expect(flat).toContain("&:focus-visible");
-    expect(String(interactive({ on: "raised" }))).toContain("background-image: linear-gradient(");
+    expect(
+      css`
+        ${ui.interactive.raised}
+      `.text,
+    ).toContain("background-image: linear-gradient(");
+    expect(String(cx(ui.p.group, ui.bg.fill, ui.radius.lg))).toBe(
+      "ui-p-group ui-bg-fill ui-radius-lg",
+    );
   });
 });

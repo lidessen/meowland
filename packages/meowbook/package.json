@@ -1,10 +1,10 @@
 {
   "name": "meowbook",
-  "version": "0.1.2-alpha.1",
+  "version": "0.2.0-alpha.0",
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "test": "bun test src/bun tests",
+    "test": "bun test src/bun tests/unit tests/lifecycle.test.ts",
     "typecheck": "tsc --noEmit -p tsconfig.json"
   },
   "description": "meowbook library",
@@ -45,9 +45,9 @@
     "@playwright/test": "1.63.0"
   },
   "peerDependencies": {
-    "meowjsx": "^0.1.0 || ^0.1.1-alpha.0",
-    "meowcss": "^0.1.0 || ^0.1.1-alpha.0",
-    "meowtail": "^0.1.0 || ^0.2.0-alpha.0"
+    "meowjsx": "^0.2.0-alpha.0",
+    "meowcss": "^0.2.0-alpha.0",
+    "meowtail": "^0.3.0-alpha.0"
   },
   "devDependencies": {
     "@types/pngjs": "^6.0.5",

@@ -1,19 +1,20 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { textShimmerContract as shimmer } from "../../components/text-shimmer";
 
+import type { TextShimmer } from "../../components/text-shimmer";
+const textShimmerPartRefs = parts<typeof TextShimmer>("text-shimmer");
 export const textShimmerStyles = css`
-  ${partSelector(shimmer, "root")} {
+  ${textShimmerPartRefs.root} {
     position: relative;
     display: inline-block;
     max-width: 100%;
     min-width: 0;
     vertical-align: top;
   }
-  ${partSelector(shimmer, "content")} {
+  ${textShimmerPartRefs.content} {
     color: inherit;
   }
-  ${partSelector(shimmer, "decoration")} {
+  ${textShimmerPartRefs.decoration} {
     display: none;
     position: absolute;
     inset: 0;
@@ -31,16 +32,16 @@ export const textShimmerStyles = css`
     mask-size: calc(200% + 224px) 100%;
     mask-repeat: no-repeat;
   }
-  ${partSelector(shimmer, "decoration")} * {
+  ${textShimmerPartRefs.decoration} * {
     color: inherit !important;
   }
-  ${partSelector(shimmer, "decoration")} [data-shimmer-decoration] {
+  ${textShimmerPartRefs.decoration} [data-shimmer-decoration] {
     background: currentColor;
   }
-  ${partSelector(shimmer, "root")}[data-active="true"] > ${partSelector(shimmer, "content")} {
+  ${textShimmerPartRefs.root}[data-active="true"] > ${textShimmerPartRefs.content} {
     color: color-mix(in srgb, currentColor 55%, transparent);
   }
-  ${partSelector(shimmer, "root")}[data-active="true"] > ${partSelector(shimmer, "decoration")} {
+  ${textShimmerPartRefs.root}[data-active="true"] > ${textShimmerPartRefs.decoration} {
     display: block;
     animation: ui-text-shimmer ${uiTokens.motion.sweep} linear infinite;
   }
@@ -53,11 +54,11 @@ export const textShimmerStyles = css`
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(shimmer, "root")}[data-active="true"] > ${partSelector(shimmer, "decoration")} {
+    ${textShimmerPartRefs.root}[data-active="true"] > ${textShimmerPartRefs.decoration} {
       display: none;
       animation: none;
     }
-    ${partSelector(shimmer, "root")}[data-active="true"] > ${partSelector(shimmer, "content")} {
+    ${textShimmerPartRefs.root}[data-active="true"] > ${textShimmerPartRefs.content} {
       color: inherit;
     }
   }

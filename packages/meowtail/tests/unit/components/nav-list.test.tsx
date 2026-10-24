@@ -2,8 +2,8 @@ import { expect, test } from "bun:test";
 import { Window } from "happy-dom";
 import { createRuntime, h, signal } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { installMeowUI } from "../../../src/registry";
-import { NavList, navListContract, type NavListItem } from "../../../src/components/nav-list";
+import { installMeowUI, meowUIComponents } from "../../../src/registry";
+import { NavList, type NavListItem } from "../../../src/components/nav-list";
 
 const dom = new Window() as unknown as Record<string, unknown>;
 for (const key of [
@@ -26,10 +26,7 @@ for (const key of [
 
 function renderer() {
   const runtime = createRuntime();
-  installMeowUI(runtime);
-  // The shared registry is Lead-owned; registering the contract keeps the
-  // style-prop plugin writing data parts while the component is integrated.
-  runtime.use({ name: "nav-list-test", components: [navListContract] });
+  installMeowUI({ components: meowUIComponents }, runtime);
   return createWebRenderer(runtime);
 }
 

@@ -1,9 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { webBlockContract as web } from "../../components/web-block";
 
+import type { WebBlock } from "../../components/web-block";
+const webBlockPartRefs = parts<typeof WebBlock>("web-block");
 export const webBlockStyles = css`
-  ${partSelector(web, "root")} {
+  ${webBlockPartRefs.root} {
     min-width: 0;
     padding: 12px 14px;
     border-radius: ${uiTokens.radius.xl};
@@ -11,12 +12,12 @@ export const webBlockStyles = css`
     color: ${uiTokens.ink.primary};
     font: ${uiTokens.type.body} / ${uiTokens.type.line.bodyCompact} ${uiTokens.type.sans};
   }
-  ${partSelector(web, "answer")} {
+  ${webBlockPartRefs.answer} {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
     margin-bottom: 8px;
   }
-  ${partSelector(web, "sources")} {
+  ${webBlockPartRefs.sources} {
     display: flex;
     flex-direction: column;
     gap: 10px;
@@ -25,23 +26,23 @@ export const webBlockStyles = css`
     max-height: 320px;
     overflow: auto;
   }
-  ${partSelector(web, "link")} {
+  ${webBlockPartRefs.link} {
     color: ${uiTokens.status.info};
     font-weight: ${uiTokens.type.weight.medium};
     text-decoration: none;
     overflow-wrap: anywhere;
   }
-  ${partSelector(web, "link")}:hover {
+  ${webBlockPartRefs.link}:hover {
     text-decoration: underline dotted;
     text-underline-offset: 3px;
   }
-  ${partSelector(web, "snippet")} {
+  ${webBlockPartRefs.snippet} {
     margin-top: 2px;
     color: ${uiTokens.ink.secondary};
     font: ${uiTokens.type.label} / ${uiTokens.type.line.label} ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
-  ${partSelector(web, "meta")} {
+  ${webBlockPartRefs.meta} {
     margin-top: 4px;
     color: ${uiTokens.ink.tertiary};
     font: ${uiTokens.type.caption} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};

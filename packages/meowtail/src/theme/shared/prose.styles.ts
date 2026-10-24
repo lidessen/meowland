@@ -1,20 +1,25 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { proseContract, proseOptions } from "../../components/prose";
-import { chatMessageContract } from "../../chat/message";
-import { chatBubbleContract } from "../../chat/bubble";
-import { assistantMarkdownContract } from "../../chat/assistant-markdown";
-
+import type { AssistantMarkdown } from "../../chat/assistant-markdown";
+import type { ChatBubble } from "../../chat/bubble";
+import type { ChatMessage } from "../../chat/message";
+import type { Prose } from "../../components/prose";
+import { proseOptions } from "../../components/prose.options";
+import { ui } from "../utilities";
+import { selectorForPart } from "../selectors";
+const assistantMarkdownPartRefs = parts<typeof AssistantMarkdown>("assistant-markdown");
+const chatBubblePartRefs = parts<typeof ChatBubble>("chat-bubble");
+const chatMessagePartRefs = parts<typeof ChatMessage>("chat-message");
+const prosePartRefs = parts<typeof Prose>("prose");
 /*
  * One reading rhythm for every place long-form text lands: Prose, chat message
  * content, chat bubbles and rendered assistant markdown. Each owner keeps its
  * own type size and line height; blocks, lists, code, quotes, rules, tables and
  * links read the same everywhere, and headings step down the type ramp.
  */
-const prose = partSelector(proseContract, "root");
-const markdown = partSelector(assistantMarkdownContract, "root");
-const scope = `:where(${prose}, ${partSelector(chatMessageContract, "content")}, ${partSelector(chatBubbleContract, "root")}, ${markdown})`;
+const prose = selectorForPart(prosePartRefs.root);
+const markdown = selectorForPart(assistantMarkdownPartRefs.root);
+const scope = `:where(${prose}, ${selectorForPart(chatMessagePartRefs.content)}, ${selectorForPart(chatBubblePartRefs.root)}, ${markdown})`;
 
 export const proseStyles = css`
   ${prose} {
@@ -38,7 +43,7 @@ export const proseStyles = css`
     margin: 0;
   }
   /* Chat bubbles are not grids, so their blocks space by margin. */
-  ${partSelector(chatBubbleContract, "root")} > * + * {
+  ${chatBubblePartRefs.root} > * + * {
     margin-top: ${uiTokens.space.prose};
   }
   /* Headings step down the type ramp. Inside a conversation they stay compact: h2 is a title,
@@ -106,7 +111,7 @@ export const proseStyles = css`
     overflow-wrap: normal;
   }
   ${scope} > :where(pre:focus-visible) {
-    ${focusRing()}
+    ${ui.focus.ring}
   }
   ${scope} > :where(blockquote) {
     padding-inline-start: ${uiTokens.space.section};

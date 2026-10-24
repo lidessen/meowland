@@ -1,17 +1,18 @@
-import { defineComponent, type ComponentContract, type Props } from "meowjsx";
-
-export const cardDescriptionContract = {
-  name: "card-description",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+import { h, type Props, type Context } from "meowjsx";
 
 export interface CardDescriptionProps extends Props {
-  className?: string;
+  className?: Props["className"];
 }
 
 /** The supporting line under a card title. */
-export const CardDescription = defineComponent<CardDescriptionProps, "card-description", "root">(
-  cardDescriptionContract,
-  ({ children, className, ...props }, context) =>
-    context.part("root", "p", { ...props, className }, children),
-);
+export function CardDescription(
+  { children, className, ref, ...props }: CardDescriptionProps,
+  context: Context<typeof CardDescription>,
+) {
+  return (
+    <p {...props} className={className} ref={[context.parts.root, ref]}>
+      {children}
+    </p>
+  );
+}
+CardDescription.meta = { name: "card-description", parts: ["root"] } as const;

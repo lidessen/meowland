@@ -1,36 +1,37 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { fieldContract } from "../../components/field";
 
+import type { Field } from "../../components/field";
+const fieldPartRefs = parts<typeof Field>("field");
 export const fieldStyles = css`
-  :where(${partSelector(fieldContract, "root")}) {
+  :where(${fieldPartRefs.root}) {
     box-sizing: border-box;
     color: ${uiTokens.ink.primary};
     font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
-  ${partSelector(fieldContract, "root")} {
+  ${fieldPartRefs.root} {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     min-width: 0;
     gap: ${uiTokens.space.group};
   }
-  ${partSelector(fieldContract, "label")} {
+  ${fieldPartRefs.label} {
     font-weight: ${uiTokens.type.weight.medium};
     overflow-wrap: anywhere;
   }
-  :where(${partSelector(fieldContract, "description")}, ${partSelector(fieldContract, "error")}) {
+  :where(${fieldPartRefs.description}, ${fieldPartRefs.error}) {
     margin: 0;
     font-size: ${uiTokens.type.caption};
     line-height: ${uiTokens.type.line.caption};
     overflow-wrap: anywhere;
   }
-  ${partSelector(fieldContract, "description")} {
+  ${fieldPartRefs.description} {
     color: ${uiTokens.ink.secondary};
   }
-  ${partSelector(fieldContract, "error")} {
+  ${fieldPartRefs.error} {
     color: ${uiTokens.status.danger};
   }
-  ${partSelector(fieldContract, "control")} {
+  ${fieldPartRefs.control} {
     min-width: 0;
   }
 `;

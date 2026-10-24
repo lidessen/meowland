@@ -1,10 +1,11 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { timelineContract, timelineItemContract } from "../../components/timeline";
 
-const timeline = partSelector(timelineContract, "root");
-const entry = (part: (typeof timelineItemContract.parts)[number]) =>
-  partSelector(timelineItemContract, part);
+import type { Timeline, TimelineItem } from "../../components/timeline";
+const timelinePartRefs = parts<typeof Timeline>("timeline");
+const timelineItemPartRefs = parts<typeof TimelineItem>("timeline-item");
+const timeline = timelinePartRefs.root;
+const entry = (part: keyof typeof timelineItemPartRefs) => timelineItemPartRefs[part];
 
 export const timelineStyles = css`
   ${timeline} {

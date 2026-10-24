@@ -1,5 +1,6 @@
 import { isSignal, unwrap, type RendererCleanup, type RenderStrategy } from "../src/index";
 import { ATTRIBUTE_NAMES, HTML_NAMESPACE, SVG_NAMESPACE, isRecord } from "./html-facts";
+import { classText } from "../src/style";
 
 /** DOM nodes are text, comment, and element nodes; the strategy owns all three. */
 export type DomNode = Node;
@@ -51,7 +52,7 @@ export function setDOMProperty(element: Element, name: string, value: unknown): 
   }
 
   if (name === "class" || name === "className") {
-    element.setAttribute("class", resolved == null || resolved === false ? "" : String(resolved));
+    element.setAttribute("class", classText(resolved));
     return () => {};
   }
 

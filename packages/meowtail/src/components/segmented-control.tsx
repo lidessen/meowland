@@ -1,11 +1,4 @@
-import {
-  defineComponent,
-  derived,
-  unwrap,
-  type ComponentContract,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { derived, unwrap, type MaybeSignal, type Props, type Context, h } from "meowjsx";
 export interface SegmentedControlOption {
   value: string;
   label: string;
@@ -21,35 +14,39 @@ export interface SegmentedControlProps extends Props {
   options: readonly SegmentedControlOption[];
   onValueChange: (value: string) => void;
   disabled?: MaybeSignal<boolean>;
-  className?: string;
+  className?: Props["className"];
 }
-export const segmentedControlContract = {
-  name: "segmented-control",
-  parts: ["root", "legend", "options", "option", "input", "label"],
-} as const satisfies ComponentContract;
+
 /** A single choice, using native radio keyboard semantics; tabs remain a separate component. */
-export const SegmentedControl = defineComponent<
-  SegmentedControlProps,
-  "segmented-control",
-  (typeof segmentedControlContract.parts)[number]
->(
-  segmentedControlContract,
-  ({ id, name = id, form, label, value, options, onValueChange, disabled, className }, context) => {
-    const inputs = new Map<string, HTMLInputElement>();
-    // Form reset and a rejected change flip the native radio before the signal does.
-    const reconcile = () => {
-      const selected = unwrap(value);
-      for (const [key, input] of inputs) input.checked = selected === key;
-    };
-    return context.part(
-      "root",
-      "fieldset",
-      {
-        id,
-        form,
-        className,
-        disabled,
-        ref: (root: HTMLFieldSetElement) => {
+export function SegmentedControl(
+  {
+    id,
+    name = id,
+    form,
+    label,
+    value,
+    options,
+    onValueChange,
+    disabled,
+    className,
+  }: SegmentedControlProps,
+  context: Context<typeof SegmentedControl>,
+) {
+  const inputs = new Map<string, HTMLInputElement>();
+  // Form reset and a rejected change flip the native radio before the signal does.
+  const reconcile = () => {
+    const selected = unwrap(value);
+    for (const [key, input] of inputs) input.checked = selected === key;
+  };
+  return (
+    <fieldset
+      id={id}
+      form={form}
+      className={className}
+      disabled={disabled}
+      ref={[
+        context.parts.root,
+        (root: HTMLFieldSetElement) => {
           let disposed = false;
           let timer: ReturnType<typeof setTimeout> | undefined;
           const reset = (event: Event) => {
@@ -67,46 +64,52 @@ export const SegmentedControl = defineComponent<
             root.ownerDocument.removeEventListener("reset", reset, true);
           };
         },
-      },
-      context.part("legend", "legend", null, label),
-      context.part(
-        "options",
-        "div",
-        null,
-        ...options.map((option) =>
-          context.part(
-            "option",
-            "label",
-            { title: option.title },
-            context.part("input", "input", {
-              type: "radio",
-              name,
-              form,
-              value: option.value,
-              checked: derived(() => unwrap(value) === option.value),
-              disabled: option.disabled,
-              ref: (input: HTMLInputElement) => {
-                inputs.set(option.value, input);
-                reconcile();
-                return () => {
-                  inputs.delete(option.value);
-                };
-              },
-              onChange: (event: Event) => {
-                if (
-                  !unwrap(disabled) &&
-                  !option.disabled &&
-                  (event.currentTarget as HTMLInputElement).checked &&
-                  unwrap(value) !== option.value
-                )
-                  onValueChange(option.value);
-                reconcile();
-              },
-            }),
-            context.part("label", "span", null, option.label),
-          ),
-        ),
-      ),
-    );
-  },
-);
+      ]}
+    >
+      {<legend ref={[context.parts.legend]}>{label}</legend>}
+      {
+        <div ref={[context.parts.options]}>
+          {options.map((option) => (
+            <label title={option.title} ref={[context.parts.option]}>
+              {
+                <input
+                  type={"radio"}
+                  name={name}
+                  form={form}
+                  value={option.value}
+                  checked={derived(() => unwrap(value) === option.value)}
+                  disabled={option.disabled}
+                  onChange={(event: Event) => {
+                    if (
+                      !unwrap(disabled) &&
+                      !option.disabled &&
+                      (event.currentTarget as HTMLInputElement).checked &&
+                      unwrap(value) !== option.value
+                    )
+                      onValueChange(option.value);
+                    reconcile();
+                  }}
+                  ref={[
+                    context.parts.input,
+                    (input: HTMLInputElement) => {
+                      inputs.set(option.value, input);
+                      reconcile();
+                      return () => {
+                        inputs.delete(option.value);
+                      };
+                    },
+                  ]}
+                />
+              }
+              {<span ref={[context.parts.label]}>{option.label}</span>}
+            </label>
+          ))}
+        </div>
+      }
+    </fieldset>
+  );
+}
+SegmentedControl.meta = {
+  name: "segmented-control",
+  parts: ["root", "legend", "options", "option", "input", "label"],
+} as const;

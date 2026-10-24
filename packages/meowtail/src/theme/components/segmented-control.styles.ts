@@ -1,10 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { segmentedControlContract as segmented } from "../../components/segmented-control";
-
+import type { SegmentedControl } from "../../components/segmented-control";
+import { ui } from "../utilities";
+const segmentedControlPartRefs = parts<typeof SegmentedControl>("segmented-control");
 export const segmentedControlStyles = css`
-  ${partSelector(segmented, "root")} {
+  ${segmentedControlPartRefs.root} {
     /* A fieldset fills its block; the track hugs its choices like any other control. */
     width: fit-content;
     max-width: 100%;
@@ -13,14 +13,14 @@ export const segmentedControlStyles = css`
     padding: 0;
     border: 0;
   }
-  ${partSelector(segmented, "legend")} {
+  ${segmentedControlPartRefs.legend} {
     position: absolute;
     width: 1px;
     height: 1px;
     overflow: hidden;
     clip-path: inset(50%);
   }
-  ${partSelector(segmented, "options")} {
+  ${segmentedControlPartRefs.options} {
     display: flex;
     gap: 2px;
     /* Same track as Tabs: one control height, concentric radii. */
@@ -28,7 +28,7 @@ export const segmentedControlStyles = css`
     border-radius: calc(${uiTokens.radius.md} + ${uiTokens.control.trackInset});
     background: ${uiTokens.surface.fill};
   }
-  ${partSelector(segmented, "option")} {
+  ${segmentedControlPartRefs.option} {
     position: relative;
     /* Grow from each label's own width so a long label keeps its padding;
        min-width 0 still lets a narrow container wrap the text. */
@@ -36,7 +36,7 @@ export const segmentedControlStyles = css`
     min-width: 0;
     cursor: pointer;
   }
-  ${partSelector(segmented, "input")} {
+  ${segmentedControlPartRefs.input} {
     position: absolute;
     opacity: 0;
     width: 100%;
@@ -44,7 +44,7 @@ export const segmentedControlStyles = css`
     margin: 0;
     cursor: inherit;
   }
-  ${partSelector(segmented, "label")} {
+  ${segmentedControlPartRefs.label} {
     display: block;
     box-sizing: border-box;
     min-height: calc(${uiTokens.control.regular} - 2 * ${uiTokens.control.trackInset});
@@ -55,15 +55,15 @@ export const segmentedControlStyles = css`
       ${uiTokens.type.sans};
     color: ${uiTokens.ink.secondary};
   }
-  ${partSelector(segmented, "input")}:checked + ${partSelector(segmented, "label")} {
+  ${segmentedControlPartRefs.input}:checked + ${segmentedControlPartRefs.label} {
     background: ${uiTokens.control.thumb};
     color: ${uiTokens.ink.primary};
     box-shadow: ${uiTokens.shadow.thumb};
   }
-  ${partSelector(segmented, "input")}:focus-visible + ${partSelector(segmented, "label")} {
-    ${focusRing({ inset: true })}
+  ${segmentedControlPartRefs.input}:focus-visible + ${segmentedControlPartRefs.label} {
+    ${ui.focus.inset}
   }
-  ${partSelector(segmented, "input")}:disabled + ${partSelector(segmented, "label")} {
+  ${segmentedControlPartRefs.input}:disabled + ${segmentedControlPartRefs.label} {
     opacity: 0.4;
     cursor: not-allowed;
   }

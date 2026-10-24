@@ -1,7 +1,6 @@
 import { css } from "meowcss/meowjsx";
 import { logoTokens, uiTokens } from "./tokens";
-import { focusRing } from "./recipes";
-
+import { ui } from "./utilities";
 export const cornerShapeStyles = css`
   @supports (corner-shape: superellipse(1.5)) {
     :where([data-meowui-part]),
@@ -41,7 +40,7 @@ export const foundationStyles = css`
     letter-spacing: inherit;
   }
   :where([data-meowui-theme-root="meowui"] :focus-visible) {
-    ${focusRing()}
+    ${ui.focus.ring}
   }
   /* One quiet scrollbar for every scroll region: a thin control-line thumb on no track. */
   :where([data-meowui-theme-root="meowui"], [data-meowui-theme-root="meowui"] *) {

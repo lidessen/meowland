@@ -1,10 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { breadcrumbContract } from "../../components/breadcrumb";
-
+import type { Breadcrumb } from "../../components/breadcrumb";
+import { ui } from "../utilities";
+const breadcrumbPartRefs = parts<typeof Breadcrumb>("breadcrumb");
 export const breadcrumbStyles = css`
-  ${partSelector(breadcrumbContract, "list")} {
+  ${breadcrumbPartRefs.list} {
     display: flex;
     flex-wrap: wrap;
     align-items: baseline;
@@ -15,30 +15,30 @@ export const breadcrumbStyles = css`
     font-family: ${uiTokens.type.sans};
     font-size: ${uiTokens.type.caption};
   }
-  ${partSelector(breadcrumbContract, "item")} {
+  ${breadcrumbPartRefs.item} {
     display: inline-flex;
     align-items: baseline;
     gap: ${uiTokens.space.group};
     min-width: 0;
     overflow-wrap: anywhere;
   }
-  ${partSelector(breadcrumbContract, "link")} {
+  ${breadcrumbPartRefs.link} {
     color: ${uiTokens.ink.secondary};
     text-decoration: none;
     padding-block: ${uiTokens.space.group};
   }
-  ${partSelector(breadcrumbContract, "link")}:hover {
+  ${breadcrumbPartRefs.link}:hover {
     text-decoration: underline;
     color: ${uiTokens.ink.primary};
   }
-  ${partSelector(breadcrumbContract, "link")}:focus-visible {
-    ${focusRing()}
+  ${breadcrumbPartRefs.link}:focus-visible {
+    ${ui.focus.ring}
   }
-  ${partSelector(breadcrumbContract, "current")} {
+  ${breadcrumbPartRefs.current} {
     color: ${uiTokens.ink.primary};
     font-weight: ${uiTokens.type.weight.medium};
   }
-  ${partSelector(breadcrumbContract, "separator")} {
+  ${breadcrumbPartRefs.separator} {
     color: ${uiTokens.ink.secondary};
     opacity: 0.6;
   }

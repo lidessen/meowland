@@ -1,18 +1,19 @@
-import { defineComponent, type ComponentContract, type Props } from "meowjsx";
+import { h, type Props, type Context } from "meowjsx";
 import { actionRowRef } from "../shared/action-row-fit";
 
-export const cardFooterContract = {
-  name: "card-footer",
-  parts: ["root"],
-} as const satisfies ComponentContract;
-
 export interface CardFooterProps extends Props {
-  className?: string;
+  className?: Props["className"];
 }
 
 /** The row of actions at the end of a card; it stacks whole when it does not fit, like ActionRow. */
-export const CardFooter = defineComponent<CardFooterProps, "card-footer", "root">(
-  cardFooterContract,
-  ({ children, className, ...props }, context) =>
-    context.part("root", "div", { ...props, className, ref: actionRowRef(props.ref) }, children),
-);
+export function CardFooter(
+  { children, className, ref, ...props }: CardFooterProps,
+  context: Context<typeof CardFooter>,
+) {
+  return (
+    <div {...props} className={className} ref={[context.parts.root, ref, actionRowRef()]}>
+      {children}
+    </div>
+  );
+}
+CardFooter.meta = { name: "card-footer", parts: ["root"] } as const;

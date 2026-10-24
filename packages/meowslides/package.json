@@ -1,6 +1,6 @@
 {
   "name": "meowslides",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "license": "MIT",
   "type": "module",
   "description": "MeowJSX presentation runtime and trusted local MDX authoring",
@@ -52,9 +52,9 @@
     "@types/node": "26.6.5"
   },
   "peerDependencies": {
-    "meowjsx": "^0.1.0 || ^0.1.1-alpha.0",
-    "meowcss": "^0.1.0 || ^0.1.1-alpha.0",
-    "meowtail": "^0.2.0-alpha.0"
+    "meowjsx": "^0.2.0-alpha.0",
+    "meowcss": "^0.2.0-alpha.0",
+    "meowtail": "^0.3.0-alpha.0"
   },
   "devDependencies": {
     "meowjsx": "workspace:*",

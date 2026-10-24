@@ -1,9 +1,12 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { pageFrameContract, pageFrameOptions } from "../../components/page-frame";
+import { css, parts } from "meowcss/meowjsx";
+
 import { uiTokens } from "../tokens";
 
+import type { PageFrame } from "../../components/page-frame";
+import { pageFrameOptions } from "../../components/page-frame.options";
+const pageFramePartRefs = parts<typeof PageFrame>("page-frame");
 export const pageFrameStyles = css`
-  ${partSelector(pageFrameContract, "root")} {
+  ${pageFramePartRefs.root} {
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
@@ -17,33 +20,33 @@ export const pageFrameStyles = css`
     padding: ${uiTokens.space.pageBlock} ${uiTokens.space.pageInline};
     overflow: hidden;
   }
-  :where(${partSelector(pageFrameContract, "toolbar")}, ${partSelector(pageFrameContract, "header")}, ${partSelector(pageFrameContract, "notice")}, ${partSelector(pageFrameContract, "footer")}) {
+  :where(${pageFramePartRefs.toolbar}, ${pageFramePartRefs.header}, ${pageFramePartRefs.notice}, ${pageFramePartRefs.footer}) {
     min-width: 0;
     flex: 0 0 auto;
     max-height: none;
     overflow: visible;
   }
-  ${partSelector(pageFrameContract, "body")} {
+  ${pageFramePartRefs.body} {
     display: flex;
     flex: 1;
     min-width: 0;
     min-height: 0;
     overflow: hidden;
   }
-  ${partSelector(pageFrameContract, "root")}[${pageFrameOptions.attribute("variant")}="workspace"] > ${partSelector(pageFrameContract, "notice")} {
+  ${pageFramePartRefs.root}[${pageFrameOptions.attribute("variant")}="workspace"] > ${pageFramePartRefs.notice} {
     padding: 8px 12px 0;
   }
-  ${partSelector(pageFrameContract, "root")}[${pageFrameOptions.attribute("variant")}="workspace"] > ${partSelector(pageFrameContract, "footer")} {
+  ${pageFramePartRefs.root}[${pageFrameOptions.attribute("variant")}="workspace"] > ${pageFramePartRefs.footer} {
     padding: 8px 12px max(8px, env(safe-area-inset-bottom));
   }
-  ${partSelector(pageFrameContract, "root")}[${pageFrameOptions.attribute("scrollOwner")}="content"] >
-  ${partSelector(pageFrameContract, "body")} > * {
+  ${pageFramePartRefs.root}[${pageFrameOptions.attribute("scrollOwner")}="content"] >
+  ${pageFramePartRefs.body} > * {
     flex: 1;
     min-width: 0;
     min-height: 0;
   }
-  ${partSelector(pageFrameContract, "root")}[${pageFrameOptions.attribute("scrollOwner")}="layout"] >
-  ${partSelector(pageFrameContract, "body")} {
+  ${pageFramePartRefs.root}[${pageFrameOptions.attribute("scrollOwner")}="layout"] >
+  ${pageFramePartRefs.body} {
     display: block;
     overflow: auto;
     overscroll-behavior: contain;
@@ -52,16 +55,16 @@ export const pageFrameStyles = css`
      width from one side only, so the page reserves both gutters to keep that
      center line. Workspace frames (Dialog, Drawer) start content at the
      header's edge, where a leading gutter would push the body off it. */
-  ${partSelector(pageFrameContract, "root")}[${pageFrameOptions.attribute("variant")}="page"][${pageFrameOptions.attribute("scrollOwner")}="layout"] >
-  ${partSelector(pageFrameContract, "body")} {
+  ${pageFramePartRefs.root}[${pageFrameOptions.attribute("variant")}="page"][${pageFrameOptions.attribute("scrollOwner")}="layout"] >
+  ${pageFramePartRefs.body} {
     scrollbar-gutter: stable both-edges;
   }
   @media (max-width: 768px) {
-    ${partSelector(pageFrameContract, "root")} {
+    ${pageFramePartRefs.root} {
       padding: ${uiTokens.space.pageBlockCompact} ${uiTokens.space.pageInlineCompact};
     }
   }
-  ${partSelector(pageFrameContract, "root")} {
+  ${pageFramePartRefs.root} {
     ${pageFrameOptions.when({ variant: "workspace" })} {
       max-width: none;
       padding: 0;

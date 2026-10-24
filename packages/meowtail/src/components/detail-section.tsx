@@ -1,39 +1,33 @@
-import { defineComponent, type Child, type ComponentContract, type Props } from "meowjsx";
-
-export const detailSectionContract = {
-  name: "detail-section",
-  parts: ["root", "header", "title", "aside", "body"],
-} as const satisfies ComponentContract;
+import { type Child, type Props, type Context, h } from "meowjsx";
 
 export interface DetailSectionProps extends Props {
   title: Child;
   /** A quiet fact on the heading line, such as a count or a caveat. */
   aside?: Child;
-  className?: string;
+  className?: Props["className"];
 }
 
 /**
  * One titled block inside a detail surface (a side panel or a full-screen reader). Blocks are
  * separated by a hairline; the heading is a small label, not a page title.
  */
-export const DetailSection = defineComponent<
-  DetailSectionProps,
-  typeof detailSectionContract.name,
-  (typeof detailSectionContract.parts)[number]
->(detailSectionContract, ({ title, aside, className, children, ...props }, context) =>
-  context.part(
-    "root",
-    "section",
-    { ...props, className },
-    context.part(
-      "header",
-      "div",
-      null,
-      context.part("title", "h3", null, title),
-      aside !== undefined && aside !== null && aside !== false
-        ? context.part("aside", "span", null, aside)
-        : null,
-    ),
-    context.part("body", "div", null, children),
-  ),
-);
+export function DetailSection(
+  { title, aside, className, children, ...props }: DetailSectionProps,
+  context: Context<typeof DetailSection>,
+) {
+  return (
+    <section {...props} className={className} ref={[context.parts.root, props.ref]}>
+      <div ref={[context.parts.header]}>
+        <h3 ref={[context.parts.title]}>{title}</h3>
+        {aside !== undefined && aside !== null && aside !== false ? (
+          <span ref={[context.parts.aside]}>{aside}</span>
+        ) : null}
+      </div>
+      <div ref={[context.parts.body]}>{children}</div>
+    </section>
+  );
+}
+DetailSection.meta = {
+  name: "detail-section",
+  parts: ["root", "header", "title", "aside", "body"],
+} as const;

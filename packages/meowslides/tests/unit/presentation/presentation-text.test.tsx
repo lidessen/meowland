@@ -2,11 +2,13 @@ import { expect, test } from "bun:test";
 import { createRuntime, h, signal } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { PresentationText } from "../../../src/presentation/presentation-text";
-import { createMeowUI } from "meowtail";
+import { createMeowUI, meowUIComponents } from "meowtail";
 import { createMeowSlides } from "../../../src/registry";
 
 test("presentation text preserves one semantic, native text source", () => {
-  const runtime = createRuntime({ plugins: [createMeowUI(), createMeowSlides()] });
+  const runtime = createRuntime({
+    plugins: [createMeowUI({ components: meowUIComponents }), createMeowSlides()],
+  });
   // Mixed-script payload is intentional: verifies text splitting across scripts.
   const text = signal("A clear idea / 清楚的想法");
   const html = createWebRenderer(runtime).renderToHtml(
@@ -31,7 +33,9 @@ test("presentation text preserves one semantic, native text source", () => {
 
 test("presentation text defaults to an inline source without owning its text or scale", () => {
   const html = createWebRenderer(
-    createRuntime({ plugins: [createMeowUI(), createMeowSlides()] }),
+    createRuntime({
+      plugins: [createMeowUI({ components: meowUIComponents }), createMeowSlides()],
+    }),
   ).renderToHtml(
     // Mixed-script payload is intentional: verifies text splitting across scripts.
     <PresentationText lang="zh-CN">

@@ -1,8 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { avatarContract, avatarOptions } from "../../components/avatar";
 
-const root = partSelector(avatarContract, "root");
+import type { Avatar } from "../../components/avatar";
+import { avatarOptions } from "../../components/avatar.options";
+const avatarPartRefs = parts<typeof Avatar>("avatar");
+const root = avatarPartRefs.root;
 
 export const avatarStyles = css`
   ${root} {
@@ -37,19 +39,19 @@ export const avatarStyles = css`
       font-size: ${uiTokens.type.body};
     }
   }
-  ${partSelector(avatarContract, "initials")} {
+  ${avatarPartRefs.initials} {
     display: grid;
     place-items: center;
     letter-spacing: ${uiTokens.type.trackingCaps};
   }
-  ${partSelector(avatarContract, "image")} {
+  ${avatarPartRefs.image} {
     position: absolute;
     inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;
   }
-  ${partSelector(avatarContract, "image")}[hidden] {
+  ${avatarPartRefs.image}[hidden] {
     display: none;
   }
 `;

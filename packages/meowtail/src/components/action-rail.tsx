@@ -1,9 +1,4 @@
-import { defineComponent, type Child, type ComponentContract, type Props } from "meowjsx";
-
-export const actionRailContract = {
-  name: "action-rail",
-  parts: ["root", "leading", "trailing", "submit"],
-} as const satisfies ComponentContract;
+import { h, type Child, type Props, type Context } from "meowjsx";
 
 export interface ActionRailProps extends Props {
   /** Actions anchored to the start of the row. */
@@ -12,25 +7,27 @@ export interface ActionRailProps extends Props {
   trailing?: Child;
   /** The final action; flexible leading and trailing actions wrap to keep it visible. */
   submit?: Child;
-  className?: string;
+  className?: Props["className"];
 }
 
 /**
  * An action row with wrapping groups. The rail owns order, start/end anchoring, the gap between
  * groups and the rule that the submit action stays visible; callers pass actions.
  */
-export const ActionRail = defineComponent<
-  ActionRailProps,
-  typeof actionRailContract.name,
-  (typeof actionRailContract.parts)[number]
->(actionRailContract, ({ leading, trailing, submit, children, className, ...props }, context) => {
+export function ActionRail(
+  { leading, trailing, submit, children, className, ref, ...props }: ActionRailProps,
+  context: Context<typeof ActionRail>,
+) {
   void children;
-  return context.part(
-    "root",
-    "div",
-    { ...props, className },
-    context.part("leading", "div", null, leading),
-    context.part("trailing", "div", null, trailing),
-    context.part("submit", "div", null, submit),
+  return (
+    <div {...props} className={className} ref={[context.parts.root, ref]}>
+      <div ref={context.parts.leading}>{leading}</div>
+      <div ref={context.parts.trailing}>{trailing}</div>
+      <div ref={context.parts.submit}>{submit}</div>
+    </div>
   );
-});
+}
+ActionRail.meta = {
+  name: "action-rail",
+  parts: ["root", "leading", "trailing", "submit"],
+} as const;

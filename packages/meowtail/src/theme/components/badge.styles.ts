@@ -1,9 +1,11 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { badgeContract, badgeOptions } from "../../components/badge";
 
+import type { Badge } from "../../components/badge";
+import { badgeOptions } from "../../components/badge.options";
+const badgePartRefs = parts<typeof Badge>("badge");
 export const badgeStyles = css`
-  ${partSelector(badgeContract, "root")} {
+  ${badgePartRefs.root} {
     display: inline-flex;
     align-items: center;
     box-sizing: border-box;
@@ -16,31 +18,31 @@ export const badgeStyles = css`
     font: ${uiTokens.type.weight.regular} ${uiTokens.type.caption} / ${uiTokens.type.line.caption}
       ${uiTokens.type.sans};
   }
-  ${partSelector(badgeContract, "root")} {
+  ${badgePartRefs.root} {
     ${badgeOptions.when({ tone: "accent" })} {
       color: ${uiTokens.action.primary};
       background: ${uiTokens.action.soft};
     }
   }
-  ${partSelector(badgeContract, "root")} {
+  ${badgePartRefs.root} {
     ${badgeOptions.when({ tone: "danger" })} {
       color: ${uiTokens.status.danger};
       background: color-mix(in srgb, ${uiTokens.status.danger} 10%, transparent);
     }
   }
-  ${partSelector(badgeContract, "root")} {
+  ${badgePartRefs.root} {
     ${badgeOptions.when({ tone: "success" })} {
       color: ${uiTokens.status.success};
       background: color-mix(in srgb, ${uiTokens.status.success} 10%, transparent);
     }
   }
-  ${partSelector(badgeContract, "root")} {
+  ${badgePartRefs.root} {
     ${badgeOptions.when({ tone: "warning" })} {
       color: ${uiTokens.status.warning};
       background: color-mix(in srgb, ${uiTokens.status.warning} 12%, transparent);
     }
   }
-  ${partSelector(badgeContract, "root")} {
+  ${badgePartRefs.root} {
     ${badgeOptions.when({ size: "small" })} {
       padding: 1px 8px;
       min-height: 20px;
@@ -49,7 +51,7 @@ export const badgeStyles = css`
       font-weight: ${uiTokens.type.weight.medium};
     }
   }
-  ${partSelector(badgeContract, "root")} {
+  ${badgePartRefs.root} {
     ${badgeOptions.when({ tone: "outline" })} {
       border: 1px solid ${uiTokens.line.control};
       background: transparent;

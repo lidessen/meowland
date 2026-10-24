@@ -1,18 +1,5 @@
-import {
-  defineComponent,
-  h,
-  unwrap,
-  type Child,
-  type ComponentContract,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { h, unwrap, type Child, type MaybeSignal, type Props, type Context } from "meowjsx";
 import { PageFrame } from "./page-frame";
-
-export const drawerContract = {
-  name: "drawer",
-  parts: ["root", "panel"],
-} as const satisfies ComponentContract;
 
 export interface DrawerProps extends Props {
   /** Accessible name of the drawer. */
@@ -21,39 +8,37 @@ export interface DrawerProps extends Props {
   /** Called when the reader dismisses the drawer (scrim, Escape); the owner updates `open`. */
   onOpenChange: (open: boolean) => void;
   header?: Child;
-  className?: string;
+  className?: Props["className"];
 }
 
 /**
  * A modal panel that slides in from the start edge over a scrim, for navigation on narrow
  * screens. The native dialog supplies focus containment and Escape; the scrim dismisses.
  */
-export const Drawer = defineComponent<
-  DrawerProps,
-  typeof drawerContract.name,
-  (typeof drawerContract.parts)[number]
->(
-  drawerContract,
-  ({ label, open, onOpenChange, header, className, children, ...props }, context) => {
-    let dialog: HTMLDialogElement | undefined;
-    const sync = () => {
-      // Read first: the effect must subscribe to `open` even before the dialog is mounted.
-      const next = unwrap(open);
-      if (!dialog?.isConnected) return;
-      if (next && !dialog.open) dialog.showModal();
-      else if (!next && dialog.open) dialog.close();
-    };
-    context.effect(sync);
-    return context.part(
-      "root",
-      "dialog",
-      {
-        ...props,
-        className,
-        "aria-label": label,
-        ref: (element: HTMLDialogElement) => {
+export function Drawer(
+  { label, open, onOpenChange, header, className, children, ref, ...props }: DrawerProps,
+  context: Context<typeof Drawer>,
+) {
+  let dialog: HTMLDialogElement | undefined;
+  const sync = () => {
+    // Read first: the effect must subscribe to `open` even before the dialog is mounted.
+    const next = unwrap(open);
+    if (!dialog?.isConnected) return;
+    if (next && !dialog.open) dialog.showModal();
+    else if (!next && dialog.open) dialog.close();
+  };
+  context.effect(sync);
+  return (
+    <dialog
+      {...props}
+      className={className}
+      aria-label={label}
+      ref={[
+        context.parts.root,
+        ref,
+        (element: HTMLDialogElement) => {
           dialog = element;
-          sync();
+          queueMicrotask(sync);
           const dismiss = (event: Event) => {
             event.preventDefault();
             onOpenChange(false);
@@ -75,13 +60,14 @@ export const Drawer = defineComponent<
             dialog = undefined;
           };
         },
-      },
-      context.part(
-        "panel",
-        "div",
-        null,
-        h(PageFrame, { variant: "workspace", scrollOwner: "layout", header }, children),
-      ),
-    );
-  },
-);
+      ]}
+    >
+      <div ref={context.parts.panel}>
+        <PageFrame variant="workspace" scrollOwner="layout" header={header}>
+          {children}
+        </PageFrame>
+      </div>
+    </dialog>
+  );
+}
+Drawer.meta = { name: "drawer", parts: ["root", "panel"] } as const;

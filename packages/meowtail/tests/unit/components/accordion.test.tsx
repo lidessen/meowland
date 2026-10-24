@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h, signal } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Accordion, installMeowUI } from "../../../src/index";
+import { Accordion, installMeowUI, meowUIComponents } from "../../../src/index";
 
 const items = [
   { id: "general", summary: "General", content: <p>Language</p> },
@@ -10,7 +10,7 @@ const items = [
 
 test("accordion composes disclosures and keeps a group name", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const html = createWebRenderer(runtime).renderToHtml(
     <Accordion id="settings" label="Settings" defaultValue="general" items={items} />,
   );

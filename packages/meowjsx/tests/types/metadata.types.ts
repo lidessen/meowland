@@ -1,4 +1,4 @@
-import { defineComponent, type Component, type ComponentMetadata } from "meowjsx";
+import type { Component, ComponentMetadata, Context } from "meowjsx";
 
 declare module "meowjsx" {
   interface ComponentMetadata {
@@ -6,17 +6,12 @@ declare module "meowjsx" {
   }
 }
 
-declare const Typed: Component<{ label: string }>;
+const Typed = (({ label }: { label: string }) => label) as Component<{ label: string }>;
 Typed.metadata = { inspection: { transparent: true } };
 // @ts-expect-error Metadata extension values must match their declared types.
 Typed.metadata = { inspection: { transparent: "true" } };
 // @ts-expect-error Misspelled metadata namespaces are rejected.
 Typed.metadata = { inspectoin: { transparent: true } };
-
-const Defined = defineComponent({ name: "Metadata", parts: [] } as const, () => null);
-Defined.metadata = { inspection: { transparent: false } };
-// @ts-expect-error defineComponent preserves the metadata extension contract.
-Defined.metadata = { inspection: { transparent: 1 } };
 
 function Plain() {
   return "plain";
@@ -25,3 +20,11 @@ Plain.metadata = { inspection: { transparent: true } } satisfies ComponentMetada
 // @ts-expect-error satisfies checks metadata on untyped ordinary functions.
 const Invalid = { inspection: { transparent: "false" } } satisfies ComponentMetadata;
 void Invalid;
+
+function Card(_props: { title: string }, context: Context<typeof Card, { title: string }>): string {
+  const root = context.parts.root;
+  // @ts-expect-error Component parts are finite.
+  const invalid = context.parts.missing;
+  return root.component + invalid.part;
+}
+Card.meta = { name: "metadata-card", parts: ["root"] } as const;

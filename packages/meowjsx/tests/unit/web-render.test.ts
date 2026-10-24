@@ -1,15 +1,19 @@
 import { expect, test } from "bun:test";
 import {
   createRuntime,
-  defineComponent,
+  createThemePlugin,
+  createPartDescriptor,
   h,
   raw,
   signal,
+  type ClassValue,
   type Component,
   type RuntimePlugin,
   type WritableSignal,
+  type Context,
 } from "../../src/index";
 import { createWebRenderer, defineShadow, renderToHtml } from "../../web/index";
+import { createJSXRuntime } from "../../src/jsx-runtime";
 
 test("replacement covers prebuilt, repeated, Signal and Promise children with its own lifecycle", async () => {
   await withTestDOM(async () => {
@@ -22,20 +26,22 @@ test("replacement covers prebuilt, repeated, Signal and Promise children with it
       originals++;
       return "original";
     };
-    const Replacement = defineComponent(
-      { name: "replacement", parts: ["root"] } as const,
-      (_props, context) => {
-        mounts++;
-        context.onCleanup(() => {
-          cleanups++;
-        });
-        return context.part("root", "aside", null, "placeholder");
-      },
-    );
+    type ReplacementProps = Record<string, never>;
+    function Replacement(
+      _props: ReplacementProps,
+      context: Context<typeof Replacement, ReplacementProps>,
+    ) {
+      mounts++;
+      context.onCleanup(() => {
+        cleanups++;
+      });
+      return h("aside", { ref: context.parts.root }, "placeholder");
+    }
+    Replacement.meta = { name: "replacement", parts: ["root"] } as const;
     const prebuilt = h(Original, {});
     const changing = signal(prebuilt);
     const runtime = createRuntime({
-      components: [Replacement.contract!],
+      components: [Replacement],
       shadows: [
         defineShadow(Replacement, "root", (_props, context) => {
           shadowMounts++;
@@ -251,6 +257,126 @@ async function withTestDOM<T>(run: () => T | Promise<T>): Promise<T> {
   }
 }
 
+test("nested class lists agree in static HTML and Web and retain theme classes", async () => {
+  await withTestDOM(async () => {
+    type CardProps = { className: ClassValue };
+    function Card(props: CardProps, context: Context<typeof Card, CardProps>) {
+      return h("section", { ...props, ref: context.parts.root });
+    }
+    Card.meta = { name: "class-card", parts: ["root"] } as const;
+    const themeClass = signal<ClassValue>(["themed", [false, "surface"]]);
+    const runtime = createRuntime({
+      components: [Card],
+      plugins: [createThemePlugin({ name: "classes", resolve: () => ({ className: themeClass }) })],
+    });
+    const classes = ["host", [null, false, undefined, "", { toString: () => "custom" }]] as const;
+    const vnode = runtime.h(Card, { className: classes });
+    const web = createWebRenderer(runtime);
+    expect(web.renderToHtml(vnode)).toBe('<section class="host custom themed surface"></section>');
+    expect(web.renderToHtml(runtime.h("svg", { class: ["vector", ["icon"]] }))).toBe(
+      '<svg class="vector icon"></svg>',
+    );
+    expect(web.renderToHtml(runtime.h("div", { className: [false, null, []] }))).toBe(
+      "<div></div>",
+    );
+    const host = new TestElement("main");
+    const mounted = web.mount(vnode, host as unknown as Element);
+    const element = host.childNodes[0] as TestElement;
+    expect(element.getAttribute("class")).toBe("host custom themed surface");
+    themeClass.value = ["updated"];
+    await Promise.resolve();
+    expect(element.getAttribute("class")).toBe("host custom updated");
+    mounted.unmount();
+  });
+});
+
+test("class lists rebind nested structural Signals even when the class text is unchanged", () => {
+  const source = (initial: ClassValue) => {
+    let value = initial;
+    const listeners = new Set<(value: ClassValue) => void>();
+    return {
+      get value() {
+        return value;
+      },
+      subscribe(listener: (value: ClassValue) => void) {
+        listeners.add(listener);
+        return () => {
+          listeners.delete(listener);
+        };
+      },
+      set(next: ClassValue) {
+        value = next;
+        for (const listener of listeners) listener(value);
+      },
+      get subscribers() {
+        return listeners.size;
+      },
+    };
+  };
+  return withTestDOM(() => {
+    const first = source("same");
+    const second = source("same");
+    const outer = source([first, first]);
+    const runtime = createRuntime();
+    const web = createWebRenderer(runtime);
+    const vnode = runtime.h("div", { className: ["base", outer] });
+    expect(web.renderToHtml(vnode)).toBe('<div class="base same same"></div>');
+    expect(outer.subscribers).toBe(0);
+    const host = new TestElement("main");
+    const mounted = web.mount(vnode, host as unknown as Element);
+    const element = host.childNodes[0] as TestElement;
+    expect(first.subscribers).toBe(1);
+    outer.set([second, second]);
+    expect(element.getAttribute("class")).toBe("base same same");
+    expect(first.subscribers).toBe(0);
+    expect(second.subscribers).toBe(1);
+    second.set("changed");
+    expect(element.getAttribute("class")).toBe("base changed changed");
+    outer.set([false, null, undefined]);
+    expect(element.getAttribute("class")).toBe("base");
+    expect(second.subscribers).toBe(0);
+    outer.set([second]);
+    mounted.unmount();
+    expect(outer.subscribers).toBe(0);
+    expect(second.subscribers).toBe(0);
+    second.set("detached");
+    expect(element.getAttribute("class")).toBe("base changed");
+  });
+});
+
+test("class-list subscription failures release acquired sources", () =>
+  withTestDOM(() => {
+    let subscribers = 0;
+    const first = {
+      value: "first",
+      subscribe() {
+        subscribers++;
+        return () => {
+          subscribers--;
+        };
+      },
+    };
+    const failure = new Error("class subscription failed");
+    const broken = {
+      value: "broken",
+      subscribe() {
+        throw failure;
+      },
+    };
+    const host = new TestElement("main");
+    expect(() =>
+      createWebRenderer(createRuntime()).mount(
+        h("div", { className: [first, broken] }),
+        host as unknown as Element,
+      ),
+    ).toThrow(failure);
+    expect(subscribers).toBe(0);
+    expect(host.childNodes).toHaveLength(0);
+    const cyclic: ClassValue[] = [];
+    cyclic.push(cyclic);
+    expect(() => renderToHtml(h("div", { className: cyclic }))).toThrow("Cyclic className value");
+  }));
+
 test("DOM ref receives the host element before insertion and cleans up once on removal", async () => {
   await withTestDOM(async () => {
     const root = new TestElement("main");
@@ -263,6 +389,7 @@ test("DOM ref receives the host element before insertion and cleans up once on r
           ref: (element: Element) => {
             received = element;
             expect(element.parentNode).toBeNull();
+            expect(element.childNodes).toHaveLength(0);
             return () => {
               cleanups++;
             };
@@ -284,6 +411,271 @@ test("DOM ref receives the host element before insertion and cleans up once on r
     mounted.unmount();
     mounted.unmount();
     expect(cleanups).toBe(1);
+  });
+});
+
+test("composed refs call in order and clean up in reverse once", async () => {
+  await withTestDOM(async () => {
+    const events: string[] = [];
+    const root = new TestElement("main");
+    const runtime = createRuntime();
+    const vnode = runtime.h("button", {
+      ref: [
+        (element: Element) => {
+          events.push(`first:${element.tagName}`);
+          return () => events.push("cleanup:first");
+        },
+        [
+          false,
+          undefined,
+          (element: Element) => {
+            events.push(`second:${element.tagName}`);
+            return () => events.push("cleanup:second");
+          },
+        ],
+        null,
+      ],
+    });
+    const mounted = createWebRenderer(runtime).mount(vnode, root as unknown as Element);
+    expect(events).toEqual(["first:button", "second:button"]);
+    mounted.unmount();
+    mounted.unmount();
+    expect(events).toEqual(["first:button", "second:button", "cleanup:second", "cleanup:first"]);
+  });
+});
+
+test("ref mount failure rolls back every acquired cleanup and preserves the callback error", async () => {
+  await withTestDOM(async () => {
+    const events: string[] = [];
+    const root = new TestElement("main");
+    const failure = new Error("ref failed");
+    const vnode = h("button", {
+      ref: [
+        () => () => {
+          events.push("cleanup:first");
+          throw new Error("cleanup failed");
+        },
+        () => () => events.push("cleanup:second"),
+        () => {
+          throw failure;
+        },
+      ],
+    });
+    expect(() =>
+      createWebRenderer(createRuntime()).mount(vnode, root as unknown as Element),
+    ).toThrow(failure);
+    expect(events).toEqual(["cleanup:second", "cleanup:first"]);
+    expect(root.childNodes).toHaveLength(0);
+  });
+});
+
+test("ref cleanup failure still releases every binding and removes the host once", async () => {
+  await withTestDOM(async () => {
+    const events: string[] = [];
+    const root = new TestElement("main");
+    const failure = new Error("cleanup failed");
+    const vnode = h("button", {
+      ref: [
+        () => () => events.push("first"),
+        () => () => {
+          events.push("second");
+          throw failure;
+        },
+        () => () => events.push("third"),
+      ],
+    });
+    const mounted = createWebRenderer(createRuntime()).mount(vnode, root as unknown as Element);
+    expect(() => mounted.unmount()).toThrow(failure);
+    expect(events).toEqual(["third", "second", "first"]);
+    expect(root.childNodes).toHaveLength(0);
+    mounted.unmount();
+    expect(events).toEqual(["third", "second", "first"]);
+  });
+});
+
+test("child or insertion failure rolls back mounted refs and preserves the mount error", async () => {
+  await withTestDOM(async () => {
+    for (const stage of ["child", "insertion"]) {
+      const events: string[] = [];
+      const failure = new Error(`${stage} failed`);
+      const Failure: Component = () => {
+        throw failure;
+      };
+      class RejectingRoot extends TestElement {
+        override insertBefore(_node: TestNode, _before: TestNode | null): TestNode {
+          throw failure;
+        }
+      }
+      const root = stage === "child" ? new TestElement("main") : new RejectingRoot("main");
+      const vnode = h(
+        "section",
+        {
+          ref: [
+            () => () => {
+              events.push("first");
+              throw new Error("rollback failed");
+            },
+            () => () => events.push("second"),
+          ],
+        },
+        stage === "child" ? h(Failure, {}) : "ready",
+      );
+      expect(() =>
+        createWebRenderer(createRuntime()).mount(vnode, root as unknown as Element),
+      ).toThrow(failure);
+      expect(events).toEqual(["second", "first"]);
+      expect(root.childNodes).toHaveLength(0);
+    }
+  });
+});
+
+test("part refs bypass create hooks, preserve one identity, and static output omits callbacks", async () => {
+  await withTestDOM(async () => {
+    let createCalls = 0;
+    let callbackCalls = 0;
+    const runtime = createRuntime({
+      plugins: [
+        {
+          create(context, next) {
+            createCalls++;
+            return next(context);
+          },
+        },
+      ],
+    });
+    const part = createPartDescriptor("part-card", "root", { title: "original" });
+    const vnode = runtime.h(
+      "section",
+      {
+        ref: [
+          part,
+          [part],
+          () => {
+            callbackCalls++;
+          },
+        ],
+      },
+      "ready",
+    );
+    expect(vnode.raw).toBe(true);
+    expect(vnode.componentPart).toEqual({
+      component: "part-card",
+      part: "root",
+      state: { title: "original" },
+    });
+    expect(createCalls).toBe(0);
+    expect(renderToHtml(vnode)).toBe("<section>ready</section>");
+    expect(callbackCalls).toBe(0);
+    expect(() =>
+      runtime.h("section", { ref: [part, createPartDescriptor("part-card", "body")] }),
+    ).toThrow("cannot bind multiple distinct parts");
+  });
+});
+
+test("ordinary refs pass through create hooks without duplicate normalization", async () => {
+  await withTestDOM(async () => {
+    let createCalls = 0;
+    const events: string[] = [];
+    const runtime = createRuntime({
+      plugins: [
+        {
+          create(context, next) {
+            createCalls++;
+            return next({ ...context, props: { ...context.props, title: "hooked" } });
+          },
+        },
+      ],
+    });
+    const ref = () => {
+      events.push("ref");
+    };
+    const vnode = runtime.h("input", { ref: [ref, ref] });
+    expect(createCalls).toBe(1);
+    expect(vnode.props.title).toBe("hooked");
+    const root = new TestElement("main");
+    createWebRenderer(createRuntime()).mount(vnode, root as unknown as Element);
+    expect(events).toEqual(["ref", "ref"]);
+  });
+});
+
+test("automatic JSX reuses a part descriptor across hosts and still runs render hooks", async () => {
+  await withTestDOM(async () => {
+    const rendered: string[] = [];
+    const mounted: Element[] = [];
+    const runtime = createRuntime({
+      overrides: { span: () => "replacement" },
+      plugins: [
+        {
+          render({ vnode }, next) {
+            if (vnode.componentPart) rendered.push(vnode.componentPart.part);
+            return next(vnode);
+          },
+        },
+      ],
+    });
+    const automatic = createJSXRuntime(runtime);
+    function Repeated(_props: { title: string }, context: Context<typeof Repeated>) {
+      const item = context.parts.item;
+      return automatic.jsxs("section", {
+        ref: context.parts.root,
+        children: ["first", "second"].map((label) =>
+          automatic.jsx("span", {
+            ref: [item, (element: Element) => mounted.push(element)],
+            children: label,
+          }),
+        ),
+      });
+    }
+    Repeated.meta = { name: "repeated-parts", parts: ["root", "item"] } as const;
+    const node = automatic.jsx(Repeated, { title: "original" });
+    expect(renderToHtml(node)).toBe("<section><span>first</span><span>second</span></section>");
+    expect(mounted).toHaveLength(0);
+    rendered.length = 0;
+    const root = new TestElement("main");
+    const view = createWebRenderer(runtime).mount(node, root as unknown as Element);
+    expect(mounted).toHaveLength(2);
+    expect(new Set(mounted).size).toBe(2);
+    expect(mounted.map((element) => element.tagName)).toEqual(["span", "span"]);
+    expect(rendered).toEqual(["root", "item", "item"]);
+    view.unmount();
+    expect(root.childNodes).toHaveLength(0);
+  });
+});
+
+test("render hooks normalize refs they add and preserve callback cleanup", async () => {
+  await withTestDOM(async () => {
+    const events: string[] = [];
+    const part = createPartDescriptor("hook-part", "root");
+    const runtime = createRuntime({
+      plugins: [
+        {
+          render({ vnode }, next) {
+            return next({
+              ...vnode,
+              props: {
+                ...vnode.props,
+                ref: [
+                  part,
+                  () => {
+                    events.push("mount");
+                    return () => events.push("cleanup");
+                  },
+                ],
+              },
+            });
+          },
+        },
+      ],
+    });
+    const vnode = runtime.h("div", {});
+    const web = createWebRenderer(runtime);
+    expect(web.renderToHtml(vnode)).toBe("<div></div>");
+    expect(events).toEqual([]);
+    const root = new TestElement("main");
+    const view = web.mount(vnode, root as unknown as Element);
+    expect(events).toEqual(["mount"]);
+    view.unmount();
+    expect(events).toEqual(["mount", "cleanup"]);
   });
 });
 
@@ -484,23 +876,19 @@ test("runtime plugins support presets, falsy entries, and enforce ordering", () 
 test("components and shadows share scoped lifecycle primitives", async () => {
   await withTestDOM(async () => {
     type CardProps = { title: string; active: boolean };
-    const contract = { name: "lifecycle-card", parts: ["root"] } as const;
     const events: string[] = [];
     let componentValue: WritableSignal<string> | undefined;
     let shadowValue: WritableSignal<boolean> | undefined;
-
-    const Card = defineComponent<CardProps, typeof contract.name, (typeof contract.parts)[number]>(
-      contract,
-      (props, context) => {
-        componentValue = context.signal(props.title);
-        context.effect(() => {
-          events.push(`component:${componentValue?.value}`);
-          return () => events.push("component cleanup");
-        });
-        context.onCleanup(() => events.push("component scope cleanup"));
-        return context.part("root", "article", null, props.title);
-      },
-    );
+    function Card(props: CardProps, context: Context<typeof Card, CardProps>) {
+      componentValue = context.signal(props.title);
+      context.effect(() => {
+        events.push(`component:${componentValue?.value}`);
+        return () => events.push("component cleanup");
+      });
+      context.onCleanup(() => events.push("component scope cleanup"));
+      return h("article", { ref: context.parts.root }, props.title);
+    }
+    Card.meta = { name: "lifecycle-card", parts: ["root"] } as const;
 
     const CardRootShadow = defineShadow(Card, "root", (props, context) => {
       shadowValue = context.signal(props.active);
@@ -512,7 +900,7 @@ test("components and shadows share scoped lifecycle primitives", async () => {
       context.onCleanup(() => events.push("shadow scope cleanup"));
     });
 
-    const runtime = createRuntime({ components: [contract] });
+    const runtime = createRuntime({ components: [Card] });
     runtime.registerShadow(CardRootShadow);
     const web = createWebRenderer(runtime);
     const root = new TestElement("main");
@@ -555,17 +943,15 @@ test("components and shadows share scoped lifecycle primitives", async () => {
 });
 
 test("shadows are mount-only and do not affect static HTML rendering", () => {
-  const contract = { name: "static-card", parts: ["root"] } as const;
   const events: string[] = [];
-  const Card = defineComponent<
-    { title: string },
-    typeof contract.name,
-    (typeof contract.parts)[number]
-  >(contract, (props, context) => context.part("root", "article", null, props.title));
+  function Card(props: { title: string }, context: Context<typeof Card, { title: string }>) {
+    return h("article", { ref: context.parts.root }, props.title);
+  }
+  Card.meta = { name: "static-card", parts: ["root"] } as const;
   const CardRootShadow = defineShadow(Card, "root", () => {
     events.push("shadow mounted");
   });
-  const runtime = createRuntime({ components: [contract], shadows: [CardRootShadow] });
+  const runtime = createRuntime({ components: [Card], shadows: [CardRootShadow] });
   expect(typeof CardRootShadow).toBe("object");
   expect(runtime.shadowRegistry.list()).toEqual([CardRootShadow]);
 

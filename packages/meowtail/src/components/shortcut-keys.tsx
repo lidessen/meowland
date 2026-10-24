@@ -1,26 +1,31 @@
-import { defineComponent, type ComponentContract, type Props } from "meowjsx";
-export const shortcutKeysContract = {
-  name: "shortcut-keys",
-  parts: ["root", "key"],
-} as const satisfies ComponentContract;
+import { type Props, type Context, h } from "meowjsx";
+
 export interface ShortcutKeysProps extends Props {
   keys: readonly string[];
   variant?: "plain" | "tooltip";
-  className?: string;
+  className?: Props["className"];
 }
 /**
  * A keyboard shortcut, shown as keys. Effective key labels belong to the command owner, including
  * platform differences.
  */
-export const ShortcutKeys = defineComponent<ShortcutKeysProps, "shortcut-keys", "root" | "key">(
-  shortcutKeysContract,
-  ({ keys, variant = "plain", className, ...props }, context) =>
-    context.part(
-      "root",
-      "span",
-      { ...props, className, "data-variant": variant },
-      ...keys.map((key) =>
-        context.part("key", "kbd", { "data-separator": key === "+" ? "true" : undefined }, key),
-      ),
-    ),
-);
+export function ShortcutKeys(
+  { keys, variant = "plain", className, ...props }: ShortcutKeysProps,
+  context: Context<typeof ShortcutKeys>,
+) {
+  return (
+    <span
+      {...props}
+      className={className}
+      data-variant={variant}
+      ref={[context.parts.root, props.ref]}
+    >
+      {keys.map((key) => (
+        <kbd data-separator={key === "+" ? "true" : undefined} ref={[context.parts.key]}>
+          {key}
+        </kbd>
+      ))}
+    </span>
+  );
+}
+ShortcutKeys.meta = { name: "shortcut-keys", parts: ["root", "key"] } as const;

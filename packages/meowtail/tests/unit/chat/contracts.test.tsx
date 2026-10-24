@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h, signal } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
+import { createMeowUI } from "../../../src/registry";
 import {
   ChatAttachments,
   ChatComposer,
@@ -8,9 +9,12 @@ import {
   Card,
   ChatMessageListItem,
   ChatToolCall,
+  meowUIComponents,
 } from "../../../src/index";
 
-const { renderToHtml } = createWebRenderer(createRuntime());
+const { renderToHtml } = createWebRenderer(
+  createRuntime({ plugins: [createMeowUI({ components: meowUIComponents })] }),
+);
 
 test("composer uses a labelled icon action and accepts alternate visible content", () => {
   const html = renderToHtml(<ChatComposer submitLabel="Send message" />);
@@ -104,8 +108,8 @@ test("attachments preserve image accessibility and file download markup", () => 
   expect(html).toContain('loading="lazy"');
   expect(html).toContain('href="/notes.txt"');
   expect(html).toContain('download="notes.txt"');
-  expect(html).toContain("<strong>notes.txt</strong>");
-  expect(html).toContain("<small>TXT 1.5KB</small>");
+  expect(html).toContain(">notes.txt</strong>");
+  expect(html).toContain(">TXT 1.5KB</small>");
 });
 
 test("attachment sizes are optional and use compact reference formatting", () => {
@@ -134,7 +138,7 @@ test("attachment sizes are optional and use compact reference formatting", () =>
     );
     expect(html).toContain('aria-label="Message attachments"');
     if (expected === undefined) expect(html).not.toContain("<small");
-    else expect(html).toContain(`<small>${expected}</small>`);
+    else expect(html).toContain(`>${expected}</small>`);
     expect(html).not.toContain("<img");
   }
 });
@@ -236,7 +240,7 @@ test("unthemed composer preserves caller events, input semantics and disabled co
 test("an activating row is one button and never discloses, even when both modes are asked for", () => {
   const activating = renderToHtml(<ChatToolCall label="Run command" onActivate={() => {}} />);
   expect(activating).toContain('data-tool-interactive="true"');
-  expect(activating).toContain('<button type="button">');
+  expect(activating).toContain('<button type="button" data-meowui-part="chat-tool-call/header">');
   expect(activating).not.toContain("data-tool-collapsible");
   expect(activating).not.toContain("<details");
   const both = renderToHtml(<ChatToolCall label="Read" collapsible onActivate={() => {}} />);

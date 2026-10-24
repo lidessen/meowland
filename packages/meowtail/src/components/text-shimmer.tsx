@@ -1,64 +1,50 @@
 import {
-  defineComponent,
-  derived,
   createContext,
-  useContext,
+  derived,
   h,
   unwrap,
+  useContext,
   type Child,
-  type ComponentContract,
+  type Context,
   type MaybeSignal,
   type Props,
 } from "meowjsx";
 const ShimmerContent = createContext(false);
-export const textShimmerContract = {
-  name: "text-shimmer",
-  parts: ["root", "content", "decoration"],
-} as const satisfies ComponentContract;
 export interface TextShimmerProps extends Props {
   text?: MaybeSignal<string>;
   /** Presentational fragments only: decoration duplicates them, so omit effects and element IDs. */
   children?: Child;
   active?: MaybeSignal<boolean>;
-  className?: string;
+  className?: Props["className"];
   contentClassName?: string;
 }
 /**
  * Text with a light sweep across it, for work in progress. Nested fragments share the outer sweep;
  * the inert copy is excluded from accessibility.
  */
-export const TextShimmer = defineComponent<
-  TextShimmerProps,
-  "text-shimmer",
-  "root" | "content" | "decoration"
->(
-  textShimmerContract,
-  ({ text, children, active = false, className, contentClassName, ...props }, context) => {
-    const content = text ?? children;
-    if (useContext(ShimmerContent))
-      return context.part("content", "span", { ...props, className }, content);
-    const activity = derived(() => String(unwrap(active)));
-    return context.part(
-      "root",
-      "span",
-      { ...props, className, "data-active": activity },
-      context.part(
-        "content",
-        "span",
-        { className: contentClassName },
-        <ShimmerContent.Provider value={true}>{content}</ShimmerContent.Provider>,
-      ),
-      context.part(
-        "decoration",
-        "span",
-        { "aria-hidden": "true", inert: true },
-        context.part(
-          "content",
-          "span",
-          { className: contentClassName },
-          <ShimmerContent.Provider value={true}>{content}</ShimmerContent.Provider>,
-        ),
-      ),
+export function TextShimmer(
+  { text, children, active = false, className, contentClassName, ref, ...props }: TextShimmerProps,
+  context: Context<typeof TextShimmer>,
+) {
+  const content = text ?? children;
+  if (useContext(ShimmerContent))
+    return (
+      <span {...props} className={className} ref={[context.parts.content, ref]}>
+        {content}
+      </span>
     );
-  },
-);
+  const activity = derived(() => String(unwrap(active)));
+  return (
+    <span {...props} className={className} data-active={activity} ref={[context.parts.root, ref]}>
+      <span className={contentClassName} ref={context.parts.content}>
+        <ShimmerContent.Provider value={true}>{content}</ShimmerContent.Provider>
+      </span>
+      <span aria-hidden="true" inert ref={context.parts.decoration}>
+        <span className={contentClassName} ref={context.parts.content}>
+          <ShimmerContent.Provider value={true}>{content}</ShimmerContent.Provider>
+        </span>
+      </span>
+    </span>
+  );
+}
+TextShimmer.meta = { name: "text-shimmer", parts: ["root", "content", "decoration"] } as const;

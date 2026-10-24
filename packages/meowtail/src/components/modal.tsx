@@ -1,21 +1,8 @@
-import {
-  defineComponent,
-  h,
-  unwrap,
-  type Child,
-  type ComponentContract,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { h, unwrap, type Child, type MaybeSignal, type Props, type Context } from "meowjsx";
 import { activeElementInRoot } from "../shared/dom-root";
 import { Icon } from "../icons/icon";
 import { Dialog, DialogActions, DialogHeader, DialogPanel } from "./dialog";
 import { IconButton } from "./icon-button";
-
-export const modalContract = {
-  name: "modal",
-  parts: ["root"],
-} as const satisfies ComponentContract;
 
 export interface ModalProps extends Props {
   /** Required; the host owns the state. A Signal keeps the dialog in sync after mount. */
@@ -41,7 +28,7 @@ export interface ModalProps extends Props {
    * A generated base is used when omitted. Fixed for the mount.
    */
   id?: string;
-  className?: string;
+  className?: Props["className"];
   children: Child;
 }
 
@@ -58,68 +45,68 @@ function hasSlot(slot: Child): boolean {
  * `showModal`/`close` mechanics, Escape and backdrop dismissal, focus return and
  * the generated title/description ids.
  */
-export const Modal = defineComponent<ModalProps, "modal", "root">(
-  modalContract,
-  (
-    {
-      open,
-      onOpenChange,
-      title,
-      description,
-      actions,
-      dismissible = true,
-      closeLabel = "Close",
-      id,
-      className,
-      children,
-      ...props
-    },
-    context,
-  ) => {
-    const baseId = id ?? `modal-${++nextModalId}`;
-    const titleId = `${baseId}-title`;
-    const descriptionId = `${baseId}-description`;
-    // DialogHeader renders its description on truthiness; match it so the id never dangles.
-    const hasDescription = hasSlot(description) && Boolean(description);
-    let dialog: HTMLDialogElement | undefined;
-    let opener: HTMLElement | null = null;
-    let alive = true;
-    context.onCleanup(() => {
-      alive = false;
-    });
-    const dismiss = () => {
-      if (dismissible) onOpenChange(false);
-    };
-    const rememberOpener = (element: HTMLDialogElement) => {
-      // `open` may be set without a click, so remember whatever held focus when the
-      // modal actually opened and give it back after the dialog closes. Focus that is
-      // already inside the dialog is not a useful return target (a rapid reopen).
-      const focused = activeElementInRoot(element);
-      if (focused instanceof HTMLElement && element.contains(focused)) return;
-      opener = focused instanceof HTMLElement ? focused : null;
-    };
-    const restoreOpener = () => {
-      const target = opener;
-      opener = null;
-      if (target?.isConnected) target.focus();
-    };
-    const sync = () => {
-      if (!alive || !dialog?.isConnected) return;
-      if (unwrap(open)) {
-        if (!dialog.open) {
-          rememberOpener(dialog);
-          dialog.showModal();
-        }
-      } else if (dialog.open) {
-        dialog.close();
+export function Modal(
+  {
+    open,
+    onOpenChange,
+    title,
+    description,
+    actions,
+    dismissible = true,
+    closeLabel = "Close",
+    id,
+    className,
+    children,
+    ref,
+    ...props
+  }: ModalProps,
+  context: Context<typeof Modal>,
+) {
+  const baseId = id ?? `modal-${++nextModalId}`;
+  const titleId = `${baseId}-title`;
+  const descriptionId = `${baseId}-description`;
+  // DialogHeader renders its description on truthiness; match it so the id never dangles.
+  const hasDescription = hasSlot(description) && Boolean(description);
+  let dialog: HTMLDialogElement | undefined;
+  let opener: HTMLElement | null = null;
+  let alive = true;
+  context.onCleanup(() => {
+    alive = false;
+  });
+  const dismiss = () => {
+    if (dismissible) onOpenChange(false);
+  };
+  const rememberOpener = (element: HTMLDialogElement) => {
+    // `open` may be set without a click, so remember whatever held focus when the
+    // modal actually opened and give it back after the dialog closes. Focus that is
+    // already inside the dialog is not a useful return target (a rapid reopen).
+    const focused = activeElementInRoot(element);
+    if (focused instanceof HTMLElement && element.contains(focused)) return;
+    opener = focused instanceof HTMLElement ? focused : null;
+  };
+  const restoreOpener = () => {
+    const target = opener;
+    opener = null;
+    if (target?.isConnected) target.focus();
+  };
+  const sync = () => {
+    if (!alive || !dialog?.isConnected) return;
+    if (unwrap(open)) {
+      if (!dialog.open) {
+        rememberOpener(dialog);
+        dialog.showModal();
       }
-    };
-    context.effect(() => {
-      // Read before the dialog mounts so the effect subscribes to a live owner signal.
-      unwrap(open);
-      sync();
-    });
-    return context.part("root", "div", { ...props, id, className }, [
+    } else if (dialog.open) {
+      dialog.close();
+    }
+  };
+  context.effect(() => {
+    // Read before the dialog mounts so the effect subscribes to a live owner signal.
+    unwrap(open);
+    sync();
+  });
+  return (
+    <div {...props} id={id} className={className} ref={[context.parts.root, ref]}>
       <Dialog
         labelledBy={titleId}
         describedBy={hasDescription ? descriptionId : undefined}
@@ -173,7 +160,8 @@ export const Modal = defineComponent<ModalProps, "modal", "root">(
           {children}
           {hasSlot(actions) ? <DialogActions>{actions}</DialogActions> : null}
         </DialogPanel>
-      </Dialog>,
-    ]);
-  },
-);
+      </Dialog>
+    </div>
+  );
+}
+Modal.meta = { name: "modal", parts: ["root"] } as const;

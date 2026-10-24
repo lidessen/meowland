@@ -1,11 +1,11 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing, surface, text } from "../recipes";
 import { chartTokens } from "../shared/chart.tokens";
-import { mermaidDiagramContract } from "../../components/mermaid-diagram.contract";
 
-const part = (name: (typeof mermaidDiagramContract.parts)[number]) =>
-  partSelector(mermaidDiagramContract, name);
+import type { MermaidDiagram } from "../../components/mermaid-diagram";
+import { ui } from "../utilities";
+const mermaidDiagramPartRefs = parts<typeof MermaidDiagram>("mermaid-diagram");
+const part = (name: keyof typeof mermaidDiagramPartRefs) => mermaidDiagramPartRefs[name];
 
 /*
  * A diagram is content to look at, so it sits on the raised surface with the hairline edge, its
@@ -19,7 +19,7 @@ export const mermaidDiagramStyles = css`
     min-width: 0;
     max-width: 100%;
     margin: 0;
-    ${surface("raised")}
+    ${ui.surface.raised}
     overflow: hidden;
   }
   ${part("header")} {
@@ -32,12 +32,12 @@ export const mermaidDiagramStyles = css`
   }
   ${part("title")} {
     min-width: 0;
-    ${text("label")}
+    ${ui.text.label}
     overflow-wrap: anywhere;
   }
   ${part("caption")} {
     min-width: 0;
-    ${text("caption")}
+    ${ui.text.caption}
     color: ${uiTokens.ink.tertiary};
     overflow-wrap: anywhere;
   }
@@ -146,12 +146,12 @@ export const mermaidDiagramStyles = css`
     white-space: pre;
   }
   ${part("source")}:focus-visible {
-    ${focusRing({ inset: true })}
+    ${ui.focus.inset}
   }
   ${part("error")} {
     margin: 0;
     padding: 12px 16px 0;
-    ${text("caption")}
+    ${ui.text.caption}
     color: ${uiTokens.status.danger};
   }
   ${part("feedback")}:empty {
@@ -160,6 +160,6 @@ export const mermaidDiagramStyles = css`
   ${part("feedback")} {
     display: block;
     padding: 0 16px 12px;
-    ${text("caption")}
+    ${ui.text.caption}
   }
 `;

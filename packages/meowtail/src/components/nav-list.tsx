@@ -1,30 +1,13 @@
 import {
-  defineComponent,
   derived,
   h,
   isSignal,
   unwrap,
   type Child,
-  type ComponentContract,
   type MaybeSignal,
   type Props,
+  type Context,
 } from "meowjsx";
-
-export const navListContract = {
-  name: "nav-list",
-  parts: [
-    "root",
-    "group",
-    "groupTitle",
-    "list",
-    "item",
-    "icon",
-    "label",
-    "badge",
-    "meta",
-    "description",
-  ],
-} as const satisfies ComponentContract;
 
 export interface NavListItem {
   id: string;
@@ -63,7 +46,7 @@ export interface NavListProps extends Props {
    * the host.
    */
   onSelect?: (item: NavListItem) => void;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** True when a slot was given; `false` and `null` mean the slot is omitted. */
@@ -76,11 +59,10 @@ function hasSlot(slot: Child): boolean {
  * grouping, the active location and the link/button semantics. The host owns
  * routing, search filtering and what an item points at.
  */
-export const NavList = defineComponent<
-  NavListProps,
-  typeof navListContract.name,
-  (typeof navListContract.parts)[number]
->(navListContract, ({ label, groups, activeId, onSelect, className, ...props }, context) => {
+export function NavList(
+  { label, groups, activeId, onSelect, className, ...props }: NavListProps,
+  context: Context<typeof NavList>,
+) {
   // The active id may be a Signal; each item binds one derived aria-current value.
   const currentFor = (id: string) =>
     isSignal(activeId)
@@ -90,64 +72,78 @@ export const NavList = defineComponent<
         : undefined;
 
   const itemContent = (item: NavListItem) => [
-    hasSlot(item.icon) ? context.part("icon", "span", null, item.icon) : null,
-    context.part("label", "span", null, item.label),
-    hasSlot(item.description) ? context.part("description", "span", null, item.description) : null,
-    hasSlot(item.badge) ? context.part("badge", "span", null, item.badge) : null,
-    hasSlot(item.meta) ? context.part("meta", "span", null, item.meta) : null,
+    hasSlot(item.icon) ? <span ref={[context.parts.icon]}>{item.icon}</span> : null,
+    <span ref={[context.parts.label]}>{item.label}</span>,
+    hasSlot(item.description) ? (
+      <span ref={[context.parts.description]}>{item.description}</span>
+    ) : null,
+    hasSlot(item.badge) ? <span ref={[context.parts.badge]}>{item.badge}</span> : null,
+    hasSlot(item.meta) ? <span ref={[context.parts.meta]}>{item.meta}</span> : null,
   ];
 
   const itemNode = (item: NavListItem) => {
     // The active id is part of the item contract, so aria-current lives on both shapes.
     const current = currentFor(item.id);
     if (item.href !== undefined) {
-      return context.part(
-        "item",
-        "a",
-        {
-          href: item.href,
-          "aria-current": current,
-          // A disabled anchor stays a link but leaves the tab order and activation.
-          "aria-disabled": item.disabled ? "true" : undefined,
-          tabIndex: item.disabled ? -1 : undefined,
-          onClick: item.disabled ? (event: Event) => event.preventDefault() : undefined,
-        },
-        itemContent(item),
+      return (
+        <a
+          href={item.href}
+          aria-current={current}
+          /* A disabled anchor stays a link but leaves the tab order and activation. */ aria-disabled={
+            item.disabled ? "true" : undefined
+          }
+          tabIndex={item.disabled ? -1 : undefined}
+          onClick={item.disabled ? (event: Event) => event.preventDefault() : undefined}
+          ref={[context.parts.item]}
+        >
+          {itemContent(item)}
+        </a>
       );
     }
-    return context.part(
-      "item",
-      "button",
-      {
-        type: "button",
-        disabled: item.disabled === true,
-        "aria-current": current,
-        // The native disabled flag already blocks activation; the guard keeps it
-        // true for programmatic activation as well.
-        onClick: item.disabled ? undefined : () => onSelect?.(item),
-      },
-      itemContent(item),
+    return (
+      <button
+        type={"button"}
+        disabled={item.disabled === true}
+        aria-current={current}
+        /* The native disabled flag already blocks activation; the guard keeps it */ /* true for programmatic activation as well. */ onClick={
+          item.disabled ? undefined : () => onSelect?.(item)
+        }
+        ref={[context.parts.item]}
+      >
+        {itemContent(item)}
+      </button>
     );
   };
 
-  const groupNode = (group: NavListGroup) =>
-    context.part(
-      "group",
-      "section",
-      group.id ? { id: group.id } : null,
-      hasSlot(group.label) ? context.part("groupTitle", "h2", null, group.label) : null,
-      context.part(
-        "list",
-        "ul",
-        null,
-        group.items.map((item) => h("li", null, itemNode(item))),
-      ),
-    );
-
-  return context.part(
-    "root",
-    "nav",
-    { ...props, className, "aria-label": label },
-    groups.map((group) => groupNode(group)),
+  const groupNode = (group: NavListGroup) => (
+    <section id={group.id ? group.id : undefined} ref={[context.parts.group]}>
+      {hasSlot(group.label) ? <h2 ref={[context.parts.groupTitle]}>{group.label}</h2> : null}
+      {
+        <ul ref={[context.parts.list]}>
+          {group.items.map((item) => h("li", null, itemNode(item)))}
+        </ul>
+      }
+    </section>
   );
-});
+
+  return (
+    <nav {...props} className={className} aria-label={label} ref={[context.parts.root, props.ref]}>
+      {groups.map((group) => groupNode(group))}
+    </nav>
+  );
+}
+NavList.meta = {
+  name: "nav-list",
+  parts: [
+    "root",
+    "group",
+    "groupTitle",
+    "list",
+    "item",
+    "icon",
+    "label",
+    "badge",
+    "meta",
+    "description",
+  ],
+} as const;

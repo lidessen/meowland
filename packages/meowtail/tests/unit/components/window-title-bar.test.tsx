@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
-import { h } from "meowjsx";
+import { h, defaultRuntime } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
 import { WindowTitleBar } from "../../../src/components/window-title-bar";
-import { installMeowUI } from "../../../src/registry";
+import { installMeowUI, meowUIComponents } from "../../../src/registry";
 import { standardTheme } from "../../../src/theme";
 
-installMeowUI();
+installMeowUI({ components: meowUIComponents }, defaultRuntime);
 
 test("the title bar is a header with leading, title and trailing slots", () => {
   const html = renderToHtml(

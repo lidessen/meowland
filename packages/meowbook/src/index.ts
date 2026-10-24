@@ -10,8 +10,8 @@ export function defineConfig<T extends StoryConfig>(config: T): T {
   return config;
 }
 export function replaceComponent<P extends object>(
-  component: Component<P, any, any>,
-  replacement: Component<NoInfer<P>, any, any>,
+  component: Component<P, any>,
+  replacement: Component<NoInfer<P>, any>,
 ): ComponentReplacement {
   return { component, replacement };
 }

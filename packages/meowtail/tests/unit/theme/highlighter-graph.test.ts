@@ -249,7 +249,7 @@ test("theme and registry imports do not reach the syntax highlighter", () => {
   expect(reached.has(highlighter)).toBe(false);
   expect([...reached].some((file) => file.endsWith(`${path.sep}code-block.tsx`))).toBe(false);
   expect([...reached].some((file) => file.endsWith(`${path.sep}read-block.tsx`))).toBe(false);
-  expect(reached.has(path.join(sourceRoot, "registry/index.ts"))).toBe(true);
+  expect(reached.has(path.join(sourceRoot, "registry/factory.ts"))).toBe(true);
 });
 
 test("code surfaces still reach the syntax highlighter", () => {

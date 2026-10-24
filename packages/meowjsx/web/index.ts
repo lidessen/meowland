@@ -1,3 +1,10 @@
+export type {
+  WebRef,
+  WebRefCallback,
+  WebRefCleanup,
+  WebHostProps,
+  WebIntrinsicElements,
+} from "./types";
 export {
   createWebRenderer,
   defaultWebRenderer,

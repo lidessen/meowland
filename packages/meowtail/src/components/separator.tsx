@@ -1,25 +1,23 @@
-import { defineComponent, type ComponentContract, type Props } from "meowjsx";
-
-export const separatorContract = {
-  name: "separator",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+import { h, type Props, type Context } from "meowjsx";
 
 export interface SeparatorProps extends Props {
   orientation?: "horizontal" | "vertical";
-  className?: string;
+  className?: Props["className"];
 }
 
 /** A thin rule that divides groups of content or tools. */
-export const Separator = defineComponent<
-  SeparatorProps,
-  typeof separatorContract.name,
-  (typeof separatorContract.parts)[number]
->(separatorContract, ({ orientation = "horizontal", className, ...props }, context) =>
-  context.part("root", "div", {
-    ...props,
-    className,
-    role: "separator",
-    "aria-orientation": orientation,
-  }),
-);
+export function Separator(
+  { orientation = "horizontal", className, ...props }: SeparatorProps,
+  context: Context<typeof Separator>,
+) {
+  return (
+    <div
+      {...props}
+      className={className}
+      role="separator"
+      aria-orientation={orientation}
+      ref={[context.parts.root, props.ref]}
+    />
+  );
+}
+Separator.meta = { name: "separator", parts: ["root"] } as const;

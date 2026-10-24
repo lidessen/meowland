@@ -1,10 +1,9 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { resourceLinkContract } from "../../components/resource-link";
-
-const link = (part: (typeof resourceLinkContract.parts)[number]) =>
-  partSelector(resourceLinkContract, part);
+import type { ResourceLink } from "../../components/resource-link";
+import { ui } from "../utilities";
+const resourceLinkPartRefs = parts<typeof ResourceLink>("resource-link");
+const link = (part: keyof typeof resourceLinkPartRefs) => resourceLinkPartRefs[part];
 
 export const resourceLinkStyles = css`
   ${link("root")} {
@@ -30,7 +29,7 @@ export const resourceLinkStyles = css`
     border-color: color-mix(in srgb, ${uiTokens.ink.primary} 24%, transparent);
   }
   ${link("root")}:focus-visible {
-    ${focusRing()}
+    ${ui.focus.ring}
   }
   ${link("icon")} {
     display: grid;

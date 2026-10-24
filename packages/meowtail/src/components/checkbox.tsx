@@ -1,17 +1,12 @@
 import {
-  defineComponent,
   isSignal,
   mapSignal,
   unwrap,
-  type ComponentContract,
   type MaybeSignal,
   type Props,
+  type Context,
+  h,
 } from "meowjsx";
-
-export const checkboxContract = {
-  name: "checkbox",
-  parts: ["root", "input", "label"],
-} as const satisfies ComponentContract;
 
 interface NativeToggleProps extends Props {
   checked?: MaybeSignal<boolean>;
@@ -25,7 +20,7 @@ export interface CheckboxProps extends NativeToggleProps {
   label: MaybeSignal<string>;
   /** Keep the accessible name while hiding the visible label, for compact tables. */
   labelHidden?: boolean;
-  className?: string;
+  className?: Props["className"];
 }
 
 function mixedValue(indeterminate: MaybeSignal<boolean> | undefined): boolean {
@@ -59,36 +54,37 @@ export function nativeToggleBindings({
     type: "checkbox",
     checked: checked !== undefined ? checked : defaultChecked,
     "aria-checked": mixedAttr,
-    ref: (input: HTMLInputElement) => {
-      apply(input);
-      const cleanup = typeof ref === "function" ? ref(input) : undefined;
-      let disposed = false;
-      let timer: ReturnType<typeof setTimeout> | undefined;
-      const reset = (event: Event) => {
-        if (checked === undefined || event.target !== input.form) return;
-        clearTimeout(timer);
-        timer = setTimeout(() => {
-          if (!disposed && !event.defaultPrevented) apply(input);
-        }, 0);
-      };
-      const refresh = () => {
-        if (!disposed) apply(input);
-      };
-      const unsubIndeterminate = isSignal(indeterminate)
-        ? indeterminate.subscribe(refresh)
-        : undefined;
-      const unsubChecked = isSignal(checked) ? checked.subscribe(refresh) : undefined;
-      // The native form owner may change through the form attribute after mount.
-      input.ownerDocument.addEventListener("reset", reset, true);
-      return () => {
-        disposed = true;
-        clearTimeout(timer);
-        unsubIndeterminate?.();
-        unsubChecked?.();
-        input.ownerDocument.removeEventListener("reset", reset, true);
-        if (typeof cleanup === "function") cleanup();
-      };
-    },
+    ref: [
+      ref,
+      (input: HTMLInputElement) => {
+        apply(input);
+        let disposed = false;
+        let timer: ReturnType<typeof setTimeout> | undefined;
+        const reset = (event: Event) => {
+          if (checked === undefined || event.target !== input.form) return;
+          clearTimeout(timer);
+          timer = setTimeout(() => {
+            if (!disposed && !event.defaultPrevented) apply(input);
+          }, 0);
+        };
+        const refresh = () => {
+          if (!disposed) apply(input);
+        };
+        const unsubIndeterminate = isSignal(indeterminate)
+          ? indeterminate.subscribe(refresh)
+          : undefined;
+        const unsubChecked = isSignal(checked) ? checked.subscribe(refresh) : undefined;
+        // The native form owner may change through the form attribute after mount.
+        input.ownerDocument.addEventListener("reset", reset, true);
+        return () => {
+          disposed = true;
+          clearTimeout(timer);
+          unsubIndeterminate?.();
+          unsubChecked?.();
+          input.ownerDocument.removeEventListener("reset", reset, true);
+        };
+      },
+    ],
     onChange: (event: Event) => {
       onChange?.(event);
       const input = event.currentTarget as HTMLInputElement;
@@ -99,16 +95,22 @@ export function nativeToggleBindings({
 }
 
 /** A native checkbox with its label, including the mixed state. */
-export const Checkbox = defineComponent<
-  CheckboxProps,
-  typeof checkboxContract.name,
-  (typeof checkboxContract.parts)[number]
->(checkboxContract, ({ label, labelHidden, className, ...props }, context) =>
-  context.part(
-    "root",
-    "label",
-    { className, "data-label-hidden": labelHidden ? "true" : undefined },
-    context.part("input", "input", nativeToggleBindings(props)),
-    context.part("label", "span", { "data-label-hidden": labelHidden ? "true" : undefined }, label),
-  ),
-);
+export function Checkbox(
+  { label, labelHidden, className, ...props }: CheckboxProps,
+  context: Context<typeof Checkbox>,
+) {
+  const inputProps = nativeToggleBindings(props);
+  return (
+    <label
+      className={className}
+      data-label-hidden={labelHidden ? "true" : undefined}
+      ref={[context.parts.root]}
+    >
+      <input {...inputProps} ref={[context.parts.input, inputProps.ref]} />
+      <span data-label-hidden={labelHidden ? "true" : undefined} ref={[context.parts.label]}>
+        {label}
+      </span>
+    </label>
+  );
+}
+Checkbox.meta = { name: "checkbox", parts: ["root", "input", "label"] } as const;

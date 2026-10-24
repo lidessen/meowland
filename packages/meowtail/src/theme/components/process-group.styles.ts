@@ -1,14 +1,15 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { processGroupContract } from "../../components/process-group";
-import { processStepContract } from "../../components/process-step";
-import { statusContract } from "../../components/status";
-import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
+import { css, parts } from "meowcss/meowjsx";
 
-const group = (part: (typeof processGroupContract.parts)[number]) =>
-  partSelector(processGroupContract, part);
-const step = (part: (typeof processStepContract.parts)[number]) =>
-  partSelector(processStepContract, part);
+import { uiTokens } from "../tokens";
+import type { ProcessGroup } from "../../components/process-group";
+import type { ProcessStep } from "../../components/process-step";
+import type { Status } from "../../components/status";
+import { ui } from "../utilities";
+const statusPartRefs = parts<typeof Status>("status");
+const processGroupPartRefs = parts<typeof ProcessGroup>("process-group");
+const processStepPartRefs = parts<typeof ProcessStep>("process-step");
+const group = (part: keyof typeof processGroupPartRefs) => processGroupPartRefs[part];
+const step = (part: keyof typeof processStepPartRefs) => processStepPartRefs[part];
 
 export const processGroupStyles = css`
   ${group("root")} {
@@ -42,7 +43,7 @@ export const processGroupStyles = css`
     background: ${uiTokens.state.hover};
   }
   ${group("summary")}:focus-visible {
-    ${focusRing({ inset: true })}
+    ${ui.focus.inset}
   }
   ${group("chevron")} {
     display: grid;
@@ -74,10 +75,10 @@ export const processGroupStyles = css`
     white-space: nowrap;
   }
   /* A badge leads the status; a fact after it reads as quiet words that truncate first. */
-  ${group("status")} > ${partSelector(statusContract, "root")} {
+  ${group("status")} > ${statusPartRefs.root} {
     vertical-align: middle;
   }
-  ${group("status")} > ${partSelector(statusContract, "root")} + * {
+  ${group("status")} > ${statusPartRefs.root} + * {
     margin-inline-start: 8px;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.caption};

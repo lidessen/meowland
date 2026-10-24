@@ -1,14 +1,14 @@
 import { expect, test } from "bun:test";
-import { createRuntime, h, createThemePlugin, type Props, type Child } from "meowjsx";
+import { createRuntime, h, createThemePlugin } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Container, containerContract } from "../../../src/components/container";
-import { Stack, stackContract } from "../../../src/components/stack";
-import { Inline, inlineContract } from "../../../src/components/inline";
-import { Grid, gridContract } from "../../../src/components/grid";
+import { Container } from "../../../src/components/container";
+import { Stack } from "../../../src/components/stack";
+import { Inline } from "../../../src/components/inline";
+import { Grid } from "../../../src/components/grid";
 import { AspectRatio } from "../../../src/components/aspect-ratio";
 import { FieldGroup } from "../../../src/components/field-group";
 import { LayoutItem } from "../../../src/components/layout-item";
-import { createMeowUI } from "../../../src/registry";
+import { createMeowUI, meowUIComponents } from "../../../src/registry";
 
 test("layout items own flex placement without changing content semantics", () => {
   const web = createWebRenderer(createRuntime());
@@ -33,9 +33,9 @@ test("layout items own flex placement without changing content semantics", () =>
   expect(html).not.toContain("grow=");
 });
 
-test("layout spacing defaults preserve gap and expose axis overrides through contracts", () => {
+test("layout spacing defaults preserve gap and expose axis overrides through metadata", () => {
   const runtime = createRuntime();
-  runtime.use(createMeowUI());
+  runtime.use(createMeowUI({ components: meowUIComponents }));
   const web = createWebRenderer(runtime);
   const html = web.renderToHtml(
     <Inline gap="relaxed" rowGap="compact">
@@ -50,9 +50,7 @@ test("layout spacing defaults preserve gap and expose axis overrides through con
 
 test("layout hosts retain decoration and placement while structure wins", () => {
   const web = createWebRenderer(createRuntime());
-  for (const Component of [Stack, Inline, Grid, Container, AspectRatio] as Array<
-    (props: Props) => Child
-  >) {
+  for (const Component of [Stack, Inline, Grid, Container, AspectRatio]) {
     const html = web.renderToHtml(
       h(Component, { style: { color: "red", gridColumn: "1 / -1", minWidth: 300 } }),
     );
@@ -120,8 +118,7 @@ test("unthemed layouts retain semantic elements and structure without choosing v
 
 test("layout themes can change spacing independently from structure and uninstall cleanly", () => {
   const runtime = createRuntime();
-  for (const contract of [stackContract, inlineContract, gridContract, containerContract])
-    runtime.registry.register(contract);
+  for (const component of [Stack, Inline, Grid, Container]) runtime.registry.register(component);
   const web = createWebRenderer(runtime);
   const view = (
     <Grid minColumnWidth="compact" gap="relaxed">

@@ -1,17 +1,19 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { menuContract } from "../../components/menu";
+import { css, parts } from "meowcss/meowjsx";
+
 import { uiTokens } from "../tokens";
+import type { Menu } from "../../components/menu";
+const menuPartRefs = parts<typeof Menu>("menu");
 export const menuStyles = css`
-  ${partSelector(menuContract, "branch")} {
+  ${menuPartRefs.branch} {
     min-width: 0;
   }
-  ${partSelector(menuContract, "root")} {
+  ${menuPartRefs.root} {
     min-width: 144px;
     max-width: min(360px, 100%);
     font: ${uiTokens.type.body} / ${uiTokens.type.line.bodyCompact} ${uiTokens.type.sans};
     color: ${uiTokens.ink.primary};
   }
-  ${partSelector(menuContract, "item")} {
+  ${menuPartRefs.item} {
     display: flex;
     align-items: center;
     gap: ${uiTokens.space.group};
@@ -28,45 +30,45 @@ export const menuStyles = css`
     cursor: pointer;
     transition: background-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
-  ${partSelector(menuContract, "item")}:is(:hover, :focus-visible):not(:disabled) {
+  ${menuPartRefs.item}:is(:hover, :focus-visible):not(:disabled) {
     background: ${uiTokens.state.hover};
     outline: none;
   }
-  ${partSelector(menuContract, "item")}:disabled {
+  ${menuPartRefs.item}:disabled {
     opacity: 0.4;
     cursor: not-allowed;
   }
-  ${partSelector(menuContract, "item")}[data-danger="true"] {
+  ${menuPartRefs.item}[data-danger="true"] {
     color: ${uiTokens.status.danger};
   }
-  ${partSelector(menuContract, "item")}[data-danger="true"]:is(:hover, :focus-visible):not(:disabled) {
+  ${menuPartRefs.item}[data-danger="true"]:is(:hover, :focus-visible):not(:disabled) {
     background: color-mix(in srgb, ${uiTokens.status.danger} 10%, transparent);
   }
-  ${partSelector(menuContract, "label")} {
+  ${menuPartRefs.label} {
     flex: 1;
     min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  ${partSelector(menuContract, "icon")} {
+  ${menuPartRefs.icon} {
     display: flex;
     width: ${uiTokens.icon.size};
     height: ${uiTokens.icon.size};
     flex: none;
     color: ${uiTokens.ink.secondary};
   }
-  ${partSelector(menuContract, "icon")} svg {
+  ${menuPartRefs.icon} svg {
     width: ${uiTokens.icon.size};
     height: ${uiTokens.icon.size};
   }
-  ${partSelector(menuContract, "shortcut")} {
+  ${menuPartRefs.shortcut} {
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.micro};
     line-height: ${uiTokens.type.line.micro};
     white-space: nowrap;
   }
-  ${partSelector(menuContract, "heading")} {
+  ${menuPartRefs.heading} {
     padding: 8px 10px 4px;
     font-size: ${uiTokens.type.micro};
     font-weight: ${uiTokens.type.weight.medium};
@@ -76,13 +78,13 @@ export const menuStyles = css`
     color: ${uiTokens.ink.tertiary};
   }
   /* Separators run to the panel edges, so groups read as bands. */
-  ${partSelector(menuContract, "separator")} {
+  ${menuPartRefs.separator} {
     height: 0.5px;
     background: ${uiTokens.line.divider};
     margin: 4px -6px;
   }
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(menuContract, "item")} {
+    ${menuPartRefs.item} {
       transition: none;
     }
   }

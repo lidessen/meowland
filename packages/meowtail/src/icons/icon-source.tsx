@@ -1,4 +1,4 @@
-import { h, type Child } from "meowjsx";
+import { h, type Child, type ClassValue } from "meowjsx";
 import { IconFrame } from "./icon-frame";
 
 /**
@@ -14,7 +14,7 @@ export interface IconSourceProps {
   /** Icon node data supplied by the caller from its own trusted icon source. */
   source: IconNode;
   size?: number;
-  className?: string;
+  className?: ClassValue;
   /** Omit for decorative icons. Icon-only controls should label the control itself. */
   label?: string;
 }

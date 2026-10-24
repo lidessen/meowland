@@ -1,66 +1,51 @@
-import { defineComponent, h, type Child, type ComponentContract, type Props } from "meowjsx";
+import { h, type Child, type Props, type Context } from "meowjsx";
 import { actionRowRef } from "../shared/action-row-fit";
 import { PageFrame } from "./page-frame";
-
-export const dialogContract = {
-  name: "dialog",
-  parts: ["root"],
-} as const satisfies ComponentContract;
 
 export interface DialogProps extends Props {
   labelledBy?: string;
   describedBy?: string;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** The native dialog element, themed; Modal builds a complete dialog on top of it. */
-export const Dialog = defineComponent<
-  DialogProps,
-  typeof dialogContract.name,
-  (typeof dialogContract.parts)[number]
->(dialogContract, ({ labelledBy, describedBy, className, children, ...props }, context) =>
-  context.part(
-    "root",
-    "dialog",
-    {
-      ...props,
-      className,
-      "aria-labelledby": labelledBy,
-      "aria-describedby": describedBy,
-    },
-    children,
-  ),
-);
-
-export const dialogPanelContract = {
-  name: "dialog-panel",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+export function Dialog(
+  { labelledBy, describedBy, className, children, ref, ...props }: DialogProps,
+  context: Context<typeof Dialog>,
+) {
+  return (
+    <dialog
+      {...props}
+      className={className}
+      aria-labelledby={labelledBy}
+      aria-describedby={describedBy}
+      ref={[context.parts.root, ref]}
+    >
+      {children}
+    </dialog>
+  );
+}
+Dialog.meta = { name: "dialog", parts: ["root"] } as const;
 
 export interface DialogPanelProps extends Props {
   as?: "div" | "form";
   header?: Child;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** The body of a dialog, with an optional header that stays in place while the body scrolls. */
-export const DialogPanel = defineComponent<
-  DialogPanelProps,
-  typeof dialogPanelContract.name,
-  (typeof dialogPanelContract.parts)[number]
->(dialogPanelContract, ({ as = "div", header, className, children, ...props }, context) =>
-  context.part(
-    "root",
-    as,
-    { ...props, className },
-    h(PageFrame, { variant: "workspace", scrollOwner: "layout", header }, children),
-  ),
-);
-
-export const dialogHeaderContract = {
-  name: "dialog-header",
-  parts: ["root", "identity", "eyebrow", "title", "description", "actions"],
-} as const satisfies ComponentContract;
+export function DialogPanel(
+  { as = "div", header, className, children, ref, ...props }: DialogPanelProps,
+  context: Context<typeof DialogPanel>,
+) {
+  const Panel = as;
+  return (
+    <Panel {...props} className={className} ref={[context.parts.root, ref]}>
+      {h(PageFrame, { variant: "workspace", scrollOwner: "layout", header }, children)}
+    </Panel>
+  );
+}
+DialogPanel.meta = { name: "dialog-panel", parts: ["root"] } as const;
 
 export interface DialogHeaderProps extends Props {
   title: Child;
@@ -69,54 +54,58 @@ export interface DialogHeaderProps extends Props {
   actions?: Child;
   titleId?: string;
   descriptionId?: string;
-  className?: string;
+  className?: Props["className"];
 }
 
 /** The title block of a dialog: an optional eyebrow, the title, a description and actions. */
-export const DialogHeader = defineComponent<
-  DialogHeaderProps,
-  typeof dialogHeaderContract.name,
-  (typeof dialogHeaderContract.parts)[number]
->(
-  dialogHeaderContract,
-  ({ title, eyebrow, description, actions, titleId, descriptionId, className }, context) =>
-    context.part(
-      "root",
-      "header",
-      { className },
-      context.part(
-        "identity",
-        "div",
-        null,
-        eyebrow ? context.part("eyebrow", "span", null, eyebrow) : null,
-        context.part("title", "h2", titleId ? { id: titleId } : null, title),
-        description
-          ? context.part(
-              "description",
-              "p",
-              descriptionId ? { id: descriptionId } : null,
-              description,
-            )
-          : null,
-      ),
-      actions ? context.part("actions", "div", null, actions) : null,
-    ),
-);
-
-export const dialogActionsContract = {
-  name: "dialog-actions",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+export function DialogHeader(
+  {
+    title,
+    eyebrow,
+    description,
+    actions,
+    titleId,
+    descriptionId,
+    className,
+    ref,
+  }: DialogHeaderProps,
+  context: Context<typeof DialogHeader>,
+) {
+  return (
+    <header className={className} ref={[context.parts.root, ref]}>
+      <div ref={context.parts.identity}>
+        {eyebrow ? <span ref={context.parts.eyebrow}>{eyebrow}</span> : null}
+        <h2 id={titleId} ref={context.parts.title}>
+          {title}
+        </h2>
+        {description ? (
+          <p id={descriptionId} ref={context.parts.description}>
+            {description}
+          </p>
+        ) : null}
+      </div>
+      {actions ? <div ref={context.parts.actions}>{actions}</div> : null}
+    </header>
+  );
+}
+DialogHeader.meta = {
+  name: "dialog-header",
+  parts: ["root", "identity", "eyebrow", "title", "description", "actions"],
+} as const;
 
 export interface DialogActionsProps extends Props {
-  className?: string;
+  className?: Props["className"];
 }
 
 /** The row of buttons that ends a dialog; it stacks whole when it does not fit, like ActionRow. */
-export const DialogActions = defineComponent<
-  DialogActionsProps,
-  typeof dialogActionsContract.name,
-  (typeof dialogActionsContract.parts)[number]
->(dialogActionsContract, ({ children, className, ...props }, context) =>
-  context.part("root", "div", { ...props, className, ref: actionRowRef(props.ref) }, children),
-);
+export function DialogActions(
+  { children, className, ref, ...props }: DialogActionsProps,
+  context: Context<typeof DialogActions>,
+) {
+  return (
+    <div {...props} className={className} ref={[context.parts.root, ref, actionRowRef()]}>
+      {children}
+    </div>
+  );
+}
+DialogActions.meta = { name: "dialog-actions", parts: ["root"] } as const;

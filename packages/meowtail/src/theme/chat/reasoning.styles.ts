@@ -1,10 +1,9 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { chatReasoningContract } from "../../chat/reasoning";
-
-const part = (name: (typeof chatReasoningContract.parts)[number]) =>
-  partSelector(chatReasoningContract, name);
+import type { ChatReasoning } from "../../chat/reasoning";
+import { ui } from "../utilities";
+const chatReasoningPartRefs = parts<typeof ChatReasoning>("chat-reasoning");
+const part = (name: keyof typeof chatReasoningPartRefs) => chatReasoningPartRefs[name];
 
 export const chatReasoningStyles = css`
   ${part("root")} {
@@ -37,7 +36,7 @@ export const chatReasoningStyles = css`
     color: ${uiTokens.ink.primary};
   }
   ${part("summary")}:focus-visible {
-    ${focusRing()}
+    ${ui.focus.ring}
     border-radius: ${uiTokens.radius.md};
   }
   ${part("icon")} {

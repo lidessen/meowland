@@ -12,6 +12,47 @@ import {
   Tag,
 } from "meowtail";
 
+export const InitiallyOpenDrawerStory = defineStory({
+  id: "drawer-initially-open",
+  title: "Drawer · Initially open",
+  group: "Navigation and layout",
+  groupOrder: 34,
+  component: "Drawer",
+  variant: "Controlled initial state",
+  description: "An initially open drawer enters the native modal layer after mounting.",
+  covers: ["Initial open state", "Escape", "controlled reopen"],
+  render() {
+    const open = signal(true);
+    return (
+      <Stack align="start">
+        <Button
+          onClick={() => {
+            open.value = true;
+          }}
+        >
+          Reopen drawer
+        </Button>
+        <Drawer
+          label="Initially open navigation"
+          open={open}
+          onOpenChange={(next) => {
+            open.value = next;
+          }}
+          header={<DialogHeader title="Navigation" />}
+        >
+          <NavItem
+            label="Current workspace"
+            active
+            onClick={() => {
+              open.value = false;
+            }}
+          />
+        </Drawer>
+      </Stack>
+    );
+  },
+});
+
 export const DrawerStory = defineStory({
   id: "drawer",
   title: "Drawer · Narrow-screen navigation",

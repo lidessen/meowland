@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Button, ComposerPanel, MetaRow, installMeowUI } from "meowtail";
+import { Button, ComposerPanel, MetaRow, installMeowUI, meowUIComponents } from "meowtail";
 
 function web() {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   return createWebRenderer(runtime);
 }
 

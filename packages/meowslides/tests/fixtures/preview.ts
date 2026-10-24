@@ -1,6 +1,6 @@
 import { createRuntime } from "meowjsx";
 import { applyTheme, mountStyles } from "meowcss/web";
-import { createMeowUI } from "meowtail";
+import { createMeowUI, meowUIComponents } from "meowtail";
 import { createMeowSlides } from "meowslides";
 import { presentationOptions, presentationTheme } from "meowslides/theme";
 import type { PreviewEnvironment } from "meowbook";
@@ -28,5 +28,7 @@ export default (({ root, onCleanup }) => {
   label.append(select);
   root.before(label);
   onCleanup(() => label.remove());
-  return createRuntime({ plugins: [createMeowUI(), createMeowSlides()] });
+  return createRuntime({
+    plugins: [createMeowUI({ components: meowUIComponents }), createMeowSlides()],
+  });
 }) satisfies PreviewEnvironment;

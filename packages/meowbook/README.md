@@ -41,14 +41,14 @@ The style lifecycle is owned by the environment; switching stories in the same d
 
 ```ts
 import { createRuntime } from "meowjsx";
-import { createMeowUI } from "meowtail";
+import { createMeowUI, meowUIComponents } from "meowtail";
 import { standardTheme } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 import type { PreviewEnvironment } from "meowbook";
 export default (({ root, onCleanup }) => {
   onCleanup(mountStyles(root.ownerDocument, standardTheme.cssText));
   onCleanup(applyTheme(root.ownerDocument.documentElement, standardTheme));
-  return createRuntime({ plugins: [createMeowUI()] });
+  return createRuntime({ plugins: [createMeowUI({ components: meowUIComponents })] });
 }) satisfies PreviewEnvironment;
 ```
 
@@ -106,7 +106,7 @@ export const LayoutOnly = defineStory({
 });
 ```
 
-Replacement happens by function identity before the execution runtime calls the component, and the original component does not execute. Pre-created VNodes, Signals, Promises and multiple instances are all covered. Replacement components go through the normal lifecycle, theme and cleanup; a replacement contract that needs shadow must still be registered by the environment. The rule is a `pre` plugin, follows the runtime's first match and does not replace recursively.
+Replacement happens by function identity before the execution runtime calls the component, and the original component does not execute. Pre-created VNodes, Signals, Promises and multiple instances are all covered. Replacement components go through the normal lifecycle, theme and cleanup; an environment must also register any shadow a replacement needs. The rule is a `pre` plugin, follows the runtime's first match and does not replace recursively.
 
 A partial preview explicitly shows the replacement marker; `#story-replacements` provides hit counts (including zero hits). Direct function calls, module import side effects and private renderers are not controlled by replacement. A complete story and a partial story use different ids, and a placeholder story cannot prove complete behavior.
 
@@ -114,7 +114,7 @@ A partial preview explicitly shows the replacement marker; `#story-replacements`
 
 For large catalogs, first narrow discovery with `list --query <text> --json`, for example `--query composer` or `--query process`.
 The query is case-insensitive and matches literal substrings of id, title, group, component name and variant; full source information is retained, and zero matches return an empty array.
-It is only for catalog discovery and does not change the capture selection contract.
+It is only for catalog discovery and does not change which stories or components capture selects.
 
 `capture` reuses discovery, typechecking and the canvas, builds once, and uses a separate Chromium context for each story.
 By default it outputs the whole-story image and local component images for the next layer; local images are cropped from the same viewport original without remounting components:
@@ -139,7 +139,7 @@ Layout.metadata = { capture: { transparent: true } } satisfies ComponentMetadata
 ```
 
 `--select` exactly matches the display name of the actual component or the replaced component and keeps all instances with the same name; explicitly selecting a transparent component also captures it.
-The component name comes first from the contract, then from the retained function name; anonymous components can only use the name of the current instance.
+The component name comes first from `.meta.name`, then from the retained function name; anonymous components can only use the name of the current instance.
 The complete tree keeps transparent, hidden, off-screen, ancestor-clipped and out-of-range nodes, and instance IDs are only valid within this mount.
 
 Complex transforms, clip-path, mask and similar ranges are marked as approximate; private renderers, direct function calls and native popups cannot reconstruct the internal instance tree.

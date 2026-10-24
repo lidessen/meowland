@@ -1,33 +1,20 @@
-import {
-  defineComponent,
-  derived,
-  unwrap,
-  type ComponentContract,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { derived, unwrap, type MaybeSignal, type Props, type Context, h } from "meowjsx";
 import { createSkeletonController, useWebObservation } from "meowjsx/web";
-
-export const skeletonBoundaryContract = {
-  name: "skeleton-boundary",
-  parts: ["root", "content", "status"],
-} as const satisfies ComponentContract;
 
 export interface SkeletonBoundaryProps extends Props {
   active: MaybeSignal<boolean>;
   label: string;
-  className?: string;
+  className?: Props["className"];
 }
 
 /**
  * Shows skeletons in place of a region while it loads. Loading presentation preserves the mounted
  * subtree; the caller owns request state.
  */
-export const SkeletonBoundary = defineComponent<
-  SkeletonBoundaryProps,
-  "skeleton-boundary",
-  (typeof skeletonBoundaryContract.parts)[number]
->(skeletonBoundaryContract, ({ active, label, children, ...props }, context) => {
+export function SkeletonBoundary(
+  { active, label, children, ...props }: SkeletonBoundaryProps,
+  context: Context<typeof SkeletonBoundary>,
+) {
   const observation = useWebObservation();
   const mounted = context.signal<HTMLElement | null>(null);
   const busy = derived(() => unwrap(active));
@@ -55,7 +42,7 @@ export const SkeletonBoundary = defineComponent<
           ?.read()
           .filter(
             (instance) =>
-              instance.component.contract === skeletonBoundaryContract &&
+              instance.component.meta?.name === SkeletonBoundary.meta.name &&
               instance.nodes.has(element),
           ) ?? [];
       const root = candidates.find(
@@ -75,31 +62,36 @@ export const SkeletonBoundary = defineComponent<
   });
   context.onCleanup(clear);
   return [
-    context.part(
-      "root",
-      "div",
-      { ...props, "aria-busy": busyAttribute },
-      context.part(
-        "content",
-        "div",
-        {
-          inert: busy,
-          ref: (element: HTMLElement) => {
-            let alive = true;
-            queueMicrotask(() => {
-              if (alive) mounted.value = element;
-            });
-            return () => {
-              alive = false;
-              clear();
-              mounted.value = null;
-            };
-          },
-        },
-        children,
-      ),
-    ),
+    <div {...props} aria-busy={busyAttribute} ref={[context.parts.root, props.ref]}>
+      {
+        <div
+          inert={busy}
+          ref={[
+            context.parts.content,
+            (element: HTMLElement) => {
+              let alive = true;
+              queueMicrotask(() => {
+                if (alive) mounted.value = element;
+              });
+              return () => {
+                alive = false;
+                clear();
+                mounted.value = null;
+              };
+            },
+          ]}
+        >
+          {children}
+        </div>
+      }
+    </div>,
     // Keep announcements outside the busy region so its updates are not deferred.
-    context.part("status", "span", { role: "status", "aria-atomic": "true" }, announcement),
+    <span role={"status"} aria-atomic={"true"} ref={[context.parts.status]}>
+      {announcement}
+    </span>,
   ];
-});
+}
+SkeletonBoundary.meta = {
+  name: "skeleton-boundary",
+  parts: ["root", "content", "status"],
+} as const;

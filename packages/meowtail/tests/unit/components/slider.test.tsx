@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h, signal, type Props } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Slider, installMeowUI } from "../../../src/index";
+import { Slider, installMeowUI, meowUIComponents } from "../../../src/index";
 
 test("slider exposes a named native range and the same visible value", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const html = createWebRenderer(runtime).renderToHtml(
     <Slider id="volume" label="Volume" defaultValue={40} min={0} max={100} step={5} />,
   );

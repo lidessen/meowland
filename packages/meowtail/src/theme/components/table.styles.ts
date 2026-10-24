@@ -1,9 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { tableContract, tableMinWidth } from "../../components/table";
-
-const part = (name: (typeof tableContract.parts)[number]) => partSelector(tableContract, name);
+import type { Table } from "../../components/table";
+import { tableMinWidth } from "../../components/table.options";
+import { ui } from "../utilities";
+const tablePartRefs = parts<typeof Table>("table");
+const part = (name: keyof typeof tablePartRefs) => tablePartRefs[name];
 
 export const tableStyles = css`
   ${part("root")} {
@@ -86,7 +87,7 @@ export const tableStyles = css`
     color: currentColor;
   }
   ${part("sort")}:focus-visible {
-    ${focusRing()}
+    ${ui.focus.ring}
     border-radius: ${uiTokens.radius.xs};
   }
   ${part("resize")} {

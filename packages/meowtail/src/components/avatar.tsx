@@ -1,23 +1,15 @@
-import { defineOptions } from "meowcss";
-import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
-import { defineComponent, type Props } from "meowjsx";
+import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
+import { type Props, type Context, h } from "meowjsx";
 
-export const avatarOptions = defineOptions("avatar", {
-  size: ["small", "default", "large"],
-});
-
-export const avatarContract = {
-  name: "avatar",
-  parts: ["root", "image", "initials"],
-  styleProps: defineStyleProps(avatarOptions, { defaults: { size: "default" } }),
-} as const satisfies StyledComponentContract;
+import { avatarOptions } from "./avatar.options";
+export { avatarOptions } from "./avatar.options";
 
 export interface AvatarProps extends Props, ThemedProps<typeof avatarOptions> {
   /** Used for initials and the accessible name. */
   name: string;
   src?: string;
   alt?: string;
-  className?: string;
+  className?: Props["className"];
 }
 
 export function initialsFromName(name: string): string {
@@ -34,32 +26,39 @@ export function initialsFromName(name: string): string {
 }
 
 /** A face or the initials that remain when the image is missing. */
-export const Avatar = defineComponent<
-  AvatarProps,
-  typeof avatarContract.name,
-  (typeof avatarContract.parts)[number]
->(avatarContract, ({ name, src, alt, className, ...props }, context) => {
+export function Avatar(
+  { name, src, alt, className, ...props }: AvatarProps,
+  context: Context<typeof Avatar>,
+) {
   const failed = context.signal(false);
-  return context.part(
-    "root",
-    "span",
-    {
-      ...props,
-      className,
-      role: "img",
-      "aria-label": name,
-    },
-    context.part("initials", "span", { "aria-hidden": "true" }, initialsFromName(name)),
-    src
-      ? context.part("image", "img", {
-          src,
-          alt: alt ?? "",
-          hidden: failed,
-          referrerPolicy: "no-referrer",
-          onError: () => {
+  return (
+    <span
+      {...props}
+      className={className}
+      role="img"
+      aria-label={name}
+      ref={[context.parts.root, props.ref]}
+    >
+      <span aria-hidden="true" ref={[context.parts.initials]}>
+        {initialsFromName(name)}
+      </span>
+      {src ? (
+        <img
+          src={src}
+          alt={alt ?? ""}
+          hidden={failed}
+          referrerPolicy="no-referrer"
+          onError={() => {
             failed.value = true;
-          },
-        })
-      : null,
+          }}
+          ref={[context.parts.image]}
+        />
+      ) : null}
+    </span>
   );
-});
+}
+Avatar.meta = {
+  name: "avatar",
+  parts: ["root", "image", "initials"],
+  style: defineStyleProps(avatarOptions, { defaults: { size: "default" } }),
+} as const;

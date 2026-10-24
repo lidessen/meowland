@@ -1,11 +1,13 @@
-import { css, partSelector } from "meowcss/meowjsx";
-import { checkboxContract } from "../../components/checkbox";
-import { switchContract } from "../../components/switch";
-import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
+import { css, parts } from "meowcss/meowjsx";
 
+import { uiTokens } from "../tokens";
+import type { Checkbox } from "../../components/checkbox";
+import type { Switch } from "../../components/switch";
+import { ui } from "../utilities";
+const checkboxPartRefs = parts<typeof Checkbox>("checkbox");
+const switchPartRefs = parts<typeof Switch>("switch");
 export const toggleStyles = css`
-  :where(${partSelector(checkboxContract, "root")}, ${partSelector(switchContract, "root")}) {
+  :where(${checkboxPartRefs.root}, ${switchPartRefs.root}) {
     position: relative;
     display: inline-flex;
     align-items: center;
@@ -14,7 +16,7 @@ export const toggleStyles = css`
     font: ${uiTokens.type.body} / ${uiTokens.type.line.bodyCompact} ${uiTokens.type.sans};
     cursor: pointer;
   }
-  ${partSelector(checkboxContract, "input")} {
+  ${checkboxPartRefs.input} {
     flex: 0 0 auto;
     width: 16px;
     height: 16px;
@@ -22,7 +24,7 @@ export const toggleStyles = css`
     accent-color: ${uiTokens.action.primary};
     cursor: inherit;
   }
-  ${partSelector(switchContract, "input")} {
+  ${switchPartRefs.input} {
     position: absolute;
     width: 36px;
     height: 20px;
@@ -30,7 +32,7 @@ export const toggleStyles = css`
     opacity: 0;
     cursor: inherit;
   }
-  ${partSelector(switchContract, "track")} {
+  ${switchPartRefs.track} {
     box-sizing: border-box;
     flex: 0 0 auto;
     width: 36px;
@@ -41,7 +43,7 @@ export const toggleStyles = css`
     background: ${uiTokens.line.edge};
     pointer-events: none;
   }
-  ${partSelector(switchContract, "thumb")} {
+  ${switchPartRefs.thumb} {
     display: block;
     width: 16px;
     height: 16px;
@@ -50,24 +52,24 @@ export const toggleStyles = css`
     background: ${uiTokens.control.knob};
     transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
-  ${partSelector(switchContract, "input")}:checked + ${partSelector(switchContract, "track")} {
+  ${switchPartRefs.input}:checked + ${switchPartRefs.track} {
     background: ${uiTokens.action.primary};
   }
-  ${partSelector(switchContract, "input")}:checked + ${partSelector(switchContract, "track")} ${partSelector(switchContract, "thumb")} {
+  ${switchPartRefs.input}:checked + ${switchPartRefs.track} ${switchPartRefs.thumb} {
     transform: translateX(16px);
     background: ${uiTokens.action.onPrimary};
   }
-  :where(${partSelector(checkboxContract, "input")}:focus-visible, ${partSelector(switchContract, "input")}:focus-visible + ${partSelector(switchContract, "track")}) {
-    ${focusRing()}
+  :where(${checkboxPartRefs.input}:focus-visible, ${switchPartRefs.input}:focus-visible + ${switchPartRefs.track}) {
+    ${ui.focus.ring}
   }
-  :where(${partSelector(checkboxContract, "root")}, ${partSelector(switchContract, "root")}):has(input:disabled) {
+  :where(${checkboxPartRefs.root}, ${switchPartRefs.root}):has(input:disabled) {
     cursor: default;
     opacity: 0.5;
   }
-  ${partSelector(checkboxContract, "root")}[data-label-hidden] {
+  ${checkboxPartRefs.root}[data-label-hidden] {
     gap: 0;
   }
-  ${partSelector(checkboxContract, "label")}[data-label-hidden] {
+  ${checkboxPartRefs.label}[data-label-hidden] {
     position: absolute;
     width: 1px;
     height: 1px;
@@ -75,21 +77,21 @@ export const toggleStyles = css`
     clip-path: inset(50%);
   }
   @media (prefers-reduced-motion: reduce) {
-    ${partSelector(switchContract, "thumb")} {
+    ${switchPartRefs.thumb} {
       transition: none;
     }
   }
   @media (forced-colors: active) {
-    ${partSelector(switchContract, "track")} {
+    ${switchPartRefs.track} {
       border: 1px solid ButtonText;
     }
-    ${partSelector(switchContract, "thumb")} {
+    ${switchPartRefs.thumb} {
       background: ButtonText;
     }
-    ${partSelector(switchContract, "input")}:checked + ${partSelector(switchContract, "track")} {
+    ${switchPartRefs.input}:checked + ${switchPartRefs.track} {
       background: Highlight;
     }
-    ${partSelector(switchContract, "input")}:checked + ${partSelector(switchContract, "track")} ${partSelector(switchContract, "thumb")} {
+    ${switchPartRefs.input}:checked + ${switchPartRefs.track} ${switchPartRefs.thumb} {
       background: HighlightText;
     }
   }

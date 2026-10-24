@@ -1,13 +1,11 @@
-import {
-  descriptionItemContract,
-  descriptionListContract,
-} from "../../components/description-list";
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 
-const list = partSelector(descriptionListContract, "root");
-const item = (part: (typeof descriptionItemContract.parts)[number]) =>
-  partSelector(descriptionItemContract, part);
+import type { DescriptionItem, DescriptionList } from "../../components/description-list";
+const descriptionListPartRefs = parts<typeof DescriptionList>("description-list");
+const descriptionItemPartRefs = parts<typeof DescriptionItem>("description-item");
+const list = descriptionListPartRefs.root;
+const item = (part: keyof typeof descriptionItemPartRefs) => descriptionItemPartRefs[part];
 
 export const descriptionListStyles = css`
   ${list} {

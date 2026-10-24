@@ -1,34 +1,27 @@
-import { defineComponent, type Props } from "meowjsx";
-import { defineOptions } from "meowcss";
-import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
-
-export const presentationTextOptions = defineOptions("presentation-text", {
-  effect: ["plain", "editorial", "marker"],
-});
-
-export const presentationTextContract = {
-  name: "presentation-text",
-  parts: ["root", "content"],
-  styleProps: defineStyleProps(presentationTextOptions, {
-    defaults: { effect: "plain" },
-  }),
-} as const satisfies StyledComponentContract;
+import { h, type Context, type Props } from "meowjsx";
+import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
+import { presentationTextOptions } from "./presentation-text.options";
 
 export interface PresentationTextProps extends Props, ThemedProps<typeof presentationTextOptions> {
   as?: "span" | "h1" | "h2" | "h3" | "p";
-  className?: string;
 }
 
 /** Real text with optional presentation typography; its surrounding layout owns the scale. */
-export const PresentationText = defineComponent<
-  PresentationTextProps,
-  typeof presentationTextContract.name,
-  (typeof presentationTextContract.parts)[number]
->(presentationTextContract, ({ as = "span", className, children, ...props }, context) =>
-  context.part(
-    "root",
-    as,
-    { ...props, className },
-    context.part("content", "span", null, children),
-  ),
-);
+export function PresentationText(
+  { as = "span", className, children, ref, ...props }: PresentationTextProps,
+  context: Context<typeof PresentationText>,
+) {
+  const parts = context.parts;
+  const Root = as;
+  return (
+    <Root {...props} ref={[parts.root, ref]} className={className}>
+      <span ref={parts.content}>{children}</span>
+    </Root>
+  );
+}
+
+PresentationText.meta = {
+  name: "presentation-text",
+  parts: ["root", "content"],
+  style: defineStyleProps(presentationTextOptions, { defaults: { effect: "plain" } }),
+} as const;

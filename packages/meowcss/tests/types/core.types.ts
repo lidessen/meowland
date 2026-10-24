@@ -1,8 +1,10 @@
 import { css, defineOptions, defineTheme, defineTokens, type CSSFragment } from "meowcss";
 
 const options = defineOptions("plain", { density: ["compact", "normal"] });
-const tokens = defineTokens("plain", { gap: options.by.density(["4px", "8px"]) });
-const fragment: CSSFragment<never> = css`
+const tokens = defineTokens("plain", {
+  gap: options.by.density(["4px", "8px"]),
+});
+const fragment: CSSFragment = css`
   body {
     gap: ${tokens.gap};
   }

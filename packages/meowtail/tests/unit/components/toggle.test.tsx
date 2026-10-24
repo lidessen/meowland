@@ -1,11 +1,12 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h, signal, type Props } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Checkbox, Switch, installMeowUI } from "../../../src/index";
+import { Checkbox, Switch, installMeowUI, meowUIComponents } from "../../../src/index";
+import { mountComponent } from "./mount";
 
 test("toggles expose native form semantics and implicit labels without a theme", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const html = createWebRenderer(runtime).renderToHtml(
     <div>
       <Checkbox
@@ -31,27 +32,17 @@ test("toggles expose native form semantics and implicit labels without a theme",
 
 test("indeterminate checkboxes expose mixed native state", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
-  let native: Props = {};
-  runtime.use({
-    render({ vnode }, next) {
-      if (vnode.type === "input") native = vnode.props;
-      return next(vnode);
-    },
-  });
-  const html = createWebRenderer(runtime).renderToHtml(
-    <Checkbox label="Some selected" indeterminate labelHidden />,
-  );
+  installMeowUI({ components: meowUIComponents }, runtime);
+  const node = <Checkbox label="Some selected" indeterminate labelHidden />;
+  const html = createWebRenderer(runtime).renderToHtml(node);
   expect(html).toContain('aria-checked="mixed"');
   expect(html).toContain("data-label-hidden");
-  const input = {
-    defaultChecked: false,
-    checked: false,
-    indeterminate: false,
-    ownerDocument: new EventTarget(),
-  };
-  (native.ref as (node: typeof input) => () => void)(input);
-  expect(input.indeterminate).toBe(true);
+  const view = mountComponent(node, runtime);
+  try {
+    expect(view.host.querySelector("input")!.indeterminate).toBe(true);
+  } finally {
+    view.unmount();
+  }
 });
 
 test("controlled toggles accept or reject changes through the caller; uncontrolled input stays native", () => {
@@ -93,30 +84,35 @@ test("controlled toggles accept or reject changes through the caller; uncontroll
 });
 
 test("controlled reset restores the caller value and cleanup removes the form listener", async () => {
-  const runtime = createRuntime();
-  let native: Props = {};
-  runtime.use({
-    render({ vnode }, next) {
-      if (vnode.type === "input") native = vnode.props;
-      return next(vnode);
-    },
-  });
   const checked = signal(true);
-  createWebRenderer(runtime).renderToHtml(
-    <Switch label="Toggle" checked={checked} defaultChecked={false} />,
+  const view = mountComponent(
+    <form>
+      <Switch label="Toggle" checked={checked} defaultChecked={false} />
+    </form>,
   );
-  const form = new EventTarget();
-  const input = { form, ownerDocument: form, checked: false, defaultChecked: false };
-  const cleanup = (native.ref as (input: unknown) => () => void)(input);
-  await Promise.resolve();
-  expect(input.checked).toBe(true);
-  input.checked = false;
-  form.dispatchEvent(new Event("reset"));
-  await new Promise((resolve) => setTimeout(resolve, 5));
-  expect(input.checked).toBe(true);
-  cleanup();
-  input.checked = false;
-  form.dispatchEvent(new Event("reset"));
-  await new Promise((resolve) => setTimeout(resolve, 5));
-  expect(input.checked).toBe(false);
+  const form = view.host.querySelector("form")!;
+  const input = view.host.querySelector("input")!;
+  const reset = () =>
+    form.dispatchEvent(new form.ownerDocument.defaultView!.Event("reset", { bubbles: true }));
+  try {
+    await Promise.resolve();
+    expect(input.checked).toBe(true);
+    input.checked = false;
+    reset();
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    expect(input.checked).toBe(true);
+  } finally {
+    view.unmount();
+  }
+  // Reattach the same native nodes so a leaked document listener would still receive reset.
+  form.append(input);
+  form.ownerDocument.body.append(form);
+  try {
+    input.checked = false;
+    reset();
+    await new Promise((resolve) => setTimeout(resolve, 5));
+    expect(input.checked).toBe(false);
+  } finally {
+    form.remove();
+  }
 });

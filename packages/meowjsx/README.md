@@ -13,7 +13,7 @@ Synchronous HTML output follows the same ancestor rule, but still does not suppo
 `useContext` reads environment only during the component's synchronous execution. Event handlers and code after `await` must use the value captured in render beforehand; do not treat it as asynchronous local storage. Provider does not add whole-tree re-render or dependency tracking; to share a dynamic value, pass a Signal object as the value and let consumers use the existing Signal binding. Replacing a Provider's ordinary value does not automatically re-run already mounted descendants. Context's internal scope is passed by the renderer and users must not modify it.
 
 `RuntimePlugin.resolveComponent({ component, props, runtime })` can select a replacement function before the component is called.
-It is called in the order `pre`, normal, `post`, and within each group's registration order; the first non-`undefined` result wins, and returning the original function also stops resolution; the result is not resolved recursively. Selection happens before the lifecycle scope is created, and the selected component uses its own contract, parts and cleanup logic while the original component does not execute. `props` is a read-only typed view and does not copy or freeze the object.
+It is called in the order `pre`, normal, `post`, and within each group's registration order; the first non-`undefined` result wins, and returning the original function also stops resolution; the result is not resolved recursively. Selection happens before the lifecycle scope is created, and the selected component uses its own metadata, parts and cleanup logic while the original component does not execute. `props` is a read-only typed view and does not copy or freeze the object.
 
 This hook belongs to the execution runtime: pre-created VNodes, Signal/Promise deferred mounts and synchronous HTML all apply. The cleanup returned by `runtime.use()` unmounts rules and does not rewrite already mounted instances; other runtimes are unaffected.
 It does not intercept module side effects or direct function calls, and does not change the meaning of the `create` / `render` hooks.
@@ -21,7 +21,7 @@ It does not intercept module side effects or direct function calls, and does not
 ## Development metadata and instance observation
 
 Component functions may carry `metadata?: ComponentMetadata`. `ComponentMetadata` is an open type-extension interface; development tools register their own namespaces through declaration merging, and core does not interpret or read their tool fields.
-Both `Component<Props>` and the value returned by `defineComponent` preserve this constraint, and ordinary functions can use
+`Component<Props>` preserves this constraint, and ordinary functions can use
 `satisfies ComponentMetadata` to check assignment. Metadata is not part of props or component runtime options.
 
 `runtime.createRenderer(strategy, { observer })` enables target-neutral instance observation:
@@ -66,7 +66,7 @@ if that outlet is missing or throws again, the error is reported asynchronously 
 from an existing renderer are ignored. Usually one observation center is attached to one renderer; the implementation stores by instance identity and does not overwrite because different renderers have the same numeric id. `roots` may use a getter, but the scope is read and fixed when the renderer is created, suitable for tools that set the real child before creation; it is not a runtime dynamic-switch entry. Purely host or text roots
 have no component instances, and external DOM/styles, font loading and browser size changes also do not belong to this observation contract.
 
-MeowJSX core: the JSX/VNode factory, Signal/batch/effect, component and part contracts, shadow/plugin/theme
+MeowJSX core: the JSX/VNode factory, Signal/batch/effect, component metadata and part bindings, shadow/plugin/theme
 contracts, lifecycle and context, and the target-neutral renderer seam (`RenderStrategy<TNode>` /
 `createRenderer()`). Core does not know the target platform.
 
@@ -79,9 +79,9 @@ meowjsx (this package: core + JSX contract)
 
 ## Exports
 
-- `.`, `./runtime`: `h`, `Fragment`, `raw`, `part`, `signal`/`batch`/`mapSignal`/`derived`,
-  `createRuntime`, `defaultRuntime`, `defineComponent`, `defineShadow`,
-  `createThemePlugin`, plus VNode/Signal/contract types.
+- `.`, `./runtime`: `h`, `Fragment`, `raw`, `signal`/`batch`/`mapSignal`/`derived`,
+  `createRuntime`, `defaultRuntime`, `defineShadow`, `createThemePlugin`, part descriptor helpers,
+  plus VNode/Signal/metadata, `Context` and generic ref types.
 - `./renderer`: `RenderStrategy<TNode>`, `createRenderer()`, `Renderer`/`Rendered`/
   `RendererOptions`, `ComponentObserver`/`ObservedComponent` and other target-seam types. `createRenderer()` injects component lifecycle,
   render hooks, overrides and `key`/`componentPart` identity; the target only implements node and attribute placement.
@@ -111,18 +111,66 @@ The command above runs from the repository root and only checks the DOM-free cor
 (defaults to `unknown`); the Web module narrows it to a real element. Theme contracts (`Theme`/`ThemeRule`/
 `ThemeStyle` and their merge rules) stay in core as planned; they carry values only and touch no style API.
 
-## Component authoring design
+## Class lists
 
-The [parts and ref-binding design](../../docs/designs/2026-10-24-component-parts-ref-bindings.md)
-selects ordinary function components and native JSX with `ref={ctx.parts.root}` or composed
-`ref={[ctx.parts.root, forwardedRef, mount]}` bindings. This is a design direction pending
-implementation and type validation; current exports still use `context.part(...)`. It is a
-breaking change: `context.part`, `defineComponent`, hand-written `ComponentContract` objects and
-`partSelector` are removed without aliases; themes address parts through a type-only adapter.
+`className` accepts strings, stringifiable class values, nested readonly arrays, and Signals of
+those values. Arrays keep their order, join with spaces, and omit `false`, `null`, `undefined` and
+empty strings. They do not merge conflicting classes or interpret objects as class dictionaries.
+The native `class` attribute follows the same runtime normalization.
+
+```tsx
+const stateClass = signal("is-idle");
+<div className={["panel", [false, stateClass], "host-panel"]} />;
+stateClass.value = "is-active";
+```
+
+Static HTML reads current values without subscribing. Mounted nodes subscribe to Signals at any
+list depth, update their class attribute in place, and release replaced sources and unmount
+subscriptions. Theme-provided class lists compose with the caller's classes in the same way. The
+public `ClassValue` type is available to components that forward `className`.
+
+## Components and refs
+
+Components are ordinary functions. A static `meta` declares their stable name and finite parts;
+`Context<typeof Component>` supplies the lifecycle and a typed `parts` map. Use
+`Context<typeof Component, ComponentProps>` when setup also needs the declared types of
+`context.props`. Setup runs once per mount, and Signals carry later changes.
+
+```tsx
+import { h, type Context, type Props } from "meowjsx";
+import type { WebRef } from "meowjsx/web";
+
+interface PanelProps extends Props {
+  title: string;
+  ref?: WebRef<HTMLElement>;
+}
+
+export function Panel({ title, children, ref, ...props }: PanelProps, ctx: Context<typeof Panel>) {
+  return (
+    <section {...props} ref={[ctx.parts.root, ref]}>
+      <h2 ref={ctx.parts.heading}>{title}</h2>
+      <div ref={ctx.parts.body}>{children}</div>
+    </section>
+  );
+}
+Panel.meta = { name: "panel", parts: ["root", "heading", "body"] } as const;
+```
+
+`ref` accepts nested readonly arrays of part descriptors, node callbacks and `false`/nullish
+omissions. Callbacks run in order at the existing host-property mount point; returned synchronous
+cleanups run in reverse order. A failure still releases acquired cleanups. Static HTML extracts part
+identity without running callbacks. A host node accepts one distinct part identity, and a descriptor
+can mark several nodes. Component refs remain props and are forwarded explicitly to the intended
+host node.
+
+Generic ref types stay in the DOM-free root. Importing the explicit `meowjsx/web` type surface adds
+HTML/SVG node inference for native JSX refs. Register component functions with `components: [Panel]`;
+metadata does not register itself. The [parts and ref-binding design](../../docs/designs/2026-10-24-component-parts-ref-bindings.md)
+records the breaking migration and theme adapter.
 
 ## Verification
 
-- `bun test packages/meowjsx/tests/unit`: Signal, VNode, plugin, contracts, fake target seam and Web host tests.
+- `bun test packages/meowjsx/tests/unit`: Signal, VNode, plugin, metadata, part/ref bindings, fake target seam and Web host tests.
 - `tests/types/` checks core and Web type cases separately; the core type environment does not include the DOM.
 
 ## Web module

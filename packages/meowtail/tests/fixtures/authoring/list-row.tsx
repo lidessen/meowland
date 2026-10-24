@@ -1,20 +1,14 @@
-// An interactive host row: the interactive() recipe supplies hover, press, focus and disabled.
 import {
-  defineComponent,
+  h,
   isSignal,
   mapSignal,
   type Child,
-  type ComponentContract,
+  type Context,
   type MaybeSignal,
   type Props,
 } from "meowjsx";
-import { css, partSelector } from "meowcss/meowjsx";
-import { interactive, text, uiTokens } from "meowtail/theme";
-
-export const listRowContract = {
-  name: "app-list-row",
-  parts: ["root", "leading", "title", "detail", "trailing"],
-} as const satisfies ComponentContract;
+import { css, parts } from "meowcss/meowjsx";
+import { ui, uiTokens } from "meowtail/theme";
 
 export interface ListRowProps extends Props {
   title: string;
@@ -25,47 +19,55 @@ export interface ListRowProps extends Props {
   current?: MaybeSignal<boolean>;
   disabled?: MaybeSignal<boolean>;
   onSelect?: () => void;
-  className?: string;
 }
 
-export const ListRow = defineComponent<
-  ListRowProps,
-  typeof listRowContract.name,
-  (typeof listRowContract.parts)[number]
->(
-  listRowContract,
-  (
-    { title, detail, leading, trailing, current = false, disabled, onSelect, className, ...props },
-    context,
-  ) =>
-    context.part(
-      "root",
-      "button",
-      {
-        ...props,
-        type: "button",
-        className,
-        disabled,
-        "aria-current": isSignal(current)
+export function ListRow(
+  {
+    title,
+    detail,
+    leading,
+    trailing,
+    current = false,
+    disabled,
+    onSelect,
+    className,
+    ...props
+  }: ListRowProps,
+  context: Context<typeof ListRow>,
+) {
+  return (
+    <button
+      {...props}
+      type="button"
+      className={className}
+      disabled={disabled}
+      aria-current={
+        isSignal(current)
           ? mapSignal(current, (value) => (value ? "true" : undefined))
           : current
             ? "true"
-            : undefined,
-        onClick: () => onSelect?.(),
-      },
-      leading ? context.part("leading", "span", null, leading) : null,
-      context.part("title", "span", null, title),
-      detail ? context.part("detail", "span", null, detail) : null,
-      trailing ? context.part("trailing", "span", null, trailing) : null,
-    ),
-);
+            : undefined
+      }
+      onClick={() => onSelect?.()}
+      ref={context.parts.root}
+    >
+      {leading ? <span ref={context.parts.leading}>{leading}</span> : null}
+      <span ref={context.parts.title}>{title}</span>
+      {detail ? <span ref={context.parts.detail}>{detail}</span> : null}
+      {trailing ? <span ref={context.parts.trailing}>{trailing}</span> : null}
+    </button>
+  );
+}
+ListRow.meta = {
+  name: "app-list-row",
+  parts: ["root", "leading", "title", "detail", "trailing"],
+} as const;
 
-const part = (name: (typeof listRowContract.parts)[number]) => partSelector(listRowContract, name);
-
+const row = parts<typeof ListRow>("app-list-row");
 export const listRowStyles = css`
-  ${part("root")} {
-    ${text("body")}
-    ${interactive({ on: "flat" })}
+  ${row.root} {
+    ${ui.text.body}
+    ${ui.interactive.flat}
     display: grid;
     grid-template-columns: auto minmax(0, 1fr) auto;
     grid-template-areas: "leading title trailing" "leading detail trailing";
@@ -79,24 +81,24 @@ export const listRowStyles = css`
     background: transparent;
     text-align: start;
   }
-  ${part("root")}[aria-current="true"] {
+  ${row.root}[aria-current="true"] {
     background: ${uiTokens.accent.selected};
   }
-  ${part("leading")} {
+  ${row.leading} {
     grid-area: leading;
     display: grid;
     color: ${uiTokens.ink.secondary};
   }
-  ${part("title")} {
+  ${row.title} {
     grid-area: title;
     font-weight: ${uiTokens.type.weight.medium};
     overflow-wrap: anywhere;
   }
-  ${part("detail")} {
-    ${text("caption")}
+  ${row.detail} {
+    ${ui.text.caption}
     grid-area: detail;
   }
-  ${part("trailing")} {
+  ${row.trailing} {
     grid-area: trailing;
     color: ${uiTokens.ink.tertiary};
   }

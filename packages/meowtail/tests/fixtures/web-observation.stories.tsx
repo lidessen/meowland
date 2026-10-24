@@ -1,4 +1,12 @@
-import { createComponentObservation, createRuntime, h, signal, type Child } from "meowjsx";
+import {
+  createComponentObservation,
+  createRuntime,
+  h,
+  signal,
+  type Child,
+  type Context,
+  type Props,
+} from "meowjsx";
 import { createSkeletonController, createWebRenderer, useWebObservation } from "meowjsx/web";
 import { defineStory } from "meowbook";
 
@@ -33,7 +41,10 @@ export const WebObservation = defineStory({
         </section>
       );
     }
-    const Neighbor = () => <aside id="neighbor">{neighbor}</aside>;
+    function Neighbor(_props: Props, _context: Context<typeof Neighbor>) {
+      return <aside id="neighbor">{neighbor}</aside>;
+    }
+    Neighbor.meta = { name: "observation-neighbor", parts: [] } as const;
     const rendererA = createWebRenderer(runtime, { observation: sourceA });
     const rendererB = createWebRenderer(runtime, { observation: sourceB });
     const rendererPlain = createWebRenderer(runtime);

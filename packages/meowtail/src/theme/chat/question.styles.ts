@@ -1,9 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
-import { chatQuestionContract } from "../../chat/question";
 
+import type { ChatQuestion } from "../../chat/question";
+const chatQuestionPartRefs = parts<typeof ChatQuestion>("chat-question");
 export const chatQuestionStyles = css`
-  ${partSelector(chatQuestionContract, "root")} {
+  ${chatQuestionPartRefs.root} {
     box-sizing: border-box;
     width: 100%;
     max-width: 38rem;
@@ -15,41 +16,41 @@ export const chatQuestionStyles = css`
     color: ${uiTokens.ink.primary};
     font: ${chatTokens.fontBody} / ${chatTokens.leading} ${uiTokens.type.sans};
   }
-  ${partSelector(chatQuestionContract, "root")}[hidden] {
+  ${chatQuestionPartRefs.root}[hidden] {
     display: none;
   }
-  ${partSelector(chatQuestionContract, "eyebrow")} {
+  ${chatQuestionPartRefs.eyebrow} {
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
     font-weight: ${uiTokens.type.weight.medium};
     margin-bottom: ${uiTokens.space.group};
   }
-  ${partSelector(chatQuestionContract, "title")} {
+  ${chatQuestionPartRefs.title} {
     margin: 0;
     font-size: ${uiTokens.type.body};
     font-weight: ${uiTokens.type.weight.medium};
     line-height: ${uiTokens.type.line.reading};
     overflow-wrap: anywhere;
   }
-  ${partSelector(chatQuestionContract, "description")} {
+  ${chatQuestionPartRefs.description} {
     margin: ${uiTokens.space.group} 0 0;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.body};
     line-height: ${uiTokens.type.leading};
   }
-  ${partSelector(chatQuestionContract, "content")} {
+  ${chatQuestionPartRefs.content} {
     margin-top: 16px;
     min-width: 0;
   }
-  ${partSelector(chatQuestionContract, "feedback")} {
+  ${chatQuestionPartRefs.feedback} {
     margin-top: ${uiTokens.space.section};
     font-size: ${uiTokens.type.body};
     line-height: ${uiTokens.type.leading};
   }
-  ${partSelector(chatQuestionContract, "feedback")}:has(> [hidden]:only-child) {
+  ${chatQuestionPartRefs.feedback}:has(> [hidden]:only-child) {
     display: none;
   }
-  ${partSelector(chatQuestionContract, "actions")} {
+  ${chatQuestionPartRefs.actions} {
     display: flex;
     flex-wrap: wrap;
     align-items: center;

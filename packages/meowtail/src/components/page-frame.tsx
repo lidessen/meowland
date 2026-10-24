@@ -1,19 +1,8 @@
-import { defineComponent, type Child, type Props } from "meowjsx";
-import { defineOptions } from "meowcss";
-import { defineStyleProps, type StyledComponentContract, type ThemedProps } from "meowcss/meowjsx";
+import { type Child, type Props, type Context, h } from "meowjsx";
+import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
 
-export const pageFrameOptions = defineOptions("page-frame", {
-  variant: ["page", "workspace"],
-  scrollOwner: ["content", "layout"],
-});
-
-export const pageFrameContract = {
-  name: "page-frame",
-  parts: ["root", "toolbar", "header", "notice", "body", "footer"],
-  styleProps: defineStyleProps(pageFrameOptions, {
-    defaults: { variant: "page", scrollOwner: "content" },
-  }),
-} as const satisfies StyledComponentContract;
+import { pageFrameOptions } from "./page-frame.options";
+export { pageFrameOptions } from "./page-frame.options";
 
 export interface PageFrameProps extends Props, ThemedProps<typeof pageFrameOptions> {
   header?: Child;
@@ -22,28 +11,31 @@ export interface PageFrameProps extends Props, ThemedProps<typeof pageFrameOptio
   notice?: Child;
   /** A persistent region after the body, typically a composer or action bar. */
   footer?: Child;
-  className?: string;
+  className?: Props["className"];
 }
 
 /**
  * A frame with fixed chrome and a body that takes the remaining space; the parent owns the
  * chrome.
  */
-export const PageFrame = defineComponent<
-  PageFrameProps,
-  "page-frame",
-  (typeof pageFrameContract.parts)[number]
->(
-  pageFrameContract,
-  ({ header, toolbar, notice, footer, children, className, ...props }, context) =>
-    context.part(
-      "root",
-      "section",
-      { ...props, className },
-      toolbar ? context.part("toolbar", "div", null, toolbar) : null,
-      header ? context.part("header", "div", null, header) : null,
-      notice ? context.part("notice", "div", null, notice) : null,
-      context.part("body", "div", null, children),
-      footer ? context.part("footer", "div", null, footer) : null,
-    ),
-);
+export function PageFrame(
+  { header, toolbar, notice, footer, children, className, ...props }: PageFrameProps,
+  context: Context<typeof PageFrame>,
+) {
+  return (
+    <section {...props} className={className} ref={[context.parts.root, props.ref]}>
+      {toolbar ? <div ref={[context.parts.toolbar]}>{toolbar}</div> : null}
+      {header ? <div ref={[context.parts.header]}>{header}</div> : null}
+      {notice ? <div ref={[context.parts.notice]}>{notice}</div> : null}
+      {<div ref={[context.parts.body]}>{children}</div>}
+      {footer ? <div ref={[context.parts.footer]}>{footer}</div> : null}
+    </section>
+  );
+}
+PageFrame.meta = {
+  name: "page-frame",
+  parts: ["root", "toolbar", "header", "notice", "body", "footer"],
+  style: defineStyleProps(pageFrameOptions, {
+    defaults: { variant: "page", scrollOwner: "content" },
+  }),
+} as const;

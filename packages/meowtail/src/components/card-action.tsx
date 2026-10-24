@@ -1,17 +1,18 @@
-import { defineComponent, type ComponentContract, type Props } from "meowjsx";
-
-export const cardActionContract = {
-  name: "card-action",
-  parts: ["root"],
-} as const satisfies ComponentContract;
+import { h, type Props, type Context } from "meowjsx";
 
 export interface CardActionProps extends Props {
-  className?: string;
+  className?: Props["className"];
 }
 
 /** The actions at the end of a card header. */
-export const CardAction = defineComponent<CardActionProps, "card-action", "root">(
-  cardActionContract,
-  ({ children, className, ...props }, context) =>
-    context.part("root", "div", { ...props, className }, children),
-);
+export function CardAction(
+  { children, className, ref, ...props }: CardActionProps,
+  context: Context<typeof CardAction>,
+) {
+  return (
+    <div {...props} className={className} ref={[context.parts.root, ref]}>
+      {children}
+    </div>
+  );
+}
+CardAction.meta = { name: "card-action", parts: ["root"] } as const;

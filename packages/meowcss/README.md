@@ -35,30 +35,34 @@ It does not guess components from CSS text and does not install styles.
 ## JSX component adapters
 
 Consuming components requires a compatible `meowjsx` install. `meowcss/meowjsx` provides `defineStyleProps`,
-`partSelector`, `ThemedProps` and `createStylePropsPlugin`, using component identity through the same MeowJSX registry.
-That entry's `css` preserves typed part dependencies; the same-named `defineTheme` derives the real carrier of component options from the fragments,
-then calls the pure root assembler. It does not create a second component table.
+`parts`, `ThemedProps` and `createStylePropsPlugin`, using component metadata through the same MeowJSX registry.
+A theme imports a component's type to address its finite parts; constructing descriptors loads no component code.
+The adapter's `defineTheme` binds conditional component tokens by their option attributes, while keeping
+root and scheme configuration regional. It does not infer carriers from component implementations.
 
 ```ts
-import { defineOptions, defineTokens } from "meowcss";
-import { css, defineStyleProps, partSelector, defineTheme } from "meowcss/meowjsx";
+// button.styles.ts
+import type { Button } from "./button";
+import { css, parts } from "meowcss/meowjsx";
+import { buttonOptions } from "./button.options";
 
-const options = defineOptions("button", { size: ["small", "large"] });
-const contract = {
-  name: "button",
-  parts: ["root"],
-  styleProps: defineStyleProps(options, { defaults: { size: "small" } }),
-} as const;
+const button = parts<typeof Button>("button");
 const styles = css`
-  ${partSelector(contract, "root")} {
+  ${button.root} {
     display: inline-flex;
+    ${buttonOptions.when({ size: "large" })} {
+      align-items: center;
+    }
   }
 `;
 ```
 
-Component options, part names and default values are owned by the component's own contract; MeowCSS does not import concrete UI.
-Do not call `String(styles)` before assembly, otherwise only CSS text remains and the component dependency information is explicitly discarded.
-The root and adapters share the same internal token module; builds must not inline one copy per entry.
+The component's static `meta` owns its name, part names and `style: defineStyleProps(...)` metadata.
+Components and themes share each `defineOptions` object from an implementation-free module such as
+`button.options.ts`. Registration checks metadata and carrier parts; token assembly checks conflicting
+option-source definitions. Theme assembly does not compare component metadata with independently
+authored schemas. The root and adapters share the same internal token module; builds must not inline
+one copy per entry.
 
 ## Web lifecycle
 
@@ -77,13 +81,22 @@ and at-rules included, comments and custom property definitions skipped) and ret
 `AuditRule` flags, with the property, value, selector and line. The root knows no scale: a consumer
 supplies the rules (Meowtail's are `standardAuditRules`), and `allow` accepts a deliberate exception.
 
-## Utility styles design
+## Class values and cx
 
-The [utility styles design](../../docs/designs/2026-10-24-utility-styles.md) proposes utilities
-as typed functions over tokens that return classes (`className={[ui.p.group, ui.hover(ui.bg.fill)]}`),
-with conditions and composition as higher-order classes. The same class expands to declarations
-inside a theme rule; classes stay independent of component parts. It is a selected, not yet
-implemented, breaking change: the `meowtail/theme` recipe functions are removed without aliases.
+`cx` combines class values and plain class strings, omitting `false`, `null` and `undefined`.
+String conversion returns the joined classes; interpolation into `css` expands the declarations.
+A composite containing a plain external class string cannot expand declarations, since that string
+has no CSS definition attached. Class-name composition does not resolve conflicts: stylesheet order
+and the CSS cascade govern the result.
+
+Meowtail supplies `ui` from `meowtail/theme`, for example `cx(ui.p.group, ui.bg.fill)`. Another theme
+can define values with `defineClassValue(className, order, declarations, catalog)`, using one opaque
+object or Symbol as its catalog identity and fixed numeric order matching its stylesheet. Within a
+composite, values from that catalog expand in catalog order. Nested state and media rules remain
+ordinary CSS in the declarations; there is no condition language, scanning or automatic installation.
+
+The [utility styles design](../../docs/designs/2026-10-24-utility-styles.md) records the breaking
+replacement of the old recipe surface.
 
 ## Verification
 

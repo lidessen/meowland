@@ -1,18 +1,18 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { focusRing } from "../recipes";
-import { navItemContract } from "../../components/nav-item";
-
+import type { NavItem } from "../../components/nav-item";
+import { ui } from "../utilities";
+const navItemPartRefs = parts<typeof NavItem>("nav-item");
 export const navItemStyles = css`
-  :where(${partSelector(navItemContract, "root")}) {
+  :where(${navItemPartRefs.root}) {
     box-sizing: border-box;
     color: ${uiTokens.ink.primary};
     font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
-  :where(${partSelector(navItemContract, "root")}):focus-visible {
-    ${focusRing()}
+  :where(${navItemPartRefs.root}):focus-visible {
+    ${ui.focus.ring}
   }
-  ${partSelector(navItemContract, "root")} {
+  ${navItemPartRefs.root} {
     display: flex;
     width: 100%;
     align-items: center;
@@ -27,42 +27,42 @@ export const navItemStyles = css`
     text-decoration: none;
     cursor: pointer;
   }
-  :where(${partSelector(navItemContract, "root")}[aria-current="page"]) {
+  :where(${navItemPartRefs.root}[aria-current="page"]) {
     color: ${uiTokens.ink.primary};
     background: ${uiTokens.accent.selected};
     font-weight: ${uiTokens.type.weight.medium};
   }
   @media (hover: hover) {
-    ${partSelector(navItemContract, "root")}:hover:not(:disabled):not([aria-current="page"]) {
+    ${navItemPartRefs.root}:hover:not(:disabled):not([aria-current="page"]) {
       background: ${uiTokens.state.hover};
     }
   }
-  ${partSelector(navItemContract, "root")}:disabled {
+  ${navItemPartRefs.root}:disabled {
     color: ${uiTokens.ink.tertiary};
     cursor: not-allowed;
   }
-  ${partSelector(navItemContract, "icon")} {
+  ${navItemPartRefs.icon} {
     display: inline-flex;
     width: ${uiTokens.icon.size};
     flex-shrink: 0;
   }
-  ${partSelector(navItemContract, "icon")} svg {
+  ${navItemPartRefs.icon} svg {
     width: ${uiTokens.icon.size};
     height: ${uiTokens.icon.size};
   }
-  ${partSelector(navItemContract, "badge")} {
+  ${navItemPartRefs.badge} {
     margin-left: auto;
     flex-shrink: 0;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
   }
-  ${partSelector(navItemContract, "label")} {
+  ${navItemPartRefs.label} {
     flex: 1;
     min-width: 0;
     overflow-wrap: anywhere;
   }
   @media (pointer: coarse) {
-    ${partSelector(navItemContract, "root")} {
+    ${navItemPartRefs.root} {
       min-height: 44px;
     }
   }

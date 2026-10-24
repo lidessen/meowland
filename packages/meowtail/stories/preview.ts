@@ -2,12 +2,12 @@ import { previewStyles } from "./preview.styles";
 import { languageStyles } from "./language.styles";
 import { defaultRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { installMeowUI, Select } from "meowtail";
+import { installMeowUI, meowUIComponents, Select } from "meowtail";
 import { standardTheme } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 import type { PreviewEnvironment } from "meowbook";
 
-installMeowUI(defaultRuntime);
+installMeowUI({ components: meowUIComponents }, defaultRuntime);
 /**
  * An embedded canvas is a frame inside a page that already carries its own
  * chrome. The theme toolbar would repeat in every frame, so an embedded canvas

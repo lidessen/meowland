@@ -1,32 +1,7 @@
-import {
-  defineComponent,
-  derived,
-  h,
-  keyed,
-  type ComponentContract,
-  type MaybeSignal,
-  type Props,
-} from "meowjsx";
+import { derived, h, keyed, type Context, type MaybeSignal, type Props } from "meowjsx";
 import { Icon } from "../icons/icon";
 import { FileTypeIcon, fileExtension } from "../icons/file-type-icon";
 import { ImagePreview } from "../components/image-preview";
-
-export const chatAttachmentsContract = {
-  name: "chat-attachments",
-  parts: [
-    "root",
-    "image",
-    "preview",
-    "file",
-    "icon",
-    "details",
-    "name",
-    "size",
-    "entry",
-    "previewButton",
-    "remove",
-  ],
-} as const satisfies ComponentContract;
 
 export interface ChatAttachmentItem {
   id: string;
@@ -45,27 +20,17 @@ export interface ChatAttachmentsProps extends Props {
   /** Plain arrays are fixed for the mount. A signal updates rows in place. */
   items: MaybeSignal<readonly ChatAttachmentItem[]>;
   label?: string;
-  className?: string;
 }
 
 /** Files attached to a message or a draft, with preview, download and remove actions. */
-export const ChatAttachments = defineComponent<
-  ChatAttachmentsProps,
-  typeof chatAttachmentsContract.name,
-  (typeof chatAttachmentsContract.parts)[number]
->(
-  chatAttachmentsContract,
-  ({ items, label = "Message attachments", className, ...props }, context) =>
-    context.part(
-      "root",
-      "div",
-      {
-        ...props,
-        className,
-        role: "group",
-        "aria-label": label,
-      },
-      keyed(
+export function ChatAttachments(
+  { items, label = "Message attachments", ref, ...props }: ChatAttachmentsProps,
+  context: Context<typeof ChatAttachments>,
+) {
+  const parts = context.parts;
+  return (
+    <div {...props} role="group" aria-label={label} ref={[parts.root, ref]}>
+      {keyed(
         items,
         (item) =>
           [
@@ -76,113 +41,111 @@ export const ChatAttachments = defineComponent<
           ].join(":"),
         (item) => {
           const current = item.value;
-          const remove = current.onRemove
-            ? context.part(
-                "remove",
-                "button",
-                {
-                  type: "button",
-                  onClick: () => item.value.onRemove?.(),
-                  "aria-label": derived(() => `Remove ${item.value.name}`),
-                },
-                <Icon name="x" />,
-              )
-            : null;
+          const remove = current.onRemove ? (
+            <button
+              type="button"
+              onClick={() => item.value.onRemove?.()}
+              aria-label={derived(() => `Remove ${item.value.name}`)}
+              ref={parts.remove}
+            >
+              <Icon name="x" />
+            </button>
+          ) : null;
           const size = derived(() => {
             const bytes = item.value.sizeBytes;
             if (bytes === undefined || !Number.isFinite(bytes) || bytes < 0) return null;
-            return context.part(
-              "size",
-              "small",
-              null,
-              [fileExtension(item.value.name).toUpperCase().slice(0, 8), formatBytes(bytes)]
-                .filter(Boolean)
-                .join(" "),
+            return (
+              <small ref={parts.size}>
+                {[fileExtension(item.value.name).toUpperCase().slice(0, 8), formatBytes(bytes)]
+                  .filter(Boolean)
+                  .join(" ")}
+              </small>
             );
           });
-          return current.mediaType.startsWith("image/")
-            ? context.part(
-                "entry",
-                "div",
-                { "data-kind": "image" },
-                context.part(
-                  "image",
-                  current.onPreview ? "button" : "a",
-                  current.onPreview
-                    ? {
-                        type: "button",
-                        onClick: () => item.value.onPreview?.(),
-                        "aria-label": derived(() => `Preview ${item.value.name}`),
-                      }
-                    : {
-                        href: derived(() => item.value.url),
-                        target: "_blank",
-                        rel: "noreferrer",
-                        "aria-label": derived(() => `Open image ${item.value.name}`),
-                      },
-                  context.part(
-                    "preview",
-                    "span",
-                    null,
-                    <ImagePreview src={current.url} alt={current.name} />,
-                  ),
-                ),
-                remove,
-              )
-            : context.part(
-                "entry",
-                "div",
-                { "data-kind": "file" },
-                context.part(
-                  "file",
-                  "a",
-                  {
-                    href: derived(() => item.value.url),
-                    download: derived(() => item.value.name),
-                    onClick: (event: MouseEvent) => {
-                      const download = item.value.onDownload;
-                      if (!download) return;
-                      event.preventDefault();
-                      download();
-                    },
-                  },
-                  context.part(
-                    "icon",
-                    "span",
-                    { "aria-hidden": "true" },
-                    <FileTypeIcon path={current.name} />,
-                  ),
-                  context.part(
-                    "details",
-                    "span",
-                    null,
-                    context.part(
-                      "name",
-                      "strong",
-                      null,
-                      derived(() => item.value.name),
-                    ),
-                    size,
-                  ),
-                ),
-                current.onPreview
-                  ? context.part(
-                      "previewButton",
-                      "button",
-                      {
-                        type: "button",
-                        onClick: () => item.value.onPreview?.(),
-                        "aria-label": derived(() => `Preview ${item.value.name}`),
-                      },
-                      "Preview",
-                    )
-                  : null,
-                remove,
-              );
+          return current.mediaType.startsWith("image/") ? (
+            <div data-kind="image" ref={parts.entry}>
+              {current.onPreview ? (
+                <button
+                  type="button"
+                  onClick={() => item.value.onPreview?.()}
+                  aria-label={derived(() => `Preview ${item.value.name}`)}
+                  ref={parts.image}
+                >
+                  <span ref={parts.preview}>
+                    <ImagePreview src={current.url} alt={current.name} />
+                  </span>
+                </button>
+              ) : (
+                <a
+                  href={derived(() => item.value.url)}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label={derived(() => `Open image ${item.value.name}`)}
+                  ref={parts.image}
+                >
+                  <span ref={parts.preview}>
+                    <ImagePreview src={current.url} alt={current.name} />
+                  </span>
+                </a>
+              )}
+              {remove}
+            </div>
+          ) : (
+            <div data-kind="file" ref={parts.entry}>
+              <a
+                href={derived(() => item.value.url)}
+                download={derived(() => item.value.name)}
+                onClick={(event: MouseEvent) => {
+                  const download = item.value.onDownload;
+                  if (!download) return;
+                  event.preventDefault();
+                  download();
+                }}
+                ref={parts.file}
+              >
+                <span aria-hidden="true" ref={parts.icon}>
+                  <FileTypeIcon path={current.name} />
+                </span>
+                <span ref={parts.details}>
+                  <strong ref={parts.name}>{derived(() => item.value.name)}</strong>
+                  {size}
+                </span>
+              </a>
+              {current.onPreview ? (
+                <button
+                  type="button"
+                  onClick={() => item.value.onPreview?.()}
+                  aria-label={derived(() => `Preview ${item.value.name}`)}
+                  ref={parts.previewButton}
+                >
+                  Preview
+                </button>
+              ) : null}
+              {remove}
+            </div>
+          );
         },
-      ),
-    ),
-);
+      )}
+    </div>
+  );
+}
+
+ChatAttachments.meta = {
+  name: "chat-attachments",
+  parts: [
+    "root",
+    "image",
+    "preview",
+    "file",
+    "icon",
+    "details",
+    "name",
+    "size",
+    "entry",
+    "previewButton",
+    "remove",
+  ],
+} as const;
 
 function formatBytes(value: number): string {
   if (value < 1024) return `${value}B`;

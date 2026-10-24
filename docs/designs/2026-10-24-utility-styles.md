@@ -1,140 +1,103 @@
 # Utility classes as values
 
-Status: selected direction, not implemented. This is a breaking change with no compatibility layer
-for the old styling surface; see [Breaking changes](#breaking-changes). Names are working names.
+Status: implemented and locally accepted on 2026-10-24; see the
+[implementation receipt](../records/2026-10-24-authoring-migration.md). This is a breaking change
+with no compatibility layer for the old recipe surface. Published packages retain the previous APIs
+until a separately authorized release.
 
-MeowCSS is JavaScript, so a utility does not need a class-string language. Utilities live on one
-namespace object, `ui`, built from the token scales: `ui.p.group` is a class, a value that a
-component's `className` takes directly and that a theme rule can expand into declarations.
-Conditions and composition are higher-order classes: functions from classes to classes. Classes know
-nothing about component parts; a part, or any node, is associated with a class where it is used.
+The authoring surface is `cx` plus theme values:
 
 ```tsx
-<Card className={[ui.p.group, ui.bg.fill]} />
-<div className={[ui.p.panel, ui.radius.xl, ui.hover(ui.bg.fill), ui.wide(ui.p.section)]} />
+import { cx } from "meowcss";
+import { ui } from "meowtail/theme";
+
+<Card className={cx(ui.p.group, ui.bg.fill)} />
+<div className={cx(ui.p.panel, ui.radius.xl, ui.text.caption)} />
 ```
 
-## Classes
+`cx` is a public composition utility. `ui` is Meowtail's built-in theme catalog, with typed names
+for its spacing, colors, typography and other styles. MeowCSS knows nothing about those names or
+the Meowtail scale. Another theme can supply its own catalog and stylesheet using the same class
+values and the same `cx`.
 
-`ui.p.group` is a `UtilityClass`:
+## Class values and cx
 
-- its class name, `ui-p-group`, derived from the utility and the key, so static HTML and Web
-  mounting agree and the name reads in devtools;
-- its declarations, `padding: var(--ui-space-group);`.
+A class value carries a stable CSS class name and its declarations. For example, `ui.p.group`
+carries `ui-p-group` and `padding: var(--ui-space-group);`. `String(ui.p.group)` returns the class
+name. Editors complete the keys of the theme's ordinary typed object.
 
-Typing `ui.` lists every utility and `ui.p.` every value of that scale. Every scale is finite (one
-token group or a finite keyword map), so the namespace is a frozen plain object built once when it is
-defined; no Proxy, and the types are the exact keys. `ui.p.group` exists, `ui.p.13px` does not. A
-one-off literal is not a class; it stays a declaration beside its selector, where the audit sees it.
-
-Keys are the token roles, not a numeric scale. `ui.p.group` reads as the spacing within a group,
-the same name as `uiTokens.space.group`, so the class vocabulary and the token tree stay one system.
-
-`String(ui.p.group)` is the class name, so the existing `className` path (which stringifies the
-value) already accepts a single class or a Signal of one:
+`cx` combines class values and plain class strings, ignores `false`, `null` and `undefined`, and
+returns a reusable class value:
 
 ```tsx
-<div className={mapSignal(selected, (on) => (on ? ui.bg.selected : ui.bg.raised))} />
+const panel = cx(ui.p.panel, ui.bg.raised, ui.radius.xl);
+
+<div className={cx("host-panel", panel)} />
+<div className={mapSignal(selected, (on) => cx(panel, on && "is-selected"))} />
 ```
 
-## Higher-order classes
+`cx` joins classes; it does not parse class names or resolve CSS conflicts. Stylesheet order and
+the CSS cascade decide overlapping properties, as with Tailwind classes. Argument order is not an
+override API. Composed values keep their declarations so they can also be used in a theme rule.
 
-A higher-order class takes classes and returns a class.
+MeowJSX also accepts `className={[ui.p.panel, ui.bg.raised]}` for class-list composition, including
+nested lists and Signals. Use `cx` when a reusable composed value must retain declarations for a
+theme rule. Conditional selection uses JavaScript as above. Hover, focus, disabled and responsive
+rules remain CSS in the theme, where existing options and component parts already apply.
 
-- Conditions: `ui.hover(ui.bg.fill)` is the class `ui-hover:bg-fill`, whose rule is
-  `.ui-hover\:bg-fill:hover { … }`. `ui.wide(ui.p.section)` nests the rule in the catalog's media
-  query. Conditions compose: `ui.wide(ui.hover(ui.bg.fill))`.
-- Composition: `ui.cx(ui.p.panel, ui.bg.raised, ui.radius.xl)` is one value holding those atoms.
-  Its class name is the atoms' names joined, so it introduces no new rule. A named style is just a
-  constant, `const card = ui.cx(...)`, and `ui.cx(card, ui.p.group)` overrides by order (a later
-  atom of the same utility replaces the earlier one).
-- `className` arrays: MeowJSX normalizes an array (nested, with `false`, `null` and `undefined`
-  ignored) into a class list, so `className={[card, active && ui.bg.selected]}` works for plain
-  strings too. This is the one renderer change; it belongs in the core prop normalization so static
-  HTML and Web agree.
+## The same values in theme rules
 
-Because every composite is a list of atoms and every scale is finite, the CSS needed for any class
-anyone can write is the atom sheet: each utility × its keys × the conditions it allows. There is no
-per-style registration, hashing or scanning.
-
-## Classes in themes
-
-Interpolating a class into a rule body expands its declarations; conditions expand to nested rules.
-`css` recognizes a class value (by its own marker, not by `toString`):
+The `css` template expands class values into declarations instead of their class-name string:
 
 ```ts
-const card = parts<typeof Card>("card"); // type-only import of Card
+import { cx } from "meowcss";
+import { css, parts } from "meowcss/meowjsx";
+import type { Card } from "../../components/card";
+import { ui } from "../utilities";
+
+const card = parts<typeof Card>("card");
 
 export const cardStyles = css`
   ${card.root} {
-    ${ui.cx(ui.p.panel, ui.bg.raised, ui.radius.xl, ui.hover(ui.bg.fill))}
+    ${cx(ui.p.panel, ui.bg.raised, ui.radius.xl)}
   }
 `;
 ```
 
-The association between a part and a style is made here, by the theme. The part descriptor comes
-from the [parts design](2026-10-24-component-parts-ref-bindings.md), which replaces `partSelector`.
-The existing recipes (`surface`, `text`, `interactive`, `focusRing`) are replaced by utilities of
-the same kind: `ui.text.caption` works in a theme rule and in `className`.
+Within one composite, values from the same catalog expand in that catalog's stylesheet order.
+Separate interpolations and handwritten CSS retain ordinary CSS order. Plain class strings have no
+declarations to expand; interpolating a composite containing one as declarations is an error.
+
+Parts stay independent of styles. The [parts design](2026-10-24-component-parts-ref-bindings.md)
+provides the descriptor; the theme associates it with styles here.
 
 ## Ownership and delivery
 
-- `meowcss` root: `defineUtilities(namespace, { utilities, conditions })`, which builds the
-  namespace object with its class values, condition functions and `cx`; the `css` expansion of class
-  values; and the atom sheet of a namespace. No DOM, no JSX.
-- MeowJSX: `className` array normalization only.
-- Meowtail: the `ui` namespace over `uiTokens` and its allowed conditions, and its atom sheet
-  appended last in `standardTheme.cssText`, after the component fragments. A utility class is
-  `0,1,0` and the theme's part rules are `:where(...)`, so an instance class wins over the theme's
-  paint of the same property; a conditioned class is emitted after the plain ones.
-- The atom sheet is audited with `standardAuditRules`, and a size budget test keeps conditions a
-  deliberate choice per utility.
+MeowCSS owns `cx`, the shared class-value contract and expansion in `css`. MeowJSX owns class-list
+normalization, including stringifiable values and Signals, shared by Web mounting and static HTML.
+It needs no knowledge of MeowCSS or `ui`.
 
-Part markers and option attributes do not change. A Meowtail component keeps its look in its theme
-file and forwards a host `className` on its root; a host class is a local adjustment, not the
-component's look.
+Meowtail owns the built-in `ui` values and their rules over the existing `uiTokens`. The catalog
+lives in a small module independent of components, registration and complete theme assembly;
+`meowtail/theme` exports it. Its stylesheet is an ordinary shared fragment delivered with the
+standard theme. Extended and presentation themes reuse that fragment once, after their component
+rules. There is no source scanning or per-render style registration.
 
-## Breaking changes
+The catalog uses the existing audit. Part descriptors keep their `:where(...)` selectors; complete
+rules, instance classes and inline styles follow the ordinary CSS cascade. This change does not
+introduce cascade layers or require a separate rewrite of every theme selector.
 
-The new surface replaces the old one; there are no aliases, shims or deprecation period. Callers
-migrate in the change that lands each step, and each affected package takes a breaking version
-bump under the [release contract](../releasing.md).
+## Migration and verification
 
-- The recipe functions `surface`, `text`, `interactive` and `focusRing`, and their types
-  `SurfaceRung`, `TextRole` and `InteractiveOptions`, are removed from `meowtail/theme`. Their uses
-  in Meowtail themes, the docs app, Meowbook and stories move to `ui` classes. Parameterized recipes
-  (`focusRing({ inset })`, `interactive({ on, pressed })`) become finite keys or conditions on `ui`;
-  the exact mapping is decided in implementation.
-- `className` changes meaning for arrays: an array is a class list, not a value stringified with
-  commas. A host that relied on the old stringification breaks.
-- Hosts and stories that paint with inline `style` objects or ad hoc classes restating tokens are
-  expected to move to `ui` classes; inline `style` stays only for instance measurements.
+This replaces `surface`, `text`, `interactive` and `focusRing`, and their public recipe types,
+without aliases. Their finite styles become values such as `ui.surface.raised` and `ui.text.caption`;
+existing interaction and reduced-motion behavior stays in those styles. One-off geometry stays in
+owned CSS, and instance measurements can stay inline. Tokens, options and part markers keep their
+existing names. Affected packages take breaking versions under the [release contract](../releasing.md).
 
-Unchanged: `uiTokens` and every token name, the `css` template, `defineOptions`,
-`defineStyleProps`, part markers and option attributes. Contract and `partSelector` changes belong to
-the [parts design](2026-10-24-component-parts-ref-bindings.md#breaking-changes).
-
-## A Tailwind-style export later
-
-A separate export can offer a Tailwind-like surface (for example `tw.p1` or `` tw.p`32px` ``) on top
-of the same mechanism, without changing `ui`. Numeric keys can map onto the same atoms or a scale of
-their own. Arbitrary values are the part that needs its own design: they are not finite, so they
-cannot come from the atom sheet and need their own delivery (collected at render and emitted, or
-generated at build) and their own audit policy. `ui` stays token-only.
-
-## Open questions
-
-- Condition kinds: media queries, or container queries for components embedded in host layouts.
-- Which inline `style` objects in stories and examples become classes, and which are instance
-  measurements that stay.
-
-## Implementation and verification
-
-1. `defineUtilities`, class values, conditions, `cx`, `css` expansion and the atom sheet in the
-   `meowcss` root: tests for names, determinism, override order, condition nesting, and type cases
-   for unknown keys, inside the DOM-free core check.
-2. `className` array normalization in MeowJSX, checked through static HTML and Web mounting.
-3. Meowtail's `ui` over `uiTokens`; audit and budget the atom sheet; rewrite a few theme files and
-   confirm unchanged computed styles; migrate a story and look at it in Meowbook.
-
-Use [development checks](../development-checks.md) for commands and coverage.
+Implement and check the class values and `cx` in the DOM-free MeowCSS root first. Verify conditional
+inputs, reusable composites, deterministic names and ordering, and declaration expansion. Then
+check class values, nested lists and Signals through static HTML and Web mounting. Migrate representative
+theme rules and a story, checking default styles, instance overrides and stylesheet delivery through
+standard, extended and presentation themes before completing the migration. Follow
+[development checks](../development-checks.md) for commands and coverage.

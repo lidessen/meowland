@@ -1,9 +1,10 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { fieldGroupContract } from "../../components/field-group";
 
+import type { FieldGroup } from "../../components/field-group";
+const fieldGroupPartRefs = parts<typeof FieldGroup>("field-group");
 export const fieldGroupStyles = css`
-  ${partSelector(fieldGroupContract, "root")} {
+  ${fieldGroupPartRefs.root} {
     min-inline-size: 0;
     margin: 0;
     padding: 0;
@@ -11,22 +12,22 @@ export const fieldGroupStyles = css`
     color: ${uiTokens.ink.primary};
     font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
   }
-  ${partSelector(fieldGroupContract, "legend")} {
+  ${fieldGroupPartRefs.legend} {
     padding: 0;
     margin-bottom: ${uiTokens.space.group};
     font-weight: ${uiTokens.type.weight.semibold};
     overflow-wrap: anywhere;
   }
-  ${partSelector(fieldGroupContract, "description")} {
+  ${fieldGroupPartRefs.description} {
     margin: 0 0 ${uiTokens.space.section};
     color: ${uiTokens.ink.secondary};
   }
-  ${partSelector(fieldGroupContract, "content")} {
+  ${fieldGroupPartRefs.content} {
     display: grid;
     gap: ${uiTokens.space.section};
     min-width: 0;
   }
-  ${partSelector(fieldGroupContract, "root")}:disabled > ${partSelector(fieldGroupContract, "legend")} {
+  ${fieldGroupPartRefs.root}:disabled > ${fieldGroupPartRefs.legend} {
     color: ${uiTokens.ink.tertiary};
   }
 `;

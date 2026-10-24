@@ -2,7 +2,9 @@
 type AxisChoices = readonly [string, ...string[]];
 export type Axes = Readonly<Record<string, AxisChoices>>;
 type Scheme = "light" | "dark" | "auto";
-export type Choices<A extends Axes> = { [K in keyof A]?: A[K][number] } & { scheme?: Scheme };
+export type Choices<A extends Axes> = { [K in keyof A]?: A[K][number] } & {
+  scheme?: Scheme;
+};
 type Values<C extends readonly string[]> =
   | { readonly [K in C[number]]: string }
   | { readonly [K in keyof C]: string };
@@ -28,7 +30,9 @@ export interface Condition {
 export interface Options<A extends Axes = Axes> {
   readonly name: string;
   readonly axes: A;
-  readonly by: { readonly [K in keyof A]: (values: Values<A[K]>) => ConditionalValue } & {
+  readonly by: {
+    readonly [K in keyof A]: (values: Values<A[K]>) => ConditionalValue;
+  } & {
     readonly scheme: (values: Values<readonly ["light", "dark"]>) => ConditionalValue;
   };
   select(values: Choices<A>): Selection;
@@ -72,7 +76,11 @@ function valueDescription(source: Source, input: unknown): ConditionalValue {
     if (typeof value !== "string" || !value.trim())
       throw new Error("Branches must be nonempty CSS strings; nesting is unsupported");
   }
-  return Object.freeze({ [conditional]: true as const, source, values: Object.freeze(values) });
+  return Object.freeze({
+    [conditional]: true as const,
+    source,
+    values: Object.freeze(values),
+  });
 }
 
 export function defineOptions<const A extends Axes>(
@@ -229,6 +237,8 @@ export interface TokenBinding {
     readonly options: Options<any> | "scheme";
     readonly selector: string;
   }[];
+  /** Optional selector resolver used by component adapters for otherwise-unbound sources. */
+  readonly resolveSource?: (attribute: string) => string | undefined;
 }
 export function compileTokens(
   tokens: TokenSet | readonly TokenSet[],
@@ -266,7 +276,11 @@ export function compileTokens(
     else
       for (const [axis, choices] of Object.entries(entry.options.axes))
         register(
-          { name: entry.options.name, axis, choices: choices as readonly string[] },
+          {
+            name: entry.options.name,
+            axis,
+            choices: choices as readonly string[],
+          },
           entry.selector,
         );
   }
@@ -288,7 +302,14 @@ export function compileTokens(
       continue;
     }
     const key = attribute(value.source);
-    const host = installed.get(key);
+    let host = installed.get(key);
+    if (!host && binding.resolveSource) {
+      const selector = binding.resolveSource(key);
+      if (selector !== undefined) {
+        host = { source: value.source, selector };
+        installed.set(key, host);
+      }
+    }
     if (!host) throw new Error(`Missing source binding: ${key}`);
     if (JSON.stringify(host.source) !== JSON.stringify(value.source))
       throw new Error(`Conflicting source definition: ${key}`);

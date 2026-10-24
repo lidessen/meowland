@@ -1,11 +1,10 @@
 import {
   batch,
-  defineComponent,
   h,
   mapSignal,
   unwrap,
   type Child,
-  type ComponentContract,
+  type Context,
   type Props,
   type ReadableSignal,
   type WritableSignal,
@@ -28,7 +27,7 @@ import {
 import { entranceMotion, pendingEntranceAnimations } from "./transition";
 import { hasPresentationOverflow } from "./diagnostics";
 
-export const presentationContract = {
+const presentationMeta = {
   name: "presentation",
   parts: [
     "root",
@@ -50,7 +49,7 @@ export const presentationContract = {
     "soundtrack",
     "diagnostic",
   ],
-} as const satisfies ComponentContract;
+} as const;
 
 let nextPresentationId = 0;
 
@@ -64,608 +63,563 @@ interface CurrentSlideProps extends Props {
 const SlideContent = ({ slide, position }: CurrentSlideProps): Child =>
   slide.render({ step: mapSignal(position, (value) => value.step) });
 
-const CurrentSlide = defineComponent<CurrentSlideProps, "presentation-current-slide", never>(
-  { name: "presentation-current-slide", parts: [] },
-  (props, context) => {
-    const parent = usePresentationActivity();
-    const activity = activitySignal(context, () => parent.value && props.enabled.value);
-    const environment = {
-      step: mapSignal(props.position, (value) => value.step),
-      steps: props.slide.steps ?? 0,
-      focusFallback: props.focusFallback,
-    };
-    return (
-      <PresentationActivity.Provider value={activity}>
-        <PresentationSlide.Provider value={environment}>
-          <SlideContent {...props} />
-        </PresentationSlide.Provider>
-      </PresentationActivity.Provider>
-    );
-  },
-);
+function CurrentSlide(
+  { slide, position, enabled, focusFallback }: CurrentSlideProps,
+  context: Context<typeof CurrentSlide>,
+): Child {
+  const parent = usePresentationActivity();
+  const activity = activitySignal(context, () => parent.value && enabled.value);
+  const environment = {
+    step: mapSignal(position, (value) => value.step),
+    steps: slide.steps ?? 0,
+    focusFallback,
+  };
+  return (
+    <PresentationActivity.Provider value={activity}>
+      <PresentationSlide.Provider value={environment}>
+        <SlideContent
+          slide={slide}
+          position={position}
+          enabled={enabled}
+          focusFallback={focusFallback}
+        />
+      </PresentationSlide.Provider>
+    </PresentationActivity.Provider>
+  );
+}
+CurrentSlide.meta = { name: "presentation-current-slide", parts: [] } as const;
 
 /** One mounted page; authored experiment signals remain owned by the work's host. */
-export const Presentation = defineComponent<
-  PresentationProps,
-  "presentation",
-  (typeof presentationContract.parts)[number]
->(
-  presentationContract,
-  (
-    {
-      title,
-      slides,
-      position: suppliedPosition,
-      active = true,
-      transition = "none",
-      background,
-      soundtrack,
-      className,
-      slideClassName,
-      ...props
-    },
-    context,
-  ) => {
-    validateSlides(slides);
-    const position =
-      suppliedPosition ?? context.signal<SlidePosition>({ slideId: slides[0]!.id, step: 0 });
-    positionIndex(slides, position.value);
-    const resolveBackground = (): SlideBackground =>
-      unwrap(slides[positionIndex(slides, position.value)]!.background) ??
-      unwrap(background) ??
-      "theme";
-    const resolvedBackground = context.signal(resolveBackground());
-    context.effect(() => {
-      resolvedBackground.value = resolveBackground();
+export function Presentation(
+  {
+    title,
+    slides,
+    position: suppliedPosition,
+    active = true,
+    transition = "none",
+    background,
+    soundtrack,
+    className,
+    slideClassName,
+    ...props
+  }: PresentationProps,
+  context: Context<typeof Presentation>,
+) {
+  const parts = context.parts;
+  validateSlides(slides);
+  const position =
+    suppliedPosition ?? context.signal<SlidePosition>({ slideId: slides[0]!.id, step: 0 });
+  positionIndex(slides, position.value);
+  const resolveBackground = (): SlideBackground =>
+    unwrap(slides[positionIndex(slides, position.value)]!.background) ??
+    unwrap(background) ??
+    "theme";
+  const resolvedBackground = context.signal(resolveBackground());
+  context.effect(() => {
+    resolvedBackground.value = resolveBackground();
+  });
+  const paused = context.signal(false);
+  const optionsOpen = context.signal(false);
+  const optionsId = `meowui-presentation-options-${++nextPresentationId}`;
+  let firstOption: HTMLButtonElement | undefined;
+  const visible = context.signal(false);
+  const activity = activitySignal(context, () => unwrap(active) && visible.value && !paused.value);
+  const scale = context.signal(1);
+  const actualSize = context.signal(false);
+  const overflow = context.signal(false);
+  let viewport: HTMLElement | undefined;
+  let stage: HTMLElement | undefined;
+  let frame: HTMLElement | undefined;
+  let heading: HTMLElement | undefined;
+  let currentId = position.value.slideId;
+  let currentEnabled = context.signal(true);
+  const motion = entranceMotion(context, activity);
+  let reducedMotion: MediaQueryList | undefined;
+  let entranceFrame: number | undefined;
+  let navigationGeneration = 0;
+  const cancelEntrance = () => {
+    if (entranceFrame !== undefined)
+      stage?.ownerDocument.defaultView?.cancelAnimationFrame(entranceFrame);
+    entranceFrame = undefined;
+    motion.cancel();
+  };
+  context.effect(() => {
+    if (!activity.value) cancelEntrance();
+  });
+  const focusFallback = () => heading?.focus();
+  // Use the first child as the signal's initial value: setting it before mount
+  // would queue a notification and mount the same page again for new subscribers.
+  const page = context.signal<Child>(
+    <CurrentSlide
+      slide={slides[positionIndex(slides, position.value)]!}
+      position={position}
+      enabled={currentEnabled}
+      focusFallback={focusFallback}
+    />,
+  );
+  let pendingOverflow: Promise<unknown> | undefined;
+  const fit = () => {
+    const originalSize = actualSize.value;
+    if (!viewport) return;
+    scale.value = originalSize
+      ? 1
+      : Math.min(viewport.clientWidth / 1280, viewport.clientHeight / 720, 1);
+    if (!stage) return;
+    // Reveal movement can briefly enlarge scroll geometry. Measure the logical
+    // content once our finite decorations settle, never an author's own clock.
+    const animations = pendingEntranceAnimations(stage);
+    if (animations.length) {
+      if (!pendingOverflow) {
+        const pending = Promise.allSettled(animations.map((animation) => animation.finished));
+        pendingOverflow = pending;
+        void pending.then(() => {
+          if (pendingOverflow !== pending) return;
+          pendingOverflow = undefined;
+          fit();
+        });
+      }
+      return;
+    }
+    // Signal-bound transforms may flush after this resize callback. Geometry
+    // and its one-logical-pixel tolerance must use the same applied scale.
+    overflow.value = hasPresentationOverflow(stage, stage.getBoundingClientRect().width / 1280);
+  };
+  context.effect(fit);
+  context.effect(() => {
+    const value = position.value;
+    const index = positionIndex(slides, value);
+    if (currentId === value.slideId) return;
+    const direction =
+      index > slides.findIndex((slide) => slide.id === currentId) ? "left" : "right";
+    const generation = ++navigationGeneration;
+    cancelEntrance();
+    // Flush the old activity gate before the renderer mounts a replacement.
+    batch(() => {
+      currentEnabled.value = false;
     });
-    const paused = context.signal(false);
-    const optionsOpen = context.signal(false);
-    const optionsId = `meowui-presentation-options-${++nextPresentationId}`;
-    let firstOption: HTMLButtonElement | undefined;
-    const visible = context.signal(false);
-    const activity = activitySignal(
-      context,
-      () => unwrap(active) && visible.value && !paused.value,
-    );
-    const scale = context.signal(1);
-    const actualSize = context.signal(false);
-    const overflow = context.signal(false);
-    let viewport: HTMLElement | undefined;
-    let stage: HTMLElement | undefined;
-    let frame: HTMLElement | undefined;
-    let heading: HTMLElement | undefined;
-    let currentId = position.value.slideId;
-    let currentEnabled = context.signal(true);
-    const motion = entranceMotion(context, activity);
-    let reducedMotion: MediaQueryList | undefined;
-    let entranceFrame: number | undefined;
-    let navigationGeneration = 0;
-    const cancelEntrance = () => {
-      if (entranceFrame !== undefined)
-        stage?.ownerDocument.defaultView?.cancelAnimationFrame(entranceFrame);
-      entranceFrame = undefined;
-      motion.cancel();
-    };
-    context.effect(() => {
-      if (!activity.value) cancelEntrance();
-    });
-    const focusFallback = () => heading?.focus();
-    // Use the first child as the signal's initial value: setting it before mount
-    // would queue a notification and mount the same page again for new subscribers.
-    const page = context.signal<Child>(
+    const hadPageFocus = stage && stage.contains(stage.ownerDocument.activeElement);
+    if (hadPageFocus) focusFallback();
+    currentId = value.slideId;
+    currentEnabled = context.signal(true);
+    page.value = (
       <CurrentSlide
-        slide={slides[positionIndex(slides, position.value)]!}
+        slide={slides[index]!}
         position={position}
         enabled={currentEnabled}
         focusFallback={focusFallback}
-      />,
+      />
     );
-    let pendingOverflow: Promise<unknown> | undefined;
-    const fit = () => {
-      const originalSize = actualSize.value;
-      if (!viewport) return;
-      scale.value = originalSize
-        ? 1
-        : Math.min(viewport.clientWidth / 1280, viewport.clientHeight / 720, 1);
-      if (!stage) return;
-      // Reveal movement can briefly enlarge scroll geometry. Measure the logical
-      // content once our finite decorations settle, never an author's own clock.
-      const animations = pendingEntranceAnimations(stage);
-      if (animations.length) {
-        if (!pendingOverflow) {
-          const pending = Promise.allSettled(animations.map((animation) => animation.finished));
-          pendingOverflow = pending;
-          void pending.then(() => {
-            if (pendingOverflow !== pending) return;
-            pendingOverflow = undefined;
-            fit();
-          });
-        }
-        return;
-      }
-      // Signal-bound transforms may flush after this resize callback. Geometry
-      // and its one-logical-pixel tolerance must use the same applied scale.
-      overflow.value = hasPresentationOverflow(stage, stage.getBoundingClientRect().width / 1280);
-    };
-    context.effect(fit);
-    context.effect(() => {
-      const value = position.value;
-      const index = positionIndex(slides, value);
-      if (currentId === value.slideId) return;
-      const direction =
-        index > slides.findIndex((slide) => slide.id === currentId) ? "left" : "right";
-      const generation = ++navigationGeneration;
-      cancelEntrance();
-      // Flush the old activity gate before the renderer mounts a replacement.
-      batch(() => {
-        currentEnabled.value = false;
+    // Rendering is flushed before the next frame. A superseded navigation must
+    // never decorate a page that has already stopped or been replaced.
+    if (activity.value && !reducedMotion?.matches)
+      entranceFrame = stage?.ownerDocument.defaultView?.requestAnimationFrame(() => {
+        entranceFrame = undefined;
+        if (generation !== navigationGeneration || currentId !== position.value.slideId) return;
+        if (stage?.isConnected) motion.play(stage, transition, direction, frame);
       });
-      const hadPageFocus = stage && stage.contains(stage.ownerDocument.activeElement);
-      if (hadPageFocus) focusFallback();
-      currentId = value.slideId;
-      currentEnabled = context.signal(true);
-      page.value = (
-        <CurrentSlide
-          slide={slides[index]!}
-          position={position}
-          enabled={currentEnabled}
-          focusFallback={focusFallback}
-        />
-      );
-      // Rendering is flushed before the next frame. A superseded navigation must
-      // never decorate a page that has already stopped or been replaced.
-      if (activity.value && !reducedMotion?.matches)
-        entranceFrame = stage?.ownerDocument.defaultView?.requestAnimationFrame(() => {
-          entranceFrame = undefined;
-          if (generation !== navigationGeneration || currentId !== position.value.slideId) return;
-          if (stage?.isConnected) motion.play(stage, transition, direction, frame);
-        });
-      queueMicrotask(fit);
-    });
-    context.onCleanup(() => {
-      pendingOverflow = undefined;
-      currentEnabled.set(false);
-      cancelEntrance();
-    });
-    const move = (delta: -1 | 1) => {
-      const current = position.value;
-      const index = positionIndex(slides, current);
-      const last = slides[index]!.steps ?? 0;
-      if (delta === 1) {
-        if (current.step < last) position.value = { ...current, step: current.step + 1 };
-        else if (index < slides.length - 1)
-          position.value = { slideId: slides[index + 1]!.id, step: 0 };
-      } else if (current.step > 0) position.value = { ...current, step: current.step - 1 };
-      else if (index > 0)
-        position.value = { slideId: slides[index - 1]!.id, step: slides[index - 1]!.steps ?? 0 };
-    };
-    const previousDisabled = mapSignal(
-      position,
-      (value) => positionIndex(slides, value) === 0 && value.step === 0,
-    );
-    const nextDisabled = mapSignal(
-      position,
-      (value) =>
-        positionIndex(slides, value) === slides.length - 1 &&
-        value.step === (slides.at(-1)!.steps ?? 0),
-    );
-    const keydown = (event: KeyboardEvent) => {
-      if (
-        event.defaultPrevented ||
-        event.altKey ||
-        event.ctrlKey ||
-        event.metaKey ||
-        event.shiftKey
+    queueMicrotask(fit);
+  });
+  context.onCleanup(() => {
+    pendingOverflow = undefined;
+    currentEnabled.set(false);
+    cancelEntrance();
+  });
+  const move = (delta: -1 | 1) => {
+    const current = position.value;
+    const index = positionIndex(slides, current);
+    const last = slides[index]!.steps ?? 0;
+    if (delta === 1) {
+      if (current.step < last) position.value = { ...current, step: current.step + 1 };
+      else if (index < slides.length - 1)
+        position.value = { slideId: slides[index + 1]!.id, step: 0 };
+    } else if (current.step > 0) position.value = { ...current, step: current.step - 1 };
+    else if (index > 0)
+      position.value = { slideId: slides[index - 1]!.id, step: slides[index - 1]!.steps ?? 0 };
+  };
+  const previousDisabled = mapSignal(
+    position,
+    (value) => positionIndex(slides, value) === 0 && value.step === 0,
+  );
+  const nextDisabled = mapSignal(
+    position,
+    (value) =>
+      positionIndex(slides, value) === slides.length - 1 &&
+      value.step === (slides.at(-1)!.steps ?? 0),
+  );
+  const keydown = (event: KeyboardEvent) => {
+    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
+      return;
+    const target = event.target as Element | null;
+    if (
+      target?.closest(
+        'input,textarea,select,button,a,video,audio,summary,[contenteditable]:not([contenteditable="false"]),[role="slider"],[role="textbox"],[role="combobox"],[data-presentation-keys="local"]',
       )
-        return;
-      const target = event.target as Element | null;
-      if (
-        target?.closest(
-          'input,textarea,select,button,a,video,audio,summary,[contenteditable]:not([contenteditable="false"]),[role="slider"],[role="textbox"],[role="combobox"],[data-presentation-keys="local"]',
-        )
-      )
-        return;
-      if (event.key === "ArrowRight" || event.key === "PageDown") {
-        event.preventDefault();
-        move(1);
-      } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
-        event.preventDefault();
-        move(-1);
-      }
-    };
-    const frameStyle = {
-      width: mapSignal(scale, (value) => `${1280 * value}px`),
-      height: mapSignal(scale, (value) => `${720 * value}px`),
-    };
-    return (
-      <PresentationActivity.Provider value={activity}>
-        {context.part(
-          "root",
-          "section",
-          {
-            ...props,
-            className,
-            "aria-label": title,
-            tabIndex: 0,
-            onKeyDown: (event: KeyboardEvent) => {
-              if (typeof props.onKeyDown === "function") props.onKeyDown(event);
-              keydown(event);
-            },
-            ref: (element: HTMLElement) => {
-              const document = element.ownerDocument;
-              reducedMotion = document.defaultView?.matchMedia("(prefers-reduced-motion: reduce)");
-              const updateMotionPreference = (event: MediaQueryListEvent) => {
-                if (event.matches) cancelEntrance();
-              };
-              reducedMotion?.addEventListener("change", updateMotionPreference);
-              const updateVisibility = () => {
-                visible.value = document.visibilityState !== "hidden";
-              };
-              updateVisibility();
-              document.addEventListener("visibilitychange", updateVisibility);
-              let hostCleanup: unknown;
-              try {
-                hostCleanup = typeof props.ref === "function" ? props.ref(element) : undefined;
-              } catch (error) {
-                reducedMotion?.removeEventListener("change", updateMotionPreference);
-                reducedMotion = undefined;
-                document.removeEventListener("visibilitychange", updateVisibility);
-                visible.value = false;
-                throw error;
-              }
-              return () => {
-                try {
-                  if (typeof hostCleanup === "function") hostCleanup();
-                } finally {
-                  reducedMotion?.removeEventListener("change", updateMotionPreference);
-                  reducedMotion = undefined;
-                  document.removeEventListener("visibilitychange", updateVisibility);
-                  visible.value = false;
-                }
-              };
-            },
+    )
+      return;
+    if (event.key === "ArrowRight" || event.key === "PageDown") {
+      event.preventDefault();
+      move(1);
+    } else if (event.key === "ArrowLeft" || event.key === "PageUp") {
+      event.preventDefault();
+      move(-1);
+    }
+  };
+  const frameStyle = {
+    width: mapSignal(scale, (value) => `${1280 * value}px`),
+    height: mapSignal(scale, (value) => `${720 * value}px`),
+  };
+  return (
+    <PresentationActivity.Provider value={activity}>
+      <section
+        {...props}
+        className={className}
+        aria-label={title}
+        tabIndex={0}
+        onKeyDown={(event: KeyboardEvent) => {
+          if (typeof props.onKeyDown === "function") props.onKeyDown(event);
+          keydown(event);
+        }}
+        ref={[
+          parts.root,
+          (element: HTMLElement) => {
+            const document = element.ownerDocument;
+            reducedMotion = document.defaultView?.matchMedia("(prefers-reduced-motion: reduce)");
+            const updateMotionPreference = (event: MediaQueryListEvent) => {
+              if (event.matches) cancelEntrance();
+            };
+            reducedMotion?.addEventListener("change", updateMotionPreference);
+            const updateVisibility = () => {
+              visible.value = document.visibilityState !== "hidden";
+            };
+            updateVisibility();
+            document.addEventListener("visibilitychange", updateVisibility);
+            return () => {
+              reducedMotion?.removeEventListener("change", updateMotionPreference);
+              reducedMotion = undefined;
+              document.removeEventListener("visibilitychange", updateVisibility);
+              visible.value = false;
+            };
           },
-          context.part(
-            "header",
-            "header",
-            null,
-            context.part(
-              "title",
-              "h1",
-              {
-                tabIndex: -1,
-                title,
-                ref: (element: HTMLElement) => {
-                  heading = element;
-                  return () => {
-                    heading = undefined;
-                  };
-                },
-              },
-              title,
-            ),
-            context.part(
-              "position",
-              "p",
-              { role: "status", "aria-live": "polite", "aria-atomic": "true" },
-              mapSignal(
-                position,
-                (value) =>
-                  `${positionIndex(slides, value) + 1} / ${slides.length} · ${slides[positionIndex(slides, value)]!.title} · ${value.step} / ${slides[positionIndex(slides, value)]!.steps ?? 0}`,
-              ),
-            ),
-          ),
-          context.part(
-            "viewport",
-            "div",
-            {
-              "data-actual-size": actualSize,
-              ref: (element: HTMLElement) => {
-                viewport = element;
-                const Resize = element.ownerDocument.defaultView?.ResizeObserver;
-                const observer = Resize ? new Resize(fit) : undefined;
-                observer?.observe(element);
-                fit();
+          props.ref,
+        ]}
+      >
+        <header ref={parts.header}>
+          <h1
+            tabIndex={-1}
+            title={title}
+            ref={[
+              parts.title,
+              (element: HTMLElement) => {
+                heading = element;
                 return () => {
-                  observer?.disconnect();
-                  viewport = undefined;
+                  heading = undefined;
                 };
               },
+            ]}
+          >
+            {title}
+          </h1>
+          <p ref={parts.position} role="status" aria-live="polite" aria-atomic="true">
+            {mapSignal(
+              position,
+              (value) =>
+                `${positionIndex(slides, value) + 1} / ${slides.length} · ${slides[positionIndex(slides, value)]!.title} · ${value.step} / ${slides[positionIndex(slides, value)]!.steps ?? 0}`,
+            )}
+          </p>
+        </header>
+        <div
+          ref={[
+            parts.viewport,
+            (element: HTMLElement) => {
+              viewport = element;
+              const Resize = element.ownerDocument.defaultView?.ResizeObserver;
+              const observer = Resize ? new Resize(fit) : undefined;
+              observer?.observe(element);
+              fit();
+              return () => {
+                observer?.disconnect();
+                viewport = undefined;
+              };
             },
-            context.part(
-              "stage",
-              "div",
-              {
-                style: frameStyle,
-                ref: (element: HTMLElement) => {
-                  frame = element;
+          ]}
+          data-actual-size={actualSize}
+        >
+          <div
+            ref={[
+              parts.stage,
+              (element: HTMLElement) => {
+                frame = element;
+                return () => {
+                  frame = undefined;
+                };
+              },
+            ]}
+            style={frameStyle}
+          >
+            <article
+              className={slideClassName}
+              style={{ transform: mapSignal(scale, (value) => `scale(${value})`) }}
+              data-background-foreground={mapSignal(resolvedBackground, (value) =>
+                value === "theme" ? "theme" : (value.foreground ?? "theme"),
+              )}
+              ref={[
+                parts.slide,
+                (element: HTMLElement) => {
+                  stage = element;
+                  const view = element.ownerDocument.defaultView;
+                  const Resize = view?.ResizeObserver;
+                  const observer = Resize ? new Resize(fit) : undefined;
+                  observer?.observe(element);
+                  const regions = new Set<Element>();
+                  const observeRegions = () => {
+                    const current = new Set(
+                      element.querySelectorAll(
+                        '[data-meowui-part="presentation-layout/header"],[data-meowui-part="presentation-layout/body"],[data-meowui-part="presentation-layout/footer"]',
+                      ),
+                    );
+                    for (const region of regions)
+                      if (!current.has(region)) {
+                        observer?.unobserve(region);
+                        regions.delete(region);
+                      }
+                    for (const region of current)
+                      if (!regions.has(region)) {
+                        observer?.observe(region);
+                        regions.add(region);
+                      }
+                  };
+                  let connected = true;
+                  let queued = false;
+                  const contentChanged = () => {
+                    if (queued) return;
+                    queued = true;
+                    queueMicrotask(() => {
+                      queued = false;
+                      if (connected) {
+                        observeRegions();
+                        fit();
+                      }
+                    });
+                  };
+                  const Mutation = view?.MutationObserver;
+                  const mutations = Mutation
+                    ? new Mutation((records) => {
+                        if (
+                          records.some(
+                            (record) =>
+                              record.target !== element ||
+                              record.type !== "attributes" ||
+                              record.attributeName !== "style",
+                          )
+                        )
+                          contentChanged();
+                      })
+                    : undefined;
+                  mutations?.observe(element, {
+                    childList: true,
+                    characterData: true,
+                    subtree: true,
+                    attributes: true,
+                    attributeFilter: ["class", "style", "hidden", "data-revealed"],
+                  });
+                  element.ownerDocument.fonts?.addEventListener("loadingdone", contentChanged);
+                  contentChanged();
+                  element.addEventListener("load", contentChanged, true);
+                  element.addEventListener("loadedmetadata", contentChanged, true);
                   return () => {
-                    frame = undefined;
+                    connected = false;
+                    observer?.disconnect();
+                    mutations?.disconnect();
+                    regions.clear();
+                    element.ownerDocument.fonts?.removeEventListener("loadingdone", contentChanged);
+                    element.removeEventListener("load", contentChanged, true);
+                    element.removeEventListener("loadedmetadata", contentChanged, true);
+                    stage = undefined;
                   };
                 },
-              },
-              context.part(
-                "slide",
-                "article",
-                {
-                  className: slideClassName,
-                  style: { transform: mapSignal(scale, (value) => `scale(${value})`) },
-                  "data-background-foreground": mapSignal(resolvedBackground, (value) =>
-                    value === "theme" ? "theme" : (value.foreground ?? "theme"),
-                  ),
-                  ref: (element: HTMLElement) => {
-                    stage = element;
-                    const view = element.ownerDocument.defaultView;
-                    const Resize = view?.ResizeObserver;
-                    const observer = Resize ? new Resize(fit) : undefined;
-                    observer?.observe(element);
-                    const regions = new Set<Element>();
-                    const observeRegions = () => {
-                      const current = new Set(
-                        element.querySelectorAll(
-                          '[data-meowui-part="presentation-layout/header"],[data-meowui-part="presentation-layout/body"],[data-meowui-part="presentation-layout/footer"]',
-                        ),
-                      );
-                      for (const region of regions)
-                        if (!current.has(region)) {
-                          observer?.unobserve(region);
-                          regions.delete(region);
-                        }
-                      for (const region of current)
-                        if (!regions.has(region)) {
-                          observer?.observe(region);
-                          regions.add(region);
-                        }
-                    };
-                    let connected = true;
-                    let queued = false;
-                    const contentChanged = () => {
-                      if (queued) return;
-                      queued = true;
-                      queueMicrotask(() => {
-                        queued = false;
-                        if (connected) {
-                          observeRegions();
-                          fit();
-                        }
-                      });
-                    };
-                    const Mutation = view?.MutationObserver;
-                    const mutations = Mutation
-                      ? new Mutation((records) => {
-                          if (
-                            records.some(
-                              (record) =>
-                                record.target !== element ||
-                                record.type !== "attributes" ||
-                                record.attributeName !== "style",
-                            )
-                          )
-                            contentChanged();
-                        })
-                      : undefined;
-                    mutations?.observe(element, {
-                      childList: true,
-                      characterData: true,
-                      subtree: true,
-                      attributes: true,
-                      attributeFilter: ["class", "style", "hidden", "data-revealed"],
-                    });
-                    element.ownerDocument.fonts?.addEventListener("loadingdone", contentChanged);
-                    contentChanged();
-                    element.addEventListener("load", contentChanged, true);
-                    element.addEventListener("loadedmetadata", contentChanged, true);
-                    return () => {
-                      connected = false;
-                      observer?.disconnect();
-                      mutations?.disconnect();
-                      regions.clear();
-                      element.ownerDocument.fonts?.removeEventListener(
-                        "loadingdone",
-                        contentChanged,
-                      );
-                      element.removeEventListener("load", contentChanged, true);
-                      element.removeEventListener("loadedmetadata", contentChanged, true);
-                      stage = undefined;
-                    };
-                  },
-                },
-                mapSignal(resolvedBackground, (value) => {
-                  if (value === "theme") return null;
-                  return context.part(
-                    "background",
-                    "div",
-                    {
-                      "aria-hidden": "true",
-                      inert: true,
-                      style: value.fill ? { background: value.fill } : undefined,
-                    },
-                    value.image
-                      ? context.part("background-image", "img", {
-                          src: value.image.src,
-                          alt: "",
-                          draggable: false,
-                          decoding: "async",
-                          style: {
-                            objectFit: value.image.fit ?? "cover",
-                            objectPosition: value.image.position ?? "center",
-                          },
-                          onError: (event: Event) => {
-                            (event.currentTarget as HTMLImageElement).hidden = true;
-                          },
-                          ref: (image: HTMLImageElement) => () => {
+              ]}
+            >
+              {mapSignal(resolvedBackground, (value) => {
+                if (value === "theme") return null;
+                return (
+                  <div
+                    ref={parts.background}
+                    aria-hidden="true"
+                    inert
+                    style={value.fill ? { background: value.fill } : undefined}
+                  >
+                    {value.image ? (
+                      <img
+                        ref={[
+                          parts["background-image"],
+                          (image: HTMLImageElement) => () => {
                             image.removeAttribute("src");
                           },
-                        })
-                      : null,
-                    value.overlay
-                      ? context.part("background-overlay", "div", {
-                          style: { background: value.overlay },
-                        })
-                      : null,
-                  );
-                }),
-                page,
-              ),
-            ),
-          ),
-          context.part(
-            "diagnostic",
-            "p",
-            { role: "status", hidden: mapSignal(overflow, (value) => !value) },
-            "Content exceeds the slide or an allocated layout region. Check the content and layout.",
-          ),
-          context.part(
-            "controls",
-            "nav",
-            { "aria-label": "Presentation controls" },
-            <Inline gap="compact">
-              {context.part(
-                "navigation",
-                "div",
-                { role: "group", "aria-label": "Presentation navigation" },
-                <Inline gap="none" wrap={false}>
-                  <Button
-                    variant="quiet"
-                    aria-label="Previous"
-                    title="Previous"
-                    onClick={() => move(-1)}
-                    disabled={previousDisabled}
-                  >
-                    <Icon name="chevron-left" aria-hidden="true" />
-                  </Button>
-                  {context.part(
-                    "page-number",
-                    "div",
-                    { "aria-hidden": "true" },
-                    <span>
-                      {mapSignal(position, (value) =>
-                        String(positionIndex(slides, value) + 1).padStart(2, "0"),
-                      )}
-                    </span>,
-                    <span> / {String(slides.length).padStart(2, "0")}</span>,
-                    context.part(
-                      "step",
-                      "small",
-                      {
-                        hidden: mapSignal(
-                          position,
-                          (value) => (slides[positionIndex(slides, value)]!.steps ?? 0) === 0,
-                        ),
-                      },
-                      mapSignal(
-                        position,
-                        (value) =>
-                          `Step ${value.step} / ${slides[positionIndex(slides, value)]!.steps ?? 0}`,
-                      ),
-                    ),
-                  )}
-                  <Button
-                    variant="quiet"
-                    aria-label="Next"
-                    title="Next"
-                    onClick={() => move(1)}
-                    disabled={nextDisabled}
-                  >
-                    <Icon name="chevron-right" aria-hidden="true" />
-                  </Button>
-                </Inline>,
-              )}
-              {context.part(
-                "slide-picker",
-                "label",
-                null,
-                <Inline as="span" gap="compact" wrap={false}>
-                  <LayoutItem as="span" shrink={false}>
-                    <Inline as="span" gap="compact" wrap={false}>
-                      <Icon name="list" aria-hidden="true" />
-                      <span>Contents</span>
-                    </Inline>
-                  </LayoutItem>
-                  <LayoutItem as="span" grow>
-                    <select
-                      aria-label="Choose slide"
-                      title={mapSignal(
-                        position,
-                        (value) => slides[positionIndex(slides, value)]!.title,
-                      )}
-                      value={mapSignal(position, (value) => value.slideId)}
-                      onChange={(event: Event) => {
-                        position.value = {
-                          slideId: (event.currentTarget as HTMLSelectElement).value,
-                          step: 0,
-                        };
-                      }}
-                    >
-                      {slides.map((slide) => (
-                        <option value={slide.id}>{slide.title}</option>
-                      ))}
-                    </select>
-                  </LayoutItem>
-                </Inline>,
-              )}
-              {context.part(
-                "tools",
-                "div",
-                null,
-                <Popover
-                  id={optionsId}
-                  role="dialog"
-                  labelledBy={`${optionsId}-trigger`}
-                  open={optionsOpen}
-                  align="end"
-                  onOpenChange={(next) => {
-                    optionsOpen.value = next;
-                    if (next)
-                      queueMicrotask(() => {
-                        if (optionsOpen.value) firstOption?.focus();
-                      });
-                  }}
-                  trigger={(bindings) => (
-                    <Button
-                      {...bindings}
-                      variant="quiet"
-                      aria-label="Presentation options"
-                      aria-haspopup="dialog"
-                      title="Presentation options"
-                    >
-                      <Icon name="settings" aria-hidden="true" />
-                    </Button>
-                  )}
+                        ]}
+                        src={value.image.src}
+                        alt=""
+                        draggable={false}
+                        decoding="async"
+                        style={{
+                          objectFit: value.image.fit ?? "cover",
+                          objectPosition: value.image.position ?? "center",
+                        }}
+                        onError={(event: Event) => {
+                          (event.currentTarget as HTMLImageElement).hidden = true;
+                        }}
+                      />
+                    ) : null}
+                    {value.overlay ? (
+                      <div
+                        ref={parts["background-overlay"]}
+                        style={{ background: value.overlay }}
+                      />
+                    ) : null}
+                  </div>
+                );
+              })}
+              {page}
+            </article>
+          </div>
+        </div>
+        <p ref={parts.diagnostic} role="status" hidden={mapSignal(overflow, (value) => !value)}>
+          Content exceeds the slide or an allocated layout region. Check the content and layout.
+        </p>
+        <nav ref={parts.controls} aria-label="Presentation controls">
+          <Inline gap="compact">
+            <div ref={parts.navigation} role="group" aria-label="Presentation navigation">
+              <Inline gap="none" wrap={false}>
+                <Button
+                  variant="quiet"
+                  aria-label="Previous"
+                  title="Previous"
+                  onClick={() => move(-1)}
+                  disabled={previousDisabled}
                 >
-                  <Stack gap="compact">
-                    <Button
-                      variant="quiet"
-                      aria-pressed={mapSignal(paused, String)}
-                      ref={(element: HTMLButtonElement) => {
-                        firstOption = element;
-                        return () => {
-                          firstOption = undefined;
-                        };
-                      }}
-                      onClick={() => {
-                        paused.value = !paused.value;
-                      }}
-                    >
-                      {mapSignal(paused, (value) => (value ? "Resume effects" : "Pause effects"))}
-                    </Button>
-                    <Button
-                      variant="quiet"
-                      aria-pressed={mapSignal(actualSize, String)}
-                      onClick={() => {
-                        actualSize.value = !actualSize.value;
-                      }}
-                    >
-                      {mapSignal(actualSize, (value) => (value ? "Fit to window" : "Actual size"))}
-                    </Button>
-                  </Stack>
-                </Popover>,
-              )}
-            </Inline>,
-          ),
-          soundtrack ? context.part("soundtrack", "div", null, soundtrack) : null,
-        )}
-      </PresentationActivity.Provider>
-    );
-  },
-);
+                  <Icon name="chevron-left" aria-hidden="true" />
+                </Button>
+                <div ref={parts["page-number"]} aria-hidden="true">
+                  <span>
+                    {mapSignal(position, (value) =>
+                      String(positionIndex(slides, value) + 1).padStart(2, "0"),
+                    )}
+                  </span>
+                  <span> / {String(slides.length).padStart(2, "0")}</span>
+                  <small
+                    ref={parts.step}
+                    hidden={mapSignal(
+                      position,
+                      (value) => (slides[positionIndex(slides, value)]!.steps ?? 0) === 0,
+                    )}
+                  >
+                    {mapSignal(
+                      position,
+                      (value) =>
+                        `Step ${value.step} / ${slides[positionIndex(slides, value)]!.steps ?? 0}`,
+                    )}
+                  </small>
+                </div>
+                <Button
+                  variant="quiet"
+                  aria-label="Next"
+                  title="Next"
+                  onClick={() => move(1)}
+                  disabled={nextDisabled}
+                >
+                  <Icon name="chevron-right" aria-hidden="true" />
+                </Button>
+              </Inline>
+            </div>
+            <label ref={parts["slide-picker"]}>
+              <Inline as="span" gap="compact" wrap={false}>
+                <LayoutItem as="span" shrink={false}>
+                  <Inline as="span" gap="compact" wrap={false}>
+                    <Icon name="list" aria-hidden="true" />
+                    <span>Contents</span>
+                  </Inline>
+                </LayoutItem>
+                <LayoutItem as="span" grow>
+                  <select
+                    aria-label="Choose slide"
+                    title={mapSignal(
+                      position,
+                      (value) => slides[positionIndex(slides, value)]!.title,
+                    )}
+                    value={mapSignal(position, (value) => value.slideId)}
+                    onChange={(event: Event) => {
+                      position.value = {
+                        slideId: (event.currentTarget as HTMLSelectElement).value,
+                        step: 0,
+                      };
+                    }}
+                  >
+                    {slides.map((slide) => (
+                      <option value={slide.id}>{slide.title}</option>
+                    ))}
+                  </select>
+                </LayoutItem>
+              </Inline>
+            </label>
+            <div ref={parts.tools}>
+              <Popover
+                id={optionsId}
+                role="dialog"
+                labelledBy={`${optionsId}-trigger`}
+                open={optionsOpen}
+                align="end"
+                onOpenChange={(next) => {
+                  optionsOpen.value = next;
+                  if (next)
+                    queueMicrotask(() => {
+                      if (optionsOpen.value) firstOption?.focus();
+                    });
+                }}
+                trigger={(bindings) => (
+                  <Button
+                    {...bindings}
+                    variant="quiet"
+                    aria-label="Presentation options"
+                    aria-haspopup="dialog"
+                    title="Presentation options"
+                  >
+                    <Icon name="settings" aria-hidden="true" />
+                  </Button>
+                )}
+              >
+                <Stack gap="compact">
+                  <Button
+                    variant="quiet"
+                    aria-pressed={mapSignal(paused, String)}
+                    ref={(element: HTMLButtonElement) => {
+                      firstOption = element;
+                      return () => {
+                        firstOption = undefined;
+                      };
+                    }}
+                    onClick={() => {
+                      paused.value = !paused.value;
+                    }}
+                  >
+                    {mapSignal(paused, (value) => (value ? "Resume effects" : "Pause effects"))}
+                  </Button>
+                  <Button
+                    variant="quiet"
+                    aria-pressed={mapSignal(actualSize, String)}
+                    onClick={() => {
+                      actualSize.value = !actualSize.value;
+                    }}
+                  >
+                    {mapSignal(actualSize, (value) => (value ? "Fit to window" : "Actual size"))}
+                  </Button>
+                </Stack>
+              </Popover>
+            </div>
+          </Inline>
+        </nav>
+        {soundtrack ? <div ref={parts.soundtrack}>{soundtrack}</div> : null}
+      </section>
+    </PresentationActivity.Provider>
+  );
+}
+
+Presentation.meta = presentationMeta;

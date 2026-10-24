@@ -1,14 +1,16 @@
-import { css, partSelector } from "meowcss/meowjsx";
+import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { popoverContract } from "../../components/popover";
-import { tooltipContract } from "../../components/tooltip";
 
+import type { Popover } from "../../components/popover";
+import type { Tooltip } from "../../components/tooltip";
+const popoverPartRefs = parts<typeof Popover>("popover");
+const tooltipPartRefs = parts<typeof Tooltip>("tooltip");
 export const tooltipStyles = css`
-  ${partSelector(tooltipContract, "root")} {
+  ${tooltipPartRefs.root} {
     display: inline-block;
     max-width: 100%;
   }
-  ${partSelector(tooltipContract, "root")} > ${partSelector(popoverContract, "root")} > ${partSelector(popoverContract, "panel")} {
+  ${tooltipPartRefs.root} > ${popoverPartRefs.root} > ${popoverPartRefs.panel} {
     padding: 4px 8px;
     width: max-content;
     max-width: min(50vw, calc(100vw - 16px));
@@ -19,7 +21,7 @@ export const tooltipStyles = css`
     backdrop-filter: none;
     font: ${uiTokens.type.label} / ${uiTokens.type.line.label} ${uiTokens.type.sans};
   }
-  ${partSelector(tooltipContract, "content")} {
+  ${tooltipPartRefs.content} {
     display: block;
     max-width: 30ch;
     overflow-wrap: anywhere;

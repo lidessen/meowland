@@ -18,7 +18,7 @@ const rect = (value: {
 });
 const name = (instance: ObservedComponent<Node>, original = false): string => {
   const component = original ? instance.originalComponent : instance.component;
-  return component.contract?.name || component.name || `instance-${instance.id}`;
+  return component.meta?.name || component.name || `instance-${instance.id}`;
 };
 
 function geometry(

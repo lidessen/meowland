@@ -1,5 +1,5 @@
 import { createRuntime } from "meowjsx";
-import { createMeowUI } from "meowtail";
+import { createMeowUI, meowUIComponents } from "meowtail";
 import { createMeowSlides } from "meowslides";
 import { presentationOptions, presentationTheme } from "meowslides/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
@@ -18,5 +18,7 @@ export default (({ root, onCleanup }) => {
       presentationOptions.select({ scheme: "light" }),
     ),
   );
-  return createRuntime({ plugins: [createMeowUI(), createMeowSlides()] });
+  return createRuntime({
+    plugins: [createMeowUI({ components: meowUIComponents }), createMeowSlides()],
+  });
 }) satisfies PreviewEnvironment;

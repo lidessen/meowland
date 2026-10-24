@@ -1,11 +1,11 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { Link, ResourceLink, installMeowUI } from "../../../src/index";
+import { Link, ResourceLink, installMeowUI, meowUIComponents } from "../../../src/index";
 
 test("an inline link is an anchor, not a whole-row resource reference", () => {
   const runtime = createRuntime();
-  installMeowUI(runtime);
+  installMeowUI({ components: meowUIComponents }, runtime);
   const html = createWebRenderer(runtime).renderToHtml(
     <p>
       See the <Link href="https://example.com/docs">docs</Link>.

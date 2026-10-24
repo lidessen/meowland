@@ -1,13 +1,13 @@
-import { h, type Child } from "meowjsx";
+import { h, type Child, type ClassValue } from "meowjsx";
 
 export interface DoodleCatProps {
-  className?: string;
+  className?: ClassValue;
 }
 
 export function DoodleCat({ className = "empty-cat" }: DoodleCatProps = {}): Child {
   return (
     <svg
-      className={`meow-doodle-cat ${className}`}
+      className={["meow-doodle-cat", className]}
       viewBox="0 0 150 124"
       aria-hidden="true"
       focusable="false"

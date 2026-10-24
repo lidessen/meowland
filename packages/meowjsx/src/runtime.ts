@@ -1,5 +1,7 @@
-export { createContext, useContext, type Context, type ContextScope } from "./context";
+export { createContext, useContext, type ContextScope, type ContextValue } from "./context";
 export { keyed, type KeyedChild } from "./keyed";
+export { createPartDescriptor, isPartDescriptor } from "./parts";
+export type { PartDescriptor, RefBinding, RefCallback, RefCleanup } from "./parts";
 import { isContextProvider } from "./context";
 import {
   createRenderer as createTargetRenderer,
@@ -12,27 +14,26 @@ import {
 import {
   addHook,
   createBaseVNode,
-  createComponentContext,
   createComponentRegistry,
   createShadowRegistry,
   invokeComponent,
   removeHook,
   runCreateHooks,
   runRenderHooks,
+  normalizeHostVNode,
   type HookEntry,
   type RuntimeState,
 } from "./registry";
-import { createLifecycleScope, disposeCleanups } from "./lifecycle";
+import { disposeCleanups } from "./lifecycle";
 import type {
+  AnyShadowDefinition,
   Child,
   Cleanup,
-  AnyShadowDefinition,
-  ComponentContract,
-  ComponentRenderContext,
+  ComponentMeta,
+  Component,
+  HFactory,
   ShadowDefinition,
   ShadowSetup,
-  Component,
-  ComponentPartRef,
   CreateHook,
   FragmentComponent,
   Props,
@@ -49,14 +50,16 @@ import type {
 // Public surface: runtime.ts stays the single entry point for these modules.
 export type {
   Child,
+  ClassValue,
   Cleanup,
   Component,
-  ComponentContract,
+  ComponentMeta,
   ComponentMetadata,
   ComponentPartRef,
   ComponentRegistry,
   ComponentRegistryMap,
   ComponentRenderContext,
+  Context,
   CreateContext,
   CreateHook,
   Effect,
@@ -68,6 +71,7 @@ export type {
   MountResult,
   Props,
   ReadableSignal,
+  RegisteredComponent,
   RegisteredComponentName,
   RegisteredComponentPart,
   RenderContext,
@@ -124,44 +128,32 @@ function replacementFor(state: RuntimeState, node: VNode): Component<any> | unde
   if (node.raw || typeof node.type !== "string") return undefined;
   return state.overrides.get(node.type);
 }
-export function defineComponent<PropsType extends object, Name extends string, Part extends string>(
-  contract: ComponentContract<Name, Part>,
-  render: (props: PropsType, context: ComponentRenderContext<Name, Part, PropsType>) => Child,
-): Component<PropsType, Name, Part> {
-  const component = ((props: PropsType, context?: ComponentRenderContext<Name, Part, PropsType>) =>
-    render(
-      props,
-      context ??
-        createComponentContext(
-          defaultRuntime,
-          contract,
-          props,
-          createLifecycleScope(defaultRuntime),
-        ),
-    )) as Component<PropsType, Name, Part>;
-  return Object.assign(component, { contract });
-}
-
 export function defineShadow<
-  PropsType extends object,
-  Name extends string,
-  AllPart extends string,
-  Part extends AllPart,
+  C extends Component<any, any> & { readonly meta: ComponentMeta },
+  Part extends C["meta"]["parts"][number],
   TNode = unknown,
 >(
-  target: Component<PropsType, Name, AllPart> | ComponentContract<Name, AllPart>,
+  component: C,
   part: Part,
-  setup: ShadowSetup<PropsType, Name, Part, TNode>,
-): ShadowDefinition<PropsType, Name, AllPart, Part, TNode> {
-  const contract = typeof target === "function" ? target.contract : target;
-  if (!contract) throw new Error("meowjsx shadows need a component contract");
-
+  setup: ShadowSetup<Parameters<C>[0], C["meta"]["name"], Part, TNode>,
+): ShadowDefinition<Parameters<C>[0], C["meta"]["name"], C["meta"]["parts"][number], Part, TNode> {
+  const meta = component.meta;
+  if (!meta.parts.includes(part))
+    throw new Error(
+      `meowjsx shadow ${meta.name}.${String(part)} is not declared in component metadata`,
+    );
   return {
-    name: `meowjsx-shadow:${contract.name}/${String(part)}`,
-    contract,
+    name: `meowjsx-shadow:${meta.name}/${String(part)}`,
+    component,
     part,
     setup,
-  };
+  } as ShadowDefinition<
+    Parameters<C>[0],
+    C["meta"]["name"],
+    C["meta"]["parts"][number],
+    Part,
+    TNode
+  >;
 }
 
 export const shadow = defineShadow;
@@ -236,8 +228,8 @@ export function createRuntime(options: RuntimeOptions = {}): Runtime {
         const disposeShadow = state.shadowRegistry.register(shadow);
         contributionCleanups.push(disposeShadow);
       }
-      for (const contract of plugin.components ?? []) {
-        const disposeComponent = registry.register(contract);
+      for (const component of plugin.components ?? []) {
+        const disposeComponent = registry.register(component);
         contributionCleanups.push(disposeComponent);
       }
 
@@ -296,38 +288,22 @@ export function createRuntime(options: RuntimeOptions = {}): Runtime {
     return installPlugin(option);
   };
 
-  const h = <PropsType extends object, Name extends string, Part extends string>(
-    type: string | Component<PropsType, Name, Part>,
-    props: PropsType | null,
+  const h: HFactory = (
+    type: string | Component<any, any>,
+    props: object | null,
     ...children: Child[]
   ): VNode => {
-    return runCreateHooks(state, {
-      type,
-      props: { ...props },
-      children,
-      runtime,
-    });
+    const context = { type, props: { ...props }, children, runtime };
+    const candidate = createBaseVNode(context);
+    const normalized = normalizeHostVNode(candidate);
+    if (normalized.raw) return normalized;
+    return normalizeHostVNode(runCreateHooks(state, context));
   };
 
-  const raw = (type: string, props: Props | null, ...children: Child[]): VNode => {
-    return createBaseVNode({
-      type,
-      props: { ...props },
-      children,
-      runtime,
-      raw: true,
-    });
-  };
-
-  const part = (
-    identity: ComponentPartRef,
-    type: string,
-    props: Props | null,
-    ...children: Child[]
-  ): VNode => ({
-    ...raw(type, props, ...children),
-    componentPart: identity,
-  });
+  const raw = (type: string, props: Props | null, ...children: Child[]): VNode =>
+    normalizeHostVNode(
+      createBaseVNode({ type, props: { ...props }, children, runtime, raw: true }),
+    );
 
   const Fragment: FragmentComponent = (props) => props.children ?? null;
   fragments.add(Fragment);
@@ -362,7 +338,7 @@ export function createRuntime(options: RuntimeOptions = {}): Runtime {
       const identity = vnode.componentPart;
       if (!identity || !registry.has(identity.component)) return;
       const hasShadow = state.shadowRegistry.list().some((shadow) => {
-        return shadow.contract.name === identity.component && shadow.part === identity.part;
+        return shadow.component.meta.name === identity.component && shadow.part === identity.part;
       });
       if (hasShadow) {
         throw new Error(
@@ -415,7 +391,6 @@ export function createRuntime(options: RuntimeOptions = {}): Runtime {
     shadowRegistry: state.shadowRegistry,
     h,
     raw,
-    part,
     Fragment,
     targetHooks,
     createRenderer,
@@ -434,7 +409,6 @@ export const defaultRuntime = createRuntime();
 export const registry = defaultRuntime.registry;
 export const h = defaultRuntime.h;
 export const raw = defaultRuntime.raw;
-export const part = defaultRuntime.part;
 export const Fragment = defaultRuntime.Fragment;
 
 export const registerComponent = defaultRuntime.registerComponent;

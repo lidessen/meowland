@@ -64,15 +64,16 @@ Interpolating a class into a rule body expands its declarations; conditions expa
 
 ```ts
 export const cardStyles = css`
-  ${partSelector(cardContract, "root")} {
+  ${cardContract.parts.root} {
     ${ui.cx(ui.p.panel, ui.bg.raised, ui.radius.xl, ui.hover(ui.bg.fill))}
   }
 `;
 ```
 
-The association between a part and a style is made here, by the theme, exactly as today. The
-existing recipes (`surface`, `text`, `interactive`, `focusRing`) are replaced by utilities of the
-same kind: `ui.text.caption` works in a theme rule and in `className`.
+The association between a part and a style is made here, by the theme. The part descriptor comes
+from the [parts design](2026-10-24-component-parts-ref-bindings.md), which replaces `partSelector`.
+The existing recipes (`surface`, `text`, `interactive`, `focusRing`) are replaced by utilities of
+the same kind: `ui.text.caption` works in a theme rule and in `className`.
 
 ## Ownership and delivery
 
@@ -87,9 +88,9 @@ same kind: `ui.text.caption` works in a theme rule and in `className`.
 - The atom sheet is audited with `standardAuditRules`, and a size budget test keeps conditions a
   deliberate choice per utility.
 
-Component contracts, part markers and option attributes do not change. A Meowtail component keeps
-its look in its theme file and forwards a host `className` on its root; a host class is a local
-adjustment, not the component's look.
+Part markers and option attributes do not change. A Meowtail component keeps its look in its theme
+file and forwards a host `className` on its root; a host class is a local adjustment, not the
+component's look.
 
 ## Breaking changes
 
@@ -107,8 +108,9 @@ bump under the [release contract](../releasing.md).
 - Hosts and stories that paint with inline `style` objects or ad hoc classes restating tokens are
   expected to move to `ui` classes; inline `style` stays only for instance measurements.
 
-Unchanged: `uiTokens` and every token name, the `css` template, `partSelector`, `defineOptions`,
-`defineStyleProps`, component contracts, part markers and option attributes.
+Unchanged: `uiTokens` and every token name, the `css` template, `defineOptions`,
+`defineStyleProps`, part markers and option attributes. Contract and `partSelector` changes belong to
+the [parts design](2026-10-24-component-parts-ref-bindings.md#breaking-changes).
 
 ## A Tailwind-style export later
 

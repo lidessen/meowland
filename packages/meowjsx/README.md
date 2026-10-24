@@ -116,7 +116,9 @@ The command above runs from the repository root and only checks the DOM-free cor
 The [parts and ref-binding design](../../docs/designs/2026-10-24-component-parts-ref-bindings.md)
 selects ordinary function components and native JSX with `ref={ctx.parts.root}` or composed
 `ref={[ctx.parts.root, forwardedRef, mount]}` bindings. This is a design direction pending
-implementation and type validation; current exports still use `context.part(...)`.
+implementation and type validation; current exports still use `context.part(...)`. It is a
+breaking change: `context.part`, the old `defineComponent` form and `partSelector` are removed
+without aliases.
 
 ## Verification
 

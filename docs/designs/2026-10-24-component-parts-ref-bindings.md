@@ -1,8 +1,11 @@
 # Component parts through composable ref bindings
 
 Status: selected authoring direction, pending implementation and type validation. This design covers
-MeowJSX component implementations and their host nodes. Existing runtime APIs and published packages
-still use `context.part(...)`; the examples below describe the target API.
+MeowJSX component implementations, their host nodes and how themes address parts. It is a breaking
+change with no compatibility layer for the old authoring surface; see
+[Breaking changes](#breaking-changes). Existing runtime APIs and published packages still use
+`context.part(...)` and `partSelector(...)` until it lands; the examples below describe the target
+API.
 
 Component authors write ordinary functions and native JSX. A part is a binding supplied through
 `ref`, and `ref` accepts multiple bindings when the component and its caller both need the node.
@@ -192,6 +195,48 @@ those wrappers must accept and forward composed refs too.
 Registration, theme assembly and CSS installation retain their existing owners. Attaching a
 contract to a function does not register it or install styles.
 
+### Themes address parts through the same descriptors
+
+The descriptors are defined with the contract, before any mount, and `ctx.parts` is that same
+object. A theme therefore addresses a part by interpolating its descriptor, and `partSelector` is
+not needed:
+
+```ts
+// Working names: the contract exposes its part descriptors.
+export const cardStyles = css`
+  ${cardContract.parts.root} {
+    ${ui.cx(ui.p.panel, ui.bg.raised)}
+  }
+`;
+```
+
+The `css` template in `meowcss/meowjsx` recognizes a part descriptor through a MeowJSX guard and
+emits the part selector (`:where([data-meowui-part="card/root"])`) and the contract dependency that
+`defineTheme` uses for carrier inference. The MeowJSX core gains no CSS text; the selector form stays
+owned by the adapter, as it is today. Styles themselves stay independent of parts: the descriptor
+is where a theme associates a style with a part, as the
+[utility styles design](2026-10-24-utility-styles.md) describes.
+
+## Breaking changes
+
+The new surface replaces the old one; there are no aliases, shims or deprecation period. Every
+in-repository component, theme, story and app migrates before the release that ships it, and each
+affected package takes a breaking version bump under the [release contract](../releasing.md).
+
+- `context.part(name, tag, props, ...children)` is removed. Parts are bound with `ref={ctx.parts.x}`.
+- `defineComponent` with repeated name and part generics is removed. Components are ordinary
+  functions with an attached contract; the exact attachment API comes from the type prototype.
+- `partSelector(contract, part)` is removed from `meowcss/meowjsx`. Themes interpolate the part
+  descriptor directly, as above. The same applies to `ScopedTokens.at`, which takes a descriptor.
+- `ComponentContract.parts` changes from an array of names to the descriptor record. Code that reads
+  it as an array (`contract.parts.includes(...)`) breaks; the finite names stay available from the
+  record's keys.
+- `props.ref` on a component may be a composed array, not only a callback. Wrappers that call it as
+  a function break and must forward it instead.
+
+Unchanged: part identity on the VNode (`componentPart`), the `data-meowui-part` marker and its
+values, option attributes, `defineOptions`, `defineStyleProps` and the style-props plugin's behavior.
+
 ## Alternatives considered
 
 | Candidate                                        | Decision and reason                                                                                                                 |
@@ -225,9 +270,11 @@ Failure cleanup and contextual typing still need the implementation checks below
    `Accordion` for repeated parts, and a host-forwarding control. Verify keyboard behavior, focus and
    drafts in the relevant real scenarios; unchanged observation depth and shadow behavior need
    focused contract checks.
-5. Update component authoring guidance and audit ref-forwarding helpers before wider migration.
-   Decide the compatibility period for `context.part` and `defineComponent` from the validated
-   prototype; this design does not remove their current exports.
+5. Teach the `meowcss/meowjsx` `css` template and `defineTheme` to accept part descriptors, then
+   migrate every `partSelector` call and remove it. Confirm the generated `cssText` is unchanged.
+6. Update component authoring guidance, migrate the remaining components and wrappers, and remove
+   `context.part` and the old `defineComponent` form in the same release. There is no compatibility
+   period.
 
 Use [development checks](../development-checks.md) for commands and coverage. No runtime, type,
 browser or installed-package acceptance is established by this design-only change.

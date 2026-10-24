@@ -111,6 +111,13 @@ The command above runs from the repository root and only checks the DOM-free cor
 (defaults to `unknown`); the Web module narrows it to a real element. Theme contracts (`Theme`/`ThemeRule`/
 `ThemeStyle` and their merge rules) stay in core as planned; they carry values only and touch no style API.
 
+## Component authoring design
+
+The [parts and ref-binding design](../../docs/designs/2026-10-24-component-parts-ref-bindings.md)
+selects ordinary function components and native JSX with `ref={ctx.parts.root}` or composed
+`ref={[ctx.parts.root, forwardedRef, mount]}` bindings. This is a design direction pending
+implementation and type validation; current exports still use `context.part(...)`.
+
 ## Verification
 
 - `bun test packages/meowjsx/tests/unit`: Signal, VNode, plugin, contracts, fake target seam and Web host tests.

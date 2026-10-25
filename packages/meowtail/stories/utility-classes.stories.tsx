@@ -10,7 +10,7 @@ export const UtilityClassesStory = defineStory({
   id: "utility-classes",
   title: "Utility classes · Values and composition",
   group: "Foundations",
-  component: "Button",
+  component: "Theme utilities",
   variant: "Class values and component defaults",
   description:
     "Shows reusable theme class values through class arrays and cx alongside Button defaults and an instance variant override.",

@@ -12,11 +12,17 @@ test("a controlled grid region keeps natural geometry, input identity and focus 
   const region = page.locator("[data-support-controlled]");
   const input = page.locator("#presentation-support-draft");
   const original = await input.elementHandle();
+  // Compare logical layout because the presentation may adjust its viewport scale.
   const geometry = () =>
     page.locator("[data-support-grid]").evaluate((node) =>
       [node, ...node.children].map((element) => {
-        const rect = element.getBoundingClientRect();
-        return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
+        const box = element as HTMLElement;
+        return {
+          x: box.offsetLeft,
+          y: box.offsetTop,
+          width: box.offsetWidth,
+          height: box.offsetHeight,
+        };
       }),
     );
   const concealedGeometry = await geometry();

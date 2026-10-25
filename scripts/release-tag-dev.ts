@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { valid } from "semver";
 import { assertOIDC, run, type Runner } from "./release.ts";
 
-/** The five inspected signal-entry tarballs; Slides has a separate release path. */
+/** The five inspected signal-entry tarballs. */
 export const devTargets = [
   {
     name: "meowjsx",
@@ -47,6 +47,18 @@ export const devTargets = [
   },
 ] as const;
 
+/** The separately published Slides tarball, selected only by an exact one-package request. */
+export const slidesDevTargets = [
+  {
+    name: "meowslides",
+    version: "0.2.0-alpha.0",
+    previousDev: "0.1.0-alpha.1",
+    sha256: "35961cd8cafdbf88839781f5b6a8e8e5d863820af534bf45aa93b6566d1ab3bb",
+    integrity:
+      "sha512-EIHpUhPz5/Qv0w7yb66fusrYMs/OUCiWqo4k7V0XP/LMTge1sIA6skQxvh2jnntwi4oi3JH+C/ITZq1eKL5Ibg==",
+  },
+] as const;
+
 export type DevTarget = Readonly<{
   name: string;
   version: string;
@@ -64,7 +76,8 @@ export type TagResult = {
 
 const root = resolve(import.meta.dir, "..");
 const decoder = new TextDecoder();
-const selected = devTargets.map((target) => target.name).join(",");
+const selectedFive = devTargets.map((target) => target.name).join(",");
+const selectedSlides = slidesDevTargets[0].name;
 const statusArgs = [
   "git",
   "--no-optional-locks",
@@ -183,7 +196,7 @@ async function assertCurrentSource(source: string, runner: Runner) {
   );
 }
 
-/** Preflight the entire fixed batch before changing any tag. */
+/** Preflight the entire selected fixed batch before changing any tag. */
 export async function tagDev(
   source: string,
   mode: "check" | "execute" = "check",
@@ -204,9 +217,10 @@ export async function tagDev(
   const pause = options.visibility?.pause ?? ((milliseconds: number) => Bun.sleep(milliseconds));
   assert(Number.isInteger(reads) && reads > 0, "Invalid registry visibility read limit");
   assert(
-    targets.length === devTargets.length &&
-      targets.every((item, index) => item.name === devTargets[index]?.name),
-    "The complete five-package set is required",
+    (targets.length === devTargets.length &&
+      targets.every((item, index) => item.name === devTargets[index]?.name)) ||
+      (targets.length === 1 && targets[0]?.name === selectedSlides),
+    "Select the complete five-package set or meowslides alone",
   );
   if (mode === "execute") assertOIDC(source, env);
   await assertCurrentSource(source, runner);
@@ -306,19 +320,24 @@ export function parseTagDevRequest(args: string[]) {
     assert(value && !value.startsWith("--"), `Missing value: ${key}`);
     values.set(key, value);
   }
+  const packages = values.get("--packages");
   assert(
-    values.get("--packages") === selected,
-    "Select the exact five published packages in order",
+    packages === selectedFive || packages === selectedSlides,
+    "Select the exact five published packages in order or meowslides alone",
   );
   assert(values.get("--channel") === "alpha", "Tag-dev requires the alpha channel");
   const source = values.get("--commit") ?? "";
   assert(/^[a-f0-9]{40}$/.test(source), "A full main SHA is required");
-  return { source, mode: execute ? ("execute" as const) : ("check" as const) };
+  return {
+    source,
+    mode: execute ? ("execute" as const) : ("check" as const),
+    targets: packages === selectedSlides ? slidesDevTargets : devTargets,
+  };
 }
 
 export async function main(args: string[]) {
   const request = parseTagDevRequest(args);
-  const results = await tagDev(request.source, request.mode);
+  const results = await tagDev(request.source, request.mode, { targets: request.targets });
   console.log(
     JSON.stringify({ mode: request.mode, commit: request.source, distTag: "dev", results }),
   );

@@ -3,6 +3,7 @@ import { createHash } from "node:crypto";
 import {
   devTargets,
   parseTagDevRequest,
+  slidesDevTargets,
   tagDev,
   type DevTarget,
   type Download,
@@ -24,11 +25,11 @@ const oidc = {
   ACTIONS_ID_TOKEN_REQUEST_TOKEN: "fixture-token",
 };
 
-function fixture() {
+function fixture(selectedTargets: readonly DevTarget[] = devTargets) {
   const bytes = new Map<string, Uint8Array>(
-    devTargets.map(({ name }) => [name, encoded(`published ${name}`)]),
+    selectedTargets.map(({ name }) => [name, encoded(`published ${name}`)]),
   );
-  const targets: DevTarget[] = devTargets.map(({ name, version, previousDev }) => {
+  const targets: DevTarget[] = selectedTargets.map(({ name, version, previousDev }) => {
     const content = bytes.get(name)!;
     return {
       name,
@@ -44,7 +45,7 @@ function fixture() {
       {
         alpha: target.version,
         dev: target.previousDev,
-        latest: "0.1.0",
+        latest: target.name === "meowslides" ? "0.1.0-alpha.1" : "0.1.0",
         legacy: "0.0.1",
       } as Record<string, string>,
     ]),
@@ -129,17 +130,72 @@ test("request selects exactly five published alphas and requires an explicit mut
     "--channel",
     "alpha",
   ];
-  expect(parseTagDevRequest(args)).toEqual({ source: commit, mode: "check" });
+  expect(parseTagDevRequest(args)).toEqual({
+    source: commit,
+    mode: "check",
+    targets: devTargets,
+  });
   expect(parseTagDevRequest([...args, "--execute"]).mode).toBe("execute");
+  expect(
+    parseTagDevRequest(["--commit", commit, "--packages", "meowslides", "--channel", "alpha"])
+      .targets,
+  ).toEqual(slidesDevTargets);
   for (const invalid of [
     args.slice(0, -2),
     [...args.slice(0, -1), "stable"],
     [...args.slice(0, 3), "meowjsx,meowcss", ...args.slice(4)],
+    [...args.slice(0, 3), "meowslides,meowjsx", ...args.slice(4)],
     [...args, "--execute", "--execute"],
     [...args, "--operation", "publish"],
     ["--commit", "main", ...args.slice(2)],
   ])
     expect(() => parseTagDevRequest(invalid)).toThrow();
+});
+
+test("Slides-only execution moves its pinned dev tag and preserves latest", async () => {
+  const setup = fixture(slidesDevTargets);
+  const target = setup.targets[0]!;
+  expect(await tagDev(commit, "check", setup.options())).toEqual([
+    { name: "meowslides", version: target.version, action: "would-tag" },
+  ]);
+  expect(setup.mutations).toEqual([]);
+
+  expect(await tagDev(commit, "execute", setup.options())).toEqual([
+    { name: "meowslides", version: target.version, action: "tagged" },
+  ]);
+  expect(setup.mutations).toEqual([["npm", "dist-tag", "add", "meowslides@0.2.0-alpha.0", "dev"]]);
+  expect(setup.tags.get("meowslides")).toEqual({
+    alpha: "0.2.0-alpha.0",
+    dev: "0.2.0-alpha.0",
+    latest: "0.1.0-alpha.1",
+    legacy: "0.0.1",
+  });
+  expect(
+    setup.calls.filter((args) => args[0] === "registry").every((args) => args[2] === "meowslides"),
+  ).toBe(true);
+  expect(await tagDev(commit, "execute", setup.options())).toEqual([
+    { name: "meowslides", version: target.version, action: "already-tagged" },
+  ]);
+  expect(setup.mutations).toHaveLength(1);
+});
+
+test("Slides-only preflight rejects changed tags or tarball bytes before mutation", async () => {
+  const alpha = fixture(slidesDevTargets);
+  alpha.tags.get("meowslides")!.alpha = "0.1.0-alpha.1";
+  await expect(tagDev(commit, "execute", alpha.options())).rejects.toThrow("Alpha tag moved");
+  expect(alpha.mutations).toEqual([]);
+
+  const dev = fixture(slidesDevTargets);
+  dev.tags.get("meowslides")!.dev = "0.0.0-stage";
+  await expect(tagDev(commit, "execute", dev.options())).rejects.toThrow(
+    "Dev tag already targets another version",
+  );
+  expect(dev.mutations).toEqual([]);
+
+  const tarball = fixture(slidesDevTargets);
+  tarball.targets[0] = { ...tarball.targets[0]!, sha256: "0".repeat(64) };
+  await expect(tagDev(commit, "execute", tarball.options())).rejects.toThrow("SHA256 differs");
+  expect(tarball.mutations).toEqual([]);
 });
 
 test("check mode verifies all five tarballs and reports planned tags without mutation", async () => {

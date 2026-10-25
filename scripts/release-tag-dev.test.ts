@@ -28,11 +28,12 @@ function fixture() {
   const bytes = new Map<string, Uint8Array>(
     devTargets.map(({ name }) => [name, encoded(`published ${name}`)]),
   );
-  const targets: DevTarget[] = devTargets.map(({ name, version }) => {
+  const targets: DevTarget[] = devTargets.map(({ name, version, previousDev }) => {
     const content = bytes.get(name)!;
     return {
       name,
       version,
+      previousDev,
       sha256: createHash("sha256").update(content).digest("hex"),
       integrity: `sha512-${createHash("sha512").update(content).digest("base64")}`,
     };
@@ -40,7 +41,12 @@ function fixture() {
   const tags = new Map(
     targets.map((target) => [
       target.name,
-      { alpha: target.version, latest: "0.1.0", legacy: "0.0.1" } as Record<string, string>,
+      {
+        alpha: target.version,
+        dev: target.previousDev,
+        latest: "0.1.0",
+        legacy: "0.0.1",
+      } as Record<string, string>,
     ]),
   );
   const calls: string[][] = [];
@@ -144,7 +150,7 @@ test("check mode verifies all five tarballs and reports planned tags without mut
   expect(setup.calls.filter((args) => args[0] === "registry").length).toBeGreaterThan(5);
 });
 
-test("execution tags five pinned versions and preserves every other dist-tag", async () => {
+test("execution moves five pinned dev tags and preserves every other dist-tag", async () => {
   const setup = fixture();
   const results = await tagDev(commit, "execute", setup.options());
   expect(results.map((item) => item.action)).toEqual(Array(5).fill("tagged"));
@@ -167,6 +173,24 @@ test("execution tags five pinned versions and preserves every other dist-tag", a
   const second = await tagDev(commit, "execute", setup.options());
   expect(second.map((item) => item.action)).toEqual(Array(5).fill("already-tagged"));
   expect(setup.mutations).toHaveLength(5);
+});
+
+test("an interrupted move resumes only the still-old dev tags", async () => {
+  const setup = fixture();
+  setup.tags.get("meowjsx")!.dev = setup.targets[0]!.version;
+  const results = await tagDev(commit, "execute", setup.options());
+  expect(results.map((item) => item.action)).toEqual([
+    "already-tagged",
+    "tagged",
+    "tagged",
+    "tagged",
+    "tagged",
+  ]);
+  expect(setup.mutations).toHaveLength(4);
+  for (const target of setup.targets) {
+    expect(setup.tags.get(target.name)!.dev).toBe(target.version);
+    expect(setup.tags.get(target.name)!.latest).toBe("0.1.0");
+  }
 });
 
 test("OIDC context is required before any execution read or mutation", async () => {
@@ -204,6 +228,13 @@ test("an altered alpha or preexisting dev target blocks all mutations", async ()
     "Dev tag already targets another version",
   );
   expect(dev.mutations).toEqual([]);
+
+  const missing = fixture();
+  delete missing.tags.get("meowbook")!.dev;
+  await expect(tagDev(commit, "execute", missing.options())).rejects.toThrow(
+    "Dev tag already targets another version",
+  );
+  expect(missing.mutations).toEqual([]);
 });
 
 test("a concurrent change stops before the next tag without rolling the first one back", async () => {
@@ -215,7 +246,7 @@ test("a concurrent change stops before the next tag without rolling the first on
     "Registry tags changed during preflight: meowcss",
   );
   expect(setup.mutations).toHaveLength(1);
-  expect(setup.tags.get("meowjsx")!.dev).toBe("0.2.0-alpha.0");
+  expect(setup.tags.get("meowjsx")!.dev).toBe("0.3.0-alpha.0");
 });
 
 test("a failed npm response is uncertain and never causes an automatic retry", async () => {

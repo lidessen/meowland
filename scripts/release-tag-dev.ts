@@ -3,48 +3,54 @@ import { resolve } from "node:path";
 import { valid } from "semver";
 import { assertOIDC, run, type Runner } from "./release.ts";
 
-/** The five immutable tarballs published from c6d6fd4. Slides was not published in that batch. */
+/** The five inspected signal-entry tarballs; Slides has a separate release path. */
 export const devTargets = [
   {
     name: "meowjsx",
-    version: "0.2.0-alpha.0",
-    sha256: "108aec8f979ad035c9ca58b7756b7ff66ad515675edc0ec04acc8f85cde98146",
+    version: "0.3.0-alpha.0",
+    previousDev: "0.2.0-alpha.0",
+    sha256: "db1c7aec34dde0bbe3734681f02713eb02f1168741b63aaf1121e4a494fa4c4c",
     integrity:
-      "sha512-60ja909155njObDEE3GeyaRzbE2KqH3dxNf9wIgL4BP3a2Ymr92F6VWNC1OKlhA5FL2r1kxNVqp7OZp34IpIDA==",
+      "sha512-XldoWxfBjao6+NRkZo5G0x8nkXyg2Gd0qC797DVbw9aYdDjt3rLgibWdCs0gzSwGrUaqrNy0HD6X3cj3HgLZAQ==",
   },
   {
     name: "meowcss",
-    version: "0.2.0-alpha.0",
-    sha256: "67f049403c22bde1443b50834603686a2a220ac6a1c10a135a48808ff21a827e",
+    version: "0.3.0-alpha.0",
+    previousDev: "0.2.0-alpha.0",
+    sha256: "d8ae20f05013595774ad3f16033ca11050815ef9dd681df53b4be518ca9c07bb",
     integrity:
-      "sha512-yKr4Bl1Tg0tXEWPVssj3jdztzHrngWLxxznz3MFuAWXDfhmiwGxtJyK/xkVkCOdQmbd1ijDRnYkVWIJ1lbJ7rA==",
+      "sha512-n1dXkLryuHCE/RTkcU8WZhHzpr/rV2tvd2adyA4WQh/256F2aeGzcIPEM9ct2TOXZoiHK7g7KSuNBeTNjzxlLQ==",
   },
   {
     name: "meowtail",
-    version: "0.3.0-alpha.0",
-    sha256: "f28e4d513bb8cf9d19a532c604e374f167268b37867f0f6c8295cfe4d4cf5e27",
+    version: "0.4.0-alpha.0",
+    previousDev: "0.3.0-alpha.0",
+    sha256: "aa20641401f9e54431728d88706c4283f336241207b9cd893ccaa4c3c686c210",
     integrity:
-      "sha512-ecFd5KXx85R1ZD8WL4q8hFzKqf2YjhXM7uLKoYek2viLJOCUCTZZ4vBIa+SLdVgoKjNsQsa3/aG79TvdeeQi/g==",
+      "sha512-7NO6mHuoAL4yNEe1r0tJD9UVO+s1k0Mm1xSxlb0U69uYrroiRtiUhZsuQV3/zPMc9qNECFjVhD8gvmxBWMmoNA==",
   },
   {
     name: "meowbook",
-    version: "0.2.0-alpha.0",
-    sha256: "21f67070e1d7d1ee0e4fad36fc484ee7a239bba55460b651e10f3d249903f9f1",
+    version: "0.3.0-alpha.0",
+    previousDev: "0.2.0-alpha.0",
+    sha256: "15d681fff2e1522566df9312380ead1f37db5908de58ab86c535c244f2dddaeb",
     integrity:
-      "sha512-y6CJRHdRqXgoI3Ur/gQckuwbhFQGj0aobSOsK9cjby6e2+/Q97dL2r+ijXII63RllcqQWrO8Ca/DoSc1rD2l/A==",
+      "sha512-JhLDjFgLtDJioZg6dAuTy5tSpLq1bLFqVRQNVl/2UyAKkA8fep5y83qeE7PK/xykC7WLYTpIoS2pVbftgJqWgw==",
   },
   {
     name: "meowpress",
-    version: "0.2.0-alpha.0",
-    sha256: "3f1f784281970b0be00eba87c921cac12266f8b587b805cf0d0bcfe82f7bfaa8",
+    version: "0.3.0-alpha.0",
+    previousDev: "0.2.0-alpha.0",
+    sha256: "05a572898776e9a22b434fcd8a545155ef8e93b513c93cdfbcc8809d1389e222",
     integrity:
-      "sha512-Z2s7xL0jkM/VjV2682BFmiF/WupXtx8rd401y1lKfKQPUI2+K8al/kQMiPjgWEQ5fPgmrKJq+auCCEklC5mL4A==",
+      "sha512-V1IAqsXRgpyLwrUyTt80e2sR1HuHpHPMe2bPzY1Q2uiLE3v28hyftTsUO2IReZwuDjEBqHW4FRg+oYEkYkh/7A==",
   },
 ] as const;
 
 export type DevTarget = Readonly<{
   name: string;
   version: string;
+  previousDev: string;
   sha256: string;
   integrity: string;
 }>;
@@ -158,7 +164,7 @@ async function readTags(target: DevTarget, runner: Runner): Promise<Record<strin
   const copy = { ...(tags as Record<string, string>) };
   assert(copy.alpha === target.version, `Alpha tag moved: ${target.name}`);
   assert(
-    copy.dev === undefined || copy.dev === target.version,
+    copy.dev === target.previousDev || copy.dev === target.version,
     `Dev tag already targets another version: ${target.name}`,
   );
   return copy;

@@ -2,9 +2,10 @@
 
 `meowslides` is a standalone presentation package that owns the player, pages and steps, activity
 permission, reveals, the media lifecycle, presentation layouts and themes, and the trusted local MDX
-authoring entry point. The package is currently preparing the public candidate `0.1.0-alpha.1` and is
-not yet published to npm; release wiring and out-of-package acceptance do not imply actual
-authorization to publish.
+authoring entry point. The first public version, `0.1.0-alpha.1`, was published from the frozen
+`c6d6fd4` artifact and passed an independent registry installation check. See the
+[first-publication receipt](../../docs/records/2026-10-25-slides-first-publication.md). Later source
+changes are not included in that version.
 
 Meowtail keeps generic UI, layout, image preview and the standard application theme. The new package
 depends one-way on Meowtail, MeowJSX and MeowCSS; the old `meowtail/presentation` and root presentation

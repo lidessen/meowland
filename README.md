@@ -1,6 +1,6 @@
 # Meowland
 
-A standalone Bun / TypeScript UI toolkit repository. The original five packages have completed npm publishing, independent-registry consumption acceptance and official GitHub Releases; this round adds `meowslides` as a local candidate and has not published it yet. The product switch is still pending; the original Rossovia product repository's source, services, official dependencies and Git remote have not been switched here.
+A standalone Bun / TypeScript UI toolkit repository. The original five packages have completed npm publishing, independent-registry consumption acceptance and official GitHub Releases; `meowslides@0.1.0-alpha.1` has also completed its first npm publication and independent-registry consumption check. The product switch is still pending; the original Rossovia product repository's source, services, official dependencies and Git remote have not been switched here.
 
 ## Packages
 
@@ -9,7 +9,7 @@ A standalone Bun / TypeScript UI toolkit repository. The original five packages 
 | [`meowjsx`](packages/meowjsx/README.md)       | Platform-agnostic JSX / reactive runtime; browser capabilities are loaded explicitly through `meowjsx/web`                                                                               |
 | [`meowcss`](packages/meowcss/README.md)       | Shared token / CSS generation, with additional `/meowjsx` and `/web` adapter entries                                                                                                     |
 | [`meowtail`](packages/meowtail/README.md)     | Components, semantic layout and concrete standard themes; this round's complete Assistant and finite JSON catalog have completed local implementation and limited independent acceptance |
-| [`meowslides`](packages/meowslides/README.md) | Standalone presentation playback, content layouts, reveals, media, themes and trusted local MDX authoring tools; local candidate                                                         |
+| [`meowslides`](packages/meowslides/README.md) | Standalone presentation playback, content layouts, reveals, media, themes and trusted local MDX authoring tools; first public alpha                                                      |
 | [`meowbook`](packages/meowbook/README.md)     | Component showcase, inspection, browser preview and screenshot tooling                                                                                                                   |
 | [`meowpress`](packages/meowpress/README.md)   | Markdown / MDX static-site build tooling                                                                                                                                                 |
 
@@ -44,14 +44,14 @@ The source code comes from the library directory of the Rossovia repository and 
 
 ## Release status
 
-Current operations use [manual Actions + npm OIDC publishing](docs/releasing.md): explicit package selection and independent versions; prereleases use `alpha`, stable releases use `latest`. Regular pushes only check; publishing is triggered by a manual workflow and does not depend on long-lived npm tokens. The scripts do not manage GitHub Releases; the completed releases below remain historical facts. `meowjsx@0.1.1-alpha.0`, `meowcss@0.1.1-alpha.0`, `meowtail@0.2.0-alpha.0`, `meowbook@0.1.2-alpha.0` and `meowpress@0.1.1-alpha.0` have been published through Actions OIDC and accepted from the registry. `meowtail@0.2.0-alpha.1`, `meowbook@0.1.2-alpha.1` and `meowpress@0.1.1-alpha.1` were subsequently published under `alpha` by [the exact-source OIDC run](https://github.com/lidessen/meowland/actions/runs/39185612444) and passed independent registry consumption. Their public tarballs match the accepted local bytes; all `latest` tags remain unchanged. See the [publication receipt](docs/records/2026-10-19-alpha1-publication.md).
+Current operations use [manual Actions + npm OIDC publishing](docs/releasing.md): explicit package selection and independent versions; prereleases use `alpha`, stable releases use `latest`. Regular pushes only check; subsequent publishing is triggered by a manual workflow and does not depend on long-lived npm tokens. Slides' user-authorized first-package bootstrap used direct npm CLI with user-handled 2FA and a revoked temporary login. The scripts do not manage GitHub Releases; the completed releases below remain historical facts. `meowjsx@0.1.1-alpha.0`, `meowcss@0.1.1-alpha.0`, `meowtail@0.2.0-alpha.0`, `meowbook@0.1.2-alpha.0` and `meowpress@0.1.1-alpha.0` have been published through Actions OIDC and accepted from the registry. `meowtail@0.2.0-alpha.1`, `meowbook@0.1.2-alpha.1` and `meowpress@0.1.1-alpha.1` were subsequently published under `alpha` by [the exact-source OIDC run](https://github.com/lidessen/meowland/actions/runs/39185612444) and passed independent registry consumption. Their public tarballs match the accepted local bytes; all `latest` tags remain unchanged. See the [publication receipt](docs/records/2026-10-19-alpha1-publication.md).
 
 The authoring migration is published under `alpha` as JSX/CSS/Book/Press `0.2.0-alpha.0` and Tail
 `0.3.0-alpha.0`. These versions replace component definers/contracts with ordinary functions and
 static metadata, and replace theme recipes with class values and `cx`. The
 [OIDC publication receipt](docs/records/2026-10-24-authoring-alpha-publication.md) records the exact
-source, checks, public bytes and registry consumption. Slides `0.1.0-alpha.1` passed local tarball
-acceptance but remains unpublished until its first-package bootstrap and trusted publisher are set up.
+source, checks, public bytes and registry consumption. Slides `0.1.0-alpha.1` subsequently completed
+its [first publication and registry consumption](docs/records/2026-10-25-slides-first-publication.md).
 The earlier [authoring migration receipt](docs/records/2026-10-24-authoring-migration.md) retains the
 implementation's original local acceptance scope.
 

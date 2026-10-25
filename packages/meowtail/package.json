@@ -1,6 +1,6 @@
 {
   "name": "meowtail",
-  "version": "0.3.0-alpha.0",
+  "version": "0.4.0-alpha.0",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -63,8 +63,8 @@
     "shiki": "4.3.1"
   },
   "peerDependencies": {
-    "meowjsx": "^0.2.0-alpha.0",
-    "meowcss": "^0.2.0-alpha.0"
+    "meowjsx": "^0.3.0-alpha.0",
+    "meowcss": "^0.3.0-alpha.0"
   },
   "devDependencies": {
     "meowjsx": "workspace:*",

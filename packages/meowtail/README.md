@@ -16,10 +16,10 @@ Application authors writing their own components (the shadcn/ui and Tailwind equ
 
 ## Runtime compatibility
 
-The local `0.3.0-alpha.0` candidate requires `meowjsx@^0.2.0-alpha.0` and
-`meowcss@^0.2.0-alpha.0`. It uses ordinary components with static `meta`, composed part/ref bindings
+The local `0.4.0-alpha.0` candidate requires `meowjsx@^0.3.0-alpha.0` and
+`meowcss@^0.3.0-alpha.0`. It uses ordinary components with static `meta`, composed part/ref bindings
 and the class-value theme API. Earlier package generations do not implement that authoring contract.
-These are local candidate versions; the published releases remain listed in the root README.
+The published releases remain listed in the root README.
 
 ## Minimal browser integration
 

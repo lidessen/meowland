@@ -43,7 +43,7 @@
     },
     "packages/meowbook": {
       "name": "meowbook",
-      "version": "0.2.0-alpha.0",
+      "version": "0.3.0-alpha.0",
       "bin": {
         "meowbook": "./dist/src/cli.js",
       },
@@ -70,7 +70,7 @@
     },
     "packages/meowcss": {
       "name": "meowcss",
-      "version": "0.2.0-alpha.0",
+      "version": "0.3.0-alpha.0",
       "devDependencies": {
         "meowjsx": "workspace:*",
       },
@@ -83,11 +83,11 @@
     },
     "packages/meowjsx": {
       "name": "meowjsx",
-      "version": "0.2.0-alpha.0",
+      "version": "0.3.0-alpha.0",
     },
     "packages/meowpress": {
       "name": "meowpress",
-      "version": "0.2.0-alpha.0",
+      "version": "0.3.0-alpha.0",
       "bin": {
         "meowpress": "./dist/src/cli.js",
       },
@@ -110,7 +110,7 @@
     },
     "packages/meowslides": {
       "name": "meowslides",
-      "version": "0.1.0-alpha.1",
+      "version": "0.2.0-alpha.0",
       "bin": {
         "meowslides": "./dist/src/cli.js",
       },
@@ -134,7 +134,7 @@
     },
     "packages/meowtail": {
       "name": "meowtail",
-      "version": "0.3.0-alpha.0",
+      "version": "0.4.0-alpha.0",
       "dependencies": {
         "@floating-ui/dom": "^1.8.0",
         "@shikijs/langs": "4.3.1",

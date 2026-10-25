@@ -112,8 +112,8 @@ The dev server listens only on loopback; after the script, an imported local mod
 changes, it rebuilds and reloads the whole page; on error it keeps the last valid picture, shows the
 error in the terminal, and continues after the fix. A reload rebuilds the session; this is a reload,
 not state-preserving HMR. `dist/` is a browser output that can be opened with an ordinary static HTTP
-server; double-clicking a file URL is not promised. The new package currently has no official npm
-release, and an old published package cannot substitute for this round's candidate.
+server; double-clicking a file URL is not promised. The published `0.1.0-alpha.1` is available from
+npm, but it does not include the later signal-entry migration in this local candidate.
 
 ### Pages, layout and interaction
 

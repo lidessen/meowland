@@ -4,6 +4,7 @@ import { activeElementInRoot } from "../shared/dom-root";
 import { Icon } from "../icons/icon";
 import { Dialog, DialogActions, DialogHeader, DialogPanel } from "./dialog";
 import { IconButton } from "./icon-button";
+import { elementId } from "../shared/element-id";
 
 export interface ModalProps extends Props {
   /** Required; the host owns the state. A Signal keeps the dialog in sync after mount. */
@@ -33,8 +34,6 @@ export interface ModalProps extends Props {
   children: Child;
 }
 
-let nextModalId = 0;
-
 /** True when a slot was given; `false` and `null` mean the slot is omitted. */
 function hasSlot(slot: Child): boolean {
   return slot !== undefined && slot !== null && slot !== false;
@@ -63,7 +62,7 @@ export function Modal(
   }: ModalProps,
   context: Context<typeof Modal>,
 ) {
-  const baseId = id ?? `modal-${++nextModalId}`;
+  const baseId = id ?? elementId("modal");
   const titleId = `${baseId}-title`;
   const descriptionId = `${baseId}-description`;
   // DialogHeader renders its description on truthiness; match it so the id never dangles.

@@ -6,9 +6,11 @@ import { ListGroup, ListRow } from "./list-group";
 import { Select } from "./select";
 import { Stack } from "./stack";
 import { Status } from "./status";
+import { elementId } from "../shared/element-id";
 
 export interface CredentialSourceProps {
-  id: string;
+  /** Base id for the ARIA references this component wires; generated when omitted. */
+  id?: string;
   source: "stored" | "environment";
   environmentName: string;
   apiKey: string;
@@ -27,7 +29,7 @@ export interface CredentialSourceProps {
 
 /** Controlled credential editor. Discovery and secret persistence belong to the host. */
 export function CredentialSource(props: CredentialSourceProps) {
-  const { id, disabled } = props;
+  const { id = elementId("credential-source"), disabled } = props;
   return (
     <Stack gap="compact">
       <Field label="API Key source" htmlFor={`${id}-source`}>

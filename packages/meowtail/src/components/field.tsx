@@ -1,10 +1,15 @@
 import { type Child, type Props, type VNode, type Context, h } from "meowjsx";
 import { derived, isSignal, mapSignal, unwrap, type MaybeSignal } from "meowjsx/signal";
+import { elementId } from "../shared/element-id";
 
 export interface FieldProps extends Props {
   label: Child;
   description?: Child;
   error?: Child;
+  /**
+   * Id of the labelled control. When omitted, Field uses the single child control's own `id`,
+   * or generates one and gives it to that control.
+   */
   htmlFor?: string;
   descriptionId?: string;
   errorId?: string;
@@ -30,6 +35,11 @@ export function Field(
   }: FieldProps,
   context: Context<typeof Field>,
 ) {
+  // Field takes over the control id only when the host supplies none; a live id stays the host's.
+  const ownControl = htmlFor === undefined ? soleControl(children) : undefined;
+  const ownControlId = ownControl?.props.id;
+  const generatedId = ownControl && ownControlId === undefined ? elementId("field") : undefined;
+  const controlId = htmlFor ?? (typeof ownControlId === "string" ? ownControlId : generatedId);
   const hasDescription = isSignal(description)
     ? mapSignal(description, hasMessage)
     : hasMessage(description);
@@ -37,10 +47,10 @@ export function Field(
   const mountDescription = isSignal(description) || hasDescription;
   const mountError = isSignal(error) || hasError;
   const resolvedDescriptionId = mountDescription
-    ? (descriptionId ?? (htmlFor ? `${htmlFor}-description` : undefined))
+    ? (descriptionId ?? (controlId ? `${controlId}-description` : undefined))
     : undefined;
   const resolvedErrorId = mountError
-    ? (errorId ?? (htmlFor ? `${htmlFor}-error` : undefined))
+    ? (errorId ?? (controlId ? `${controlId}-error` : undefined))
     : undefined;
   const readDescribedBy = () =>
     [
@@ -56,6 +66,7 @@ export function Field(
     describedBy,
     invalid: invalidState,
     setInvalid: invalid !== undefined || error !== undefined,
+    id: generatedId,
   });
 
   return (
@@ -71,7 +82,7 @@ export function Field(
       }
       ref={[context.parts.root, ref]}
     >
-      <label htmlFor={htmlFor} ref={context.parts.label}>
+      <label htmlFor={controlId} ref={context.parts.label}>
         {label}
       </label>
       {mountDescription ? (
@@ -111,6 +122,8 @@ function enhanceControl(
     describedBy: MaybeSignal<string>;
     invalid: MaybeSignal<boolean>;
     setInvalid: boolean;
+    /** Set only when Field generated the control id. */
+    id?: string;
   },
 ): Child {
   if (!children || Array.isArray(children) || !isVNode(children)) return children;
@@ -129,6 +142,7 @@ function enhanceControl(
       ? derived(readDescribedBy)
       : readDescribedBy();
   const props: Props = { ...children.props };
+  if (options.id !== undefined) props.id = options.id;
   if (describedBy) props["aria-describedby"] = describedBy;
   if (options.setInvalid)
     props["aria-invalid"] = isSignal(options.invalid)
@@ -138,6 +152,10 @@ function enhanceControl(
         : "false";
 
   return { ...children, props };
+}
+
+function soleControl(children: Child | undefined): VNode | undefined {
+  return children && !Array.isArray(children) && isVNode(children) ? children : undefined;
 }
 
 function hasMessage(value: unknown): boolean {

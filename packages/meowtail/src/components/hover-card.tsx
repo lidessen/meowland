@@ -2,9 +2,11 @@ import { h, type Child, type Props, type Context } from "meowjsx";
 import { signal } from "meowjsx/signal";
 import { Popover, type PopoverTriggerBindings } from "./popover";
 import { copyTextToClipboard } from "../clipboard";
+import { elementId } from "../shared/element-id";
 
 export interface HoverCardProps extends Props {
-  id: string;
+  /** Base id for the ARIA references this component wires; generated when omitted. */
+  id?: string;
   trigger: (bindings: PopoverTriggerBindings) => Child;
   content: Child;
   openDelay?: number;
@@ -23,7 +25,7 @@ export interface HoverCardProps extends Props {
  */
 export function HoverCard(
   {
-    id,
+    id = elementId("hover-card"),
     trigger,
     content,
     openDelay = 500,

@@ -5,7 +5,8 @@ import { Icon } from "../icons/icon";
 import { Menu, type MenuEntry } from "./menu";
 
 export interface MenuButtonProps extends Omit<ButtonProps, "id" | "onClick"> {
-  id: string;
+  /** Base id for the ARIA references this component wires; generated when omitted. */
+  id?: string;
   items: readonly MenuEntry[];
   open?: MaybeSignal<boolean>;
   onOpenChange?: (open: boolean) => void;

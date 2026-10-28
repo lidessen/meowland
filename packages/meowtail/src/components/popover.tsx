@@ -2,6 +2,7 @@ import { h, type Child, type Props, type Context } from "meowjsx";
 import { derived, isSignal, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { autoUpdate, computePosition, offset, flip, shift, size } from "@floating-ui/dom";
 import { activeElementInRoot, elementByIdInRoot } from "../shared/dom-root";
+import { elementId } from "../shared/element-id";
 
 export interface PopoverTriggerBindings {
   id: string;
@@ -10,7 +11,8 @@ export interface PopoverTriggerBindings {
   onClick: (event: MouseEvent) => void;
 }
 export interface PopoverProps extends Props {
-  id: string;
+  /** Base id for the ARIA references this component wires; generated when omitted. */
+  id?: string;
   triggerId?: string;
   trigger: (bindings: PopoverTriggerBindings) => Child;
   open?: MaybeSignal<boolean>;
@@ -36,7 +38,7 @@ const dismissedEvents = new WeakSet<Event>();
 /** A floating panel anchored to a trigger, in the top layer. */
 export function Popover(
   {
-    id,
+    id = elementId("popover"),
     triggerId = `${id}-trigger`,
     trigger,
     open,

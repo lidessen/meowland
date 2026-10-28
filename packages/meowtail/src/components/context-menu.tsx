@@ -1,9 +1,11 @@
 import { h, type Child, type Props, type Context } from "meowjsx";
 import { signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Menu, type MenuEntry } from "./menu";
+import { elementId } from "../shared/element-id";
 
 export interface ContextMenuProps extends Props {
-  id: string;
+  /** Base id for the ARIA references this component wires; generated when omitted. */
+  id?: string;
   items: readonly MenuEntry[];
   open?: MaybeSignal<boolean>;
   onOpenChange?: (open: boolean) => void;
@@ -13,7 +15,15 @@ export interface ContextMenuProps extends Props {
 
 /** Right-click or Shift+F10 opens the existing Menu, including nested items. */
 export function ContextMenu(
-  { id, items, open, onOpenChange, className, children, ...props }: ContextMenuProps,
+  {
+    id = elementId("context-menu"),
+    items,
+    open,
+    onOpenChange,
+    className,
+    children,
+    ...props
+  }: ContextMenuProps,
   context: Context<typeof ContextMenu>,
 ) {
   const local = signal(false);

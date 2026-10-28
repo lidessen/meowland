@@ -3,9 +3,11 @@ import { derived, isSignal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Dialog, DialogPanel, DialogHeader, DialogActions } from "./dialog";
 import { Checkbox } from "./checkbox";
 import { Button } from "./button";
+import { elementId } from "../shared/element-id";
 
 export interface RiskConfirmationProps extends Props {
-  id: string;
+  /** Base id for the ARIA references this component wires; generated when omitted. */
+  id?: string;
   open: MaybeSignal<boolean>;
   title: string;
   description: string;
@@ -22,7 +24,7 @@ export interface RiskConfirmationProps extends Props {
 /** One host-requested acknowledgement; it never decides which actions need confirmation. */
 export function RiskConfirmation(
   {
-    id,
+    id = elementId("risk-confirmation"),
     open,
     title,
     description,

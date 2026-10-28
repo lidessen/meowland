@@ -72,28 +72,79 @@ test("consumer checks actual tarball identity and hash before installation", asy
   }
 });
 
-test("the standard native Node public probe catches a broken Slides theme specifier", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "release-consumer-node-test-"));
-  try {
-    const packageDirectory = join(directory, "node_modules/meowslides");
-    await mkdir(packageDirectory, { recursive: true });
-    await writeFile(
-      join(packageDirectory, "package.json"),
-      JSON.stringify({
-        name: "meowslides",
-        type: "module",
-        exports: { ".": "./index.js", "./theme": "./theme.js", "./build": "./build.js" },
-      }),
-    );
-    await writeFile(join(packageDirectory, "index.js"), "export const runtime = true;");
-    await writeFile(join(packageDirectory, "theme.styles.js"), "export const theme = true;");
-    await writeFile(join(packageDirectory, "theme.js"), 'export {theme} from "./theme.styles";');
-    await writeFile(
-      join(packageDirectory, "build.js"),
-      'throw Error("Bun-only tooling must not execute under Node");',
-    );
-    await writeFile(join(directory, "public-imports.mjs"), publicImportProbe(["meowslides"]));
-    const run = async () => {
+// Each probe starts cold `node` processes; a busy CI runner can exceed the 5s default per test.
+const nodeProbeTimeout = 30_000;
+
+test(
+  "the standard native Node public probe catches a broken Slides theme specifier",
+  async () => {
+    const directory = await mkdtemp(join(tmpdir(), "release-consumer-node-test-"));
+    try {
+      const packageDirectory = join(directory, "node_modules/meowslides");
+      await mkdir(packageDirectory, { recursive: true });
+      await writeFile(
+        join(packageDirectory, "package.json"),
+        JSON.stringify({
+          name: "meowslides",
+          type: "module",
+          exports: { ".": "./index.js", "./theme": "./theme.js", "./build": "./build.js" },
+        }),
+      );
+      await writeFile(join(packageDirectory, "index.js"), "export const runtime = true;");
+      await writeFile(join(packageDirectory, "theme.styles.js"), "export const theme = true;");
+      await writeFile(join(packageDirectory, "theme.js"), 'export {theme} from "./theme.styles";');
+      await writeFile(
+        join(packageDirectory, "build.js"),
+        'throw Error("Bun-only tooling must not execute under Node");',
+      );
+      await writeFile(join(directory, "public-imports.mjs"), publicImportProbe(["meowslides"]));
+      const run = async () => {
+        const child = Bun.spawn(["node", "public-imports.mjs"], {
+          cwd: directory,
+          stdout: "pipe",
+          stderr: "pipe",
+        });
+        const [code, stdout, stderr] = await Promise.all([
+          child.exited,
+          new Response(child.stdout).text(),
+          new Response(child.stderr).text(),
+        ]);
+        return { code, stdout, stderr };
+      };
+      const broken = await run();
+      expect(broken.code).not.toBe(0);
+      expect(broken.stderr).toContain("ERR_MODULE_NOT_FOUND");
+      expect(broken.stderr).toContain("theme.styles");
+      await writeFile(
+        join(packageDirectory, "theme.js"),
+        'export {theme} from "./theme.styles.js";',
+      );
+      const repaired = await run();
+      expect(repaired.code).toBe(0);
+      expect(JSON.parse(repaired.stdout)).toEqual(["meowslides", "meowslides/theme"]);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  },
+  nodeProbeTimeout,
+);
+
+test(
+  "the native Node public probe excludes the Press-only Bun tool",
+  async () => {
+    const directory = await mkdtemp(join(tmpdir(), "release-consumer-press-node-test-"));
+    try {
+      const packageDirectory = join(directory, "node_modules/meowpress");
+      await mkdir(packageDirectory, { recursive: true });
+      await writeFile(
+        join(packageDirectory, "package.json"),
+        JSON.stringify({ name: "meowpress", type: "module", exports: { "./build": "./build.js" } }),
+      );
+      await writeFile(
+        join(packageDirectory, "build.js"),
+        'throw Error("Press tooling was executed under Node");',
+      );
+      await writeFile(join(directory, "public-imports.mjs"), publicImportProbe(["meowpress"]));
       const child = Bun.spawn(["node", "public-imports.mjs"], {
         cwd: directory,
         stdout: "pipe",
@@ -104,49 +155,12 @@ test("the standard native Node public probe catches a broken Slides theme specif
         new Response(child.stdout).text(),
         new Response(child.stderr).text(),
       ]);
-      return { code, stdout, stderr };
-    };
-    const broken = await run();
-    expect(broken.code).not.toBe(0);
-    expect(broken.stderr).toContain("ERR_MODULE_NOT_FOUND");
-    expect(broken.stderr).toContain("theme.styles");
-    await writeFile(join(packageDirectory, "theme.js"), 'export {theme} from "./theme.styles.js";');
-    const repaired = await run();
-    expect(repaired.code).toBe(0);
-    expect(JSON.parse(repaired.stdout)).toEqual(["meowslides", "meowslides/theme"]);
-  } finally {
-    await rm(directory, { recursive: true, force: true });
-  }
-});
-
-test("the native Node public probe excludes the Press-only Bun tool", async () => {
-  const directory = await mkdtemp(join(tmpdir(), "release-consumer-press-node-test-"));
-  try {
-    const packageDirectory = join(directory, "node_modules/meowpress");
-    await mkdir(packageDirectory, { recursive: true });
-    await writeFile(
-      join(packageDirectory, "package.json"),
-      JSON.stringify({ name: "meowpress", type: "module", exports: { "./build": "./build.js" } }),
-    );
-    await writeFile(
-      join(packageDirectory, "build.js"),
-      'throw Error("Press tooling was executed under Node");',
-    );
-    await writeFile(join(directory, "public-imports.mjs"), publicImportProbe(["meowpress"]));
-    const child = Bun.spawn(["node", "public-imports.mjs"], {
-      cwd: directory,
-      stdout: "pipe",
-      stderr: "pipe",
-    });
-    const [code, stdout, stderr] = await Promise.all([
-      child.exited,
-      new Response(child.stdout).text(),
-      new Response(child.stderr).text(),
-    ]);
-    expect(code).toBe(0);
-    expect(stderr).toBe("");
-    expect(JSON.parse(stdout)).toEqual([]);
-  } finally {
-    await rm(directory, { recursive: true, force: true });
-  }
-});
+      expect(code).toBe(0);
+      expect(stderr).toBe("");
+      expect(JSON.parse(stdout)).toEqual([]);
+    } finally {
+      await rm(directory, { recursive: true, force: true });
+    }
+  },
+  nodeProbeTimeout,
+);

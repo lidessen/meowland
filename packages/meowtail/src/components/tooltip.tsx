@@ -1,13 +1,15 @@
 import { h, type Child, type Context, type Props } from "meowjsx";
 import { signal } from "meowjsx/signal";
 import { Popover } from "./popover";
+import { elementId } from "../shared/element-id";
 
 export interface TooltipTriggerBindings {
   id: string;
   "aria-describedby": string;
 }
 export interface TooltipProps extends Props {
-  id: string;
+  /** Base id for the ARIA references this component wires; generated when omitted. */
+  id?: string;
   content: string;
   /** Use a focusable control with its own accessible name; this is supplementary text. */
   trigger: (bindings: TooltipTriggerBindings) => Child;
@@ -16,7 +18,7 @@ export interface TooltipProps extends Props {
 }
 /** Non-interactive help. Popover owns positioning, top-layer dismissal and cleanup. */
 export function Tooltip(
-  { id, content, trigger, delay = 350, className, ref }: TooltipProps,
+  { id = elementId("tooltip"), content, trigger, delay = 350, className, ref }: TooltipProps,
   context: Context<typeof Tooltip>,
 ) {
   const open = signal(false);

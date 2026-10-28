@@ -1,4 +1,5 @@
 import { type Child, type Props, type Context, h } from "meowjsx";
+import { elementId } from "../shared/element-id";
 
 export interface FieldGroupProps extends Props {
   legend: Child;
@@ -7,7 +8,6 @@ export interface FieldGroupProps extends Props {
   disabled?: boolean;
   className?: Props["className"];
 }
-let nextFieldGroupId = 0;
 /** A titled set of related fields, as a native fieldset. */
 export function FieldGroup(
   { legend, description, descriptionId, disabled, children, className, ...props }: FieldGroupProps,
@@ -15,7 +15,7 @@ export function FieldGroup(
 ) {
   const hasDescription = description !== undefined && description !== null && description !== false;
   const resolvedDescriptionId = hasDescription
-    ? (descriptionId ?? `field-group-${++nextFieldGroupId}-description`)
+    ? (descriptionId ?? `${elementId("field-group")}-description`)
     : undefined;
   return (
     <fieldset

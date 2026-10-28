@@ -1,6 +1,7 @@
 import { h, type Child, type Context, type Props } from "meowjsx";
 import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { tabsCount, tabsIndex } from "./tabs.options";
+import { elementId } from "../shared/element-id";
 export { tabsCount, tabsIndex } from "./tabs.options";
 
 export interface TabItem {
@@ -10,7 +11,8 @@ export interface TabItem {
   disabled?: boolean;
 }
 export interface TabsProps extends Props {
-  id: string;
+  /** Base id for the ARIA references this component wires; generated when omitted. */
+  id?: string;
   label: string;
   items: readonly TabItem[];
   value?: MaybeSignal<string>;
@@ -22,7 +24,7 @@ export interface TabsProps extends Props {
 /** Horizontal tabs with automatic keyboard activation. Items are fixed for the mount, and panels stay mounted to preserve drafts. */
 export function Tabs(
   {
-    id,
+    id = elementId("tabs"),
     label,
     items,
     value,

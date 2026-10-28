@@ -302,7 +302,7 @@ Nesting does not mean borders and shadows must be repeated. Complex content stil
 `AspectRatio ratio={16/9}` controls layout ratio; the caller chooses media object-fit and clipping.
 `Separator` keeps horizontal/vertical separator semantics.
 
-`Tabs` uses the required id, label, and items (value/label/content/disabled) to create associated tabs/tabpanels;
+`Tabs` uses label and items (value/label/content/disabled) to create associated tabs/tabpanels;
 it supports arrow keys, Home/End, a controlled value Signal, and defaultValue. Panels stay mounted when switching, so drafts are not lost.
 `Breadcrumb items` is an array of label/href, and the last item marks the current location.
 `Tooltip` uses `trigger(bindings)` to add text descriptions to named focusable controls; it appears after a mouse delay, appears immediately on keyboard focus,
@@ -324,7 +324,7 @@ approach and does not force the component index on. Both approaches keep supplem
 
 The native select control `Select` reuses browser option, keyboard, and form semantics and provides a `root` part; the theme decides visuals. It is used both for the Meowbook tool appearance and for scene theme selection. The control keeps native `size` (row count) semantics and does not reuse it as a visual size.
 
-`Popover` is a non-modal general overlay; it does not set a menu role or trap focus by default. It requires `id` and
+`Popover` is a non-modal general overlay; it does not set a menu role or trap focus by default. It requires
 `trigger(bindings)`; the trigger button exposes the bindings, and content goes in children. It supports `open` Signal / `defaultOpen`,
 `onOpenChange`, `align`, `matchTriggerWidth`, `role`, and `labelledBy`. `triggerId` can associate with an external Field.
 It uses the browser Popover API's top-layer hosting and depends on browsers that support that API; positioning uses `@floating-ui/dom`'s
@@ -362,8 +362,13 @@ import { Bell } from "meowtail/icons/lucide";
 Before adding a component, confirm it can be reused in more than two applications or scenes; page components used once by an application should not be moved
 here just to "extract" them.
 
-`Field` associates its label through `htmlFor`; the caller supplies the matching control `id`.
-For a single control child, it merges visible description and error ids from `htmlFor`, `descriptionId`, or `errorId`
+Components that wire ARIA references (`Tabs`, `Popover`, `Menu`, `MenuButton`, `ContextMenu`, `HoverCard`, `Tooltip`,
+`SegmentedControl`, `RiskConfirmation`, `CredentialSource`) take an optional `id` as the base of those references and
+generate a document-unique one when it is omitted; pass `id` when the host must address the element.
+
+`Field` associates its label through `htmlFor`. Without `htmlFor`, a single control child is labelled by its own
+string `id`, or Field generates one and gives it to that child; a Signal `id` stays the host's and is not wired.
+For a single control child, it merges visible description and error ids from that control id, `descriptionId`, or `errorId`
 with the child's original `aria-describedby`, including a host Signal. It manages only its own ids.
 Multiple control children and custom compositions require the caller to pass association attributes explicitly.
 Top-level `description` and `error` Signals keep their message parts mounted and update content, `hidden`, and

@@ -1,5 +1,6 @@
 import { h, type Props, type Context } from "meowjsx";
 import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
+import { elementId } from "../shared/element-id";
 
 export interface ChoiceGroupOption {
   value: string;
@@ -24,15 +25,13 @@ export interface ChoiceGroupProps extends Props {
   className?: Props["className"];
 }
 
-let nextChoiceGroupId = 0;
-
 /** Visible single choices with native radio keyboard, validation and form semantics. */
 export function ChoiceGroup(
   {
     options,
     label,
     hideLabel = false,
-    id = `choice-group-${++nextChoiceGroupId}`,
+    id = elementId("choice-group"),
     name = id,
     form,
     value,

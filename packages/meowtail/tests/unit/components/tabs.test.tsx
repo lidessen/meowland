@@ -74,3 +74,30 @@ test("tabs connect panels to their tabs and ignore disabled selection", () => {
     expect(changes).toEqual([]);
   }
 });
+
+test("tabs without an id generate distinct, connected ARIA references", () => {
+  const runtime = createRuntime();
+  const tabs: Props[] = [];
+  const panels: Props[] = [];
+  runtime.use({
+    render({ vnode }, next) {
+      if (vnode.props.role === "tab") tabs.push(vnode.props);
+      if (vnode.props.role === "tabpanel") panels.push(vnode.props);
+      return next(vnode);
+    },
+  });
+  const items = [
+    { value: "first", label: "First", content: "First content" },
+    { value: "second", label: "Second", content: "Second content" },
+  ];
+  const renderer = createWebRenderer(runtime);
+  renderer.renderToHtml(<Tabs label="Views" items={items} />);
+  renderer.renderToHtml(<Tabs label="Views" items={items} />);
+
+  expect(tabs).toHaveLength(4);
+  for (const [index, tab] of tabs.entries()) {
+    expect(tab["aria-controls"]).toBe(panels[index]!.id);
+    expect(panels[index]!["aria-labelledby"]).toBe(tab.id);
+  }
+  expect(tabs[0]!.id).not.toBe(tabs[2]!.id);
+});

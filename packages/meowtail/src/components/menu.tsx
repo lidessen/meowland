@@ -3,6 +3,7 @@ import { signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Popover, type PopoverTriggerBindings } from "./popover";
 import { Icon } from "../icons/icon";
 import { activeElementInRoot, elementByIdInRoot } from "../shared/dom-root";
+import { elementId } from "../shared/element-id";
 
 export interface MenuAction {
   id: string;
@@ -23,7 +24,8 @@ export interface MenuTriggerBindings extends PopoverTriggerBindings {
   onKeyDown: (event: KeyboardEvent) => void;
 }
 export interface MenuProps extends Props {
-  id: string;
+  /** Base id for the ARIA references this component wires; generated when omitted. */
+  id?: string;
   trigger: (bindings: MenuTriggerBindings) => Child;
   items: readonly MenuEntry[];
   open?: MaybeSignal<boolean>;
@@ -44,7 +46,7 @@ interface MenuLevelProps extends MenuProps {
 /** A list of actions in a popover, with keyboard navigation and nested submenus. */
 export function Menu(
   {
-    id,
+    id = elementId("menu"),
     trigger,
     items,
     open,

@@ -1,5 +1,6 @@
 import { type Props, type Context, h } from "meowjsx";
 import { derived, unwrap, type MaybeSignal } from "meowjsx/signal";
+import { elementId } from "../shared/element-id";
 export interface SegmentedControlOption {
   value: string;
   label: string;
@@ -7,7 +8,8 @@ export interface SegmentedControlOption {
   title?: string;
 }
 export interface SegmentedControlProps extends Props {
-  id: string;
+  /** Base id for the ARIA references this component wires; generated when omitted. */
+  id?: string;
   name?: string;
   form?: string;
   label: string;
@@ -21,7 +23,7 @@ export interface SegmentedControlProps extends Props {
 /** A single choice, using native radio keyboard semantics; tabs remain a separate component. */
 export function SegmentedControl(
   {
-    id,
+    id = elementId("segmented-control"),
     name = id,
     form,
     label,

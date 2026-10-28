@@ -191,3 +191,49 @@ test("multiple controls keep the caller's manual associations", async () => {
     view.unmount();
   }
 });
+
+test("a field without htmlFor labels and describes its single control by a generated id", () => {
+  const view = mount(
+    <Field label="Email" description="Used for receipts" error="Enter an email">
+      <Input />
+    </Field>,
+  );
+  try {
+    const input = view.host.querySelector("input")!;
+    expect(input.id).toMatch(/^field-\d+$/);
+    expect(view.host.querySelector("label")!.htmlFor).toBe(input.id);
+    expect(input.getAttribute("aria-describedby")).toBe(
+      `${input.id}-description ${input.id}-error`,
+    );
+    expect(view.host.querySelector(`#${input.id}-error`)!.textContent).toBe("Enter an email");
+  } finally {
+    view.unmount();
+  }
+});
+
+test("a field without htmlFor keeps the control's own id, and two fields never share one", () => {
+  const view = mount(
+    <div>
+      <Field label="Name">
+        <Input id="host-name" />
+      </Field>
+      <Field label="First">
+        <Input />
+      </Field>
+      <Field label="Second">
+        <Input />
+      </Field>
+    </div>,
+  );
+  try {
+    const [named, first, second] = [...view.host.querySelectorAll("input")];
+    const labels = [...view.host.querySelectorAll("label")];
+    expect(named!.id).toBe("host-name");
+    expect(labels[0]!.htmlFor).toBe("host-name");
+    expect(first!.id).not.toBe(second!.id);
+    expect(labels[1]!.htmlFor).toBe(first!.id);
+    expect(labels[2]!.htmlFor).toBe(second!.id);
+  } finally {
+    view.unmount();
+  }
+});

@@ -3,6 +3,7 @@ import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Popover, type PopoverTriggerBindings } from "./popover";
 import { Icon } from "../icons/icon";
 import { elementByIdInRoot } from "../shared/dom-root";
+import { elementId } from "../shared/element-id";
 
 export interface ChoiceOption {
   value: string;
@@ -32,8 +33,6 @@ export interface ChoiceSelectProps extends Props {
   matchTriggerWidth?: boolean;
 }
 
-let nextChoiceId = 0;
-
 /** Single-choice listbox. Form participation remains native; data fetching belongs to callers. */
 export function ChoiceSelect(
   {
@@ -43,7 +42,7 @@ export function ChoiceSelect(
     defaultValue = "",
     onValueChange,
     name,
-    id = `choice-${++nextChoiceId}`,
+    id = elementId("choice"),
     disabled = false,
     required = false,
     placeholder = "Select an option",

@@ -1,13 +1,8 @@
-import { createContext, h, useContext, type Child, type Props, type Context } from "meowjsx";
+import { h, useContext, type Child, type Props, type Context } from "meowjsx";
 import { Card } from "./card";
+import { sectionLevelContext } from "./heading-level";
 
-/**
- * The authoring region's heading depth. `Page` provides 1, so a direct `Section`
- * with a title renders h2; each titled `Section` provides the level it rendered,
- * so a nested one renders h3. A title-less grouping section passes the level
- * through unchanged, and a section mounted outside a page falls back to 1.
- */
-export const sectionLevelContext = createContext(1);
+export { sectionLevelContext } from "./heading-level";
 
 export type SectionVariant = "plain" | "card";
 

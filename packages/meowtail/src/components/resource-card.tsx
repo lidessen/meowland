@@ -1,4 +1,5 @@
 import { type Child, type Props, type Context, h } from "meowjsx";
+import { nestedHeadingLevel } from "./heading-level";
 
 export interface ResourceCardProps extends Props {
   title: Child;
@@ -16,7 +17,10 @@ export interface ResourceCardProps extends Props {
   className?: Props["className"];
 }
 
-/** One prepared capability on an overview page: what it is, whether it runs, what to do next. */
+/**
+ * One prepared capability on an overview page: what it is, whether it runs, what to do next.
+ * The title sits one heading level below the surrounding `Page` or `Section`.
+ */
 export function ResourceCard(
   {
     title,
@@ -33,6 +37,7 @@ export function ResourceCard(
   }: ResourceCardProps,
   context: Context<typeof ResourceCard>,
 ) {
+  const Heading = `h${nestedHeadingLevel()}`;
   return (
     <article
       {...props}
@@ -47,7 +52,7 @@ export function ResourceCard(
           </span>
         ) : null}
         <div ref={[context.parts.copy]}>
-          <h3 ref={[context.parts.title]}>{title}</h3>
+          <Heading ref={[context.parts.title]}>{title}</Heading>
           {subtitle ? <span ref={[context.parts.subtitle]}>{subtitle}</span> : null}
         </div>
         {status ? <span ref={[context.parts.status]}>{status}</span> : null}

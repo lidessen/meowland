@@ -2,7 +2,17 @@ import { expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { installMeowUI, meowUIComponents } from "../../../src/registry";
-import { Button, Card, Page, Section } from "../../../src/components";
+import {
+  Button,
+  Card,
+  CardTitle,
+  DetailSection,
+  Dialog,
+  DialogHeader,
+  Page,
+  ResourceCard,
+  Section,
+} from "../../../src/components";
 import { standardTheme, uiTokens } from "../../../src/theme";
 
 function web() {
@@ -165,4 +175,45 @@ test("the standard theme paints every section part with the shared spacing step"
   for (const part of ["root", "header", "title", "description", "actions", "content", "footer"])
     expect(standardTheme.cssText).toContain(`data-meowui-part="section/${part}"`);
   expect(standardTheme.cssText).toContain(uiTokens.space.group.name);
+});
+
+test("card titles, detail sections and resource cards take the next level below their region", () => {
+  const headingOf = (html: string, text: string) =>
+    new RegExp(`<(h[1-6])[^>]*>${text}</h[1-6]>`).exec(html)?.[1];
+  const html = web().renderToHtml(
+    <Page title="Workspace">
+      <Section title="Overview">
+        <Card>
+          <CardTitle>Usage</CardTitle>
+        </Card>
+        <DetailSection title="Limits">
+          <Section title="Monthly">Body</Section>
+        </DetailSection>
+        <ResourceCard title="Channel" />
+      </Section>
+      <Card>
+        <CardTitle>Top card</CardTitle>
+      </Card>
+    </Page>,
+  );
+  expect(headingOf(html, "Overview")).toBe("h2");
+  expect(headingOf(html, "Usage")).toBe("h3");
+  expect(headingOf(html, "Limits")).toBe("h3");
+  expect(headingOf(html, "Monthly")).toBe("h4");
+  expect(headingOf(html, "Channel")).toBe("h3");
+  expect(headingOf(html, "Top card")).toBe("h2");
+  expect(headingOf(web().renderToHtml(<CardTitle as="h5">Explicit</CardTitle>), "Explicit")).toBe(
+    "h5",
+  );
+});
+
+test("content inside a dialog starts below the dialog's h2 title", () => {
+  const html = web().renderToHtml(
+    <Dialog>
+      <DialogHeader title="Settings" />
+      <Section title="Account">Body</Section>
+    </Dialog>,
+  );
+  expect(html).toMatch(/<h2[^>]*>Settings<\/h2>/);
+  expect(html).toMatch(/<h3[^>]*>Account<\/h3>/);
 });

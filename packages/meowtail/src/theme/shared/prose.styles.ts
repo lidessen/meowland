@@ -25,7 +25,7 @@ export const proseStyles = css`
   ${prose} {
     min-width: 0;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.body} / ${uiTokens.type.line.reading} ${uiTokens.type.sans};
+    font: ${uiTokens.type.readingSize} / ${uiTokens.type.line.reading} ${uiTokens.type.reading};
     overflow-wrap: anywhere;
   }
   ${prose} {
@@ -61,6 +61,9 @@ export const proseStyles = css`
   ${scope} > :where(h3, h4) {
     font-size: ${uiTokens.type.body};
     line-height: ${uiTokens.type.line.body};
+  }
+  ${prose} > :where(h2, h3, h4) {
+    font-family: ${uiTokens.type.display};
   }
   ${prose} > :where(h2) {
     font-size: ${uiTokens.type.heading};

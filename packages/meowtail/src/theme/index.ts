@@ -17,6 +17,7 @@ import { hoverCardStyles } from "./components/hover-card.styles";
 import { menuStyles } from "./components/menu.styles";
 import { toastStyles } from "./components/toast.styles";
 import { standardOptions, uiTokens, chatTokens, alertTokens } from "./tokens";
+import { journalUiTokens } from "./journal.tokens";
 import { utilityStyles } from "./utilities";
 import { choiceSelectStyles } from "./components/choice-select.styles";
 import { tooltipStyles } from "./components/tooltip.styles";
@@ -102,7 +103,16 @@ import { numberInputStyles } from "./components/number-input.styles";
 import { accordionStyles } from "./components/accordion.styles";
 import { contextMenuStyles } from "./components/context-menu.styles";
 
-export { standardOptions, uiTokens, chatTokens, logoTokens } from "./tokens";
+export {
+  standardOptions,
+  standardUiTokenValues,
+  uiTokens,
+  chatTokens,
+  logoTokens,
+  type TokenValues,
+  type UiTokenValues,
+} from "./tokens";
+export { journalUiTokenValues, journalUiTokens } from "./journal.tokens";
 export { ui, utilityStyles } from "./utilities";
 export { chartTokens } from "./shared/chart.tokens";
 
@@ -227,6 +237,25 @@ export const standardTheme = /* @__PURE__ */ defineTheme({
   options: standardOptions,
   defaults: { scheme: "auto" },
   tokens: standardThemeTokens,
+  styles: standardThemeStyles,
+});
+
+/**
+ * Journal, for blogs and long-form reading: every standard rule, painted with the Journal values of
+ * the same `ui` roles. Mount it instead of `standardTheme`; components and markup do not change.
+ */
+export const journalThemeTokens = [
+  journalUiTokens,
+  chatTokens,
+  alertTokens,
+  codeHighlightTokens,
+  chartTokens,
+] as const;
+
+export const journalTheme = /* @__PURE__ */ defineTheme({
+  options: standardOptions,
+  defaults: { scheme: "auto" },
+  tokens: journalThemeTokens,
   styles: standardThemeStyles,
 });
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## Unreleased
+
+- Add `journalTheme`, a second concrete theme for blogs and long-form reading, assembled from the
+  standard rules with Journal values for the same `ui` roles. Export `journalUiTokenValues`,
+  `journalUiTokens`, `journalThemeTokens`, `standardUiTokenValues` and the `UiTokenValues` /
+  `TokenValues` types so a theme values every role and nothing else.
+- Add `uiTokens.type.display`, `type.reading` and `type.readingSize`. Titles and Prose headings use
+  `display`; Prose copy and `ui.text.reading` use `reading` at `readingSize`. The standard values are
+  the UI face and the body size, so the standard theme renders as before; this reverses the earlier
+  removal of `type.display` only as a theme role, not as a standard serif.
+- The Meowbook gallery's Theme control switches every story between Standard and Journal.
+
 ## 0.3.0-alpha.0
 
 Local breaking authoring candidate; no npm release is implied. It includes the previous unreleased

@@ -8,7 +8,7 @@ for (const width of [1280, 390]) {
       await page.setViewportSize({ width, height: 900 });
       await page.goto("/canvas.html?story=attachment-scales");
       await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
-      await page.getByRole("combobox").selectOption(theme);
+      await page.getByRole("combobox", { name: "Appearance", exact: true }).selectOption(theme);
       const hooked = page.locator('a[download="protected-document.txt"]');
       const regular = page.locator('a[download="empty.txt"]');
       await expect(hooked).toHaveAttribute("href", "data:text/plain,Host%20download%20example");

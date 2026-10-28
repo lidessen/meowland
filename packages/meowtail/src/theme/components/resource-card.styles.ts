@@ -64,6 +64,7 @@ export const resourceCardStyles = css`
   }
   ${card("title")} {
     margin: 0;
+    font-family: ${uiTokens.type.display};
     font-size: ${uiTokens.type.title};
     font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: ${uiTokens.type.trackingTight};

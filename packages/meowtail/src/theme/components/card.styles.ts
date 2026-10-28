@@ -58,6 +58,7 @@ ${cardHeaderPartRefs.root} {
 ${cardTitlePartRefs.root} {
   margin: 0;
   color: ${uiTokens.ink.primary};
+  font-family: ${uiTokens.type.display};
   font-size: ${uiTokens.type.title};
   font-weight: ${uiTokens.type.weight.semibold};
   line-height: ${uiTokens.type.line.title};

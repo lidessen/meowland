@@ -294,7 +294,10 @@ actions and inputs inside values in one viewport, for checking shared columns, n
 `Card` supports CardHeader, CardTitle, CardDescription, CardAction, CardContent, and CardFooter.
 The default `variant="auto"` takes depth from the render tree Context: the standard theme presents the top level as an independent surface and blends descendants into the parent; an explicit variant takes precedence.
 Depth follows the logical component tree, so an overlay does not automatically become a new root just because it visually leaves the parent card; overlay content that needs an independent surface uses surface explicitly.
-Title can specify h2–h6; heading levels are still decided by document structure and are not guessed automatically from card nesting.
+CardTitle takes the heading level one below the surrounding `Page`, `Section`, `DetailSection` or `Dialog` heading (h2 at the
+top); `as` (h2–h6) overrides it. The level follows that document structure, not card nesting. `DetailSection` and
+`ResourceCard` titles follow the same rule, a `DetailSection` passes its level on to sections inside it, and `Dialog`
+content starts at h3 below its h2 title.
 Ordinary internal groups use the shared surface, standalone items can explicitly use `variant="surface"`, and `variant="embedded"` explicitly blends into the parent surface.
 Nesting does not mean borders and shadows must be repeated. Complex content still uses Stack/Inline/Grid layout; do not turn Card into a universal layout component.
 

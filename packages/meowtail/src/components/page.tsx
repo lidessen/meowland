@@ -1,7 +1,7 @@
 import { h, type Child, type Props, type Context } from "meowjsx";
 import { Container } from "./container";
 import { PageHeader } from "./page-header";
-import { sectionLevelContext } from "./section";
+import { sectionLevelContext } from "./heading-level";
 
 export type PageWidth = "narrow" | "content" | "wide" | "full";
 

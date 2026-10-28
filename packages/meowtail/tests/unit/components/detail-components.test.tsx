@@ -18,7 +18,8 @@ test("detail sections keep a heading, an optional aside and their body", () => {
       <p>Content</p>
     </DetailSection>,
   );
-  expect(html).toContain("<h3");
+  // Outside any page or section, the heading starts at h2.
+  expect(html).toContain("<h2");
   expect(html).toContain("Delegated execution");
   expect(html).toContain("2 times");
   expect(html).toContain("<p>Content</p>");

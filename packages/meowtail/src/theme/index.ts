@@ -80,6 +80,7 @@ import { workCardStyles } from "./components/work-card.styles";
 import { iconRailStyles } from "./components/icon-rail.styles";
 import { detailSectionStyles } from "./components/detail-section.styles";
 import { timelineStyles } from "./components/timeline.styles";
+import { entryStyles } from "./components/entry.styles";
 import { resourceLinkStyles } from "./components/resource-link.styles";
 import { pageHeaderStyles } from "./components/page-header.styles";
 import { pageStyles } from "./components/page.styles";
@@ -139,6 +140,7 @@ export const standardThemeStyles = [
   iconRailStyles,
   detailSectionStyles,
   timelineStyles,
+  entryStyles,
   resourceLinkStyles,
   pageHeaderStyles,
   pageStyles,

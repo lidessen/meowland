@@ -1,4 +1,4 @@
-name: Build and lint
+name: Checks
 
 on:
   push:
@@ -11,6 +11,7 @@ permissions:
 
 jobs:
   checks:
+    name: Build, format, lint, types and unit tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -20,4 +21,60 @@ jobs:
       - run: bun install --frozen-lockfile
       - run: bun run build
       - run: bun run --cwd apps/docs build
-      - run: bun run lint
+      # format:check → lint → typecheck → test; typecheck and tests consume the built dist.
+      - run: bun run check
+
+  browser:
+    name: Browser (${{ matrix.suite }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - suite: meowjsx
+            config: packages/meowjsx/playwright.config.ts
+          - suite: meowtail
+            config: packages/meowtail/playwright.config.ts
+          - suite: meowbook
+            config: packages/meowbook/playwright.config.ts
+          - suite: meowslides
+            config: packages/meowslides/playwright.config.ts
+          - suite: meowslides-presentation
+            config: packages/meowslides/tests/browser/presentation/playwright.config.ts
+          - suite: meowslides-authoring
+            config: packages/meowslides/tests/browser/authoring/playwright.config.ts
+          - suite: showcase
+            config: apps/showcase/playwright.config.ts
+          - suite: image-loading
+            config: examples/image-loading/tests/playwright.config.ts
+            prepare: bun examples/image-loading/build.ts
+          - suite: sunshine-welcome
+            config: examples/sunshine-welcome/tests/playwright.config.ts
+            prepare: bun examples/sunshine-welcome/build.ts
+          - suite: protecting-pandas
+            config: examples/protecting-pandas/tests/playwright.config.ts
+            prepare: bun examples/protecting-pandas/build.ts
+    env:
+      # Use the Playwright-bundled Chromium instead of each config's system Chrome default.
+      PLAYWRIGHT_CHANNEL: chromium
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+      # Example works serve their own build output.
+      - if: matrix.prepare
+        run: ${{ matrix.prepare }}
+      - run: bun node_modules/@playwright/test/cli.js install --with-deps chromium
+      - run: bun node_modules/@playwright/test/cli.js test --config ${{ matrix.config }}
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-${{ matrix.suite }}
+          path: |
+            **/test-results/
+            !**/node_modules/**
+          retention-days: 7
+          if-no-files-found: ignore

@@ -13,18 +13,18 @@ const partOutline = (page: Page) =>
 test("journal paints the same article markup with reading faces and sizes", async ({ page }) => {
   await open(page, "blog-article", "standard");
   const standardParts = await partOutline(page);
-  await expect(page.locator("h1")).not.toHaveCSS("font-family", /Iowan/);
+  await expect(page.locator("h1")).not.toHaveCSS("font-family", /Newsreader/);
 
   await open(page, "blog-article", "journal");
   expect(await partOutline(page)).toEqual(standardParts);
-  await expect(page.locator("h1")).toHaveCSS("font-family", /Iowan/);
+  await expect(page.locator("h1")).toHaveCSS("font-family", /Newsreader/);
   const paragraph = page.locator("[data-meowui-part='prose/root'] > p").first();
-  await expect(paragraph).toHaveCSS("font-family", /Iowan/);
-  await expect(paragraph).toHaveCSS("font-size", "18px");
-  await expect(paragraph).toHaveCSS("line-height", "30px");
+  await expect(paragraph).toHaveCSS("font-family", /Newsreader/);
+  await expect(paragraph).toHaveCSS("font-size", "19px");
+  await expect(paragraph).toHaveCSS("line-height", "33px");
   // Controls stay on the UI face and the shared control ladder.
   const subscribe = page.getByRole("button", { name: "Subscribe" });
-  await expect(subscribe).not.toHaveCSS("font-family", /Iowan/);
+  await expect(subscribe).not.toHaveCSS("font-family", /Newsreader/);
   await expect(subscribe).toHaveCSS("min-height", "36px");
 });
 

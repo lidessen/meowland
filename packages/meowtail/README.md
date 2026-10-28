@@ -485,10 +485,12 @@ visual class names. See TypeScript tokens and parameterized configuration (histo
 
 `journalTheme` is a second concrete theme for blogs and long-form reading. It is assembled from the
 same `standardThemeStyles` and supplies different values for the same `ui` roles
-(`journalUiTokenValues`, compiled as `journalUiTokens`): warm paper surfaces and ink, serif titles and
-reading copy over sans controls, one terracotta accent, flat surfaces with small radii, an 18 / 30
-reading size and more generous spacing. Control heights, icon sizes, motion and the code face keep
-the standard values. Mount it instead of `standardTheme`; components, markup and heading structure do
+(`journalUiTokenValues`, compiled as `journalUiTokens`), after an editorial research site: warm paper
+and ink, Newsreader titles and reading copy over Inter controls, JetBrains Mono code, an oxblood
+accent, quiet hairlines, small radii and soft warm depth. Titles take a book weight (500), reading
+copy is 19 / 33 in a softer ink under full-ink headings on a 680px column, and quotations are italic.
+The theme names those fonts first and falls back to system faces; the host loads the font files.
+Control heights, icon sizes and code sizes keep the standard values. Mount it instead of `standardTheme`; components, markup and heading structure do
 not change.
 
 ```ts
@@ -522,7 +524,9 @@ tracking; apply it with `ui.text[role]` from `meowtail/theme`, or with the match
 Interface text uses `uiTokens.type.sans` and code uses `uiTokens.type.mono`. Titles take
 `uiTokens.type.display` and Prose reading copy takes `uiTokens.type.reading` at `type.readingSize`; in
 the standard theme those roles hold the UI face and the body size, and a theme such as Journal gives
-them a serif and a larger reading size. The standard audit rules reject
+them a serif and a larger reading size. `type.weight.display` sets the weight of display-face titles,
+`ink.reading` the ink of Prose copy under `ink.primary` headings, and `type.quoteStyle` the style of
+quotations; their standard values are `semibold`, `ink.primary` and `normal`. The standard audit rules reject
 literal font sizes, line heights and weights, including inside the `font` shorthand.
 
 | Style       | Size / line / weight      | Use                                                                           |

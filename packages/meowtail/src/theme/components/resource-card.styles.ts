@@ -66,7 +66,7 @@ export const resourceCardStyles = css`
     margin: 0;
     font-family: ${uiTokens.type.display};
     font-size: ${uiTokens.type.title};
-    font-weight: ${uiTokens.type.weight.semibold};
+    font-weight: ${uiTokens.type.weight.display};
     letter-spacing: ${uiTokens.type.trackingTight};
     overflow-wrap: anywhere;
   }

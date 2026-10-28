@@ -23,7 +23,7 @@ test("journal declares exactly the standard ui roles and paints with the standar
 
 type Pair = readonly [ink: string, surface: string, minimum: number];
 const pairs: Pair[] = [
-  ...["primary", "secondary", "tertiary"].flatMap((ink) =>
+  ...["primary", "reading", "secondary", "tertiary"].flatMap((ink) =>
     ["canvas", "reading", "raised", "fill"].map(
       (surface) => [`ink.${ink}`, `surface.${surface}`, 4.5] as const,
     ),

@@ -54,10 +54,10 @@ function textDeclarations(key: TextKey): string {
     label: `color: ${uiTokens.ink.primary}; font: ${uiTokens.type.weight.medium} ${uiTokens.type.label} / ${uiTokens.type.line.label} ${uiTokens.type.sans};`,
     body: `color: ${uiTokens.ink.primary}; font: ${uiTokens.type.weight.regular} ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};`,
     secondary: `color: ${uiTokens.ink.secondary}; font: ${uiTokens.type.weight.regular} ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};`,
-    reading: `color: ${uiTokens.ink.primary}; font: ${uiTokens.type.weight.regular} ${uiTokens.type.body} / ${uiTokens.type.line.reading} ${uiTokens.type.sans};`,
-    title: `color: ${uiTokens.ink.primary}; font: ${uiTokens.type.weight.semibold} ${uiTokens.type.title} / ${uiTokens.type.line.title} ${uiTokens.type.sans}; letter-spacing: ${uiTokens.type.trackingTight};`,
-    heading: `color: ${uiTokens.ink.primary}; font: ${uiTokens.type.weight.semibold} ${uiTokens.type.heading} / ${uiTokens.type.line.heading} ${uiTokens.type.sans}; letter-spacing: ${uiTokens.type.trackingTight};`,
-    pageTitle: `color: ${uiTokens.ink.primary}; font: ${uiTokens.type.weight.semibold} ${uiTokens.type.pageTitle} / ${uiTokens.type.line.pageTitle} ${uiTokens.type.sans}; letter-spacing: ${uiTokens.type.trackingTight};`,
+    reading: `color: ${uiTokens.ink.primary}; font: ${uiTokens.type.weight.regular} ${uiTokens.type.readingSize} / ${uiTokens.type.line.reading} ${uiTokens.type.reading};`,
+    title: `color: ${uiTokens.ink.primary}; font: ${uiTokens.type.weight.semibold} ${uiTokens.type.title} / ${uiTokens.type.line.title} ${uiTokens.type.display}; letter-spacing: ${uiTokens.type.trackingTight};`,
+    heading: `color: ${uiTokens.ink.primary}; font: ${uiTokens.type.weight.semibold} ${uiTokens.type.heading} / ${uiTokens.type.line.heading} ${uiTokens.type.display}; letter-spacing: ${uiTokens.type.trackingTight};`,
+    pageTitle: `color: ${uiTokens.ink.primary}; font: ${uiTokens.type.weight.semibold} ${uiTokens.type.pageTitle} / ${uiTokens.type.line.pageTitle} ${uiTokens.type.display}; letter-spacing: ${uiTokens.type.trackingTight};`,
   };
   return declarations[key];
 }

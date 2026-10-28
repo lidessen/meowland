@@ -481,6 +481,26 @@ The standard theme exports `standardTheme`, `standardOptions`, and typed `uiToke
 are both defined in TypeScript; components match CSS through stable part markers and style options, and theme plugins no longer generate
 visual class names. See TypeScript tokens and parameterized configuration (historical reference in the original product repository) for the complete design.
 
+### Journal theme
+
+`journalTheme` is a second concrete theme for blogs and long-form reading. It is assembled from the
+same `standardThemeStyles` and supplies different values for the same `ui` roles
+(`journalUiTokenValues`, compiled as `journalUiTokens`): warm paper surfaces and ink, serif titles and
+reading copy over sans controls, one terracotta accent, flat surfaces with small radii, an 18 / 30
+reading size and more generous spacing. Control heights, icon sizes, motion and the code face keep
+the standard values. Mount it instead of `standardTheme`; components, markup and heading structure do
+not change.
+
+```ts
+mountStyles(document, journalTheme.cssText);
+applyTheme(document.documentElement, journalTheme);
+```
+
+Both themes share one theme root name and one set of `--ui-*` variables, so a document mounts one of
+them. `standardUiTokenValues` and the `UiTokenValues` type let a host value the same roles for its own
+theme; a value tree that misses or adds a role does not typecheck. In Meowbook, the gallery's Theme
+control paints every story with either theme, and `?theme=journal` selects it in a link.
+
 Style files use `<responsibility>.styles.ts`; the standard theme groups them by component and conversation responsibility, and application styles are maintained with application modules.
 See the style file organization (historical reference in the original product repository) for naming, component family boundaries, and cascade organization.
 Existing styles have been migrated to this specification, and historical conversation overrides have been merged back into the files owned by messages and the composer.
@@ -499,7 +519,10 @@ validation, correction, and save sequence. These are composition references, not
 Every piece of text is one style of the type ramp. A style binds a size to its line box, weight and
 tracking; apply it with `ui.text[role]` from `meowtail/theme`, or with the matching
 `uiTokens.type` size, `type.line.*` and `type.weight.*` tokens where a part sets them one by one.
-All text uses `uiTokens.type.sans`; code uses `uiTokens.type.mono`. The standard audit rules reject
+Interface text uses `uiTokens.type.sans` and code uses `uiTokens.type.mono`. Titles take
+`uiTokens.type.display` and Prose reading copy takes `uiTokens.type.reading` at `type.readingSize`; in
+the standard theme those roles hold the UI face and the body size, and a theme such as Journal gives
+them a serif and a larger reading size. The standard audit rules reject
 literal font sizes, line heights and weights, including inside the `font` shorthand.
 
 | Style       | Size / line / weight      | Use                                                                           |

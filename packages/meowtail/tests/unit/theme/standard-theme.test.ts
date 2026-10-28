@@ -5,6 +5,7 @@ import { selectorForPart } from "../../../src/theme/selectors";
 import {
   standardTheme,
   standardOptions,
+  standardUiTokenValues,
   ui,
   utilityStyles,
   uiTokens,
@@ -32,10 +33,13 @@ test("serialized part selectors retain adjacent native state conditions", () => 
   );
 });
 
-test("every title uses the UI face; there is no display face", () => {
-  expect("display" in uiTokens.type).toBe(false);
+test("every standard title and reading run uses the UI face; display and reading are theme roles", () => {
+  // Another theme (Journal) gives these roles a serif; the standard theme keeps them on the UI face.
+  expect(standardUiTokenValues.type.display).toBe(standardUiTokenValues.type.sans);
+  expect(standardUiTokenValues.type.reading).toBe(standardUiTokenValues.type.sans);
+  expect(standardUiTokenValues.type.readingSize).toBe(standardUiTokenValues.type.body);
   expect(standardTheme.cssText).not.toContain("Iowan Old Style");
-  expect(standardTheme.cssText).not.toContain("--ui-type-display");
+  expect(standardTheme.cssText).toContain("--ui-type-display");
   expect(standardTheme.cssText).toContain('data-meowui-part="page-header/title"');
   expect(standardTheme.cssText).toContain('data-meowui-part="section/title"');
 });

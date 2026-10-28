@@ -11,7 +11,7 @@ export const standardOptions = defineOptions("meowui", {});
  * nested scheme region resolves its own value. CSS names are `--ui-<group>-<key>`.
  * The rules for each group live in packages/meowtail/AGENTS.md ("Design system").
  */
-export const uiTokens = defineTokens("ui", {
+export const standardUiTokenValues = {
   /**
    * The surface ladder. Every background is one rung; each rung has one edge rule.
    * Dark lightness steps up with elevation; a field is recessed, so it is darker
@@ -116,6 +116,12 @@ export const uiTokens = defineTokens("ui", {
   /** The type ramp: sizes, the line box of each size, and weights. */
   type: {
     sans: '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif',
+    /** Titles and headings: page, section, card, dialog and long-form headings. */
+    display:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif',
+    /** Long-form reading copy in Prose; controls and compact UI text stay on `sans`. */
+    reading:
+      '-apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Helvetica Neue", Helvetica, Arial, sans-serif',
     mono: '"SF Mono", "JetBrains Mono", "Fira Code", Consolas, "Liberation Mono", Menlo, Courier, "PingFang SC", "Microsoft YaHei"',
     /** Key caps, compact counts and small-caps group labels. */
     micro: "11px",
@@ -125,6 +131,8 @@ export const uiTokens = defineTokens("ui", {
     /** Compact UI text: menus, tooltips, small rows, bar notices. */
     label: "13px",
     body: "14px",
+    /** Long-form reading copy in Prose, on `line.reading`. */
+    readingSize: "14px",
     title: "16px",
     heading: "20px",
     pageTitle: "24px",
@@ -273,7 +281,23 @@ export const uiTokens = defineTokens("ui", {
       `url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23a3a3a3' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E")`,
     ],
   },
-});
+} as const;
+
+/** Leaf values a theme supplies for a token tree of the same shape. */
+export type TokenValues<T> = {
+  readonly [K in keyof T]: T[K] extends string | readonly [string, string]
+    ? string | readonly [string, string]
+    : TokenValues<T[K]>;
+};
+
+/**
+ * The value tree another concrete theme supplies for the same roles. Every theme file paints with
+ * `uiTokens`, so a theme built from these values keeps every component rule and changes only the
+ * values those roles carry.
+ */
+export type UiTokenValues = TokenValues<typeof standardUiTokenValues>;
+
+export const uiTokens = /* @__PURE__ */ defineTokens("ui", standardUiTokenValues);
 
 /** Chat-only measures; colors and surfaces come from uiTokens. */
 export const chatTokens = defineTokens("chat", {

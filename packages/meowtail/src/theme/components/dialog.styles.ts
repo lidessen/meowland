@@ -103,6 +103,7 @@ export const dialogStyles = css`
   }
   ${dialogHeaderPartRefs.title} {
     margin: 0;
+    font-family: ${uiTokens.type.display};
     font-size: ${uiTokens.type.title};
     /* Same title role as Card, Section and EmptyState. */
     font-weight: ${uiTokens.type.weight.semibold};

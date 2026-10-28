@@ -3,11 +3,32 @@ import { languageStyles } from "./language.styles";
 import { defaultRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { installMeowUI, meowUIComponents, Select } from "meowtail";
-import { standardTheme } from "meowtail/theme";
+import { journalTheme, standardTheme } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 import type { PreviewEnvironment } from "meowbook";
 
 installMeowUI({ components: meowUIComponents }, defaultRuntime);
+
+/** Concrete themes the gallery can paint every story with; the markup is the same for each. */
+const themes = { standard: standardTheme, journal: journalTheme } as const;
+type ThemeKey = keyof typeof themes;
+const themeChoices = [
+  ["standard", "Standard"],
+  ["journal", "Journal"],
+] as const;
+
+/** A `?theme=` parameter wins, so captures and links are reproducible; otherwise the last choice. */
+function chosenTheme(): ThemeKey {
+  const requested = new URLSearchParams(location.search).get("theme");
+  if (requested && requested in themes) return requested as ThemeKey;
+  try {
+    const saved = sessionStorage.getItem("meowui-preview:theme");
+    if (saved && saved in themes) return saved as ThemeKey;
+  } catch {
+    // Storage can be unavailable in embedded or privacy-restricted previews.
+  }
+  return "standard";
+}
 /**
  * An embedded canvas is a frame inside a page that already carries its own
  * chrome. The theme toolbar would repeat in every frame, so an embedded canvas
@@ -19,13 +40,12 @@ function isEmbedded(): boolean {
 const preview: PreviewEnvironment = ({ root, onCleanup }) => {
   root.classList.add("meowui-story");
   const scope = document.documentElement;
+  const themeKey = chosenTheme();
+  const theme = themes[themeKey];
   onCleanup(
-    mountStyles(
-      root.ownerDocument,
-      standardTheme.cssText + previewStyles.text + languageStyles.text,
-    ),
+    mountStyles(root.ownerDocument, theme.cssText + previewStyles.text + languageStyles.text),
   );
-  onCleanup(applyTheme(scope, standardTheme));
+  onCleanup(applyTheme(scope, theme));
   if (scope.dataset.meowbookCapture === "true") {
     const scheme = matchMedia("(prefers-color-scheme: dark)");
     const update = () => {
@@ -90,6 +110,34 @@ const preview: PreviewEnvironment = ({ root, onCleanup }) => {
     );
     toolbar.append(field);
   }
+  const themeField = document.createElement("label");
+  themeField.textContent = "Theme";
+  controls.push(
+    createWebRenderer(defaultRuntime).render(
+      h(
+        Select,
+        {
+          value: themeKey,
+          onChange: (event: Event) => {
+            const value = (event.currentTarget as HTMLSelectElement).value;
+            try {
+              sessionStorage.setItem("meowui-preview:theme", value);
+            } catch {
+              // The URL parameter below still carries the choice.
+            }
+            // Theme CSS is mounted once per canvas, so a new theme reloads it.
+            const url = new URL(location.href);
+            url.searchParams.set("theme", value);
+            location.replace(url);
+          },
+        },
+        ...themeChoices.map(([value, text]) => h("option", { value }, text)),
+      ),
+      themeField,
+    ),
+  );
+  // Theme first: Appearance stays the last control before the story in the Tab order.
+  toolbar.prepend(themeField);
   root.before(toolbar);
   onCleanup(() => {
     root.classList.remove("meowui-story");

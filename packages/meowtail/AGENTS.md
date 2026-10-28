@@ -127,25 +127,25 @@ region resolves its own value. Chat-only measures live in `chatTokens`; option-d
 (`chartTokens.series1` … `series8`, taken in fixed order, never cycled) are the only other sets. There are no
 aliases: one role, one name.
 
-| Group     | Keys                                                                         | Rule                                                                       |
-| --------- | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
-| `surface` | canvas, reading, raised, overlay, fill, field · tint, knockout, scrim        | the surface ladder below; the last three are not rungs                     |
-| `inverse` | surface, ink, action                                                         | Tooltip and Toast, dark in both schemes                                    |
-| `line`    | width, edge, divider, control, controlHover                                  | three jobs, all 1px                                                        |
-| `ink`     | primary, secondary, tertiary, chip                                           | content, supporting copy and placeholders, captions, text on a chip        |
-| `state`   | hover, active, focus, focusRing                                              | translucent overlays that work on any rung                                 |
-| `action`  | primary, primaryHover, onPrimary, soft, danger, onDanger                     | filled actions; each "on" color sits with its fill                         |
-| `control` | small, regular, large, inset, fieldInset, trackInset, thumb, knob            | the 28 / 36 / 44 ladder every single-line control shares                   |
-| `accent`  | base, soft, selected, ink, line, halo                                        | what is happening now and where the reader is                              |
-| `status`  | info, success, warning, danger, unknown                                      | one text-safe color per status, also used for markers; halos derive by mix |
-| `type`    | sans, display, mono, micro … pageTitle, leading, trackingTight, trackingCaps | the ramp 11 / 12 / 12 / 13 / 14 / 16 / 20 / 24; two tracking roles         |
-| `space`   | group, section, panel, prose, insetBlock, insetInline, page insets           | spacing by relationship; compact rows pad 12 / 16                          |
-| `icon`    | small, size, large, stroke                                                   | 14 / 16 / 18; no other glyph size                                          |
-| `radius`  | xs, sm, md, lg, xl, xxl, full                                                | by element size: marks, tags, small elements, controls, surfaces, dialogs  |
-| `shadow`  | raised, field, action, filled, thumb, pressed, knob, sheet, float            | one shadow per role                                                        |
-| `motion`  | instant, response, settle, draw, loop, sweep, ease, enter                    | press, hover, open, draw-in, spinner turn, shimmer pass, surface arrival   |
-| `layout`  | grid columns, containers, measure                                            |                                                                            |
-| `glyph`   | chevron, check, arrow, cross, selectChevron                                  | mask glyphs colored by ink                                                 |
+| Group     | Keys                                                                                                | Rule                                                                                                          |
+| --------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- |
+| `surface` | canvas, reading, raised, overlay, fill, field · tint, knockout, scrim                               | the surface ladder below; the last three are not rungs                                                        |
+| `inverse` | surface, ink, action                                                                                | Tooltip and Toast, dark in both schemes                                                                       |
+| `line`    | width, edge, divider, control, controlHover                                                         | three jobs, all 1px                                                                                           |
+| `ink`     | primary, secondary, tertiary, chip                                                                  | content, supporting copy and placeholders, captions, text on a chip                                           |
+| `state`   | hover, active, focus, focusRing                                                                     | translucent overlays that work on any rung                                                                    |
+| `action`  | primary, primaryHover, onPrimary, soft, danger, onDanger                                            | filled actions; each "on" color sits with its fill                                                            |
+| `control` | small, regular, large, inset, fieldInset, trackInset, thumb, knob                                   | the 28 / 36 / 44 ladder every single-line control shares                                                      |
+| `accent`  | base, soft, selected, ink, line, halo                                                               | what is happening now and where the reader is                                                                 |
+| `status`  | info, success, warning, danger, unknown                                                             | one text-safe color per status, also used for markers; halos derive by mix                                    |
+| `type`    | sans, display, reading, mono, micro … readingSize … pageTitle, leading, trackingTight, trackingCaps | the ramp 11 / 12 / 12 / 13 / 14 / 16 / 20 / 24; display and reading are theme faces (the UI face in standard) |
+| `space`   | group, section, panel, prose, insetBlock, insetInline, page insets                                  | spacing by relationship; compact rows pad 12 / 16                                                             |
+| `icon`    | small, size, large, stroke                                                                          | 14 / 16 / 18; no other glyph size                                                                             |
+| `radius`  | xs, sm, md, lg, xl, xxl, full                                                                       | by element size: marks, tags, small elements, controls, surfaces, dialogs                                     |
+| `shadow`  | raised, field, action, filled, thumb, pressed, knob, sheet, float                                   | one shadow per role                                                                                           |
+| `motion`  | instant, response, settle, draw, loop, sweep, ease, enter                                           | press, hover, open, draw-in, spinner turn, shimmer pass, surface arrival                                      |
+| `layout`  | grid columns, containers, measure                                                                   |                                                                                                               |
+| `glyph`   | chevron, check, arrow, cross, selectChevron                                                         | mask glyphs colored by ink                                                                                    |
 
 Field surfaces (Input, Textarea, Select, ChoiceSelect, SearchInput, NumberInput) take their box and
 their hover, focus, read-only, invalid and disabled states from

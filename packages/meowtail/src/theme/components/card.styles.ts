@@ -60,7 +60,7 @@ ${cardTitlePartRefs.root} {
   color: ${uiTokens.ink.primary};
   font-family: ${uiTokens.type.display};
   font-size: ${uiTokens.type.title};
-  font-weight: ${uiTokens.type.weight.semibold};
+  font-weight: ${uiTokens.type.weight.display};
   line-height: ${uiTokens.type.line.title};
   letter-spacing: ${uiTokens.type.trackingTight};
   overflow-wrap: anywhere;

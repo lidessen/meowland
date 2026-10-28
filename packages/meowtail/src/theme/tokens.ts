@@ -59,6 +59,8 @@ export const standardUiTokenValues = {
     secondary: ["#636363", "#a3a3a3"],
     tertiary: ["#6e6e6e", "#8f8f8f"],
     chip: ["#636363", "#d4d4d4"],
+    /** Long-form copy in Prose; headings inside it keep `primary`. */
+    reading: ["#0a0a0a", "#fafafa"],
   },
   /** Translucent overlays that work on any rung, plus focus. */
   state: {
@@ -160,6 +162,8 @@ export const standardUiTokenValues = {
       regular: "400",
       medium: "500",
       semibold: "600",
+      /** Titles set in the `display` face: page, section, card, dialog and Prose headings. */
+      display: "600",
     },
     /**
      * Unitless body leading (22/14), inherited by the root and by component roots; children that
@@ -172,6 +176,8 @@ export const standardUiTokenValues = {
     trackingTight: "-0.01em",
     /** The small-caps group label. */
     trackingCaps: "0.04em",
+    /** The font style of quotations in reading content. */
+    quoteStyle: "normal",
   },
   /** Spacing by relationship: within a group, between related areas, at a container edge. */
   space: {

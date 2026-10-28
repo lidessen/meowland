@@ -24,7 +24,7 @@ const scope = `:where(${prose}, ${selectorForPart(chatMessagePartRefs.content)},
 export const proseStyles = css`
   ${prose} {
     min-width: 0;
-    color: ${uiTokens.ink.primary};
+    color: ${uiTokens.ink.reading};
     font: ${uiTokens.type.readingSize} / ${uiTokens.type.line.reading} ${uiTokens.type.reading};
     overflow-wrap: anywhere;
   }
@@ -63,7 +63,9 @@ export const proseStyles = css`
     line-height: ${uiTokens.type.line.body};
   }
   ${prose} > :where(h2, h3, h4) {
+    color: ${uiTokens.ink.primary};
     font-family: ${uiTokens.type.display};
+    font-weight: ${uiTokens.type.weight.display};
   }
   ${prose} > :where(h2) {
     font-size: ${uiTokens.type.heading};
@@ -120,6 +122,7 @@ export const proseStyles = css`
     padding-inline-start: ${uiTokens.space.section};
     border-inline-start: 2px solid ${uiTokens.line.edge};
     color: ${uiTokens.ink.secondary};
+    font-style: ${uiTokens.type.quoteStyle};
   }
   ${scope} > :where(hr) {
     height: 0;

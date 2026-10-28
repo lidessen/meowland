@@ -38,6 +38,11 @@ test("every standard title and reading run uses the UI face; display and reading
   expect(standardUiTokenValues.type.display).toBe(standardUiTokenValues.type.sans);
   expect(standardUiTokenValues.type.reading).toBe(standardUiTokenValues.type.sans);
   expect(standardUiTokenValues.type.readingSize).toBe(standardUiTokenValues.type.body);
+  expect(standardUiTokenValues.type.weight.display).toBe(
+    standardUiTokenValues.type.weight.semibold,
+  );
+  expect(standardUiTokenValues.type.quoteStyle).toBe("normal");
+  expect(standardUiTokenValues.ink.reading).toEqual(standardUiTokenValues.ink.primary);
   expect(standardTheme.cssText).not.toContain("Iowan Old Style");
   expect(standardTheme.cssText).toContain("--ui-type-display");
   expect(standardTheme.cssText).toContain('data-meowui-part="page-header/title"');

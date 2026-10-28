@@ -168,6 +168,8 @@ export { RailSection, type RailSectionProps } from "./rail-section";
 export { DetailSection, type DetailSectionProps } from "./detail-section";
 export { Timeline, type TimelineProps } from "./timeline";
 export { TimelineItem, type TimelineItemProps } from "./timeline";
+export { Entry, EntryList, type EntryProps, type EntryListProps } from "./entry";
+export { entryOptions } from "./entry.options";
 export { ResourceLink, type ResourceLinkProps } from "./resource-link";
 export { Page, type PageProps, type PageWidth } from "./page";
 export { PageHeader, type PageHeaderProps } from "./page-header";

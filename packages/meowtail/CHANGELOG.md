@@ -12,6 +12,10 @@
   `ink.primary` headings, and quotations take `quoteStyle`. The standard values are the UI face, the
   body size, `semibold`, `ink.primary` and `normal`, so the standard theme renders as before; this
   reverses the earlier removal of `type.display` only as a theme role, not as a standard serif.
+- Add `EntryList` and `Entry` (L1) for content entries such as posts, notes and releases: a kicker,
+  a heading that can link to the entry, a standfirst and its facts, separated by hairlines on the
+  surrounding surface. An Entry is a list item in an EntryList and an article alone, and its heading
+  level follows the region. `size="feature"` marks the lead entry.
 - The Meowbook gallery's Theme control switches every story between Standard and Journal.
 
 ## 0.3.0-alpha.0

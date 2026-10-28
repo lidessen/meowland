@@ -9,11 +9,11 @@ import {
   CardHeader,
   CardTitle,
   Container,
+  Entry,
+  EntryList,
   Field,
   Inline,
   Input,
-  ListGroup,
-  ListRow,
   MetaRow,
   Page,
   Prose,
@@ -115,33 +115,41 @@ const posts = [
   {
     title: "Write the meaning once, paint it many ways",
     description: "Why a component library should keep what a screen says apart from how it looks.",
-    tag: "Interfaces",
-    meta: "Oct 26 · 7 min read",
+    date: "Oct 26, 2026",
+    readingTime: "7 min read",
   },
   {
     title: "The heading that counts its own depth",
     description: "Document outlines never shipped in browsers; a section can still know its level.",
-    tag: "Accessibility",
-    meta: "Oct 12 · 5 min read",
+    date: "Oct 12, 2026",
+    readingTime: "5 min read",
   },
   {
     title: "A reading size is not a body size",
     description: "Controls and essays want different type, and one token cannot serve both.",
-    tag: "Typography",
-    meta: "Sep 28 · 4 min read",
+    date: "Sep 28, 2026",
+    readingTime: "4 min read",
+  },
+  {
+    title: "Hairlines, not boxes",
+    description: "A run of posts reads as one column when rules separate it instead of cards.",
+    date: "Sep 14, 2026",
+    readingTime: "6 min read",
   },
 ];
+
+const author = { icon: <Avatar name="Mira Okafor" size="small" />, label: "Mira Okafor" };
 
 export const BlogIndexStory = defineStory({
   id: "blog-index",
   title: "Blog · Post index",
   group: "Composition examples",
   groupOrder: 46,
-  component: "ListGroup",
+  component: "EntryList",
   variant: "Post listing composition",
   description:
-    "A blog's front page from existing components: the publication identity, a featured post and the archive list. Switch the gallery Theme to Journal to compare.",
-  covers: ["page header", "card", "list group", "tag"],
+    "A blog's front page from existing components: the publication identity, a lead Entry and the archive as an EntryList. Switch the gallery Theme to Journal to compare.",
+  covers: ["page header", "entry", "entry list", "meta row"],
   render: () => (
     <Container width="content">
       <Page
@@ -150,27 +158,26 @@ export const BlogIndexStory = defineStory({
         description="Essays on components, type and the space between them."
         actions={<Button variant="outline">Subscribe</Button>}
       >
-        <Section title="Featured">
-          <Card>
-            <CardHeader>
-              <CardTitle>{posts[0]!.title}</CardTitle>
-              <CardDescription>{posts[0]!.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <MetaRow items={byline} />
-            </CardContent>
-          </Card>
-        </Section>
+        <Entry
+          size="feature"
+          eyebrow={posts[0]!.date}
+          title={posts[0]!.title}
+          href="#latest"
+          description={posts[0]!.description}
+          meta={<MetaRow items={[author, { label: posts[0]!.readingTime }]} />}
+        />
         <Section title="Archive">
-          <ListGroup>
-            {posts.map((post) => (
-              <ListRow
+          <EntryList>
+            {posts.slice(1).map((post) => (
+              <Entry
+                eyebrow={post.date}
                 title={post.title}
-                tags={<Tag>{post.tag}</Tag>}
-                description={`${post.meta} · ${post.description}`}
+                href="#post"
+                description={post.description}
+                meta={<MetaRow items={[author, { label: post.readingTime }]} />}
               />
             ))}
-          </ListGroup>
+          </EntryList>
         </Section>
       </Page>
     </Container>

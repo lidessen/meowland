@@ -155,6 +155,14 @@ low-contrast disabled state); `Drawer` is a narrow-screen native modal panel tha
 tightens its track and selected state to match the design draft. The narrow-screen `ChatComposer` stacked layout puts "add, input, send" on one row and keeps model selection below.
 Every color, size, radius, shadow and duration is a role in one tree, `uiTokens` in `theme/tokens.ts` (surface, inverse, line, ink, state, action, control, accent, status, type, space, icon, radius, shadow, motion, layout, glyph; CSS names `--ui-<group>-<key>`). Accent expresses only "happening now" and "where you are", while the main action stays black and white. The rules for each group are in [AGENTS.md](AGENTS.md#design-system).
 
+`EntryList` and `Entry` present content entries such as posts, notes, releases or results. An
+`Entry` takes `title`, an optional `href` that the title links to, an `eyebrow` kicker (often the
+date), a `description` standfirst and `meta` facts (for example a `MetaRow` byline);
+`size="feature"` makes it the lead entry with a larger title and a reading-size standfirst. Its
+heading level follows the surrounding `Page` or `Section`. Inside an `EntryList` it is a list item and
+on its own an article; the list sits on the surrounding surface and opens each entry with a hairline,
+with no box around the run.
+
 `ChatToolCall` uses `label` for the action and `summary` for the short target still visible when collapsed; input/output are reactive lazy text,
 and overlong results collapse through the shared `OutputBlock` and copy in full. queued/running/waiting/success/error/cancelled/unknown
 each represent host facts, and complete stays for compatibility. onRetry/onCancel only notify the host; the component does not execute tools or update business state automatically.

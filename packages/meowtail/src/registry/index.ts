@@ -130,6 +130,8 @@ export const MeowUIComponent = {
   DescriptionItem: "description-item",
   Timeline: "timeline",
   TimelineItem: "timeline-item",
+  EntryList: "entry-list",
+  Entry: "entry",
   ResourceLink: "resource-link",
   Page: "page",
   PageHeader: "page-header",
@@ -265,6 +267,8 @@ export const meowUIComponents = [
   Components.DetailSection,
   Components.Timeline,
   Components.TimelineItem,
+  Components.EntryList,
+  Components.Entry,
   Components.ResourceLink,
   Components.Page,
   Components.PageHeader,
@@ -463,6 +467,8 @@ declare module "meowjsx" {
     "timeline-item": {
       parts: ComponentParts<typeof import("../components/timeline").TimelineItem>;
     };
+    "entry-list": { parts: ComponentParts<typeof import("../components/entry").EntryList> };
+    entry: { parts: ComponentParts<typeof import("../components/entry").Entry> };
     "resource-link": {
       parts: ComponentParts<typeof import("../components/resource-link").ResourceLink>;
     };

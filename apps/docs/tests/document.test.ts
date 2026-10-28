@@ -91,6 +91,12 @@ function page(path: string): string {
 }
 
 describe("the page document", () => {
+  test("both navigation bars and the browser icon use the site mark", () => {
+    const html = document("components/button");
+    expect(html.match(/src="\.\.\/\.\.\/meowland-logo-9a311ad1.jpg"/g)).toHaveLength(2);
+    expect(html).toContain('href="/favicon.ico?v=9a311ad1"');
+  });
+
   test("the catalog rail labels the full documentation navigation", () => {
     const html = document("components/button");
     expect(html).toContain('data-meowui-part="search-input/root"');

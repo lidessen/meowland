@@ -3,7 +3,7 @@ import "./runtime";
 import { h, type Child } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
 import { Breadcrumb, NavList, SearchInput, type NavListGroup } from "meowtail";
-import { Icon, IconSource, MeowlandMark } from "meowtail/icons";
+import { Icon, IconSource } from "meowtail/icons";
 import { Monitor, Moon, Sun } from "meowtail/icons/lucide";
 import type { Catalog, NavigationGroup } from "./catalog";
 import type { DocsPackage } from "./packages";
@@ -15,9 +15,13 @@ export const SITE_NAME = "Meowland";
 export const SITE_DESCRIPTION =
   "A small UI capability library: a JSX runtime, a style system, a component library, a presentation engine, a workbench and a site generator.";
 
-/** The site mark, inlined so the site has no extra asset request: the Meowland silhouette on a dark rounded square. */
-const FAVICON =
-  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' rx='24' fill='%230f1115'/%3E%3Cpath transform='translate(18 17) scale(0.64)' fill='%23ffffff' fill-rule='evenodd' d='M17.5 42C15.6 34.5 16.8 25.8 19.8 19.4C21.4 16.6 24.6 16.4 26.6 18.9C30.4 23.4 35.2 26.4 40.4 28.4C46.8 26.2 53.6 26.1 60 28.2C65.2 26.2 69.8 23.1 73.4 18.6C75.4 16.1 78.8 16.3 80.3 19.3C83.2 25.8 83 35 82 42.5C87 47.5 89.8 53.2 90.3 60.2C90.6 74.5 79 86 62.4 87.5C55 88.3 45 88.2 38 87.1C20.6 85.2 9.5 73.4 10.2 59C10.4 52.6 13.2 47 17.5 42ZM26.5 52.5C30 47.5 38.5 47.8 43.5 52.8C41.5 59 34 62 28.6 59C26 57.5 25 55 26.5 52.5ZM56.5 53C61.5 48 70 47.6 73.5 52.4C75 55 74 57.6 71.4 59.1C66 62 58.5 59 56.5 53Z'/%3E%3C/svg%3E";
+/** The supplied site mark. Its content hash keeps browser caches in sync with releases. */
+const LOGO = "meowland-logo-9a311ad1.jpg";
+
+function logoHref(depth: number): string {
+  return depth <= 0 ? `./${LOGO}` : `${"../".repeat(depth)}${LOGO}`;
+}
+const FAVICON = "/favicon.ico?v=9a311ad1";
 
 /** One level of the trail that says where the reader is. */
 export interface TrailItem {
@@ -546,7 +550,7 @@ function Sidebar({
   return (
     <aside className="docs-sidebar" id="docs-navigation" aria-label="Documentation navigation">
       <a className="docs-brand" href="/">
-        <MeowlandMark />
+        <img src={logoHref(path ? path.split("/").length : 0)} alt="" width="28" height="28" />
         <strong>Meowland</strong>
         <span>docs</span>
       </a>
@@ -598,7 +602,7 @@ function Document({
         <div className="docs-shell">
           <div className="docs-mobile-bar">
             <a className="docs-mobile-brand" href="/">
-              <MeowlandMark />
+              <img src={logoHref(depth)} alt="" width="28" height="28" />
               Meowland <span>docs</span>
             </a>
             <button

@@ -106,10 +106,10 @@ export const docsStyles = css`
     font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: -0.02em;
   }
-  .docs-brand > svg {
-    width: 21px;
-    height: 21px;
-    color: ${uiTokens.ink.secondary};
+  .docs-brand > img {
+    width: 28px;
+    height: 28px;
+    object-fit: contain;
   }
   .docs-brand > span {
     margin-left: auto;
@@ -1139,10 +1139,10 @@ export const docsStyles = css`
       color: ${uiTokens.ink.primary};
       font-weight: ${uiTokens.type.weight.semibold};
     }
-    .docs-mobile-brand > svg {
-      width: 20px;
-      height: 20px;
-      color: ${uiTokens.ink.secondary};
+    .docs-mobile-brand > img {
+      width: 28px;
+      height: 28px;
+      object-fit: contain;
     }
     .docs-mobile-brand > span {
       color: ${uiTokens.ink.tertiary};

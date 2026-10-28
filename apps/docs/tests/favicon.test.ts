@@ -1,23 +1,21 @@
 import { describe, expect, test } from "bun:test";
-import { faviconIco, faviconPixels } from "../favicon";
+import { readFile } from "node:fs/promises";
+import { join } from "node:path";
+
+const path = join(import.meta.dir, "../favicon.ico");
 
 describe("the site icon", () => {
-  test("the icon is an ICO file with one image", () => {
-    const ico = faviconIco();
-    const view = new DataView(ico.buffer, ico.byteOffset, ico.byteLength);
-    expect(view.getUint16(0, true)).toBe(0);
-    expect(view.getUint16(2, true)).toBe(1);
-    expect(view.getUint16(4, true)).toBe(1);
-    expect(ico[6]).toBe(16);
-    expect(ico[7]).toBe(16);
-  });
-
-  test("the icon carries the mark on the dark surface", () => {
-    const pixels = faviconPixels();
-    // The top left corner is the surface, the left stroke of the mark is white.
-    const surface = [pixels[0], pixels[1], pixels[2], pixels[3]];
-    expect(surface).toEqual([0x0f, 0x11, 0x15, 0xff]);
-    const stroke = (7 * 16 + 4) * 4;
-    expect([pixels[stroke], pixels[stroke + 1], pixels[stroke + 2]]).toEqual([0xff, 0xff, 0xff]);
+  test("contains PNG images at browser icon sizes", async () => {
+    const ico = await readFile(path);
+    expect(ico.readUInt16LE(0)).toBe(0);
+    expect(ico.readUInt16LE(2)).toBe(1);
+    expect(ico.readUInt16LE(4)).toBe(3);
+    for (const [index, size] of [16, 32, 64].entries()) {
+      const entry = 6 + index * 16;
+      expect(ico[entry]).toBe(size);
+      expect(ico[entry + 1]).toBe(size);
+      const offset = ico.readUInt32LE(entry + 12);
+      expect([...ico.subarray(offset, offset + 8)]).toEqual([137, 80, 78, 71, 13, 10, 26, 10]);
+    }
   });
 });

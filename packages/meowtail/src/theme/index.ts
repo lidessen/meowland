@@ -64,6 +64,12 @@ import { navItemStyles } from "./components/nav-item.styles";
 import { iconsStyles } from "./icons/icons.styles";
 import { breadcrumbStyles } from "./components/breadcrumb.styles";
 import { paginationStyles } from "./components/pagination.styles";
+import { chartStyles } from "./components/chart.styles";
+import { formStyles } from "./components/form.styles";
+import { commandPaletteStyles } from "./components/command-palette.styles";
+import { treeViewStyles } from "./components/tree-view.styles";
+import { tokenFieldStyles } from "./components/token-field.styles";
+import { autocompleteStyles } from "./components/autocomplete.styles";
 import { itemStyles } from "./components/item.styles";
 import { toggleStyles } from "./components/toggle.styles";
 import { segmentedControlStyles } from "./components/segmented-control.styles";
@@ -202,6 +208,12 @@ export const standardThemeStyles = [
   tabsStyles,
   breadcrumbStyles,
   paginationStyles,
+  chartStyles,
+  formStyles,
+  commandPaletteStyles,
+  treeViewStyles,
+  tokenFieldStyles,
+  autocompleteStyles,
   alertStyles,
   skeletonStyles,
   spinnerStyles,

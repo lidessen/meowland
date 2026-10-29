@@ -145,12 +145,27 @@ export const docsStyles = css`
     font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: -0.02em;
   }
-  /* The mark is a tile on its own paper; rounding it makes it one on any ground. */
   .docs-brand > img {
     width: 28px;
     height: 28px;
-    border-radius: ${uiTokens.radius.md};
     object-fit: contain;
+  }
+  .docs-logo-dark {
+    display: none;
+  }
+  :root[data-meowui-color-scheme="dark"] .docs-logo-light {
+    display: none;
+  }
+  :root[data-meowui-color-scheme="dark"] .docs-logo-dark {
+    display: block;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root[data-meowui-color-scheme="auto"] .docs-logo-light {
+      display: none;
+    }
+    :root[data-meowui-color-scheme="auto"] .docs-logo-dark {
+      display: block;
+    }
   }
   .docs-brand > span {
     margin-left: auto;
@@ -1296,7 +1311,6 @@ export const docsStyles = css`
     .docs-mobile-brand > img {
       width: 28px;
       height: 28px;
-      border-radius: ${uiTokens.radius.md};
       object-fit: contain;
     }
     .docs-mobile-brand > span {

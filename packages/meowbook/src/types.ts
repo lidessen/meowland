@@ -78,8 +78,8 @@ export interface GalleryConfig {
     name?: string;
     /** Short tag beside the name; an empty string hides it. */
     tag?: string;
-    /** Image URL for the 28px mark, used as given. */
-    logo?: string;
+    /** Image URL for the 28px mark, used as given, or one URL for each scheme. */
+    logo?: string | { light: string; dark: string };
     href?: string;
   };
   /** Related pages shown in the header, such as another gallery of the same site. */

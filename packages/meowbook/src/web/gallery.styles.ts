@@ -102,6 +102,23 @@ a {
   border-radius: ${uiTokens.radius.md};
   object-fit: contain;
 }
+.workshop-logo-dark {
+  display: none;
+}
+:root[data-meowui-color-scheme="dark"] .workshop-logo-light {
+  display: none;
+}
+:root[data-meowui-color-scheme="dark"] .workshop-logo-dark {
+  display: block;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-meowui-color-scheme="auto"] .workshop-logo-light {
+    display: none;
+  }
+  :root[data-meowui-color-scheme="auto"] .workshop-logo-dark {
+    display: block;
+  }
+}
 .workshop-brand-mark {
   display: grid;
   place-items: center;

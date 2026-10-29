@@ -93,8 +93,9 @@ function page(path: string): string {
 describe("the page document", () => {
   test("both navigation bars and the browser icon use the site mark", () => {
     const html = document("components/button");
-    expect(html.match(/src="\.\.\/\.\.\/meowland-logo-3ef0fd67.png"/g)).toHaveLength(2);
-    expect(html).toContain('href="/favicon.ico?v=9a311ad1"');
+    expect(html.match(/src="\.\.\/\.\.\/meowland-logo-a.svg"/g)).toHaveLength(2);
+    expect(html.match(/src="\.\.\/\.\.\/meowland-logo-c.svg"/g)).toHaveLength(2);
+    expect(html).toContain('href="/favicon.ico?v=4"');
   });
 
   test("the catalog rail labels the full documentation navigation", () => {

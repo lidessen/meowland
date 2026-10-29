@@ -129,13 +129,24 @@ function applySettings() {
   if (tag !== undefined) get("brand-label").textContent = tag;
   get("brand-label").hidden = !get("brand-label").textContent;
   if (logo) {
-    const image = document.createElement("img");
-    image.src = logo;
-    image.alt = "";
-    image.width = 28;
-    image.height = 28;
-    get("brand-mark").replaceWith(image);
-    image.id = "brand-mark";
+    // A pair of marks shows the one for the current scheme; the stylesheet chooses.
+    const sources =
+      typeof logo === "string"
+        ? [["", logo]]
+        : [
+            ["light", logo.light],
+            ["dark", logo.dark],
+          ];
+    const marks = sources.map(([scheme, src]) => {
+      const image = document.createElement("img");
+      image.src = src!;
+      image.alt = "";
+      image.width = 28;
+      image.height = 28;
+      if (scheme) image.className = `workshop-logo-${scheme}`;
+      return image;
+    });
+    get("brand-mark").replaceWith(...marks);
   }
   const links = get("host-links");
   links.replaceChildren(

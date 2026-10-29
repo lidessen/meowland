@@ -12,7 +12,7 @@ import { readPackages } from "./packages";
 import { readComponentProps, splitSummary } from "./props";
 import { createSiteConfig } from "./site.config";
 import { type DocsState } from "./pages";
-import { LOGO, SITE_NAME } from "./document";
+import { DARK_LOGO, LIGHT_LOGO, SITE_NAME } from "./document";
 import { DOCS_APPEARANCE_STORE, DOCS_THEME_STORE } from "./theme";
 import type { GalleryConfig, StoryConfig } from "meowbook";
 import meowbookConfig from "./meowbook.config";
@@ -58,10 +58,19 @@ export async function buildDocs(): Promise<void> {
   await writeSearchIndex(outputDirectory);
   await writeFavicon(outputDirectory);
 
-  // The site build fingerprints the mark again, so the galleries take whatever name it wrote.
-  const stem = LOGO.replace(/\.png$/, "");
-  const logo = (await readdir(outputDirectory)).find((name) => name.startsWith(stem));
-  const brand = { name: SITE_NAME, tag: "playground", logo: logo && `/${logo}`, href: "/" };
+  // The site build fingerprints the marks again, so the playgrounds take the names it wrote.
+  const written = await readdir(outputDirectory);
+  const published = (asset: string) => {
+    const stem = asset.replace(/\.[a-z]+$/, "");
+    const name = written.find((entry) => entry.startsWith(stem));
+    return name ? `/${name}` : `/${asset}`;
+  };
+  const brand = {
+    name: SITE_NAME,
+    tag: "playground",
+    logo: { light: published(LIGHT_LOGO), dark: published(DARK_LOGO) },
+    href: "/",
+  };
   // Each story's docs page is known only once the catalog is built, so the link joins here.
   const pages = new Map<string, string>();
   for (const example of catalog.examples) pages.set(example.story.id, `/${example.path}/`);

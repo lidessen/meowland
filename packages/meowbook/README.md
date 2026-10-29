@@ -30,7 +30,7 @@ export default defineConfig({
 });
 ```
 
-- `brand` replaces the name, the short tag (an empty string hides it), the 28px mark and where the mark leads.
+- `brand` replaces the name, the short tag (an empty string hides it), the 28px mark (one URL, or `{ light, dark }` to follow the scheme) and where the mark leads.
 - `links` are quiet header links to related pages, such as a second gallery of the same site.
 - `docsLink` runs once per story at build time; the header shows its result while that story is current. Only the results reach the browser.
 - `appearance` lets the site and the gallery share the reader's choice through `localStorage`. A missing key means follow system and the first theme, so those are stored by removing the key. With two or more `themes`, the menu also offers a theme, and the gallery passes the chosen value to the canvas as its `theme` URL parameter; the values must be the ones the environment reads. A theme can also name the Meowtail theme that paints the gallery's own chrome while it is chosen (`chrome: "standard" | "journal" | "meow"`); the chrome keeps whatever faces the page already has, since the gallery loads no web fonts of its own. A choice made in another tab of the same site reaches the gallery.

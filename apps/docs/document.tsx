@@ -16,16 +16,33 @@ export const SITE_NAME = "Meowland";
 export const SITE_DESCRIPTION =
   "A small UI capability library: a JSX runtime, a style system, a component library, a presentation engine, a workbench and a site generator.";
 
-/**
- * The supplied site mark, scaled to 96px for its 28px slot (3x screens). Its content hash keeps
- * browser caches in sync with releases.
- */
-const LOGO = "meowland-logo-3ef0fd67.png";
+/** The light and dark variants of the site mark. */
+const LIGHT_LOGO = "meowland-logo-a.svg";
+const DARK_LOGO = "meowland-logo-c.svg";
 
-function logoHref(depth: number): string {
-  return depth <= 0 ? `./${LOGO}` : `${"../".repeat(depth)}${LOGO}`;
+function logoHref(depth: number, asset: string): string {
+  return depth <= 0 ? `./${asset}` : `${"../".repeat(depth)}${asset}`;
 }
-const FAVICON = "/favicon.ico?v=9a311ad1";
+const FAVICON = "/favicon.ico?v=4";
+
+function SiteMark({ depth }: { depth: number }): Child {
+  return [
+    <img
+      className="docs-logo-light"
+      src={logoHref(depth, LIGHT_LOGO)}
+      alt=""
+      width="28"
+      height="28"
+    />,
+    <img
+      className="docs-logo-dark"
+      src={logoHref(depth, DARK_LOGO)}
+      alt=""
+      width="28"
+      height="28"
+    />,
+  ];
+}
 
 /** One level of the trail that says where the reader is. */
 export interface TrailItem {
@@ -610,7 +627,7 @@ function Sidebar({
   return (
     <aside className="docs-sidebar" id="docs-navigation" aria-label="Documentation navigation">
       <a className="docs-brand" href="/">
-        <img src={logoHref(path ? path.split("/").length : 0)} alt="" width="28" height="28" />
+        <SiteMark depth={path ? path.split("/").length : 0} />
         <strong>Meowland</strong>
         <span>docs</span>
       </a>
@@ -683,7 +700,7 @@ function Document({
         <div className="docs-shell">
           <div className="docs-mobile-bar">
             <a className="docs-mobile-brand" href="/">
-              <img src={logoHref(depth)} alt="" width="28" height="28" />
+              <SiteMark depth={depth} />
               Meowland <span>docs</span>
             </a>
             <button

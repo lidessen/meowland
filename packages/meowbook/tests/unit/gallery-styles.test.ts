@@ -7,6 +7,7 @@ import {
   chromeThemes,
   galleryStyles,
 } from "../../src/web/gallery.styles";
+import { canvasStyles } from "../../src/web/canvas.styles";
 
 // The canvas styles are left out: the measurement overlay is an instrument with its own palette
 // that also runs where no theme is loaded.
@@ -19,4 +20,11 @@ test("each named chrome theme paints the shared roles under its own attribute", 
     expect(chromeThemeStyles).toContain(`[${chromeThemeAttribute}="${theme}"]`);
   }
   expect(chromeThemeStyles).toContain("--ui-surface-canvas");
+});
+
+// Both are their own documents, and the property inherits: setting it at each root is what keeps
+// Mobile Safari from outlining tapped regions in the chrome, the stories and embedded examples.
+test("the gallery and the canvas turn off the tap highlight at their roots", () => {
+  expect(String(galleryStyles)).toMatch(/:root\s*\{[^}]*-webkit-tap-highlight-color: transparent/);
+  expect(String(canvasStyles)).toMatch(/html\s*\{[^}]*-webkit-tap-highlight-color: transparent/);
 });

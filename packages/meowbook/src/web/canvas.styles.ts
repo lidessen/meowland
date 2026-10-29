@@ -7,6 +7,11 @@ export const canvasStyles = css`
     margin: 0;
     min-width: 0;
   }
+  /* The canvas is its own document, so the host page's setting does not reach it: Mobile Safari
+   would outline every tapped target in the story, in the playground and in embedded examples. */
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
   /* System-color fallbacks follow the consumer's inherited color-scheme without
    importing a theme or assigning a scheme to the story itself. */
   #story-state {

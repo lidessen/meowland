@@ -44,17 +44,15 @@ export const galleryStyles = css`
   font-size: ${uiTokens.type.label};
   color: ${uiTokens.ink.primary};
   background: ${uiTokens.surface.canvas};
+  /* Mobile Safari outlines every tapped target, delegated click regions included; the property
+   inherits, so the root covers all of them, and each control shows its own pressed state. */
+  -webkit-tap-highlight-color: transparent;
 }
 * {
   box-sizing: border-box;
 }
 body {
   margin: 0;
-}
-button,
-a,
-summary {
-  -webkit-tap-highlight-color: transparent;
 }
 a {
   color: inherit;

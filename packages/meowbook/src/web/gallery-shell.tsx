@@ -16,6 +16,7 @@ import {
 import { Icon, IconSource } from "meowtail/icons";
 import { BookOpen, Monitor, Moon, Sun, Type } from "meowtail/icons/lucide";
 import { standardTheme } from "meowtail/theme";
+import { installFocusModality } from "meowtail/web";
 import { applyTheme } from "meowcss/web";
 import type { GallerySettings, StoryEntry } from "../types";
 import { chromeThemeAttribute } from "./gallery.styles";
@@ -1007,5 +1008,6 @@ export function mountGallery(props: GalleryProps) {
   const runtime = createRuntime();
   installMeowUI({ components: meowUIComponents }, runtime);
   applyTheme(document.documentElement, standardTheme);
+  installFocusModality(document);
   return createWebRenderer(runtime).render(<Gallery {...props} />, document.body);
 }

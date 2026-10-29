@@ -3,6 +3,7 @@ import { createMeowUI, meowUIComponents } from "meowtail";
 import { createMeowSlides } from "meowslides";
 import { presentationOptions, presentationTheme } from "meowslides/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
+import { installFocusModality } from "meowtail/web";
 import type { PreviewEnvironment } from "meowbook";
 import { imageLoadingCss } from "../../styles";
 const previewCss = `
@@ -21,6 +22,7 @@ export default (({ root, onCleanup }) => {
   onCleanup(
     mountStyles(root.ownerDocument, presentationTheme.cssText + imageLoadingCss + previewCss),
   );
+  onCleanup(installFocusModality(root.ownerDocument));
   onCleanup(
     applyTheme(
       root.ownerDocument.documentElement,

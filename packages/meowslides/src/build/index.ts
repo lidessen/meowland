@@ -25,6 +25,7 @@ const host = `import { h, createRuntime } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { createMeowUI, meowUIComponents } from "meowtail";
 import { applyTheme, mountStyles } from "meowcss/web";
+import { installFocusModality } from "meowtail/web";
 import { Presentation } from "meowslides";
 import { createMeowSlides, meowSlidesComponents } from "meowslides/registry";
 import { presentationTheme } from "meowslides/theme";
@@ -35,8 +36,9 @@ const uninstallSlides = runtime.use(createMeowSlides({ components: meowSlidesCom
 const root = document.getElementById("app");
 const removeStyles = mountStyles(document, presentationTheme.cssText);
 const restoreTheme = applyTheme(document.documentElement, presentationTheme);
+const removeFocusModality = installFocusModality(document);
 const mounted = createWebRenderer(runtime).render(h(Presentation, createDeck()), root);
-window.addEventListener("pagehide", (event) => { if (event.persisted) return; mounted.unmount(); restoreTheme(); removeStyles(); uninstallSlides(); uninstallUI(); });
+window.addEventListener("pagehide", (event) => { if (event.persisted) return; mounted.unmount(); removeFocusModality(); restoreTheme(); removeStyles(); uninstallSlides(); uninstallUI(); });
 `;
 
 function html(title: string, script: string): string {

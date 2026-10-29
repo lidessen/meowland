@@ -83,6 +83,10 @@ export const sliderStyles = css`
       0 0 0 2px var(--meowui-focus-halo, ${uiTokens.surface.knockout}),
       0 0 0 4px ${uiTokens.state.focus};
   }
+  /* The thumb's ring is a shadow, so the foundation's pointer rule cannot reach it. */
+  :where([data-meowui-focus-modality="pointer"]) ${root}:has(${control}:focus-visible) ${thumb} {
+    box-shadow: ${uiTokens.shadow.knob};
+  }
   ${root}:has(${control}:disabled) {
     color: ${uiTokens.ink.tertiary};
   }

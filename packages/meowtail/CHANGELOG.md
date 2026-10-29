@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Add the `meowtail/web` entry with `installFocusModality(document)` and `focusModalityScript`.
+  They record whether the last input was a pointer or a key, and after a pointer the theme hides
+  outline focus rings until the next keystroke, so Safari no longer rings what a script focused
+  after a tap. Text entry keeps its focus state. Without the tracker, rings follow `:focus-visible`
+  as before. The theme root also turns off the browser's tap highlight; Button and the chat record
+  parts no longer set it themselves.
+
 - Remove the `DoodleCat` illustration and its public export.
 
 - Add `journalTheme`, a second concrete theme for blogs and long-form reading, assembled from the

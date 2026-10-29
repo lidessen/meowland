@@ -7,6 +7,7 @@ import type { AssistantDraft, AssistantMessage } from "meowtail/chat";
 import { createMeowUICatalog } from "meowtail/json";
 import { standardTheme } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
+import { installFocusModality } from "meowtail/web";
 
 const root = document.querySelector("#app");
 if (!root) throw new Error("Example mount point is missing");
@@ -80,6 +81,7 @@ const child = createJsonView(description, {
   ]),
 });
 const uninstall = installMeowUI({ components: [AssistantView] }, defaultRuntime);
+installFocusModality(document);
 const restoreTheme = applyTheme(document.documentElement, standardTheme);
 const removeStyles = mountStyles(document, standardTheme.cssText);
 const mounted = render(child, root);

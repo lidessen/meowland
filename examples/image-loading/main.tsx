@@ -4,6 +4,7 @@ import { Button, Grid, ImagePreview, Inline, Stack, installMeowUI } from "meowta
 import { installMeowSlides } from "meowslides";
 import { presentationOptions, presentationTheme } from "meowslides/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
+import { installFocusModality } from "meowtail/web";
 import { createImageLoadingDeck } from "./deck";
 import { imageLoadingCss } from "./styles";
 
@@ -14,6 +15,7 @@ const uninstall = installMeowUI(
   defaultRuntime,
 );
 const uninstallSlides = installMeowSlides();
+installFocusModality(document);
 const restoreTheme = applyTheme(
   document.documentElement,
   presentationTheme,

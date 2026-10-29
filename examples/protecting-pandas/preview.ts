@@ -3,12 +3,14 @@ import { createMeowUI, meowUIComponents } from "meowtail";
 import { createMeowSlides } from "meowslides";
 import { presentationOptions, presentationTheme } from "meowslides/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
+import { installFocusModality } from "meowtail/web";
 import type { PreviewEnvironment } from "meowbook";
 import { lessonCss } from "./lesson.styles";
 export default (({ root, onCleanup }) => {
   root.style.height = "100dvh";
   onCleanup(() => root.style.removeProperty("height"));
   onCleanup(mountStyles(root.ownerDocument, presentationTheme.cssText + lessonCss));
+  onCleanup(installFocusModality(root.ownerDocument));
   onCleanup(
     applyTheme(
       root.ownerDocument.documentElement,

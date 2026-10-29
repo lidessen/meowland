@@ -7,6 +7,17 @@ export const canvasStyles = css`
     margin: 0;
     min-width: 0;
   }
+  /* Before the theme loads, the scheme the host named already paints the frame, so a dark host
+   never shows a white canvas first; the theme assigns the same values once it mounts. */
+  :where(:root[data-meowui-color-scheme="light"]) {
+    color-scheme: light;
+  }
+  :where(:root[data-meowui-color-scheme="dark"]) {
+    color-scheme: dark;
+  }
+  :where(:root[data-meowui-color-scheme="auto"]) {
+    color-scheme: light dark;
+  }
   /* System-color fallbacks follow the consumer's inherited color-scheme without
    importing a theme or assigning a scheme to the story itself. */
   #story-state {
@@ -21,6 +32,47 @@ export const canvasStyles = css`
   }
   #story-state:not(:empty) {
     padding: 8px 16px;
+  }
+  /* Loading covers the frame until the story is ready, so it appears whole rather than while its
+   fonts and setup settle. The spinner waits a beat, so a quick story never flashes it; before the
+   theme loads the cover is clear and the host's frame shows through. */
+  #story-state[data-status="loading"] {
+    position: fixed;
+    inset: 0;
+    z-index: 2147483645;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 16px;
+    background: var(${uiTokens.surface.canvas.name}, transparent);
+    animation: story-loading-in 200ms ease-out 300ms both;
+  }
+  #story-state[data-status="loading"]::before {
+    content: "";
+    flex: none;
+    box-sizing: border-box;
+    width: 16px;
+    height: 16px;
+    border: 2px solid color-mix(in srgb, currentColor 25%, transparent);
+    border-top-color: currentColor;
+    border-radius: 50%;
+    animation: story-loading-turn var(${uiTokens.motion.loop.name}, 1.2s) linear infinite;
+  }
+  @keyframes story-loading-in {
+    from {
+      color: transparent;
+    }
+  }
+  @keyframes story-loading-turn {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    #story-state[data-status="loading"]::before {
+      animation: none;
+    }
   }
   #story-state[data-status="error"] {
     color: color-mix(in srgb, CanvasText 80%, var(${uiTokens.status.danger.name}, #c43131));

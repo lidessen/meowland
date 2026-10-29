@@ -231,3 +231,6 @@ An independent review challenged this section. Adopted:
   does not survive, and its repaired form re-renders once when streaming ends. `renderCode` covers
   top-level fences only; fences inside lists or quotes stay a `pre`. The whole text is lexed per
   update, as before.
+- Follow-up decision: the Assistant passes `renderCode` with `CodeBlock`, so fenced code in its
+  text matches its code parts (highlighting, wrap and copy). The Assistant already loads the
+  highlighter for code parts, so this adds no new dependency to it.

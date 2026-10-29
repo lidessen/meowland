@@ -61,7 +61,7 @@ export async function buildDocs(): Promise<void> {
   // The site build fingerprints the mark again, so the galleries take whatever name it wrote.
   const stem = LOGO.replace(/\.png$/, "");
   const logo = (await readdir(outputDirectory)).find((name) => name.startsWith(stem));
-  const brand = { name: SITE_NAME, tag: "workbench", logo: logo && `/${logo}`, href: "/" };
+  const brand = { name: SITE_NAME, tag: "playground", logo: logo && `/${logo}`, href: "/" };
   // Each story's docs page is known only once the catalog is built, so the link joins here.
   const pages = new Map<string, string>();
   for (const example of catalog.examples) pages.set(example.story.id, `/${example.path}/`);

@@ -46,7 +46,7 @@ export const docsTokens = defineTokens("docs", {
 /** The root attribute that selects the reader's site theme; standard when absent. */
 export const DOCS_THEME_ATTRIBUTE = "data-docs-theme";
 
-/** Where the reader's choices persist; the workbench reads the same keys. */
+/** Where the reader's choices persist; the playground reads the same keys. */
 export const DOCS_APPEARANCE_STORE = "meowland-docs-appearance";
 export const DOCS_THEME_STORE = "meowland-docs-theme";
 
@@ -362,7 +362,7 @@ export const docsStyles = css`
     font-size: ${uiTokens.type.label};
     text-align: center;
   }
-  /* On the narrowest screens the header keeps the trail readable: Workbench becomes its icon. */
+  /* On the narrowest screens the header keeps the trail readable: Playground becomes its icon. */
   @media (max-width: 480px) {
     .docs-header-link > span {
       display: none;
@@ -537,7 +537,7 @@ export const docsStyles = css`
   .docs-search-wrap ${searchInput.control} {
     padding-right: 36px;
   }
-  /* The way to the workbench: a quiet labeled link, not an unnamed glyph. */
+  /* The way to the playground: a quiet labeled link, not an unnamed glyph. */
   .docs-header-link {
     display: inline-flex;
     flex: none;
@@ -779,7 +779,7 @@ export const docsStyles = css`
     color: ${uiTokens.ink.tertiary};
   }
   /* Preview and Code: text tabs on a hairline, the selected one underlined in ink; the way into
-     the workbench sits at the far end of the same line. */
+     the playground sits at the far end of the same line. */
   .docs-example-bar {
     display: flex;
     align-items: center;

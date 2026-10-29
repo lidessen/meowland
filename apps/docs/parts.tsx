@@ -95,7 +95,7 @@ export function StoryExample({
           </div>
         ) : null}
         <a className="docs-example-open" href={`/gallery/?story=${encodeURIComponent(storyId)}`}>
-          Open in workbench
+          Open in playground
           <Icon name="arrow-right" size={14} />
         </a>
       </div>

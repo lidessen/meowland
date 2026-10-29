@@ -37,6 +37,6 @@ describe("the search index", () => {
   });
 
   test("a page without an article is not indexed", () => {
-    expect(searchEntryFor("/gallery/", "<html><body>Workbench</body></html>")).toBeUndefined();
+    expect(searchEntryFor("/gallery/", "<html><body>Playground</body></html>")).toBeUndefined();
   });
 });

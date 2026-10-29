@@ -68,8 +68,8 @@ dist/
   packages/<pkg>/index.html      the package pages
   components/<kebab>/index.html  the component pages
   examples/<story>/index.html    the stories that compose several components
-  gallery/                       the Meowbook workbench and its live canvas
-  gallery/slides/                the presentation workbench
+  gallery/                       the Meowbook playground and its live canvas
+  gallery/slides/                the presentation playground
   llm.txt  llms.txt  agents.md   the agent-facing indexes
 ```
 
@@ -88,15 +88,15 @@ dist/
 
 ## The look
 
-The pages and the workbench are one site. The workbench is Meowbook's gallery dressed through its
+The pages and the playground are one site. The playground is Meowbook's gallery dressed through its
 `gallery` config in `build.ts`: it carries the Meowland mark and leads back to the home page, its
 catalog rail, header and breadcrumb use the same sizes as the pages, and each story links to the
 page that documents it. Each example on a component page links the other way, to the same story
-in the workbench. The component and presentation workbenches link to each other.
+in the playground. The component and presentation playgrounds link to each other.
 
 The appearance menu is one choice across the site: the pages, their live previews and the
-workbench read the same `localStorage` keys, so a theme or scheme picked on a page is the one the
-workbench opens with, and the reverse. The chosen theme paints the workbench's own chrome as well
+playground read the same `localStorage` keys, so a theme or scheme picked on a page is the one the
+playground opens with, and the reverse. The chosen theme paints the playground's own chrome as well
 as its stories; the chrome keeps the system faces, since only the stories load Journal's web fonts.
 
 The theme supplies the same surfaces, hairlines and type scale to every page. The site adds only

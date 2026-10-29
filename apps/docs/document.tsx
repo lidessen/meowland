@@ -540,7 +540,7 @@ function sidebarGroups(catalog: Catalog, packages: DocsPackage[]): NavListGroup[
       items: [
         { id: "", href: "/", label: "Home" },
         { id: "components", href: "/components/", label: "Components" },
-        { id: "gallery", href: "/gallery/", label: "Component workbench" },
+        { id: "gallery", href: "/gallery/", label: "Component playground" },
       ],
     },
     {
@@ -564,7 +564,7 @@ function sidebarGroups(catalog: Catalog, packages: DocsPackage[]): NavListGroup[
 
 /**
  * The pages before and after this one in sidebar order, so a reader can keep going without
- * returning to the rail. The workbench is a separate app, not a page in the sequence.
+ * returning to the rail. The playground is a separate app, not a page in the sequence.
  */
 function Pager({
   catalog,
@@ -763,7 +763,7 @@ function Document({
               </div>
               <a className="docs-header-link" href="/gallery/">
                 <IconSource source={LayoutPanelLeft} size={14} />
-                <span>Workbench</span>
+                <span>Playground</span>
               </a>
             </header>
             <main className={path === "" ? "docs-content docs-content-home" : "docs-content"}>

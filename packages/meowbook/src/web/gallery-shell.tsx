@@ -224,10 +224,16 @@ function Gallery({ settings, manifest }: GalleryProps, context: ComponentRenderC
     flush(() => {
       catalogOpen.value = next;
     });
-  const choose = (story: StoryInfo) => {
+  /**
+   * Focus follows a choice so a keyboard reader lands on the result; after a tap the browser is
+   * told not to ring it, since the tap itself was the cue.
+   */
+  const moveFocus = (target: HTMLElement | undefined, event?: MouseEvent) =>
+    target?.focus({ preventScroll: true, focusVisible: !event?.detail } as FocusOptions);
+  const choose = (story: StoryInfo, event: MouseEvent) => {
     open(story);
     setCatalogOpen(false);
-    title?.focus({ preventScroll: true });
+    moveFocus(title, event);
   };
 
   // One scheme paints the tool and the story, so a dark story never sits in light chrome; the
@@ -420,7 +426,7 @@ function Gallery({ settings, manifest }: GalleryProps, context: ComponentRenderC
     if (event.key !== "Escape") return;
     if (catalogOpen.value) {
       setCatalogOpen(false);
-      toggle?.focus();
+      moveFocus(toggle);
     } else if (document.activeElement === search && query.value) query.value = "";
   };
   const media = matchMedia(narrowQuery);
@@ -558,7 +564,7 @@ function Gallery({ settings, manifest }: GalleryProps, context: ComponentRenderC
             const story = stories.value.find((item) => item.id === id);
             if (!story) return;
             event.preventDefault();
-            choose(story);
+            choose(story, event);
           }}
         >
           {/* NavList takes its groups for the mount, so each catalog state is a new list. */}
@@ -587,9 +593,9 @@ function Gallery({ settings, manifest }: GalleryProps, context: ComponentRenderC
         aria-label="Close component catalog"
         tabindex={-1}
         hidden={mapSignal(catalogOpen, (open) => !open)}
-        onClick={() => {
+        onClick={(event: MouseEvent) => {
           setCatalogOpen(false);
-          toggle?.focus();
+          moveFocus(toggle, event);
         }}
       />
       <main className="workshop-main">
@@ -737,7 +743,7 @@ function Gallery({ settings, manifest }: GalleryProps, context: ComponentRenderC
                   onClick={(event: MouseEvent) => {
                     if (!plainClick(event)) return;
                     event.preventDefault();
-                    choose(story.value);
+                    choose(story.value, event);
                   }}
                 >
                   {mapSignal(story, (item) => item.variant ?? item.title)}

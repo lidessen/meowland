@@ -17,6 +17,18 @@ import { chromeThemeStyles, galleryStyles } from "../web/gallery.styles";
 const sourceDirectory = resolve(import.meta.dir, "..");
 const moduleExtension = import.meta.url.endsWith(".ts") ? ".ts" : ".js";
 const jsxEntry = fileURLToPath(import.meta.resolve("meowjsx"));
+/**
+ * Runs before the canvas paints: the scheme comes from the `scheme` parameter, or else from the
+ * same-origin page that embeds the canvas, so the frame starts in the host's scheme instead of
+ * white until the story's bundle and theme load.
+ */
+const canvasSchemeScript = `(() => {
+  let scheme = new URLSearchParams(location.search).get("scheme");
+  if (!scheme && parent !== window)
+    try { scheme = parent.document.documentElement.getAttribute("data-meowui-color-scheme"); } catch {}
+  if (scheme === "light" || scheme === "dark" || scheme === "auto")
+    document.documentElement.setAttribute("data-meowui-color-scheme", scheme);
+})();`;
 
 export interface PreparedStories {
   stories: DiscoveredStory[];
@@ -188,7 +200,7 @@ export async function buildStories(
     );
     await writeFile(
       join(prepared.directory, "canvas.html"),
-      `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Meowbook canvas</title><link rel="stylesheet" href="./canvas.css"></head><body><div id="story-state" data-status="loading">Loading</div><main id="story-root"></main><script type="module" src="./canvas-entry.ts"></script></body></html>`,
+      `<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Meowbook canvas</title>${options.capture ? "" : `<script>${canvasSchemeScript}</script>`}<link rel="stylesheet" href="./canvas.css"></head><body><div id="story-state" data-status="loading" role="status">Loading the scenario…</div><main id="story-root"></main><script type="module" src="./canvas-entry.ts"></script></body></html>`,
     );
     const galleryFile = join(sourceDirectory, "web/index.html");
     const gallery = (await readFile(galleryFile, "utf8")).replace(

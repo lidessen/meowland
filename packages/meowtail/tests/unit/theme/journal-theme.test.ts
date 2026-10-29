@@ -3,6 +3,8 @@ import { auditCSS } from "meowcss";
 import {
   journalTheme,
   journalUiTokenValues,
+  meowTheme,
+  meowUiTokenValues,
   standardAuditRules,
   standardTheme,
   standardThemeStyles,
@@ -19,6 +21,16 @@ test("journal declares exactly the standard ui roles and paints with the standar
   expect(journalTheme.cssText.endsWith(rules)).toBe(true);
   expect(journalTheme.name).toBe(standardTheme.name);
   expect(auditCSS(journalTheme.cssText, standardAuditRules)).toEqual([]);
+});
+
+test("meow declares exactly the standard ui roles and changes only colors", () => {
+  expect(declaredNames(meowTheme.cssText)).toEqual(declaredNames(standardTheme.cssText));
+  const rules = standardThemeStyles.map((fragment) => fragment.text).join("\n");
+  expect(meowTheme.cssText.endsWith(rules)).toBe(true);
+  expect(meowTheme.name).toBe(standardTheme.name);
+  expect(auditCSS(meowTheme.cssText, standardAuditRules)).toEqual([]);
+  for (const group of ["type", "space", "icon", "radius", "shadow", "motion", "layout"] as const)
+    expect(meowUiTokenValues[group]).toEqual(standardUiTokenValues[group]);
 });
 
 type Pair = readonly [ink: string, surface: string, minimum: number];
@@ -61,10 +73,11 @@ function read(values: object, path: string, scheme: 0 | 1): string {
   return (Array.isArray(leaf) ? leaf[scheme] : leaf) as string;
 }
 
-test("standard and journal keep text, actions and focus readable in both schemes", () => {
+test("standard, journal and meow keep text, actions and focus readable in both schemes", () => {
   for (const [name, values] of [
     ["standard", standardUiTokenValues],
     ["journal", journalUiTokenValues],
+    ["meow", meowUiTokenValues],
   ] as const) {
     for (const scheme of [0, 1] as const) {
       for (const [ink, surface, minimum] of pairs) {

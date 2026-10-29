@@ -1,4 +1,4 @@
-import { defineTokens } from "meowcss";
+import { compileTokens, defineTokens } from "meowcss";
 import { css, defineTheme, parts } from "meowcss/meowjsx";
 import type {
   Breadcrumb,
@@ -13,6 +13,7 @@ import type {
   Table,
 } from "meowtail";
 import {
+  meowUiTokens,
   standardOptions,
   standardThemeStyles,
   standardThemeTokens,
@@ -40,6 +41,28 @@ export const docsTokens = defineTokens("docs", {
   previewHeightTall: "680px",
   codeHeight: "480px",
 });
+
+/** The root attribute that selects the reader's site theme; standard when absent. */
+export const DOCS_THEME_ATTRIBUTE = "data-docs-theme";
+
+/**
+ * The Meow values of the same `--ui-*` roles, in force under `data-docs-theme="meow"`. The site
+ * keeps one stylesheet and one theme root, so switching themes is one attribute and needs no
+ * reload. These rules have the same zero specificity as the standard ones and follow them, so they
+ * win for every scheme.
+ */
+const meowScope = `[${DOCS_THEME_ATTRIBUTE}="meow"]`;
+export const docsMeowTokenStyles = css`
+  ${compileTokens(meowUiTokens, {
+    constants: `:where(${meowScope}[data-meowui-theme-root], ${meowScope} [data-meowui-theme-root])`,
+    sources: [
+      {
+        options: "scheme",
+        selector: `:where(${meowScope}[data-meowui-scope], ${meowScope} [data-meowui-scope])`,
+      },
+    ],
+  })}
+`;
 
 /** A reading environment built from the shared palette and component metadata. */
 export const docsStyles = css`
@@ -345,7 +368,8 @@ export const docsStyles = css`
     }
   }
   /* The appearance switch: one quiet icon button that shows the current choice. */
-  .docs-appearance {
+  .docs-appearance,
+  .docs-theme {
     display: inline-grid;
     place-items: center;
     flex: none;
@@ -358,12 +382,18 @@ export const docsStyles = css`
     color: ${uiTokens.ink.secondary};
     cursor: pointer;
   }
-  .docs-appearance[hidden] {
+  :is(.docs-appearance, .docs-theme)[hidden] {
     display: none;
   }
-  .docs-appearance:hover {
+  :is(.docs-appearance, .docs-theme):hover {
     background: ${uiTokens.state.hover};
     color: ${uiTokens.ink.primary};
+  }
+  .docs-theme[aria-pressed="true"] {
+    color: ${uiTokens.accent.ink};
+  }
+  .docs-search-open:not([hidden]) ~ .docs-theme {
+    margin-left: 0;
   }
   .docs-appearance > svg {
     display: none;
@@ -1247,5 +1277,5 @@ export const docsTheme = defineTheme({
   options: standardOptions,
   defaults: { scheme: "auto" },
   tokens: [...standardThemeTokens, docsTokens],
-  styles: [...standardThemeStyles, docsStyles],
+  styles: [...standardThemeStyles, docsMeowTokenStyles, docsStyles],
 });

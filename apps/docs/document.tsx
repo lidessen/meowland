@@ -4,9 +4,10 @@ import { h, type Child } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
 import { Breadcrumb, NavList, SearchInput, type NavListGroup } from "meowtail";
 import { Icon, IconSource } from "meowtail/icons";
-import { Monitor, Moon, Sun } from "meowtail/icons/lucide";
+import { Monitor, Moon, PawPrint, Sun } from "meowtail/icons/lucide";
 import type { Catalog, NavigationGroup } from "./catalog";
 import type { DocsPackage } from "./packages";
+import { DOCS_THEME_ATTRIBUTE } from "./theme";
 
 /** The name the site gives itself. */
 export const SITE_NAME = "Meowland";
@@ -134,14 +135,59 @@ const PREVIEW_FIT = `(() => {
   }
 })();`;
 
-/** The reader's appearance choice, applied before the stylesheet paints so no page flashes. */
+/**
+ * The reader's appearance and theme choices, applied before the stylesheet paints so no page
+ * flashes.
+ */
 const APPEARANCE_STORE = "meowland-docs-appearance";
+const THEME_STORE = "meowland-docs-theme";
 const APPEARANCE_EARLY = `(() => {
   try {
     const choice = localStorage.getItem("${APPEARANCE_STORE}");
     if (choice === "light" || choice === "dark")
       document.documentElement.setAttribute("data-meowui-color-scheme", choice);
+    if (localStorage.getItem("${THEME_STORE}") === "meow")
+      document.documentElement.setAttribute("${DOCS_THEME_ATTRIBUTE}", "meow");
   } catch {}
+})();`;
+
+/**
+ * Toggle the Meow theme. The site's own colors follow one root attribute; each live preview is a
+ * gallery canvas that mounts its theme once, so a preview that shows another theme reloads with
+ * the reader's choice in its `theme` parameter.
+ */
+const THEME_SWITCH = `(() => {
+  const button = document.getElementById("docs-theme");
+  if (!button) return;
+  const root = document.documentElement;
+  const current = () => (root.getAttribute("${DOCS_THEME_ATTRIBUTE}") === "meow" ? "meow" : "standard");
+  const paintFrames = (choice) => {
+    for (const frame of document.querySelectorAll("iframe.docs-preview-frame")) {
+      const url = new URL(frame.getAttribute("src"), location.href);
+      if (url.searchParams.get("theme") === choice) continue;
+      url.searchParams.set("theme", choice);
+      frame.setAttribute("src", url.pathname + url.search);
+    }
+  };
+  const show = () => {
+    const meow = current() === "meow";
+    button.setAttribute("aria-pressed", String(meow));
+    button.title = meow ? "Meow theme: on" : "Meow theme: off";
+  };
+  button.addEventListener("click", () => {
+    const next = current() === "meow" ? "standard" : "meow";
+    if (next === "meow") root.setAttribute("${DOCS_THEME_ATTRIBUTE}", "meow");
+    else root.removeAttribute("${DOCS_THEME_ATTRIBUTE}");
+    try {
+      if (next === "meow") localStorage.setItem("${THEME_STORE}", "meow");
+      else localStorage.removeItem("${THEME_STORE}");
+    } catch {}
+    paintFrames(next);
+    show();
+  });
+  paintFrames(current());
+  show();
+  button.hidden = false;
 })();`;
 
 /**
@@ -627,6 +673,16 @@ function Document({
                 <kbd aria-hidden="true">⌘K</kbd>
               </button>
               <button
+                className="docs-theme"
+                id="docs-theme"
+                type="button"
+                aria-label="Meow theme"
+                aria-pressed="false"
+                hidden
+              >
+                <IconSource source={PawPrint} size={16} />
+              </button>
+              <button
                 className="docs-appearance"
                 id="docs-appearance"
                 type="button"
@@ -683,6 +739,7 @@ function Document({
         <script dangerouslySetInnerHTML={{ __html: CATALOG_FILTER }} />
         <script dangerouslySetInnerHTML={{ __html: NAVIGATION_DISCLOSURE }} />
         <script dangerouslySetInnerHTML={{ __html: PREVIEW_FIT }} />
+        <script dangerouslySetInnerHTML={{ __html: THEME_SWITCH }} />
         <script dangerouslySetInnerHTML={{ __html: APPEARANCE_SWITCH }} />
         <script dangerouslySetInnerHTML={{ __html: FILTER_SHORTCUT }} />
         <script dangerouslySetInnerHTML={{ __html: EXAMPLE_TABS }} />

@@ -506,10 +506,24 @@ mountStyles(document, journalTheme.cssText);
 applyTheme(document.documentElement, journalTheme);
 ```
 
-Both themes share one theme root name and one set of `--ui-*` variables, so a document mounts one of
+### Meow theme
+
+`meowTheme` recolors the standard theme after the Meowland mark and changes nothing else. It is
+assembled from the same `standardThemeStyles` with `meowUiTokenValues` (compiled as `meowUiTokens`):
+black carries the page (ink, filled actions, Tooltip and Toast, and the ground in the dark scheme),
+the mark's red (`#e71c22`) is the one accent for focus, selection, the current place and links, and
+the light ground is the mark's warm paper. Type, spacing, radii, control heights, depth and motion
+are the standard values.
+
+```ts
+mountStyles(document, meowTheme.cssText);
+applyTheme(document.documentElement, meowTheme);
+```
+
+The three themes share one theme root name and one set of `--ui-*` variables, so a document mounts one of
 them. `standardUiTokenValues` and the `UiTokenValues` type let a host value the same roles for its own
 theme; a value tree that misses or adds a role does not typecheck. In Meowbook, the gallery's Theme
-control paints every story with either theme, and `?theme=journal` selects it in a link.
+control paints every story with any of them, and `?theme=journal` or `?theme=meow` selects one in a link.
 
 Style files use `<responsibility>.styles.ts`; the standard theme groups them by component and conversation responsibility, and application styles are maintained with application modules.
 See the style file organization (historical reference in the original product repository) for naming, component family boundaries, and cascade organization.

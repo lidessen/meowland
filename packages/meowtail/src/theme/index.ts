@@ -18,6 +18,7 @@ import { menuStyles } from "./components/menu.styles";
 import { toastStyles } from "./components/toast.styles";
 import { standardOptions, uiTokens, chatTokens, alertTokens } from "./tokens";
 import { journalUiTokens } from "./journal.tokens";
+import { meowUiTokens } from "./meow.tokens";
 import { utilityStyles } from "./utilities";
 import { choiceSelectStyles } from "./components/choice-select.styles";
 import { tooltipStyles } from "./components/tooltip.styles";
@@ -114,6 +115,7 @@ export {
   type UiTokenValues,
 } from "./tokens";
 export { journalUiTokenValues, journalUiTokens } from "./journal.tokens";
+export { meowUiTokenValues, meowUiTokens } from "./meow.tokens";
 export { ui, utilityStyles } from "./utilities";
 export { chartTokens } from "./shared/chart.tokens";
 
@@ -258,6 +260,26 @@ export const journalTheme = /* @__PURE__ */ defineTheme({
   options: standardOptions,
   defaults: { scheme: "auto" },
   tokens: journalThemeTokens,
+  styles: standardThemeStyles,
+});
+
+/**
+ * Meow, after the Meowland mark: every standard rule, painted black with one red accent. Only the
+ * colors differ from the standard theme. Mount it instead of `standardTheme`; components and
+ * markup do not change.
+ */
+export const meowThemeTokens = [
+  meowUiTokens,
+  chatTokens,
+  alertTokens,
+  codeHighlightTokens,
+  chartTokens,
+] as const;
+
+export const meowTheme = /* @__PURE__ */ defineTheme({
+  options: standardOptions,
+  defaults: { scheme: "auto" },
+  tokens: meowThemeTokens,
   styles: standardThemeStyles,
 });
 

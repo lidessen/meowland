@@ -16,7 +16,7 @@ export function StoryCanvas(props: Props): Child {
     { className: "docs-preview" },
     h("iframe", {
       className: "docs-preview-frame docs-preview-frame-tall",
-      src: `/gallery/canvas.html?story=${encodeURIComponent(story)}&embedded=1`,
+      src: `/gallery/canvas.html?story=${encodeURIComponent(story)}&embedded=1&theme=standard`,
       loading: "lazy",
       title,
     }),

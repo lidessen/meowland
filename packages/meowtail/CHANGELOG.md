@@ -18,7 +18,10 @@
   a heading that can link to the entry, a standfirst and its facts, separated by hairlines on the
   surrounding surface. An Entry is a list item in an EntryList and an article alone, and its heading
   level follows the region. `size="feature"` marks the lead entry.
-- The Meowbook gallery's Theme control switches every story between Standard and Journal.
+- Add `meowTheme`, a red-and-black recolor of the standard theme after the Meowland mark: black
+  ink, actions and inverse surfaces with one red accent. Only colors differ from the standard values.
+  Export `meowUiTokenValues`, `meowUiTokens` and `meowThemeTokens`.
+- The Meowbook gallery's Theme control switches every story between Standard, Journal and Meow.
 
 ## 0.3.0-alpha.0
 

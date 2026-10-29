@@ -1,12 +1,18 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
-import { dirname, join, relative, resolve } from "node:path";
+import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { StoryConfig, StoryEntry } from "../types";
+import type {
+  GalleryConfig,
+  GalleryLink,
+  GallerySettings,
+  StoryConfig,
+  StoryEntry,
+} from "../types";
 import { discoverStories, sourcePath, type DiscoveredStory, type TemporaryStory } from "./discover";
 import { standardTheme } from "meowtail/theme";
 import { themeAttributes } from "meowcss";
 import { canvasStyles } from "../web/canvas.styles";
-import { galleryStyles } from "../web/gallery.styles";
+import { chromeThemeStyles, galleryStyles } from "../web/gallery.styles";
 
 const sourceDirectory = resolve(import.meta.dir, "..");
 const moduleExtension = import.meta.url.endsWith(".ts") ? ".ts" : ".js";
@@ -136,6 +142,20 @@ function manifest(stories: readonly DiscoveredStory[]): StoryEntry[] {
   return stories.map(({ generated: _generated, ...entry }) => entry);
 }
 
+/** The browser half of the gallery config: data only, with each story's docs link resolved. */
+function gallerySettings(
+  { docsLink, ...settings }: GalleryConfig,
+  entries: readonly StoryEntry[],
+): GallerySettings {
+  if (!docsLink) return settings;
+  const docsLinks: Record<string, GalleryLink> = {};
+  for (const entry of entries) {
+    const link = docsLink(entry);
+    if (link) docsLinks[entry.id] = { label: link.label, href: link.href };
+  }
+  return { ...settings, docsLinks };
+}
+
 export async function buildStories(
   config: StoryConfig,
   outdir: string,
@@ -156,7 +176,7 @@ export async function buildStories(
     await writeFile(join(prepared.directory, "canvas.css"), canvasStyles.text);
     await writeFile(
       join(prepared.directory, "gallery.css"),
-      standardTheme.cssText + "\n" + galleryStyles.text,
+      [standardTheme.cssText, chromeThemeStyles, galleryStyles.text].join("\n"),
     );
     await writeFile(
       join(prepared.directory, "canvas-entry.ts"),
@@ -200,7 +220,18 @@ export async function buildStories(
         : true,
     });
     if (!result.success) throw new Error(result.logs.map(String).join("\n"));
-    await writeFile(join(resolve(outdir), "manifest.json"), JSON.stringify(entries, null, 2));
+    // The published manifest names each story file from the config root, so a deployed gallery
+    // does not carry the build machine's directories.
+    const published = entries.map((entry) => ({
+      ...entry,
+      file: relative(config.root, entry.file).split(sep).join("/"),
+    }));
+    await writeFile(join(resolve(outdir), "manifest.json"), JSON.stringify(published, null, 2));
+    if (config.gallery)
+      await writeFile(
+        join(resolve(outdir), "gallery.json"),
+        JSON.stringify(gallerySettings(config.gallery, entries), null, 2),
+      );
     return entries;
   } finally {
     await prepared.cleanup();

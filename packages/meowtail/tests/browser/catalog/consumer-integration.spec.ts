@@ -54,13 +54,18 @@ test("MeowUI appearance persists across story navigation and gallery reset clear
   await page.goto("/?story=fields");
   const canvas = page.frameLocator("#canvas");
   await expect(canvas.locator("#story-state")).toHaveAttribute("data-status", "ready");
-  await canvas.getByRole("combobox", { name: "Appearance", exact: true }).selectOption("dark");
+  // The gallery owns the one appearance control; the embedded canvas draws none of its own.
+  await expect(canvas.getByRole("combobox", { name: "Appearance", exact: true })).toHaveCount(0);
+  await page.getByRole("button", { name: "Appearance", exact: true }).click();
+  await page
+    .getByRole("dialog", { name: "Appearance" })
+    .getByRole("radio", { name: "Dark" })
+    .check();
+  await page.keyboard.press("Escape");
   await canvas.getByLabel("Project name", { exact: true }).fill("Unsaved rename");
   await page.locator("#reset").click();
   await expect(canvas.getByLabel("Project name", { exact: true })).toHaveValue("Meowland");
-  await expect(canvas.getByRole("combobox", { name: "Appearance", exact: true })).toHaveValue(
-    "dark",
-  );
+  await expect(canvas.locator("html")).toHaveAttribute("data-meowui-color-scheme", "dark");
   await page.goto("/?story=dialog");
   await expect(canvas.locator("#story-state")).toHaveAttribute("data-status", "ready");
   await expect(canvas.locator("html")).toHaveAttribute("data-meowui-color-scheme", "dark");

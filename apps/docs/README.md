@@ -68,8 +68,8 @@ dist/
   packages/<pkg>/index.html      the package pages
   components/<kebab>/index.html  the component pages
   examples/<story>/index.html    the stories that compose several components
-  gallery/                       the Meowbook workbench and its live canvas
-  gallery/slides/                the presentation workbench
+  gallery/                       the Meowbook playground and its live canvas
+  gallery/slides/                the presentation playground
   llm.txt  llms.txt  agents.md   the agent-facing indexes
 ```
 
@@ -88,11 +88,20 @@ dist/
 
 ## The look
 
-The pages wear the workbench's own clothes: the catalog rail, the search field, the breadcrumb in
-the header and the preview frame are the same parts the Meowbook gallery is built from, and the
-theme supplies the same surfaces, hairlines and type scale. The site adds only the layout a
-reference needs — the reading column, the code panel and the API table — and every one of them
-uses the shared tokens.
+The pages and the playground are one site. The playground is Meowbook's gallery dressed through its
+`gallery` config in `build.ts`: it carries the Meowland mark and leads back to the home page, its
+catalog rail, header and breadcrumb use the same sizes as the pages, and each story links to the
+page that documents it. Each example on a component page links the other way, to the same story
+in the playground. The component and presentation playgrounds link to each other.
+
+The appearance menu is one choice across the site: the pages, their live previews and the
+playground read the same `localStorage` keys, so a theme or scheme picked on a page is the one the
+playground opens with, and the reverse. The chosen theme paints the playground's own chrome as well
+as its stories; the chrome keeps the system faces, since only the stories load Journal's web fonts.
+
+The theme supplies the same surfaces, hairlines and type scale to every page. The site adds only
+the layout a reference needs — the reading column, the code panel and the API table — and every
+one of them uses the shared tokens.
 
 The catalog filter is the one piece of behavior the site owns: the search field is meowtail's
 `SearchInput`, and the page matches the catalog entries with it. The matching runs in the page

@@ -228,7 +228,7 @@ test("the actual Meowbook toolbar retains its native Select and action navigatio
   const desktop = toolbar.getByRole("button", { name: "Desktop", exact: true });
   await desktop.focus();
   await page.keyboard.press("End");
-  await expect(toolbar.getByRole("button", { name: "Text placeholders" })).toBeFocused();
+  await expect(toolbar.getByRole("button", { name: "Reset sample" })).toBeFocused();
   const select = toolbar.getByRole("combobox", { name: "Annotation category" });
   await select.focus();
   await select.evaluate((element) => {
@@ -243,6 +243,7 @@ test("the actual Meowbook toolbar retains its native Select and action navigatio
   await page.keyboard.press("Escape");
   await select.selectOption("controls");
   await expect(select).toHaveValue("controls");
+  // The actions keep one Tab entry: the last one reached with the arrow keys.
   await page.keyboard.press("Tab");
-  await expect(toolbar.getByRole("button", { name: "Text placeholders" })).toBeFocused();
+  await expect(toolbar.getByRole("button", { name: "Reset sample" })).toBeFocused();
 });

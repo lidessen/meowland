@@ -33,6 +33,10 @@ export async function bootCanvas(options: CanvasOptions): Promise<() => void> {
   const id = new URL(location.href).searchParams.get("story") ?? options.manifest[0]?.id ?? "";
   const captureMode = options.capture === true;
   if (captureMode) document.documentElement.dataset.meowbookCapture = "true";
+  // The gallery names its scheme up front, so an embedded story paints in it from the start.
+  const scheme = new URL(location.href).searchParams.get("scheme");
+  if (!captureMode && (scheme === "light" || scheme === "dark" || scheme === "auto"))
+    document.documentElement.dataset.meowuiColorScheme = scheme;
   state.dataset.story = id;
   const abort = new AbortController();
   let mounted: MountResult | undefined;

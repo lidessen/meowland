@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import { mkdtemp, mkdir, readFile, readdir, rm, writeFile } from "node:fs/promises";
-import { resolve, join } from "node:path";
+import { relative, resolve, join } from "node:path";
 import { discoverSource, discoverStories } from "./discover";
 import { buildStories, checkStories } from "./build";
 import type { StoryConfig } from "../types";
@@ -247,12 +247,34 @@ test("build emits a static gallery, independent canvas and manifest, then remove
     expect(entries[0]?.id).toBe("build/button");
     expect(await readFile(join(outdir, "index.html"), "utf8")).toContain("Meowbook");
     expect(await readFile(join(outdir, "canvas.html"), "utf8")).toContain("story-root");
-    expect(JSON.parse(await readFile(join(outdir, "manifest.json"), "utf8"))).toEqual(entries);
+    // The published manifest names story files from the config root, never the build machine.
+    expect(JSON.parse(await readFile(join(outdir, "manifest.json"), "utf8"))).toEqual(
+      entries.map((entry) => ({ ...entry, file: relative(config.root, entry.file) })),
+    );
     expect(entries.find((entry) => entry.id === "build/search")).toMatchObject({
       description: "Component description",
       covers: ["Input"],
     });
     expect((await readdir(root)).some((path) => path.startsWith(".meowbook-"))).toBe(false);
+    // Without a gallery config the gallery keeps its own chrome and no settings file is written.
+    expect(await readdir(outdir)).not.toContain("gallery.json");
+    await buildStories(
+      {
+        ...config,
+        gallery: {
+          brand: { name: "Site", tag: "" },
+          appearance: { schemeStorageKey: "site-scheme" },
+          docsLink: (story) =>
+            story.id === "build/button" ? { label: "Docs", href: "/button/" } : undefined,
+        },
+      },
+      outdir,
+    );
+    expect(JSON.parse(await readFile(join(outdir, "gallery.json"), "utf8"))).toEqual({
+      brand: { name: "Site", tag: "" },
+      appearance: { schemeStorageKey: "site-scheme" },
+      docsLinks: { "build/button": { label: "Docs", href: "/button/" } },
+    });
   }));
 
 test("CLI list emits machine-readable metadata without importing a throwing story module", async () =>

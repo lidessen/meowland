@@ -1,12 +1,42 @@
 import { css, parts } from "meowcss/meowjsx";
-import { tokenRef } from "meowcss";
-import { uiTokens } from "meowtail/theme";
-import type { Button, Disclosure } from "meowtail";
+import { compileTokens, tokenRef, type TokenSet } from "meowcss";
+import { journalUiTokens, meowUiTokens, uiTokens } from "meowtail/theme";
+import type { Button, Disclosure, NavList, SearchInput } from "meowtail";
 import { buttonOptions } from "meowtail";
 export const inspectionHeight = tokenRef("workshop", "inspection", "height");
 
 const button = parts<typeof Button>("button");
 const disclosure = parts<typeof Disclosure>("disclosure");
+const navList = parts<typeof NavList>("nav-list");
+const searchInput = parts<typeof SearchInput>("search-input");
+
+/** The Meowtail themes that can paint the gallery's own chrome; standard when none is named. */
+export const chromeThemes = ["standard", "journal", "meow"] as const;
+export type ChromeTheme = (typeof chromeThemes)[number];
+/** The root attribute that selects a chrome theme other than standard. */
+export const chromeThemeAttribute = "data-meowbook-chrome";
+
+/**
+ * One theme's values of the same `--ui-*` roles, in force under the chrome attribute. One
+ * stylesheet and one theme root serve every theme, so switching is one attribute and no reload.
+ * The rules follow the standard ones at the same zero specificity, so they win in every scheme.
+ */
+function scopedTokens(name: Exclude<ChromeTheme, "standard">, tokens: TokenSet) {
+  const scope = `[${chromeThemeAttribute}="${name}"]`;
+  return compileTokens(tokens, {
+    constants: `:where(${scope}[data-meowui-theme-root], ${scope} [data-meowui-theme-root])`,
+    sources: [
+      {
+        options: "scheme",
+        selector: `:where(${scope}[data-meowui-scope], ${scope} [data-meowui-scope])`,
+      },
+    ],
+  });
+}
+export const chromeThemeStyles = [
+  scopedTokens("journal", journalUiTokens),
+  scopedTokens("meow", meowUiTokens),
+].join("\n");
 
 export const galleryStyles = css`
 :root {
@@ -39,7 +69,7 @@ a {
 }
 .workshop-shell {
   display: grid;
-  grid-template-columns: 224px minmax(0, 1fr);
+  grid-template-columns: 232px minmax(0, 1fr);
   height: 100dvh;
   overflow: hidden;
 }
@@ -55,41 +85,109 @@ a {
   display: flex;
   align-items: center;
   gap: 9px;
-  height: 66px;
+  height: 76px;
   flex-shrink: 0;
   padding: 0 10px;
+  color: ${uiTokens.ink.primary};
   font-size: ${uiTokens.type.title};
   font-weight: ${uiTokens.type.weight.semibold};
   letter-spacing: -0.02em;
 }
-.workshop-brand > svg {
+/* The mark is a 28px tile: the host's image, or the notebook glyph on a filled tile. */
+.workshop-brand > img,
+.workshop-brand-mark {
+  flex: none;
+  width: 28px;
+  height: 28px;
+  border-radius: ${uiTokens.radius.md};
+  object-fit: contain;
+}
+.workshop-logo-dark {
+  display: none;
+}
+:root[data-meowui-color-scheme="dark"] .workshop-logo-light {
+  display: none;
+}
+:root[data-meowui-color-scheme="dark"] .workshop-logo-dark {
+  display: block;
+}
+@media (prefers-color-scheme: dark) {
+  :root[data-meowui-color-scheme="auto"] .workshop-logo-light {
+    display: none;
+  }
+  :root[data-meowui-color-scheme="auto"] .workshop-logo-dark {
+    display: block;
+  }
+}
+.workshop-brand-mark {
+  display: grid;
+  place-items: center;
+  background: ${uiTokens.surface.fill};
   color: ${uiTokens.ink.secondary};
 }
-.workshop-brand > span {
+/* A theme with a larger title keeps the tag inside the rail by shortening it. */
+#brand-name {
+  flex: none;
+}
+#brand-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   margin-left: auto;
   font: ${uiTokens.type.micro} / ${uiTokens.type.line.micro} ${uiTokens.type.mono};
   color: ${uiTokens.ink.tertiary};
-  border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
-  padding: 1px 5px;
-  border-radius: ${uiTokens.radius.xs};
+  letter-spacing: 0;
+}
+.workshop-search {
+  flex: none;
+  margin-bottom: 4px;
+}
+.workshop-search ${searchInput.control} {
+  font-size: ${uiTokens.type.label};
 }
 /* One small-caps label role, shared with the docs sidebar and story specimens. */
 .catalog-label {
   display: flex;
   justify-content: space-between;
-  padding: 20px 10px 8px;
+  align-items: center;
+  padding: 24px 10px 12px;
   color: ${uiTokens.ink.tertiary};
   font-size: ${uiTokens.type.micro};
   font-weight: ${uiTokens.type.weight.medium};
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
+#story-count {
+  font-family: ${uiTokens.type.mono};
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+}
 #catalog {
   flex: 1;
   overflow: auto;
   min-height: 0;
-  padding: 0 0 18px;
+  padding: 0 0 24px;
   scrollbar-width: thin;
+  scrollbar-color: ${uiTokens.line.edge} transparent;
+}
+/* NavList keeps its rows, titles and selection; the catalog only sets the density. */
+#catalog ${navList.root} {
+  gap: 20px;
+  font-size: ${uiTokens.type.label};
+}
+#catalog ${navList.group} {
+  gap: 2px;
+}
+#catalog ${navList.groupTitle} {
+  padding-block: 0 6px;
+}
+#catalog ${navList.item} {
+  min-height: 32px;
+  color: ${uiTokens.ink.secondary};
+}
+#catalog ${navList.item}[aria-current="page"] {
+  color: ${uiTokens.ink.primary};
 }
 .catalog-empty {
   margin: 12px 10px;
@@ -111,36 +209,6 @@ a {
 .workshop-observations > summary > strong {
   flex-shrink: 0;
 }
-.workshop-local {
-  border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
-  display: grid;
-  gap: 12px;
-  padding: 15px 10px;
-  color: ${uiTokens.ink.secondary};
-  font-size: ${uiTokens.type.micro};
-}
-.workshop-local-note {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-}
-/* Label above a full-width select, so the choice is never truncated. */
-.workshop-appearance {
-  display: grid;
-  gap: 6px;
-}
-.workshop-appearance select {
-  width: 100%;
-  min-height: ${uiTokens.control.small};
-  border-radius: ${uiTokens.radius.md};
-  font-size: ${uiTokens.type.label};
-}
-.status-dot {
-  width: 5px;
-  height: 5px;
-  background: ${uiTokens.status.success};
-  border-radius: 50%;
-}
 .workshop-main {
   position: relative;
   min-width: 0;
@@ -157,16 +225,21 @@ a {
   border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.edge};
   min-width: 0;
 }
-#group {
+.workshop-trail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
   font-size: ${uiTokens.type.caption};
+}
+#group {
   color: ${uiTokens.ink.secondary};
   white-space: nowrap;
 }
 .breadcrumb-separator {
-  color: ${uiTokens.line.control};
+  color: ${uiTokens.ink.tertiary};
 }
 #breadcrumb-component {
-  font-size: ${uiTokens.type.label};
   font-weight: ${uiTokens.type.weight.medium};
   margin: 0;
   min-width: 0;
@@ -174,24 +247,138 @@ a {
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-#standalone {
+.workshop-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   margin-left: auto;
-  display: grid;
-  place-items: center;
-  min-width: 30px;
-  min-height: 30px;
-  color: ${uiTokens.ink.secondary};
-  border-radius: ${uiTokens.radius.md};
+  flex: none;
 }
-#standalone:hover {
-  background: ${uiTokens.surface.fill};
+.workshop-host-links {
+  display: flex;
+  gap: 4px;
+}
+/* Quiet labeled links and icon buttons share the header's 32px line. */
+.workshop-header-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 0 10px;
+  border-radius: ${uiTokens.radius.md};
+  color: ${uiTokens.ink.secondary};
+  font-size: ${uiTokens.type.label};
+  font-weight: ${uiTokens.type.weight.medium};
+  white-space: nowrap;
+}
+.workshop-icon-button {
+  display: inline-grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  border: 0;
+  border-radius: ${uiTokens.radius.md};
+  background: transparent;
+  color: ${uiTokens.ink.secondary};
+  font: inherit;
+  cursor: pointer;
+}
+:is(.workshop-header-link, .workshop-icon-button):hover,
+.workshop-icon-button[aria-expanded="true"] {
+  background: ${uiTokens.state.hover};
   color: ${uiTokens.ink.primary};
+}
+#appearance-trigger > svg {
+  display: none;
+}
+#appearance-trigger[data-appearance="auto"] > .appearance-auto,
+#appearance-trigger[data-appearance="light"] > .appearance-light,
+#appearance-trigger[data-appearance="dark"] > .appearance-dark {
+  display: block;
+}
+/* The appearance panel: the theme and the scheme as two short radio lists. */
+#appearance:popover-open {
+  display: grid;
+  gap: 4px;
+  width: 208px;
+  padding: 6px;
+}
+#appearance fieldset {
+  display: grid;
+  margin: 0;
+  padding: 0;
+  border: 0;
+}
+#appearance fieldset + fieldset {
+  padding-top: 4px;
+  background: linear-gradient(${uiTokens.line.divider}, ${uiTokens.line.divider}) top / 100%
+    ${uiTokens.line.width} no-repeat;
+}
+#appearance legend {
+  float: left;
+  width: 100%;
+  padding: 8px 8px 4px;
+  color: ${uiTokens.ink.tertiary};
+  font-size: ${uiTokens.type.micro};
+  font-weight: ${uiTokens.type.weight.medium};
+  line-height: ${uiTokens.type.line.micro};
+  letter-spacing: ${uiTokens.type.trackingCaps};
+  text-transform: uppercase;
+}
+#appearance label {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: ${uiTokens.control.small};
+  padding: 0 8px;
+  border-radius: ${uiTokens.radius.md};
+  color: ${uiTokens.ink.secondary};
+  font-size: ${uiTokens.type.label};
+  line-height: ${uiTokens.type.line.label};
+  cursor: pointer;
+}
+#appearance label:hover {
+  background: ${uiTokens.state.hover};
+  color: ${uiTokens.ink.primary};
+}
+#appearance label:has(input:focus-visible) {
+  outline: 2px solid ${uiTokens.state.focus};
+  outline-offset: -2px;
+}
+/* The radio stays in the Tab and arrow-key order; the row shows its state. */
+#appearance input {
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+#appearance label > span {
+  flex: 1;
+}
+#appearance label::after {
+  content: "";
+  width: ${uiTokens.icon.small};
+  height: ${uiTokens.icon.small};
+  background: currentColor;
+  mask: ${uiTokens.glyph.check} center / contain no-repeat;
+  visibility: hidden;
+}
+#appearance label:has(input:checked) {
+  color: ${uiTokens.ink.primary};
+  font-weight: ${uiTokens.type.weight.medium};
+}
+#appearance label:has(input:checked)::after {
+  color: ${uiTokens.accent.ink};
+  visibility: visible;
 }
 #toggle-sidebar {
   display: none;
 }
 .workshop-intro {
-  padding: 22px 24px 0;
+  padding: 28px 24px 0;
   min-width: 0;
 }
 #title {
@@ -199,13 +386,13 @@ a {
   font-size: ${uiTokens.type.pageTitle};
   line-height: ${uiTokens.type.line.pageTitle};
   font-weight: ${uiTokens.type.weight.semibold};
-  letter-spacing: -0.02em;
+  letter-spacing: -0.025em;
 }
 #scenario-description {
-  margin: 6px 0 16px;
-  max-width: 76ch;
-  font-size: ${uiTokens.type.caption};
-  line-height: ${uiTokens.type.line.caption};
+  margin: 8px 0 16px;
+  max-width: 72ch;
+  font-size: ${uiTokens.type.body};
+  line-height: ${uiTokens.type.line.body};
   color: ${uiTokens.ink.secondary};
 }
 #variants {
@@ -219,10 +406,11 @@ a {
   flex-shrink: 0;
   display: flex;
   align-items: center;
-  min-height: 34px;
+  min-height: 36px;
   border-bottom: 2px solid transparent;
+  margin-bottom: -1px;
   color: ${uiTokens.ink.secondary};
-  font-size: ${uiTokens.type.caption};
+  font-size: ${uiTokens.type.label};
 }
 #variants a:hover,
 #variants a[aria-current="page"] {
@@ -230,6 +418,7 @@ a {
 }
 #variants a[aria-current="page"] {
   border-bottom-color: ${uiTokens.ink.primary};
+  font-weight: ${uiTokens.type.weight.medium};
 }
 .workshop-toolbar {
   display: flex;
@@ -238,13 +427,12 @@ a {
   gap: 12px;
   padding: 0 24px;
 }
-.preview-label {
+/* The view on the left, the instruments on the right. */
+.workshop-tools {
   display: flex;
   align-items: center;
-  gap: 7px;
-  color: ${uiTokens.ink.secondary};
-  font-size: ${uiTokens.type.micro};
-  margin-right: auto;
+  gap: 8px;
+  margin-left: auto;
 }
 /* The viewport switch is the library's track: same inset, concentric radii and thumb. */
 .workshop-viewport {
@@ -271,14 +459,13 @@ a {
 .viewport-size {
   font-size: ${uiTokens.type.micro};
   font-family: ${uiTokens.type.mono};
-  color: ${uiTokens.ink.secondary};
+  font-variant-numeric: tabular-nums;
+  color: ${uiTokens.ink.tertiary};
   min-width: 48px;
-  text-align: center;
 }
 #reset {
-  border-left: ${uiTokens.line.width} solid ${uiTokens.line.divider};
-  border-radius: 0;
-  padding-left: 14px;
+  width: ${uiTokens.control.small};
+  padding: 0;
 }
 /* The specimen sits on a recessed table, raised on the library's in-flow material. */
 .workshop-stage {
@@ -381,12 +568,23 @@ a {
   font-weight: ${uiTokens.type.weight.medium};
   margin-right: auto;
 }
+/* The newest line first, each on its own hairline row. */
 #events {
-  max-height: 80px;
+  max-height: 120px;
   overflow: auto;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
   font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
   color: ${uiTokens.ink.secondary};
-  padding-left: 18px;
+}
+#events li {
+  padding: 4px 0;
+  border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+  overflow-wrap: anywhere;
+}
+#events li:first-child {
+  color: ${uiTokens.ink.primary};
 }
 #events:empty {
   display: none;
@@ -443,16 +641,10 @@ a {
   .breadcrumb-separator {
     display: none;
   }
-  .preview-label {
-    display: none;
-  }
-  .workshop-viewport {
-    margin-right: auto;
-  }
   .workshop-stage {
     padding: 20px;
   }
-  #reset span {
+  #text-placeholder span {
     display: none;
   }
 }
@@ -489,6 +681,14 @@ a {
     display: inline-flex;
     padding: 0;
     min-width: 28px;
+  }
+  /* A phone keeps the docs link as its icon; related pages stay a tap away in the host site. */
+  .workshop-host-links,
+  #story-docs span {
+    display: none;
+  }
+  .workshop-tools {
+    margin-left: 0;
   }
   .workshop-toolbar {
     gap: 5px;
@@ -529,11 +729,12 @@ a {
 }
 @media (pointer: coarse) {
   #variants a,
-  #standalone,
+  .workshop-icon-button,
+  .workshop-header-link,
   #toggle-sidebar {
     min-height: 44px;
   }
-  #standalone,
+  .workshop-icon-button,
   #toggle-sidebar {
     min-width: 44px;
   }

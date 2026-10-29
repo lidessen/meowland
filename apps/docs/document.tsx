@@ -4,10 +4,23 @@ import { h, type Child } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
 import { Breadcrumb, NavList, SearchInput, type NavListGroup } from "meowtail";
 import { Icon, IconSource, type IconSourceProps } from "meowtail/icons";
-import { BookOpen, Monitor, Moon, Palette, PawPrint, Sun } from "meowtail/icons/lucide";
+import {
+  BookOpen,
+  LayoutPanelLeft,
+  Monitor,
+  Moon,
+  Palette,
+  PawPrint,
+  Sun,
+} from "meowtail/icons/lucide";
 import type { Catalog, NavigationGroup } from "./catalog";
 import type { DocsPackage } from "./packages";
-import { DOCS_THEME_ATTRIBUTE, DOCS_THEMES } from "./theme";
+import {
+  DOCS_APPEARANCE_STORE,
+  DOCS_THEME_ATTRIBUTE,
+  DOCS_THEME_STORE,
+  DOCS_THEMES,
+} from "./theme";
 
 /** The name the site gives itself. */
 export const SITE_NAME = "Meowland";
@@ -17,8 +30,8 @@ export const SITE_DESCRIPTION =
   "A small UI capability library: a JSX runtime, a style system, a component library, a presentation engine, a workbench and a site generator.";
 
 /** The light and dark variants of the site mark. */
-const LIGHT_LOGO = "meowland-logo-a.svg";
-const DARK_LOGO = "meowland-logo-c.svg";
+export const LIGHT_LOGO = "meowland-logo-a.svg";
+export const DARK_LOGO = "meowland-logo-c.svg";
 
 function logoHref(depth: number, asset: string): string {
   return depth <= 0 ? `./${asset}` : `${"../".repeat(depth)}${asset}`;
@@ -159,8 +172,8 @@ const PREVIEW_FIT = `(() => {
  * The reader's appearance and theme choices, applied before the stylesheet paints so no page
  * flashes.
  */
-const APPEARANCE_STORE = "meowland-docs-appearance";
-const THEME_STORE = "meowland-docs-theme";
+const APPEARANCE_STORE = DOCS_APPEARANCE_STORE;
+const THEME_STORE = DOCS_THEME_STORE;
 const APPEARANCE_EARLY = `(() => {
   try {
     const choice = localStorage.getItem("${APPEARANCE_STORE}");
@@ -544,7 +557,7 @@ function sidebarGroups(catalog: Catalog, packages: DocsPackage[]): NavListGroup[
       items: [
         { id: "", href: "/", label: "Home" },
         { id: "components", href: "/components/", label: "Components" },
-        { id: "gallery", href: "/gallery/", label: "Component workbench" },
+        { id: "gallery", href: "/gallery/", label: "Component playground" },
       ],
     },
     {
@@ -568,7 +581,7 @@ function sidebarGroups(catalog: Catalog, packages: DocsPackage[]): NavListGroup[
 
 /**
  * The pages before and after this one in sidebar order, so a reader can keep going without
- * returning to the rail. The workbench is a separate app, not a page in the sequence.
+ * returning to the rail. The playground is a separate app, not a page in the sequence.
  */
 function Pager({
   catalog,
@@ -765,9 +778,9 @@ function Document({
                   </fieldset>
                 </div>
               </div>
-              <a className="docs-header-link" href="/gallery/" aria-label="Workbench">
-                <span>Workbench</span>
-                <Icon name="arrow-up-right" size={14} />
+              <a className="docs-header-link" href="/gallery/">
+                <IconSource source={LayoutPanelLeft} size={14} />
+                <span>Playground</span>
               </a>
             </header>
             <main className={path === "" ? "docs-content docs-content-home" : "docs-content"}>

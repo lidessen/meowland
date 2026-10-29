@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-test("gallery appearance persists and auto follows the system without remounting canvas", async ({
+test("one appearance paints tool and canvas, persists and auto follows the system without remounting", async ({
   page,
 }) => {
   await page.emulateMedia({ colorScheme: "light" });
@@ -8,25 +8,33 @@ test("gallery appearance persists and auto follows the system without remounting
   const frame = page.frameLocator("#canvas");
   await expect(frame.locator("#story-state")).toHaveAttribute("data-status", "ready");
   await frame.getByRole("textbox", { name: "Draft" }).fill("Input retained across preview");
-  const appearance = page.getByRole("combobox", { name: "Tool appearance" });
+  const trigger = page.getByRole("button", { name: "Appearance" });
+  const panel = page.getByRole("dialog", { name: "Appearance" });
   const light = await page
     .locator(".workshop-sidebar")
     .evaluate((el) => getComputedStyle(el).backgroundColor);
-  await appearance.selectOption("dark");
+  await trigger.click();
+  await panel.getByRole("radio", { name: "Dark" }).check();
   const dark = await page
     .locator(".workshop-sidebar")
     .evaluate((el) => getComputedStyle(el).backgroundColor);
   expect(dark).not.toBe(light);
+  await expect(frame.locator("html")).toHaveAttribute("data-meowui-color-scheme", "dark");
   await expect(frame.getByRole("textbox", { name: "Draft" })).toHaveValue(
     "Input retained across preview",
   );
   await page.reload();
-  await expect(appearance).toHaveValue("dark");
-  await appearance.selectOption("auto");
+  await expect(frame.locator("html")).toHaveAttribute("data-meowui-color-scheme", "dark");
+  await trigger.click();
+  await expect(panel.getByRole("radio", { name: "Dark" })).toBeChecked();
+  await panel.getByRole("radio", { name: "System" }).check();
   await page.emulateMedia({ colorScheme: "dark" });
   await expect(page.locator(".workshop-sidebar")).toHaveCSS("background-color", dark);
   await page.emulateMedia({ colorScheme: "light" });
   await expect(page.locator(".workshop-sidebar")).toHaveCSS("background-color", light);
+  // The embedded canvas leaves the controls to the gallery; the standalone link keeps its own.
+  await expect(frame.locator("html")).toHaveAttribute("data-meowui-color-scheme", "auto");
+  await expect(page.locator("#standalone")).not.toHaveAttribute("href", /embedded/);
 });
 
 test("catalog is a labelled NavList with groups, anchors, current story and search that keeps focus", async ({

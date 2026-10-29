@@ -497,7 +497,10 @@ same `standardThemeStyles` and supplies different values for the same `ui` roles
 and ink, Newsreader titles and reading copy over Inter controls, JetBrains Mono code, an oxblood
 accent, quiet hairlines, small radii and soft warm depth. Titles take a book weight (500), reading
 copy is 19 / 33 in a softer ink under full-ink headings on a 680px column, and quotations are italic.
-The theme names those fonts first and falls back to system faces; the host loads the font files.
+The theme names those fonts first and falls back to system faces. `journalFonts` lists the Fontsource
+packages that carry them (Newsreader with its italic, Inter, JetBrains Mono); Meowtail ships no font
+files, so the host installs those packages and loads them, for example by passing the list to
+Meowpress as `fonts`.
 Control heights, icon sizes and code sizes keep the standard values. Mount it instead of `standardTheme`; components, markup and heading structure do
 not change.
 

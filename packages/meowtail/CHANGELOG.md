@@ -22,6 +22,8 @@
   ink, actions and inverse surfaces with one red accent. Only colors differ from the standard values.
   Export `meowUiTokenValues`, `meowUiTokens` and `meowThemeTokens`.
 - The Meowbook gallery's Theme control switches every story between Standard, Journal and Meow.
+- Add `journalFonts` and the `ThemeFont` type: the Fontsource packages that carry the faces Journal
+  names. Meowtail ships no font files. The gallery paints Journal stories with those faces.
 
 ## 0.3.0-alpha.0
 

@@ -1,5 +1,6 @@
 import { previewStyles } from "./preview.styles";
 import { languageStyles } from "./language.styles";
+import { journalFontFaces } from "./journal-fonts";
 import { defaultRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { installMeowUI, meowUIComponents, Select } from "meowtail";
@@ -44,7 +45,13 @@ const preview: PreviewEnvironment = ({ root, onCleanup }) => {
   const themeKey = chosenTheme();
   const theme = themes[themeKey];
   onCleanup(
-    mountStyles(root.ownerDocument, theme.cssText + previewStyles.text + languageStyles.text),
+    mountStyles(
+      root.ownerDocument,
+      (themeKey === "journal" ? journalFontFaces + "\n" : "") +
+        theme.cssText +
+        previewStyles.text +
+        languageStyles.text,
+    ),
   );
   onCleanup(applyTheme(scope, theme));
   if (scope.dataset.meowbookCapture === "true") {

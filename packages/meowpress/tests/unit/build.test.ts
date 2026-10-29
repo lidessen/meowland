@@ -57,6 +57,9 @@ test("builds Markdown and MDX while excluding draft pages and assets", async () 
     const cssText = await Bun.file(join(output, "posts/public", styleHref)).text();
     expect(cssText).toContain(tokens.ink.name);
     expect(cssText).not.toContain(blogTokens.bg.name);
+    // A theme without fonts publishes no font files or licenses.
+    expect(await Bun.file(join(output, "licenses/geist-OFL.txt")).exists()).toBe(false);
+    expect(cssText).not.toContain("@font-face");
     expect(mdx).toContain("MDX fixture content");
     expect(mdx).toContain("mdx-callout");
     expect(await Bun.file(join(output, "thoughts/note/index.html")).text()).toContain(
@@ -82,8 +85,17 @@ test("builds Markdown and MDX while excluding draft pages and assets", async () 
     const defaultHref = home.match(/href="([^" ]+\.css)"/)![1]!;
     const defaultCSS = await Bun.file(join(output, defaultHref)).text();
     expect(defaultCSS).toContain("@font-face");
-    expect(defaultCSS).toContain("data:font/woff2;base64,");
+    expect(defaultCSS).toContain("unicode-range");
+    expect(defaultCSS).not.toContain("data:font");
     expect(defaultCSS).not.toContain("@import");
+    // Each subset is its own published file, referenced next to the stylesheet at the root.
+    const fontFiles = [...defaultCSS.matchAll(/url\(\.\/(fonts\/[^)]+\.woff2)\)/g)].map(
+      (match) => match[1]!,
+    );
+    expect(fontFiles.some((file) => /geist-latin-wght-normal-[0-9a-f]{8}\.woff2$/.test(file))).toBe(
+      true,
+    );
+    for (const file of fontFiles) expect(await Bun.file(join(output, file)).exists()).toBe(true);
     expect(defaultCSS).not.toContain("node_modules");
     expect(await Bun.file(join(output, "licenses/geist-OFL.txt")).text()).toContain(
       "SIL OPEN FONT LICENSE Version 1.1",

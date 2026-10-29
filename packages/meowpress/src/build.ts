@@ -1,9 +1,9 @@
 import { type ThemeDefinition } from "meowcss";
-import { blogTheme } from "./theme";
+import { blogFonts, blogTheme } from "./theme";
+import { FONT_EXTERNAL, publishFonts, type SiteFont } from "./fonts";
 import { DEFAULT_SITE, type SiteIdentity } from "./identity";
 import { mkdir, rm, writeFile, cp } from "node:fs/promises";
 import { isAbsolute, join, relative, resolve } from "node:path";
-import { fileURLToPath } from "node:url";
 import {
   collectContentAssets,
   isDraftAsset,
@@ -30,6 +30,7 @@ import { sitePageFile, type SitePage, type SitePageProvider } from "./pages";
 
 export type { SitePage, SitePageContext, SitePageProvider } from "./pages";
 export type { ContentItem } from "./content";
+export type { SiteFont } from "./fonts";
 export type { SiteIdentity } from "./identity";
 
 export interface SiteConfig {
@@ -51,6 +52,11 @@ export interface SiteConfig {
   mdxComponents?: Record<string, MdxComponent>;
   /** Stylesheet file name for the theme; defaults to "blog-theme.css". */
   themeStylesheet?: string;
+  /**
+   * Web fonts the theme names, published as separate files with their licenses. Defaults to Geist
+   * for the default Blog theme and to none for any other theme.
+   */
+  fonts?: readonly SiteFont[];
 }
 
 export interface ResolvedSiteConfig {
@@ -63,6 +69,7 @@ export interface ResolvedSiteConfig {
   pages?: SitePageProvider;
   mdxComponents: Record<string, MdxComponent>;
   themeStylesheet: string;
+  fonts: readonly SiteFont[];
 }
 
 /** Define a site config in the app package without taking on the build pipeline. */
@@ -79,6 +86,8 @@ export function meowSite(config: SiteConfig): ResolvedSiteConfig {
     pages: config.pages,
     mdxComponents: config.mdxComponents ?? {},
     themeStylesheet: config.themeStylesheet ?? DEFAULT_THEME_STYLESHEET,
+    fonts:
+      config.fonts ?? (config.theme === undefined || config.theme === blogTheme ? blogFonts : []),
   };
 }
 
@@ -136,6 +145,8 @@ async function buildStaticHtmlFromEntrypoints(
     outdir: outputDirectory,
     target: "browser",
     minify: true,
+    // Published font files stay separate, so subsets load by unicode-range instead of inline.
+    external: [FONT_EXTERNAL],
   });
   if (!result.success) {
     console.error(result.logs);
@@ -288,24 +299,16 @@ export async function buildSite(input: SiteConfig | ResolvedSiteConfig): Promise
     }
   }
 
+  // Font faces come first in the one theme stylesheet; the bundled stylesheet sits at the output
+  // root, next to the published font directory its rules reference.
+  const fontFaces = await publishFonts(config.fonts, config.outputDirectory);
   await writeFile(
     join(generatedDirectory, config.themeStylesheet),
-    config.theme.cssText.replaceAll(
-      '"@fontsource-variable/geist"',
-      JSON.stringify(fileURLToPath(import.meta.resolve("@fontsource-variable/geist"))),
-    ),
+    fontFaces ? `${fontFaces}\n${config.theme.cssText}` : config.theme.cssText,
     "utf8",
   );
   await stageAssets(generatedDirectory, config.content);
   await buildStaticHtmlFromEntrypoints(entrypoints, generatedDirectory, config.outputDirectory);
-  if (config.theme.cssText.includes('"@fontsource-variable/geist"')) {
-    const licensesDirectory = join(config.outputDirectory, "licenses");
-    await mkdir(licensesDirectory, { recursive: true });
-    await cp(
-      fileURLToPath(import.meta.resolve("@fontsource-variable/geist/LICENSE")),
-      join(licensesDirectory, "geist-OFL.txt"),
-    );
-  }
   await copyPostAssets(config.outputDirectory, config.content);
   await Promise.all([
     writeFile(

@@ -1,4 +1,4 @@
-import { compileTokens, defineTokens } from "meowcss";
+import { compileTokens, defineTokens, type TokenSet } from "meowcss";
 import { css, defineTheme, parts } from "meowcss/meowjsx";
 import type {
   Breadcrumb,
@@ -13,6 +13,7 @@ import type {
   Table,
 } from "meowtail";
 import {
+  journalUiTokens,
   meowUiTokens,
   standardOptions,
   standardThemeStyles,
@@ -45,24 +46,33 @@ export const docsTokens = defineTokens("docs", {
 /** The root attribute that selects the reader's site theme; standard when absent. */
 export const DOCS_THEME_ATTRIBUTE = "data-docs-theme";
 
+/** The site themes a reader can choose besides standard, as the gallery's `theme` parameter names them. */
+export const DOCS_THEMES = ["journal", "meow"] as const;
+export type DocsTheme = "standard" | (typeof DOCS_THEMES)[number];
+
 /**
- * The Meow values of the same `--ui-*` roles, in force under `data-docs-theme="meow"`. The site
- * keeps one stylesheet and one theme root, so switching themes is one attribute and needs no
+ * One theme's values of the same `--ui-*` roles, in force under `data-docs-theme="<name>"`. The
+ * site keeps one stylesheet and one theme root, so switching themes is one attribute and needs no
  * reload. These rules have the same zero specificity as the standard ones and follow them, so they
  * win for every scheme.
  */
-const meowScope = `[${DOCS_THEME_ATTRIBUTE}="meow"]`;
-export const docsMeowTokenStyles = css`
-  ${compileTokens(meowUiTokens, {
-    constants: `:where(${meowScope}[data-meowui-theme-root], ${meowScope} [data-meowui-theme-root])`,
-    sources: [
-      {
-        options: "scheme",
-        selector: `:where(${meowScope}[data-meowui-scope], ${meowScope} [data-meowui-scope])`,
-      },
-    ],
-  })}
-`;
+function scopedThemeTokens(name: (typeof DOCS_THEMES)[number], tokens: TokenSet) {
+  const scope = `[${DOCS_THEME_ATTRIBUTE}="${name}"]`;
+  return css`
+    ${compileTokens(tokens, {
+      constants: `:where(${scope}[data-meowui-theme-root], ${scope} [data-meowui-theme-root])`,
+      sources: [
+        {
+          options: "scheme",
+          selector: `:where(${scope}[data-meowui-scope], ${scope} [data-meowui-scope])`,
+        },
+      ],
+    })}
+  `;
+}
+
+export const docsJournalTokenStyles = scopedThemeTokens("journal", journalUiTokens);
+export const docsMeowTokenStyles = scopedThemeTokens("meow", meowUiTokens);
 
 /** A reading environment built from the shared palette and component metadata. */
 export const docsStyles = css`
@@ -1366,5 +1376,5 @@ export const docsTheme = defineTheme({
   options: standardOptions,
   defaults: { scheme: "auto" },
   tokens: [...standardThemeTokens, docsTokens],
-  styles: [...standardThemeStyles, docsMeowTokenStyles, docsStyles],
+  styles: [...standardThemeStyles, docsJournalTokenStyles, docsMeowTokenStyles, docsStyles],
 });

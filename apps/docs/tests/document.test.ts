@@ -284,7 +284,7 @@ describe("the reader's controls", () => {
     expect(html).toMatch(/<button class="docs-appearance" id="docs-appearance"[^>]*hidden/);
     const panel = html.slice(html.indexOf('id="docs-appearance-panel"'));
     expect(panel).toMatch(/^id="docs-appearance-panel" hidden/);
-    for (const value of ["standard", "meow"])
+    for (const value of ["standard", "journal", "meow"])
       expect(panel).toContain(`name="docs-theme" value="${value}"`);
     for (const value of ["auto", "light", "dark"])
       expect(panel).toContain(`name="docs-scheme" value="${value}"`);

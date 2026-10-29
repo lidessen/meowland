@@ -4,10 +4,10 @@ import { h, type Child } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
 import { Breadcrumb, NavList, SearchInput, type NavListGroup } from "meowtail";
 import { Icon, IconSource, type IconSourceProps } from "meowtail/icons";
-import { Monitor, Moon, Palette, PawPrint, Sun } from "meowtail/icons/lucide";
+import { BookOpen, Monitor, Moon, Palette, PawPrint, Sun } from "meowtail/icons/lucide";
 import type { Catalog, NavigationGroup } from "./catalog";
 import type { DocsPackage } from "./packages";
-import { DOCS_THEME_ATTRIBUTE } from "./theme";
+import { DOCS_THEME_ATTRIBUTE, DOCS_THEMES } from "./theme";
 
 /** The name the site gives itself. */
 export const SITE_NAME = "Meowland";
@@ -149,8 +149,9 @@ const APPEARANCE_EARLY = `(() => {
     const choice = localStorage.getItem("${APPEARANCE_STORE}");
     if (choice === "light" || choice === "dark")
       document.documentElement.setAttribute("data-meowui-color-scheme", choice);
-    if (localStorage.getItem("${THEME_STORE}") === "meow")
-      document.documentElement.setAttribute("${DOCS_THEME_ATTRIBUTE}", "meow");
+    const theme = localStorage.getItem("${THEME_STORE}");
+    if (${JSON.stringify(DOCS_THEMES)}.includes(theme))
+      document.documentElement.setAttribute("${DOCS_THEME_ATTRIBUTE}", theme);
   } catch {}
 })();`;
 
@@ -167,7 +168,11 @@ const APPEARANCE_MENU = `(() => {
   const names = { auto: "System", light: "Light", dark: "Dark" };
   const root = document.documentElement;
   const scheme = () => root.getAttribute("data-meowui-color-scheme") || "auto";
-  const theme = () => (root.getAttribute("${DOCS_THEME_ATTRIBUTE}") === "meow" ? "meow" : "standard");
+  const themes = { standard: "Standard", journal: "Journal", meow: "Meow" };
+  const theme = () => {
+    const choice = root.getAttribute("${DOCS_THEME_ATTRIBUTE}");
+    return choice in themes ? choice : "standard";
+  };
   const frames = () => document.querySelectorAll("iframe.docs-preview-frame");
   const paintScheme = (choice) => {
     for (const frame of frames()) {
@@ -188,7 +193,7 @@ const APPEARANCE_MENU = `(() => {
   const show = () => {
     const choice = scheme();
     button.setAttribute("data-appearance", choice);
-    button.title = "Appearance: " + (theme() === "meow" ? "Meow" : "Standard") + ", " + names[choice];
+    button.title = "Appearance: " + themes[theme()] + ", " + names[choice];
     for (const input of panel.querySelectorAll("input")) {
       input.checked = input.value === (input.name === "docs-theme" ? theme() : choice);
     }
@@ -204,11 +209,11 @@ const APPEARANCE_MENU = `(() => {
   panel.addEventListener("change", (event) => {
     const input = event.target;
     if (input.name === "docs-theme") {
-      if (input.value === "meow") root.setAttribute("${DOCS_THEME_ATTRIBUTE}", "meow");
-      else root.removeAttribute("${DOCS_THEME_ATTRIBUTE}");
+      if (input.value === "standard") root.removeAttribute("${DOCS_THEME_ATTRIBUTE}");
+      else root.setAttribute("${DOCS_THEME_ATTRIBUTE}", input.value);
       try {
-        if (input.value === "meow") localStorage.setItem("${THEME_STORE}", "meow");
-        else localStorage.removeItem("${THEME_STORE}");
+        if (input.value === "standard") localStorage.removeItem("${THEME_STORE}");
+        else localStorage.setItem("${THEME_STORE}", input.value);
       } catch {}
       paintTheme(input.value);
     } else {
@@ -721,6 +726,9 @@ function Document({
                     <legend>Theme</legend>
                     <AppearanceChoice group="docs-theme" value="standard" icon={Palette}>
                       Standard
+                    </AppearanceChoice>
+                    <AppearanceChoice group="docs-theme" value="journal" icon={BookOpen}>
+                      Journal
                     </AppearanceChoice>
                     <AppearanceChoice group="docs-theme" value="meow" icon={PawPrint}>
                       Meow

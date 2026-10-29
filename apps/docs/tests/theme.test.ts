@@ -1,7 +1,7 @@
 import { expect, test } from "bun:test";
 import { auditCSS } from "meowcss";
 import { standardAuditRules } from "meowtail/theme";
-import { docsMeowTokenStyles, docsStyles, docsTheme } from "../theme";
+import { docsJournalTokenStyles, docsMeowTokenStyles, docsStyles, docsTheme } from "../theme";
 
 test("the docs chrome holds to the standard scales, the type ramp included", () => {
   expect(auditCSS(docsStyles, standardAuditRules)).toEqual([]);
@@ -15,4 +15,11 @@ test("the Meow values follow the standard ones and apply only under the site's t
   expect(declarations.length).toBeGreaterThan(0);
   for (const selector of declarations) expect(selector).toContain('[data-docs-theme="meow"]');
   expect(docsMeowTokenStyles.text).toContain("--ui-accent-base: #e71c22;");
+});
+
+test("the Journal values apply only under its own theme attribute", () => {
+  const declarations = docsJournalTokenStyles.text.match(/^[^{}@]+\{/gm) ?? [];
+  expect(declarations.length).toBeGreaterThan(0);
+  for (const selector of declarations) expect(selector).toContain('[data-docs-theme="journal"]');
+  expect(docsJournalTokenStyles.text).toContain("Newsreader");
 });

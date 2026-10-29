@@ -359,7 +359,7 @@ The parts are `root/trigger/value/indicator/list/group/option/native/validation`
 - Dialogs: Dialog, DialogPanel, DialogHeader, DialogActions.
 - Chat: ChatFrame, ChatHeader, ChatStatus, ChatConversation, ChatMessageList, ChatMessage, ChatBubble,
   ChatMessageActions, ChatComposer, ChatToolCall, ChatAttachments, ChatProcess, ChatSources.
-- Icons: the finite semantic set `Icon` and `iconNames` sourced from the pinned Lucide dependency, caller-supplied `IconSource` and `IconNode`, and the `meowtail/icons/lucide` pass-through for application icons, plus MeowlandMark, AssistantMark, DoodleCat, EmptyStack, NotesIcon, TasksIcon, SearchIcon, PlusIcon, GithubIcon, ExternalArrowIcon.
+- Icons: the finite semantic set `Icon` and `iconNames` sourced from the pinned Lucide dependency, caller-supplied `IconSource` and `IconNode`, and the `meowtail/icons/lucide` pass-through for application icons, plus MeowlandMark, AssistantMark, EmptyStack, NotesIcon, TasksIcon, SearchIcon, PlusIcon, GithubIcon, ExternalArrowIcon.
 
 Icons outside the semantic set go through `IconSource` with structural `IconNode` data from a trusted source. The pinned pass-through at `meowtail/icons/lucide` re-exports the installed Lucide version, so an application can use any Lucide icon without adding its own icon dependency; JSON surfaces keep only the finite `iconNames` set:
 

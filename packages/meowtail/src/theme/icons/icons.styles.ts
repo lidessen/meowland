@@ -59,22 +59,4 @@ export const iconsStyles = css`
   .meow-empty-stack .empty-stack-line.is-short {
     opacity: 0.7;
   }
-  .meow-doodle-cat {
-    width: 120px;
-    height: auto;
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
-  }
-  .meow-doodle-cat .empty-cat-body {
-    fill: ${uiTokens.surface.knockout};
-  }
-  .meow-doodle-cat .empty-cat-face {
-    stroke-width: 3;
-  }
-  .meow-doodle-cat .empty-cat-whisker {
-    opacity: 0.55;
-  }
 `;

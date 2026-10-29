@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+- Remove the `DoodleCat` illustration and its public export.
+
 - Add `journalTheme`, a second concrete theme for blogs and long-form reading, assembled from the
   standard rules with Journal values for the same `ui` roles. Export `journalUiTokenValues`,
   `journalUiTokens`, `journalThemeTokens`, `standardUiTokenValues` and the `UiTokenValues` /

@@ -1,8 +1,9 @@
 import { h, type Child } from "meowjsx";
 import type { ThemeDefinition } from "meowcss";
-import { Badge, Inline, Link, Page, PageHeader, Prose, Section, Stack } from "meowtail";
+import { Badge, Link, Page, PageHeader, Prose, Section, Stack } from "meowtail";
 import * as meowtail from "meowtail";
-import { Icon } from "meowtail/icons";
+import { Icon, IconSource } from "meowtail/icons";
+import { BookOpen, LayoutPanelLeft } from "meowtail/icons/lucide";
 import type { ContentItem, SitePage } from "meowpress/build";
 import type { StoryEntry } from "meowbook";
 import type { Catalog, CatalogComponent, CatalogExample } from "./catalog";
@@ -228,16 +229,35 @@ function HomePage({ state }: { state: DocsState }): Child {
         title="Components"
         description={`${componentCount} components. Each one lists its style axes and DOM parts; the ones the stories cover also show a live example and the code behind it.`}
       >
-        <Stack gap="compact">
-          <Inline gap="compact" wrap>
-            <Link href="/components/button/">Browse the component reference</Link>
-            <Link href="/gallery/">Open the component playground</Link>
-          </Inline>
-          <Note>
-            The playground is the same gallery the library ships: every story the components
-            declare, in one list.
-          </Note>
-        </Stack>
+        {/* The two ways into the components, laid out like the packages above them. */}
+        <div className="docs-package-grid">
+          <a className="docs-package-link" href="/components/">
+            <span className="docs-package-number">
+              <IconSource source={BookOpen} size={16} />
+            </span>
+            <div>
+              <strong>Component reference</strong>
+              <p>
+                One page per component: its live examples, the code behind them, its style axes and
+                its DOM parts.
+              </p>
+              <span className="docs-package-version">/components/</span>
+            </div>
+          </a>
+          <a className="docs-package-link" href="/gallery/">
+            <span className="docs-package-number">
+              <IconSource source={LayoutPanelLeft} size={16} />
+            </span>
+            <div>
+              <strong>Component playground</strong>
+              <p>
+                Every story the components declare, in one list: try each one at any width, with
+                annotations and checks.
+              </p>
+              <span className="docs-package-version">/gallery/</span>
+            </div>
+          </a>
+        </div>
       </Section>
       <Section
         id="architecture"

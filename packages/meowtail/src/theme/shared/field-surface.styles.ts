@@ -2,18 +2,22 @@ import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import { selectorForPart } from "../selectors";
 
+import type { Autocomplete } from "../../components/autocomplete";
 import type { ChoiceSelect } from "../../components/choice-select";
 import type { Input } from "../../components/input";
 import type { NumberInput } from "../../components/number-input";
 import type { SearchInput } from "../../components/search-input";
 import type { Select } from "../../components/select";
 import type { Textarea } from "../../components/textarea";
+import type { TokenField } from "../../components/token-field";
+const autocompletePartRefs = parts<typeof Autocomplete>("autocomplete");
 const choiceSelectPartRefs = parts<typeof ChoiceSelect>("choice-select");
 const inputPartRefs = parts<typeof Input>("input");
 const numberInputPartRefs = parts<typeof NumberInput>("number-input");
 const searchInputPartRefs = parts<typeof SearchInput>("search-input");
 const selectPartRefs = parts<typeof Select>("select");
 const textareaPartRefs = parts<typeof Textarea>("textarea");
+const tokenFieldPartRefs = parts<typeof TokenField>("token-field");
 /*
  * One surface for every place a reader types or picks a value. Each family
  * keeps its own layout in its own file; the resting box, the single-line
@@ -28,15 +32,17 @@ const select = selectorForPart(selectPartRefs.root);
 const choice = selectorForPart(choiceSelectPartRefs.trigger);
 const search = selectorForPart(searchInputPartRefs.root);
 const number = selectorForPart(numberInputPartRefs.root);
+const suggest = selectorForPart(autocompletePartRefs.input);
+const tokens = selectorForPart(tokenFieldPartRefs.control);
 
-const surfaces = `:where(${input}, ${textarea}, ${select}, ${choice}, ${search}, ${number})`;
-const singleLine = `:where(${input}, ${select}:not([multiple]):is(:not([size]), [size="0"], [size="1"]), ${choice}, ${search}, ${number})`;
+const surfaces = `:where(${input}, ${textarea}, ${select}, ${choice}, ${search}, ${number}, ${suggest}, ${tokens})`;
+const singleLine = `:where(${input}, ${select}:not([multiple]):is(:not([size]), [size="0"], [size="1"]), ${choice}, ${search}, ${number}, ${suggest}, ${tokens})`;
 /* Where focus lands: the element itself, or the wrapper around a bare control. */
-const focused = `:where(${input}:focus-visible, ${textarea}:focus-visible, ${select}:focus-visible, ${choice}:focus-visible, ${choice}[aria-expanded="true"], ${search}:focus-within, ${number}:focus-within)`;
-const invalid = `:where(${input}[aria-invalid="true"], ${textarea}[aria-invalid="true"], ${select}[aria-invalid="true"], ${choice}[aria-invalid="true"], ${search}:has([aria-invalid="true"]), ${number}:has([aria-invalid="true"]))`;
+const focused = `:where(${input}:focus-visible, ${textarea}:focus-visible, ${select}:focus-visible, ${choice}:focus-visible, ${choice}[aria-expanded="true"], ${search}:focus-within, ${number}:focus-within, ${suggest}:focus-visible, ${tokens}:has(> input:focus-visible))`;
+const invalid = `:where(${input}[aria-invalid="true"], ${textarea}[aria-invalid="true"], ${select}[aria-invalid="true"], ${choice}[aria-invalid="true"], ${search}:has([aria-invalid="true"]), ${number}:has([aria-invalid="true"]), ${suggest}[aria-invalid="true"], ${tokens}:has(input[aria-invalid="true"]))`;
 /* Read-only text stays at full contrast; only the surface steps back. */
-const readOnly = `:where(${input}[readonly], ${textarea}[readonly], ${search}:has([readonly]), ${number}:has([readonly]))`;
-const disabled = `:where(${input}:disabled, ${textarea}:disabled, ${select}:disabled, ${choice}:disabled, ${search}:has(:disabled), ${number}:has(:disabled))`;
+const readOnly = `:where(${input}[readonly], ${textarea}[readonly], ${search}:has([readonly]), ${number}:has([readonly]), ${suggest}[readonly])`;
+const disabled = `:where(${input}:disabled, ${textarea}:disabled, ${select}:disabled, ${choice}:disabled, ${search}:has(:disabled), ${number}:has(:disabled), ${suggest}:disabled, ${tokens}:has(input:disabled))`;
 
 export const fieldSurfaceStyles = css`
   ${surfaces} {

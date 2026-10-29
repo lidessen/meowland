@@ -130,6 +130,8 @@ Wrapping changes only the display; copying preserves the original whitespace. Wh
 clipboard implementation, and the component does not execute code. With no language it shows "Code", and `defaultWrap` sets the initial wrap state.
 Unknown languages or failed highlight loads keep a plain-text display.
 
+`Chart type categories series` draws host data as bars (comparison, always from zero) or a line (trend), up to eight series in the fixed `chartTokens` order; later series are left out with a console warning, and values are padded or cut to the categories, with `null` as a missing value. A legend names every series when there are two or more, line markers differ by shape, the plot wrapper takes focus and reads each category through a polite status as the arrow keys move, and Show data opens every value as a `Table`. The width follows the container; `type` is fixed for the mount.
+
 `Checkbox`, `Switch`, and `SegmentedControl` provide native form selection; `Tabs` handles switching panels that stay mounted.
 A `Checkbox` can be `indeterminate` for a parent of mixed children; assistive technology reads `aria-checked="mixed"`.
 `Slider` is a native range with a visible figure for the same value; `NumberInput` steps and clamps a number and formats the committed figure.
@@ -331,6 +333,7 @@ Nesting does not mean borders and shadows must be repeated. Complex content stil
 it supports arrow keys, Home/End, a controlled value Signal, and defaultValue. Panels stay mounted when switching, so drafts are not lost.
 `Breadcrumb items` is an array of label/href, and the last item marks the current location.
 `Pagination page pageCount onPageChange` moves through a host-owned record set: a known total shows the first and last page, the current page with `siblings` on each side (default 1) and gaps, at a constant count; omitting `pageCount` keeps Previous/Next and the page fact (`pageStatus`), and `hasNext` says whether a later page exists. In a bar narrower than 32rem the theme shows the page fact in place of the numbered pages, so Previous and Next stay on one line. Clicks only call `onPageChange`. `busy` sets `aria-busy` and keeps the controls in place without acting; boundaries and busy use `aria-disabled`, so focus stays on the control. `paginationEntries(page, pageCount, siblings)` exposes the same window; a non-integer or out-of-range page fact throws `RangeError`.
+`TreeView label items` explores a host hierarchy with the tree keyboard model: Up/Down through visible rows, Right/Left to open, close and climb, Home/End, `*` to open siblings and a letter to jump. `expanded`/`defaultExpanded`/`onExpandedChange` and `selected`/`defaultSelected`/`onSelectedChange` follow the controlled-or-local rule; one row holds the tab stop, disabled rows stay focusable but unselectable, and when the host collapses or removes the focused row, focus moves to its nearest visible ancestor. The chevron is pointer-only; no focusable control sits inside a row.
 `Tooltip` uses `trigger(bindings)` to add text descriptions to named focusable controls; it appears after a mouse delay, appears immediately on keyboard focus,
 and closes on Escape; do not put necessary information or interactive content only in a Tooltip—use Popover for the latter.
 `Alert tone` expresses visual state, and `role` explicitly chooses status/alert; urgency is not inferred from color. `tone="neutral"` is the quiet notice: the same structure, tinted with the muted ink instead of a status color.
@@ -368,6 +371,9 @@ trigger. Error messages use the browser's native validation copy. Reset restores
 The theme visually hides the native form carrier; a hidden input is not used to fake required validation. It provides no custom multiple selection or asynchronous search.
 The parts are `root/trigger/value/indicator/list/group/option/native/validation`.
 
+`Autocomplete suggestions value onValueChange` keeps focus in a real text input (`role="combobox"`) while the arrow keys move through the host's suggestions; Enter accepts the active one without submitting the form, and any other text stays valid. The host filters and loads; `loading` and `emptyMessage` sit in a status region beside the list. Native `name`, `required` and reset keep working, and a reset reaches a controlled host through `onValueChange`.
+`TokenField tokens onAdd onRemove` enters several values: Enter, a separator or a paste calls `onAdd` with the trimmed text (return `false` to keep the draft), and the host resolves, deduplicates and updates `tokens`. Tokens are a labelled list with one tab stop; the first Backspace on an empty draft moves to the last token and the next removes it, and focus moves only after the host has removed it. `name` submits one value per token, and `required` uses the draft's custom validity.
+
 - Basics: Button, AddButton, IconButton, MenuButton, Card, Badge, Avatar, Input, NumberInput,
   Textarea, Select, Field, SearchInput, Slider, Progress, Link, Disclosure, Accordion, Table,
   Separator, NavItem, EmptyState.
@@ -400,6 +406,8 @@ Multiple control children and custom compositions require the caller to pass ass
 Top-level `description` and `error` Signals keep their message parts mounted and update content, `hidden`, and
 associations without remounting the control, preserving drafts and focus. `null`, `undefined`, `false`, and `""`
 are empty messages; `0` is content. Field does not inspect arbitrary VNodes, Promises, or nested Signals for DOM visibility.
+
+`Form onSubmit` wraps the fields in a native form: constraint validation runs first and focuses the first invalid control (a hidden carrier such as ChoiceSelect's select hands focus to its visible control), then `onSubmit(data, event)` receives the `FormData` with the submitter. `busy` sets `aria-busy` and ignores further submits, `error` shows a danger alert and `status` a polite receipt; nothing is reset. Field and the host own `aria-invalid`. `onCancel` adds a `type="button"` Cancel, and `actions` replaces the row.
 Explicit `invalid`, including `false` or a boolean Signal, takes precedence; otherwise a provided error derives the
 live invalid state, clearing `aria-invalid` to `"false"` when the message empties. Without either input, the child's
 original `aria-invalid` is preserved. Field supplies no validation, submission, focus management, or automatic announcement.

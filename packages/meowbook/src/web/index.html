@@ -77,6 +77,18 @@
             if (node.matches(":hover")) bits.push("hover");
             lines.push("  " + describe(node) + (bits.length ? "  → " + bits.join(" | ") : ""));
           }
+          // Which rules paint the invalid-field halo, as Safari parsed them, and does the toolbar match?
+          const toolbar = document.querySelector(".workshop-toolbar");
+          for (const sheet of document.styleSheets) {
+            let rules;
+            try { rules = sheet.cssRules; } catch { continue; }
+            for (const rule of rules) {
+              if (!rule.style || !String(rule.style.boxShadow).includes("danger")) continue;
+              let match;
+              try { match = toolbar.matches(rule.selectorText); } catch (error) { match = "error " + error.message; }
+              lines.push("RULE matches toolbar: " + match + "\n  " + rule.selectorText.slice(-160));
+            }
+          }
           out.textContent = lines.join("\n");
         };
         document.addEventListener(

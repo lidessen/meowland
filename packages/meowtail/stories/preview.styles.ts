@@ -224,10 +224,6 @@ export const previewStyles = css`
     width: 64px;
     height: 64px;
   }
-  .workshop-brand-grid .meow-doodle-cat {
-    width: 104px;
-    height: 88px;
-  }
   .workshop-brand-grid .meow-github-icon {
     width: 52px;
     height: 52px;

@@ -4,7 +4,6 @@ import {
   Inline,
   Stack,
   AssistantMark,
-  DoodleCat,
   EmptyStack,
   ExternalArrowIcon,
   Field,
@@ -194,7 +193,6 @@ export const BrandIconsStory = defineStory({
   covers: [
     "MeowlandMark",
     "AssistantMark",
-    "DoodleCat",
     "EmptyStack",
     "GithubIcon",
     "NotesIcon",
@@ -215,10 +213,6 @@ export const BrandIconsStory = defineStory({
             <AssistantMark />
           </span>
           <figcaption>AssistantMark</figcaption>
-        </figure>
-        <figure>
-          <DoodleCat />
-          <figcaption>DoodleCat</figcaption>
         </figure>
         <figure>
           <EmptyStack />

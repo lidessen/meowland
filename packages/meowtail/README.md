@@ -31,6 +31,7 @@ import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { Button, Inline, Stack, createMeowUI } from "meowtail";
 import { standardTheme, standardOptions } from "meowtail/theme";
+import { installFocusModality } from "meowtail/web";
 import { applyTheme, mountStyles } from "meowcss/web";
 
 const root = document.querySelector<HTMLElement>("#app");
@@ -39,6 +40,7 @@ const runtime = createRuntime();
 const uninstall = runtime.use(createMeowUI({ components: [Button, Inline, Stack] }));
 const removeStyles = mountStyles(root.ownerDocument, standardTheme.cssText);
 const removeTheme = applyTheme(root, standardTheme, standardOptions.select({ scheme: "light" }));
+const removeFocusModality = installFocusModality(root.ownerDocument);
 const mounted = createWebRenderer(runtime).render(
   <Stack align="start">
     <strong>Connection settings</strong>
@@ -53,11 +55,22 @@ const mounted = createWebRenderer(runtime).render(
 // Dispose with the host that owns this mount.
 const dispose = () => {
   mounted.unmount();
+  removeFocusModality();
   removeTheme();
   removeStyles();
   uninstall();
 };
 ```
+
+`installFocusModality` from `meowtail/web` makes focus rings follow the keyboard. Browsers disagree on
+`:focus-visible`: Safari also matches it when script moves focus after a tap, so a ring lands on
+what the reader just touched. Like React Aria's input modality, the tracker records whether the last
+input was a pointer or a key on the document element (`data-meowui-focus-modality`). After a pointer,
+the theme hides every outline focus ring until the next keystroke. Text entry (text inputs, textarea,
+select, `contenteditable`, `role="textbox"`) keeps its focus state either way, and a Menu keeps its
+active row. Install it once per document, the canvas iframe of a gallery included; calls are counted.
+A page rendered ahead of time inlines `focusModalityScript` instead. Without the tracker, rings follow
+the browser's own `:focus-visible`. Styles inside shadow roots do not see the attribute.
 
 The theme root provides an inheritable body font, font size, line height, and text color; local theme configuration inherits the outer typography, while components still own their own control and heading scales.
 This does not include a global `html/body` margin reset, page background, or page whitespace, and does not automatically reset arbitrary `h1/h2/p`.
@@ -76,6 +89,7 @@ src/
   registry/     # Component catalog, meowjsx type declarations, and the installation entry point
   shared/       # Small utilities shared inside components
   theme/        # Standard theme token definitions and TS styles organized by part
+  web/          # Document-level browser behavior: the focus modality tracker
 tests/
   unit/         # Bun, grouped by components/chat/icons/shared/theme
   types/        # Public type contracts using *.types.ts / *.types.tsx, verified by tsc

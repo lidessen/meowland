@@ -6,6 +6,7 @@ import { createWebRenderer } from "meowjsx/web";
 import { installMeowUI, meowUIComponents, Select } from "meowtail";
 import { journalTheme, meowTheme, standardTheme } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
+import { installFocusModality } from "meowtail/web";
 import type { PreviewEnvironment } from "meowbook";
 
 installMeowUI({ components: meowUIComponents }, defaultRuntime);
@@ -54,6 +55,7 @@ const preview: PreviewEnvironment = ({ root, onCleanup }) => {
     ),
   );
   onCleanup(applyTheme(scope, theme));
+  onCleanup(installFocusModality(root.ownerDocument));
   if (scope.dataset.meowbookCapture === "true") {
     const scheme = matchMedia("(prefers-color-scheme: dark)");
     const update = () => {

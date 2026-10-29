@@ -18,6 +18,15 @@ export const cornerShapeStyles = css`
    every family rule and every host rule overrides it. It deliberately resets no
    margins, headings or lists: copy and long-form reading take Text and Prose
    instead. */
+/** Elements that take typed text: they keep their focus state whatever moved focus there. */
+export const textEntry = [
+  'input:not([type="button"], [type="checkbox"], [type="color"], [type="file"], [type="image"], [type="radio"], [type="range"], [type="reset"], [type="submit"])',
+  "textarea",
+  "select",
+  '[contenteditable]:not([contenteditable="false"])',
+  '[role="textbox"]',
+].join(", ");
+
 export const foundationStyles = css`
   :where(
     [data-meowui-theme-root="meowui"],
@@ -42,6 +51,15 @@ export const foundationStyles = css`
   }
   :where([data-meowui-theme-root="meowui"] :focus-visible) {
     ${ui.focus.ring}
+  }
+  /* After a tap the reader needs no ring: browsers disagree on :focus-visible, and Safari matches
+     it when script moves focus, so the ring lands on what was just touched. With the focus
+     modality tracker from meowtail/web, pointer input hides every outline ring until the next
+     keystroke; text entry keeps its focus state, since the caret's field must stay marked.
+     !important because each family's own ring is more specific than this floor. */
+  :where([data-meowui-focus-modality="pointer"])
+  :where([data-meowui-theme-root="meowui"], [data-meowui-theme-root="meowui"] *):focus-visible:not(${textEntry}) {
+    outline: none !important;
   }
   /* Mobile Safari outlines tapped targets; every control here shows its own pressed or checked
      state instead. The property inherits, so the root covers parts and host elements alike. */

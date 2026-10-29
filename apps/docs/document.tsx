@@ -4,6 +4,7 @@ import { h, type Child } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
 import { Breadcrumb, NavList, SearchInput, type NavListGroup } from "meowtail";
 import { Icon, IconSource, type IconSourceProps } from "meowtail/icons";
+import { focusModalityScript } from "meowtail/web";
 import {
   BookOpen,
   LayoutPanelLeft,
@@ -703,6 +704,8 @@ function Document({
       <head>
         <meta charSet="UTF-8" />
         <script dangerouslySetInnerHTML={{ __html: APPEARANCE_EARLY }} />
+        {/* Focus rings follow the keyboard, not the browser's guess after a tap. */}
+        <script dangerouslySetInnerHTML={{ __html: focusModalityScript }} />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description" content={description ?? SITE_DESCRIPTION} />
         <link rel="icon" href={FAVICON} />

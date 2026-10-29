@@ -109,6 +109,16 @@ export {
   type PaginationEntry,
 } from "./pagination";
 export {
+  Markdown,
+  markdownBlocks,
+  renderMarkdown,
+  repairMarkdownTail,
+  safeMarkdownLink,
+  type MarkdownProps,
+  type MarkdownBlock,
+  type MarkdownCodeBlock,
+} from "./markdown";
+export {
   Chart,
   admitSeries,
   chartSeriesLimit,

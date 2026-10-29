@@ -64,6 +64,7 @@ import { navItemStyles } from "./components/nav-item.styles";
 import { iconsStyles } from "./icons/icons.styles";
 import { breadcrumbStyles } from "./components/breadcrumb.styles";
 import { paginationStyles } from "./components/pagination.styles";
+import { markdownStyles } from "./components/markdown.styles";
 import { chartStyles } from "./components/chart.styles";
 import { formStyles } from "./components/form.styles";
 import { commandPaletteStyles } from "./components/command-palette.styles";
@@ -208,6 +209,7 @@ export const standardThemeStyles = [
   tabsStyles,
   breadcrumbStyles,
   paginationStyles,
+  markdownStyles,
   chartStyles,
   formStyles,
   commandPaletteStyles,

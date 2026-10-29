@@ -180,3 +180,54 @@ are:
   the mount. A ninth series and beyond are not drawn (a console warning, no throw), and values are
   padded with `null` or cut to the category count. Marks and ticks are keyed with
   attribute-bound derived signals; the width comes from a ResizeObserver into a signal.
+
+## Markdown
+
+Task: render Agent text independently of the complete Assistant, including incomplete streamed
+syntax, and keep reading, selection and copying usable. The catalog asks to reuse the existing
+renderer before considering another parser and to keep the Assistant content policy.
+
+- `Markdown` takes `text: MaybeSignal<string>` and reuses the Assistant's `marked` configuration:
+  GFM, line breaks, raw HTML and images shown as text, and only explicit `http:`, `https:` and
+  `mailto:` links navigate (new tab, `noreferrer`). No other parser is added and nothing executes.
+- Blocks, not one HTML string: the text is split into top-level blocks and each block is its own
+  element (the `p`, `ul`, `pre` … itself), keyed by its position and opening tag. A streamed chunk
+  rewrites only the block whose output changed, normally the last one, so a selection or a copy in
+  earlier blocks survives; the shared prose styles still see blocks as direct children.
+- `streaming?: MaybeSignal<boolean>` repairs the open tail before parsing, so incomplete syntax
+  does not flash as raw markers: an unclosed inline code span, `**`, `~~` or `*` is closed, and a
+  half-typed link shows only its text until it is complete. An open code fence already renders as
+  code. Repair never runs on finished text, and the root reports `aria-busy` while streaming.
+- `renderCode?(block)` lets a host draw fenced code with `CodeBlock` (copy, highlighting) by
+  receiving a Signal of `{ code, language }`; without it fences stay a themed `pre`, so importing
+  Markdown does not pull the highlighter.
+- `AssistantMarkdown` becomes a thin use of the same block renderer, and the Assistant passes
+  `streaming` for the last text part of a streaming message, so the Assistant gains the same
+  selection and tail behavior. Its part name, styles and content policy are unchanged.
+- Out of scope: math, footnotes, Mermaid fences (the host can route them through `renderCode`),
+  MDX and any HTML passthrough.
+
+### Markdown review and adopted changes
+
+An independent review challenged this section. Adopted:
+
+- Blocks take their element from the token type, never from parsing renderer HTML; only the
+  renderer's own escaped output is inserted, as before. Raw HTML and top-level text tokens become
+  a `p`; space and definition tokens render nothing and do not count toward the key index.
+- The whole text is lexed once per update with the link definitions applied to every block, and
+  every block's output is compared, because a late definition can change an earlier block. Each
+  block compares its HTML string before writing, so an unchanged block is never rewritten.
+- The key carries the element and an ordered list's start, so a paragraph that becomes a heading,
+  list or table, or a list whose start changes, remounts. `renderCode` is called once per fence
+  mount with a Signal that follows the code and its language.
+- The tail repair touches only the last paragraph and nothing inside an open fence, an indented
+  code block, a code span, a URL or an autolink. Bullets, spaced operators (`5 * 3`) and escapes
+  are not markers, only `](` marks a half-typed link (`array[0` and `[1]` stay text), and `_`
+  and `__` are not repaired, so snake_case never gains a marker. Each rule has a test.
+- Blocks stay direct children of the element carrying the `assistant-markdown` or `markdown` root
+  part, so the shared prose rhythm applies unchanged; `AssistantMarkdown` accepts a plain string or
+  a Signal like `Markdown`.
+- Known limits: the block still being written is rewritten as it grows, so a selection inside it
+  does not survive, and its repaired form re-renders once when streaming ends. `renderCode` covers
+  top-level fences only; fences inside lists or quotes stay a `pre`. The whole text is lexed per
+  update, as before.

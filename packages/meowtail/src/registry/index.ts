@@ -46,6 +46,7 @@ export const MeowUIComponent = {
   Tabs: "tabs",
   Breadcrumb: "breadcrumb",
   Pagination: "pagination",
+  Markdown: "markdown",
   Chart: "chart",
   Form: "form",
   CommandPalette: "command-palette",
@@ -200,6 +201,7 @@ export const meowUIComponents = [
   Components.Tabs,
   Components.Breadcrumb,
   Components.Pagination,
+  Components.Markdown,
   Components.Chart,
   Components.Form,
   Components.CommandPalette,
@@ -357,6 +359,7 @@ declare module "meowjsx" {
     tabs: { parts: ComponentParts<typeof import("../components/tabs").Tabs> };
     breadcrumb: { parts: ComponentParts<typeof import("../components/breadcrumb").Breadcrumb> };
     pagination: { parts: ComponentParts<typeof import("../components/pagination").Pagination> };
+    markdown: { parts: ComponentParts<typeof import("../components/markdown").Markdown> };
     chart: { parts: ComponentParts<typeof import("../components/chart").Chart> };
     form: { parts: ComponentParts<typeof import("../components/form").Form> };
     "command-palette": {

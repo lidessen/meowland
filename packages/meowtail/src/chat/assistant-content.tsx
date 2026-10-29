@@ -85,7 +85,15 @@ export function AssistantPartView(
   const custom = renderPart ? derived(() => renderPart(value.value, message.value)) : undefined;
   let fallback: Child;
   if (initial.kind === "text") {
-    const text = <AssistantMarkdown text={derived(() => (value.value as typeof initial).text)} />;
+    const text = (
+      <AssistantMarkdown
+        text={derived(() => (value.value as typeof initial).text)}
+        // Only the part still being written repairs its open tail.
+        streaming={derived(
+          () => message.value.status === "streaming" && message.value.parts.at(-1) === value.value,
+        )}
+      />
+    );
     fallback = message.value.role === "user" ? <ChatBubble>{text}</ChatBubble> : text;
   } else if (initial.kind === "tool") {
     const tool = () => value.value as typeof initial;

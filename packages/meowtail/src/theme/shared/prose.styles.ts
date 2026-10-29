@@ -3,6 +3,7 @@ import { uiTokens } from "../tokens";
 import type { AssistantMarkdown } from "../../chat/assistant-markdown";
 import type { ChatBubble } from "../../chat/bubble";
 import type { ChatMessage } from "../../chat/message";
+import type { Markdown } from "../../components/markdown";
 import type { Prose } from "../../components/prose";
 import { proseOptions } from "../../components/prose.options";
 import { ui } from "../utilities";
@@ -11,6 +12,7 @@ const assistantMarkdownPartRefs = parts<typeof AssistantMarkdown>("assistant-mar
 const chatBubblePartRefs = parts<typeof ChatBubble>("chat-bubble");
 const chatMessagePartRefs = parts<typeof ChatMessage>("chat-message");
 const prosePartRefs = parts<typeof Prose>("prose");
+const markdownPartRefs = parts<typeof Markdown>("markdown");
 /*
  * One reading rhythm for every place long-form text lands: Prose, chat message
  * content, chat bubbles and rendered assistant markdown. Each owner keeps its
@@ -19,7 +21,8 @@ const prosePartRefs = parts<typeof Prose>("prose");
  */
 const prose = selectorForPart(prosePartRefs.root);
 const markdown = selectorForPart(assistantMarkdownPartRefs.root);
-const scope = `:where(${prose}, ${selectorForPart(chatMessagePartRefs.content)}, ${selectorForPart(chatBubblePartRefs.root)}, ${markdown})`;
+const markdownRoot = selectorForPart(markdownPartRefs.root);
+const scope = `:where(${prose}, ${selectorForPart(chatMessagePartRefs.content)}, ${selectorForPart(chatBubblePartRefs.root)}, ${markdown}, ${markdownRoot})`;
 
 export const proseStyles = css`
   ${prose} {
@@ -33,7 +36,7 @@ export const proseStyles = css`
       max-inline-size: ${uiTokens.layout.measure};
     }
   }
-  :where(${prose}, ${markdown}) {
+  :where(${prose}, ${markdown}, ${markdownRoot}) {
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: ${uiTokens.space.prose};

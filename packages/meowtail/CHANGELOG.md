@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Add `Markdown`, the public form of the Assistant's safe Markdown renderer, with
+  `repairMarkdownTail`, `markdownBlocks`, `renderMarkdown` and `safeMarkdownLink`. Text renders
+  block by block, so streamed chunks no longer rewrite finished blocks or drop a selection in them;
+  `streaming` hides half-typed markers in the open tail, and `renderCode` can draw fences with
+  `CodeBlock`. The Assistant's text uses the same renderer and repairs the tail of the part a
+  streaming message is still writing.
+
 - Add `Autocomplete` (suggestions for free text), `TokenField` (several values entered as
   host-resolved tokens), `TreeView` (hierarchy with the tree keyboard model), `CommandPalette`
   (search and run host commands), `Form` (native validation, busy, outcome and actions) and

@@ -1,47 +1,29 @@
 import { h, type Context, type Props } from "meowjsx";
-import { derived, type Signal } from "meowjsx/signal";
-import { Marked, Renderer } from "marked";
+import { derived, unwrap, type MaybeSignal } from "meowjsx/signal";
+import { markdownBlockChildren } from "../components/markdown";
+import { renderMarkdown, safeMarkdownLink } from "../components/markdown-blocks";
 
-const escape = (text: string) =>
-  text.replace(
-    /[&<>"']/g,
-    (value) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[value]!,
-  );
-
-export function assistantSafeLink(href: string): string | undefined {
-  try {
-    const url = new URL(href);
-    return ["http:", "https:", "mailto:"].includes(url.protocol) ? url.href : undefined;
-  } catch {
-    return undefined;
-  }
-}
-
-const renderer = new Renderer();
-renderer.html = ({ text }) => escape(text);
-renderer.image = ({ text }) => escape(text);
-renderer.link = function ({ href, title, tokens }) {
-  const label = this.parser.parseInline(tokens);
-  const link = assistantSafeLink(href);
-  return link
-    ? `<a href="${escape(link)}" target="_blank" rel="noreferrer"${title ? ` title="${escape(title)}"` : ""}>${label}</a>`
-    : label;
-};
-const markdown = new Marked({ renderer, gfm: true, breaks: true });
+export const assistantSafeLink = safeMarkdownLink;
 
 /** Raw HTML and images are text. Only explicit safe external links become navigation. */
-export const assistantMarkdown = (text: string): string =>
-  markdown.parse(text, { async: false }) as string;
+export const assistantMarkdown = renderMarkdown;
 
+/** The Assistant's text: the shared Markdown blocks under the Assistant's own part. */
 export function AssistantMarkdown(
-  { text, ref }: { text: Signal<string>; ref?: Props["ref"] },
+  {
+    text,
+    streaming = false,
+    ref,
+  }: { text: MaybeSignal<string>; streaming?: MaybeSignal<boolean>; ref?: Props["ref"] },
   context: Context<typeof AssistantMarkdown>,
 ) {
   return (
     <div
-      dangerouslySetInnerHTML={derived(() => ({ __html: assistantMarkdown(text.value) }))}
+      aria-busy={derived(() => (unwrap(streaming) ? "true" : undefined))}
       ref={[context.parts.root, ref]}
-    />
+    >
+      {markdownBlockChildren(text, streaming, undefined, undefined)}
+    </div>
   );
 }
 

@@ -67,6 +67,12 @@ describe("built-in theme utility values", () => {
     );
   });
 
+  test("the theme root turns off the browser tap highlight for every part and host element", () => {
+    expect(standardTheme.cssText).toMatch(
+      /:where\(\[data-meowui-theme-root="meowui"\]\)\s*\{\s*-webkit-tap-highlight-color: transparent;/,
+    );
+  });
+
   test("the standard and extended assemblies share one utility fragment last", () => {
     expect(standardThemeStyles[0]).toBe(standardFoundationStyles);
     expect(standardThemeStyles.at(-1)).toBe(utilityStyles);

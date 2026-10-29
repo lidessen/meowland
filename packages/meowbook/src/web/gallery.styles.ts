@@ -51,11 +51,6 @@ export const galleryStyles = css`
 body {
   margin: 0;
 }
-button,
-a,
-summary {
-  -webkit-tap-highlight-color: transparent;
-}
 a {
   color: inherit;
   text-decoration: none;

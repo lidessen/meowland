@@ -201,7 +201,6 @@ export const chatRecordsStyles = css`
     cursor: pointer;
     user-select: none;
     border-radius: ${uiTokens.radius.lg};
-    -webkit-tap-highlight-color: transparent;
   }
 
   ${chatProcessPartRefs.label} {
@@ -299,7 +298,6 @@ export const chatRecordsStyles = css`
     cursor: pointer;
     list-style: none;
     border-radius: ${uiTokens.radius.lg};
-    -webkit-tap-highlight-color: transparent;
   }
 
   /* The chevron swaps with the leading glyph, so it centres in the row whatever height the

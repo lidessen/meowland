@@ -13,10 +13,11 @@ export const cornerShapeStyles = css`
 
 /* The floor for anything inside a Meowland region, library part or host element:
    border-box sizing, media that never overflows its column, code in the mono
-   face, controls in the surrounding type and one keyboard focus outline. It
-   is first in the theme and has zero specificity, so every family rule and
-   every host rule overrides it. It deliberately resets no margins, headings or
-   lists: copy and long-form reading take Text and Prose instead. */
+   face, controls in the surrounding type, one keyboard focus outline and no
+   browser tap highlight. It is first in the theme and has zero specificity, so
+   every family rule and every host rule overrides it. It deliberately resets no
+   margins, headings or lists: copy and long-form reading take Text and Prose
+   instead. */
 export const foundationStyles = css`
   :where(
     [data-meowui-theme-root="meowui"],
@@ -41,6 +42,11 @@ export const foundationStyles = css`
   }
   :where([data-meowui-theme-root="meowui"] :focus-visible) {
     ${ui.focus.ring}
+  }
+  /* Mobile Safari outlines tapped targets; every control here shows its own pressed or checked
+     state instead. The property inherits, so the root covers parts and host elements alike. */
+  :where([data-meowui-theme-root="meowui"]) {
+    -webkit-tap-highlight-color: transparent;
   }
   /* One quiet scrollbar for every scroll region: a thin control-line thumb on no track. */
   :where([data-meowui-theme-root="meowui"], [data-meowui-theme-root="meowui"] *) {

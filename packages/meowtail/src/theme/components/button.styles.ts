@@ -29,7 +29,6 @@ export const buttonStyles = css`
     border-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
     box-shadow ${uiTokens.motion.settle} ${uiTokens.motion.ease},
     transform ${uiTokens.motion.response} ${uiTokens.motion.ease};
-  -webkit-tap-highlight-color: transparent;
 }
 /* A press settles the action half a pixel, so a click is felt, not only seen. */
 :where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}):active:not(:disabled) {

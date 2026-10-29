@@ -87,8 +87,6 @@ export const docsStyles = css`
   }
   html {
     scroll-padding-top: 88px;
-    /* Mobile Safari outlines every tapped target; each control here shows its own pressed state. */
-    -webkit-tap-highlight-color: transparent;
   }
   body {
     background: ${uiTokens.surface.canvas};

@@ -55,10 +55,6 @@ a {
   color: inherit;
   text-decoration: none;
 }
-:focus-visible {
-  outline: 2px solid ${uiTokens.state.focus};
-  outline-offset: 3px;
-}
 [hidden] {
   display: none !important;
 }
@@ -191,8 +187,10 @@ a {
   color: ${uiTokens.ink.secondary};
   overflow-wrap: anywhere;
 }
+/* The scrim only closes the drawer on a tap; it is out of the Tab order and draws no ring. */
 #catalog-backdrop {
   display: none;
+  outline: none;
 }
 #latest-event {
   max-width: 45%;

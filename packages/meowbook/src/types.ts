@@ -56,4 +56,54 @@ export interface StoryConfig {
   stories: readonly string[];
   preview: string;
   tsconfig: string;
+  /** How the gallery presents itself inside a host site; omitted, it is Meowbook's own chrome. */
+  gallery?: GalleryConfig;
+}
+/** A link the gallery shows in its header. */
+export interface GalleryLink {
+  label: string;
+  href: string;
+}
+/** A theme the canvas environment can paint, named by the canvas `theme` URL parameter. */
+export interface GalleryTheme {
+  /** The value the environment reads from `?theme=`. */
+  value: string;
+  label: string;
+  /** The Meowtail theme that paints the gallery's own chrome while this theme is chosen. */
+  chrome?: "standard" | "journal" | "meow";
+}
+export interface GalleryConfig {
+  /** The brand at the top of the catalog. Defaults: "Meowbook", "UI", a notebook mark, "./". */
+  brand?: {
+    name?: string;
+    /** Short tag beside the name; an empty string hides it. */
+    tag?: string;
+    /** Image URL for the 28px mark, used as given, or one URL for each scheme. */
+    logo?: string | { light: string; dark: string };
+    href?: string;
+  };
+  /** Related pages shown in the header, such as another gallery of the same site. */
+  links?: readonly GalleryLink[];
+  /**
+   * The page that documents a story, shown in the header while the story is current. Runs once
+   * per story at build time; only its results reach the browser.
+   */
+  docsLink?(story: StoryEntry): GalleryLink | undefined;
+  /**
+   * One appearance for the tool and the story. A host site passes its own storage keys so its
+   * pages and the gallery share the reader's choice. A missing key means "auto" and the first
+   * theme, so those choices are stored by removing the key.
+   */
+  appearance?: {
+    /** `localStorage` key holding "light" or "dark". Default `meowbook:color-scheme`. */
+    schemeStorageKey?: string;
+    /** `localStorage` key holding a theme value; required for the choice to persist. */
+    themeStorageKey?: string;
+    /** Themes the environment can paint; fewer than two shows no theme choice. */
+    themes?: readonly GalleryTheme[];
+  };
+}
+/** The browser-side form of `GalleryConfig`, written to `gallery.json` by the build. */
+export interface GallerySettings extends Omit<GalleryConfig, "docsLink"> {
+  docsLinks?: Readonly<Record<string, GalleryLink>>;
 }

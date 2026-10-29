@@ -192,7 +192,7 @@ function HomePage({ state }: { state: DocsState }): Child {
                 <a href="/gallery/">
                   <span className="docs-route-step">03</span>
                   <span>
-                    <strong>Open the workbench</strong>
+                    <strong>Open the playground</strong>
                     <span>Try the stories and composed interfaces.</span>
                   </span>
                 </a>
@@ -231,11 +231,11 @@ function HomePage({ state }: { state: DocsState }): Child {
         <Stack gap="compact">
           <Inline gap="compact" wrap>
             <Link href="/components/button/">Browse the component reference</Link>
-            <Link href="/gallery/">Open the component workbench</Link>
+            <Link href="/gallery/">Open the component playground</Link>
           </Inline>
           <Note>
-            The workbench is the same gallery the library ships: every story the components declare,
-            in one list.
+            The playground is the same gallery the library ships: every story the components
+            declare, in one list.
           </Note>
         </Stack>
       </Section>
@@ -253,7 +253,7 @@ function HomePage({ state }: { state: DocsState }): Child {
             <code> meowtail</code> is the component library those two rules produce.
           </p>
           <p>
-            <code>meowbook</code> turns the stories a package declares into a workbench and a live
+            <code>meowbook</code> turns the stories a package declares into a playground and a live
             canvas. <code>meowslides</code> is the presentation engine on top of the same
             components. <code>meowpress</code> is the site generator that writes this page.
           </p>
@@ -366,17 +366,17 @@ function PackagePage({
   if (entry.name === "meowbook" || entry.name === "meowslides") {
     const slides = entry.name === "meowslides";
     sections.push({
-      id: "workbench",
-      title: slides ? "Presentation workbench" : "Workbench",
+      id: "playground",
+      title: slides ? "Presentation playground" : "Playground",
       children: (
         <Stack gap="compact">
           <Link href={slides ? "/gallery/slides/" : "/gallery/"}>
-            {slides ? "Open the presentation workbench" : "Open the component workbench"}
+            {slides ? "Open the presentation playground" : "Open the component playground"}
           </Link>
           <Note>
             {slides
-              ? "The presentation workbench runs the stories the slides package declares, in the presentation theme."
-              : "The workbench lists every story the library declares, grouped the way the component reference groups them."}
+              ? "The presentation playground runs the stories the slides package declares, in the presentation theme."
+              : "The playground lists every story the library declares, grouped the way the component reference groups them."}
           </Note>
         </Stack>
       ),

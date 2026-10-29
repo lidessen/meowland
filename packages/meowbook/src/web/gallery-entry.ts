@@ -1,6 +1,7 @@
 import type { NavListGroup } from "meowtail";
-import type { StoryEntry } from "../types";
+import type { GallerySettings, StoryEntry } from "../types";
 import { mountCatalog, mountGallery } from "./gallery-shell";
+import { chromeThemeAttribute } from "./gallery.styles";
 mountGallery();
 type StoryInfo = StoryEntry & {
   id: string;
@@ -37,23 +38,143 @@ get("text-placeholder").addEventListener("click", () => {
   syncMeasurements();
 });
 const search = get<HTMLInputElement>("search");
-const galleryScheme = get<HTMLSelectElement>("gallery-scheme");
-galleryScheme.value = "auto";
-try {
-  const saved = localStorage.getItem("meowbook:color-scheme");
-  if (saved && ["auto", "light", "dark"].includes(saved)) galleryScheme.value = saved;
-} catch {
-  /* Appearance remains usable when storage is unavailable. */
-}
-document.documentElement.dataset.meowuiColorScheme = galleryScheme.value;
-galleryScheme.addEventListener("change", () => {
-  document.documentElement.dataset.meowuiColorScheme = galleryScheme.value;
+
+/** What the host site set in the config; an absent `gallery.json` keeps Meowbook's own chrome. */
+let settings: GallerySettings = {};
+const schemes = ["auto", "light", "dark"] as const;
+type Scheme = (typeof schemes)[number];
+const schemeKey = () => settings.appearance?.schemeStorageKey ?? "meowbook:color-scheme";
+const themes = () => settings.appearance?.themes ?? [];
+function read(key: string | undefined) {
+  if (!key) return null;
   try {
-    localStorage.setItem("meowbook:color-scheme", galleryScheme.value);
+    return localStorage.getItem(key);
   } catch {
-    /* No persistence required. */
+    return null;
   }
+}
+/** The first choice is the default, so it is stored by removing the key, as a host site does. */
+function write(key: string | undefined, value: string, fallback: string) {
+  if (!key) return;
+  try {
+    if (value === fallback) localStorage.removeItem(key);
+    else localStorage.setItem(key, value);
+  } catch {
+    /* The choice still applies to this page. */
+  }
+}
+function scheme(): Scheme {
+  const saved = read(schemeKey());
+  return schemes.includes(saved as Scheme) ? (saved as Scheme) : "auto";
+}
+function theme() {
+  const choices = themes();
+  const saved = read(settings.appearance?.themeStorageKey);
+  return choices.find((choice) => choice.value === saved)?.value ?? choices[0]?.value;
+}
+/** One scheme paints the tool and the story, so a dark story never sits in light chrome. */
+function paintScheme() {
+  const choice = scheme();
+  document.documentElement.dataset.meowuiColorScheme = choice;
+  // The chrome wears the chosen theme's Meowtail counterpart, so tool and story agree.
+  const chrome = themes().find((item) => item.value === theme())?.chrome;
+  if (chrome && chrome !== "standard")
+    document.documentElement.setAttribute(chromeThemeAttribute, chrome);
+  else document.documentElement.removeAttribute(chromeThemeAttribute);
+  get("appearance-trigger").dataset.appearance = choice;
+  const root = frameRoot();
+  if (root && root.dataset.meowuiColorScheme !== choice) root.dataset.meowuiColorScheme = choice;
+  for (const input of document.querySelectorAll<HTMLInputElement>("#appearance input"))
+    input.checked = input.value === (input.name === "gallery-theme" ? theme() : choice);
+}
+function frameRoot() {
+  try {
+    return frame.contentDocument?.documentElement ?? null;
+  } catch {
+    return null;
+  }
+}
+/** An environment can re-apply its theme while the story mounts; the reader's scheme stays. */
+function followScheme(target: HTMLIFrameElement) {
+  target.addEventListener("load", () => {
+    const root = frameRoot();
+    if (target !== frame || !root) return;
+    new MutationObserver(() => {
+      if (root.dataset.meowuiColorScheme !== scheme()) root.dataset.meowuiColorScheme = scheme();
+    }).observe(root, { attributes: true, attributeFilter: ["data-meowui-color-scheme"] });
+    paintScheme();
+  });
+}
+get("appearance").addEventListener("change", (event) => {
+  const input = event.target as HTMLInputElement;
+  if (input.name === "gallery-theme") {
+    write(settings.appearance?.themeStorageKey, input.value, themes()[0]?.value ?? "");
+    // An environment mounts its theme once, so a new theme is a new canvas.
+    load();
+  } else write(schemeKey(), input.value, "auto");
+  paintScheme();
 });
+// A choice made in the host site's other tabs reaches this one.
+window.addEventListener("storage", (event) => {
+  if (event.key === schemeKey()) paintScheme();
+  else if (event.key && event.key === settings.appearance?.themeStorageKey) load();
+});
+paintScheme();
+
+/** Brand, related links and theme choices come from the host's config. */
+function applySettings() {
+  const { name, tag, logo, href } = settings.brand ?? {};
+  if (href) get<HTMLAnchorElement>("brand").href = href;
+  if (name) get("brand-name").textContent = name;
+  if (tag !== undefined) get("brand-label").textContent = tag;
+  get("brand-label").hidden = !get("brand-label").textContent;
+  if (logo) {
+    // A pair of marks shows the one for the current scheme; the stylesheet chooses.
+    const sources =
+      typeof logo === "string"
+        ? [["", logo]]
+        : [
+            ["light", logo.light],
+            ["dark", logo.dark],
+          ];
+    const marks = sources.map(([scheme, src]) => {
+      const image = document.createElement("img");
+      image.src = src!;
+      image.alt = "";
+      image.width = 28;
+      image.height = 28;
+      if (scheme) image.className = `workshop-logo-${scheme}`;
+      return image;
+    });
+    get("brand-mark").replaceWith(...marks);
+  }
+  const links = get("host-links");
+  links.replaceChildren(
+    ...(settings.links ?? []).map(({ label, href }) => {
+      const link = document.createElement("a");
+      link.className = "workshop-header-link";
+      link.href = href;
+      link.textContent = label;
+      return link;
+    }),
+  );
+  links.hidden = !links.childElementCount;
+  const choices = get("appearance-themes");
+  choices.replaceChildren(choices.querySelector("legend")!);
+  for (const { value, label } of themes()) {
+    const row = document.createElement("label");
+    const input = document.createElement("input");
+    input.type = "radio";
+    input.name = "gallery-theme";
+    input.value = value;
+    const text = document.createElement("span");
+    text.textContent = label;
+    row.append(input, text);
+    choices.append(row);
+  }
+  choices.hidden = themes().length < 2;
+  paintScheme();
+}
 const viewportButtons = [...get("viewport").querySelectorAll<HTMLButtonElement>("[data-width]")];
 let width = "fluid";
 let stories: StoryInfo[] = [];
@@ -64,8 +185,22 @@ const initialWidth = new URL(location.href).searchParams.get("width");
 if (["fluid", "390", "768", "1100"].includes(initialWidth ?? "")) width = initialWidth!;
 
 /** The canvas and the manifest sit next to the gallery, whatever path it is served from. */
-function canvasURL() {
-  return `./canvas.html${active ? `?story=${encodeURIComponent(active)}` : ""}`;
+/**
+ * The one canvas address. Inside the gallery the canvas is embedded: the gallery's chrome carries
+ * the theme and the scheme, so the environment draws no controls of its own. The standalone link
+ * leaves the canvas its own controls.
+ */
+function canvasURL(id = active, embedded = true) {
+  const query = new URLSearchParams();
+  if (id) query.set("story", id);
+  if (embedded) {
+    query.set("embedded", "1");
+    query.set("scheme", scheme());
+  }
+  const chosen = theme();
+  if (chosen) query.set("theme", chosen);
+  const search = query.toString();
+  return `./canvas.html${search ? `?${search}` : ""}`;
 }
 function updateURL(replace = false) {
   const url = new URL(location.href);
@@ -75,9 +210,15 @@ function updateURL(replace = false) {
   if (replace) history.replaceState(null, "", url);
   else history.pushState(null, "", url);
 }
+/** The readout names the width the story actually gets, the fluid one included. */
+function showSize() {
+  const pixels = width === "fluid" ? Math.round(frame.clientWidth) : Number(width);
+  get("viewport-size").textContent = pixels ? `${pixels} px` : "";
+}
+new ResizeObserver(showSize).observe(get("canvas").parentElement!);
 function applyWidth() {
   frame.style.width = width === "fluid" ? "100%" : `${width}px`;
-  get("viewport-size").textContent = width === "fluid" ? "Fluid" : `${width} px`;
+  showSize();
   for (const button of viewportButtons)
     button.setAttribute("aria-pressed", String(button.dataset.width === width));
 }
@@ -103,8 +244,18 @@ function showInfo() {
       return span;
     }),
   );
-  get<HTMLAnchorElement>("standalone").href = canvasURL();
-  document.title = `${story?.title ?? "Meowbook"} · Meowbook`;
+  get<HTMLAnchorElement>("standalone").href = canvasURL(active, false);
+  const name = settings.brand?.name ?? "Meowbook";
+  document.title = story ? `${story.component ?? story.title} · ${name}` : name;
+  const docs = get<HTMLAnchorElement>("story-docs");
+  const link = story ? settings.docsLinks?.[story.id] : undefined;
+  docs.hidden = !link;
+  if (link) {
+    docs.href = link.href;
+    docs.querySelector("span")!.textContent = link.label;
+    // A phone shows only the icon, so the link keeps its name.
+    docs.setAttribute("aria-label", link.label);
+  }
 }
 function componentKey(story: StoryInfo) {
   return JSON.stringify([story.group, story.component ?? story.id]);
@@ -195,6 +346,7 @@ function load() {
   next.removeAttribute("src");
   frame.replaceWith(next);
   frame = next;
+  followScheme(frame);
   frame.src = canvasURL();
   get("events").replaceChildren();
   get("latest-event").hidden = true;
@@ -309,7 +461,7 @@ function inspectStory(
     };
     window.addEventListener("message", receive);
     signal.addEventListener("abort", cancel, { once: true });
-    probe.src = `./canvas.html?story=${encodeURIComponent(story.id)}`;
+    probe.src = canvasURL(story.id);
     if (signal.aborted) {
       cancel();
       return;
@@ -442,6 +594,13 @@ window.addEventListener("popstate", () => {
   load();
 });
 applyWidth();
+try {
+  const response = await fetch("./gallery.json");
+  if (response.ok) settings = await response.json();
+} catch {
+  /* Without host settings the gallery keeps its own chrome. */
+}
+applySettings();
 try {
   const response = await fetch("./manifest.json");
   if (!response.ok) throw new Error("Failed to load the scenario manifest");

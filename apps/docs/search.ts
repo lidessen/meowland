@@ -61,7 +61,7 @@ export function searchEntryFor(url: string, html: string): SearchEntry | undefin
   };
 }
 
-/** Write `search-index.json` from every built page except the workbench. */
+/** Write `search-index.json` from every built page except the playground. */
 export async function writeSearchIndex(directory: string): Promise<number> {
   const entries: SearchEntry[] = [];
   for await (const entry of new Bun.Glob("**/index.html").scan({ cwd: directory })) {

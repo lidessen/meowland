@@ -1,6 +1,7 @@
 import { expect, test } from "bun:test";
 import { auditCSS } from "meowcss";
 import {
+  journalFonts,
   journalTheme,
   journalUiTokenValues,
   meowTheme,
@@ -31,6 +32,22 @@ test("meow declares exactly the standard ui roles and changes only colors", () =
   expect(auditCSS(meowTheme.cssText, standardAuditRules)).toEqual([]);
   for (const group of ["type", "space", "icon", "radius", "shadow", "motion", "layout"] as const)
     expect(meowUiTokenValues[group]).toEqual(standardUiTokenValues[group]);
+});
+
+test("journal lists every web font its type stacks name", () => {
+  const { sans, display, reading, mono } = journalUiTokenValues.type;
+  // Quoted names that are not system faces must come from the manifest.
+  const system =
+    /^(Iowan Old Style|Songti SC|Noto Serif CJK SC|Source Han Serif SC|PingFang SC|Hiragino Sans GB|Microsoft YaHei|Segoe UI|SF Mono|JetBrains Mono)$/;
+  const named = [sans, display, reading, mono]
+    .flatMap((stack) => [...stack.matchAll(/"([^"]+)"/g)].map((match) => match[1]!))
+    .filter((family) => !system.test(family));
+  const listed = journalFonts.map((font) => font.family);
+  expect([...new Set(named)].sort()).toEqual([...listed].sort());
+  expect(journalUiTokenValues.type.quoteStyle).toBe("italic");
+  expect(journalFonts.find((font) => font.family === "Newsreader Variable")?.styles).toContain(
+    "italic",
+  );
 });
 
 type Pair = readonly [ink: string, surface: string, minimum: number];

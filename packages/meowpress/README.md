@@ -58,9 +58,17 @@ export default meowSite({
 
 Directories in the configuration are provided explicitly by the application; the default theme resolves from this package and does not depend on the startup directory.
 The whole theme can be replaced with `theme: defineTheme(...)`; all static pages output that theme's root attributes and default options.
-The build writes `theme.cssText` to a temporary CSS file, then lets Bun handle fonts and other assets, and finally delivers through a stylesheet link,
-so the theme applies without client-side JavaScript. Files for the default Geist font are bundled with the site and do not depend on an external font service.
-When the default font is used, the output also includes `licenses/geist-OFL.txt`, preserving the font's SIL OFL license.
+The build writes `theme.cssText` to a temporary CSS file, then lets Bun handle the other assets, and finally delivers through a stylesheet link,
+so the theme applies without client-side JavaScript.
+
+`fonts` lists the web fonts the theme names, as Fontsource variable packages
+(`{ family, package, styles }`, the same shape as Meowtail's `journalFonts`). The build publishes
+each package's weight-axis `woff2` files into `fonts/` with a content hash, puts their `@font-face`
+rules first in the theme stylesheet with each subset's `unicode-range`, and copies each license to
+`licenses/<name>-OFL.txt`. A browser fetches only the files a page's text and families use, and
+nothing for a family the page does not use, so a site with a theme switch pays only for the active
+theme. The default Blog theme defaults to `blogFonts` (Geist); any other theme defaults to none.
+Install the listed packages in the site; nothing depends on an external font service.
 Default illustrations use in-package vectors and CSS and require no business images. The `hero`, `feed` and `about` keys of `site.images`
 can explicitly set decorative image paths, for example `images/cover.svg`; paths are relative to the content root's `assets/`, the library handles each page depth,
 and assets are delivered along the existing asset build flow. When no About image is set, the first letter of the site name is used.
@@ -75,8 +83,8 @@ After installing `meowpress` and its `meowcss` and `meowjsx` dependencies, run i
 bunx --no-install meowpress --config ./site.config.ts
 ```
 
-The CLI requires Bun, and the output location is determined by `outputDirectory`. Font files resolve from this package's official Geist dependency,
-and consumers are not required to copy source, install workspace-root dependencies or access an external font service.
+The CLI requires Bun, and the output location is determined by `outputDirectory`. Font packages resolve from the startup directory first, then from
+this package, which carries the default Geist, so consumers are not required to copy source, install workspace-root dependencies or access an external font service.
 
 ## Independent verification
 

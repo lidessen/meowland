@@ -1,4 +1,5 @@
 import { css, defineOptions, defineTheme, defineTokens } from "meowcss";
+import type { SiteFont } from "./fonts";
 
 export const blogOptions = defineOptions("blog", {});
 export const blogTokens = defineTokens("blog", {
@@ -2222,14 +2223,14 @@ const styles = css`
 `;
 
 /** Static HTML owns the theme root; CSS remains available without JavaScript. */
-const definition = defineTheme({
+export const blogTheme = defineTheme({
   options: blogOptions,
   defaults: { scheme: "auto" },
   tokens: [blogTokens],
   styles,
 });
-// CSS imports must precede the generated token declarations. Bun resolves and emits font assets.
-export const blogTheme = Object.freeze({
-  ...definition,
-  cssText: `@import "@fontsource-variable/geist";\n${definition.cssText}`,
-});
+
+/** The web font the Blog theme names; the build publishes it with its license. */
+export const blogFonts = [
+  { family: "Geist Variable", package: "@fontsource-variable/geist", styles: ["normal"] },
+] as const satisfies readonly SiteFont[];

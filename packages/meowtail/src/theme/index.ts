@@ -114,7 +114,12 @@ export {
   type TokenValues,
   type UiTokenValues,
 } from "./tokens";
-export { journalUiTokenValues, journalUiTokens } from "./journal.tokens";
+export {
+  journalFonts,
+  journalUiTokenValues,
+  journalUiTokens,
+  type ThemeFont,
+} from "./journal.tokens";
 export { meowUiTokenValues, meowUiTokens } from "./meow.tokens";
 export { ui, utilityStyles } from "./utilities";
 export { chartTokens } from "./shared/chart.tokens";

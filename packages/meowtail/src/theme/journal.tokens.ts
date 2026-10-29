@@ -13,9 +13,9 @@ const mono =
  * editorial research site. Warm paper and ink, Newsreader titles and reading copy over Inter
  * controls, an oxblood accent, quiet hairlines, small radii and soft warm depth. Titles are set at
  * a book weight, reading copy sits in a softer ink under full-ink headings, and quotations are
- * italic. Fonts are named first and fall back to system faces; the host loads them. Control
- * heights, icon sizes and code sizes keep the standard values, so every component keeps its
- * geometry and behavior.
+ * italic. Fonts are named first and fall back to system faces; `journalFonts` lists the files a
+ * host loads. Control heights, icon sizes and code sizes keep the standard values, so every
+ * component keeps its geometry and behavior.
  */
 export const journalUiTokenValues = {
   surface: {
@@ -171,3 +171,30 @@ export const journalUiTokenValues = {
 
 /** The Journal values under the shared `ui` names, so every standard theme rule paints with them. */
 export const journalUiTokens = /* @__PURE__ */ defineTokens("ui", journalUiTokenValues);
+
+/**
+ * A web font a theme names in its type stacks, as a Fontsource variable package: `family` is the
+ * name the stack uses, `package` the npm package that carries its weight-axis files, and `styles`
+ * the files to load (`italic` loads `wght-italic.css`). Meowtail ships no font files; a host that
+ * wants the faces installs the packages and loads them (Meowpress takes the list as `fonts`).
+ */
+export interface ThemeFont {
+  readonly family: string;
+  readonly package: string;
+  readonly styles: readonly ("normal" | "italic")[];
+}
+
+/** The web fonts Journal names. Newsreader loads its italic for Journal's italic quotations. */
+export const journalFonts = [
+  {
+    family: "Newsreader Variable",
+    package: "@fontsource-variable/newsreader",
+    styles: ["normal", "italic"],
+  },
+  { family: "Inter Variable", package: "@fontsource-variable/inter", styles: ["normal"] },
+  {
+    family: "JetBrains Mono Variable",
+    package: "@fontsource-variable/jetbrains-mono",
+    styles: ["normal"],
+  },
+] as const satisfies readonly ThemeFont[];

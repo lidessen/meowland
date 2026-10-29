@@ -1,8 +1,9 @@
 # Theme fonts
 
-Status: proposal for review on 2026-10-29. Nothing here is implemented. Per the
-[design-change method](../../.agents/skills/design-change/SKILL.md), an independent challenger
-reviews the boundary below before implementation starts.
+Status: implemented on 2026-10-29. The project owner reviewed the proposal and accepted its three
+recommendations (see [Decisions](#decisions)). Two details changed during implementation and are
+recorded where they apply: the font rules lead the theme stylesheet instead of a second
+stylesheet, and the gallery imports Latin files instead of the packages' CSS.
 
 ## The problem
 
@@ -101,18 +102,26 @@ export const journalFonts = [
 
 Meowtail does not depend on the font packages and ships no font files. A host that wants the faces
 installs the packages it lists. The `ThemeFont` type lives in Meowtail beside `UiTokenValues`: it
-describes Fontsource packages, which is a Meowtail decision, not a MeowCSS one.
+describes Fontsource packages, which is a Meowtail decision, not a MeowCSS one. Meowpress does not
+depend on Meowtail, so its `fonts` option takes `SiteFont`, the same shape, and a theme's manifest
+passes as it is.
 
 ### Meowpress: a `fonts` option
 
 `meowSite({ fonts: journalFonts, ... })` replaces the Geist special case. For each entry the build:
 
-1. resolves the package's `wght.css` (and `wght-italic.css` when listed) from the site's own
-   dependencies,
-2. copies the referenced `woff2` files into the output as hashed files and writes the
-   `@font-face` rules with their `unicode-range` into a fonts stylesheet linked before the theme,
-   with `font-display: swap`,
-3. copies each package's `LICENSE` to `licenses/<package>-OFL.txt`.
+1. resolves the package's `wght.css` (and `wght-italic.css` when listed) from the startup
+   directory, where the site installs its fonts, then from Meowpress, which carries Geist,
+2. copies the referenced `woff2` files into `fonts/` as hashed files and puts their `@font-face`
+   rules, with each subset's `unicode-range` and Fontsource's `font-display: swap`, first in the
+   theme stylesheet,
+3. copies each package's `LICENSE` to `licenses/<name>-OFL.txt`.
+
+Implementation note: Bun's HTML bundling inlines every `url()` it can resolve, whatever loader is
+configured, so the rules reference `./fonts/*` and the build marks that pattern `external`. The
+bundled stylesheet is emitted at the output root, next to `fonts/`, for pages at every depth. One
+stylesheet with the rules first replaces the separate fonts stylesheet proposed above; it saves a
+request and needs no change to page templates.
 
 The blog theme exports `blogFonts` for Geist and its default configuration passes it, so the
 string replacement and the `includes('"@fontsource-variable/geist"')` license check are removed.
@@ -131,39 +140,46 @@ picks Journal. The standard and Meow themes make no font requests.
 
 ### Meowbook gallery and other runtime hosts
 
-The gallery preview imports the packages' CSS through its bundler (`import
-"@fontsource-variable/newsreader/wght.css"` and so on), next to the theme registry in
-`stories/preview.ts`. The same lazy fetching applies, and the faces are in place before a reader
-switches the gallery to Journal. Applications do the same; the Journal README section shows the
-imports and points at the manifest as the list to follow.
+The proposal had the gallery import the packages' CSS. Measured, that does not work: Bun hoists a
+CSS import from the lazily loaded preview module into the canvas page and inlines every subset, so
+each gallery canvas, including every live preview the docs embed, would carry about 1.1 MB.
+Instead, `stories/journal-fonts.ts` imports only the four Latin `woff2` files, which Bun publishes
+as hashed files and returns as URLs, and the preview mounts their `@font-face` rules with the
+theme only when a story is painted with Journal. Gallery copy is English, so Latin is the only
+subset it needs. An application with its own bundler can import the packages' CSS instead.
 
 ## What changes, by package
 
-| Package     | Change                                                                                               |
-| ----------- | ---------------------------------------------------------------------------------------------------- |
-| `meowtail`  | `ThemeFont` type, `journalFonts`; README Journal section; a test that stacks and manifest agree      |
-| `meowpress` | `fonts` option and loader; `blogFonts`; Geist special case removed; release-consumer assertion moved |
-| `apps/docs` | passes `journalFonts`; installs the three packages as dev dependencies                               |
-| `meowbook`  | none; the Meowtail stories' preview imports the font CSS                                             |
-| `meowcss`   | none                                                                                                 |
+| Package          | Change                                                                                        |
+| ---------------- | --------------------------------------------------------------------------------------------- |
+| `meowtail`       | `ThemeFont`, `journalFonts`; README Journal section; a test that stacks and manifest agree    |
+| `meowtail` story | `journal-fonts.ts` mounts the Latin faces for Journal; the font packages are dev dependencies |
+| `meowpress`      | `fonts` option and loader; `blogFonts`; Geist special case removed; release check moved       |
+| `apps/docs`      | passes `journalFonts`; installs the three packages as dev dependencies                        |
+| `meowbook`       | none                                                                                          |
+| `meowcss`        | none                                                                                          |
 
 ## Verification
 
-- Meowpress unit test: a build with `fonts` emits the `woff2` files as separate hashed files, a
-  fonts stylesheet with `unicode-range` and no data URIs, linked before the theme, and the license
-  files; a build without `fonts` emits none of them.
-- Docs browser test: on the standard theme the page requests no font file; after choosing Journal,
-  `document.fonts.check('16px "Newsreader Variable"')` becomes true and a heading's used face is
-  Newsreader.
-- The release-consumer check for the default Meowpress site, updated as above.
+- Meowpress unit tests: the default build publishes Geist as hashed `woff2` files under `fonts/`
+  with `unicode-range` rules, no data URIs and the license; a custom theme without `fonts`
+  publishes no rules, files or licenses. The release-consumer check asserts the same of the
+  installed package.
+- Meowtail unit test: every quoted non-system family in Journal's stacks is in `journalFonts`, and
+  Newsreader loads its italic because Journal's quotations are italic.
+- Meowtail browser test: a gallery story on the standard theme requests no font file; on Journal
+  it requests Newsreader's Latin file and `document.fonts.check` passes.
+- Observed on the built docs: the standard theme requests no font file; choosing Journal fetches
+  only the Latin Inter, JetBrains Mono and Newsreader files (about 146 KB), and its live previews
+  load their own. The docs stylesheet grows by 6 KB of rules, against 1.1 MB had they been inlined.
 
-## Questions for the challenger
+## Decisions
 
-1. Is the manifest worth its code over the status quo, given only one theme names web fonts
-   today? The counterweight is Meowpress, which already needs a font mechanism and has a
-   hard-coded one.
-2. Should the manifest be tied to the Fontsource package layout, or name URLs and let a host
-   supply files from anywhere? Tying it keeps loaders small and covers both current fonts; a
-   URL form can be added if a theme ever needs a face Fontsource does not carry.
-3. Is dropping Geist inlining an acceptable Meowpress behavior change for an `alpha` line, given
-   it makes the default stylesheet smaller and lets subsets load lazily?
+The review asked three questions; the owner accepted the recommended answer to each.
+
+1. The manifest is worth its code over the status quo: Meowpress already needed a font mechanism
+   and had a hard-coded one, and the docs and gallery showed Journal in fallback faces.
+2. The manifest is tied to the Fontsource package layout. A URL form can be added if a theme ever
+   needs a face Fontsource does not carry.
+3. Meowpress stops inlining Geist on the `alpha` line. The default stylesheet is smaller and
+   subsets load lazily.

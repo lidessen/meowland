@@ -387,9 +387,14 @@ const tokens=defineTokens("consumer-press",{ink:["black","white"]});const theme=
     "Press default theme/root missing",
   );
   const defaultCSS = await readFile(join(output, href), "utf8");
+  const geistFile = defaultCSS.match(
+    /url\(\.\/(fonts\/geist-latin-wght-normal-[0-9a-f]{8}\.woff2)\)/,
+  )?.[1];
   assert(
     defaultCSS.includes("@font-face") &&
-      defaultCSS.includes("data:font/woff2;base64,") &&
+      geistFile !== undefined &&
+      existsSync(join(output, geistFile)) &&
+      !defaultCSS.includes("data:font") &&
       !defaultCSS.includes("@import") &&
       !defaultCSS.includes("node_modules"),
     "Press default Geist font did not build from installed dependencies",

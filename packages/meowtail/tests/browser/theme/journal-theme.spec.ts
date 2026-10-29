@@ -40,3 +40,16 @@ test("journal keeps every single-line control on the standard height ladder", as
   await open(page, "basic-quality-controls", "journal");
   expect(await heights()).toEqual(standard);
 });
+
+test("journal loads its named faces only when a story is painted with it", async ({ page }) => {
+  const fonts: string[] = [];
+  page.on("request", (request) => {
+    if (request.url().endsWith(".woff2")) fonts.push(request.url());
+  });
+  await open(page, "blog-article", "standard");
+  expect(fonts).toEqual([]);
+  await open(page, "blog-article", "journal");
+  await page.evaluate(() => document.fonts.ready);
+  expect(await page.evaluate(() => document.fonts.check('48px "Newsreader Variable"'))).toBe(true);
+  expect(fonts.some((url) => /newsreader-latin-wght-normal/.test(url))).toBe(true);
+});

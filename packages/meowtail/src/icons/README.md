@@ -54,7 +54,7 @@ new icon joins the set together with its row, and a unit test keeps the two in s
 | -------------------------------------------------------- | ---------------- |
 | Add                                                      | `plus`           |
 | Decrease one step                                        | `minus`          |
-| Close, dismiss, remove an attachment                     | `x`              |
+| Close, dismiss, remove an attachment or a token          | `x`              |
 | Copy                                                     | `copy`           |
 | Done or chosen: copied, a checked menu item              | `check`          |
 | Retry, reload, refresh                                   | `refresh-cw`     |

@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Add `Autocomplete` (suggestions for free text), `TokenField` (several values entered as
+  host-resolved tokens), `TreeView` (hierarchy with the tree keyboard model), `CommandPalette`
+  (search and run host commands), `Form` (native validation, busy, outcome and actions) and
+  `Chart` (bar and line charts with a legend, keyboard readout and data table), with
+  `commandMatches`, `admitSeries`, `niceTicks`, `chartSeriesLimit` and `treeViewLevel`. The
+  contracts are in the selected-targets design.
+
 - Add `Pagination` (L1) and `paginationEntries`: Previous/Next with numbered pages and gaps for a
   known total, or the page fact and a host `hasNext` for an unknown one. The host owns the page,
   loading and records; `busy` and boundaries keep focus on the control.

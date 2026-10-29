@@ -46,6 +46,12 @@ export const MeowUIComponent = {
   Tabs: "tabs",
   Breadcrumb: "breadcrumb",
   Pagination: "pagination",
+  Chart: "chart",
+  Form: "form",
+  CommandPalette: "command-palette",
+  TreeView: "tree-view",
+  TokenField: "token-field",
+  Autocomplete: "autocomplete",
   Alert: "alert",
   Skeleton: "skeleton",
   SkeletonBoundary: "skeleton-boundary",
@@ -194,6 +200,12 @@ export const meowUIComponents = [
   Components.Tabs,
   Components.Breadcrumb,
   Components.Pagination,
+  Components.Chart,
+  Components.Form,
+  Components.CommandPalette,
+  Components.TreeView,
+  Components.TokenField,
+  Components.Autocomplete,
   Components.Alert,
   Components.Skeleton,
   Components.SkeletonBoundary,
@@ -345,6 +357,16 @@ declare module "meowjsx" {
     tabs: { parts: ComponentParts<typeof import("../components/tabs").Tabs> };
     breadcrumb: { parts: ComponentParts<typeof import("../components/breadcrumb").Breadcrumb> };
     pagination: { parts: ComponentParts<typeof import("../components/pagination").Pagination> };
+    chart: { parts: ComponentParts<typeof import("../components/chart").Chart> };
+    form: { parts: ComponentParts<typeof import("../components/form").Form> };
+    "command-palette": {
+      parts: ComponentParts<typeof import("../components/command-palette").CommandPalette>;
+    };
+    "tree-view": { parts: ComponentParts<typeof import("../components/tree-view").TreeView> };
+    "token-field": { parts: ComponentParts<typeof import("../components/token-field").TokenField> };
+    autocomplete: {
+      parts: ComponentParts<typeof import("../components/autocomplete").Autocomplete>;
+    };
     alert: { parts: ComponentParts<typeof import("../components/alert").Alert> };
     skeleton: { parts: ComponentParts<typeof import("../components/skeleton").Skeleton> };
     "skeleton-boundary": {

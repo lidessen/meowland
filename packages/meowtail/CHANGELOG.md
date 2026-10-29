@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add `Pagination` (L1) and `paginationEntries`: Previous/Next with numbered pages and gaps for a
+  known total, or the page fact and a host `hasNext` for an unknown one. The host owns the page,
+  loading and records; `busy` and boundaries keep focus on the control.
+
 - Add the `meowtail/web` entry with `installFocusModality(document)` and `focusModalityScript`.
   They record whether the last input was a pointer or a key, and after a pointer the theme hides
   outline focus rings until the next keystroke, so Safari no longer rings what a script focused

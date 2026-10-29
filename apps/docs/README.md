@@ -96,8 +96,8 @@ in the workbench. The component and presentation workbenches link to each other.
 
 The appearance menu is one choice across the site: the pages, their live previews and the
 workbench read the same `localStorage` keys, so a theme or scheme picked on a page is the one the
-workbench opens with, and the reverse. The workbench chrome itself stays on the standard theme;
-the chosen theme paints its stories.
+workbench opens with, and the reverse. The chosen theme paints the workbench's own chrome as well
+as its stories; the chrome keeps the system faces, since only the stories load Journal's web fonts.
 
 The theme supplies the same surfaces, hairlines and type scale to every page. The site adds only
 the layout a reference needs — the reading column, the code panel and the API table — and every

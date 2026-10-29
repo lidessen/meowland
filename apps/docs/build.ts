@@ -81,9 +81,9 @@ export async function buildDocs(): Promise<void> {
         themeStorageKey: DOCS_THEME_STORE,
         // The values are the `theme` parameter the Meowtail stories' environment reads.
         themes: [
-          { value: "standard", label: "Standard" },
-          { value: "journal", label: "Journal" },
-          { value: "meow", label: "Meow" },
+          { value: "standard", label: "Standard", chrome: "standard" },
+          { value: "journal", label: "Journal", chrome: "journal" },
+          { value: "meow", label: "Meow", chrome: "meow" },
         ],
       },
     }),

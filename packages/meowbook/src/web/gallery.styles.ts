@@ -1,6 +1,6 @@
 import { css, parts } from "meowcss/meowjsx";
-import { tokenRef } from "meowcss";
-import { uiTokens } from "meowtail/theme";
+import { compileTokens, tokenRef, type TokenSet } from "meowcss";
+import { journalUiTokens, meowUiTokens, uiTokens } from "meowtail/theme";
 import type { Button, Disclosure, NavList, SearchInput } from "meowtail";
 import { buttonOptions } from "meowtail";
 export const inspectionHeight = tokenRef("workshop", "inspection", "height");
@@ -9,6 +9,34 @@ const button = parts<typeof Button>("button");
 const disclosure = parts<typeof Disclosure>("disclosure");
 const navList = parts<typeof NavList>("nav-list");
 const searchInput = parts<typeof SearchInput>("search-input");
+
+/** The Meowtail themes that can paint the gallery's own chrome; standard when none is named. */
+export const chromeThemes = ["standard", "journal", "meow"] as const;
+export type ChromeTheme = (typeof chromeThemes)[number];
+/** The root attribute that selects a chrome theme other than standard. */
+export const chromeThemeAttribute = "data-meowbook-chrome";
+
+/**
+ * One theme's values of the same `--ui-*` roles, in force under the chrome attribute. One
+ * stylesheet and one theme root serve every theme, so switching is one attribute and no reload.
+ * The rules follow the standard ones at the same zero specificity, so they win in every scheme.
+ */
+function scopedTokens(name: Exclude<ChromeTheme, "standard">, tokens: TokenSet) {
+  const scope = `[${chromeThemeAttribute}="${name}"]`;
+  return compileTokens(tokens, {
+    constants: `:where(${scope}[data-meowui-theme-root], ${scope} [data-meowui-theme-root])`,
+    sources: [
+      {
+        options: "scheme",
+        selector: `:where(${scope}[data-meowui-scope], ${scope} [data-meowui-scope])`,
+      },
+    ],
+  });
+}
+export const chromeThemeStyles = [
+  scopedTokens("journal", journalUiTokens),
+  scopedTokens("meow", meowUiTokens),
+].join("\n");
 
 export const galleryStyles = css`
 :root {
@@ -80,7 +108,15 @@ a {
   background: ${uiTokens.surface.fill};
   color: ${uiTokens.ink.secondary};
 }
+/* A theme with a larger title keeps the tag inside the rail by shortening it. */
+#brand-name {
+  flex: none;
+}
 #brand-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
   margin-left: auto;
   font: ${uiTokens.type.micro} / ${uiTokens.type.line.micro} ${uiTokens.type.mono};
   color: ${uiTokens.ink.tertiary};

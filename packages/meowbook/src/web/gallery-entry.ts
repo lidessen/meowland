@@ -1,6 +1,7 @@
 import type { NavListGroup } from "meowtail";
 import type { GallerySettings, StoryEntry } from "../types";
 import { mountCatalog, mountGallery } from "./gallery-shell";
+import { chromeThemeAttribute } from "./gallery.styles";
 mountGallery();
 type StoryInfo = StoryEntry & {
   id: string;
@@ -75,6 +76,11 @@ function theme() {
 function paintScheme() {
   const choice = scheme();
   document.documentElement.dataset.meowuiColorScheme = choice;
+  // The chrome wears the chosen theme's Meowtail counterpart, so tool and story agree.
+  const chrome = themes().find((item) => item.value === theme())?.chrome;
+  if (chrome && chrome !== "standard")
+    document.documentElement.setAttribute(chromeThemeAttribute, chrome);
+  else document.documentElement.removeAttribute(chromeThemeAttribute);
   get("appearance-trigger").dataset.appearance = choice;
   const root = frameRoot();
   if (root && root.dataset.meowuiColorScheme !== choice) root.dataset.meowuiColorScheme = choice;

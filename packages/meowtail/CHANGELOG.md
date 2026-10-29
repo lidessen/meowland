@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Add `Pagination` (L1) and `paginationEntries`: Previous/Next with numbered pages and gaps for a
+  known total, or the page fact and a host `hasNext` for an unknown one. The host owns the page,
+  loading and records; `busy` and boundaries keep focus on the control.
+
 - The invalid-field focus halo selects its focus states with `:where()` instead of `:is()`, so a
   bundler writes no legacy `:-moz-any()` copy that iOS Safari would match on any focused container.
 

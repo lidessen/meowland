@@ -102,6 +102,12 @@ export { Grid, type GridProps, gridOptions } from "./grid";
 export { Container, type ContainerProps, containerOptions } from "./container";
 export { Tabs, type TabsProps, type TabItem, tabsCount, tabsIndex } from "./tabs";
 export { Breadcrumb, type BreadcrumbProps, type BreadcrumbItem } from "./breadcrumb";
+export {
+  Pagination,
+  paginationEntries,
+  type PaginationProps,
+  type PaginationEntry,
+} from "./pagination";
 export { Alert, type AlertProps, alertOptions } from "./alert";
 export { Skeleton, type SkeletonProps, skeletonOptions } from "./skeleton";
 export { Spinner, type SpinnerProps } from "./spinner";

@@ -75,14 +75,14 @@ new icon joins the set together with its row, and a unit test keeps the two in s
 
 ### Disclosure and feedback
 
-| Intent                                                          | Icon            |
-| --------------------------------------------------------------- | --------------- |
-| Disclose content; the theme rotates it when open                | `chevron-right` |
-| Open a select or menu trigger                                   | `chevron-down`  |
-| Collapse upward, step up                                        | `chevron-up`    |
-| Step back in a pager or carousel                                | `chevron-left`  |
-| Work in progress inside a control, where a dot cannot sit       | `loader-circle` |
-| A problem beside its words: a failed load, a field error notice | `circle-alert`  |
+| Intent                                                                     | Icon            |
+| -------------------------------------------------------------------------- | --------------- |
+| Disclose content (the theme rotates it when open); step forward in a pager | `chevron-right` |
+| Open a select or menu trigger                                              | `chevron-down`  |
+| Collapse upward, step up                                                   | `chevron-up`    |
+| Step back in a pager or carousel                                           | `chevron-left`  |
+| Work in progress inside a control, where a dot cannot sit                  | `loader-circle` |
+| A problem beside its words: a failed load, a field error notice            | `circle-alert`  |
 
 `IconName` and `iconNames` are the finite semantic inventory used by this library and its JSON contracts. For application icons outside that set, `IconSource` renders caller-supplied structural `IconNode` data through the same frame, size, and accessibility rules:
 

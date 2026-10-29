@@ -45,6 +45,7 @@ export const MeowUIComponent = {
   ChatConversation: "chat-conversation",
   Tabs: "tabs",
   Breadcrumb: "breadcrumb",
+  Pagination: "pagination",
   Alert: "alert",
   Skeleton: "skeleton",
   SkeletonBoundary: "skeleton-boundary",
@@ -192,6 +193,7 @@ export const meowUIComponents = [
   Chat.ChatConversation,
   Components.Tabs,
   Components.Breadcrumb,
+  Components.Pagination,
   Components.Alert,
   Components.Skeleton,
   Components.SkeletonBoundary,
@@ -342,6 +344,7 @@ declare module "meowjsx" {
     };
     tabs: { parts: ComponentParts<typeof import("../components/tabs").Tabs> };
     breadcrumb: { parts: ComponentParts<typeof import("../components/breadcrumb").Breadcrumb> };
+    pagination: { parts: ComponentParts<typeof import("../components/pagination").Pagination> };
     alert: { parts: ComponentParts<typeof import("../components/alert").Alert> };
     skeleton: { parts: ComponentParts<typeof import("../components/skeleton").Skeleton> };
     "skeleton-boundary": {

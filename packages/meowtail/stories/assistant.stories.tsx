@@ -34,6 +34,15 @@ export function assistantDemo(): Child {
               ? "The default Assistant keeps **messages, process and actions** on one reading axis.\n\nYou can read earlier messages while new results arrive. This example uses local view models, with no product API or execution runtime."
               : "Review the shared Assistant layout and preserve my reading position.",
         },
+        ...(index === 9
+          ? [
+              {
+                id: "check",
+                kind: "text" as const,
+                text: "Run the same checks before handing it over:\n\n```sh\nbun run check\n```",
+              },
+            ]
+          : []),
         ...(index === 7
           ? [
               {

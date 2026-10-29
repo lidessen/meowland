@@ -9,6 +9,7 @@ import {
   meowUIComponents,
   repairMarkdownTail,
 } from "../../../src/index";
+import { AssistantMarkdown } from "../../../src/chat/assistant-markdown";
 import { mountComponent } from "./mount";
 
 test("the streaming tail closes open emphasis and code and hides a half-typed link target", () => {
@@ -131,4 +132,14 @@ test("static output keeps the Assistant content policy", () => {
   );
   expect(output).not.toContain("<img");
   expect(output).toContain('href="https://example.com/"');
+});
+
+test("Assistant text draws fences with the shared CodeBlock, like its code parts", () => {
+  const output = createWebRenderer(runtime()).renderToHtml(
+    <AssistantMarkdown text={"Run this:\n\n```ts\nlet a = 1\n```"} />,
+  );
+  expect(output).toContain('data-meowui-part="code-block/root"');
+  // The renderer's own fence markup is replaced, not kept beside it.
+  expect(output).not.toContain('<pre><code class="language-ts">');
+  expect(output).toContain("let a = 1");
 });

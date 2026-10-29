@@ -93,7 +93,7 @@ function page(path: string): string {
 describe("the page document", () => {
   test("both navigation bars and the browser icon use the site mark", () => {
     const html = document("components/button");
-    expect(html.match(/src="\.\.\/\.\.\/meowland-logo-9a311ad1.jpg"/g)).toHaveLength(2);
+    expect(html.match(/src="\.\.\/\.\.\/meowland-logo-3ef0fd67.png"/g)).toHaveLength(2);
     expect(html).toContain('href="/favicon.ico?v=9a311ad1"');
   });
 
@@ -276,8 +276,18 @@ describe("the reader's controls", () => {
     const head = html.slice(0, html.indexOf("</head>"));
     expect(head.indexOf("meowland-docs-theme")).toBeGreaterThan(-1);
     expect(head.indexOf("meowland-docs-theme")).toBeLessThan(head.indexOf('rel="stylesheet"'));
-    expect(html).toMatch(/<button class="docs-theme" id="docs-theme"[^>]*hidden/);
     expect(html).not.toMatch(/<html[^>]*data-docs-theme/);
+  });
+
+  test("one appearance menu holds the theme and scheme choices", () => {
+    const html = document("packages/meowtail");
+    expect(html).toMatch(/<button class="docs-appearance" id="docs-appearance"[^>]*hidden/);
+    const panel = html.slice(html.indexOf('id="docs-appearance-panel"'));
+    expect(panel).toMatch(/^id="docs-appearance-panel" hidden/);
+    for (const value of ["standard", "meow"])
+      expect(panel).toContain(`name="docs-theme" value="${value}"`);
+    for (const value of ["auto", "light", "dark"])
+      expect(panel).toContain(`name="docs-scheme" value="${value}"`);
   });
 
   test("code actions stay hidden until the page wires them", () => {

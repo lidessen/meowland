@@ -462,14 +462,13 @@ a {
   width: ${uiTokens.control.small};
   padding: 0;
 }
-/* The specimen sits on a recessed table, raised on the library's in-flow material. */
+/* The specimen frame sits on the page itself, drawn by one hairline like the docs examples;
+   a narrower device width centres it on the same surface. The hairline is a ring outside the
+   frame, so a device width stays the story's exact viewport. */
 .workshop-stage {
   min-height: 0;
   overflow: auto;
-  padding: 24px;
-  background-color: ${uiTokens.surface.fill};
-  border-top: ${uiTokens.line.width} solid ${uiTokens.line.edge};
-  border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+  padding: 4px 24px 24px;
 }
 #canvas {
   display: block;
@@ -478,14 +477,12 @@ a {
   margin: 0 auto;
   border: 0;
   border-radius: ${uiTokens.radius.xl};
-  /* The specimen frame is a host page (canvas) set into the recessed stage. */
   background: ${uiTokens.surface.canvas};
-  box-shadow:
-    0 0 0 ${uiTokens.line.width} ${uiTokens.line.edge},
-    ${uiTokens.shadow.raised};
+  box-shadow: 0 0 0 ${uiTokens.line.width} ${uiTokens.line.edge};
 }
 .workshop-observations {
   background: ${uiTokens.surface.canvas};
+  border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
   min-height: 0;
 }
 .workshop-observations > summary {
@@ -637,7 +634,7 @@ a {
     display: none;
   }
   .workshop-stage {
-    padding: 20px;
+    padding: 4px 16px 16px;
   }
   #text-placeholder span {
     display: none;
@@ -696,12 +693,13 @@ a {
     min-width: 42px;
     font-size: ${uiTokens.type.micro};
   }
+  /* A phone runs the frame edge to edge between two hairlines. */
   .workshop-stage {
-    padding: 12px 0;
+    padding: 4px 0 0;
   }
   #canvas {
     border-radius: 0;
-    box-shadow: none;
+    box-shadow: 0 calc(-1 * ${uiTokens.line.width}) 0 ${uiTokens.line.divider};
   }
   .workshop-observations > summary {
     padding: 0 16px;

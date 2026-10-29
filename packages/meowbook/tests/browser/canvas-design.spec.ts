@@ -123,3 +123,27 @@ for (const scheme of ["light", "dark"] as const) {
     }
   });
 }
+
+test("the canvas starts in the host's scheme and shows a spinner before the story loads", async ({
+  page,
+}) => {
+  // Hold the story bundle so the page shows only what its HTML and stylesheet paint.
+  let release!: () => void;
+  const held = new Promise<void>((resolve) => (release = resolve));
+  await page.route(/\.js$/, async (route) => {
+    await held;
+    await route.continue();
+  });
+  await page.goto("/canvas.html?story=runtime/partial&scheme=dark", { waitUntil: "commit" });
+  const state = page.locator("#story-state");
+  await expect(state).toHaveAttribute("data-status", "loading");
+  await expect(state).toHaveText("Loading the scenario…");
+  expect(await page.evaluate(() => getComputedStyle(document.documentElement).colorScheme)).toBe(
+    "dark",
+  );
+  expect(
+    await state.evaluate((element) => getComputedStyle(element, "::before").borderRadius),
+  ).toBe("50%");
+  release();
+  await expect(state).toHaveAttribute("data-status", "ready");
+});

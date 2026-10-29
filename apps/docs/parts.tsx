@@ -27,7 +27,7 @@ export function Preview({
     <Card variant="surface" className="docs-preview-card">
       <iframe
         className={tall ? "docs-preview-frame docs-preview-frame-tall" : "docs-preview-frame"}
-        src={`/gallery/canvas.html?story=${encodeURIComponent(storyId)}&embedded=1`}
+        src={`/gallery/canvas.html?story=${encodeURIComponent(storyId)}&embedded=1&theme=standard`}
         loading="lazy"
         title={title}
       />

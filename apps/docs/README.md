@@ -55,7 +55,7 @@ follow their separate manual workflow.
 | `parts.tsx`               | The blocks a page is made of: the preview, the code sample, the API table.          |
 | `document.tsx`            | The page document: the head, the sidebar and the footer.                            |
 | `pages.tsx`               | The page builders: the home page, the package pages, the component pages.           |
-| `theme.ts`                | The site theme: the standard theme, extended with the site layout.                  |
+| `theme.ts`                | The site theme: the standard theme, the site layout and the Meow switch.           |
 | `site.config.ts`          | The Meowpress configuration, including the pages provider.                          |
 | `serve.ts`                | The loopback static server.                                                         |
 | `content/posts/packages/` | The hand-written MDX page of each package.                                          |

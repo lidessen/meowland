@@ -271,6 +271,15 @@ describe("the reader's controls", () => {
     expect(html).toMatch(/<button class="docs-appearance" id="docs-appearance"[^>]*hidden/);
   });
 
+  test("the theme choice applies before the stylesheet and previews name their theme", () => {
+    const html = document("packages/meowtail");
+    const head = html.slice(0, html.indexOf("</head>"));
+    expect(head.indexOf("meowland-docs-theme")).toBeGreaterThan(-1);
+    expect(head.indexOf("meowland-docs-theme")).toBeLessThan(head.indexOf('rel="stylesheet"'));
+    expect(html).toMatch(/<button class="docs-theme" id="docs-theme"[^>]*hidden/);
+    expect(html).not.toMatch(/<html[^>]*data-docs-theme/);
+  });
+
   test("code actions stay hidden until the page wires them", () => {
     const html = document("packages/meowtail");
     expect(html).toContain('setAttribute("data-docs-code-actions"');

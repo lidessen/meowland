@@ -3,8 +3,8 @@ import "./runtime";
 import { h, type Child } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
 import { Breadcrumb, NavList, SearchInput, type NavListGroup } from "meowtail";
-import { Icon, IconSource } from "meowtail/icons";
-import { Monitor, Moon, PawPrint, Sun } from "meowtail/icons/lucide";
+import { Icon, IconSource, type IconSourceProps } from "meowtail/icons";
+import { Monitor, Moon, Palette, PawPrint, Sun } from "meowtail/icons/lucide";
 import type { Catalog, NavigationGroup } from "./catalog";
 import type { DocsPackage } from "./packages";
 import { DOCS_THEME_ATTRIBUTE } from "./theme";
@@ -16,8 +16,11 @@ export const SITE_NAME = "Meowland";
 export const SITE_DESCRIPTION =
   "A small UI capability library: a JSX runtime, a style system, a component library, a presentation engine, a workbench and a site generator.";
 
-/** The supplied site mark. Its content hash keeps browser caches in sync with releases. */
-const LOGO = "meowland-logo-9a311ad1.jpg";
+/**
+ * The supplied site mark, scaled to 96px for its 28px slot (3x screens). Its content hash keeps
+ * browser caches in sync with releases.
+ */
+const LOGO = "meowland-logo-3ef0fd67.png";
 
 function logoHref(depth: number): string {
   return depth <= 0 ? `./${LOGO}` : `${"../".repeat(depth)}${LOGO}`;
@@ -152,17 +155,30 @@ const APPEARANCE_EARLY = `(() => {
 })();`;
 
 /**
- * Toggle the Meow theme. The site's own colors follow one root attribute; each live preview is a
- * gallery canvas that mounts its theme once, so a preview that shows another theme reloads with
+ * The appearance menu: one button opens the theme and scheme choices. Both persist for the reader.
+ * The scheme reaches the live previews directly, since they share the site's origin; each preview
+ * is a gallery canvas that mounts its theme once, so a preview showing another theme reloads with
  * the reader's choice in its `theme` parameter.
  */
-const THEME_SWITCH = `(() => {
-  const button = document.getElementById("docs-theme");
-  if (!button) return;
+const APPEARANCE_MENU = `(() => {
+  const button = document.getElementById("docs-appearance");
+  const panel = document.getElementById("docs-appearance-panel");
+  if (!button || !panel) return;
+  const names = { auto: "System", light: "Light", dark: "Dark" };
   const root = document.documentElement;
-  const current = () => (root.getAttribute("${DOCS_THEME_ATTRIBUTE}") === "meow" ? "meow" : "standard");
-  const paintFrames = (choice) => {
-    for (const frame of document.querySelectorAll("iframe.docs-preview-frame")) {
+  const scheme = () => root.getAttribute("data-meowui-color-scheme") || "auto";
+  const theme = () => (root.getAttribute("${DOCS_THEME_ATTRIBUTE}") === "meow" ? "meow" : "standard");
+  const frames = () => document.querySelectorAll("iframe.docs-preview-frame");
+  const paintScheme = (choice) => {
+    for (const frame of frames()) {
+      try {
+        const doc = frame.contentDocument;
+        if (doc && doc.documentElement) doc.documentElement.setAttribute("data-meowui-color-scheme", choice);
+      } catch {}
+    }
+  };
+  const paintTheme = (choice) => {
+    for (const frame of frames()) {
       const url = new URL(frame.getAttribute("src"), location.href);
       if (url.searchParams.get("theme") === choice) continue;
       url.searchParams.set("theme", choice);
@@ -170,68 +186,60 @@ const THEME_SWITCH = `(() => {
     }
   };
   const show = () => {
-    const meow = current() === "meow";
-    button.setAttribute("aria-pressed", String(meow));
-    button.title = meow ? "Meow theme: on" : "Meow theme: off";
-  };
-  button.addEventListener("click", () => {
-    const next = current() === "meow" ? "standard" : "meow";
-    if (next === "meow") root.setAttribute("${DOCS_THEME_ATTRIBUTE}", "meow");
-    else root.removeAttribute("${DOCS_THEME_ATTRIBUTE}");
-    try {
-      if (next === "meow") localStorage.setItem("${THEME_STORE}", "meow");
-      else localStorage.removeItem("${THEME_STORE}");
-    } catch {}
-    paintFrames(next);
-    show();
-  });
-  paintFrames(current());
-  show();
-  button.hidden = false;
-})();`;
-
-/**
- * Cycle the appearance: system, light, dark. The choice persists for the reader and reaches the
- * live previews too, since they share the site's origin.
- */
-const APPEARANCE_SWITCH = `(() => {
-  const button = document.getElementById("docs-appearance");
-  if (!button) return;
-  const order = ["auto", "light", "dark"];
-  const names = { auto: "System", light: "Light", dark: "Dark" };
-  const root = document.documentElement;
-  const current = () => root.getAttribute("data-meowui-color-scheme") || "auto";
-  const paintFrames = (choice) => {
-    for (const frame of document.querySelectorAll("iframe.docs-preview-frame")) {
-      try {
-        const doc = frame.contentDocument;
-        if (doc && doc.documentElement) doc.documentElement.setAttribute("data-meowui-color-scheme", choice);
-      } catch {}
+    const choice = scheme();
+    button.setAttribute("data-appearance", choice);
+    button.title = "Appearance: " + (theme() === "meow" ? "Meow" : "Standard") + ", " + names[choice];
+    for (const input of panel.querySelectorAll("input")) {
+      input.checked = input.value === (input.name === "docs-theme" ? theme() : choice);
     }
   };
-  const show = () => {
-    const choice = current();
-    button.setAttribute("data-appearance", choice);
-    button.setAttribute("aria-label", "Appearance: " + names[choice]);
-    button.title = "Appearance: " + names[choice];
+  const open = (next) => {
+    panel.hidden = !next;
+    button.setAttribute("aria-expanded", String(next));
   };
   button.addEventListener("click", () => {
-    const next = order[(order.indexOf(current()) + 1) % order.length];
-    root.setAttribute("data-meowui-color-scheme", next);
-    try {
-      if (next === "auto") localStorage.removeItem("${APPEARANCE_STORE}");
-      else localStorage.setItem("${APPEARANCE_STORE}", next);
-    } catch {}
-    paintFrames(next);
+    open(panel.hidden);
+    if (!panel.hidden) (panel.querySelector("input:checked") || panel.querySelector("input")).focus();
+  });
+  panel.addEventListener("change", (event) => {
+    const input = event.target;
+    if (input.name === "docs-theme") {
+      if (input.value === "meow") root.setAttribute("${DOCS_THEME_ATTRIBUTE}", "meow");
+      else root.removeAttribute("${DOCS_THEME_ATTRIBUTE}");
+      try {
+        if (input.value === "meow") localStorage.setItem("${THEME_STORE}", "meow");
+        else localStorage.removeItem("${THEME_STORE}");
+      } catch {}
+      paintTheme(input.value);
+    } else {
+      root.setAttribute("data-meowui-color-scheme", input.value);
+      try {
+        if (input.value === "auto") localStorage.removeItem("${APPEARANCE_STORE}");
+        else localStorage.setItem("${APPEARANCE_STORE}", input.value);
+      } catch {}
+      paintScheme(input.value);
+    }
     show();
   });
-  // A story re-applies its theme as it mounts; keep the reader's choice on each preview.
+  panel.addEventListener("keydown", (event) => {
+    if (event.key !== "Escape") return;
+    event.preventDefault();
+    open(false);
+    button.focus();
+  });
+  document.addEventListener("pointerdown", (event) => {
+    if (!panel.hidden && !button.parentElement.contains(event.target)) open(false);
+  });
+  panel.addEventListener("focusout", (event) => {
+    if (!panel.hidden && !button.parentElement.contains(event.relatedTarget)) open(false);
+  });
+  // A story re-applies its theme as it mounts; keep the reader's scheme on each preview.
   const follow = (frame) => {
     let doc;
     try { doc = frame.contentDocument; } catch { return; }
     if (!doc || !doc.documentElement) return;
     const sync = () => {
-      const choice = current();
+      const choice = scheme();
       if (doc.documentElement.getAttribute("data-meowui-color-scheme") !== choice)
         doc.documentElement.setAttribute("data-meowui-color-scheme", choice);
     };
@@ -241,10 +249,11 @@ const APPEARANCE_SWITCH = `(() => {
     });
     sync();
   };
-  for (const frame of document.querySelectorAll("iframe.docs-preview-frame")) {
+  for (const frame of frames()) {
     frame.addEventListener("load", () => follow(frame));
     if (frame.contentDocument && frame.contentDocument.readyState === "complete") follow(frame);
   }
+  paintTheme(theme());
   show();
   button.hidden = false;
 })();`;
@@ -621,6 +630,27 @@ function Sidebar({
   );
 }
 
+/** One choice in the appearance menu: a radio row with its icon and name. */
+function AppearanceChoice({
+  group,
+  value,
+  icon,
+  children,
+}: {
+  group: string;
+  value: string;
+  icon: IconSourceProps["source"];
+  children: Child;
+}): Child {
+  return (
+    <label>
+      <input type="radio" name={group} value={value} />
+      <IconSource source={icon} size={14} />
+      <span>{children}</span>
+    </label>
+  );
+}
+
 function Document({
   theme,
   catalog,
@@ -672,27 +702,44 @@ function Document({
                 <span>Search</span>
                 <kbd aria-hidden="true">⌘K</kbd>
               </button>
-              <button
-                className="docs-theme"
-                id="docs-theme"
-                type="button"
-                aria-label="Meow theme"
-                aria-pressed="false"
-                hidden
-              >
-                <IconSource source={PawPrint} size={16} />
-              </button>
-              <button
-                className="docs-appearance"
-                id="docs-appearance"
-                type="button"
-                aria-label="Appearance: System"
-                hidden
-              >
-                <IconSource source={Monitor} size={16} className="docs-appearance-auto" />
-                <IconSource source={Sun} size={16} className="docs-appearance-light" />
-                <IconSource source={Moon} size={16} className="docs-appearance-dark" />
-              </button>
+              <div className="docs-appearance-menu">
+                <button
+                  className="docs-appearance"
+                  id="docs-appearance"
+                  type="button"
+                  aria-label="Appearance"
+                  aria-expanded="false"
+                  aria-controls="docs-appearance-panel"
+                  hidden
+                >
+                  <IconSource source={Monitor} size={16} className="docs-appearance-auto" />
+                  <IconSource source={Sun} size={16} className="docs-appearance-light" />
+                  <IconSource source={Moon} size={16} className="docs-appearance-dark" />
+                </button>
+                <div className="docs-appearance-panel" id="docs-appearance-panel" hidden>
+                  <fieldset>
+                    <legend>Theme</legend>
+                    <AppearanceChoice group="docs-theme" value="standard" icon={Palette}>
+                      Standard
+                    </AppearanceChoice>
+                    <AppearanceChoice group="docs-theme" value="meow" icon={PawPrint}>
+                      Meow
+                    </AppearanceChoice>
+                  </fieldset>
+                  <fieldset>
+                    <legend>Appearance</legend>
+                    <AppearanceChoice group="docs-scheme" value="auto" icon={Monitor}>
+                      System
+                    </AppearanceChoice>
+                    <AppearanceChoice group="docs-scheme" value="light" icon={Sun}>
+                      Light
+                    </AppearanceChoice>
+                    <AppearanceChoice group="docs-scheme" value="dark" icon={Moon}>
+                      Dark
+                    </AppearanceChoice>
+                  </fieldset>
+                </div>
+              </div>
               <a className="docs-header-link" href="/gallery/" aria-label="Workbench">
                 <span>Workbench</span>
                 <Icon name="arrow-up-right" size={14} />
@@ -739,8 +786,7 @@ function Document({
         <script dangerouslySetInnerHTML={{ __html: CATALOG_FILTER }} />
         <script dangerouslySetInnerHTML={{ __html: NAVIGATION_DISCLOSURE }} />
         <script dangerouslySetInnerHTML={{ __html: PREVIEW_FIT }} />
-        <script dangerouslySetInnerHTML={{ __html: THEME_SWITCH }} />
-        <script dangerouslySetInnerHTML={{ __html: APPEARANCE_SWITCH }} />
+        <script dangerouslySetInnerHTML={{ __html: APPEARANCE_MENU }} />
         <script dangerouslySetInnerHTML={{ __html: FILTER_SHORTCUT }} />
         <script dangerouslySetInnerHTML={{ __html: EXAMPLE_TABS }} />
         <script dangerouslySetInnerHTML={{ __html: CODE_ACTIONS }} />

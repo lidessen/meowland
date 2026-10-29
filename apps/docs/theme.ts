@@ -129,9 +129,11 @@ export const docsStyles = css`
     font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: -0.02em;
   }
+  /* The mark is a tile on its own paper; rounding it makes it one on any ground. */
   .docs-brand > img {
     width: 28px;
     height: 28px;
+    border-radius: ${uiTokens.radius.md};
     object-fit: contain;
   }
   .docs-brand > span {
@@ -253,9 +255,6 @@ export const docsStyles = css`
     color: ${uiTokens.ink.tertiary};
     font: ${uiTokens.type.micro} / ${uiTokens.type.line.micro} ${uiTokens.type.mono};
   }
-  .docs-search-open:not([hidden]) ~ .docs-appearance {
-    margin-left: 0;
-  }
   .docs-search-dialog {
     width: min(600px, calc(100vw - 32px));
     max-height: min(560px, calc(100dvh - 120px));
@@ -367,12 +366,17 @@ export const docsStyles = css`
       justify-content: center;
     }
   }
-  /* The appearance switch: one quiet icon button that shows the current choice. */
-  .docs-appearance,
-  .docs-theme {
+  /*
+   * The appearance menu: one quiet icon button that shows the current scheme and opens a small
+   * panel with the two choices that set how the site looks, the theme and the scheme.
+   */
+  .docs-appearance-menu {
+    position: relative;
+    flex: none;
+  }
+  .docs-appearance {
     display: inline-grid;
     place-items: center;
-    flex: none;
     width: 32px;
     height: 32px;
     padding: 0;
@@ -382,18 +386,13 @@ export const docsStyles = css`
     color: ${uiTokens.ink.secondary};
     cursor: pointer;
   }
-  :is(.docs-appearance, .docs-theme)[hidden] {
+  .docs-appearance[hidden] {
     display: none;
   }
-  :is(.docs-appearance, .docs-theme):hover {
+  .docs-appearance:hover,
+  .docs-appearance[aria-expanded="true"] {
     background: ${uiTokens.state.hover};
     color: ${uiTokens.ink.primary};
-  }
-  .docs-theme[aria-pressed="true"] {
-    color: ${uiTokens.accent.ink};
-  }
-  .docs-search-open:not([hidden]) ~ .docs-theme {
-    margin-left: 0;
   }
   .docs-appearance > svg {
     display: none;
@@ -403,7 +402,96 @@ export const docsStyles = css`
   .docs-appearance[data-appearance="dark"] > .docs-appearance-dark {
     display: block;
   }
-  .docs-appearance:not([hidden]) + .docs-header-link {
+  .docs-appearance-panel {
+    position: absolute;
+    top: calc(100% + 8px);
+    right: 0;
+    z-index: 3;
+    display: grid;
+    gap: 4px;
+    width: 208px;
+    padding: 6px;
+    border-radius: ${uiTokens.radius.xl};
+    background: ${uiTokens.surface.overlay};
+    color: ${uiTokens.ink.primary};
+    box-shadow: ${uiTokens.shadow.float};
+  }
+  .docs-appearance-panel[hidden] {
+    display: none;
+  }
+  .docs-appearance-panel fieldset {
+    display: grid;
+    margin: 0;
+    padding: 0;
+    border: 0;
+  }
+  /* A background line: a fieldset border would break around its legend. */
+  .docs-appearance-panel fieldset + fieldset {
+    padding-top: 4px;
+    background: linear-gradient(${uiTokens.line.divider}, ${uiTokens.line.divider}) top / 100%
+      ${uiTokens.line.width} no-repeat;
+  }
+  /* Floated, the legend is an ordinary block, so the fieldset starts above it. */
+  .docs-appearance-panel legend {
+    float: left;
+    width: 100%;
+    padding: 8px 8px 4px;
+    color: ${uiTokens.ink.tertiary};
+    font-size: ${uiTokens.type.micro};
+    font-weight: ${uiTokens.type.weight.medium};
+    line-height: ${uiTokens.type.line.micro};
+    letter-spacing: ${uiTokens.type.trackingCaps};
+    text-transform: uppercase;
+  }
+  .docs-appearance-panel label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: ${uiTokens.control.small};
+    padding: 0 8px;
+    border-radius: ${uiTokens.radius.md};
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.label};
+    line-height: ${uiTokens.type.line.label};
+    cursor: pointer;
+  }
+  .docs-appearance-panel label:hover {
+    background: ${uiTokens.state.hover};
+    color: ${uiTokens.ink.primary};
+  }
+  .docs-appearance-panel label:has(input:focus-visible) {
+    outline: 2px solid ${uiTokens.state.focus};
+    outline-offset: -2px;
+  }
+  /* The radio stays in the Tab and arrow-key order; the row shows its state. */
+  .docs-appearance-panel input {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    opacity: 0;
+    cursor: pointer;
+  }
+  .docs-appearance-panel label > span {
+    flex: 1;
+  }
+  .docs-appearance-panel label::after {
+    content: "";
+    width: ${uiTokens.icon.small};
+    height: ${uiTokens.icon.small};
+    background: currentColor;
+    mask: ${uiTokens.glyph.check} center / contain no-repeat;
+    visibility: hidden;
+  }
+  .docs-appearance-panel label:has(input:checked) {
+    color: ${uiTokens.ink.primary};
+    font-weight: ${uiTokens.type.weight.medium};
+  }
+  .docs-appearance-panel label:has(input:checked)::after {
+    color: ${uiTokens.accent.ink};
+    visibility: visible;
+  }
+  .docs-appearance-menu:has(.docs-appearance:not([hidden])) + .docs-header-link {
     margin-left: 0;
   }
   /* The filter shows its keyboard shortcut at its end. */
@@ -1172,6 +1260,7 @@ export const docsStyles = css`
     .docs-mobile-brand > img {
       width: 28px;
       height: 28px;
+      border-radius: ${uiTokens.radius.md};
       object-fit: contain;
     }
     .docs-mobile-brand > span {

@@ -7,5 +7,91 @@
   </head>
   <body>
     <script type="module" src="./gallery-entry.ts"></script>
+    <!-- Temporary iOS tap diagnostics; this branch is not for merging. -->
+    <script>
+      (() => {
+        const panel = document.createElement("div");
+        panel.style.cssText =
+          "position:fixed;left:8px;right:8px;bottom:calc(8px + env(safe-area-inset-bottom,0px));z-index:2147483647;" +
+          "background:#111;color:#eee;font:11px/1.4 ui-monospace,Menlo,monospace;padding:8px;border-radius:10px;" +
+          "max-height:45vh;overflow:auto;opacity:.94";
+        const switches = {
+          outline: "*,*:focus,*:focus-visible{outline:none!important}",
+          shadow: ".workshop-toolbar,.workshop-toolbar *:not(button){box-shadow:none!important}",
+          highlight: "*{-webkit-tap-highlight-color:transparent!important}",
+          select: "*{-webkit-user-select:none!important;-webkit-touch-callout:none!important}",
+          inert: "[inert]{interactivity:auto}",
+        };
+        const style = document.createElement("style");
+        document.head.append(style);
+        const state = {};
+        const apply = () => {
+          style.textContent = Object.keys(switches)
+            .filter((key) => state[key])
+            .map((key) => switches[key])
+            .join("\n");
+        };
+        const row = document.createElement("div");
+        row.style.cssText = "display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px";
+        for (const key of [...Object.keys(switches), "tabindex"]) {
+          const label = document.createElement("label");
+          label.style.cssText = "display:flex;gap:3px;align-items:center;background:#333;padding:3px 6px;border-radius:6px";
+          const box = document.createElement("input");
+          box.type = "checkbox";
+          box.onchange = () => {
+            state[key] = box.checked;
+            if (key === "tabindex")
+              for (const button of document.querySelectorAll(".workshop-toolbar button"))
+                box.checked ? button.removeAttribute("tabindex") : button.setAttribute("tabindex", "-1");
+            apply();
+          };
+          label.append(box, "no " + key);
+          row.append(label);
+        }
+        const out = document.createElement("pre");
+        out.style.cssText = "margin:0;white-space:pre-wrap;overflow-wrap:anywhere";
+        out.textContent = "Tap a device button (Desktop / Tablet / Mobile / Fluid).";
+        panel.append(row, out);
+        const describe = (element) => {
+          if (!element || element === document.body) return "body";
+          const id = element.id ? "#" + element.id : "";
+          const cls = element.classList.length ? "." + [...element.classList].join(".") : "";
+          const role = element.getAttribute("role") ? "[role=" + element.getAttribute("role") + "]" : "";
+          return element.tagName.toLowerCase() + id + cls + role;
+        };
+        const report = (target) => {
+          const active = document.activeElement;
+          const lines = [
+            "modality: " + document.documentElement.getAttribute("data-meowui-focus-modality"),
+            "focused: " + describe(active) + "  focus-visible: " + (active && active !== document.body && active.matches(":focus-visible")),
+            "tapped: " + describe(target),
+          ];
+          for (let node = target; node && node !== document.documentElement; node = node.parentElement) {
+            const s = getComputedStyle(node);
+            const bits = [];
+            if (s.outlineStyle !== "none") bits.push("outline " + s.outlineStyle + " " + s.outlineWidth + " " + s.outlineColor);
+            if (s.boxShadow !== "none") bits.push("shadow " + s.boxShadow);
+            if (s.webkitTapHighlightColor && s.webkitTapHighlightColor !== "rgba(0, 0, 0, 0)") bits.push("tap " + s.webkitTapHighlightColor);
+            if (node.hasAttribute("tabindex")) bits.push("tabindex " + node.getAttribute("tabindex"));
+            if (node.matches(":focus-within")) bits.push("focus-within");
+            if (node.matches(":hover")) bits.push("hover");
+            lines.push("  " + describe(node) + (bits.length ? "  → " + bits.join(" | ") : ""));
+          }
+          out.textContent = lines.join("\n");
+        };
+        document.addEventListener(
+          "pointerdown",
+          (event) => {
+            if (panel.contains(event.target)) return;
+            const target = event.target;
+            setTimeout(() => report(target), 400);
+          },
+          true,
+        );
+        const mount = () => document.body.append(panel);
+        if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", mount);
+        else mount();
+      })();
+    </script>
   </body>
 </html>

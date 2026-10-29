@@ -63,6 +63,7 @@ import { emptyStateStyles } from "./components/empty-state.styles";
 import { navItemStyles } from "./components/nav-item.styles";
 import { iconsStyles } from "./icons/icons.styles";
 import { breadcrumbStyles } from "./components/breadcrumb.styles";
+import { paginationStyles } from "./components/pagination.styles";
 import { itemStyles } from "./components/item.styles";
 import { toggleStyles } from "./components/toggle.styles";
 import { segmentedControlStyles } from "./components/segmented-control.styles";
@@ -200,6 +201,7 @@ export const standardThemeStyles = [
   toolbarStyles,
   tabsStyles,
   breadcrumbStyles,
+  paginationStyles,
   alertStyles,
   skeletonStyles,
   spinnerStyles,

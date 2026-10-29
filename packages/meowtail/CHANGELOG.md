@@ -7,7 +7,8 @@
   block by block, so streamed chunks no longer rewrite finished blocks or drop a selection in them;
   `streaming` hides half-typed markers in the open tail, and `renderCode` can draw fences with
   `CodeBlock`. The Assistant's text uses the same renderer and repairs the tail of the part a
-  streaming message is still writing.
+  streaming message is still writing. Fenced code in Assistant text now uses the shared
+  `CodeBlock`, like code parts.
 
 - Add `Autocomplete` (suggestions for free text), `TokenField` (several values entered as
   host-resolved tokens), `TreeView` (hierarchy with the tree keyboard model), `CommandPalette`

@@ -8,10 +8,12 @@ import {
   SearchInput,
   Select,
   Disclosure,
+  Popover,
   Toolbar,
   type NavListGroup,
 } from "meowtail";
-import { Icon } from "meowtail/icons";
+import { Icon, IconSource } from "meowtail/icons";
+import { BookOpen, Monitor, Moon, Sun, Type } from "meowtail/icons/lucide";
 import { standardTheme } from "meowtail/theme";
 import { applyTheme } from "meowcss/web";
 
@@ -64,10 +66,12 @@ export function mountGallery() {
   createWebRenderer(runtime).render(
     <div className="workshop-shell">
       <aside className="workshop-sidebar" id="sidebar">
-        <a className="workshop-brand" href="./">
-          <Icon name="notebook-tabs" size={21} />
-          <strong>Meowbook</strong>
-          <span>UI</span>
+        <a className="workshop-brand" id="brand" href="./">
+          <span id="brand-mark" className="workshop-brand-mark">
+            <Icon name="notebook-tabs" size={18} />
+          </span>
+          <strong id="brand-name">Meowbook</strong>
+          <span id="brand-label">UI</span>
         </a>
         <SearchInput
           className="workshop-search"
@@ -76,24 +80,10 @@ export function mountGallery() {
           placeholder="Find components…"
         />
         <div className="catalog-label">
-          Component catalog <span id="story-count" />
+          Components <span id="story-count" />
         </div>
         <div id="catalog">
-          <p>Loading samples…</p>
-        </div>
-        <div className="workshop-local">
-          <label className="workshop-appearance">
-            Tool appearance
-            <Select id="gallery-scheme" aria-label="Tool appearance">
-              <option value="auto">Follow system</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-            </Select>
-          </label>
-          <span className="workshop-local-note">
-            <span className="status-dot" />
-            Local component environment
-          </span>
+          <p className="catalog-empty">Loading samples…</p>
         </div>
       </aside>
       <button id="catalog-backdrop" aria-label="Close component catalog" tabindex={-1} hidden />
@@ -106,21 +96,77 @@ export function mountGallery() {
             aria-controls="sidebar"
             aria-expanded="false"
           >
-            <Icon name="panel-left" size={17} />
+            <Icon name="panel-left" size={16} />
           </Button>
-          <span id="group">Component preview</span>
-          <span className="breadcrumb-separator">/</span>
-          <span id="breadcrumb-component">Meowbook</span>
-          <a
-            id="standalone"
-            href="./canvas.html"
-            target="_blank"
-            rel="noopener"
-            aria-label="Standalone preview"
-            title="Standalone preview"
-          >
-            <Icon name="arrow-up-right" size={16} />
-          </a>
+          <nav className="workshop-trail" aria-label="Breadcrumb">
+            <span id="group">Components</span>
+            <span className="breadcrumb-separator" aria-hidden="true">
+              /
+            </span>
+            <span id="breadcrumb-component" aria-current="page">
+              Meowbook
+            </span>
+          </nav>
+          <div className="workshop-header-actions">
+            <a id="story-docs" className="workshop-header-link" hidden>
+              <IconSource source={BookOpen} size={14} />
+              <span>Docs</span>
+            </a>
+            <nav id="host-links" className="workshop-host-links" aria-label="Related" hidden />
+            <Popover
+              id="appearance"
+              className="workshop-appearance"
+              align="end"
+              role="dialog"
+              labelledBy="appearance-trigger"
+              trigger={(bindings) => (
+                <button
+                  {...bindings}
+                  id="appearance-trigger"
+                  className="workshop-icon-button"
+                  type="button"
+                  aria-label="Appearance"
+                  title="Appearance"
+                  data-appearance="auto"
+                >
+                  <IconSource source={Monitor} size={16} className="appearance-auto" />
+                  <IconSource source={Sun} size={16} className="appearance-light" />
+                  <IconSource source={Moon} size={16} className="appearance-dark" />
+                </button>
+              )}
+            >
+              <fieldset id="appearance-themes" hidden>
+                <legend>Theme</legend>
+              </fieldset>
+              <fieldset id="appearance-schemes">
+                <legend>Appearance</legend>
+                {(
+                  [
+                    ["auto", "System", Monitor],
+                    ["light", "Light", Sun],
+                    ["dark", "Dark", Moon],
+                  ] as const
+                ).map(([value, label, icon]) => (
+                  <label>
+                    <input type="radio" name="gallery-scheme" value={value} />
+                    <IconSource source={icon} size={14} />
+                    <span>{label}</span>
+                  </label>
+                ))}
+              </fieldset>
+            </Popover>
+            <a
+              id="standalone"
+              className="workshop-icon-button"
+              href="./canvas.html"
+              target="_blank"
+              rel="noopener"
+              aria-label="Open the canvas on its own"
+              title="Open the canvas on its own"
+            >
+              <Icon name="arrow-up-right" size={16} />
+            </a>
+          </div>
         </header>
         <section className="workshop-intro" aria-label="Current component scenario">
           <h1 id="title" tabindex={-1}>
@@ -130,10 +176,6 @@ export function mountGallery() {
           <nav id="variants" aria-label="Component scenarios" />
         </section>
         <Toolbar className="workshop-toolbar" label="Preview tools">
-          <span className="preview-label">
-            <Icon name="eye" size={15} />
-            Preview
-          </span>
           <div
             id="viewport"
             className="workshop-viewport"
@@ -142,8 +184,8 @@ export function mountGallery() {
           >
             {[
               ["1100", "Desktop"],
-              ["390", "Mobile"],
               ["768", "Tablet"],
+              ["390", "Mobile"],
               ["fluid", "Fluid"],
             ].map(([value, label]) => (
               <Button variant="quiet" size="small" data-width={value} aria-pressed="false">
@@ -154,20 +196,35 @@ export function mountGallery() {
           <span id="viewport-size" className="viewport-size">
             1100 px
           </span>
-          <Button id="reset" variant="quiet" size="small" title="Reset sample">
-            <Icon name="refresh-cw" size={14} />
-            <span>Reset sample</span>
-          </Button>
-          <Select id="measure-mode" aria-label="Annotation category">
-            <option value="off">Annotations off</option>
-            <option value="controls">Control sizes</option>
-            <option value="text">Text typography</option>
-            <option value="spacing">Spacing layout</option>
-            <option value="structure">Structure outlines</option>
-          </Select>
-          <Button id="text-placeholder" variant="quiet" size="small" aria-pressed="false">
-            Text placeholders
-          </Button>
+          <div className="workshop-tools">
+            <Select id="measure-mode" aria-label="Annotation category">
+              <option value="off">Annotations off</option>
+              <option value="controls">Control sizes</option>
+              <option value="text">Text typography</option>
+              <option value="spacing">Spacing layout</option>
+              <option value="structure">Structure outlines</option>
+            </Select>
+            <Button
+              id="text-placeholder"
+              variant="quiet"
+              size="small"
+              aria-pressed="false"
+              aria-label="Text placeholders"
+              title="Replace text with placeholder bars"
+            >
+              <IconSource source={Type} size={14} />
+              <span>Text placeholders</span>
+            </Button>
+            <Button
+              id="reset"
+              variant="quiet"
+              size="small"
+              aria-label="Reset sample"
+              title="Reset sample"
+            >
+              <Icon name="refresh-cw" size={14} />
+            </Button>
+          </div>
         </Toolbar>
         <div className="workshop-stage">
           <iframe id="canvas" title="Component preview canvas" />

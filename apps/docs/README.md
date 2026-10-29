@@ -88,11 +88,20 @@ dist/
 
 ## The look
 
-The pages wear the workbench's own clothes: the catalog rail, the search field, the breadcrumb in
-the header and the preview frame are the same parts the Meowbook gallery is built from, and the
-theme supplies the same surfaces, hairlines and type scale. The site adds only the layout a
-reference needs — the reading column, the code panel and the API table — and every one of them
-uses the shared tokens.
+The pages and the workbench are one site. The workbench is Meowbook's gallery dressed through its
+`gallery` config in `build.ts`: it carries the Meowland mark and leads back to the home page, its
+catalog rail, header and breadcrumb use the same sizes as the pages, and each story links to the
+page that documents it. Each example on a component page links the other way, to the same story
+in the workbench. The component and presentation workbenches link to each other.
+
+The appearance menu is one choice across the site: the pages, their live previews and the
+workbench read the same `localStorage` keys, so a theme or scheme picked on a page is the one the
+workbench opens with, and the reverse. The workbench chrome itself stays on the standard theme;
+the chosen theme paints its stories.
+
+The theme supplies the same surfaces, hairlines and type scale to every page. The site adds only
+the layout a reference needs — the reading column, the code panel and the API table — and every
+one of them uses the shared tokens.
 
 The catalog filter is the one piece of behavior the site owns: the search field is meowtail's
 `SearchInput`, and the page matches the catalog entries with it. The matching runs in the page

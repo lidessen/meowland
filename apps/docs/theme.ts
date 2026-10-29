@@ -46,6 +46,10 @@ export const docsTokens = defineTokens("docs", {
 /** The root attribute that selects the reader's site theme; standard when absent. */
 export const DOCS_THEME_ATTRIBUTE = "data-docs-theme";
 
+/** Where the reader's choices persist; the workbench reads the same keys. */
+export const DOCS_APPEARANCE_STORE = "meowland-docs-appearance";
+export const DOCS_THEME_STORE = "meowland-docs-theme";
+
 /** The site themes a reader can choose besides standard, as the gallery's `theme` parameter names them. */
 export const DOCS_THEMES = ["journal", "meow"] as const;
 export type DocsTheme = "standard" | (typeof DOCS_THEMES)[number];
@@ -358,7 +362,7 @@ export const docsStyles = css`
     font-size: ${uiTokens.type.label};
     text-align: center;
   }
-  /* On the narrowest screens the header keeps the trail readable: Workbench becomes its arrow. */
+  /* On the narrowest screens the header keeps the trail readable: Workbench becomes its icon. */
   @media (max-width: 480px) {
     .docs-header-link > span {
       display: none;
@@ -533,7 +537,7 @@ export const docsStyles = css`
   .docs-search-wrap ${searchInput.control} {
     padding-right: 36px;
   }
-  /* The one way out to the workbench: a quiet labeled link, not an unnamed glyph. */
+  /* The way to the workbench: a quiet labeled link, not an unnamed glyph. */
   .docs-header-link {
     display: inline-flex;
     flex: none;
@@ -774,11 +778,31 @@ export const docsStyles = css`
   .docs-prop-none {
     color: ${uiTokens.ink.tertiary};
   }
-  /* Preview and Code: text tabs on a hairline, the selected one underlined in ink. */
+  /* Preview and Code: text tabs on a hairline, the selected one underlined in ink; the way into
+     the workbench sits at the far end of the same line. */
+  .docs-example-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+  }
   .docs-tabs {
     display: flex;
     gap: 20px;
-    border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+  }
+  a.docs-example-open {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-left: auto;
+    padding: 6px 0 8px;
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.label};
+    font-weight: ${uiTokens.type.weight.medium};
+    white-space: nowrap;
+  }
+  a.docs-example-open:hover {
+    color: ${uiTokens.ink.primary};
   }
   .docs-tabs[hidden] {
     display: none;

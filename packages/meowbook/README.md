@@ -4,7 +4,38 @@
 
 The Gallery is itself rendered by MeowJSX and reuses Meowtail's Button, Input, Icon and standard theme through its own runtime, so it does not affect the story execution environment. Meowbook only maintains the tool's catalog, canvas and inspection drawer layout. Inspection notes are collapsed by default, and a narrow screen chooses stories through the catalog button.
 
-The tool centers on the canvas: it fits the available space by default, and fixed device widths are for explicit comparison. The latest interaction feedback appears directly at the bottom, and the full log expands on demand. Search shows the match count; on a narrow screen the catalog supports closing with the backdrop, Escape and focus return. The "Tool appearance" control in the lower left supports light, dark and follow system, independent of the theme inside the story, and does not remount the story.
+The tool centers on the canvas: it fits the available space by default, and fixed device widths are for explicit comparison. The latest interaction feedback appears directly at the bottom, and the full log expands on demand. Search shows the match count; on a narrow screen the catalog supports closing with the backdrop, Escape and focus return. The appearance menu in the header holds one choice for light, dark or follow system, and it paints both the tool and the story: the gallery opens its canvas with `embedded=1&scheme=<choice>`, so an environment that reads `embedded` draws no controls of its own, and a later change reaches the open canvas without remounting it. The standalone link in the header opens the canvas without `embedded`, where the environment keeps its own controls, for example to inspect a dark story apart from the tool.
+
+### Hosting the gallery in a site
+
+`gallery` in the config dresses the gallery for the site that serves it. Every field is optional; without it, the gallery is Meowbook's own.
+
+```ts
+export default defineConfig({
+  // root, stories, preview, tsconfig as above
+  gallery: {
+    brand: { name: "Acme", tag: "workbench", logo: "/logo.png", href: "/" },
+    links: [{ label: "Guides", href: "/guides/" }],
+    docsLink: (story) =>
+      story.component ? { label: "Docs", href: `/components/${story.component}/` } : undefined,
+    appearance: {
+      schemeStorageKey: "acme-appearance",
+      themeStorageKey: "acme-theme",
+      themes: [
+        { value: "standard", label: "Standard" },
+        { value: "dark-brand", label: "Brand" },
+      ],
+    },
+  },
+});
+```
+
+- `brand` replaces the name, the short tag (an empty string hides it), the 28px mark and where the mark leads.
+- `links` are quiet header links to related pages, such as a second gallery of the same site.
+- `docsLink` runs once per story at build time; the header shows its result while that story is current. Only the results reach the browser.
+- `appearance` lets the site and the gallery share the reader's choice through `localStorage`. A missing key means follow system and the first theme, so those are stored by removing the key. With two or more `themes`, the menu also offers a theme, and the gallery passes the chosen value to the canvas as its `theme` URL parameter; the values must be the ones the environment reads. A choice made in another tab of the same site reaches the gallery.
+
+`buildStories` writes these settings as `gallery.json` next to `manifest.json`; the manifest keeps its shape.
 
 ## Usage
 

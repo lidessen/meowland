@@ -253,6 +253,25 @@ test("build emits a static gallery, independent canvas and manifest, then remove
       covers: ["Input"],
     });
     expect((await readdir(root)).some((path) => path.startsWith(".meowbook-"))).toBe(false);
+    // Without a gallery config the gallery keeps its own chrome and no settings file is written.
+    expect(await readdir(outdir)).not.toContain("gallery.json");
+    await buildStories(
+      {
+        ...config,
+        gallery: {
+          brand: { name: "Site", tag: "" },
+          appearance: { schemeStorageKey: "site-scheme" },
+          docsLink: (story) =>
+            story.id === "build/button" ? { label: "Docs", href: "/button/" } : undefined,
+        },
+      },
+      outdir,
+    );
+    expect(JSON.parse(await readFile(join(outdir, "gallery.json"), "utf8"))).toEqual({
+      brand: { name: "Site", tag: "" },
+      appearance: { schemeStorageKey: "site-scheme" },
+      docsLinks: { "build/button": { label: "Docs", href: "/button/" } },
+    });
   }));
 
 test("CLI list emits machine-readable metadata without importing a throwing story module", async () =>

@@ -1,7 +1,13 @@
 import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { dirname, join, relative, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
-import type { StoryConfig, StoryEntry } from "../types";
+import type {
+  GalleryConfig,
+  GalleryLink,
+  GallerySettings,
+  StoryConfig,
+  StoryEntry,
+} from "../types";
 import { discoverStories, sourcePath, type DiscoveredStory, type TemporaryStory } from "./discover";
 import { standardTheme } from "meowtail/theme";
 import { themeAttributes } from "meowcss";
@@ -136,6 +142,20 @@ function manifest(stories: readonly DiscoveredStory[]): StoryEntry[] {
   return stories.map(({ generated: _generated, ...entry }) => entry);
 }
 
+/** The browser half of the gallery config: data only, with each story's docs link resolved. */
+function gallerySettings(
+  { docsLink, ...settings }: GalleryConfig,
+  entries: readonly StoryEntry[],
+): GallerySettings {
+  if (!docsLink) return settings;
+  const docsLinks: Record<string, GalleryLink> = {};
+  for (const entry of entries) {
+    const link = docsLink(entry);
+    if (link) docsLinks[entry.id] = { label: link.label, href: link.href };
+  }
+  return { ...settings, docsLinks };
+}
+
 export async function buildStories(
   config: StoryConfig,
   outdir: string,
@@ -201,6 +221,11 @@ export async function buildStories(
     });
     if (!result.success) throw new Error(result.logs.map(String).join("\n"));
     await writeFile(join(resolve(outdir), "manifest.json"), JSON.stringify(entries, null, 2));
+    if (config.gallery)
+      await writeFile(
+        join(resolve(outdir), "gallery.json"),
+        JSON.stringify(gallerySettings(config.gallery, entries), null, 2),
+      );
     return entries;
   } finally {
     await prepared.cleanup();

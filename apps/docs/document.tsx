@@ -4,10 +4,23 @@ import { h, type Child } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
 import { Breadcrumb, NavList, SearchInput, type NavListGroup } from "meowtail";
 import { Icon, IconSource, type IconSourceProps } from "meowtail/icons";
-import { BookOpen, Monitor, Moon, Palette, PawPrint, Sun } from "meowtail/icons/lucide";
+import {
+  BookOpen,
+  LayoutPanelLeft,
+  Monitor,
+  Moon,
+  Palette,
+  PawPrint,
+  Sun,
+} from "meowtail/icons/lucide";
 import type { Catalog, NavigationGroup } from "./catalog";
 import type { DocsPackage } from "./packages";
-import { DOCS_THEME_ATTRIBUTE, DOCS_THEMES } from "./theme";
+import {
+  DOCS_APPEARANCE_STORE,
+  DOCS_THEME_ATTRIBUTE,
+  DOCS_THEME_STORE,
+  DOCS_THEMES,
+} from "./theme";
 
 /** The name the site gives itself. */
 export const SITE_NAME = "Meowland";
@@ -20,7 +33,7 @@ export const SITE_DESCRIPTION =
  * The supplied site mark, scaled to 96px for its 28px slot (3x screens). Its content hash keeps
  * browser caches in sync with releases.
  */
-const LOGO = "meowland-logo-3ef0fd67.png";
+export const LOGO = "meowland-logo-3ef0fd67.png";
 
 function logoHref(depth: number): string {
   return depth <= 0 ? `./${LOGO}` : `${"../".repeat(depth)}${LOGO}`;
@@ -142,8 +155,8 @@ const PREVIEW_FIT = `(() => {
  * The reader's appearance and theme choices, applied before the stylesheet paints so no page
  * flashes.
  */
-const APPEARANCE_STORE = "meowland-docs-appearance";
-const THEME_STORE = "meowland-docs-theme";
+const APPEARANCE_STORE = DOCS_APPEARANCE_STORE;
+const THEME_STORE = DOCS_THEME_STORE;
 const APPEARANCE_EARLY = `(() => {
   try {
     const choice = localStorage.getItem("${APPEARANCE_STORE}");
@@ -748,9 +761,9 @@ function Document({
                   </fieldset>
                 </div>
               </div>
-              <a className="docs-header-link" href="/gallery/" aria-label="Workbench">
+              <a className="docs-header-link" href="/gallery/">
+                <IconSource source={LayoutPanelLeft} size={14} />
                 <span>Workbench</span>
-                <Icon name="arrow-up-right" size={14} />
               </a>
             </header>
             <main className={path === "" ? "docs-content docs-content-home" : "docs-content"}>

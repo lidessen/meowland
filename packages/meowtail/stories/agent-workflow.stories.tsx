@@ -580,7 +580,7 @@ export const AgentWorkflow = defineStory({
   groupOrder: 90,
   component: "ChatTask",
   description:
-    "Shared tool and task display. Execution completion, public reply, user waiting and a lost connection are different facts.",
+    "Tools and tasks in one reply. A finished run, a published reply, a wait for your answer and a lost connection each read as their own state.",
   covers: [
     "ChatTask",
     "ChatToolCall",
@@ -601,7 +601,7 @@ export const AgentWorkflowNarrow = defineStory({
   groupOrder: 90,
   component: "ChatTask",
   description:
-    "The same composition inside a 320px host on a wide screen, without story-only CSS patching the content.",
+    "The same reply in a 320px container: each row wraps its facts onto readable lines instead of squeezing them into thin columns.",
   covers: ["narrow container", "long input/output", "nested tasks", "default layout"],
   render: () => agentWorkflowDemo(true),
 });
@@ -613,7 +613,7 @@ export const AgentWorkflowAssistant = defineStory({
   groupOrder: 90,
   component: "AssistantView",
   description:
-    "The same Assistant renders tools and tasks by default and keeps messages, draft, attachments, activity, questions and safe Markdown.",
+    "The complete Assistant from one component: messages with tools, tasks and safe Markdown, a question waiting for an answer, attachments, the draft and the activity panel.",
   covers: [
     "AssistantView",
     "AssistantComposer",

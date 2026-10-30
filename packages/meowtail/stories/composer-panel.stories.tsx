@@ -11,7 +11,7 @@ export const ComposerPanelStory = defineStory({
   component: "ComposerPanel",
   variant: "Editor, action rail and facts",
   description:
-    "ComposerPanel refines ChatComposer's single writing surface. The keyboard hint and optional page-level facts follow outside the rounded editor and its bottom action row.",
+    "ComposerPanel adds a page-level details row under the writing surface, beside the keyboard hint.",
   covers: ["ComposerPanel default", "ComposerPanel external hint", "ComposerPanel meta row"],
   render: () => (
     <Measure width="content">

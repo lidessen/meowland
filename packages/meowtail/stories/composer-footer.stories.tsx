@@ -22,7 +22,7 @@ export const ComposerFooterStory = defineStory({
   component: "ChatComposer",
   variant: "Stacked footer allocation",
   description:
-    "The writing surface contains draft and bottom actions; keyboard help follows outside its rounded edge. Controls only change fixture data; the story adds no layout styles.",
+    "Model choice and a keyboard hint around the writing surface; the hint sits outside its rounded edge.",
   covers: ["stacked hint with trailing", "long model and status", "draft and focus", "attachments"],
   render() {
     const draft = signal("");

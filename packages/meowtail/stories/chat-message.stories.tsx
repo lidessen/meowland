@@ -33,7 +33,7 @@ export const ChatToolSequenceStory = defineStory({
   groupOrder: 90,
   component: "ChatToolCall",
   description:
-    "Tool actions and their target stay on one row; results expand on demand, and non-complete states always show clearly. The static example runs no tools.",
+    "Each tool call is one row: the action, its target and its state. Results expand on demand, and any state other than done is always labeled.",
   render: () => (
     <Measure>
       <ChatFrame>
@@ -133,7 +133,7 @@ export const ChatToolCallActionStory = defineStory({
   component: "ChatToolCall",
   variant: "Host actions",
   description:
-    "A row has two interactions: expand its own body, or let the host run an action. Both are the same focusable control, with consistent row metrics, state and hover glyph. The example only echoes local state and runs no command.",
+    "A row either expands its own result or hands an action, such as retry, to the host. Both are one focusable control with the same row geometry.",
   covers: ["onActivate", "button header", "collapsible body", "row geometry"],
   render: () => {
     const feedback = signal("Not activated yet");
@@ -184,7 +184,7 @@ export const ChatMessageCompositionStory = defineStory({
   component: "ChatMessage",
   variant: "Composition and surface",
   description:
-    "The message owns identity and arrangement; the Bubble owns the reading surface. Attachments and process can sit outside the bubble, and actions only echo local state.",
+    "A message keeps its author, arrangement and actions while bubbles carry the text. Attachments, process and sources sit beside the bubbles in the same message.",
   covers: [
     "ChatMessage header/footer/surface",
     "ChatBubble auto/plain/filled",
@@ -344,7 +344,7 @@ export const ChatProcessDetailStory = defineStory({
   component: "ChatProcess",
   variant: "Collapse and expand",
   description:
-    "The process summary keeps its position and execution details expand on demand; expansion and collapse come from native details.",
+    "A summary row for work that happened between messages. It keeps its place in the conversation, and its details open on demand.",
   render: () => (
     <Measure>
       <Stack>
@@ -452,7 +452,7 @@ export const ChatMessageRowsStory = defineStory({
   component: "ChatMessageList",
   variant: "Two mounting shapes",
   description:
-    "The list column declares the row pitch and each row reads it, so layout-neutral wrappers inserted when mounting row by row do not change the result. A user message starts a new round, a continuation answer sits close to the previous one, and a tool row sits close to the work it reports.",
+    "Spacing follows the conversation: a new question starts a new turn, a continued reply sits close to the one before, and a tool row sits close to the work it reports.",
   covers: [
     "ChatMessageListItem",
     "ChatMessageListContent",

@@ -39,7 +39,7 @@ export const InlineComposer = defineStory({
   component: "ChatComposer",
   variant: "Inline editing",
   description:
-    "Short drafts sit on the same row as actions; long drafts grow naturally. Supporting instructions appear outside the writing surface on focus. Local editing only.",
+    "A short draft shares one row with its actions and grows into more lines as you write. The keyboard hint appears under the field while it has focus.",
   render: () => (
     <Measure width="content">
       <ChatComposer
@@ -64,7 +64,7 @@ export const ComposerAttachments = defineStory({
   component: "ChatComposer",
   variant: "Attachments and draft",
   description:
-    "Images are identified by thumbnails and files keep their names; sending saves only a local snapshot, and neither waiting nor failure loses the draft you keep editing.",
+    "Images show as thumbnails and files keep their names. Removing one only changes the next send, and the draft stays while a send is pending or after it fails.",
   render() {
     const draft = signal("Use this sketch to check the reading order on a narrow screen.");
     const pending = signal(false);
@@ -213,7 +213,8 @@ export const SentAttachments = defineStory({
   groupOrder: 90,
   component: "ChatAttachments",
   variant: "Sent materials",
-  description: "Sent materials keep preview and download; no draft-removal action is offered.",
+  description:
+    "Images and files in a sent message: open an image to see it whole, or download a file. Nothing can be removed once it is sent.",
   render: () => (
     <Measure width="content">
       <Stack gap="compact">

@@ -12,7 +12,7 @@ export const ConversationReading = defineStory({
   component: "ChatConversation",
   variant: "Reading continuity",
   description:
-    "Read upward first, then add replies; the reading position stays put. The return action floats over the viewport's lower edge and never resizes it; after returning to the latest message it follows new content again. The buttons only update the local example, and collapsing then expanding remounts the reading region.",
+    "Scroll up and add replies: your reading position stays put. Back to latest message floats over the bottom edge, and once used the view follows new replies again.",
   covers: [
     "ChatConversation",
     "ChatMessageList",

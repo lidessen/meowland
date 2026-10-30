@@ -82,3 +82,26 @@ test("the attachment action retains keyboard activation, draft and disabled sema
   await page.getByRole("button", { name: "Toggle disabled", exact: true }).click();
   await expect(attach).toBeEnabled();
 });
+
+test("the bar composer keeps its trailing choices on one row beside send", async ({ page }) => {
+  for (const width of [680, 1000]) {
+    await page.setViewportSize({ width, height: 844 });
+    await page.goto("/canvas.html?story=assistant-complete");
+    await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+    const geometry = await page
+      .locator('[data-meowui-part="chat-composer/trailing"]')
+      .evaluate((trailing) => {
+        const model = trailing.querySelector('[data-meowui-part="choice-select/trigger"]')!;
+        const history = trailing.querySelector('[data-meowui-part="icon-button/root"]')!;
+        const center = (element: Element) => {
+          const bounds = element.getBoundingClientRect();
+          return bounds.y + bounds.height / 2;
+        };
+        return {
+          model: center(model),
+          history: center(history),
+        };
+      });
+    expect(Math.abs(geometry.model - geometry.history)).toBeLessThan(2);
+  }
+});

@@ -146,21 +146,41 @@ export const assistantStyles = css`
     line-height: ${chatTokens.leading};
     overflow-wrap: anywhere;
   }
+  /* The latest action floats over the transcript's lower edge, so showing it never resizes the
+  reading viewport. Only the button takes the pointer; the strip around it reads through. */
   ${assistantViewPartRefs.latest} {
+    position: absolute;
+    inset-inline: 0;
+    inset-block-end: 0;
+    z-index: 1;
     display: flex;
     justify-content: center;
-    flex-shrink: 0;
     width: 100%;
     max-width: ${uiTokens.layout.containerContent};
     margin-inline: auto;
     padding: ${uiTokens.space.group} ${uiTokens.space.panel};
     box-sizing: border-box;
+    pointer-events: none;
+  }
+  ${assistantViewPartRefs.latest}[hidden] {
+    display: none;
   }
   ${assistantViewPartRefs.latest} > ${buttonPartRefs.root} {
     min-width: 0;
     max-width: 100%;
     white-space: normal;
     overflow-wrap: anywhere;
+    pointer-events: auto;
+    box-shadow: ${uiTokens.shadow.float};
+  }
+  /* Floating over text, the state overlays paint on an opaque base instead of letting it through. */
+  ${assistantViewPartRefs.latest}:not([hidden]) > ${buttonPartRefs.root}:hover:not(:disabled) {
+    background: linear-gradient(${uiTokens.state.hover}, ${uiTokens.state.hover})
+      ${uiTokens.surface.raised};
+  }
+  ${assistantViewPartRefs.latest}:not([hidden]) > ${buttonPartRefs.root}:active:not(:disabled) {
+    background: linear-gradient(${uiTokens.state.active}, ${uiTokens.state.active})
+      ${uiTokens.surface.raised};
   }
   ${composer} {
     grid-area: composer;

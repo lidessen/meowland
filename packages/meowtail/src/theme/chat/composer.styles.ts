@@ -130,7 +130,7 @@ export const chatComposerStyles = css`
   ${chatComposerPartRefs.attachments} {
     grid-row: 1;
     min-width: 0;
-    padding: 2px 10px 0;
+    padding: 2px 6px 0;
     margin-bottom: -6px;
   }
 
@@ -445,7 +445,7 @@ export const chatComposerStyles = css`
     min-width: 0;
     width: auto;
     height: auto;
-    padding-inline: 6px;
+    padding-inline: 18px;
     overflow: visible;
     clip-path: none;
     white-space: normal;
@@ -454,6 +454,11 @@ export const chatComposerStyles = css`
     font-size: ${uiTokens.type.caption};
     line-height: ${uiTokens.type.line.caption};
     pointer-events: auto;
+  }
+
+  /* The inline draft starts after the surface's section inset and the input's own 14px. */
+  ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="inline"]:focus-within > ${chatComposerPartRefs.hint} {
+    padding-inline: calc(${uiTokens.space.section} + 14px);
   }
 
   /* A phone writes on one row: attach, text, send. The model choice keeps a quiet row beneath. */
@@ -507,6 +512,23 @@ export const chatComposerStyles = css`
       justify-content: flex-start;
     }
 
+    /* Any other action (a labeled button, a host control) cannot share the one writing row:
+    it takes the quiet row beneath, so the text keeps its column. */
+    ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} > :not(${iconButtonPartRefs.root}, ${chatComposerPartRefs.trailing}, ${chatComposerPartRefs.submit}) {
+      grid-column: 1 / -1;
+      grid-row: 3;
+      justify-self: start;
+      margin-top: 2px;
+    }
+
+    ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions}:has(> :not(${iconButtonPartRefs.root}, ${chatComposerPartRefs.trailing}, ${chatComposerPartRefs.submit})) > ${chatComposerPartRefs.trailing} {
+      grid-row: 4;
+    }
+
+    ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] > ${chatComposerPartRefs.hint} {
+      padding-inline: 12px;
+    }
+
     ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} > ${chatComposerPartRefs.submit} {
       grid-column: 3;
       grid-row: 2;
@@ -532,7 +554,9 @@ export const chatComposerStyles = css`
 
   /* Bar: one rounded row (attach, text, trailing choices, send) that grows with the draft. */
   ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] > ${chatComposerPartRefs.surface} {
-    grid-template-columns: auto minmax(0, 1fr) auto auto;
+    /* Beside a fractional text column an auto track would shrink to min-content and fold the
+    trailing choices into a column; they keep one row up to the trailing cap instead. */
+    grid-template-columns: auto minmax(0, 1fr) fit-content(280px) auto;
     align-items: end;
     gap: 0 ${uiTokens.space.group};
     padding: 6px;
@@ -584,6 +608,8 @@ export const chatComposerStyles = css`
     align-items: center;
     gap: 2px;
     min-width: 0;
+    /* The track caps the width; a percentage here would resolve against the track itself. */
+    max-width: none;
     min-height: ${uiTokens.control.regular};
   }
   ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="bar"] ${chatComposerPartRefs.submit} {

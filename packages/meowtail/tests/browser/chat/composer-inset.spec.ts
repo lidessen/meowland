@@ -54,3 +54,28 @@ test("a direct frame composer keeps its reading inset while nested composers use
     }
   }
 });
+
+test("a labeled action in a narrow stacked composer takes its own row instead of the text's column", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 640, height: 900 });
+  await page.goto("/canvas.html?story=composer-attachments");
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  const geometry = await page
+    .locator('[data-meowui-part="chat-composer/surface"]')
+    .evaluate((surface) => {
+      const rect = (selector: string) => surface.querySelector(selector)!.getBoundingClientRect();
+      const input = rect('[data-meowui-part="chat-composer/input"]');
+      const action = rect(
+        '[data-meowui-part="chat-composer/actions"] > [data-meowui-part="button/root"]',
+      );
+      const submit = rect('[data-meowui-part="chat-composer/submit"]');
+      return { input, action, submit, surface: surface.getBoundingClientRect() };
+    });
+  // The text keeps the writing row beside send, starting at the surface's leading edge.
+  expect(Math.abs(geometry.input.bottom - geometry.submit.bottom)).toBeLessThan(2);
+  expect(geometry.input.left - geometry.surface.left).toBeLessThan(24);
+  expect(geometry.input.right).toBeLessThanOrEqual(geometry.submit.left);
+  // The labeled action sits beneath, not beside the text.
+  expect(geometry.action.top).toBeGreaterThanOrEqual(geometry.input.bottom - 1);
+});

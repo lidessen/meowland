@@ -28,7 +28,7 @@ const view = (
 ```
 
 The component takes a constrained height from its parent container; standard installation still needs `createMeowUI` and `standardTheme.cssText`, and does not depend on Rossovia's CSS or controller. Messages and the composer share one reading column, and the return-to-latest action anchors only to the message region. Activity appears beside the container when wide and becomes a single native modal dialog when narrow, without re-mounting messages and drafts.
-The return-to-latest action uses normal layout flow below the message viewport; while shown it claims its natural height, and when hidden it returns that space. Historical body text is never covered by the button, and the composer still has its own region.
+The return-to-latest action floats over the lower edge of the message viewport, so showing or hiding it never resizes the transcript or moves the reading position. While history is being read it may cover the bottom of one line; only the button itself takes the pointer, and the composer still has its own region.
 
 A turn reads as the reader's question in a fill bubble and the reply as plain text, with no visible names or times; those stay in the message header for assistive technology. The composer is one rounded bar (attach, draft, trailing choices, send). Its history button gathers every question the reader asked into one column over the blurred transcript; choosing one closes the column and brings that turn to the top of the reading area without moving the host page, and Escape returns focus to the button. `history={false}` removes the button and column. A host `id` names the column for `aria-controls`.
 

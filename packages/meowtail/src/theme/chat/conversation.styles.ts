@@ -49,11 +49,23 @@ export const chatConversationStyles = css`
     box-shadow: ${uiTokens.shadow.float};
     cursor: pointer;
   }
+  /* The owned action floats over the viewport's lower edge, so showing it never resizes the
+  transcript. A host's standalone ChatConversationLatest keeps the normal flow above. */
+  ${chatConversationPartRefs.root} > ${chatConversationPartRefs.latest} {
+    position: absolute;
+    inset-block-end: ${uiTokens.space.group};
+    inset-inline-start: 50%;
+    z-index: 1;
+    margin: 0;
+    translate: -50% 0;
+  }
   ${chatConversationPartRefs.latest}[hidden] {
     display: none;
   }
+  /* The hover overlay paints on the opaque base, since the owned action floats over text. */
   ${chatConversationPartRefs.latest}:hover {
-    background: ${uiTokens.state.hover};
+    background: linear-gradient(${uiTokens.state.hover}, ${uiTokens.state.hover})
+      ${uiTokens.surface.overlay};
   }
   ${chatConversationPartRefs.latest}:focus-visible {
     ${ui.focus.ring}

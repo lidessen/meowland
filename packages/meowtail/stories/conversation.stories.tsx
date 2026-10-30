@@ -12,13 +12,13 @@ export const ConversationReading = defineStory({
   component: "ChatConversation",
   variant: "Reading continuity",
   description:
-    "Read upward first, then add replies; the reading position stays put. The return action sits after the body viewport and does not cover earlier text; after returning to the latest message it follows new content again. The buttons only update the local example, and collapsing then expanding remounts the reading region.",
+    "Read upward first, then add replies; the reading position stays put. The return action floats over the viewport's lower edge and never resizes it; after returning to the latest message it follows new content again. The buttons only update the local example, and collapsing then expanding remounts the reading region.",
   covers: [
     "ChatConversation",
     "ChatMessageList",
     "streaming",
     "scroll",
-    "normal-flow latest",
+    "floating latest",
     "cleanup",
   ],
   render: () => {

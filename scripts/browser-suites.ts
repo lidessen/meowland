@@ -4,8 +4,10 @@ import { join } from "node:path";
 
 /** One Playwright run in the CI browser matrix. */
 export interface BrowserSuite {
-  /** Unique name; also names the job and its failure artifact. */
+  /** Unique id; names the failure artifact, so it holds no slash. */
   suite: string;
+  /** The job's display name, when it should read differently from the id. */
+  label?: string;
   config: string;
   /** Extra Playwright arguments, such as a shard. */
   args?: string;
@@ -23,12 +25,14 @@ export const browserSuites: readonly BrowserSuite[] = [
   { suite: "meowjsx", config: "packages/meowjsx/playwright.config.ts", root: "packages/meowjsx" },
   ...[1, 2].map((shard) => ({
     suite: `meowtail-${shard}`,
+    label: `meowtail tests ${shard}/2`,
     config: meowtailConfig,
     args: `--grep-invert @story-matrix --shard=${shard}/2`,
     root: meowtail,
   })),
   ...[1, 2].map((shard) => ({
     suite: `meowtail-story-matrix-${shard}`,
+    label: `meowtail story matrix ${shard}/2`,
     config: meowtailConfig,
     args: `--grep @story-matrix --shard=${shard}/2`,
     root: meowtail,

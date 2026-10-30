@@ -194,8 +194,15 @@ export const docsStyles = css`
   /* NavList keeps its own rows, group titles, radius and selection; the
      sidebar only sets density. */
   .docs-catalog ${navList.root} {
-    gap: 20px;
+    gap: 4px;
     font-size: ${uiTokens.type.label};
+  }
+  /* Entry pages and packages keep their own breathing room; folded groups sit close together. */
+  .docs-catalog ${navList.group}:not(:has(.docs-nav-toggle)) {
+    margin-bottom: 16px;
+  }
+  .docs-catalog ${navList.group}:has(.docs-nav-toggle) ${navList.list} {
+    margin-bottom: 12px;
   }
   .docs-catalog ${navList.group} {
     gap: 2px;
@@ -222,10 +229,59 @@ export const docsStyles = css`
     color: ${uiTokens.accent.ink};
   }
   /* A component group names itself with an icon and hangs its rows on a guide line. */
-  .docs-catalog ${navList.groupTitle}:has(.docs-nav-group-icon) {
+  /* A component group title is a disclosure button that keeps the small-caps label role. */
+  .docs-catalog ${navList.groupTitle}:has(.docs-nav-toggle) {
+    padding: 0;
+  }
+  /* Folding titles read in sentence case, so even the longest stays on one line. */
+  .docs-nav-toggle {
     display: flex;
     align-items: center;
     gap: 8px;
+    width: 100%;
+    min-height: 30px;
+    margin: 0;
+    padding: 0 ${uiTokens.space.group};
+    border: 0;
+    border-radius: ${uiTokens.radius.md};
+    background: transparent;
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.weight.semibold} ${uiTokens.type.caption} / ${uiTokens.type.line.caption}
+      ${uiTokens.type.sans};
+    letter-spacing: 0;
+    text-align: left;
+    text-transform: none;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+  @media (hover: hover) {
+    .docs-nav-toggle:hover {
+      background: ${uiTokens.state.hover};
+    }
+  }
+  .docs-nav-toggle > span {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .docs-nav-chevron {
+    display: none;
+    flex: none;
+    transition: transform ${uiTokens.motion.response} ${uiTokens.motion.ease};
+  }
+  /* Groups fold only when the script that unfolds them runs; while filtering, every match shows. */
+  :root[data-docs-navigation-folds] .docs-nav-chevron {
+    display: block;
+  }
+  :root[data-docs-navigation-folds] .docs-nav-toggle[aria-expanded="false"] .docs-nav-chevron {
+    transform: rotate(-90deg);
+  }
+  :root[data-docs-navigation-folds]
+  .docs-catalog:not([data-docs-filtering])
+  ${navList.group}:has(.docs-nav-toggle[aria-expanded="false"])
+  ${navList.list} {
+    display: none;
   }
   .docs-nav-group-icon {
     flex: none;
@@ -1396,6 +1452,10 @@ export const docsStyles = css`
       border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     }
     .docs-sidebar > .docs-brand {
+      display: none;
+    }
+    /* A narrow header keeps the trail to one line: its first and last steps. */
+    .docs-header ${breadcrumb.item}:not(:first-child):not(:last-child) {
       display: none;
     }
     .docs-catalog ${navList.item} {

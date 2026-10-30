@@ -85,9 +85,9 @@ dist/
 - The [Meowtail component catalog](../../packages/meowtail/COMPONENTS.md) owns the maintained
   component list, its grouping and planned additions. This app generates the current reference from
   stories and component metadata, and reads the catalog's family tables for the sidebar and index
-  groups and their order; it does not maintain another planning inventory. A documented page the
-  families do not list goes under "Foundations and parts", and every example story under
-  "Composition examples".
+  groups, their order and which members are parts; it never infers a part from a name and does not
+  maintain another planning inventory. A documented page the families do not list goes under
+  "Foundations and parts", and a story that declares no `component` under "Composition examples".
 - Vercel deploys this static site from the repository configuration. The GitHub build-and-lint
   workflow does not publish it, and the npm release workflow remains separate.
 
@@ -104,9 +104,15 @@ playground read the same `localStorage` keys, so a theme or scheme picked on a p
 playground opens with, and the reverse. The chosen theme paints the playground's own chrome as well
 as its stories; the chrome keeps the system faces, since only the stories load Journal's web fonts.
 
-The sidebar shows names in their reading form: `CardAction` is listed as "Card Action", and a
-family part such as Card Action sits one step in under its owner. The filter ignores spaces and case
-and also matches the catalog's task term, so "CardAction" and "radio group" both find their page.
+Pages and the sidebar show names in their reading form: `CardAction` is "Card Action", while the
+import line and the agent indexes keep the export name. A part the catalog lists, such as Card
+Action, sits one step in under its family. An example is named by the topic before its story
+title's "·". The filter and the site search ignore spaces and case, and the filter also matches the
+catalog's task terms, so "CardAction" and "radio group" both find their page.
+
+Each component group folds. The group holding the current page opens, the others start folded, and
+the groups a reader opens or folds stay that way from page to page. A filter query shows its matches
+in folded groups too, and without the script every group stays open.
 
 Each place keeps one icon wherever it appears. The entry pages and packages lead their sidebar
 rows and home-page tiles with it; each component group carries its icon in its sidebar and index

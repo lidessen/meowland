@@ -6,6 +6,7 @@ import { Icon, IconSource } from "meowtail/icons";
 import type { ContentItem, SitePage } from "meowpress/build";
 import type { StoryEntry } from "meowbook";
 import { kebabCase, type Catalog, type CatalogComponent, type CatalogExample } from "./catalog";
+import { displayName } from "./families";
 import { firstElementOf, renderSourceOf, type StorySource } from "./code";
 import { groupIcon, packageIcon, PAGE_ICONS } from "./icons";
 import type { DocsPackage } from "./packages";
@@ -110,11 +111,11 @@ function trailFor(path: string, state: DocsState): TrailItem[] {
       ...(component
         ? [{ label: component.group, href: `/${COMPONENTS_PATH}/#${kebabCase(component.group)}` }]
         : []),
-      { label: component?.title ?? "Component" },
+      { label: component ? displayName(component.title) : "Component" },
     ];
   }
   const example = state.catalog.examples.find((candidate) => candidate.path === path);
-  return [{ label: example?.group ?? "Example" }, { label: example?.title ?? "Example" }];
+  return [{ label: example?.group ?? "Example" }, { label: example?.name ?? "Example" }];
 }
 
 interface ReadingSection {
@@ -451,7 +452,7 @@ function ComponentPage({
       id: "preview",
       title: "Preview",
       description: borrowed
-        ? `${component.title} has no story of its own; this one draws it as part of ${primary.component ?? "a composed scene"}.`
+        ? `${displayName(component.title)} has no story of its own; this one draws it as part of ${primary.component ? displayName(primary.component) : "a composed scene"}.`
         : undefined,
       children: (
         <StoryExample
@@ -488,7 +489,7 @@ function ComponentPage({
       id: "examples",
       title: "Examples",
       description: borrowed
-        ? `Other stories that draw ${component.title}.`
+        ? `Other stories that draw ${displayName(component.title)}.`
         : "The other stories that show this component.",
       children: (
         <Stack gap="relaxed">
@@ -541,7 +542,7 @@ function ComponentPage({
     <Page
       className="docs-reference-page"
       eyebrow="Component reference"
-      title={component.title}
+      title={displayName(component.title)}
       description={
         component.summary ??
         (primary
@@ -561,7 +562,7 @@ function ExamplePage({ example, state }: { example: CatalogExample; state: DocsS
     <Page
       className="docs-reference-page"
       eyebrow="Composition example"
-      title={example.title}
+      title={example.name}
       description={example.story.description}
       width={PAGE_WIDTH}
     >
@@ -570,6 +571,7 @@ function ExamplePage({ example, state }: { example: CatalogExample; state: DocsS
           {
             id: "preview",
             title: "Preview",
+            description: example.name === example.title ? undefined : storyLabel(example.story),
             // The same framed specimen as a component page; the frame grows to fit the story.
             children: (
               <div className="docs-specimen">
@@ -644,7 +646,15 @@ export function buildPages(
   const contentBySlug = new Map(posts.map((post) => [post.slug, post]));
   const pages: SitePage[] = [];
 
-  const add = (path: string, title: string, description: string, group: string, order: number) => {
+  // The agent indexes list a component by its export name; the page itself reads it with spaces.
+  const add = (
+    path: string,
+    title: string,
+    description: string,
+    group: string,
+    order: number,
+    pageTitle = title,
+  ) => {
     pages.push({
       path,
       title,
@@ -656,7 +666,7 @@ export function buildPages(
         catalog: state.catalog,
         packages: state.packages,
         path,
-        title,
+        title: pageTitle,
         description,
         trail: trailFor(path, state),
         children: renderPageBody(path, state, contentBySlug),
@@ -669,11 +679,23 @@ export function buildPages(
   for (const entry of state.packages) {
     add(entry.path, entry.title, entry.summary, "Packages", 10);
   }
-  for (const component of state.catalog.components) {
-    add(component.path, component.title, component.summary ?? "", component.group, 20);
+  // In sidebar order, so the indexes list each family together.
+  const byPath = new Map(state.catalog.components.map((component) => [component.path, component]));
+  const ordered = state.catalog.navigation.flatMap((group) =>
+    group.entries.flatMap((entry) => byPath.get(entry.path) ?? []),
+  );
+  for (const component of ordered) {
+    add(
+      component.path,
+      component.title,
+      component.summary ?? "",
+      component.group,
+      20,
+      displayName(component.title),
+    );
   }
   for (const example of state.catalog.examples) {
-    add(example.path, example.title, example.story.description ?? "", example.group, 30);
+    add(example.path, example.name, example.story.description ?? "", example.group, 30);
   }
   return pages;
 }

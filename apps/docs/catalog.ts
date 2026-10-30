@@ -46,6 +46,8 @@ export interface CatalogExample {
   slug: string;
   path: string;
   title: string;
+  /** The name the site lists it by: the topic before the story title's "·", unless two share it. */
+  name: string;
   group: string;
   story: StoryEntry;
 }
@@ -64,7 +66,7 @@ export interface NavigationEntry {
   label: string;
   /** Site path without a leading slash. */
   path: string;
-  /** True for a part of the entry before it in the family, such as Card Header under Card. */
+  /** True for a member the catalog lists as a part of its family, such as Card Header under Card. */
   part?: boolean;
   /** Other words the navigation filter matches: the catalog's task term, when the label does not say it. */
   terms?: string;
@@ -217,6 +219,7 @@ export function buildCatalog(
         slug,
         path: `examples/${slug}`,
         title: story.title,
+        name: story.title,
         group: story.group ?? EXAMPLE_GROUP,
         story,
       });
@@ -274,6 +277,13 @@ export function buildCatalog(
     });
   }
 
+  // An example reads by its topic, "Content views · Sources" as "Content Views", while that is unique.
+  const topic = (title: string) => displayName(title.split("·")[0]!.trim());
+  for (const example of examples) {
+    const shared = examples.filter((other) => topic(other.title) === topic(example.title));
+    example.name = shared.length === 1 ? topic(example.title) : example.title;
+  }
+
   // The families regroup the components and fix their order, parts right after their owner.
   const members = new Map<string, { member: FamilyMember; category: string; index: number }>();
   families.forEach((category) =>
@@ -323,28 +333,23 @@ export function buildCatalog(
   };
   for (const group of ordered) {
     const target = navigationGroup(group.label);
-    const titles = new Set(group.components.map((component) => component.title));
     for (const component of group.components) {
       const member = members.get(component.title)?.member;
       // Only words the label does not already say: spacing and case do not count.
-      const said = new Set([plainWords(displayName(component.title))]);
-      const terms = [component.title, member?.term].filter((term): term is string => {
-        if (term === undefined || said.has(plainWords(term))) return false;
-        said.add(plainWords(term));
-        return true;
-      });
+      const label = plainWords(displayName(component.title));
+      const terms = member && !label.includes(plainWords(member.term)) ? member.term : undefined;
       target.entries.push({
         href: `/${component.path}/`,
         label: displayName(component.title),
         path: component.path,
-        ...(member?.parent && titles.has(member.parent) ? { part: true } : {}),
-        ...(terms.length > 0 ? { terms: terms.join(" ") } : {}),
+        ...(member?.part ? { part: true } : {}),
+        ...(terms ? { terms } : {}),
       });
     }
   }
   for (const example of examples) {
     const target = navigationGroup(example.group);
-    target.entries.push({ href: `/${example.path}/`, label: example.title, path: example.path });
+    target.entries.push({ href: `/${example.path}/`, label: example.name, path: example.path });
   }
 
   return {

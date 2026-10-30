@@ -64,6 +64,7 @@ export const TerminalStatesStory = defineStory({
   id: "terminal-states",
   title: "Terminal output · Running, failure, and unknown status",
   group: "Content",
+  component: "TerminalBlock",
   render: () => (
     <Stack>
       <TerminalBlock

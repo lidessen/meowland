@@ -6,6 +6,7 @@ export const CodeBlockStory = defineStory({
   id: "code-block",
   title: "Code block · Language, copy, and wrapping",
   group: "Content",
+  component: "CodeBlock",
   render: () => (
     <Stack>
       <CodeBlock
@@ -33,6 +34,7 @@ export const CodeBlockHeaderStory = defineStory({
   id: "code-block-header",
   title: "Code block · Title, caption, and host actions",
   group: "Content",
+  component: "CodeBlock",
   description:
     "A named code surface keeps its language, soft-wrap, and copy controls; the title and quiet caption share the header, and host actions sit before the built-in ones.",
   covers: ["title", "caption", "host actions", "soft wrap", "copy feedback"],

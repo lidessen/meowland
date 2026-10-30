@@ -13,6 +13,7 @@ export const ImagePreviewStory = defineStory({
   id: "image-preview",
   title: "Image preview · Loading and failure",
   group: "Content",
+  component: "ImagePreview",
   render: () => (
     <Stack>
       <p>

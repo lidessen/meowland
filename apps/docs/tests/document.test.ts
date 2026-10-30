@@ -110,8 +110,14 @@ describe("the page document", () => {
     expect(html.match(/data-meowui-part="nav-list\/icon"/g)).toHaveLength(3 + packages.length);
     expect(html).toContain('class="meow-icon docs-nav-group-icon"');
     expect(html).toMatch(
-      /nav-list\/groupTitle"><svg[^>]*docs-nav-group-icon[\s\S]*?<span>Basic controls<\/span>/,
+      /nav-list\/groupTitle"><button[^>]*aria-expanded="true"[^>]*><svg[^>]*docs-nav-group-icon[\s\S]*?<span>Basic controls<\/span>/,
     );
+  });
+
+  test("only the group holding the current page starts open", () => {
+    const html = document("components/button");
+    expect(html).toMatch(/aria-expanded="false" data-docs-group="Composition examples"/);
+    expect(html).toMatch(/aria-expanded="true" data-docs-group="Basic controls"/);
   });
 
   test("the navigation filter drops whitespace, not the letter s", () => {

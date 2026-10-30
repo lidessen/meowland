@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- The `HoverCard` `preview` variant pads its content like the compact card instead of leaving the
+  text against the card edges, and a host narrower than 480px gets no 24px side inset, so on a phone
+  the card lines up with the host instead of shifting right of the trigger.
+
 - `HoverCard` works on touch: a tap opens the card and it stays open after the finger lifts (iOS
   Safari closed it within 120 ms because the lifted touch counted as the pointer leaving). A second
   tap on the trigger, an outside tap or Escape closes it.

@@ -59,6 +59,21 @@ test("wide hover preview follows its host width and copies only activation, not 
       return Boolean(bounds && bounds.x >= 0 && bounds.x + bounds.width <= 390);
     })
     .toBe(true);
+  // A narrow host gives no inset: the card lines up with its edges.
+  await expect
+    .poll(async () => {
+      const [anchor, preview] = await Promise.all([
+        page.locator("#wide-preview-anchor").boundingBox(),
+        panel.boundingBox(),
+      ]);
+      return Boolean(
+        anchor &&
+        preview &&
+        Math.abs(preview.x - anchor.x) < 1 &&
+        Math.abs(preview.width - anchor.width) < 1,
+      );
+    })
+    .toBe(true);
   await page.keyboard.press("Escape");
   await expect(panel).toBeHidden();
   await expect(trigger).toBeFocused();

@@ -155,10 +155,12 @@ export function HoverCard(
                     .getElementById(`${id}-trigger`)!
                     .getBoundingClientRect();
                   const wide = (widthAnchor?.() ?? root!).getBoundingClientRect();
+                  // A narrow host has no room to spare, so the card lines up with its edges.
+                  const inset = wide.width < 480 ? 0 : 24;
                   return new DOMRect(
-                    wide.left + 24,
+                    wide.left + inset,
                     triggerRect.top,
-                    Math.max(0, wide.width - 48),
+                    Math.max(0, wide.width - inset * 2),
                     triggerRect.height,
                   );
                 }

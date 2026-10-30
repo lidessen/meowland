@@ -5,8 +5,9 @@ import { ActionRow, Button, Checkbox, Stack, Switch } from "meowtail";
 
 export const ToggleStory = defineStory({
   id: "toggles",
-  title: "Selection · Checkboxes and switches",
-  group: "Form inputs",
+  title: "Checkbox · Checkboxes and switches",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "Checkbox",
   description:
     "Activate labels, toggle with the space bar and reset the form; a controlled switch leaves it to the caller to accept a change.",

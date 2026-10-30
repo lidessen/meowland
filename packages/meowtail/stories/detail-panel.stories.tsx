@@ -4,9 +4,9 @@ import { DetailSection, ResourceLink, Stack, Timeline, TimelineItem } from "meow
 
 export const DetailComponentsStory = defineStory({
   id: "detail-components",
-  title: "Detail components · Sections, timeline, and resource references",
-  group: "Navigation and layout",
-  groupOrder: 32,
+  title: "Detail Section · Sections, timeline, and resource references",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "DetailSection",
   variant: "Standalone component states",
   description:

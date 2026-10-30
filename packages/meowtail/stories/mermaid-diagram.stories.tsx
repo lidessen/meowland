@@ -43,9 +43,10 @@ const lifecycle = `stateDiagram-v2
 
 export const MermaidDiagramStory = defineStory({
   id: "mermaid-diagram",
-  title: "Mermaid diagram · Flow, sequence, chart and state",
+  title: "Mermaid Diagram · Flow, sequence, chart and state",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "MermaidDiagram",
-  group: "Content",
   variant: "Diagram types on the library theme",
   description:
     "Mermaid source drawn as SVG by Pele on the library's roles: shapes lifted on the overlay rung with a hairline, groups a step below, connectors in tertiary ink, emphasis in the accent and charts in the shared series order. Switch the appearance to see the same diagrams in dark.",

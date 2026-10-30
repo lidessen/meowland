@@ -5,9 +5,9 @@ import { Badge, Icon, NavItem, Stack } from "meowtail";
 
 export const NavigationItemsStory = defineStory({
   id: "navigation-cards",
-  title: "Navigation item · Selected, disabled, and long labels",
-  group: "Navigation and layout",
-  groupOrder: 40,
+  title: "Nav Item · Selected, disabled, and long labels",
+  group: "Navigation",
+  groupOrder: 20,
   component: "NavItem",
   variant: "Item states",
   description: "Selection is driven by local gallery props; no business page is switched.",
@@ -43,9 +43,9 @@ export const NavigationItemsStory = defineStory({
 
 export const FileNavigationStory = defineStory({
   id: "navigation-file-metadata",
-  title: "Navigation item · Long file names and metadata",
-  group: "Navigation and layout",
-  groupOrder: 40,
+  title: "Nav Item · Long file names and metadata",
+  group: "Navigation",
+  groupOrder: 20,
   component: "NavItem",
   variant: "Limited outline width",
   description:

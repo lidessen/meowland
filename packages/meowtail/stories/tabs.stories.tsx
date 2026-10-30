@@ -7,10 +7,10 @@ import { Measure } from "./specimen";
 export const ProjectTabs = defineStory({
   id: "tabs",
   title: "Tabs · Project context",
+  group: "Navigation",
+  groupOrder: 20,
   component: "Tabs",
   variant: "Keyboard and controlled selection",
-  group: "Navigation and layout",
-  groupOrder: 40,
   description:
     "Arrow keys and Home / End move between enabled tabs and skip disabled items; input drafts survive leaving and coming back. The controlled example below shows a selection confirmed by the caller.",
   covers: ["Tabs", "keyboard", "disabled", "controlled"],

@@ -7,9 +7,9 @@ import { Specimen, Specimens } from "./specimen";
 export const SliderStory = defineStory({
   id: "slider",
   title: "Slider · A value in a range",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "Slider",
-  group: "Form inputs",
-  groupOrder: 20,
   description:
     "A native range control. Arrow keys, Home, and End move it; the figure beside the track is the same value assistive technology reads.",
   covers: ["Slider keyboard", "Slider min/max/step", "disabled"],

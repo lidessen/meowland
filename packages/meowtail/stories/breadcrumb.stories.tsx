@@ -4,10 +4,10 @@ import { Breadcrumb, Section, Stack } from "meowtail";
 export const Breadcrumbs = defineStory({
   id: "breadcrumb",
   title: "Breadcrumb · Current location",
+  group: "Navigation",
+  groupOrder: 20,
   component: "Breadcrumb",
   variant: "Long path wrapping",
-  group: "Navigation and layout",
-  groupOrder: 40,
   description:
     "Earlier levels keep their links and the last item marks the current location; narrow screens may wrap long paths. These links jump to the example levels on this page.",
   covers: ["Breadcrumb", "navigation", "long-label"],

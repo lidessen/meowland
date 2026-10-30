@@ -7,9 +7,9 @@ import { Measure } from "./specimen";
 export const ProgressStory = defineStory({
   id: "progress",
   title: "Progress · Known and unknown amounts",
+  group: "Feedback and labels",
+  groupOrder: 80,
   component: "Progress",
-  group: "Overlays and feedback",
-  groupOrder: 30,
   description:
     "A labeled native progress bar for a known amount, and an indeterminate bar when the length is unknown. The spinner remains the wait that takes less room.",
   covers: ["Progress determinate", "Progress indeterminate", "label"],

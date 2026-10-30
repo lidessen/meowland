@@ -33,11 +33,11 @@ const sampleFiles = [
 
 export const InlineComposer = defineStory({
   id: "composer-inline",
-  title: "Composer · Short drafts and multi-line editing",
+  title: "Chat Composer · Short drafts and multi-line editing",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatComposer",
   variant: "Inline editing",
-  group: "Conversation components",
-  groupOrder: 50,
   description:
     "Short drafts sit on the same row as actions; long drafts grow naturally. Supporting instructions appear outside the writing surface on focus. Local editing only.",
   render: () => (
@@ -58,11 +58,11 @@ export const InlineComposer = defineStory({
 
 export const ComposerAttachments = defineStory({
   id: "composer-attachments",
-  title: "Composer attachments · Identify, remove, and keep writing",
+  title: "Chat Composer · Identify, remove, and keep writing",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatComposer",
   variant: "Attachments and draft",
-  group: "Conversation components",
-  groupOrder: 50,
   description:
     "Images are identified by thumbnails and files keep their names; sending saves only a local snapshot, and neither waiting nor failure loses the draft you keep editing.",
   render() {
@@ -208,11 +208,11 @@ export const ComposerAttachments = defineStory({
 
 export const SentAttachments = defineStory({
   id: "attachments-sent",
-  title: "Sent attachments · Materials you can revisit",
+  title: "Chat Attachments · Materials you can revisit",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatAttachments",
   variant: "Sent materials",
-  group: "Conversation components",
-  groupOrder: 50,
   description: "Sent materials keep preview and download; no draft-removal action is offered.",
   render: () => (
     <Measure width="content">

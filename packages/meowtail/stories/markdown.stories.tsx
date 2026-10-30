@@ -28,9 +28,9 @@ See [the design notes](https://example.com/notes) for the reasons. Raw <b>HTML</
 export const MarkdownStory = defineStory({
   id: "markdown",
   title: "Markdown · Agent text while it streams",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "Markdown",
-  group: "Content",
-  groupOrder: 15,
   description:
     "Safe Markdown for Agent and document text. While text streams, finished blocks are never rewritten, so a selection in them survives, and the open tail hides half-typed markers. Fences can be drawn with CodeBlock.",
   covers: ["Markdown streaming", "selection kept", "incomplete syntax", "renderCode", "safe links"],

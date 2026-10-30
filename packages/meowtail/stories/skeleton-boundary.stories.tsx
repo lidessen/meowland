@@ -35,11 +35,11 @@ const image =
 
 export const SkeletonBoundaryStory = defineStory({
   id: "skeleton-boundary",
-  title: "Loading boundary · Preserve existing content",
+  title: "Skeleton Boundary · Preserve existing content",
+  group: "Feedback and labels",
+  groupOrder: 80,
   component: "SkeletonBoundary",
   variant: "Existing content and dynamic loading",
-  group: "Overlays and feedback",
-  groupOrder: 30,
   description:
     "Light defaults to editable and dark to loading; input nodes and drafts stay unchanged across the switch. Actions sit outside the boundary.",
   covers: [

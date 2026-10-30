@@ -18,11 +18,11 @@ import { Measure, Specimen, Specimens } from "./specimen";
 
 export const FieldGroups = defineStory({
   id: "field-group",
-  title: "Field group · Legend and whole-group disabled",
+  title: "Field Group · Legend and whole-group disabled",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "FieldGroup",
   variant: "Field relationships",
-  group: "Form inputs",
-  groupOrder: 20,
   description:
     "Uses native fieldset/legend for fields in one group; when the group is unavailable, inputs and selects follow form semantics together.",
   covers: ["FieldGroup", "Field", "fieldset", "disabled"],
@@ -67,11 +67,11 @@ export const FieldGroups = defineStory({
 });
 export const MediaRatio = defineStory({
   id: "aspect-ratio",
-  title: "Media ratio · Landscape and square",
+  title: "Aspect Ratio · Landscape and square",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "AspectRatio",
   variant: "Fit to container",
-  group: "Navigation and layout",
-  groupOrder: 40,
   description:
     "The ratio controls the media placeholder and images choose their own cropping; the width follows the parent container.",
   render: () => (
@@ -101,10 +101,10 @@ export const MediaRatio = defineStory({
 export const Separators = defineStory({
   id: "separator",
   title: "Separator · Content and tool groups",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "Separator",
   variant: "Horizontal and vertical",
-  group: "Navigation and layout",
-  groupOrder: 40,
   description: "A separator expresses a content boundary and adds no focusable action by default.",
   render: () => (
     <Specimens>
@@ -131,10 +131,10 @@ export const Separators = defineStory({
 export const Tooltips = defineStory({
   id: "tooltip",
   title: "Tooltip · Hover and keyboard focus",
+  group: "Overlays and disclosure",
+  groupOrder: 50,
   component: "Tooltip",
   variant: "Description and dismissal",
-  group: "Overlays and feedback",
-  groupOrder: 30,
   description:
     "Hovering briefly adds a description and keyboard focus shows it immediately; Escape closes it and keeps focus. Necessary information always stays on the page.",
   render: () => (

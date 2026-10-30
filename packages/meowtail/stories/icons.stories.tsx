@@ -25,9 +25,9 @@ import { Bell, Camera, Rocket } from "meowtail/icons/lucide";
 
 export const IconsStory = defineStory({
   id: "icons",
-  title: "Functional icons · Full set",
-  group: "Icons and brand",
-  groupOrder: 60,
+  title: "Icon · Full set",
+  group: "Foundations and parts",
+  groupOrder: 100,
   component: "Icon",
   variant: "All icons",
   description:
@@ -93,8 +93,8 @@ export const IconsStory = defineStory({
 export const IconSizesStory = defineStory({
   id: "icon-sizes",
   title: "Icon · Scale and its relationship to text",
-  group: "Icons and brand",
-  groupOrder: 60,
+  group: "Foundations and parts",
+  groupOrder: 100,
   component: "Icon",
   variant: "Scale and text",
   description:
@@ -183,9 +183,9 @@ export const IconSizesStory = defineStory({
 
 export const BrandIconsStory = defineStory({
   id: "brand-icons",
-  title: "Graphics · Brand and convenience entries",
-  group: "Icons and brand",
-  groupOrder: 60,
+  title: "Brand Icons · Brand and convenience entries",
+  group: "Foundations and parts",
+  groupOrder: 100,
   component: "Brand icons",
   variant: "Brand and convenience entries",
   description:
@@ -267,9 +267,9 @@ export const BrandIconsStory = defineStory({
 
 export const IconSourceStory = defineStory({
   id: "icon-source",
-  title: "Icon · Caller icon data",
-  group: "Icons and brand",
-  groupOrder: 60,
+  title: "Icon Source · Caller icon data",
+  group: "Foundations and parts",
+  groupOrder: 100,
   component: "IconSource",
   variant: "Caller icon data",
   description:

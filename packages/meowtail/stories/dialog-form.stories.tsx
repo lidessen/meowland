@@ -16,8 +16,8 @@ import { Note } from "./specimen";
 export const DialogFormStory = defineStory({
   id: "dialog-form",
   title: "Dialog · Editing and long content",
-  group: "Overlays and feedback",
-  groupOrder: 30,
+  group: "Overlays and disclosure",
+  groupOrder: 50,
   component: "Dialog",
   variant: "Editing and long content",
   description:

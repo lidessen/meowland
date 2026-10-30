@@ -16,8 +16,8 @@ import {
 export const InitiallyOpenDrawerStory = defineStory({
   id: "drawer-initially-open",
   title: "Drawer · Initially open",
-  group: "Navigation and layout",
-  groupOrder: 34,
+  group: "Overlays and disclosure",
+  groupOrder: 50,
   component: "Drawer",
   variant: "Controlled initial state",
   description: "An initially open drawer enters the native modal layer after mounting.",
@@ -57,8 +57,8 @@ export const InitiallyOpenDrawerStory = defineStory({
 export const DrawerStory = defineStory({
   id: "drawer",
   title: "Drawer · Narrow-screen navigation",
-  group: "Navigation and layout",
-  groupOrder: 34,
+  group: "Overlays and disclosure",
+  groupOrder: 50,
   component: "Drawer",
   variant: "Fixed header and independent reading",
   description:

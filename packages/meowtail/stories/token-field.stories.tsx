@@ -12,10 +12,10 @@ const people = new Map([
 
 export const TokenFieldStory = defineStory({
   id: "token-field",
-  title: "Token field · Several values while typing",
+  title: "Token Field · Several values while typing",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "TokenField",
-  group: "Form inputs",
-  groupOrder: 56,
   description:
     "Enter adds the draft as a token, a comma ends one as it is typed, and Backspace steps back into the tokens. The host resolves each entry, rejects duplicates and owns the list.",
   covers: ["TokenField add", "TokenField remove", "TokenField invalid", "TokenField form"],

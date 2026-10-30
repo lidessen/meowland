@@ -315,9 +315,10 @@ export function assistantDemo(): Child {
 
 export const CompleteAssistant = defineStory({
   id: "assistant-complete",
-  title: "Complete Assistant",
+  title: "Assistant View · Complete Assistant",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "AssistantView",
-  group: "Assistant",
   description:
     "Messages, safe rich text, process, draft, model selection, attachments, activity, work details and questions use one public component.",
   covers: [

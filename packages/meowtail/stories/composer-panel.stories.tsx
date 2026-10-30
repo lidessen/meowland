@@ -5,9 +5,9 @@ import { Measure } from "./specimen";
 
 export const ComposerPanelStory = defineStory({
   id: "composer-panel",
-  title: "Composer panel · surface and meta",
-  group: "Conversation components",
-  groupOrder: 55,
+  title: "Composer Panel · Surface and meta",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ComposerPanel",
   variant: "Editor, action rail and facts",
   description:

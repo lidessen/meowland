@@ -6,9 +6,9 @@ import { Accordion, Stack } from "meowtail";
 export const AccordionStory = defineStory({
   id: "accordion",
   title: "Accordion · Grouped disclosures",
+  group: "Overlays and disclosure",
+  groupOrder: 50,
   component: "Accordion",
-  group: "Navigation and layout",
-  groupOrder: 40,
   description:
     "Sections that open and close. Single mode keeps one open; multiple mode lets several stay open. Each section reuses Disclosure.",
   covers: ["Accordion single", "Accordion multiple", "Disclosure composition"],

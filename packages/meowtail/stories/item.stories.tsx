@@ -6,8 +6,8 @@ import { Measure } from "./specimen";
 export const ItemStory = defineStory({
   id: "item-composition",
   title: "Item · Reading and navigation",
-  group: "Basic controls",
-  groupOrder: 10,
+  group: "Records and surfaces",
+  groupOrder: 60,
   component: "Item",
   variant: "Information hierarchy and states",
   description:

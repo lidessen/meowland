@@ -19,8 +19,8 @@ import { Measure, Note } from "./specimen";
 export const CardCompositionStory = defineStory({
   id: "card-composition",
   title: "Card · Project and embedded checks",
-  group: "Basic controls",
-  groupOrder: 10,
+  group: "Records and surfaces",
+  groupOrder: 60,
   component: "Card",
   variant: "Nesting and content regions",
   description:

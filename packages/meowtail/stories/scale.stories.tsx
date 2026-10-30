@@ -21,9 +21,9 @@ import { Measure } from "./specimen";
 
 export const ScaleStory = defineStory({
   id: "scale-reference",
-  title: "Default scale · Controls and composition",
+  title: "Default Scale · Controls and composition",
   group: "Composition examples",
-  component: "Stack",
+  groupOrder: 110,
   description:
     "Check the proportions of text, controls, options, and containers on one screen. Default styles come straight from the component theme; nothing is enlarged or shrunk just for the demo.",
   covers: [

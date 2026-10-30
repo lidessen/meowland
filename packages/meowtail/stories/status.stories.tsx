@@ -16,8 +16,8 @@ import { SchemePair } from "./scheme-pair";
 export const StatusStory = defineStory({
   id: "status",
   title: "Status · Text, indicator, and page slots",
-  group: "Basic controls",
-  groupOrder: 12,
+  group: "Feedback and labels",
+  groupOrder: 80,
   component: "Status",
   covers: [
     "required visible label",

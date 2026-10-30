@@ -17,10 +17,9 @@ import {
 
 export const AppShellStory = defineStory({
   id: "app-shell",
-  title: "App shell · header, notice, messages and composer",
-  group: "Conversation components",
-  groupOrder: 56,
-  component: "PageFrame",
+  title: "App Shell · Header, notice, messages and composer",
+  group: "Composition examples",
+  groupOrder: 110,
   variant: "Mobile conversation page",
   description:
     "One public composition for a small conversation screen: PageFrame owns the header, notice, scroll body and footer; AppBar carries identity and actions; ComposerPanel owns the writing surface.",

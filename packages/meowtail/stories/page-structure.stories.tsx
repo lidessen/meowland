@@ -14,9 +14,9 @@ import {
 
 export const PageStructureStory = defineStory({
   id: "page-structure",
-  title: "Page components · Page header, cards and grouped rows",
-  group: "Navigation and layout",
-  groupOrder: 33,
+  title: "Page Header · With cards and grouped rows",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "PageHeader",
   variant: "Individual component states",
   description:
@@ -73,9 +73,9 @@ const longContentCopy = {
 
 export const PageStructureLongContentStory = defineStory({
   id: "page-structure-long-content",
-  title: "Page components · Long names, identity and disabled actions",
-  group: "Navigation and layout",
-  groupOrder: 33,
+  title: "Resource Card · Long names, identity and disabled actions",
+  group: "Records and surfaces",
+  groupOrder: 60,
   component: "ResourceCard",
   variant: "Narrow window and readable metadata",
   description:

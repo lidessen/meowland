@@ -5,9 +5,9 @@ import { SchemePair } from "./scheme-pair";
 
 export const ProcessGroupNarrowStory = defineStory({
   id: "process-group-narrow",
-  title: "Process group · Narrow rows and long sequences",
-  group: "Conversation components",
-  groupOrder: 30,
+  title: "Process Group · Narrow rows and long sequences",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ProcessGroup",
   variant: "Narrow rows and long sequences",
   description:
@@ -39,9 +39,9 @@ export const ProcessGroupNarrowStory = defineStory({
 
 export const ProcessGroupStory = defineStory({
   id: "process-group",
-  title: "Process group · Collapsed step record",
-  group: "Conversation components",
-  groupOrder: 30,
+  title: "Process Group · Collapsed step record",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ProcessGroup",
   variant: "Expanded, collapsed, and running",
   description:

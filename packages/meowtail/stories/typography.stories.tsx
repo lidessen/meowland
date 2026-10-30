@@ -7,9 +7,9 @@ import { Measure, Specimen, Specimens } from "./specimen";
 export const TextRolesStory = defineStory({
   id: "text-roles",
   title: "Text · Roles between components",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "Text",
-  group: "Navigation and layout",
-  groupOrder: 40,
   variant: "Body, secondary, label, caption and eyebrow",
   description:
     "Five roles cover the copy a host places between components. Headings stay with Section and PageHeader, field labels with Field, and code with the code components.",
@@ -155,9 +155,9 @@ const ramp = [
 export const TypeRampStory = defineStory({
   id: "type-ramp",
   title: "Text · The type ramp",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "Text",
-  group: "Navigation and layout",
-  groupOrder: 40,
   variant: "Every style, size, line and weight",
   description:
     "Every piece of text is one of these styles. Each binds a size to its line box, weight and tracking; titles close up slightly, and all of it is set in the UI face.",
@@ -197,9 +197,9 @@ export const TypeRampStory = defineStory({
 export const ProseStory = defineStory({
   id: "prose",
   title: "Prose · Long-form reading",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "Prose",
-  group: "Navigation and layout",
-  groupOrder: 40,
   variant: "Reading measure and rhythm",
   description:
     'Native headings, paragraphs, lists, quotes, code, rules and tables take the reading rhythm chat messages use. The reading measure caps the line length; `measure="fill"` takes the parent\'s width.',

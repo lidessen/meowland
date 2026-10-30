@@ -9,9 +9,9 @@ const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "
 export const ChartStory = defineStory({
   id: "chart",
   title: "Chart · Compare and follow a trend",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "Chart",
-  group: "Content",
-  groupOrder: 60,
   description:
     "Bars compare categories and a line follows a trend. A legend names each series, line markers differ by shape, arrow keys read each category aloud, and Show data opens every value as a table. The host supplies the data and its units.",
   covers: ["Chart bar", "Chart line", "missing value", "keyboard readout", "data table"],

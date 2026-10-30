@@ -6,9 +6,9 @@ import { SchemePair } from "./scheme-pair";
 
 export const WorkCardStory = defineStory({
   id: "work-card",
-  title: "Work card · Task entry in a conversation",
-  group: "Conversation components",
-  groupOrder: 31,
+  title: "Work Card · Task entry in a conversation",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "WorkCard",
   variant: "States and detail entry",
   description:

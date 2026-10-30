@@ -11,8 +11,9 @@ const sample =
   );
 export const ImagePreviewStory = defineStory({
   id: "image-preview",
-  title: "Image preview · Loading and failure",
-  group: "Content",
+  title: "Image Preview · Loading and failure",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "ImagePreview",
   render: () => (
     <Stack>

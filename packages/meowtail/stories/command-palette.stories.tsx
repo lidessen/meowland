@@ -46,10 +46,10 @@ const commands: readonly CommandPaletteCommand[] = [
 
 export const CommandPaletteStory = defineStory({
   id: "command-palette",
-  title: "Command palette · Search and run",
+  title: "Command Palette · Search and run",
+  group: "Actions and commands",
+  groupOrder: 30,
   component: "CommandPalette",
-  group: "Overlays and feedback",
-  groupOrder: 35,
   description:
     "The host opens the palette from a button or its own ⌘K shortcut. Every word of the query must match a label, group or keyword; arrow keys move, Enter runs and focus returns to the opener before the command runs.",
   covers: ["CommandPalette filter", "CommandPalette run", "focus return", "disabled command"],

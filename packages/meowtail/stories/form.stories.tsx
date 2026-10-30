@@ -7,9 +7,9 @@ import { Measure, Note, Specimen, Specimens } from "./specimen";
 export const FormStory = defineStory({
   id: "form",
   title: "Form · Validate, save and cancel",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "Form",
-  group: "Form inputs",
-  groupOrder: 57,
   description:
     "Native validation runs first and focuses the first invalid field; a valid submit hands the host its FormData. The host reports saving, a failure or a receipt, and nothing is reset.",
   covers: ["Form validation", "Form busy", "Form error", "Form status", "Form cancel"],

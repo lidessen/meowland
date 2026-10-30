@@ -6,9 +6,9 @@ import { Measure } from "./specimen";
 
 export const NavListStory = defineStory({
   id: "nav-list",
-  title: "NavList · Documentation sidebar groups",
-  group: "Navigation and layout",
-  groupOrder: 42,
+  title: "Nav List · Documentation sidebar groups",
+  group: "Navigation",
+  groupOrder: 20,
   component: "NavList",
   variant: "Docs-like groups and actions",
   description:
@@ -133,9 +133,9 @@ export const NavListStory = defineStory({
 
 export const NavListLongLabelStory = defineStory({
   id: "nav-list-long-labels",
-  title: "NavList · Long labels in a narrow sidebar",
-  group: "Navigation and layout",
-  groupOrder: 42,
+  title: "Nav List · Long labels in a narrow sidebar",
+  group: "Navigation",
+  groupOrder: 20,
   component: "NavList",
   variant: "Long labels and narrow sidebar",
   description:

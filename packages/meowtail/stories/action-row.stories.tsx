@@ -22,10 +22,10 @@ function publishRow() {
 
 export const ActionRowStory = defineStory({
   id: "action-row",
-  title: "Action row · One line or a whole stack",
+  title: "Action Row · One line or a whole stack",
+  group: "Actions and commands",
+  groupOrder: 30,
   component: "ActionRow",
-  group: "Basic controls",
-  groupOrder: 10,
   variant: "Fits, stacks, keeps icons together",
   description:
     "A row of actions stays on one line while it fits. When it does not, the whole row stacks: text actions become full-width lines in their order and icon actions stay together, so no line ends ragged and no action is left alone.",

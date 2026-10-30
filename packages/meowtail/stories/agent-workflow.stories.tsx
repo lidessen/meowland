@@ -561,8 +561,9 @@ export function agentAssistantDemo(): Child {
 
 export const AgentWorkflow = defineStory({
   id: "agent-workflow",
-  title: "Agent · Concurrency, waiting and execution reporting",
-  group: "Assistant",
+  title: "Chat Task · Concurrency, waiting and execution reporting",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatTask",
   description:
     "Shared tool and task display. Execution completion, public reply, user waiting and a lost connection are different facts.",
@@ -581,8 +582,9 @@ export const AgentWorkflow = defineStory({
 
 export const AgentWorkflowNarrow = defineStory({
   id: "agent-workflow-narrow",
-  title: "Agent · 320px local container",
-  group: "Assistant",
+  title: "Chat Task · 320px local container",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatTask",
   description:
     "The same composition inside a 320px host on a wide screen, without story-only CSS patching the content.",
@@ -592,8 +594,9 @@ export const AgentWorkflowNarrow = defineStory({
 
 export const AgentWorkflowAssistant = defineStory({
   id: "agent-workflow-assistant",
-  title: "Agent · Complete Assistant composition",
-  group: "Assistant",
+  title: "Assistant View · Complete Assistant composition",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "AssistantView",
   description:
     "The same Assistant renders tools and tasks by default and keeps messages, draft, attachments, activity, questions and safe Markdown.",

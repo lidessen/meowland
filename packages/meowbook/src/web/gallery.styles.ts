@@ -60,7 +60,7 @@ a {
 }
 .workshop-shell {
   display: grid;
-  grid-template-columns: 232px minmax(0, 1fr);
+  grid-template-columns: 256px minmax(0, 1fr);
   height: 100dvh;
   overflow: hidden;
 }

@@ -25,9 +25,9 @@ const copy = {
 
 export const DescriptionListStory = defineStory({
   id: "description-list-composition",
-  title: "Information layout · Natural label column and local composition",
-  group: "Navigation and layout",
-  groupOrder: 40,
+  title: "Description List · Natural label column and local composition",
+  group: "Records and surfaces",
+  groupOrder: 60,
   component: "DescriptionList",
   description:
     "Shows only the public information layout; labels, long identity and actions are fixed examples and read no business data.",

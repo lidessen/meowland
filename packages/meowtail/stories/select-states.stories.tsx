@@ -7,8 +7,8 @@ import { Note } from "./specimen";
 export const SelectStatesStory = defineStory({
   id: "select-states",
   title: "Select · Groups, errors and multiple selection",
-  group: "Form inputs",
-  groupOrder: 20,
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "Select",
   variant: "Groups and multiple selection",
   description:

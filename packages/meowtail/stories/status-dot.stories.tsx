@@ -15,9 +15,9 @@ const states: readonly [StatusDotState, string, string][] = [
 
 export const StatusDotStory = defineStory({
   id: "status-dot",
-  title: "Status dot · Status semantics",
-  group: "Basic controls",
-  groupOrder: 12,
+  title: "Status Dot · Status semantics",
+  group: "Feedback and labels",
+  groupOrder: 80,
   component: "StatusDot",
   variant: "Status semantics",
   description:

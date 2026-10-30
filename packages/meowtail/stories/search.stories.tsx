@@ -5,9 +5,9 @@ import { Note } from "./specimen";
 
 export const SearchStory = defineStory({
   id: "search-input",
-  title: "Search · Recognition, filtering, and returning",
-  group: "Form inputs",
-  groupOrder: 20,
+  title: "Search Input · Recognition, filtering, and returning",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "SearchInput",
   variant: "Filtering and returning",
   description:

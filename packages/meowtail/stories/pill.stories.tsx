@@ -6,8 +6,9 @@ import { Badge, Button, Inline, Pill, Stack } from "meowtail";
 export const PillStory = defineStory({
   id: "pill-tags",
   title: "Pill · Filters and status tags",
+  group: "Feedback and labels",
+  groupOrder: 80,
   component: "Pill",
-  group: "Basic controls",
   description: "24px pill buttons and 20px read-only tags; the caller owns the selection state.",
   render() {
     const active = signal(true);

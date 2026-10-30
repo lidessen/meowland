@@ -25,10 +25,9 @@ import { Specimen } from "./specimen";
  */
 export const BasicQualityControlsStory = defineStory({
   id: "basic-quality-controls",
-  title: "Basic quality · Control centers and symmetry",
+  title: "Basic Quality · Control centers and symmetry",
   group: "Composition examples",
-  groupOrder: 90,
-  component: "Input",
+  groupOrder: 110,
   variant: "Single-line controls and actions",
   description:
     "Checks the vertical center and top/bottom symmetry of single-line inputs, selects, button icons/text, and the inline composer on one screen; shared by visual review and geometry regressions.",

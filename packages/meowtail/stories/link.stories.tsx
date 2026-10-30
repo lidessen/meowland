@@ -5,9 +5,9 @@ import { Link, ResourceLink, Stack } from "meowtail";
 export const LinkStory = defineStory({
   id: "text-link",
   title: "Link · Inline text",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "Link",
-  group: "Basic controls",
-  groupOrder: 10,
   description:
     "A themed inline text link inside a sentence. ResourceLink remains the whole-row reference to an openable object.",
   covers: ["Link href", "inline text", "distinct from ResourceLink"],

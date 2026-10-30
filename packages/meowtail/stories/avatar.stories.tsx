@@ -12,9 +12,9 @@ const portrait =
 export const AvatarStory = defineStory({
   id: "avatar",
   title: "Avatar · Image and initials",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "Avatar",
-  group: "Basic controls",
-  groupOrder: 10,
   description:
     "A person's picture, or the initials that remain when the image is missing. ChatMessage still takes any avatar child in its identity column rather than requiring this control.",
   covers: ["Avatar image", "Avatar initials", "Avatar sizes", "image fallback"],

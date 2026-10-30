@@ -34,7 +34,7 @@ const table = parts<typeof Table>("table");
 
 /** Measurements owned by the documentation layout. */
 export const docsTokens = defineTokens("docs", {
-  sidebarWidth: "232px",
+  sidebarWidth: "256px",
   headerHeight: "56px",
   readingWidth: "720px",
   homeWidth: "960px",
@@ -233,24 +233,23 @@ export const docsStyles = css`
   .docs-catalog ${navList.groupTitle}:has(.docs-nav-toggle) {
     padding: 0;
   }
-  /* Folding titles read in sentence case, so even the longest stays on one line. */
+  /* A folding title keeps the shared group-label role; the button only adds the disclosure. */
   .docs-nav-toggle {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     width: 100%;
-    min-height: 30px;
+    min-height: 28px;
     margin: 0;
     padding: 0 ${uiTokens.space.group};
     border: 0;
     border-radius: ${uiTokens.radius.md};
     background: transparent;
-    color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.weight.semibold} ${uiTokens.type.caption} / ${uiTokens.type.line.caption}
-      ${uiTokens.type.sans};
-    letter-spacing: 0;
+    color: inherit;
+    font: inherit;
+    letter-spacing: inherit;
     text-align: left;
-    text-transform: none;
+    text-transform: inherit;
     white-space: nowrap;
     cursor: pointer;
   }
@@ -634,10 +633,14 @@ export const docsStyles = css`
     pointer-events: none;
     transform: translateY(-50%);
   }
-  .docs-search-wrap:focus-within .docs-search-key {
+  /* The "/" hint shows only on an empty, unfocused field, and only then holds room at the end;
+     otherwise the field's own clear button takes the end. */
+  .docs-search-wrap:is(:focus-within, :has(${searchInput.control}:not(:placeholder-shown)))
+  .docs-search-key {
     display: none;
   }
-  .docs-search-wrap ${searchInput.control} {
+  .docs-search-wrap:not(:focus-within):has(${searchInput.control}:placeholder-shown)
+  ${searchInput.control} {
     padding-right: 36px;
   }
   /* The way to the playground: a quiet labeled link, not an unnamed glyph. */

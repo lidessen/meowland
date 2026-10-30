@@ -16,11 +16,11 @@ import { Measure } from "./specimen";
 
 export const ComposerFooterStory = defineStory({
   id: "composer-footer",
-  title: "Composer · Model state, keyboard hint and send",
+  title: "Chat Composer · Model state, keyboard hint and send",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatComposer",
   variant: "Stacked footer allocation",
-  group: "Conversation components",
-  groupOrder: 50,
   description:
     "The writing surface contains draft and bottom actions; keyboard help follows outside its rounded edge. Controls only change fixture data; the story adds no layout styles.",
   covers: ["stacked hint with trailing", "long model and status", "draft and focus", "attachments"],

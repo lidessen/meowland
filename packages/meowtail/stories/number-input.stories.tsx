@@ -5,10 +5,10 @@ import { Field, NumberInput, Stack } from "meowtail";
 
 export const NumberInputStory = defineStory({
   id: "number-input",
-  title: "Number input · Type or step",
+  title: "Number Input · Type or step",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "NumberInput",
-  group: "Form inputs",
-  groupOrder: 20,
   description:
     "Type a number or use the stepper. Values clamp to min, max and step on commit, and the committed figure uses the decimal places of the step.",
   covers: ["NumberInput stepper", "min/max/step", "formatting", "disabled"],

@@ -20,9 +20,9 @@ import { Specimen } from "./specimen";
 
 export const DialogLayoutStory = defineStory({
   id: "dialog-layout",
-  title: "Dialog layout · Fixed header and body scrolling",
-  group: "Overlays and feedback",
-  groupOrder: 30,
+  title: "Dialog Panel · Fixed header and body scrolling",
+  group: "Overlays and disclosure",
+  groupOrder: 50,
   component: "DialogPanel",
   variant: "Natural height and host constraints",
   description:
@@ -128,9 +128,9 @@ export const DialogLayoutStory = defineStory({
 
 export const CatalogFrameStory = defineStory({
   id: "page-frame-catalog",
-  title: "Page shell · Wrapping title and catalog filtering",
-  group: "Navigation and layout",
-  groupOrder: 40,
+  title: "Page Frame · Wrapping title and catalog filtering",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "PageFrame",
   variant: "Natural header and remaining body",
   description:

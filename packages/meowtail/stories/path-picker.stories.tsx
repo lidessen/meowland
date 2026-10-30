@@ -5,9 +5,9 @@ import { Button, Field, Input, PathPicker, Stack } from "meowtail";
 
 export const PathPickerStory = defineStory({
   id: "path-picker",
-  title: "Path picker · Manual entry and host browsing",
-  group: "Form inputs",
-  groupOrder: 20,
+  title: "Path Picker · Manual entry and host browsing",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "PathPicker",
   covers: ["PathPicker", "Field", "Input", "Button", "cancel", "failure", "disabled", "readonly"],
   render: () => {

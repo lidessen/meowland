@@ -17,9 +17,9 @@ import { Measure } from "./specimen";
 
 export const CardResponsiveHeaderStory = defineStory({
   id: "card-responsive-header",
-  title: "Card · Title, actions, and real container width",
-  group: "Basic controls",
-  groupOrder: 10,
+  title: "Card Header · Title, actions, and real container width",
+  group: "Records and surfaces",
+  groupOrder: 60,
   component: "CardHeader",
   description:
     "A wide card and a narrow sidebar in the same window share the title layout; nested cards, intrinsic button cards, and optional descriptions keep their native structure.",

@@ -29,8 +29,8 @@ import { defineStory } from "meowbook";
 export const ButtonsStory = defineStory({
   id: "buttons",
   title: "Button · Action hierarchy",
-  group: "Basic controls",
-  groupOrder: 10,
+  group: "Actions and commands",
+  groupOrder: 30,
   component: "Button",
   variant: "Action hierarchy",
   description:
@@ -121,8 +121,8 @@ export const ButtonsStory = defineStory({
 export const ButtonSizesStory = defineStory({
   id: "button-sizes",
   title: "Button · Sizes and long text",
-  group: "Basic controls",
-  groupOrder: 10,
+  group: "Actions and commands",
+  groupOrder: 30,
   component: "Button",
   variant: "Sizes and long text",
   description:
@@ -159,8 +159,8 @@ export const ButtonSizesStory = defineStory({
 export const FieldsStory = defineStory({
   id: "fields",
   title: "Input · Normal and long labels",
-  group: "Form inputs",
-  groupOrder: 20,
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "Input",
   variant: "Labels and descriptions",
   description:
@@ -268,8 +268,8 @@ export const FieldsStory = defineStory({
 export const FieldErrorsStory = defineStory({
   id: "field-errors",
   title: "Input · Error and disabled",
-  group: "Form inputs",
-  groupOrder: 20,
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "Input",
   variant: "Error and disabled",
   description:
@@ -316,8 +316,8 @@ export const FieldErrorsStory = defineStory({
 export const BadgesStory = defineStory({
   id: "badges",
   title: "Badge · Category labels and long names",
-  group: "Basic controls",
-  groupOrder: 10,
+  group: "Feedback and labels",
+  groupOrder: 80,
   component: "Badge",
   variant: "Category labels and long names",
   description:
@@ -366,9 +366,9 @@ export const BadgesStory = defineStory({
 
 export const EmptyStateStory = defineStory({
   id: "empty-state",
-  title: "Empty state · Description and next step",
-  group: "Overlays and feedback",
-  groupOrder: 30,
+  title: "Empty State · Description and next step",
+  group: "Feedback and labels",
+  groupOrder: 80,
   component: "EmptyState",
   variant: "Description and next step",
   description:
@@ -423,9 +423,9 @@ export const EmptyStateStory = defineStory({
 
 export const CompactEmptyStateStory = defineStory({
   id: "empty-state-compact",
-  title: "Empty state · Local reading and editing area",
-  group: "Overlays and feedback",
-  groupOrder: 30,
+  title: "Empty State · Local reading and editing area",
+  group: "Feedback and labels",
+  groupOrder: 80,
   component: "EmptyState",
   variant: "Local empty state and adjacent controls",
   description:
@@ -464,8 +464,8 @@ export const CompactEmptyStateStory = defineStory({
 export const DialogStory = defineStory({
   id: "dialog",
   title: "Dialog · Keyboard and focus return",
-  group: "Overlays and feedback",
-  groupOrder: 30,
+  group: "Overlays and disclosure",
+  groupOrder: 50,
   component: "Dialog",
   variant: "Confirmation and return",
   description:

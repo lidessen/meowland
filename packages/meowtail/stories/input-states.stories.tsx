@@ -5,8 +5,8 @@ import { Field, Input, Textarea } from "meowtail";
 export const InputStatesStory = defineStory({
   id: "input-states",
   title: "Input · Read-only, errors and long content",
-  group: "Form inputs",
-  groupOrder: 20,
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "Input",
   variant: "Read-only and long content",
   description:

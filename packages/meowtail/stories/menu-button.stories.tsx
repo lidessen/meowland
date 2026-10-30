@@ -6,10 +6,10 @@ import { Note } from "./specimen";
 
 export const MenuButtonStory = defineStory({
   id: "menu-button",
-  title: "Menu button · Button and menu",
+  title: "Menu Button · Button and menu",
+  group: "Actions and commands",
+  groupOrder: 30,
   component: "MenuButton",
-  group: "Basic controls",
-  groupOrder: 10,
   description:
     "A button that opens the existing Menu below it. Arrow keys still enter the menu; nested items stay with Menu.",
   covers: ["MenuButton", "Menu items", "nested Menu"],

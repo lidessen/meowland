@@ -5,10 +5,10 @@ import { Measure } from "./specimen";
 export const Alerts = defineStory({
   id: "alert",
   title: "Alert · Outcome and next step",
+  group: "Feedback and labels",
+  groupOrder: 80,
   component: "Alert",
   variant: "Informational and urgent feedback",
-  group: "Overlays and feedback",
-  groupOrder: 30,
   description:
     "Color conveys semantics; the announced urgency is set independently with role. These are all local demo messages.",
   covers: ["Alert", "bar", "neutral", "marker", "status", "error"],

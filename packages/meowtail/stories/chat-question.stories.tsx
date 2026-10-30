@@ -5,8 +5,9 @@ import { Note } from "./specimen";
 
 export const ChatQuestionStory = defineStory({
   id: "chat-question",
-  title: "Question · Choices and a written answer",
-  group: "Conversation components",
+  title: "Chat Question · Choices and a written answer",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatQuestion",
   variant: "Interactive question",
   description:
@@ -120,8 +121,9 @@ export const ChatQuestionStory = defineStory({
 
 export const ChatQuestionConflictStory = defineStory({
   id: "chat-question-conflict",
-  title: "Question · Long content and conflict feedback",
-  group: "Conversation components",
+  title: "Chat Question · Long content and conflict feedback",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatQuestion",
   variant: "Static conflict feedback",
   description:
@@ -164,8 +166,9 @@ export const ChatQuestionConflictStory = defineStory({
 
 export const ChoiceGroupStory = defineStory({
   id: "choice-group",
-  title: "Radio group · Compare options directly",
-  group: "Form inputs",
+  title: "Choice Group · Compare options directly",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "ChoiceGroup",
   description:
     "For a small set of options that need direct comparison. Native radios keep arrow keys, Tab, form reset and required validation.",

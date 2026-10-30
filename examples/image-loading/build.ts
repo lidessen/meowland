@@ -1,4 +1,5 @@
 import { cp, mkdir, readFile, rm, writeFile } from "node:fs/promises";
+import { removeLegacyIsFallbacks } from "meowcss/bundle";
 import { join } from "node:path";
 const root = import.meta.dir;
 const outdir = join(root, "dist");
@@ -12,6 +13,10 @@ const result = await Bun.build({
   sourcemap: "external",
 });
 if (!result.success) throw new Error(result.logs.map(String).join("\n"));
+// Bun writes legacy :-webkit-any()/:-moz-any() copies of every :is() rule; Safari misreads them.
+for (const output of result.outputs)
+  if (output.path.endsWith(".css"))
+    await writeFile(output.path, removeLegacyIsFallbacks(await readFile(output.path, "utf8")));
 await cp(join(root, "assets/NOTICES.md"), join(outdir, "NOTICES.md"));
 await writeFile(
   join(outdir, "DELIVERY.md"),
@@ -19,7 +24,7 @@ await writeFile(
 );
 const assets = result.outputs.map((entry) => ({
   path: entry.path.slice(outdir.length + 1),
-  bytes: entry.size,
+  bytes: Bun.file(entry.path).size,
 }));
 await writeFile(
   join(outdir, "build-manifest.json"),

@@ -11,6 +11,7 @@ import type {
 import { discoverStories, sourcePath, type DiscoveredStory, type TemporaryStory } from "./discover";
 import { standardTheme } from "meowtail/theme";
 import { themeAttributes } from "meowcss";
+import { removeLegacyIsFallbacks } from "meowcss/bundle";
 import { canvasStyles } from "../web/canvas.styles";
 import { chromeThemeStyles, galleryStyles } from "../web/gallery.styles";
 
@@ -232,6 +233,10 @@ export async function buildStories(
         : true,
     });
     if (!result.success) throw new Error(result.logs.map(String).join("\n"));
+    // Bun writes legacy :-webkit-any()/:-moz-any() copies of every :is() rule; Safari misreads them.
+    for (const output of result.outputs)
+      if (output.path.endsWith(".css"))
+        await writeFile(output.path, removeLegacyIsFallbacks(await readFile(output.path, "utf8")));
     // The published manifest names each story file from the config root, so a deployed gallery
     // does not carry the build machine's directories.
     const published = entries.map((entry) => ({

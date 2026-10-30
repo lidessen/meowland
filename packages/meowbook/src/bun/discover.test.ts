@@ -247,6 +247,14 @@ test("build emits a static gallery, independent canvas and manifest, then remove
     expect(entries[0]?.id).toBe("build/button");
     expect(await readFile(join(outdir, "index.html"), "utf8")).toContain("Meowbook");
     expect(await readFile(join(outdir, "canvas.html"), "utf8")).toContain("story-root");
+    // Bun's legacy :-webkit-any()/:-moz-any() copies are gone; Safari misreads them.
+    const stylesheets = (await readdir(outdir)).filter((name) => name.endsWith(".css"));
+    expect(stylesheets.length).toBeGreaterThan(0);
+    const bundled = await Promise.all(
+      stylesheets.map((name) => readFile(join(outdir, name), "utf8")),
+    );
+    expect(bundled.some((css) => css.includes(":is("))).toBe(true);
+    for (const css of bundled) expect(css).not.toMatch(/:-(webkit|moz)-any\(/);
     // The published manifest names story files from the config root, never the build machine.
     expect(JSON.parse(await readFile(join(outdir, "manifest.json"), "utf8"))).toEqual(
       entries.map((entry) => ({ ...entry, file: relative(config.root, entry.file) })),

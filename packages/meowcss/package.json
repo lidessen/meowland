@@ -27,6 +27,10 @@
     "./web": {
       "types": "./dist/src/web/index.d.ts",
       "import": "./dist/src/web/index.js"
+    },
+    "./bundle": {
+      "types": "./dist/src/bundle/index.d.ts",
+      "import": "./dist/src/bundle/index.js"
     }
   },
   "peerDependencies": {

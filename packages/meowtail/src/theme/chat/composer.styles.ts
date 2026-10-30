@@ -30,6 +30,7 @@ export const chatComposerStyles = css`
     border: 0;
     border-radius: ${uiTokens.radius.md};
     background: transparent;
+    box-shadow: none;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.label};
     line-height: ${uiTokens.type.line.label};

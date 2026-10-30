@@ -136,29 +136,52 @@ const CATALOG_FILTER = `(() => {
 })();`;
 
 /**
- * Grow each live preview to fit its story. The canvas is same-origin, so the page reads the
- * story's height directly; the fixed height is the floor and the no-script fallback, and a
- * cap keeps a tall story scrolling inside its frame.
+ * Fit each live preview to its story. The canvas is same-origin, so the page reads the story's
+ * height directly; the fixed height is the no-script fallback, and a cap keeps a tall story
+ * scrolling inside its frame. A story that sizes itself to its content shrinks to it, down to a
+ * floor; one with a dialog or popover keeps its starting height, since those open inside the frame. A story that fills its viewport never reads shorter than
+ * its frame, so it only grows; one that sizes itself from the viewport shows itself by shrinking
+ * along with the frame, which then returns to its starting height and from then on only grows.
  */
 const PREVIEW_FIT = `(() => {
   const frames = document.querySelectorAll(".docs-preview-frame");
-  const fit = (frame) => {
+  const FLOOR = 320;
+  const fit = (frame, state) => {
     let doc;
     try { doc = frame.contentDocument; } catch { return; }
     if (!doc || !doc.documentElement) return;
     const tall = frame.classList.contains("docs-preview-frame-tall");
+    const cap = tall ? 960 : 720;
     // The body's own extent, not the document's: the document never reports less than the frame.
     const body = doc.body;
     if (!body) return;
     const margin = parseFloat(getComputedStyle(body).marginBottom) || 0;
     const content = Math.ceil(Math.max(body.scrollHeight, body.getBoundingClientRect().bottom + margin));
-    // Grow only: a story that fills its viewport would otherwise shrink the frame with it.
-    const height = Math.max(tall ? 680 : 440, Math.min(content, tall ? 960 : 720));
-    if (Math.abs(frame.getBoundingClientRect().height - height) > 1) frame.style.height = height + "px";
+    const current = frame.getBoundingClientRect().height;
+    const set = (height) => {
+      if (Math.abs(current - height) > 1) frame.style.height = height + "px";
+    };
+    if (state.fixed) return set(Math.max(state.start, Math.min(content, cap)));
+    // Until the story has mounted, the document only reports the frame back.
+    const status = doc.getElementById("story-state");
+    if (status && status.getAttribute("data-status") !== "ready") return;
+    if (state.start === undefined) state.start = current;
+    // Content that shrank after the frame did follows the viewport: keep the starting height.
+    if (state.shrunk !== undefined && content < state.shrunk - 1 && current < state.start - 1) {
+      state.fixed = true;
+      return set(state.start);
+    }
+    // Content that reaches the frame may fill it: grow, never shrink.
+    if (content >= current - 1) return set(Math.max(current, Math.min(content, cap)));
+    state.shrunk = content;
+    // A dialog or popover opens inside the frame, so a story that has one keeps its room.
+    const floor = doc.querySelector("dialog, [popover]") ? state.start : FLOOR;
+    set(Math.max(floor, Math.min(content, cap)));
   };
   for (const frame of frames) {
+    const state = {};
     const watch = () => {
-      fit(frame);
+      fit(frame, state);
       let doc;
       try { doc = frame.contentDocument; } catch { return; }
       if (!doc || !window.ResizeObserver) return;
@@ -169,10 +192,13 @@ const PREVIEW_FIT = `(() => {
         if (pending) return;
         pending = requestAnimationFrame(() => {
           pending = 0;
-          fit(frame);
+          fit(frame, state);
         });
       });
       if (doc.body) observer.observe(doc.body);
+      // The story reports itself ready on its state element; fit again when it does.
+      const status = doc.getElementById("story-state");
+      if (status) new MutationObserver(() => fit(frame, state)).observe(status, { attributes: true });
     };
     frame.addEventListener("load", watch);
     if (frame.contentDocument && frame.contentDocument.readyState === "complete") watch();

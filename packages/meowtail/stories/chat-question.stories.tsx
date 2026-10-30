@@ -11,7 +11,7 @@ export const ChatQuestionStory = defineStory({
   component: "ChatQuestion",
   variant: "Interactive question",
   description:
-    "The question comes first and options are visible. Selecting does not send; a local receipt only appears after you confirm and submit. Switching input modes keeps the draft.",
+    "The question comes first with its options in view. Choosing an option does not send it; the answer goes only when you submit, and switching to a written answer keeps what you typed.",
   covers: [
     "ChoiceGroup native radio",
     "required",
@@ -127,7 +127,7 @@ export const ChatQuestionConflictStory = defineStory({
   component: "ChatQuestion",
   variant: "Static conflict feedback",
   description:
-    "A static composition showing a long question, long options and conflict feedback; the buttons are not wired to business actions, and async submission or input retention is not verified.",
+    "A long question with long options, and the notice shown when the question changes before your answer is sent: the answer is kept so you can copy it.",
   covers: ["long question", "long options", "static conflict feedback"],
   render: () => (
     <ChatQuestion

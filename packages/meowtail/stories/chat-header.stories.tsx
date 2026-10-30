@@ -9,6 +9,8 @@ export const ChatHeaderStory = defineStory({
   groupOrder: 90,
   component: "ChatHeader",
   variant: "Narrow screen and long title",
+  description:
+    "The conversation's name with an optional eyebrow and description, its live status, and the actions that apply to the whole conversation. Status and actions wrap below a long title.",
   render: () => (
     <Stack>
       <ChatHeader title="Assistant" />

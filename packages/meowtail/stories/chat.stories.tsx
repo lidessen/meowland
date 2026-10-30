@@ -27,7 +27,7 @@ export const MessagePartsStory = defineStory({
   component: "ChatMessage",
   variant: "Avatar and actions",
   description:
-    "The avatar, author, time, body, and actions of one conversation; long content must not crowd out actions or break narrow screens.",
+    "Avatar, author, time, body and actions of one message. Long names and long content wrap without crowding out the actions.",
   covers: [
     "ChatHeader all parts",
     "ChatMessage avatar/time/actions",
@@ -153,7 +153,7 @@ export const ComposerRecoveryStory = defineStory({
   component: "ChatComposer",
   variant: "Sending and recovery",
   description:
-    "Local simulated states are advanced by hand, with no timer or network. You can keep editing while waiting; submitted content and the latest draft are kept separately.",
+    "Send the draft, then use the buttons to play out a failure or a success. You can keep writing while a send is pending, and what you sent stays separate from what you are editing.",
   covers: [
     "ChatComposer value/placeholder/hint/submitLabel/submitDisabled",
     "onInput/onSubmit",
@@ -257,7 +257,7 @@ export const ExecutionDetailsStory = defineStory({
   component: "ChatToolCall",
   variant: "Execution and evidence",
   description:
-    "Static states and real native expansion behavior are separate: each of the four states shows both a plain and a collapsible carrier.",
+    "Running, done, waiting and failed, each as a plain row and as a row whose details expand.",
   covers: [
     "ChatToolCall running/complete/waiting/error × collapsible",
     "ChatProcess open/closed",
@@ -324,7 +324,7 @@ export const ExecutionWorkflowStory = defineStory({
   component: "ChatToolCall",
   variant: "Execution within a conversation",
   description:
-    "A fixed engineering example: identify what was done while collapsed, then check the command and result when expanded. Running, waiting, and failure each describe the current progress; no command is executed and no model is requested.",
+    "A reply that runs commands: collapsed rows say what was done, expanded rows show the command and its output, and running, waiting and failed rows each say where things stand.",
   covers: [
     "ChatToolCall concrete task and result",
     "running/complete/waiting/error",
@@ -452,7 +452,7 @@ export const AttachmentScaleStory = defineStory({
   component: "ChatAttachments",
   variant: "Ratios and missing information",
   description:
-    "Wide images, tall images, and files each use their own carrier. Downloads are built-in samples; no local file is read.",
+    "Very wide images, very tall images and files without a known size each get a seat that fits them.",
   covers: [
     "ChatAttachments image/file",
     "host download callback/default link",

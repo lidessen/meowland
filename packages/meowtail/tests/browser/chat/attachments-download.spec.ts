@@ -70,3 +70,30 @@ test("a composer image tile shows its image and a file's preview joins its card"
   expect(Math.abs(geometry.preview.top - geometry.file.top)).toBeLessThan(1);
   expect(Math.abs(geometry.preview.bottom - geometry.file.bottom)).toBeLessThan(1);
 });
+
+test("a sent image's seat takes the image's proportions instead of letterboxing it", async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 640, height: 900 });
+  await page.goto("/canvas.html?story=attachment-scales");
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  const seats = page.locator('[data-meowui-part="chat-attachments/image"]');
+  await expect(page.locator('[data-image-state="ready"]')).toHaveCount(await seats.count());
+  for (const seat of await seats.all()) {
+    const fit = await seat.evaluate((element) => {
+      const box = element.getBoundingClientRect();
+      const image = element.querySelector("img")!;
+      const drawn = image.getBoundingClientRect();
+      return {
+        seat: box.width / box.height,
+        image: image.naturalWidth / image.naturalHeight,
+        width: box.width - drawn.width,
+        height: box.height - drawn.height,
+      };
+    });
+    // Only the seat's 1px border separates it from the drawn image.
+    expect(fit.width).toBeLessThanOrEqual(3);
+    expect(fit.height).toBeLessThanOrEqual(3);
+    expect(fit.seat).toBeCloseTo(fit.image, 0);
+  }
+});

@@ -147,7 +147,7 @@ export const MessagePartsStory = defineStory({
 
 export const ComposerRecoveryStory = defineStory({
   id: "composer-recovery",
-  title: "Chat Composer · Send, failure, and recovery",
+  title: "Chat Composer · Sending, failure and recovery",
   group: "Agent and conversation",
   groupOrder: 90,
   component: "ChatComposer",
@@ -251,7 +251,7 @@ export const ComposerRecoveryStory = defineStory({
 
 export const ExecutionDetailsStory = defineStory({
   id: "execution-details",
-  title: "Chat Tool Call · Four states and expansion on demand",
+  title: "Chat Tool Call · States and expandable details",
   group: "Agent and conversation",
   groupOrder: 90,
   component: "ChatToolCall",
@@ -318,7 +318,7 @@ export const ExecutionDetailsStory = defineStory({
 
 export const ExecutionWorkflowStory = defineStory({
   id: "execution-workflow",
-  title: "Chat Tool Call · Task, progress, and actual results",
+  title: "Chat Tool Call · Inside a reply with progress and results",
   group: "Agent and conversation",
   groupOrder: 90,
   component: "ChatToolCall",
@@ -446,7 +446,7 @@ Exit code 1`}</code>
 
 export const AttachmentScaleStory = defineStory({
   id: "attachment-scales",
-  title: "Chat Attachments · Ratios, sizes, and missing information",
+  title: "Chat Attachments · Unusual ratios and missing details",
   group: "Agent and conversation",
   groupOrder: 90,
   component: "ChatAttachments",

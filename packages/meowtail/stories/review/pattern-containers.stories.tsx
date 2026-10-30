@@ -1,7 +1,7 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
 import { ActionRail, Button, Icon, IconButton, MetaRow, Stack } from "meowtail";
-import { Measure } from "./specimen";
+import { Measure } from "../specimen";
 
 export const PatternContainersStory = defineStory({
   id: "pattern-containers",

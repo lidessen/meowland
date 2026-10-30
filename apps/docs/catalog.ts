@@ -93,8 +93,11 @@ export const UNCATEGORIZED_GROUP = "Components without examples";
 /** The group that holds stories which compose several components. */
 export const EXAMPLE_GROUP = "Composition examples";
 
-/** The group that holds documented pages the component families do not list: icons, theme utilities, internal parts. */
-export const FOUNDATIONS_GROUP = "Foundations and parts";
+/**
+ * The group that holds documented pages the component families do not list and whose stories
+ * name no catalog category: icons, brand marks and theme utilities.
+ */
+export const FOUNDATIONS_GROUP = "Icons and theme";
 
 /** Turn a display name into a URL segment. */
 export function kebabCase(name: string): string {
@@ -295,8 +298,15 @@ export function buildCatalog(
     families.forEach((category, index) => orders.set(category.label, index));
     orders.set(FOUNDATIONS_GROUP, families.length);
     orders.set(EXAMPLE_GROUP, families.length + 1);
+    // A page the families do not list keeps the category its own stories name, such as region
+    // layout under "Pages and layout"; a borrowed scene does not decide where a page belongs.
+    const categories = new Set(families.map((category) => category.label));
     for (const component of components)
-      component.group = members.get(component.title)?.category ?? FOUNDATIONS_GROUP;
+      component.group =
+        members.get(component.title)?.category ??
+        (component.stories.length > 0 && categories.has(component.group)
+          ? component.group
+          : FOUNDATIONS_GROUP);
     for (const example of examples) example.group = EXAMPLE_GROUP;
   }
   const memberIndex = (component: CatalogComponent): number =>

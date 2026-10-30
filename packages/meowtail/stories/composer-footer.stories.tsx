@@ -16,7 +16,7 @@ import { Measure } from "./specimen";
 
 export const ComposerFooterStory = defineStory({
   id: "composer-footer",
-  title: "Chat Composer · Model state, keyboard hint and send",
+  title: "Chat Composer · Model choice and keyboard hint",
   group: "Agent and conversation",
   groupOrder: 90,
   component: "ChatComposer",

@@ -103,4 +103,21 @@ describe("the component families", () => {
     expect(foundations.entries.map((entry) => entry.label)).toContain("Brand Icons");
     expect(catalog.examples[0]!.group).toBe(EXAMPLE_GROUP);
   });
+
+  test("an unlisted page keeps the catalog category its own stories name", () => {
+    const catalog = buildCatalog(
+      [
+        story({ id: "region", component: "RegionLayout", group: "Records and surfaces" }),
+        story({ id: "icons", component: "Brand icons", group: "Icons and theme" }),
+        story({ id: "card", component: "Card", group: "Records and surfaces" }),
+      ],
+      undefined,
+      undefined,
+      parseFamilies(CATALOG),
+    );
+    const group = (title: string) =>
+      catalog.components.find((component) => component.title === title)!.group;
+    expect(group("RegionLayout")).toBe("Records and surfaces");
+    expect(group("Brand icons")).toBe(FOUNDATIONS_GROUP);
+  });
 });

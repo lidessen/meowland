@@ -17,7 +17,7 @@ import {
   Select,
   Stack,
 } from "meowtail";
-import { Measure } from "./specimen";
+import { Measure } from "../specimen";
 
 export const ScaleStory = defineStory({
   id: "scale-reference",

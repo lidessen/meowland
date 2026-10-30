@@ -6,7 +6,7 @@ import { ChatConversation, ChatMessageList, ChatMessage, Button, Stack, Inline }
 
 export const ConversationReading = defineStory({
   id: "chat-conversation",
-  title: "Chat Conversation · Live updates and review",
+  title: "Chat Conversation · Following new replies",
   group: "Agent and conversation",
   groupOrder: 90,
   component: "ChatConversation",

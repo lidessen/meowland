@@ -840,7 +840,7 @@ export const docsStyles = css`
     color: ${uiTokens.ink.primary};
   }
   .docs-article ${codeBlock.header} {
-    padding: 10px 16px;
+    padding: 6px 6px 6px 16px;
     border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
     background: transparent;
   }

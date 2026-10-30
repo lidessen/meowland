@@ -49,6 +49,7 @@ import {
   Wrench,
   X,
   Database,
+  TextWrap,
   type IconNode,
 } from "lucide";
 import { IconFrame } from "./icon-frame";
@@ -90,6 +91,7 @@ const shapes = {
   folder: () => renderNodes(Folder),
   "folder-open": () => renderNodes(FolderOpen),
   copy: () => renderNodes(Copy),
+  "text-wrap": () => renderNodes(TextWrap),
   x: () => renderNodes(X),
   "chevron-down": () => renderNodes(ChevronDown),
   "chevron-left": () => renderNodes(ChevronLeft),

@@ -2,7 +2,7 @@ import { expect, test } from "bun:test";
 import { createRuntime, h, type Props } from "meowjsx";
 import { unwrap, signal } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
-import { CodeBlock } from "../../../src/components/code-block";
+import { CodeBlock, codeLanguageName } from "../../../src/components/code-block";
 import { installMeowUI, meowUIComponents } from "../../../src/registry";
 import { mountComponent } from "./mount";
 
@@ -12,7 +12,7 @@ test("code blocks escape executable markup and retain exact whitespace", () => {
   );
   expect(html).toContain("&lt;script&gt;x()&lt;/script&gt;\n  trailing  ");
   expect(html).not.toContain("<script>");
-  expect(html).toContain("html");
+  expect(html).toContain("<span>HTML</span>");
   expect(html).toContain('aria-label="Code content"');
   expect(html).toContain('data-wrap="false"');
   expect(html).toContain('aria-pressed="false"');
@@ -69,7 +69,7 @@ test("title and caption parts appear in the header only when provided", () => {
   const plain = renderer.renderToHtml(<CodeBlock language="typescript" code="const value = 1;" />);
   expect(plain).not.toContain('data-meowui-part="code-block/title"');
   expect(plain).not.toContain('data-meowui-part="code-block/caption"');
-  expect(plain).toContain('data-meowui-part="code-block/language">typescript</span>');
+  expect(plain).toContain('data-meowui-part="code-block/language">TypeScript</span>');
 
   const caption = signal("examples/authoring · TypeScript");
   const titled = renderer.renderToHtml(
@@ -84,7 +84,7 @@ test("title and caption parts appear in the header only when provided", () => {
   expect(titled).toContain(
     'data-meowui-part="code-block/caption">examples/authoring · TypeScript</span>',
   );
-  expect(titled).toContain('data-meowui-part="code-block/language">typescript</span>');
+  expect(titled).toContain('data-meowui-part="code-block/language">TypeScript</span>');
   const headerAt = titled.indexOf('data-meowui-part="code-block/header"');
   const titleAt = titled.indexOf('data-meowui-part="code-block/title"');
   const captionAt = titled.indexOf('data-meowui-part="code-block/caption"');
@@ -135,8 +135,9 @@ test("host actions render before the built-in controls and leave wrap and copy u
   );
   expect(buttons.length).toBe(3);
   expect(buttons[0].children).toBe("Open in workbench");
-  expect(buttons[1].children).toBe("Soft wrap");
-  expect(buttons[2].children).toBe("Copy code");
+  // Built-in controls are icon buttons named for assistive technology.
+  expect(unwrap(buttons[1]["aria-label"])).toBe("Soft wrap");
+  expect(unwrap(buttons[2]["aria-label"])).toBe("Copy code");
   expect(unwrap(pre["data-wrap"])).toBe("false");
   (buttons[1].onClick as () => void)();
   expect(unwrap(pre["data-wrap"])).toBe("true");
@@ -145,4 +146,13 @@ test("host actions render before the built-in controls and leave wrap and copy u
   expect(unwrap(pre["data-wrap"])).toBe("false");
   await (buttons[2].onClick as () => Promise<void>)();
   expect(copied).toEqual(["  raw\nline  "]);
+});
+
+test("language ids read as names, and unknown ids stay as given", () => {
+  expect(codeLanguageName("ts")).toBe("TypeScript");
+  expect(codeLanguageName(" SH ")).toBe("Shell");
+  expect(codeLanguageName("yml")).toBe("YAML");
+  expect(codeLanguageName("elixir")).toBe("elixir");
+  expect(codeLanguageName(undefined)).toBe("Code");
+  expect(codeLanguageName("  ")).toBe("Code");
 });

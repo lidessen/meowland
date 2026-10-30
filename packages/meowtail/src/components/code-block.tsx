@@ -1,6 +1,7 @@
 import { h, type Child, type Props, type Context } from "meowjsx";
 import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
-import { Button } from "./button";
+import { IconButton } from "./icon-button";
+import { Icon } from "../icons/icon";
 import { copyTextToClipboard } from "../clipboard";
 
 // The highlighter stays in this module. Themes use type-only component imports,
@@ -10,6 +11,40 @@ import { highlightCode } from "../syntax-highlight";
 /** A header part appears only when its prop has content; a Signal counts as provided. */
 function provided(value: MaybeSignal<Child> | undefined): boolean {
   return value !== undefined && value !== null && value !== false;
+}
+
+const languageNames: Record<string, string> = {
+  typescript: "TypeScript",
+  ts: "TypeScript",
+  javascript: "JavaScript",
+  js: "JavaScript",
+  tsx: "TSX",
+  jsx: "JSX",
+  json: "JSON",
+  shellscript: "Shell",
+  shell: "Shell",
+  sh: "Shell",
+  bash: "Shell",
+  zsh: "Shell",
+  python: "Python",
+  py: "Python",
+  go: "Go",
+  rust: "Rust",
+  rs: "Rust",
+  yaml: "YAML",
+  yml: "YAML",
+  html: "HTML",
+  css: "CSS",
+  sql: "SQL",
+  markdown: "Markdown",
+  md: "Markdown",
+};
+
+/** The reader-facing name of a language id: `ts` reads TypeScript; unknown ids stay as given. */
+export function codeLanguageName(language: string | undefined): string {
+  const id = language?.trim();
+  if (!id) return "Code";
+  return languageNames[id.toLowerCase()] ?? id;
 }
 
 export interface CodeBlockProps extends Props {
@@ -56,21 +91,29 @@ export function CodeBlock(
   // These are enumerated attributes, not native boolean attributes such as disabled.
   const wrap = signal(defaultWrap ? "true" : "false");
   const copying = signal(false);
-  const feedback = signal("");
+  const copied = signal(false);
+  const failure = signal("");
   const highlighted = signal<Child>(unwrap(code));
-  const languageLabel = derived(() => unwrap(language)?.trim() || "Code");
+  const languageLabel = derived(() => codeLanguageName(unwrap(language)));
   let disposed = false;
+  let copiedTimer: ReturnType<typeof setTimeout> | undefined;
+  // The last highlight, kept so streamed code extends it instead of flashing back to plain text.
+  let shown: { source: string; language: string | undefined; spans: Child[] } | undefined;
   context.onCleanup(() => {
     disposed = true;
+    clearTimeout(copiedTimer);
   });
   context.effect(() => {
     const currentCode = unwrap(code);
     const currentLanguage = unwrap(language);
-    highlighted.value = currentCode;
+    highlighted.value =
+      shown && shown.language === currentLanguage && currentCode.startsWith(shown.source)
+        ? [...shown.spans, currentCode.slice(shown.source.length)]
+        : currentCode;
     let active = true;
     void highlightCode(currentCode, currentLanguage).then((spans) => {
       if (!active || disposed || !spans) return;
-      highlighted.value = spans.map((span) => (
+      const rendered = spans.map((span) => (
         <span
           style={{
             color: span.color,
@@ -82,6 +125,8 @@ export function CodeBlock(
           {span.text}
         </span>
       ));
+      shown = { source: currentCode, language: currentLanguage, spans: rendered };
+      highlighted.value = rendered;
     });
     return () => {
       active = false;
@@ -90,14 +135,19 @@ export function CodeBlock(
   const copy = async () => {
     if (copying.value) return;
     copying.value = true;
-    feedback.value = "";
+    failure.value = "";
     const text = unwrap(code);
     try {
       if (onCopy) await onCopy(text);
       else await copyTextToClipboard(text);
-      if (!disposed) feedback.value = "Copied";
+      if (disposed) return;
+      copied.value = true;
+      clearTimeout(copiedTimer);
+      copiedTimer = setTimeout(() => {
+        if (!disposed) copied.value = false;
+      }, 1600);
     } catch {
-      if (!disposed) feedback.value = "Copy failed; select the code and copy it manually.";
+      if (!disposed) failure.value = "Copy failed; select the code and copy it manually.";
     } finally {
       if (!disposed) copying.value = false;
     }
@@ -105,31 +155,50 @@ export function CodeBlock(
   return (
     <figure {...props} ref={[context.parts.root, ref]}>
       <figcaption ref={context.parts.header}>
-        {provided(title) ? <span ref={context.parts.title}>{title}</span> : null}
-        {provided(caption) ? <span ref={context.parts.caption}>{caption}</span> : null}
-        <span ref={context.parts.language}>{languageLabel}</span>
+        <span ref={context.parts.heading}>
+          {provided(title) ? <span ref={context.parts.title}>{title}</span> : null}
+          {provided(caption) ? <span ref={context.parts.caption}>{caption}</span> : null}
+          <span ref={context.parts.language}>{languageLabel}</span>
+        </span>
         <div ref={context.parts.actions}>
           {provided(actions) ? actions : null}
-          <Button
-            variant="quiet"
+          <IconButton
             size="small"
+            label="Soft wrap"
             aria-pressed={wrap}
             onClick={() => {
               wrap.value = wrap.value === "true" ? "false" : "true";
             }}
           >
-            Soft wrap
-          </Button>
-          <Button variant="quiet" size="small" disabled={copying} onClick={copy}>
-            Copy code
-          </Button>
+            <Icon name="text-wrap" />
+          </IconButton>
+          <IconButton
+            size="small"
+            label={derived(() => (copied.value ? "Copied" : "Copy code"))}
+            disabled={copying}
+            data-copied={derived(() => String(copied.value))}
+            onClick={copy}
+          >
+            <span ref={context.parts.copyIcon}>
+              <Icon name="copy" />
+            </span>
+            <span ref={context.parts.copiedIcon}>
+              <Icon name="check" />
+            </span>
+          </IconButton>
         </div>
       </figcaption>
       <pre tabIndex={0} aria-label="Code content" data-wrap={wrap} ref={context.parts.content}>
         <code ref={context.parts.code}>{highlighted}</code>
       </pre>
-      <span role="status" aria-live="polite" ref={context.parts.feedback}>
-        {feedback}
+      {/* Success is announced and shown on the button; a failure stays visible until the next try. */}
+      <span
+        role="status"
+        aria-live="polite"
+        data-failed={derived(() => (failure.value ? "true" : undefined))}
+        ref={context.parts.feedback}
+      >
+        {derived(() => failure.value || (copied.value ? "Copied" : ""))}
       </span>
     </figure>
   );
@@ -139,10 +208,13 @@ CodeBlock.meta = {
   parts: [
     "root",
     "header",
+    "heading",
     "title",
     "caption",
     "language",
     "actions",
+    "copyIcon",
+    "copiedIcon",
     "content",
     "code",
     "feedback",

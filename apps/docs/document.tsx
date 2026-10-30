@@ -311,15 +311,19 @@ const CODE_ACTIONS = `(() => {
       content.setAttribute("data-wrap", next);
       wrap.setAttribute("aria-pressed", next);
     });
-    const label = copy.textContent;
+    const label = copy.getAttribute("aria-label");
     copy.addEventListener("click", async () => {
       try {
         await navigator.clipboard.writeText(code.textContent || "");
-        copy.textContent = "Copied";
+        copy.setAttribute("data-copied", "true");
+        copy.setAttribute("aria-label", "Copied");
       } catch {
-        copy.textContent = "Copy failed";
+        copy.setAttribute("aria-label", "Copy failed");
       }
-      setTimeout(() => { copy.textContent = label; }, 1600);
+      setTimeout(() => {
+        copy.setAttribute("data-copied", "false");
+        copy.setAttribute("aria-label", label || "Copy code");
+      }, 1600);
     });
   }
   for (const button of document.querySelectorAll(".docs-install-copy")) {

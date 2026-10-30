@@ -179,28 +179,11 @@ export const docsStyles = css`
   .docs-search ${searchInput.control} {
     font-size: ${uiTokens.type.label};
   }
-  .docs-catalog-label {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 8px;
-    padding: 24px 10px 12px;
-    color: ${uiTokens.ink.tertiary};
-    font-size: ${uiTokens.type.micro};
-    font-weight: ${uiTokens.type.weight.medium};
-    letter-spacing: 0.04em;
-    text-transform: uppercase;
-  }
-  .docs-catalog-label > span {
-    font-family: ${uiTokens.type.mono};
-    font-variant-numeric: tabular-nums;
-    letter-spacing: 0;
-  }
   .docs-catalog {
     flex: 1;
     overflow-y: auto;
     min-height: 0;
-    padding: 0 0 24px;
+    padding: 16px 0 24px;
     scrollbar-width: thin;
     scrollbar-color: ${uiTokens.line.edge} transparent;
   }
@@ -222,6 +205,47 @@ export const docsStyles = css`
   }
   .docs-catalog ${navList.item}[aria-current="page"] {
     color: ${uiTokens.ink.primary};
+  }
+  /* Entry pages and packages lead with their icon; it takes the accent where the reader is. */
+  .docs-catalog ${navList.icon} {
+    color: ${uiTokens.ink.tertiary};
+    transition: color ${uiTokens.motion.response} ${uiTokens.motion.ease};
+  }
+  .docs-catalog ${navList.item}:hover ${navList.icon} {
+    color: ${uiTokens.ink.secondary};
+  }
+  .docs-catalog ${navList.item}[aria-current="page"] ${navList.icon} {
+    color: ${uiTokens.accent.ink};
+  }
+  /* A component group names itself with an icon and hangs its rows on a guide line. */
+  .docs-catalog ${navList.groupTitle}:has(.docs-nav-group-icon) {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .docs-nav-group-icon {
+    flex: none;
+    color: ${uiTokens.ink.secondary};
+  }
+  .docs-catalog ${navList.group}:has(.docs-nav-group-icon) ${navList.list} {
+    margin-left: 14px;
+    padding-left: 6px;
+    border-left: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+  }
+  .docs-catalog ${navList.group}:has(.docs-nav-group-icon) ${navList.item}[aria-current="page"] {
+    position: relative;
+  }
+  .docs-catalog
+  ${navList.group}:has(.docs-nav-group-icon)
+  ${navList.item}[aria-current="page"]::before {
+    content: "";
+    position: absolute;
+    top: 7px;
+    bottom: 7px;
+    left: -7px;
+    width: 2px;
+    border-radius: ${uiTokens.radius.full};
+    background: ${uiTokens.accent.base};
   }
   .docs-catalog-empty {
     margin: 12px 10px;
@@ -540,7 +564,7 @@ export const docsStyles = css`
     border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     border-radius: ${uiTokens.radius.sm};
     color: ${uiTokens.ink.tertiary};
-    font: ${uiTokens.type.micro}/1 ${uiTokens.type.mono};
+    font: ${uiTokens.type.micro} / 1 ${uiTokens.type.mono};
     pointer-events: none;
     transform: translateY(-50%);
   }
@@ -706,6 +730,11 @@ export const docsStyles = css`
     font-size: ${uiTokens.type.body};
     font-weight: ${uiTokens.type.weight.semibold};
     letter-spacing: -0.005em;
+  }
+  .docs-index-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
   }
   /* One specimen: the live preview on the raised surface, its code recessed
      beneath it, inside a single hairline frame. */
@@ -1031,16 +1060,29 @@ export const docsStyles = css`
   }
   .docs-package-link {
     display: grid;
-    grid-template-columns: 24px minmax(0, 1fr);
+    grid-template-columns: 36px minmax(0, 1fr);
     gap: 16px;
     padding-block: 24px;
     border-top: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     min-width: 0;
   }
-  .docs-package-number {
-    padding-top: 4px;
-    color: ${uiTokens.ink.secondary};
-    font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
+  /* Each entry leads with its icon on a soft accent tile, the same icon the sidebar uses. */
+  .docs-package-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: ${uiTokens.radius.lg};
+    background: ${uiTokens.accent.soft};
+    color: ${uiTokens.accent.ink};
+    transition:
+      background ${uiTokens.motion.response} ${uiTokens.motion.ease},
+      color ${uiTokens.motion.response} ${uiTokens.motion.ease};
+  }
+  .docs-package-link:hover .docs-package-icon {
+    background: ${uiTokens.accent.base};
+    color: ${uiTokens.surface.knockout};
   }
   .docs-package-link strong {
     font-size: ${uiTokens.type.title};

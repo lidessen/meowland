@@ -15,6 +15,7 @@ import {
   Sun,
 } from "meowtail/icons/lucide";
 import type { Catalog, NavigationGroup } from "./catalog";
+import { groupIcon, packageIcon, PAGE_ICONS } from "./icons";
 import type { DocsPackage } from "./packages";
 import {
   DOCS_APPEARANCE_STORE,
@@ -553,6 +554,19 @@ const NAVIGATION_DISCLOSURE = `(() => {
   button.hidden = false;
 })();`;
 
+/** A sidebar row icon, sized to the NavList icon slot. */
+function navIcon(source: IconSourceProps["source"]): Child {
+  return <IconSource source={source} size={16} />;
+}
+
+/** A component group title: its icon, then its name; the plain name stays the group label. */
+function groupTitle(label: string): Child {
+  return [
+    <IconSource source={groupIcon(label)} size={14} className="docs-nav-group-icon" />,
+    <span>{label}</span>,
+  ];
+}
+
 /** The sidebar groups, in the order the rail shows them. The home item id is the empty path. */
 function sidebarGroups(catalog: Catalog, packages: DocsPackage[]): NavListGroup[] {
   const groups: NavigationGroup[] = catalog.navigation;
@@ -560,9 +574,19 @@ function sidebarGroups(catalog: Catalog, packages: DocsPackage[]): NavListGroup[
     {
       label: "Start here",
       items: [
-        { id: "", href: "/", label: "Home" },
-        { id: "components", href: "/components/", label: "Components" },
-        { id: "gallery", href: "/gallery/", label: "Component playground" },
+        { id: "", href: "/", label: "Home", icon: navIcon(PAGE_ICONS.home) },
+        {
+          id: "components",
+          href: "/components/",
+          label: "Components",
+          icon: navIcon(PAGE_ICONS.components),
+        },
+        {
+          id: "gallery",
+          href: "/gallery/",
+          label: "Component playground",
+          icon: navIcon(PAGE_ICONS.gallery),
+        },
       ],
     },
     {
@@ -571,10 +595,11 @@ function sidebarGroups(catalog: Catalog, packages: DocsPackage[]): NavListGroup[
         id: entry.path,
         href: `/${entry.path}/`,
         label: entry.title,
+        icon: navIcon(packageIcon(entry.title)),
       })),
     },
     ...groups.map((group) => ({
-      label: group.label,
+      label: groupTitle(group.label),
       items: group.entries.map((entry) => ({
         id: entry.path,
         href: entry.href,
@@ -600,7 +625,7 @@ function Pager({
   const pages = sidebarGroups(catalog, packages).flatMap((group) =>
     group.items
       .filter((item) => item.id !== "gallery")
-      .map((item) => ({ href: item.href!, label: String(item.label), group: group.label })),
+      .map((item) => ({ href: item.href!, label: String(item.label) })),
   );
   const index = pages.findIndex((page) => page.href === (path ? `/${path}/` : "/"));
   if (index < 0) return null;
@@ -659,7 +684,6 @@ function Sidebar({
           /
         </kbd>
       </div>
-      <div className="docs-catalog-label">Documentation</div>
       <div className="docs-catalog" id="docs-catalog">
         <NavList label="Documentation" activeId={path} groups={sidebarGroups(catalog, packages)} />
         <p className="docs-catalog-empty" id="docs-catalog-empty" hidden>

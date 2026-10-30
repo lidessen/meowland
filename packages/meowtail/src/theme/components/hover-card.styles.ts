@@ -32,7 +32,32 @@ export const hoverCardStyles = css`
     max-height: min(420px, calc(100dvh - 32px));
   }
   ${hoverCardPartRefs.content}[role="button"] {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 12px;
+    align-items: start;
     cursor: pointer;
+  }
+  ${hoverCardPartRefs.body} {
+    min-width: 0;
+  }
+  /* The copy cue sits on the first line; it fades the card's own ink so it reads on either surface. */
+  ${hoverCardPartRefs.hint} {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    min-height: ${uiTokens.type.line.body};
+    white-space: nowrap;
+    color: color-mix(in srgb, currentColor 60%, transparent);
+    font: ${uiTokens.type.weight.medium} ${uiTokens.type.caption} / ${uiTokens.type.line.caption}
+      ${uiTokens.type.sans};
+  }
+  ${hoverCardPartRefs.hint} svg {
+    width: ${uiTokens.icon.small};
+    height: ${uiTokens.icon.small};
+  }
+  ${hoverCardPartRefs.content}[role="button"]:hover ${hoverCardPartRefs.hint} {
+    color: inherit;
   }
   ${hoverCardPartRefs.content} a {
     color: inherit;

@@ -15,6 +15,8 @@ test("wide hover preview follows its host width and copies only activation, not 
     name: "Copy: packages/meowtail/src/components/hover-card.tsx",
     exact: true,
   });
+  // A copyable card says so on sight; the cue stays out of its accessible name.
+  await expect(card.getByText("Copy", { exact: true })).toBeVisible();
   await expect
     .poll(async () => {
       const [anchor, preview] = await Promise.all([
@@ -103,6 +105,8 @@ test.describe("touch preview", () => {
     await expect(panel).toBeVisible();
     await page.waitForTimeout(300);
     await expect(panel).toBeVisible();
+    // A card without copy text shows no copy cue.
+    await expect(panel.getByText("Copy", { exact: true })).toHaveCount(0);
     await trigger.tap();
     await expect(panel).toBeHidden();
     await trigger.tap();

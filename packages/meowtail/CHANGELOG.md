@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- A `HoverCard` with `copyText` shows a copy cue (the `copy` icon and `copyLabel`) at the end of its
+  first line, so a reader can see that a click or tap copies. The cue is hidden from assistive
+  technology; the card's accessible name already says `Copy: <text>`. New parts: `body` wraps the
+  host content and `hint` is the cue; a card without `copyText` renders as before.
+
 - `Popover` answers a resize of its pane or anchor on the next animation frame and fits the pane in
   whole pixels. A pane squeezed by a short viewport no longer refits itself inside its own
   ResizeObserver callback, which the browser reported as a ResizeObserver loop error while a

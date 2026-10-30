@@ -2,6 +2,7 @@ import { h, type Child, type Props, type Context } from "meowjsx";
 import { signal } from "meowjsx/signal";
 import { Popover, type PopoverTriggerBindings } from "./popover";
 import { copyTextToClipboard } from "../clipboard";
+import { Icon } from "../icons/icon";
 import { elementId } from "../shared/element-id";
 
 export interface HoverCardProps extends Props {
@@ -213,7 +214,14 @@ export function HoverCard(
               }
               ref={[context.parts.content]}
             >
-              {content}
+              {copyText === undefined ? content : <div ref={[context.parts.body]}>{content}</div>}
+              {copyText === undefined ? null : (
+                // Says what a click or tap does; the card's own label already names the action.
+                <span aria-hidden={"true"} ref={[context.parts.hint]}>
+                  <Icon name="copy" />
+                  {copyLabel}
+                </span>
+              )}
               {
                 <span role={"status"} aria-live={"polite"} ref={[context.parts.feedback]}>
                   {feedback}
@@ -228,5 +236,5 @@ export function HoverCard(
 }
 HoverCard.meta = {
   name: "hover-card",
-  parts: ["root", "content", "feedback"],
+  parts: ["root", "content", "body", "hint", "feedback"],
 } as const;

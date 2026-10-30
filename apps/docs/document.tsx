@@ -130,6 +130,8 @@ const CATALOG_FILTER = `(() => {
       visible += shown;
     }
     if (empty) empty.hidden = visible > 0 || !query;
+    // While filtering, every match shows, whether or not its group is folded.
+    catalog.toggleAttribute("data-docs-filtering", !!query);
   });
 })();`;
 
@@ -183,7 +185,11 @@ const PREVIEW_FIT = `(() => {
  */
 const APPEARANCE_STORE = DOCS_APPEARANCE_STORE;
 const THEME_STORE = DOCS_THEME_STORE;
+/** Where the reader's folded and unfolded navigation groups persist. */
+const NAVIGATION_STORE = "meowland-docs-navigation";
 const APPEARANCE_EARLY = `(() => {
+  // Groups fold only where the script can unfold them again.
+  document.documentElement.setAttribute("data-docs-navigation-folds", "");
   try {
     const choice = localStorage.getItem("${APPEARANCE_STORE}");
     if (choice === "light" || choice === "dark")
@@ -432,11 +438,13 @@ const SEARCH = `(() => {
   const score = (entry, terms) => {
     let total = 0, section;
     const title = entry.title.toLowerCase();
+    // Titles read with spaces; "CardHeader" still finds "Card Header".
+    const flat = title.replace(/\\s+/g, "");
     for (const term of terms) {
       let best = 0;
-      if (title === term) best = 40;
-      else if (title.startsWith(term)) best = 24;
-      else if (title.includes(term)) best = 16;
+      if (title === term || flat === term) best = 40;
+      else if (title.startsWith(term) || flat.startsWith(term)) best = 24;
+      else if (title.includes(term) || flat.includes(term)) best = 16;
       const hit = entry.sections.find((s) => s.title.toLowerCase().includes(term));
       if (hit && best < 8) { best = 8; section = hit; }
       if (!best && (entry.description + " " + entry.group).toLowerCase().includes(term)) best = 4;
@@ -514,6 +522,27 @@ const SEARCH = `(() => {
   open.hidden = false;
 })();`;
 
+/**
+ * Fold and unfold the component groups. A reader's choices persist across pages; the group that
+ * holds the current page always opens, so the reader never lands on a hidden row.
+ */
+const NAVIGATION_GROUPS = `(() => {
+  const toggles = document.querySelectorAll("#docs-catalog .docs-nav-toggle");
+  let stored = {};
+  try { stored = JSON.parse(localStorage.getItem("${NAVIGATION_STORE}") || "{}") || {}; } catch {}
+  for (const toggle of toggles) {
+    const name = toggle.getAttribute("data-docs-group");
+    const current = toggle.getAttribute("aria-expanded") === "true";
+    if (!current && typeof stored[name] === "boolean") toggle.setAttribute("aria-expanded", String(stored[name]));
+    toggle.addEventListener("click", () => {
+      const open = toggle.getAttribute("aria-expanded") !== "true";
+      toggle.setAttribute("aria-expanded", String(open));
+      stored[name] = open;
+      try { localStorage.setItem("${NAVIGATION_STORE}", JSON.stringify(stored)); } catch {}
+    });
+  }
+})();`;
+
 /** Bring the current page's row into the rail's view, without scrolling the page itself. */
 const NAVIGATION_REVEAL = `(() => {
   const catalog = document.getElementById("docs-catalog");
@@ -576,16 +605,27 @@ function navIcon(source: IconSourceProps["source"]): Child {
   return <IconSource source={source} size={16} />;
 }
 
-/** A component group title: its icon, then its name; the plain name stays the group label. */
-function groupTitle(label: string): Child {
-  return [
-    <IconSource source={groupIcon(label)} size={14} className="docs-nav-group-icon" />,
-    <span>{label}</span>,
-  ];
+/**
+ * A component group title: a disclosure button with the group's icon, its name and a chevron. The
+ * group holding the current page starts open; the script remembers what the reader folds.
+ */
+function groupTitle(label: string, open: boolean): Child {
+  return (
+    <button
+      type="button"
+      className="docs-nav-toggle"
+      aria-expanded={open ? "true" : "false"}
+      data-docs-group={label}
+    >
+      <IconSource source={groupIcon(label)} size={14} className="docs-nav-group-icon" />
+      <span>{label}</span>
+      <Icon name="chevron-down" size={14} className="docs-nav-chevron" />
+    </button>
+  );
 }
 
 /** The sidebar groups, in the order the rail shows them. The home item id is the empty path. */
-function sidebarGroups(catalog: Catalog, packages: DocsPackage[]): NavListGroup[] {
+function sidebarGroups(catalog: Catalog, packages: DocsPackage[], path: string): NavListGroup[] {
   const groups: NavigationGroup[] = catalog.navigation;
   return [
     {
@@ -616,7 +656,10 @@ function sidebarGroups(catalog: Catalog, packages: DocsPackage[]): NavListGroup[
       })),
     },
     ...groups.map((group) => ({
-      label: groupTitle(group.label),
+      label: groupTitle(
+        group.label,
+        group.entries.some((entry) => entry.path === path),
+      ),
       items: group.entries.map((entry) => ({
         id: entry.path,
         href: entry.href,
@@ -723,7 +766,11 @@ function Sidebar({
         </kbd>
       </div>
       <div className="docs-catalog" id="docs-catalog">
-        <NavList label="Documentation" activeId={path} groups={sidebarGroups(catalog, packages)} />
+        <NavList
+          label="Documentation"
+          activeId={path}
+          groups={sidebarGroups(catalog, packages, path)}
+        />
         <p className="docs-catalog-empty" id="docs-catalog-empty" hidden>
           No navigation entries match that filter.
         </p>
@@ -892,6 +939,7 @@ function Document({
         </dialog>
         <script dangerouslySetInnerHTML={{ __html: CATALOG_FILTER }} />
         <script dangerouslySetInnerHTML={{ __html: NAVIGATION_DISCLOSURE }} />
+        <script dangerouslySetInnerHTML={{ __html: NAVIGATION_GROUPS }} />
         <script dangerouslySetInnerHTML={{ __html: NAVIGATION_REVEAL }} />
         <script dangerouslySetInnerHTML={{ __html: PREVIEW_FIT }} />
         <script dangerouslySetInnerHTML={{ __html: APPEARANCE_MENU }} />

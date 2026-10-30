@@ -42,6 +42,7 @@ export const JsonTreeStatesStory = defineStory({
   id: "json-tree-states",
   title: "JSON viewer · Properties, expansion and copy feedback",
   group: "Content",
+  component: "JsonTree",
   render: () => (
     <Stack>
       <JsonTree

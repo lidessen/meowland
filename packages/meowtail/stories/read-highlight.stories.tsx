@@ -7,6 +7,7 @@ export const ReadHighlightStory = defineStory({
   id: "read-highlight",
   title: "File window · Multi-line syntax and raw copy",
   group: "Content",
+  component: "ReadBlock",
   render: () => (
     <Stack>
       <ReadBlock

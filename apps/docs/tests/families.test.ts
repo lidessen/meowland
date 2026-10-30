@@ -9,20 +9,21 @@ const CATALOG = `# Component catalog
 
 ### Actions and commands
 
-| Family and public members | Purpose |
-| --- | --- |
-| [Buttons](src/button.tsx): \`Button\`, [Icon button](src/icon-button.tsx): \`IconButton\` | Actions. |
+| Family | Components | Parts | Purpose |
+| --- | --- | --- | --- |
+| [Buttons](src/button.tsx) | [\`Button\`](src/button.tsx), [\`IconButton\`](src/icon-button.tsx) | — | Actions. |
+| [Menus](src/menu.tsx) | \`Menu\`, \`MenuButton\` | — | Commands. |
 
 ### Records and surfaces
 
-| Family and public members | Purpose |
-| --- | --- |
-| [Card](src/card.tsx): \`Card\`, [CardHeader](src/card-header.tsx): \`CardHeader\` | A surface. |
-| [Entries](src/entry.tsx): \`EntryList\`, \`Entry\` | Entries. |
+| Family | Components | Parts | Purpose |
+| --- | --- | --- | --- |
+| [Card](src/card.tsx) | [\`Card\`](src/card.tsx) | [\`CardHeader\`](src/card-header.tsx) | A surface. |
+| [Entries](src/entry.tsx) | \`EntryList\`, \`Entry\` | — | Entries. |
 
 ## Agent scenario index
 
-| [Not a family](x): \`Ignored\` | |
+| [Not a family](x) | \`Ignored\` | — | |
 `;
 
 function story(overrides: Partial<StoryEntry> & { id: string }): StoryEntry {
@@ -42,17 +43,19 @@ describe("the component families", () => {
       "Actions and commands",
       "Records and surfaces",
     ]);
-    expect(families[0]!.members).toEqual([
-      { name: "Button", term: "Buttons" },
-      { name: "IconButton", term: "Icon button" },
+    expect(families[0]!.members.slice(0, 2)).toEqual([
+      { name: "Button", term: "Buttons", part: false },
+      { name: "IconButton", term: "Buttons", part: false },
     ]);
   });
 
-  test("a part extends the name of an owner listed before it", () => {
-    const members = parseFamilies(CATALOG)[1]!.members;
-    expect(members.find((member) => member.name === "CardHeader")?.parent).toBe("Card");
-    expect(members.find((member) => member.name === "EntryList")?.parent).toBeUndefined();
-    expect(members.find((member) => member.name === "Entry")?.term).toBe("Entries");
+  test("parts come from the Parts column, never from a shared name prefix", () => {
+    const members = parseFamilies(CATALOG).flatMap((category) => category.members);
+    const part = (name: string) => members.find((member) => member.name === name)?.part;
+    expect(part("CardHeader")).toBe(true);
+    expect(part("MenuButton")).toBe(false);
+    expect(part("EntryList")).toBe(false);
+    expect(members.some((member) => member.name === "Ignored")).toBe(false);
   });
 
   test("names read with spaces, capitals and known acronyms", () => {
@@ -92,9 +95,8 @@ describe("the component families", () => {
       },
     ]);
     const actions = catalog.navigation.find((group) => group.label === "Actions and commands")!;
-    expect(actions.entries.map((entry) => entry.label)).toEqual(["Button", "Icon Button"]);
-    // The label already says the export name and this task term; only new words are kept.
-    expect(actions.entries[1]!.terms).toBeUndefined();
+    expect(actions.entries.map((entry) => entry.label)).toEqual(["Button", "Icon Button", "Menu"]);
+    // Only words the label does not already say are kept.
     expect(actions.entries[0]!.terms).toBe("Buttons");
 
     const foundations = catalog.navigation.find((group) => group.label === FOUNDATIONS_GROUP)!;

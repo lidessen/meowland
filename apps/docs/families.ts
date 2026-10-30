@@ -5,10 +5,10 @@ import { join } from "node:path";
 export interface FamilyMember {
   /** The export name. */
   name: string;
-  /** The familiar task term the catalog links the member under, such as "Radio group". */
+  /** The family's task term, such as "Radio group". */
   term: string;
-  /** The member this one is a part of, when its name extends another member of the same family. */
-  parent?: string;
+  /** True for a member the catalog lists under Parts: it only works inside its family's components. */
+  part: boolean;
 }
 
 /** One category of the Meowtail catalog, such as "Forms and selection", with its members in order. */
@@ -22,10 +22,15 @@ export const FAMILIES_FILE = "packages/meowtail/COMPONENTS.md";
 
 const SECTION = "## Current component families";
 
+/** The export names a table cell lists, in order. */
+function exportNames(cell: string): string[] {
+  return [...cell.matchAll(/`([A-Za-z][A-Za-z0-9]*)`/g)].map((match) => match[1]!);
+}
+
 /**
  * Read the categories and families of the Meowtail component catalog. The catalog owns the
  * grouping; the site only follows it. Each `###` heading under "Current component families" is a
- * category, and each table row is one family: a linked task term followed by its export names.
+ * category, and each table row is one family: its task term, its components, then its parts.
  */
 export function parseFamilies(markdown: string): FamilyCategory[] {
   const start = markdown.indexOf(SECTION);
@@ -43,23 +48,10 @@ export function parseFamilies(markdown: string): FamilyCategory[] {
     }
     const category = categories.at(-1);
     if (!category || !line.startsWith("|")) continue;
-    const cell = line.split("|")[1] ?? "";
-    const family: FamilyMember[] = [];
-    let term = "";
-    for (const match of cell.matchAll(/(?:\[([^\]]+)\]\([^)]*\):\s*)?`([A-Za-z][A-Za-z0-9]*)`/g)) {
-      if (match[1]) term = match[1];
-      family.push({ name: match[2]!, term: term || match[2]! });
-    }
-    family.forEach((member, index) => {
-      // A part extends the name of an owner listed before it: CardHeader belongs to Card,
-      // DialogPanel to Dialog, while EntryList, listed before Entry, is not a part of it.
-      const owner = family
-        .slice(0, index)
-        .filter((other) => member.name.startsWith(other.name))
-        .sort((left, right) => right.name.length - left.name.length)[0];
-      if (owner) member.parent = owner.name;
-    });
-    category.members.push(...family);
+    const [family = "", components = "", parts = ""] = line.split("|").slice(1);
+    const term = /\[([^\]]+)\]/.exec(family)?.[1] ?? family.trim();
+    for (const name of exportNames(components)) category.members.push({ name, term, part: false });
+    for (const name of exportNames(parts)) category.members.push({ name, term, part: true });
   }
   return categories.filter((category) => category.members.length > 0);
 }

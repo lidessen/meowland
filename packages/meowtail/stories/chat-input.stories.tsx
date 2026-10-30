@@ -33,7 +33,7 @@ const sampleFiles = [
 
 export const InlineComposer = defineStory({
   id: "composer-inline",
-  title: "Chat Composer · Short drafts and multi-line editing",
+  title: "Chat Composer · Inline layout for short drafts",
   group: "Agent and conversation",
   groupOrder: 90,
   component: "ChatComposer",
@@ -58,7 +58,7 @@ export const InlineComposer = defineStory({
 
 export const ComposerAttachments = defineStory({
   id: "composer-attachments",
-  title: "Chat Composer · Identify, remove, and keep writing",
+  title: "Chat Composer · Attachments in the draft",
   group: "Agent and conversation",
   groupOrder: 90,
   component: "ChatComposer",
@@ -208,7 +208,7 @@ export const ComposerAttachments = defineStory({
 
 export const SentAttachments = defineStory({
   id: "attachments-sent",
-  title: "Chat Attachments · Materials you can revisit",
+  title: "Chat Attachments · Sent images and files",
   group: "Agent and conversation",
   groupOrder: 90,
   component: "ChatAttachments",

@@ -7,7 +7,7 @@ import config from "../../meowbook.config";
 // The story metadata rules in AGENTS.md ("Story metadata"), checked against the stories as
 // Meowbook discovers them and against the categories COMPONENTS.md declares.
 
-const FOUNDATIONS = "Foundations and parts";
+const FOUNDATIONS = "Icons and theme";
 const EXAMPLES = "Composition examples";
 
 async function categories(): Promise<Map<string, Set<string>>> {
@@ -65,7 +65,9 @@ describe("story metadata", async () => {
     // A single-component story names the export it documents and leads its title with it.
     expect(story.component).toBeDefined();
     expect(topic).toBe(readingName(story.component!));
-    if (story.group === FOUNDATIONS) expect(listed.has(story.component!)).toBe(false);
-    else expect(families.get(story.group!)?.has(story.component!)).toBe(true);
+    // A listed component sits in its family's category. A surface no family lists sits in the
+    // category it serves, or in the icons and theme group.
+    if (listed.has(story.component!))
+      expect(families.get(story.group!)?.has(story.component!)).toBe(true);
   });
 });

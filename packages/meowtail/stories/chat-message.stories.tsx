@@ -446,7 +446,7 @@ const rows = (wrap: boolean): Child[] => {
 
 export const ChatMessageRowsStory = defineStory({
   id: "chat-message-rows",
-  title: "Chat Message List · Row spacing and continuation",
+  title: "Chat Message List · Turns and continued replies",
   group: "Agent and conversation",
   groupOrder: 90,
   component: "ChatMessageList",

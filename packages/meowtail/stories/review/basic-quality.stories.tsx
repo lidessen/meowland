@@ -16,7 +16,7 @@ import {
   Select,
   Switch,
 } from "meowtail";
-import { Specimen } from "./specimen";
+import { Specimen } from "../specimen";
 
 /**
  * Canonical control scene for the basic-quality audit: one-line text, icon/text

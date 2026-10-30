@@ -371,6 +371,20 @@ export function agentAssistantDemo(): Child {
           executionText: "Execution returned; 5 / 5 items complete.",
           replyText: "Waiting for the public reply does not mean execution failed.",
           progress: { value: 5, max: 5, label: "Execution check 5 / 5 items" },
+          steps: [
+            {
+              id: "focus-order",
+              title: "Check the focus order",
+              statusText: "Reviewed",
+              tone: "success",
+            },
+            {
+              id: "shortcuts",
+              title: "Try every keyboard shortcut",
+              statusText: "Reviewed",
+              tone: "success",
+            },
+          ],
         },
         {
           id: "retry-tool",
@@ -582,7 +596,7 @@ export const AgentWorkflow = defineStory({
 
 export const AgentWorkflowNarrow = defineStory({
   id: "agent-workflow-narrow",
-  title: "Chat Task · 320px local container",
+  title: "Chat Task · In a narrow container",
   group: "Agent and conversation",
   groupOrder: 90,
   component: "ChatTask",
@@ -602,6 +616,10 @@ export const AgentWorkflowAssistant = defineStory({
     "The same Assistant renders tools and tasks by default and keeps messages, draft, attachments, activity, questions and safe Markdown.",
   covers: [
     "AssistantView",
+    "AssistantComposer",
+    "AssistantMarkdown",
+    "AssistantQuestion",
+    "AssistantSteps",
     "tool/task parts",
     "safe Markdown",
     "reactive payload",

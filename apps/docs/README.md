@@ -89,7 +89,8 @@ dist/
   stories and component metadata, and reads the catalog's family tables for the sidebar and index
   groups, their order and which members are parts; it never infers a part from a name and does not
   maintain another planning inventory. A documented page the families do not list goes under
-  "Foundations and parts", and a story that declares no `component` under "Composition examples".
+  the catalog category its own stories name (region layout under "Pages and layout"), otherwise
+  under "Icons and theme", and a story that declares no `component` under "Composition examples".
 - Vercel deploys this static site from the repository configuration. The GitHub build-and-lint
   workflow does not publish it, and the npm release workflow remains separate.
 

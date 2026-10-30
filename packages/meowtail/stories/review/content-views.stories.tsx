@@ -1,10 +1,10 @@
 import { h } from "meowjsx";
 import { defineStory } from "meowbook";
-import { Stack } from "../src/components/stack";
-import { WebBlock } from "../src/components/web-block";
-import { JsonBlock } from "../src/components/json-block";
-import { JsonTree } from "../src/components/json-tree";
-import { ImageLightbox } from "../src/components/image-lightbox";
+import { Stack } from "../../src/components/stack";
+import { WebBlock } from "../../src/components/web-block";
+import { JsonBlock } from "../../src/components/json-block";
+import { JsonTree } from "../../src/components/json-tree";
+import { ImageLightbox } from "../../src/components/image-lightbox";
 
 const sampleImage =
   "data:image/svg+xml," +

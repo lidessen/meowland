@@ -3,40 +3,6 @@ import { defineStory } from "meowbook";
 import { Icon, ProcessGroup, ProcessStep, Status, Tag } from "meowtail";
 import { SchemePair } from "./scheme-pair";
 
-export const ProcessGroupNarrowStory = defineStory({
-  id: "process-group-narrow",
-  title: "Process Group · Narrow rows and long sequences",
-  group: "Agent and conversation",
-  groupOrder: 90,
-  component: "ProcessGroup",
-  variant: "Narrow rows and long sequences",
-  description:
-    "In a narrow container, the name and the closing fact stay on the first line while the state badge gets its own second line; a long sequence is summarized as a count, not a row of marks.",
-  covers: [
-    "ProcessGroup narrow summary",
-    "title never wraps",
-    "separate outcome row",
-    "long sequence as a count",
-  ],
-  render() {
-    return (
-      <SchemePair width={340}>
-        {() => (
-          <ProcessGroup
-            title="Process · 13 steps"
-            status={<Status state="success" label="Completed" />}
-            trailing="12.4s"
-          >
-            <ProcessStep icon={<Icon name="terminal" />} meta="2.0s">
-              Run command <code>go test ./server/...</code>
-            </ProcessStep>
-          </ProcessGroup>
-        )}
-      </SchemePair>
-    );
-  },
-});
-
 export const ProcessGroupStory = defineStory({
   id: "process-group",
   title: "Process Group · Collapsed step record",
@@ -100,4 +66,67 @@ export const ProcessGroupStory = defineStory({
       </SchemePair>
     );
   },
+});
+
+export const ProcessGroupNarrowStory = defineStory({
+  id: "process-group-narrow",
+  title: "Process Group · Narrow rows and long sequences",
+  group: "Agent and conversation",
+  groupOrder: 90,
+  component: "ProcessGroup",
+  variant: "Narrow rows and long sequences",
+  description:
+    "In a narrow container, the name and the closing fact stay on the first line while the state badge gets its own second line; a long sequence is summarized as a count, not a row of marks.",
+  covers: [
+    "ProcessGroup narrow summary",
+    "title never wraps",
+    "separate outcome row",
+    "long sequence as a count",
+  ],
+  render() {
+    return (
+      <SchemePair width={340}>
+        {() => (
+          <ProcessGroup
+            title="Process · 13 steps"
+            status={<Status state="success" label="Completed" />}
+            trailing="12.4s"
+          >
+            <ProcessStep icon={<Icon name="terminal" />} meta="2.0s">
+              Run command <code>go test ./server/...</code>
+            </ProcessStep>
+          </ProcessGroup>
+        )}
+      </SchemePair>
+    );
+  },
+});
+
+export const ProcessStepStory = defineStory({
+  id: "process-step",
+  title: "Process Step · Icon, one line and a quiet fact",
+  group: "Agent and conversation",
+  groupOrder: 90,
+  component: "ProcessStep",
+  variant: "Step rows",
+  description:
+    "One step of public work is one line: an icon for the kind of action, what was done, and a quiet fact such as a duration or a count. A long target truncates instead of wrapping.",
+  render: () => (
+    <div style={{ maxWidth: "560px" }}>
+      <ProcessGroup open title="Process · 4 steps" trailing="3.6s">
+        <ProcessStep icon={<Icon name="search" />} meta="8 matches">
+          Search content <code>retryPolicy</code>
+        </ProcessStep>
+        <ProcessStep icon={<Icon name="file-text" />} meta="0.4s">
+          Read file <code>src/network/retry-policy.ts</code>
+        </ProcessStep>
+        <ProcessStep icon={<Icon name="terminal" />} meta="2.9s">
+          Run command <code>bun test tests/network/retry-policy-and-backoff-limits.test.ts</code>
+        </ProcessStep>
+        <ProcessStep icon={<Icon name="folder" />}>
+          List directory <code>src/network</code>
+        </ProcessStep>
+      </ProcessGroup>
+    </div>
+  ),
 });

@@ -30,7 +30,7 @@ import {
   Status,
   Toolbar,
 } from "meowtail";
-import { Note } from "./specimen";
+import { Note } from "../specimen";
 import { Icon } from "meowtail/icons";
 import { chatTokens, uiTokens } from "meowtail/theme";
 

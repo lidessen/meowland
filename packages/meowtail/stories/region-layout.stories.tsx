@@ -26,8 +26,8 @@ import { applyTheme } from "meowcss/web";
 export const RegionLayoutStory = defineStory({
   id: "region-layout",
   title: "Region Layout · List, reading and input",
-  group: "Foundations and parts",
-  groupOrder: 100,
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "RegionLayout",
   variant: "Named areas and separate content",
   description:
@@ -138,8 +138,8 @@ export const RegionLayoutStory = defineStory({
 export const IsolatedRegionStory = defineStory({
   id: "region-layout-isolated-controls",
   title: "Region Layout · Menus and choices in local content",
-  group: "Foundations and parts",
-  groupOrder: 100,
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "RegionLayout",
   variant: "Native popovers inside isolated content",
   description:
@@ -354,8 +354,8 @@ export const WorkspaceRegionStory = defineStory({
 export const NavigationRegionStory = defineStory({
   id: "region-layout-compact-navigation",
   title: "Region Layout · Narrow-window navigation beside content",
-  group: "Foundations and parts",
-  groupOrder: 100,
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "RegionLayout",
   variant: "Natural-height navigation and content filling the rest",
   description:

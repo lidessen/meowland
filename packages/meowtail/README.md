@@ -561,7 +561,7 @@ Existing styles have been migrated to this specification, and historical convers
 
 Compose pages from the roles below. Their current values live in the role tree in
 [theme tokens](src/theme/tokens.ts); component styles apply them to named parts.
-Meowbook's [`design-language` panorama](stories/language.stories.tsx) puts typography, actions,
+Meowbook's [`design-language` panorama](stories/review/language.stories.tsx) puts typography, actions,
 navigation, fields, execution states, and conversation on one board. The
 [`settings-workflow` scene](stories/settings-workflow.stories.tsx) shows a complete local edit,
 validation, correction, and save sequence. These are composition references, not backend integrations.

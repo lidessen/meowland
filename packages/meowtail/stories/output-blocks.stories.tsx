@@ -8,9 +8,12 @@ import { SearchBlock } from "../src/components/search-block";
 
 export const OutputBlocksStory = defineStory({
   id: "output-blocks",
-  title: "Execution Output · Terminal, file, diff, and search",
-  group: "Composition examples",
-  groupOrder: 110,
+  title: "Output Block · Terminal, file, diff and search",
+  group: "Content and inspection",
+  groupOrder: 70,
+  component: "OutputBlock",
+  description:
+    "One titled, capped and copyable surface carries every kind of tool output: a long result hides its middle on screen while Copy keeps the whole payload.",
   covers: ["output-block", "TerminalBlock", "ReadBlock", "DiffBlock", "SearchBlock"],
   render: () => (
     <Stack>

@@ -9,7 +9,7 @@ import { Specimen, Specimens } from "./specimen";
 export const UtilityClassesStory = defineStory({
   id: "utility-classes",
   title: "Theme Utilities · Values and composition",
-  group: "Foundations and parts",
+  group: "Icons and theme",
   groupOrder: 100,
   component: "Theme utilities",
   variant: "Class values and component defaults",

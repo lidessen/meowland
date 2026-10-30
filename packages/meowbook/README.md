@@ -18,6 +18,7 @@ export default defineConfig({
     links: [{ label: "Guides", href: "/guides/" }],
     docsLink: (story) =>
       story.component ? { label: "Docs", href: `/components/${story.component}/` } : undefined,
+    componentLabel: (story) => story.component?.replace(/([a-z])([A-Z])/g, "$1 $2"),
     appearance: {
       schemeStorageKey: "acme-appearance",
       themeStorageKey: "acme-theme",
@@ -33,6 +34,7 @@ export default defineConfig({
 - `brand` replaces the name, the short tag (an empty string hides it), the 28px mark (one URL, or `{ light, dark }` to follow the scheme) and where the mark leads.
 - `links` are quiet header links to related pages, such as a second gallery of the same site.
 - `docsLink` runs once per story at build time; the header shows its result while that story is current. Only the results reach the browser.
+- `componentLabel` names a story's component in the catalog row, the story header and the tab title, so a site can show `CardHeader` as "Card Header". It runs once per story at build time and only the names reach the browser. Stories of one component in one group must get the same name, or the build stops; without it the gallery shows `component`, else `title`. The catalog search matches the name as well as the component and title.
 - `appearance` lets the site and the gallery share the reader's choice through `localStorage`. A missing key means follow system and the first theme, so those are stored by removing the key. With two or more `themes`, the menu also offers a theme, and the gallery passes the chosen value to the canvas as its `theme` URL parameter; the values must be the ones the environment reads. A theme can also name the Meowtail theme that paints the gallery's own chrome while it is chosen (`chrome: "standard" | "journal" | "meow"`); the chrome keeps whatever faces the page already has, since the gallery loads no web fonts of its own. A choice made in another tab of the same site reaches the gallery.
 
 `buildStories` writes these settings as `gallery.json` next to `manifest.json`. The published `manifest.json` names each story `file` relative to the config root, so a deployed gallery does not carry the build machine's directories; the entries `buildStories` and `list` return keep absolute paths.

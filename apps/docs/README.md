@@ -106,7 +106,7 @@ playground read the same `localStorage` keys, so a theme or scheme picked on a p
 playground opens with, and the reverse. The chosen theme paints the playground's own chrome as well
 as its stories; the chrome keeps the system faces, since only the stories load Journal's web fonts.
 
-Pages and the sidebar show names in their reading form: `CardAction` is "Card Action", while the
+Pages, the sidebar and the playground (through Meowbook's `componentLabel`) show names in their reading form: `CardAction` is "Card Action", while the
 import line and the agent indexes keep the export name. A part the catalog lists, such as Card
 Action, sits one step in under its family. An example is named by the topic before its story
 title's "·". The filter and the site search ignore spaces and case, and the filter also matches the

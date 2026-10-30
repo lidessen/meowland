@@ -4,7 +4,7 @@ import { buildStories, discoverStories } from "meowbook/bun";
 import { buildSite } from "meowpress/build";
 import { buildCatalog } from "./catalog";
 import { removeEmptyScriptChunks } from "./cleanup";
-import { readFamilies } from "./families";
+import { displayName, readFamilies } from "./families";
 import { readStorySource, type StorySource } from "./code";
 import { writeFavicon } from "./favicon";
 import { highlightStaticCode } from "./highlight";
@@ -83,10 +83,14 @@ export async function buildDocs(): Promise<void> {
   for (const component of catalog.components)
     for (const story of component.stories)
       if (!pages.has(story.id)) pages.set(story.id, `/${component.path}/`);
+  // The playground names a row the way the docs sidebar does: "Card Header", or an example's topic.
+  const exampleNames = new Map(catalog.examples.map((example) => [example.story.id, example.name]));
   await buildStories(
     withGallery(meowbookConfig, {
       brand,
       links: [{ label: "Presentations", href: "/gallery/slides/" }],
+      componentLabel: (story) =>
+        story.component ? displayName(story.component) : exampleNames.get(story.id),
       docsLink: (story) => {
         const href = pages.get(story.id);
         return href ? { label: "Docs", href } : undefined;
@@ -109,6 +113,7 @@ export async function buildDocs(): Promise<void> {
       brand,
       links: [{ label: "Components", href: "/gallery/" }],
       docsLink: () => ({ label: "Docs", href: "/packages/meowslides/" }),
+      componentLabel: (story) => (story.component ? displayName(story.component) : undefined),
       appearance: { schemeStorageKey: DOCS_APPEARANCE_STORE },
     }),
     resolve(outputDirectory, "gallery/slides"),

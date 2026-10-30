@@ -5,6 +5,12 @@ import type { StoryConfig } from "../types";
 import type { TemporaryStory } from "./discover";
 import { buildStories } from "./build";
 
+/**
+ * Built chunks, styles and fonts carry a content hash in their names, so a browser may keep them
+ * for good. Pages and the manifest are not hashed and stay uncached, so a rebuild always shows.
+ */
+const HASHED_ASSET = /-[a-z0-9]{8}\.[a-z0-9]+$/;
+
 export async function serveStories(
   config: StoryConfig,
   options: { port?: number; temporary?: TemporaryStory; capture?: boolean } = {},
@@ -30,7 +36,12 @@ export async function serveStories(
         const file = Bun.file(filePath);
         if (!(await file.exists())) return new Response("Not found", { status: 404 });
         return new Response(request.method === "HEAD" ? null : file, {
-          headers: { "content-type": file.type, "cache-control": "no-store" },
+          headers: {
+            "content-type": file.type,
+            "cache-control": HASHED_ASSET.test(path)
+              ? "public, max-age=31536000, immutable"
+              : "no-store",
+          },
         });
       },
     });

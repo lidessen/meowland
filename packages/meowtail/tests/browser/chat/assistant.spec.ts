@@ -135,7 +135,8 @@ test("activity changes modality at narrow widths without remounting the draft or
   expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1)).toBe(
     true,
   );
-  await page.getByRole("combobox", { name: "Appearance" }).selectOption("dark");
+  // This suite serves capture canvases, which have no theme toolbar and follow the system scheme.
+  await page.emulateMedia({ colorScheme: "dark" });
   await expect(page.locator("html")).toHaveAttribute("data-meowui-color-scheme", "dark");
   // Let the existing standard-theme color transitions settle before a static comparison.
   await page.waitForTimeout(250);

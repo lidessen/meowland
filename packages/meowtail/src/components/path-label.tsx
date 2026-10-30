@@ -14,36 +14,7 @@ export function PathLabel(
 ) {
   const split = Math.max(path.lastIndexOf("/"), path.lastIndexOf("\\")) + 1;
   return (
-    <span
-      {...props}
-      className={className}
-      title={path}
-      ref={[
-        context.parts.root,
-        (element: HTMLElement) => {
-          let alive = true;
-          let observer: ResizeObserver | undefined;
-          queueMicrotask(() => {
-            if (!alive) return;
-            const text = element.firstElementChild as HTMLElement | null;
-            if (!text) return;
-            const update = () =>
-              element.toggleAttribute("data-path-clipped", text.offsetWidth > element.clientWidth);
-            update();
-            const Observer = element.ownerDocument.defaultView?.ResizeObserver;
-            if (Observer) {
-              observer = new Observer(update);
-              observer.observe(element);
-              observer.observe(text);
-            }
-          });
-          return () => {
-            alive = false;
-            observer?.disconnect();
-          };
-        },
-      ]}
-    >
+    <span {...props} className={className} title={path} ref={[context.parts.root]}>
       <span ref={[context.parts.text]}>
         {split ? <span ref={[context.parts.directory]}>{path.slice(0, split)}</span> : null}
         <span ref={[context.parts.name]}>{path.slice(split)}</span>
@@ -51,4 +22,7 @@ export function PathLabel(
     </span>
   );
 }
-PathLabel.meta = { name: "path-label", parts: ["root", "text", "directory", "name"] } as const;
+PathLabel.meta = {
+  name: "path-label",
+  parts: ["root", "text", "directory", "name"],
+} as const;

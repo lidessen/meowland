@@ -114,10 +114,11 @@ describe("the page document", () => {
     );
   });
 
-  test("only the group holding the current page starts open", () => {
+  test("every group renders open and marks the one holding the current page", () => {
     const html = document("components/button");
-    expect(html).toMatch(/aria-expanded="false" data-docs-group="Composition examples"/);
-    expect(html).toMatch(/aria-expanded="true" data-docs-group="Basic controls"/);
+    expect(html).not.toContain('aria-expanded="false" data-docs-group');
+    expect(html).toMatch(/aria-expanded="true" data-docs-group="Basic controls" data-docs-current/);
+    expect(html).toMatch(/aria-expanded="true" data-docs-group="Composition examples">/);
   });
 
   test("the navigation filter drops whitespace, not the letter s", () => {

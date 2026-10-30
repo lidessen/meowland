@@ -112,8 +112,8 @@ Action, sits one step in under its family. An example is named by the topic befo
 title's "·". The filter and the site search ignore spaces and case, and the filter also matches the
 catalog's task terms, so "CardAction" and "radio group" both find their page.
 
-Each component group folds. The group holding the current page opens, the others start folded, and
-the groups a reader opens or folds stay that way from page to page. A filter query shows its matches
+Each component group folds. Every group starts open; a group the reader folds stays folded from
+page to page, except the one holding the current page. A filter query shows its matches
 in folded groups too, and without the script every group stays open.
 
 Each place keeps one icon wherever it appears. The entry pages and packages lead their sidebar

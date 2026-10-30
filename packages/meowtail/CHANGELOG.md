@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- NavList group titles read as navigation headings: sentence case at `type.caption`, weight 600,
+  primary ink, instead of the small-caps label. Menu and ChoiceSelect group headings keep the
+  small-caps label.
+
+- `SearchInput` draws the native clear button in the theme (the close glyph at `icon.small` in
+  tertiary ink, darker on hover) instead of the browser's default control.
+
+- Stories follow one metadata convention (AGENTS.md, "Story metadata"): the catalog category as
+  `group`, a fixed `groupOrder`, the documented export as `component`, and `<Name> · <Scenario>`
+  titles. `COMPONENTS.md` family tables list `Components` and `Parts` separately.
+
 - Polish `CodeBlock`: the header names the language (`ts` reads TypeScript; `codeLanguageName`
   exposes the mapping), soft wrap and copy are compact icon buttons, a successful copy shows a check
   and is announced without adding a line, and a failure shows one danger line aligned with the code.

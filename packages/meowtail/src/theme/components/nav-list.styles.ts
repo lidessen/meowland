@@ -25,13 +25,12 @@ export const navListStyles = css`
     margin: 0;
     min-width: 0;
     padding-inline: ${uiTokens.space.group};
-    /* The shared small-caps label role: Menu and ChoiceSelect groups use it too. */
-    color: ${uiTokens.ink.tertiary};
-    font-size: ${uiTokens.type.micro};
-    font-weight: ${uiTokens.type.weight.medium};
-    line-height: ${uiTokens.type.line.micro};
-    letter-spacing: ${uiTokens.type.trackingCaps};
-    text-transform: uppercase;
+    /* A navigation heading reads in sentence case: a reader scans and returns to it, so it is
+       not the small-caps label Menu and ChoiceSelect use for their short group notes. */
+    color: ${uiTokens.ink.primary};
+    font-size: ${uiTokens.type.caption};
+    font-weight: ${uiTokens.type.weight.semibold};
+    line-height: ${uiTokens.type.line.caption};
     overflow-wrap: anywhere;
   }
   ${list("list")} {

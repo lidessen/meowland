@@ -523,8 +523,9 @@ const SEARCH = `(() => {
 })();`;
 
 /**
- * Fold and unfold the component groups. A reader's choices persist across pages; the group that
- * holds the current page always opens, so the reader never lands on a hidden row.
+ * Fold and unfold the component groups. Every group starts open; a group the reader folds stays
+ * folded from page to page, except the one that holds the current page, so the reader never lands
+ * on a hidden row.
  */
 const NAVIGATION_GROUPS = `(() => {
   const toggles = document.querySelectorAll("#docs-catalog .docs-nav-toggle");
@@ -532,8 +533,9 @@ const NAVIGATION_GROUPS = `(() => {
   try { stored = JSON.parse(localStorage.getItem("${NAVIGATION_STORE}") || "{}") || {}; } catch {}
   for (const toggle of toggles) {
     const name = toggle.getAttribute("data-docs-group");
-    const current = toggle.getAttribute("aria-expanded") === "true";
-    if (!current && typeof stored[name] === "boolean") toggle.setAttribute("aria-expanded", String(stored[name]));
+    // Every group starts open; only a group the reader folded stays folded, and never the current one.
+    if (stored[name] === false && !toggle.hasAttribute("data-docs-current"))
+      toggle.setAttribute("aria-expanded", "false");
     toggle.addEventListener("click", () => {
       const open = toggle.getAttribute("aria-expanded") !== "true";
       toggle.setAttribute("aria-expanded", String(open));
@@ -606,16 +608,17 @@ function navIcon(source: IconSourceProps["source"]): Child {
 }
 
 /**
- * A component group title: a disclosure button with the group's icon, its name and a chevron. The
- * group holding the current page starts open; the script remembers what the reader folds.
+ * A component group title: a disclosure button with the group's icon, its name and a chevron. Every
+ * group renders open; the script folds the ones the reader folded, never the current page's group.
  */
-function groupTitle(label: string, open: boolean): Child {
+function groupTitle(label: string, current: boolean): Child {
   return (
     <button
       type="button"
       className="docs-nav-toggle"
-      aria-expanded={open ? "true" : "false"}
+      aria-expanded="true"
       data-docs-group={label}
+      data-docs-current={current ? "" : undefined}
     >
       <IconSource source={groupIcon(label)} size={14} className="docs-nav-group-icon" />
       <span>{label}</span>

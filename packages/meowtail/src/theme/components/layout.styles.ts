@@ -19,6 +19,12 @@ export const layoutStyles = css`
 :where(${stackPartRefs.root}, ${inlinePartRefs.root}, ${gridPartRefs.root}, ${containerPartRefs.root}) > * {
   min-width: 0;
 }
+/* The gap owns the spacing between children; a plain paragraph's or heading's browser margin
+   would add to it. Component parts keep the margins their own fragments give them. */
+:where(${stackPartRefs.root}, ${inlinePartRefs.root}, ${gridPartRefs.root})
+  > :where(p, h1, h2, h3, h4, h5, h6, ul, ol, dl, figure, blockquote, pre, hr):not([data-meowui-part]) {
+  margin-block: 0;
+}
 :where(${stackPartRefs.root}, ${inlinePartRefs.root}, ${gridPartRefs.root}):is([${layoutOptions.attribute("gap")}="none"], [${gridOptions.attribute("gap")}="none"]) {
   gap: 0;
 }

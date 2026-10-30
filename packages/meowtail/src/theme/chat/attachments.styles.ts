@@ -2,9 +2,11 @@ import { css, parts } from "meowcss/meowjsx";
 import { chatTokens, uiTokens } from "../tokens";
 import type { ChatAttachments } from "../../chat/attachments";
 import type { ChatComposer } from "../../chat/composer";
+import type { ImagePreview } from "../../components/image-preview";
 import { ui } from "../utilities";
 const chatAttachmentsPartRefs = parts<typeof ChatAttachments>("chat-attachments");
 const chatComposerPartRefs = parts<typeof ChatComposer>("chat-composer");
+const imagePreviewPartRefs = parts<typeof ImagePreview>("image-preview");
 export const chatAttachmentsStyles = css`
   /* Inherit the host's chat palette; do not reset it at the attachment root. */
 
@@ -160,13 +162,24 @@ export const chatAttachmentsStyles = css`
       color: ${uiTokens.ink.primary};
     }
   }
+  /* A file with a preview reads as one split control: the card opens or downloads, its joined
+  end segment previews. */
+  ${chatAttachmentsPartRefs.entry}:has(> ${chatAttachmentsPartRefs.previewButton}) {
+    align-items: stretch;
+    gap: 0;
+  }
+  ${chatAttachmentsPartRefs.file}:has(+ ${chatAttachmentsPartRefs.previewButton}) {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
   ${chatAttachmentsPartRefs.previewButton} {
     flex: 0 0 auto;
-    border: 0;
-    background: transparent;
-    color: ${uiTokens.action.primary};
+    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-inline-start: 0;
+    background: ${uiTokens.surface.raised};
+    color: ${uiTokens.ink.secondary};
     padding: 0 ${uiTokens.control.inset};
-    border-radius: ${uiTokens.radius.lg};
+    border-radius: 0 ${chatTokens.bubbleRadius} ${chatTokens.bubbleRadius} 0;
     font: inherit;
     font-size: ${uiTokens.type.caption};
     cursor: pointer;
@@ -177,11 +190,12 @@ export const chatAttachmentsStyles = css`
   }
   @media (hover: hover) {
     ${chatAttachmentsPartRefs.previewButton}:hover:not(:disabled) {
-      background: ${uiTokens.state.hover};
+      background-image: linear-gradient(${uiTokens.state.hover}, ${uiTokens.state.hover});
+      color: ${uiTokens.ink.primary};
     }
   }
   ${chatAttachmentsPartRefs.previewButton}:active:not(:disabled) {
-    background: ${uiTokens.state.active};
+    background-image: linear-gradient(${uiTokens.state.active}, ${uiTokens.state.active});
     box-shadow: ${uiTokens.shadow.pressed};
     transition-duration: ${uiTokens.motion.instant};
   }
@@ -253,5 +267,21 @@ export const chatAttachmentsStyles = css`
     max-width: 64px;
     max-height: 64px;
     object-fit: cover;
+  }
+  /* The 64px tile is a thumbnail: the preview fills it and crops; the lightbox shows the whole image. */
+  ${chatComposerPartRefs.attachments} ${chatAttachmentsPartRefs.preview} > ${imagePreviewPartRefs.root} {
+    width: 100%;
+    height: 100%;
+  }
+  ${chatComposerPartRefs.attachments} ${chatAttachmentsPartRefs.preview} > ${imagePreviewPartRefs.root} > ${imagePreviewPartRefs.image} {
+    object-fit: cover;
+  }
+  ${chatComposerPartRefs.attachments} ${chatAttachmentsPartRefs.file}:has(+ ${chatAttachmentsPartRefs.previewButton}) {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+  ${chatComposerPartRefs.attachments} ${chatAttachmentsPartRefs.previewButton} {
+    border-start-end-radius: ${uiTokens.radius.xl};
+    border-end-end-radius: ${uiTokens.radius.xl};
   }
 `;

@@ -176,3 +176,20 @@ test("compact row sizing keeps navigation and scrolling content mounted together
   expect(await original!.evaluate((node) => node.isConnected)).toBe(true);
   await expect(page.getByRole("button", { name: "Back", exact: true })).toBeHidden();
 });
+
+test("plain paragraphs in a Stack are spaced by its gap alone", async ({ page }) => {
+  await page.setViewportSize({ width: 640, height: 900 });
+  await page.goto("/canvas.html?story=region-layout-compact-navigation");
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  const spacing = await page
+    .locator('[data-meowui-part="stack/root"]')
+    .first()
+    .evaluate((stack) => {
+      const [first, second] = [...stack.querySelectorAll(":scope > p")];
+      return {
+        gap: Number.parseFloat(getComputedStyle(stack).rowGap),
+        between: second!.getBoundingClientRect().top - first!.getBoundingClientRect().bottom,
+      };
+    });
+  expect(spacing.between).toBeCloseTo(spacing.gap, 0);
+});

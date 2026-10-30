@@ -6,9 +6,9 @@ import { Note, Specimen } from "./specimen";
 
 export const ActionMatrixStory = defineStory({
   id: "actions-matrix",
-  title: "Actions · Sizes, levels and unavailable states",
-  group: "Basic controls",
-  groupOrder: 10,
+  title: "Button · Sizes, levels and unavailable states",
+  group: "Actions and commands",
+  groupOrder: 30,
   component: "Button",
   variant: "Sizes and levels",
   description:

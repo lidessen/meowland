@@ -39,9 +39,9 @@ function rowsFor(sort: TableSort | undefined): TableRow[] {
 export const TableStory = defineStory({
   id: "data-table",
   title: "Table · Sort, resize and select",
+  group: "Records and surfaces",
+  groupOrder: 60,
   component: "Table",
-  group: "Navigation and layout",
-  groupOrder: 40,
   description:
     "A data table of host records. Column headers sort; their edges resize; checkboxes select several rows. The caller still owns the row order.",
   covers: ["Table sort", "Table resize", "Table multi-select"],

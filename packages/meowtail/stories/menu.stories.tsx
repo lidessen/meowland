@@ -7,9 +7,9 @@ import { Menu } from "../src/components/menu";
 export const MenuStory = defineStory({
   id: "menu-actions",
   title: "Menu · Groups and keyboard operation",
-  component: "Menu",
-  group: "Overlays and feedback",
+  group: "Actions and commands",
   groupOrder: 30,
+  component: "Menu",
   description:
     "Arrow keys and Home/End move the focus, typing text jumps to an item; Escape returns to the trigger button. All actions only update the local receipt.",
   render() {
@@ -70,9 +70,9 @@ export const MenuStory = defineStory({
 export const NestedMenuStory = defineStory({
   id: "menu-nested",
   title: "Menu · Nesting and touch",
-  component: "Menu",
-  group: "Overlays and feedback",
+  group: "Actions and commands",
   groupOrder: 30,
+  component: "Menu",
   description:
     "Hover or click to open a submenu; the right-arrow direction enters it, the left-arrow direction goes back, and Escape closes one level at a time.",
   render() {

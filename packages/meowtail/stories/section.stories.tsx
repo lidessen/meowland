@@ -5,8 +5,8 @@ import { Button, Container, Section, Stack } from "meowtail";
 export const SectionStory = defineStory({
   id: "section",
   title: "Section · Plain, card, nested and footer",
-  group: "Composition examples",
-  groupOrder: 45,
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "Section",
   variant: "Titled region presentations",
   description:
@@ -91,8 +91,8 @@ const longSectionCopy = {
 export const SectionLongContentStory = defineStory({
   id: "section-long-content",
   title: "Section · Long headings, descriptions and wrapped actions",
-  group: "Composition examples",
-  groupOrder: 45,
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "Section",
   variant: "Long content and narrow window",
   description:

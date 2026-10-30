@@ -6,9 +6,9 @@ import { Toast } from "../src/components/toast";
 export const ToastStory = defineStory({
   id: "toast-feedback",
   title: "Toast · Host-controlled visibility",
+  group: "Feedback and labels",
+  groupOrder: 80,
   component: "Toast",
-  group: "Overlays and feedback",
-  groupOrder: 30,
   description:
     "The host shows and dismisses toasts; no global queue or automatic timer is created.",
   render() {

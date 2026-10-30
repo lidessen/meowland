@@ -5,8 +5,9 @@ import { ReadBlock } from "../src/components/read-block";
 
 export const ReadHighlightStory = defineStory({
   id: "read-highlight",
-  title: "File window · Multi-line syntax and raw copy",
-  group: "Content",
+  title: "Read Block · Multi-line syntax and raw copy",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "ReadBlock",
   render: () => (
     <Stack>

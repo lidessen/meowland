@@ -6,9 +6,10 @@ import { Specimen, Specimens } from "./specimen";
 
 export const GroupedChoiceSelectStory = defineStory({
   id: "choice-select-grouped",
-  title: "Choice select · Grouped options",
+  title: "Choice Select · Grouped options",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "ChoiceSelect",
-  group: "Basic controls",
   render() {
     const value = signal("deepseek-flash");
     return (
@@ -30,9 +31,10 @@ export const GroupedChoiceSelectStory = defineStory({
 
 export const ChoiceWidthStory = defineStory({
   id: "choice-select-width",
-  title: "Choice select · Short trigger and long options",
+  title: "Choice Select · Short trigger and long options",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "ChoiceSelect",
-  group: "Basic controls",
   description:
     "A matching trigger keeps its exact width; the natural popover and wide form follow their existing contracts.",
   render() {

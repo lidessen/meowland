@@ -21,9 +21,9 @@ import { Note } from "./specimen";
 
 export const MessagePartsStory = defineStory({
   id: "message-parts",
-  title: "Message · Avatar, long title, and actions",
-  group: "Conversation components",
-  groupOrder: 50,
+  title: "Chat Message · Avatar, long title, and actions",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatMessage",
   variant: "Avatar and actions",
   description:
@@ -147,9 +147,9 @@ export const MessagePartsStory = defineStory({
 
 export const ComposerRecoveryStory = defineStory({
   id: "composer-recovery",
-  title: "Composer · Send, failure, and recovery",
-  group: "Conversation components",
-  groupOrder: 50,
+  title: "Chat Composer · Send, failure, and recovery",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatComposer",
   variant: "Sending and recovery",
   description:
@@ -251,9 +251,9 @@ export const ComposerRecoveryStory = defineStory({
 
 export const ExecutionDetailsStory = defineStory({
   id: "execution-details",
-  title: "Execution · Four states and expansion on demand",
-  group: "Conversation components",
-  groupOrder: 50,
+  title: "Chat Tool Call · Four states and expansion on demand",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatToolCall",
   variant: "Execution and evidence",
   description:
@@ -318,9 +318,9 @@ export const ExecutionDetailsStory = defineStory({
 
 export const ExecutionWorkflowStory = defineStory({
   id: "execution-workflow",
-  title: "Execution · Task, progress, and actual results",
-  group: "Conversation components",
-  groupOrder: 50,
+  title: "Chat Tool Call · Task, progress, and actual results",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatToolCall",
   variant: "Execution within a conversation",
   description:
@@ -446,9 +446,9 @@ Exit code 1`}</code>
 
 export const AttachmentScaleStory = defineStory({
   id: "attachment-scales",
-  title: "Attachments · Ratios, sizes, and missing information",
-  group: "Conversation components",
-  groupOrder: 50,
+  title: "Chat Attachments · Ratios, sizes, and missing information",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatAttachments",
   variant: "Ratios and missing information",
   description:

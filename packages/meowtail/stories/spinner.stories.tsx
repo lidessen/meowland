@@ -5,11 +5,11 @@ import { Spinner, Button, Stack } from "meowtail";
 import { Note } from "./specimen";
 export const Spinners = defineStory({
   id: "spinner",
-  title: "In progress · A readable wait",
+  title: "Spinner · A readable wait",
+  group: "Feedback and labels",
+  groupOrder: 80,
   component: "Spinner",
   variant: "Waiting and ready",
-  group: "Overlays and feedback",
-  groupOrder: 30,
   description:
     "Keep text next to the graphic that says what is happening, without inventing a percentage; the spinner stops when reduced motion is requested. The button toggles local demo state.",
   covers: ["Spinner", "status", "reduced-motion"],

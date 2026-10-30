@@ -5,11 +5,11 @@ import { Skeleton, Button, Stack } from "meowtail";
 import { Measure } from "./specimen";
 export const Skeletons = defineStory({
   id: "skeleton",
-  title: "Loading placeholder · Preserve content structure",
+  title: "Skeleton · Preserve content structure",
+  group: "Feedback and labels",
+  groupOrder: 80,
   component: "Skeleton",
   variant: "Loading and result",
-  group: "Overlays and feedback",
-  groupOrder: 30,
   description:
     "The placeholder itself is not announced. The container expresses the loading state and keeps a text description; the button simulates the local load finishing.",
   covers: ["Skeleton", "loading", "aria-busy"],

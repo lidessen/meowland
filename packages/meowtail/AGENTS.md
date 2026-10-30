@@ -433,6 +433,27 @@ scores and do not replace walking through real pages:
   `basic-quality-controls` and `composer-inline`); do not copy component implementations or fill in
   defaults with story-only CSS.
 
+## Story metadata
+
+The component playground and the documentation site organize the stories by their metadata, so every
+story writes it the same way. [`COMPONENTS.md`](COMPONENTS.md) owns the grouping; the stories follow
+it and `tests/unit/stories.test.ts` checks them.
+
+| Field        | Rule                                                                                                                                                                                                                                                                               |
+| ------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `id`         | Kebab case and stable. Never rename an existing id: tests, links and screenshots address stories by it.                                                                                                                                                                            |
+| `component`  | The export name of the one component the story documents, exactly as the catalog lists it, such as `CardHeader`. A part gets its own story under its own name. Omit it only for a composition example.                                                                             |
+| `group`      | The catalog category that lists the component, such as `"Records and surfaces"`. A documented surface no family lists (icons, theme utilities, region layout) uses `"Foundations and parts"`. A scene that composes several families uses `"Composition examples"`.                |
+| `groupOrder` | The group's position times ten: the nine catalog categories in their catalog order are 10 to 90, `"Foundations and parts"` is 100 and `"Composition examples"` is 110. Every story states it.                                                                                      |
+| `title`      | `"<Name> · <Scenario>"`, one separator. `<Name>` is the component's reading name (`CardHeader` reads `Card Header`, `JsonTree` reads `JSON Tree`), or the example's topic in title case. `<Scenario>` is sentence case and says what this story shows, without repeating the name. |
+| `variant`    | Optional: a shorter form of the scenario for the playground's story tabs.                                                                                                                                                                                                          |
+
+A story belongs to one component when that component is what a reader learns from it, even if it
+arranges others around it. Choose a composition example only when no single component is the
+subject, such as a page, a board or a workflow; such a story declares no `component`. When a family
+moves to another category in the catalog, move its stories' `group` and `groupOrder` in the same
+change.
+
 ## Reuse boundaries
 
 A component in a given position has exactly one implementation owner: shared structure, interaction,

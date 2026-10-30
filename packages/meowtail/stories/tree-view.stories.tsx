@@ -54,10 +54,10 @@ const plan: readonly TreeViewItem[] = [
 
 export const TreeViewStory = defineStory({
   id: "tree-view",
-  title: "Tree view · Explore and select",
+  title: "Tree View · Explore and select",
+  group: "Navigation",
+  groupOrder: 20,
   component: "TreeView",
-  group: "Navigation and layout",
-  groupOrder: 46,
   description:
     "Arrow keys move through visible rows, Right and Left open, close and climb branches, Enter selects and a letter jumps to the next match. The host owns the hierarchy, open branches and the selection it acts on.",
   covers: ["TreeView keyboard", "TreeView selection", "TreeView controlled expansion", "disabled"],

@@ -18,9 +18,9 @@ const variables = ["API_URL", "API_TOKEN", "LOG_LEVEL", "PORT", "WORKSPACE_ROOT"
 export const AutocompleteStory = defineStory({
   id: "autocomplete",
   title: "Autocomplete · Suggestions for free text",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "Autocomplete",
-  group: "Form inputs",
-  groupOrder: 55,
   description:
     "A text field that offers host suggestions without constraining the text: arrow keys move through them, Enter accepts one, and any other text stays valid. The host filters and loads suggestions.",
   covers: ["Autocomplete suggestions", "Autocomplete loading", "Autocomplete empty", "free text"],

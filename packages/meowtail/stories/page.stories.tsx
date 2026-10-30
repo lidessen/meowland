@@ -16,8 +16,8 @@ import {
 export const PageStory = defineStory({
   id: "page",
   title: "Page · Documentation page with sections",
-  group: "Composition examples",
-  groupOrder: 44,
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "Page",
   variant: "Content page composition",
   description:
@@ -165,8 +165,8 @@ const longPageCopy = {
 export const PageLongContentStory = defineStory({
   id: "page-long-content",
   title: "Page · Long identity, tools and notice",
-  group: "Composition examples",
-  groupOrder: 44,
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "Page",
   variant: "Long content and narrow window",
   description:

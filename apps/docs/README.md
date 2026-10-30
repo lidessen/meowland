@@ -79,7 +79,9 @@ dist/
 
 - The site is a consumer of the library it documents. Its chrome is meowtail's own components,
   and its theme extends `standardTheme` rather than defining a second palette.
-- The app never edits a story or a component. A story that changes changes the site with it.
+- The app never edits a story or a component. A story that changes changes the site with it. The
+  stories follow Meowtail's [story metadata rules](../../packages/meowtail/AGENTS.md#story-metadata),
+  so the playground groups them the way this site does.
 - The package pages are the app's own MDX; the component pages are generated. When both would cover
   the same ground, the generated page wins.
 - The [Meowtail component catalog](../../packages/meowtail/COMPONENTS.md) owns the maintained

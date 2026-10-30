@@ -32,8 +32,7 @@ export const BlogArticleStory = defineStory({
   id: "blog-article",
   title: "Blog · Article page",
   group: "Composition examples",
-  groupOrder: 45,
-  component: "Prose",
+  groupOrder: 110,
   variant: "Long-form reading composition",
   description:
     "One blog post from existing components: the page identity, a byline, long-form Prose and a subscribe card. Switch the gallery Theme to Journal to read the same markup in the blog theme.",
@@ -144,8 +143,7 @@ export const BlogIndexStory = defineStory({
   id: "blog-index",
   title: "Blog · Post index",
   group: "Composition examples",
-  groupOrder: 46,
-  component: "EntryList",
+  groupOrder: 110,
   variant: "Post listing composition",
   description:
     "A blog's front page from existing components: the publication identity, a lead Entry and the archive as an EntryList. Switch the gallery Theme to Journal to compare.",

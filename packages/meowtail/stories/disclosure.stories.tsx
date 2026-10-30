@@ -6,8 +6,8 @@ import { Note } from "./specimen";
 export const DisclosureStory = defineStory({
   id: "disclosure",
   title: "Disclosure · Preserving reading context",
-  group: "Navigation and layout",
-  groupOrder: 40,
+  group: "Overlays and disclosure",
+  groupOrder: 50,
   component: "Disclosure",
   variant: "Reading context",
   description:

@@ -6,8 +6,8 @@ import { Button, Field, Input, Modal, Stack } from "meowtail";
 export const ModalStory = defineStory({
   id: "modal",
   title: "Modal · Title, body, actions, and focus return",
-  group: "Overlays and feedback",
-  groupOrder: 30,
+  group: "Overlays and disclosure",
+  groupOrder: 50,
   component: "Modal",
   variant: "Controlled open state",
   description:
@@ -62,8 +62,8 @@ export const ModalStory = defineStory({
 export const ModalLongBodyStory = defineStory({
   id: "modal-long-body",
   title: "Modal · Long body scrolling",
-  group: "Overlays and feedback",
-  groupOrder: 30,
+  group: "Overlays and disclosure",
+  groupOrder: 50,
   component: "Modal",
   variant: "Fixed header and scrolling body",
   description:
@@ -122,8 +122,8 @@ export const ModalLongBodyStory = defineStory({
 export const ModalNonDismissibleStory = defineStory({
   id: "modal-non-dismissible",
   title: "Modal · Explicit close only",
-  group: "Overlays and feedback",
-  groupOrder: 30,
+  group: "Overlays and disclosure",
+  groupOrder: 50,
   component: "Modal",
   variant: "Non-dismissible review",
   description:

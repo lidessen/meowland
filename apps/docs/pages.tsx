@@ -47,10 +47,9 @@ const PAGE_WIDTH = "full" as const;
 
 /** The groups whose stories are composed scenes rather than a single control. */
 const TALL_GROUPS = new Set([
-  "Assistant",
+  "Agent and conversation",
   "Composition examples",
-  "Content",
-  "Conversation components",
+  "Content and inspection",
 ]);
 
 /** The story titles that describe a full board rather than one control. */

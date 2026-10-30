@@ -6,8 +6,8 @@ import { SchemePair } from "./scheme-pair";
 export const TagStory = defineStory({
   id: "tag-facts",
   title: "Tag · Facts, counts and paths",
-  group: "Basic controls",
-  groupOrder: 13,
+  group: "Feedback and labels",
+  groupOrder: 80,
   component: "Tag",
   variant: "Neutral, accent and count",
   description:

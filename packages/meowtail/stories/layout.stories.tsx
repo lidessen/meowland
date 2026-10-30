@@ -18,9 +18,9 @@ import { Measure } from "./specimen";
 
 export const LayoutCompositionStory = defineStory({
   id: "layout-composition",
-  title: "Layout composition · Text baseline and fixed actions",
-  group: "Navigation and layout",
-  groupOrder: 40,
+  title: "Layout Item · Text baseline and fixed actions",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "LayoutItem",
   variant: "Long content and actions",
   description:
@@ -67,9 +67,9 @@ export const LayoutCompositionStory = defineStory({
 
 export const StackStory = defineStory({
   id: "layout-stack",
-  title: "Vertical layout · Reading and actions",
-  group: "Navigation and layout",
-  groupOrder: 40,
+  title: "Stack · Reading and actions",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "Stack",
   variant: "Reading and actions",
   description:
@@ -100,9 +100,9 @@ export const StackStory = defineStory({
 
 export const InlineStory = defineStory({
   id: "layout-inline",
-  title: "Horizontal layout · Wrapping and alignment",
-  group: "Navigation and layout",
-  groupOrder: 40,
+  title: "Inline · Wrapping and alignment",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "Inline",
   variant: "Wrapping and alignment",
   description:
@@ -134,9 +134,9 @@ export const InlineStory = defineStory({
 
 export const GridStory = defineStory({
   id: "layout-grid",
-  title: "Grid layout · Parallel work",
-  group: "Navigation and layout",
-  groupOrder: 40,
+  title: "Grid · Parallel work",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "Grid",
   variant: "Adaptive columns",
   description:
@@ -164,9 +164,9 @@ export const GridStory = defineStory({
 
 export const ContainerStory = defineStory({
   id: "layout-container",
-  title: "Content width · Keeping reading focused",
-  group: "Navigation and layout",
-  groupOrder: 40,
+  title: "Container · Keeping reading focused",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "Container",
   variant: "Reading width",
   description:
@@ -201,9 +201,9 @@ export const ContainerStory = defineStory({
 
 export const NaturalPageContainerStory = defineStory({
   id: "layout-container-page",
-  title: "Natural page · Semantic whitespace and continuous reading",
-  group: "Navigation and layout",
-  groupOrder: 40,
+  title: "Container · Semantic whitespace and continuous reading",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "Container",
   variant: "Page whitespace and natural document flow",
   description:
@@ -246,9 +246,9 @@ export const NaturalPageContainerStory = defineStory({
 
 export const NestedLayoutScrollStory = defineStory({
   id: "layout-nested-scroll",
-  title: "Nested layout · Fixed header and footer with local scrolling",
-  group: "Navigation and layout",
-  groupOrder: 40,
+  title: "Layout Item · Fixed header and footer with local scrolling",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "LayoutItem",
   variant: "Vertical remaining space and dynamic long content",
   description:

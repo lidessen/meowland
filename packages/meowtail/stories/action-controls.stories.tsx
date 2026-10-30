@@ -15,9 +15,9 @@ import { Specimen, Note } from "./specimen";
 
 export const IconButtonStory = defineStory({
   id: "icon-button",
-  title: "Icon button · Compact actions",
-  group: "Basic controls",
-  groupOrder: 10,
+  title: "Icon Button · Compact actions",
+  group: "Actions and commands",
+  groupOrder: 30,
   component: "IconButton",
   variant: "Actions and accessible names",
   description:
@@ -49,8 +49,8 @@ export const IconButtonStory = defineStory({
 export const ToolbarStory = defineStory({
   id: "toolbar",
   title: "Toolbar · Related actions",
-  group: "Navigation and layout",
-  groupOrder: 40,
+  group: "Actions and commands",
+  groupOrder: 30,
   component: "Toolbar",
   variant: "Horizontal, vertical and mixed controls",
   description:

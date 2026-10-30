@@ -28,9 +28,9 @@ const reference = {
 
 export const ChatToolSequenceStory = defineStory({
   id: "chat-tool-sequence",
-  title: "Message · Tool call sequence",
-  group: "Conversation components",
-  groupOrder: 60,
+  title: "Chat Tool Call · Tool call sequence",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatToolCall",
   description:
     "Tool actions and their target stay on one row; results expand on demand, and non-complete states always show clearly. The static example runs no tools.",
@@ -127,9 +127,9 @@ export const ChatToolSequenceStory = defineStory({
 
 export const ChatToolCallActionStory = defineStory({
   id: "chat-tool-call-action",
-  title: "Tool row · Actions and expansion",
-  group: "Conversation components",
-  groupOrder: 60,
+  title: "Chat Tool Call · Actions and expansion",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatToolCall",
   variant: "Host actions",
   description:
@@ -178,9 +178,9 @@ export const ChatToolCallActionStory = defineStory({
 
 export const ChatMessageCompositionStory = defineStory({
   id: "chat-message-composition",
-  title: "Message · Text, files and evidence",
-  group: "Conversation components",
-  groupOrder: 60,
+  title: "Chat Message · Text, files and evidence",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatMessage",
   variant: "Composition and surface",
   description:
@@ -338,9 +338,9 @@ export const ChatMessageCompositionStory = defineStory({
 
 export const ChatProcessDetailStory = defineStory({
   id: "chat-process-detail",
-  title: "Process · Summary and execution detail",
-  group: "Conversation components",
-  groupOrder: 60,
+  title: "Chat Process · Summary and execution detail",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatProcess",
   variant: "Collapse and expand",
   description:
@@ -367,9 +367,9 @@ export const ChatProcessDetailStory = defineStory({
 
 export const ChatSourcesDetailStory = defineStory({
   id: "chat-sources-detail",
-  title: "Sources · Titles and descriptions",
-  group: "Conversation components",
-  groupOrder: 60,
+  title: "Chat Sources · Titles and descriptions",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatSources",
   variant: "Expanded sources",
   description:
@@ -446,9 +446,9 @@ const rows = (wrap: boolean): Child[] => {
 
 export const ChatMessageRowsStory = defineStory({
   id: "chat-message-rows",
-  title: "Message list · Row spacing and continuation",
-  group: "Conversation components",
-  groupOrder: 60,
+  title: "Chat Message List · Row spacing and continuation",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatMessageList",
   variant: "Two mounting shapes",
   description:

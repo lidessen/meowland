@@ -8,8 +8,9 @@ import { SearchBlock } from "../src/components/search-block";
 
 export const OutputBlocksStory = defineStory({
   id: "output-blocks",
-  title: "Execution output · Terminal, file, diff, and search",
-  group: "Content",
+  title: "Execution Output · Terminal, file, diff, and search",
+  group: "Composition examples",
+  groupOrder: 110,
   covers: ["output-block", "TerminalBlock", "ReadBlock", "DiffBlock", "SearchBlock"],
   render: () => (
     <Stack>
@@ -62,8 +63,9 @@ export const OutputBlocksStory = defineStory({
 
 export const TerminalStatesStory = defineStory({
   id: "terminal-states",
-  title: "Terminal output · Running, failure, and unknown status",
-  group: "Content",
+  title: "Terminal Block · Running, failure, and unknown status",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "TerminalBlock",
   render: () => (
     <Stack>

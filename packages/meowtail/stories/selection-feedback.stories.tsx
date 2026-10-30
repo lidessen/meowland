@@ -9,10 +9,10 @@ import { RiskConfirmation } from "../src/components/risk-confirmation";
 
 export const SegmentedFormStory = defineStory({
   id: "segmented-forms",
-  title: "Segmented control · Form ownership and reset",
+  title: "Segmented Control · Form ownership and reset",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "SegmentedControl",
-  group: "Basic controls",
-  groupOrder: 10,
   description:
     "Two controlled groups sit inside and outside a form; native reset does not change the host's current value.",
   render() {
@@ -65,10 +65,10 @@ export const SegmentedFormStory = defineStory({
 });
 export const SelectionFeedbackStory = defineStory({
   id: "selection-feedback",
-  title: "Selection and feedback · Segmented control, active text and confirmation",
+  title: "Segmented Control · Active text and confirmation",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "SegmentedControl",
-  group: "Basic controls",
-  groupOrder: 10,
   description:
     "The segmented control keeps native radio semantics. Confirmation is only used for this local example and introduces no global action gate.",
   render() {

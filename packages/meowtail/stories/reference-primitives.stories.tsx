@@ -8,10 +8,10 @@ import { HoverCard } from "../src/components/hover-card";
 import { Specimen, Specimens } from "./specimen";
 export const ReferencePrimitivesStory = defineStory({
   id: "reference-primitives",
-  title: "Details · Paths, status and preview",
+  title: "Path Label · Paths, status and preview",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "PathLabel",
-  group: "Basic controls",
-  groupOrder: 10,
   description:
     "A path only shows text; the host provides preview content, readable on hover or via keyboard focus.",
   render: () => (

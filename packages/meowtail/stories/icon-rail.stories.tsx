@@ -5,9 +5,9 @@ import { SchemePair } from "./scheme-pair";
 
 export const IconRailStory = defineStory({
   id: "icon-rail",
-  title: "Icon rail · Expansion and item states",
-  group: "Navigation and layout",
-  groupOrder: 41,
+  title: "Icon Rail · Expansion and item states",
+  group: "Navigation",
+  groupOrder: 20,
   component: "IconRail",
   variant: "Component slots and states",
   description:

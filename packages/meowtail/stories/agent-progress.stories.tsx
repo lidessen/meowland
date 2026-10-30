@@ -23,10 +23,10 @@ function plan(current: number, percent?: number): TaskListEntry[] {
 
 export const TaskListStory = defineStory({
   id: "task-list",
-  title: "Task list · A plan an agent works through",
+  title: "Task List · A plan an agent works through",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "TaskList",
-  group: "Agent process",
-  groupOrder: 50,
   variant: "Pending, current, done and failed steps",
   description:
     "The host reports each step's state; the list shows the plan, the current step and how many are done. Rows keep their place by id while states move on.",
@@ -91,10 +91,10 @@ const reasoning = [
 
 export const ChatReasoningStory = defineStory({
   id: "chat-reasoning",
-  title: "Reasoning · A model working before it answers",
+  title: "Chat Reasoning · A model working before it answers",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatReasoning",
-  group: "Agent process",
-  groupOrder: 50,
   variant: "Streaming and folded",
   description:
     "While active the newest lines stay in view and older ones fade under the top edge; when the host marks it done it folds to one row the reader can reopen.",

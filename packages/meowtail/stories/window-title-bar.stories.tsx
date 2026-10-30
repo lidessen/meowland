@@ -103,9 +103,9 @@ function Window({
 
 export const WindowTitleBarStory = defineStory({
   id: "window-title-bar",
-  title: "Window title bar · Desktop shell",
-  group: "Navigation and layout",
-  groupOrder: 42,
+  title: "Window Title Bar · Desktop shell",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "WindowTitleBar",
   variant: "Light and dark",
   description:
@@ -131,9 +131,9 @@ export const WindowTitleBarStory = defineStory({
 
 export const WindowTitleBarRoomStory = defineStory({
   id: "window-title-bar-room",
-  title: "Window title bar · Shell room and narrow windows",
-  group: "Navigation and layout",
-  groupOrder: 43,
+  title: "Window Title Bar · Shell room and narrow windows",
+  group: "Pages and layout",
+  groupOrder: 10,
   component: "WindowTitleBar",
   variant: "Shell room and narrow window",
   description:

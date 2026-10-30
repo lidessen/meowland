@@ -5,10 +5,9 @@ import { Measure } from "./specimen";
 
 export const PatternContainersStory = defineStory({
   id: "pattern-containers",
-  title: "Composition containers · action rail and meta row",
+  title: "Composition Containers · Action rail and meta row",
   group: "Composition examples",
-  groupOrder: 95,
-  component: "ActionRail",
+  groupOrder: 110,
   variant: "Actions and facts",
   description:
     "The action rail owns start/end anchoring and keeps the submit action visible; the meta row owns fact separators, wrapping and progress. Callers pass actions and facts, not layout styles.",

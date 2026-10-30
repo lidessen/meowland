@@ -36,9 +36,9 @@ import { chatTokens, uiTokens } from "meowtail/theme";
 
 export const DesignLanguageStory = defineStory({
   id: "design-language",
-  title: "Design language · Panorama board",
+  title: "Design Language · Panorama board",
   group: "Composition examples",
-  groupOrder: 70,
+  groupOrder: 110,
   variant: "Design overview",
   description:
     "One standard theme: light and dark are explicit schemes; auto follows the system preference. Compare action hierarchy, current activity and readable states without losing input.",
@@ -458,8 +458,7 @@ export const ContentCarriersStory = defineStory({
   id: "content-carriers",
   title: "Content · Attachments, sources and execution states",
   group: "Composition examples",
-  groupOrder: 70,
-  component: "ChatAttachments",
+  groupOrder: 110,
   variant: "Attachments and sources",
   description:
     "Images are recognized by thumbnail and files show name and size; detailed process and sources expand on demand.",
@@ -568,8 +567,7 @@ export const ConversationStatesStory = defineStory({
   id: "conversation-states",
   title: "Conversation · Roles and feedback states",
   group: "Composition examples",
-  groupOrder: 70,
-  component: "ChatMessage",
+  groupOrder: 110,
   variant: "Roles and feedback",
   description:
     "Fixed-state examples: online, waiting, error and generating. There is no background task or model call.",

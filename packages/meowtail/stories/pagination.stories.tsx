@@ -22,9 +22,9 @@ function rowsFor(page: number): TableRow[] {
 export const PaginationStory = defineStory({
   id: "pagination",
   title: "Pagination · Known and unknown totals",
+  group: "Navigation",
+  groupOrder: 20,
   component: "Pagination",
-  group: "Navigation and layout",
-  groupOrder: 45,
   description:
     "Moves through pages of host records. With a known total it shows numbered pages; with an unknown total it shows the page and asks the host whether a later page exists. The host owns the page, loading and the records.",
   covers: [

@@ -23,10 +23,9 @@ import {
 
 export const WorkspaceCompositionStory = defineStory({
   id: "workspace-composition",
-  title: "Workspace composition · Fixed header, form and dynamic body",
-  group: "Navigation and layout",
-  groupOrder: 40,
-  component: "PageFrame",
+  title: "Workspace Composition · Fixed header, form and dynamic body",
+  group: "Composition examples",
+  groupOrder: 110,
   variant: "Shared layout and control composition",
   description:
     "One focused content page: keep the draft, inspect the checks, and finish with one action; a short narrow window still returns to the page header and never clips an overlay.",

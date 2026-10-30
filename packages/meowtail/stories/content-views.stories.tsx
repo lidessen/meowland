@@ -13,8 +13,9 @@ const sampleImage =
   );
 export const ContentViewsStory = defineStory({
   id: "content-views",
-  title: "Content views · Sources, JSON and images",
-  group: "Content",
+  title: "Content Views · Sources, JSON and images",
+  group: "Composition examples",
+  groupOrder: 110,
   render: () => (
     <Stack>
       <WebBlock
@@ -40,8 +41,9 @@ export const ContentViewsStory = defineStory({
 
 export const JsonTreeStatesStory = defineStory({
   id: "json-tree-states",
-  title: "JSON viewer · Properties, expansion and copy feedback",
-  group: "Content",
+  title: "JSON Tree · Properties, expansion and copy feedback",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "JsonTree",
   render: () => (
     <Stack>

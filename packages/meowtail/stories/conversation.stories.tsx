@@ -6,11 +6,11 @@ import { ChatConversation, ChatMessageList, ChatMessage, Button, Stack, Inline }
 
 export const ConversationReading = defineStory({
   id: "chat-conversation",
-  title: "Conversation reading · Live updates and review",
+  title: "Chat Conversation · Live updates and review",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatConversation",
   variant: "Reading continuity",
-  group: "Conversation components",
-  groupOrder: 50,
   description:
     "Read upward first, then add replies; the reading position stays put. The return action sits after the body viewport and does not cover earlier text; after returning to the latest message it follows new content again. The buttons only update the local example, and collapsing then expanding remounts the reading region.",
   covers: [

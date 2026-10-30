@@ -5,8 +5,9 @@ import { Specimen, Specimens } from "./specimen";
 
 export const CredentialSourceStory = defineStory({
   id: "credential-source",
-  title: "Credential source · Environment references and manual keys",
-  group: "Forms",
+  title: "Credential Source · Environment references and manual keys",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "CredentialSource",
   description:
     "The host reports availability; the control does not query the environment or store keys.",

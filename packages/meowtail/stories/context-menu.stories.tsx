@@ -6,10 +6,10 @@ import { Note } from "./specimen";
 
 export const ContextMenuStory = defineStory({
   id: "context-menu",
-  title: "Context menu · Right-click actions",
-  component: "ContextMenu",
-  group: "Overlays and feedback",
+  title: "Context Menu · Right-click actions",
+  group: "Actions and commands",
   groupOrder: 30,
+  component: "ContextMenu",
   description:
     "Right-click the region, or focus it and press Shift+F10. Nested items reuse Menu, including keyboard movement inside the menu.",
   covers: ["ContextMenu pointer", "Shift+F10", "Menu submenus"],

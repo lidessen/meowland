@@ -174,10 +174,9 @@ function deliveryPreferences() {
 
 export const SettingsWorkflowStory = defineStory({
   id: "settings-workflow",
-  title: "Delivery preferences",
+  title: "Settings Workflow · Delivery preferences",
   group: "Composition examples",
-  groupOrder: 95,
-  component: "FieldGroup",
+  groupOrder: 110,
   variant: "Continuous settings workflow",
   description:
     "Edit a local draft, submit an invalid email, correct it, and save. The field error and saved feedback stay next to the controls and action they describe.",

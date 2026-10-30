@@ -17,7 +17,8 @@ import { Note } from "./specimen";
 export const PopoverEscapeStory = defineStory({
   id: "popover-escape",
   title: "Popover · Child controls and modal closing",
-  group: "Overlays and feedback",
+  group: "Overlays and disclosure",
+  groupOrder: 50,
   component: "Popover",
   covers: ["Popover", "child DOM Escape", "Dialog", "unmount"],
   render() {
@@ -136,8 +137,8 @@ export const PopoverEscapeStory = defineStory({
 export const PopoverStory = defineStory({
   id: "popover",
   title: "Popover · In-place editing and returning",
-  group: "Overlays and feedback",
-  groupOrder: 30,
+  group: "Overlays and disclosure",
+  groupOrder: 50,
   component: "Popover",
   variant: "In-place editing and nesting",
   description:
@@ -308,9 +309,9 @@ export const PopoverStory = defineStory({
 
 export const ChoiceSelectStory = defineStory({
   id: "choice-select",
-  title: "Select · Custom popup and keyboard",
-  group: "Form inputs",
-  groupOrder: 20,
+  title: "Choice Select · Custom popup and keyboard",
+  group: "Forms and selection",
+  groupOrder: 40,
   component: "ChoiceSelect",
   variant: "Keyboard and forms",
   description:

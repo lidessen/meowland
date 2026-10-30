@@ -4,8 +4,9 @@ import { defineStory } from "meowbook";
 
 export const CodeBlockStory = defineStory({
   id: "code-block",
-  title: "Code block · Language, copy, and wrapping",
-  group: "Content",
+  title: "Code Block · Language, copy, and wrapping",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "CodeBlock",
   render: () => (
     <Stack>
@@ -32,8 +33,9 @@ export const CodeBlockStory = defineStory({
 
 export const CodeBlockHeaderStory = defineStory({
   id: "code-block-header",
-  title: "Code block · Title, caption, and host actions",
-  group: "Content",
+  title: "Code Block · Title, caption, and host actions",
+  group: "Content and inspection",
+  groupOrder: 70,
   component: "CodeBlock",
   description:
     "A named code surface keeps its language, soft-wrap, and copy controls; the title and quiet caption share the header, and host actions sit before the built-in ones.",

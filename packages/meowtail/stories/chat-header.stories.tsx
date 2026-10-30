@@ -4,10 +4,10 @@ import { Button, ChatHeader, ChatStatus, Stack } from "meowtail";
 
 export const ChatHeaderStory = defineStory({
   id: "chat-header",
-  title: "Chat header · Status and actions",
+  title: "Chat Header · Status and actions",
+  group: "Agent and conversation",
+  groupOrder: 90,
   component: "ChatHeader",
-  group: "Conversation components",
-  groupOrder: 50,
   variant: "Narrow screen and long title",
   render: () => (
     <Stack>

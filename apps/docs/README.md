@@ -52,6 +52,7 @@ follow their separate manual workflow.
 | `catalog.ts`              | The story manifest and the component registry become the component reference.       |
 | `code.ts`                 | The source of a story, sliced out of the story file at build time.                  |
 | `favicon.ts`              | The site icon, written at the root of the output directory.                         |
+| `icons.ts`                | The wayfinding icons: one per entry page, package and component group.              |
 | `parts.tsx`               | The blocks a page is made of: the preview, the code sample, the API table.          |
 | `document.tsx`            | The page document: the head, the sidebar and the footer.                            |
 | `pages.tsx`               | The page builders: the home page, the package pages, the component pages.           |
@@ -98,6 +99,10 @@ The appearance menu is one choice across the site: the pages, their live preview
 playground read the same `localStorage` keys, so a theme or scheme picked on a page is the one the
 playground opens with, and the reverse. The chosen theme paints the playground's own chrome as well
 as its stories; the chrome keeps the system faces, since only the stories load Journal's web fonts.
+
+Each place keeps one icon wherever it appears. The entry pages and packages lead their sidebar
+rows and home-page tiles with it; each component group carries its icon in its sidebar and index
+heading, and its rows hang on a guide line that marks the current page in the accent.
 
 The theme supplies the same surfaces, hairlines and type scale to every page. The site adds only
 the layout a reference needs — the reading column, the code panel and the API table — and every

@@ -102,7 +102,16 @@ describe("the page document", () => {
     const html = document("components/button");
     expect(html).toContain('data-meowui-part="search-input/root"');
     expect(html).toContain("Filter navigation");
-    expect(html).toContain('<div class="docs-catalog-label">Documentation</div>');
+    expect(html).not.toContain("docs-catalog-label");
+  });
+
+  test("the rail leads entry pages and packages with icons and marks component groups", () => {
+    const html = document("components/button");
+    expect(html.match(/data-meowui-part="nav-list\/icon"/g)).toHaveLength(3 + packages.length);
+    expect(html).toContain('class="meow-icon docs-nav-group-icon"');
+    expect(html).toMatch(
+      /nav-list\/groupTitle"><svg[^>]*docs-nav-group-icon[\s\S]*?<span>Basic controls<\/span>/,
+    );
   });
 
   test("the rail is one NavList landmark with labelled groups", () => {

@@ -3,11 +3,11 @@ import type { ThemeDefinition } from "meowcss";
 import { Badge, Link, Page, PageHeader, Prose, Section, Stack } from "meowtail";
 import * as meowtail from "meowtail";
 import { Icon, IconSource } from "meowtail/icons";
-import { BookOpen, LayoutPanelLeft } from "meowtail/icons/lucide";
 import type { ContentItem, SitePage } from "meowpress/build";
 import type { StoryEntry } from "meowbook";
 import type { Catalog, CatalogComponent, CatalogExample } from "./catalog";
 import { firstElementOf, renderSourceOf, type StorySource } from "./code";
+import { groupIcon, packageIcon, PAGE_ICONS } from "./icons";
 import type { DocsPackage } from "./packages";
 import { splitSummary, type ComponentProps } from "./props";
 import {
@@ -81,10 +81,18 @@ function sourceFor(
   if (!source) return {};
   // Show what draws the example; the story's id, title and coverage notes stay in its file.
   if (source.render)
-    return { source: source.render.code, file: source.file, line: source.render.line };
+    return {
+      source: source.render.code,
+      file: source.file,
+      line: source.render.line,
+    };
   const render = renderSourceOf(source.code);
   if (!render) return { source: source.code, file: source.file, line: source.line };
-  return { source: render.code, file: source.file, line: source.line + render.lineOffset };
+  return {
+    source: render.code,
+    file: source.file,
+    line: source.line + render.lineOffset,
+  };
 }
 
 /** The trail that says where the reader is. */
@@ -210,9 +218,11 @@ function HomePage({ state }: { state: DocsState }): Child {
         description="Start with the component library, or use the pieces your project needs."
       >
         <div className="docs-package-grid">
-          {state.packages.map((entry, index) => (
+          {state.packages.map((entry) => (
             <a className="docs-package-link" href={`/${entry.path}/`}>
-              <span className="docs-package-number">{String(index + 1).padStart(2, "0")}</span>
+              <span className="docs-package-icon">
+                <IconSource source={packageIcon(entry.title)} size={18} />
+              </span>
               <div>
                 <strong>{entry.title}</strong>
                 <p>{entry.summary}</p>
@@ -232,8 +242,8 @@ function HomePage({ state }: { state: DocsState }): Child {
         {/* The two ways into the components, laid out like the packages above them. */}
         <div className="docs-package-grid">
           <a className="docs-package-link" href="/components/">
-            <span className="docs-package-number">
-              <IconSource source={BookOpen} size={16} />
+            <span className="docs-package-icon">
+              <IconSource source={PAGE_ICONS.components} size={18} />
             </span>
             <div>
               <strong>Component reference</strong>
@@ -245,8 +255,8 @@ function HomePage({ state }: { state: DocsState }): Child {
             </div>
           </a>
           <a className="docs-package-link" href="/gallery/">
-            <span className="docs-package-number">
-              <IconSource source={LayoutPanelLeft} size={16} />
+            <span className="docs-package-icon">
+              <IconSource source={PAGE_ICONS.gallery} size={18} />
             </span>
             <div>
               <strong>Component playground</strong>
@@ -294,7 +304,10 @@ function ComponentList({ state }: { state: DocsState }): Child {
     <Stack gap="relaxed">
       {state.catalog.navigation.map((group) => (
         <div className="docs-index">
-          <h3 className="docs-example-title">{group.label}</h3>
+          <h3 className="docs-example-title docs-index-title">
+            <IconSource source={groupIcon(group.label)} size={16} className="docs-nav-group-icon" />
+            {group.label}
+          </h3>
           <ul className="docs-index-list">
             {group.entries.map((entry) => (
               <li>

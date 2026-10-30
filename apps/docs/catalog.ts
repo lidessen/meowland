@@ -1,5 +1,6 @@
 import type { StoryEntry } from "meowbook";
 import { MeowUIComponent, meowUIComponents } from "meowtail/registry";
+import { displayName, type FamilyCategory, type FamilyMember } from "./families";
 
 /** The style binding of component metadata, when it declares one. */
 export interface CatalogStyleProps {
@@ -63,6 +64,10 @@ export interface NavigationEntry {
   label: string;
   /** Site path without a leading slash. */
   path: string;
+  /** True for a part of the entry before it in the family, such as Card Header under Card. */
+  part?: boolean;
+  /** Other words the navigation filter matches: the catalog's task term, when the label does not say it. */
+  terms?: string;
 }
 
 /** One sidebar group, holding components and composition examples side by side. */
@@ -86,6 +91,9 @@ export const UNCATEGORIZED_GROUP = "Components without examples";
 /** The group that holds stories which compose several components. */
 export const EXAMPLE_GROUP = "Composition examples";
 
+/** The group that holds documented pages the component families do not list: icons, theme utilities, internal parts. */
+export const FOUNDATIONS_GROUP = "Foundations and parts";
+
 /** Turn a display name into a URL segment. */
 export function kebabCase(name: string): string {
   return name
@@ -95,6 +103,16 @@ export function kebabCase(name: string): string {
     .toLowerCase();
 }
 
+/** A name without case or spaces, for comparing what two names say. */
+function plainWords(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, "");
+}
+
+/** Turn a kebab-case metadata name into the PascalCase of a component function. */
+export function pascalCase(name: string): string {
+  return name.replace(/(?:^|-)([a-z0-9])/g, (_, letter: string) => letter.toUpperCase());
+}
+
 /** Registered components with finite metadata, projected without importing implementation types. */
 function registeredComponents(): CatalogRegistryEntry[] {
   return (
@@ -102,9 +120,10 @@ function registeredComponents(): CatalogRegistryEntry[] {
       meta: CatalogMeta;
     }[]
   ).map((component) => ({
+    // A registered part without a public export is named the way its source function is.
     name:
       Object.entries(MeowUIComponent).find(([, name]) => name === component.meta.name)?.[0] ??
-      component.meta.name,
+      pascalCase(component.meta.name),
     meta: component.meta,
   }));
 }
@@ -123,7 +142,7 @@ const USED_IN_LIMIT = 3;
 
 /**
  * The stories whose example draws a component, as JSX or through `h`, or that name it in their
- * `covers` list, which is how a story shows a registered part no public component exposes. Stories that document one
+ * `covers` list by name or metadata name, which is how a story shows a registered part no public component exposes. Stories that document one
  * component come before composed scenes, then the examples that draw it most often, then the
  * shorter ones, so the first is the one where the component is easiest to see.
  */
@@ -131,6 +150,7 @@ function storiesUsing(
   title: string,
   stories: readonly StoryEntry[],
   sourceOf: (story: StoryEntry) => string | undefined,
+  metaName?: string,
 ): StoryEntry[] {
   const pattern = new RegExp(`<${title}[\\s/>]|\\bh\\(${title}\\b`, "g");
   const seen = new Set<string>();
@@ -140,7 +160,7 @@ function storiesUsing(
     const source = sourceOf(story);
     const uses =
       (source?.match(pattern)?.length ?? 0) +
-      (story.covers?.filter((entry) => entry === title).length ?? 0);
+      (story.covers?.filter((entry) => entry === title || entry === metaName).length ?? 0);
     if (uses === 0) continue;
     seen.add(story.id);
     matches.push({ story, uses, length: source?.length ?? 0 });
@@ -170,13 +190,15 @@ function groupOrders(stories: readonly StoryEntry[]): Map<string, number> {
 
 /**
  * Build the component reference from the story manifest and ordinary component metadata. The
- * manifest decides what is shown and in which group; `.meta` supplies stable names, style axes and
- * DOM parts.
+ * manifest decides what is shown; `.meta` supplies stable names, style axes and DOM parts. When
+ * the Meowtail component families are given, they decide the groups and the order, and the story
+ * groups only decide where examples are shown; without them the story groups decide.
  */
 export function buildCatalog(
   stories: readonly StoryEntry[],
   sourceOf: (story: StoryEntry) => string | undefined = () => undefined,
   registry: readonly CatalogRegistryEntry[] = registeredComponents(),
+  families: readonly FamilyCategory[] = [],
 ): Catalog {
   const byName = new Map(registry.map((component) => [component.meta.name, component]));
   const byTitle = new Map(registry.map((component) => [component.name, component]));
@@ -240,7 +262,7 @@ export function buildCatalog(
     while (usedSlugs.has(slug)) slug = `${name}-${suffix++}`;
     usedSlugs.add(slug);
     const title = titles.get(name) ?? registered.name;
-    const usedIn = storiesUsing(title, stories, sourceOf);
+    const usedIn = storiesUsing(title, stories, sourceOf, name);
     components.push({
       slug,
       path: `components/${slug}`,
@@ -251,6 +273,24 @@ export function buildCatalog(
       meta: byName.get(name)?.meta,
     });
   }
+
+  // The families regroup the components and fix their order, parts right after their owner.
+  const members = new Map<string, { member: FamilyMember; category: string; index: number }>();
+  families.forEach((category) =>
+    category.members.forEach((member) =>
+      members.set(member.name, { member, category: category.label, index: members.size }),
+    ),
+  );
+  if (families.length > 0) {
+    families.forEach((category, index) => orders.set(category.label, index));
+    orders.set(FOUNDATIONS_GROUP, families.length);
+    orders.set(EXAMPLE_GROUP, families.length + 1);
+    for (const component of components)
+      component.group = members.get(component.title)?.category ?? FOUNDATIONS_GROUP;
+    for (const example of examples) example.group = EXAMPLE_GROUP;
+  }
+  const memberIndex = (component: CatalogComponent): number =>
+    members.get(component.title)?.index ?? Number.MAX_SAFE_INTEGER;
 
   const groupOrder = (group: string): number => orders.get(group) ?? Number.MAX_SAFE_INTEGER;
   const groups = new Map<string, CatalogComponent[]>();
@@ -263,7 +303,11 @@ export function buildCatalog(
     .map(([label, list]) => ({
       label,
       order: groupOrder(label),
-      components: list.sort((left, right) => left.title.localeCompare(right.title)),
+      components: list.sort(
+        (left, right) =>
+          memberIndex(left) - memberIndex(right) ||
+          displayName(left.title).localeCompare(displayName(right.title)),
+      ),
     }))
     .sort((left, right) =>
       left.order === right.order ? left.label.localeCompare(right.label) : left.order - right.order,
@@ -279,11 +323,22 @@ export function buildCatalog(
   };
   for (const group of ordered) {
     const target = navigationGroup(group.label);
+    const titles = new Set(group.components.map((component) => component.title));
     for (const component of group.components) {
+      const member = members.get(component.title)?.member;
+      // Only words the label does not already say: spacing and case do not count.
+      const said = new Set([plainWords(displayName(component.title))]);
+      const terms = [component.title, member?.term].filter((term): term is string => {
+        if (term === undefined || said.has(plainWords(term))) return false;
+        said.add(plainWords(term));
+        return true;
+      });
       target.entries.push({
         href: `/${component.path}/`,
-        label: component.title,
+        label: displayName(component.title),
         path: component.path,
+        ...(member?.parent && titles.has(member.parent) ? { part: true } : {}),
+        ...(terms.length > 0 ? { terms: terms.join(" ") } : {}),
       });
     }
   }

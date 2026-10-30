@@ -5,7 +5,7 @@ import * as meowtail from "meowtail";
 import { Icon, IconSource } from "meowtail/icons";
 import type { ContentItem, SitePage } from "meowpress/build";
 import type { StoryEntry } from "meowbook";
-import type { Catalog, CatalogComponent, CatalogExample } from "./catalog";
+import { kebabCase, type Catalog, type CatalogComponent, type CatalogExample } from "./catalog";
 import { firstElementOf, renderSourceOf, type StorySource } from "./code";
 import { groupIcon, packageIcon, PAGE_ICONS } from "./icons";
 import type { DocsPackage } from "./packages";
@@ -100,13 +100,16 @@ function trailFor(path: string, state: DocsState): TrailItem[] {
   if (path === "") return [{ label: "Overview" }];
   if (path.startsWith("packages/")) {
     const entry = state.packages.find((candidate) => candidate.path === path);
-    return [{ label: "Package" }, { label: entry?.title ?? "Package" }];
+    return [{ label: "Packages", href: "/#packages" }, { label: entry?.title ?? "Package" }];
   }
   if (path === COMPONENTS_PATH) return [{ label: "Components" }];
   if (path.startsWith("components/")) {
     const component = state.catalog.components.find((candidate) => candidate.path === path);
     return [
       { label: "Components", href: `/${COMPONENTS_PATH}/` },
+      ...(component
+        ? [{ label: component.group, href: `/${COMPONENTS_PATH}/#${kebabCase(component.group)}` }]
+        : []),
       { label: component?.title ?? "Component" },
     ];
   }
@@ -303,7 +306,7 @@ function ComponentList({ state }: { state: DocsState }): Child {
   return (
     <Stack gap="relaxed">
       {state.catalog.navigation.map((group) => (
-        <div className="docs-index">
+        <div className="docs-index" id={kebabCase(group.label)}>
           <h3 className="docs-example-title docs-index-title">
             <IconSource source={groupIcon(group.label)} size={16} className="docs-nav-group-icon" />
             {group.label}
@@ -409,7 +412,7 @@ function PackagePage({
           <Note>
             {slides
               ? "The presentation playground runs the stories the slides package declares, in the presentation theme."
-              : "The playground lists every story the library declares, grouped the way the component reference groups them."}
+              : "The playground lists every story the library declares, in the groups the stories themselves declare."}
           </Note>
         </Stack>
       ),

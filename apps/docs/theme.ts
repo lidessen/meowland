@@ -179,6 +179,10 @@ export const docsStyles = css`
   .docs-search ${searchInput.control} {
     font-size: ${uiTokens.type.label};
   }
+  /* The field's own frame shows focus; the page-wide ring would draw a second box inside it. */
+  .docs-search ${searchInput.control}:focus-visible {
+    outline: none;
+  }
   .docs-catalog {
     flex: 1;
     overflow-y: auto;
@@ -231,6 +235,12 @@ export const docsStyles = css`
     margin-left: 14px;
     padding-left: 6px;
     border-left: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+  }
+  /* A family part sits one step in from its owner, in the quieter size. */
+  .docs-catalog ${navList.item}:has(.docs-nav-part) {
+    min-height: 28px;
+    padding-inline-start: 22px;
+    font-size: ${uiTokens.type.caption};
   }
   .docs-catalog ${navList.group}:has(.docs-nav-group-icon) ${navList.item}[aria-current="page"] {
     position: relative;

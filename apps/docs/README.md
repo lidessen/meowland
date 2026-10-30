@@ -46,20 +46,21 @@ follow their separate manual workflow.
 
 ## The files
 
-| File                      | What it owns                                                                        |
-| ------------------------- | ----------------------------------------------------------------------------------- |
-| `build.ts`                | The build order: discover the stories, generate the site, then build the galleries. |
-| `catalog.ts`              | The story manifest and the component registry become the component reference.       |
-| `code.ts`                 | The source of a story, sliced out of the story file at build time.                  |
-| `favicon.ts`              | The site icon, written at the root of the output directory.                         |
-| `icons.ts`                | The wayfinding icons: one per entry page, package and component group.              |
-| `parts.tsx`               | The blocks a page is made of: the preview, the code sample, the API table.          |
-| `document.tsx`            | The page document: the head, the sidebar and the footer.                            |
-| `pages.tsx`               | The page builders: the home page, the package pages, the component pages.           |
-| `theme.ts`                | The site theme: the standard theme, the site layout and the Meow values.            |
-| `site.config.ts`          | The Meowpress configuration, including the pages provider.                          |
-| `serve.ts`                | The loopback static server.                                                         |
-| `content/posts/packages/` | The hand-written MDX page of each package.                                          |
+| File                      | What it owns                                                                            |
+| ------------------------- | --------------------------------------------------------------------------------------- |
+| `build.ts`                | The build order: discover the stories, generate the site, then build the galleries.     |
+| `catalog.ts`              | The story manifest and the component registry become the component reference.           |
+| `code.ts`                 | The source of a story, sliced out of the story file at build time.                      |
+| `families.ts`             | The Meowtail component families, read from its catalog, and the reading form of a name. |
+| `favicon.ts`              | The site icon, written at the root of the output directory.                             |
+| `icons.ts`                | The wayfinding icons: one per entry page, package and component group.                  |
+| `parts.tsx`               | The blocks a page is made of: the preview, the code sample, the API table.              |
+| `document.tsx`            | The page document: the head, the sidebar and the footer.                                |
+| `pages.tsx`               | The page builders: the home page, the package pages, the component pages.               |
+| `theme.ts`                | The site theme: the standard theme, the site layout and the Meow values.                |
+| `site.config.ts`          | The Meowpress configuration, including the pages provider.                              |
+| `serve.ts`                | The loopback static server.                                                             |
+| `content/posts/packages/` | The hand-written MDX page of each package.                                              |
 
 ## The output
 
@@ -82,8 +83,11 @@ dist/
 - The package pages are the app's own MDX; the component pages are generated. When both would cover
   the same ground, the generated page wins.
 - The [Meowtail component catalog](../../packages/meowtail/COMPONENTS.md) owns the maintained
-  component list and planned additions. This app generates the current reference from stories and
-  component metadata; it does not maintain another planning inventory.
+  component list, its grouping and planned additions. This app generates the current reference from
+  stories and component metadata, and reads the catalog's family tables for the sidebar and index
+  groups and their order; it does not maintain another planning inventory. A documented page the
+  families do not list goes under "Foundations and parts", and every example story under
+  "Composition examples".
 - Vercel deploys this static site from the repository configuration. The GitHub build-and-lint
   workflow does not publish it, and the npm release workflow remains separate.
 
@@ -99,6 +103,10 @@ The appearance menu is one choice across the site: the pages, their live preview
 playground read the same `localStorage` keys, so a theme or scheme picked on a page is the one the
 playground opens with, and the reverse. The chosen theme paints the playground's own chrome as well
 as its stories; the chrome keeps the system faces, since only the stories load Journal's web fonts.
+
+The sidebar shows names in their reading form: `CardAction` is listed as "Card Action", and a
+family part such as Card Action sits one step in under its owner. The filter ignores spaces and case
+and also matches the catalog's task term, so "CardAction" and "radio group" both find their page.
 
 Each place keeps one icon wherever it appears. The entry pages and packages lead their sidebar
 rows and home-page tiles with it; each component group carries its icon in its sidebar and index

@@ -4,6 +4,7 @@ import { buildStories, discoverStories } from "meowbook/bun";
 import { buildSite } from "meowpress/build";
 import { buildCatalog } from "./catalog";
 import { removeEmptyScriptChunks } from "./cleanup";
+import { readFamilies } from "./families";
 import { readStorySource, type StorySource } from "./code";
 import { writeFavicon } from "./favicon";
 import { highlightStaticCode } from "./highlight";
@@ -39,10 +40,15 @@ export async function buildDocs(): Promise<void> {
     const source = await readStorySource(root, story);
     if (source) sources.set(story.id, source);
   }
-  const catalog = buildCatalog(stories, (story) => {
-    const source = sources.get(story.id);
-    return source?.render?.code ?? source?.code;
-  });
+  const catalog = buildCatalog(
+    stories,
+    (story) => {
+      const source = sources.get(story.id);
+      return source?.render?.code ?? source?.code;
+    },
+    undefined,
+    await readFamilies(root),
+  );
 
   const props = await readComponentProps(resolve(root, "packages/meowtail/src"));
   // What a component is comes from the first sentence of its JSDoc; a story description says

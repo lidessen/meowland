@@ -1,8 +1,9 @@
 import { type ThemeDefinition } from "meowcss";
+import { removeLegacyIsFallbacks } from "meowcss/bundle";
 import { blogFonts, blogTheme } from "./theme";
 import { FONT_EXTERNAL, publishFonts, type SiteFont } from "./fonts";
 import { DEFAULT_SITE, type SiteIdentity } from "./identity";
-import { mkdir, rm, writeFile, cp } from "node:fs/promises";
+import { mkdir, readFile, rm, writeFile, cp } from "node:fs/promises";
 import { isAbsolute, join, relative, resolve } from "node:path";
 import {
   collectContentAssets,
@@ -152,6 +153,10 @@ async function buildStaticHtmlFromEntrypoints(
     console.error(result.logs);
     throw new Error("Unable to build site static HTML");
   }
+  // Bun writes legacy :-webkit-any()/:-moz-any() copies of every :is() rule; Safari misreads them.
+  for (const output of result.outputs)
+    if (output.path.endsWith(".css"))
+      await writeFile(output.path, removeLegacyIsFallbacks(await readFile(output.path, "utf8")));
 }
 
 /** Consumer pages are written inside the generated directory and never above it. */

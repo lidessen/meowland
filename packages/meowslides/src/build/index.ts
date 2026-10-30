@@ -3,6 +3,7 @@ import { cp, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { watch } from "node:fs";
 import { tmpdir } from "node:os";
 import { basename, dirname, extname, isAbsolute, join, relative, resolve, sep } from "node:path";
+import { removeLegacyIsFallbacks } from "meowcss/bundle";
 import { compileSlides } from "./compiler";
 
 export { compileSlides, type CompiledSlides, type SlideMetadata } from "./compiler";
@@ -139,6 +140,10 @@ export async function buildSlides(options: BuildSlidesOptions): Promise<BuildSli
       ],
     });
     if (!result.success) throw new Error(result.logs.map(String).join("\n"));
+    // Bun writes legacy :-webkit-any()/:-moz-any() copies of every :is() rule; Safari misreads them.
+    for (const output of result.outputs)
+      if (output.path.endsWith(".css"))
+        await writeFile(output.path, removeLegacyIsFallbacks(await readFile(output.path, "utf8")));
     await writeFile(join(staging, "index.html"), html(compiled.slides[0]!.title, "app.js"));
     await writeFile(
       join(staging, "slides-manifest.json"),

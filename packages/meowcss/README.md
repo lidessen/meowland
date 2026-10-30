@@ -1,7 +1,7 @@
 # MeowCSS
 
 A generic TypeScript token, options and CSS generation mechanism. The root entry does not depend on JSX, UI or the DOM; component adapters are imported from
-`meowcss/meowjsx`, and DOM theme lifecycle from `meowcss/web`.
+`meowcss/meowjsx`, DOM theme lifecycle from `meowcss/web`, and build-step passes over bundled CSS from `meowcss/bundle`.
 
 MeowUI owns concrete token values, component parts, standard themes and semantic layout. MeowCSS does not provide another component or layout system.
 
@@ -108,6 +108,15 @@ and `parts` are marked `@__NO_SIDE_EFFECTS__`, so Rollup drops an unused call an
 a consumer's own theme modules. In local checks with esbuild 0.25 the mark applied only inside the
 declaring module, and Bun 1.4 did not apply it; with those bundlers, mark a top-level call
 `/* @__PURE__ */` when it should be droppable.
+
+`meowcss/bundle` holds passes for CSS a bundler has already written. `removeLegacyIsFallbacks(css)`
+drops the `:-webkit-any()` and `:-moz-any()` copies Bun's CSS bundler (1.4.4) writes beside every
+`:is()` rule and every `:not()` with a selector list; `Bun.build` has no CSS targets to turn them off.
+iOS Safari matches the `:-moz-any()` copy of a rule like
+`:where(.field):-moz-any(:focus-visible, :focus-within)` on every element with focus inside, which
+spreads a field's focus halo over the containers of a tapped button. The `:is()` copy always stays.
+Run it over each `.css` output after `Bun.build`; Meowbook, Meowpress and Meowslides builds already do.
+Text from `mountStyles(document, cssText)` never passes a bundler and needs nothing.
 
 ## Verification
 

@@ -681,6 +681,9 @@ A static host composes `standardTheme.cssText` with application CSS at build tim
 and outputs root attributes through `themeAttributes(standardTheme, config)`. Styles can load before client-side
 JavaScript runs. The Dashboard and Meowbook use this delivery path;
 dynamic previews use `mountStyles(document, cssText)`, with the host holding the returned cleanup function.
+A static host that bundles that `.css` file with Bun runs `removeLegacyIsFallbacks` from
+`meowcss/bundle` over the output: Bun writes legacy `:-moz-any()` copies of the theme's `:is()`
+rules, and iOS Safari matches one of them on every container of a focused control.
 Source code maintains no `.css` files, and generated CSS is still a browser asset. Module imports themselves do not access the DOM;
 `mountStyles` does not deduplicate across calls, so the host should assemble once within the document or application lifecycle.
 

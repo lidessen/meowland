@@ -1,4 +1,5 @@
-import { cp, mkdir, readdir, rm, writeFile } from "node:fs/promises";
+import { cp, mkdir, readdir, readFile, rm, writeFile } from "node:fs/promises";
+import { removeLegacyIsFallbacks } from "meowcss/bundle";
 import { join, resolve, sep } from "node:path";
 const root = import.meta.dir;
 const outdir = resolve(root, process.env.SUNSHINE_OUTDIR ?? "dist");
@@ -16,6 +17,10 @@ const result = await Bun.build({
   sourcemap: "external",
 });
 if (!result.success) throw new Error(result.logs.map(String).join("\n"));
+// Bun writes legacy :-webkit-any()/:-moz-any() copies of every :is() rule; Safari misreads them.
+for (const output of result.outputs)
+  if (output.path.endsWith(".css"))
+    await writeFile(output.path, removeLegacyIsFallbacks(await readFile(output.path, "utf8")));
 await cp(join(root, "assets/NOTICES.md"), join(outdir, "NOTICES.md"));
 await cp(join(root, "SOURCES.md"), join(outdir, "SOURCES.md"));
 await writeFile(

@@ -29,7 +29,6 @@ export const hoverCardStyles = css`
     overflow-wrap: anywhere;
   }
   ${hoverCardPartRefs.content}[data-variant="preview"] {
-    padding: 0;
     max-height: min(420px, calc(100dvh - 32px));
   }
   ${hoverCardPartRefs.content}[role="button"] {

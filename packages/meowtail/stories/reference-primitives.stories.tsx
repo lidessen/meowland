@@ -102,7 +102,7 @@ export const HoverCardStory = defineStory({
     <Specimens>
       <Specimen
         label="Hover previews"
-        note="Hover, focus or tap a trigger to read its preview; tap again to close it."
+        note="Hover, focus or tap a trigger to read its preview; tap again to close it. Activating the wide preview copies its path."
         align="start"
       >
         <HoverCard
@@ -139,7 +139,17 @@ export const HoverCardStory = defineStory({
                 Wide preview and copy
               </Button>
             )}
-            content={<p>packages/meowtail/src/components/hover-card.tsx</p>}
+            content={
+              // A path breaks after a separator, never inside a name such as hover-card.
+              <p style={{ margin: 0 }}>
+                {"packages/meowtail/src/components/hover-card.tsx"
+                  .split("/")
+                  .flatMap((segment, index) => {
+                    const name = <span style={{ whiteSpace: "nowrap" }}>{segment}</span>;
+                    return index ? ["/", <wbr />, name] : [name];
+                  })}
+              </p>
+            }
           />
         </section>
       </Specimen>

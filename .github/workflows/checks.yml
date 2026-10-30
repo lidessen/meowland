@@ -33,8 +33,19 @@ jobs:
         include:
           - suite: meowjsx
             config: packages/meowjsx/playwright.config.ts
-          - suite: meowtail
+          # Meowtail is the largest suite: its tests and its story matrix each run as two shards.
+          - suite: meowtail-1
             config: packages/meowtail/playwright.config.ts
+            args: --grep-invert @story-matrix --shard=1/2
+          - suite: meowtail-2
+            config: packages/meowtail/playwright.config.ts
+            args: --grep-invert @story-matrix --shard=2/2
+          - suite: meowtail-story-matrix-1
+            config: packages/meowtail/playwright.config.ts
+            args: --grep @story-matrix --shard=1/2
+          - suite: meowtail-story-matrix-2
+            config: packages/meowtail/playwright.config.ts
+            args: --grep @story-matrix --shard=2/2
           - suite: meowbook
             config: packages/meowbook/playwright.config.ts
           - suite: meowslides
@@ -68,7 +79,7 @@ jobs:
       - if: matrix.prepare
         run: ${{ matrix.prepare }}
       - run: bun node_modules/@playwright/test/cli.js install --with-deps chromium
-      - run: bun node_modules/@playwright/test/cli.js test --config ${{ matrix.config }}
+      - run: bun node_modules/@playwright/test/cli.js test --config ${{ matrix.config }} ${{ matrix.args }}
       - if: failure()
         uses: actions/upload-artifact@v4
         with:

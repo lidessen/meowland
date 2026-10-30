@@ -155,18 +155,42 @@ function manifest(stories: readonly DiscoveredStory[]): StoryEntry[] {
   return stories.map(({ generated: _generated, ...entry }) => entry);
 }
 
-/** The browser half of the gallery config: data only, with each story's docs link resolved. */
+/**
+ * The browser half of the gallery config: data only, with each story's docs link and component
+ * name resolved.
+ */
 function gallerySettings(
-  { docsLink, ...settings }: GalleryConfig,
+  { docsLink, componentLabel, ...settings }: GalleryConfig,
   entries: readonly StoryEntry[],
 ): GallerySettings {
-  if (!docsLink) return settings;
-  const docsLinks: Record<string, GalleryLink> = {};
-  for (const entry of entries) {
-    const link = docsLink(entry);
-    if (link) docsLinks[entry.id] = { label: link.label, href: link.href };
+  const result: GallerySettings = { ...settings };
+  if (docsLink) {
+    const docsLinks: Record<string, GalleryLink> = {};
+    for (const entry of entries) {
+      const link = docsLink(entry);
+      if (link) docsLinks[entry.id] = { label: link.label, href: link.href };
+    }
+    result.docsLinks = docsLinks;
   }
-  return { ...settings, docsLinks };
+  if (componentLabel) {
+    // One catalog row holds a component's stories, so they must agree on its name.
+    const componentLabels: Record<string, string> = {};
+    const byRow = new Map<string, string | undefined>();
+    for (const entry of entries) {
+      const label = componentLabel(entry);
+      if (entry.component !== undefined) {
+        const row = JSON.stringify([entry.group, entry.component]);
+        if (byRow.has(row) && byRow.get(row) !== label)
+          throw new Error(
+            `componentLabel gives ${entry.component} in ${entry.group ?? "no group"} two names: ${JSON.stringify(byRow.get(row))} and ${JSON.stringify(label)}`,
+          );
+        byRow.set(row, label);
+      }
+      if (label) componentLabels[entry.id] = label;
+    }
+    result.componentLabels = componentLabels;
+  }
+  return result;
 }
 
 export async function buildStories(

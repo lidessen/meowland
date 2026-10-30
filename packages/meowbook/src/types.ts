@@ -90,6 +90,13 @@ export interface GalleryConfig {
    */
   docsLink?(story: StoryEntry): GalleryLink | undefined;
   /**
+   * The name the gallery shows for a story's component: its catalog row, the story header and the
+   * tab title. Runs once per story at build time; only its results reach the browser. Stories that
+   * share a group and component must get the same name. Without it, the gallery shows
+   * `component`, else `title`.
+   */
+  componentLabel?(story: StoryEntry): string | undefined;
+  /**
    * One appearance for the tool and the story. A host site passes its own storage keys so its
    * pages and the gallery share the reader's choice. A missing key means "auto" and the first
    * theme, so those choices are stored by removing the key.
@@ -104,6 +111,8 @@ export interface GalleryConfig {
   };
 }
 /** The browser-side form of `GalleryConfig`, written to `gallery.json` by the build. */
-export interface GallerySettings extends Omit<GalleryConfig, "docsLink"> {
+export interface GallerySettings extends Omit<GalleryConfig, "docsLink" | "componentLabel"> {
   docsLinks?: Readonly<Record<string, GalleryLink>>;
+  /** Each story's component name from `componentLabel`, by story id. */
+  componentLabels?: Readonly<Record<string, string>>;
 }

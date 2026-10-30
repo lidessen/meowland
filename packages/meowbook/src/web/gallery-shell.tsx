@@ -63,11 +63,29 @@ const storyHref = (story: StoryInfo, width: string) =>
 const plainClick = (event: MouseEvent) =>
   !(event.ctrlKey || event.metaKey || event.shiftKey || event.altKey);
 
+/** The name a component's row, header and tab show: the host's label, else component, else title. */
+function rowName(story: StoryInfo, settings: GallerySettings): string {
+  return settings.componentLabels?.[story.id] ?? story.component ?? story.title;
+}
+
 /** The catalog for one search: groups in their configured order, one row per component. */
-function catalogView(stories: readonly StoryInfo[], query: string, active: string, width: string) {
+function catalogView(
+  stories: readonly StoryInfo[],
+  query: string,
+  active: string,
+  width: string,
+  settings: GallerySettings,
+) {
   const needle = query.trim().toLocaleLowerCase();
   const matches = stories.filter((story) =>
-    [story.group, story.component, story.variant, story.title, ...story.covers]
+    [
+      story.group,
+      settings.componentLabels?.[story.id],
+      story.component,
+      story.variant,
+      story.title,
+      ...story.covers,
+    ]
       .join(" ")
       .toLocaleLowerCase()
       .includes(needle),
@@ -90,9 +108,7 @@ function catalogView(stories: readonly StoryInfo[], query: string, active: strin
   names.sort((a, b) => (groupOrders.get(a) ?? Infinity) - (groupOrders.get(b) ?? Infinity));
   const groups: NavListGroup[] = names.map((group) => {
     const entries = [...components.values()].filter((items) => items[0]!.group === group);
-    entries.sort((a, b) =>
-      (a[0]!.component ?? a[0]!.title).localeCompare(b[0]!.component ?? b[0]!.title),
-    );
+    entries.sort((a, b) => rowName(a[0]!, settings).localeCompare(rowName(b[0]!, settings)));
     return {
       label: group,
       items: entries.map((items) => {
@@ -101,7 +117,7 @@ function catalogView(stories: readonly StoryInfo[], query: string, active: strin
         const story = items.find((item) => item.id === active) ?? items[0]!;
         return {
           id: componentKey(items[0]!),
-          label: story.component ?? story.title,
+          label: rowName(story, settings),
           href: storyHref(story, width),
         };
       }),
@@ -174,7 +190,9 @@ function Gallery({ settings, manifest }: GalleryProps, context: ComponentRenderC
 
   const current = derived(() => stories.value.find((story) => story.id === active.value));
   const covered = derived(() => catalogOpen.value && narrow.value);
-  const catalog = derived(() => catalogView(stories.value, query.value, active.value, width.value));
+  const catalog = derived(() =>
+    catalogView(stories.value, query.value, active.value, width.value, settings),
+  );
 
   /**
    * The one canvas address. Inside the gallery the canvas is embedded: the gallery's chrome carries
@@ -249,7 +267,7 @@ function Gallery({ settings, manifest }: GalleryProps, context: ComponentRenderC
   context.effect(() => {
     const story = current.value;
     const name = settings.brand?.name ?? "Meowbook";
-    document.title = story ? `${story.component ?? story.title} · ${name}` : name;
+    document.title = story ? `${rowName(story, settings)} · ${name}` : name;
   });
   const canvasRoot = () => {
     try {
@@ -474,7 +492,7 @@ function Gallery({ settings, manifest }: GalleryProps, context: ComponentRenderC
   const label = (text: (story: StoryInfo | undefined) => string, before: string) =>
     derived(() => (loaded.value ? text(current.value) : before));
   const componentName = (story: StoryInfo | undefined) =>
-    story?.component ?? story?.title ?? "Sample not found";
+    story ? rowName(story, settings) : "Sample not found";
   const siblings = derived(() => {
     const story = current.value;
     return story ? stories.value.filter((item) => componentKey(item) === componentKey(story)) : [];

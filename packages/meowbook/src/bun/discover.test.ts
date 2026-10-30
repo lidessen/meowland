@@ -274,6 +274,7 @@ test("build emits a static gallery, independent canvas and manifest, then remove
           appearance: { schemeStorageKey: "site-scheme" },
           docsLink: (story) =>
             story.id === "build/button" ? { label: "Docs", href: "/button/" } : undefined,
+          componentLabel: (story) => (story.id === "build/button" ? "Push Button" : undefined),
         },
       },
       outdir,
@@ -282,7 +283,20 @@ test("build emits a static gallery, independent canvas and manifest, then remove
       brand: { name: "Site", tag: "" },
       appearance: { schemeStorageKey: "site-scheme" },
       docsLinks: { "build/button": { label: "Docs", href: "/button/" } },
+      componentLabels: { "build/button": "Push Button" },
     });
+  }));
+
+test("componentLabel gives every story of one catalog row the same name", async () =>
+  fixture(async (config, root) => {
+    await writeFile(
+      join(root, "pair.tsx"),
+      'import {defineStory} from "meowbook"; export const A = defineStory({id:"pair/a",group:"G",component:"Pair",render:()=>null}); export const B = defineStory({id:"pair/b",group:"G",component:"Pair",render:()=>null});',
+    );
+    const outdir = join(root, "out-labels");
+    await expect(
+      buildStories({ ...config, gallery: { componentLabel: (story) => story.id } }, outdir),
+    ).rejects.toThrow("componentLabel gives Pair in G two names");
   }));
 
 test("CLI list emits machine-readable metadata without importing a throwing story module", async () =>

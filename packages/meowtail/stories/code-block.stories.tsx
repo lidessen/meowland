@@ -41,7 +41,7 @@ export const CodeBlockHeaderStory = defineStory({
       <CodeBlock
         language="typescript"
         title="connection.ts"
-        caption="examples/authoring · TypeScript"
+        caption="examples/authoring"
         actions={[
           <Button variant="quiet" size="small">
             Open in workbench

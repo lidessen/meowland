@@ -260,8 +260,8 @@ test("code block keeps wrap state when its code signal changes", async () => {
   const code = signal("const value = 1;");
   const view = mount(<CodeBlock code={code} language="typescript" />);
   const root = view.host.querySelector("figure")!;
-  const wrap = [...view.host.querySelectorAll("button")].find((button) =>
-    button.textContent?.includes("Soft wrap"),
+  const wrap = [...view.host.querySelectorAll("button")].find(
+    (button) => button.getAttribute("aria-label") === "Soft wrap",
   )!;
   wrap.click();
   await Promise.resolve();

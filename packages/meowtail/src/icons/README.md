@@ -56,6 +56,7 @@ new icon joins the set together with its row, and a unit test keeps the two in s
 | Decrease one step                                        | `minus`          |
 | Close, dismiss, remove an attachment or a token          | `x`              |
 | Copy                                                     | `copy`           |
+| Wrap long lines in place (soft wrap)                     | `text-wrap`      |
 | Done or chosen: copied, a checked menu item              | `check`          |
 | Retry, reload, refresh                                   | `refresh-cw`     |
 | Attach files                                             | `paperclip`      |

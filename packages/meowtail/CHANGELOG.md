@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- Polish `CodeBlock`: the header names the language (`ts` reads TypeScript; `codeLanguageName`
+  exposes the mapping), soft wrap and copy are compact icon buttons, a successful copy shows a check
+  and is announced without adding a line, and a failure shows one danger line aligned with the code.
+  Header text and code share one start edge with a tighter gap, and wide host actions wrap to their
+  own row on narrow surfaces. Streamed code keeps its last highlight instead of flashing back to
+  plain text. Add the `text-wrap` semantic icon.
+
 - Add `Markdown`, the public form of the Assistant's safe Markdown renderer, with
   `repairMarkdownTail`, `markdownBlocks`, `renderMarkdown` and `safeMarkdownLink`. Text renders
   block by block, so streamed chunks no longer rewrite finished blocks or drop a selection in them;

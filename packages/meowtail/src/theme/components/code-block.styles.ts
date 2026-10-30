@@ -2,9 +2,13 @@ import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import type { CodeBlock } from "../../components/code-block";
 import { ui } from "../utilities";
-const codeBlockPartRefs = parts<typeof CodeBlock>("code-block");
+const codeBlock = parts<typeof CodeBlock>("code-block");
+/*
+ * One recessed surface: a compact header (name and language on the start edge, actions in the
+ * corner) over the code. Header text and code share the same 16px start edge.
+ */
 export const codeBlockStyles = css`
-  ${codeBlockPartRefs.root} {
+  ${codeBlock.root} {
     min-width: 0;
     max-width: 100%;
     margin: 0;
@@ -15,55 +19,79 @@ export const codeBlockStyles = css`
     font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     overflow: hidden;
   }
-  ${codeBlockPartRefs.header} {
+  /* Actions sit in the corner, a 6px inset matching the panel item radius; the name wraps beside them. */
+  ${codeBlock.header} {
     display: flex;
     flex-wrap: wrap;
-    align-items: center;
-    /* Host actions take the free space, so the original language/actions row is unchanged. */
-    justify-content: flex-start;
-    gap: 12px;
-    padding: 8px 14px;
-    border-bottom: 0;
-    background: ${uiTokens.surface.fill};
+    align-items: flex-start;
+    gap: ${uiTokens.space.group};
+    padding: 6px 6px 0 16px;
+    background: transparent;
   }
-  ${codeBlockPartRefs.title} {
+  ${codeBlock.heading} {
+    display: flex;
+    /* The name keeps a readable width; wide host actions move to their own row instead. */
+    flex: 1 1 12rem;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 10px;
+    min-width: 0;
+    /* Centers one caption line against the 28px actions. */
+    padding-block: 5px;
+    font: ${uiTokens.type.caption} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
+  }
+  ${codeBlock.title} {
     min-width: 0;
     color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.weight.medium} ${uiTokens.type.caption} / ${uiTokens.type.leading}
-      ${uiTokens.type.sans};
+    font-weight: ${uiTokens.type.weight.medium};
     overflow-wrap: anywhere;
   }
-  ${codeBlockPartRefs.caption} {
+  ${codeBlock.caption} {
     min-width: 0;
     color: ${uiTokens.ink.tertiary};
-    font: ${uiTokens.type.weight.regular} ${uiTokens.type.caption} / ${uiTokens.type.leading}
-      ${uiTokens.type.sans};
     overflow-wrap: anywhere;
   }
-  ${codeBlockPartRefs.language} {
-    font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
+  ${codeBlock.language} {
     min-width: 0;
+    color: ${uiTokens.ink.secondary};
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
   }
-  ${codeBlockPartRefs.actions} {
+  /* After a name, the language is a quiet fact. */
+  ${codeBlock.caption} + ${codeBlock.language},
+  ${codeBlock.title} + ${codeBlock.language} {
+    color: ${uiTokens.ink.tertiary};
+  }
+  ${codeBlock.actions} {
     display: flex;
+    flex: 0 1 auto;
     flex-wrap: wrap;
     justify-content: flex-end;
-    gap: ${uiTokens.space.group};
-    min-width: 0;
-    flex-shrink: 1;
+    align-items: center;
+    gap: 2px;
     margin-inline-start: auto;
-    font: ${uiTokens.type.micro} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
+    font: ${uiTokens.type.caption} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
   }
-  ${codeBlockPartRefs.actions} [aria-pressed="true"] {
-    background: ${uiTokens.action.soft};
-    color: ${uiTokens.action.primary};
+  ${codeBlock.actions} [aria-pressed="true"] {
+    background: ${uiTokens.state.active};
+    color: ${uiTokens.ink.primary};
   }
-  ${codeBlockPartRefs.root} ${codeBlockPartRefs.content} {
+  ${codeBlock.copyIcon},
+  ${codeBlock.copiedIcon} {
+    display: inline-flex;
+  }
+  ${codeBlock.copiedIcon},
+  ${codeBlock.actions} [data-copied="true"] ${codeBlock.copyIcon} {
+    display: none;
+  }
+  ${codeBlock.actions} [data-copied="true"] ${codeBlock.copiedIcon} {
+    display: inline-flex;
+    color: ${uiTokens.status.success};
+  }
+  ${codeBlock.root} ${codeBlock.content} {
     margin: 0;
-    padding: 16px;
+    padding: 6px 16px 16px;
     overflow: auto;
     border: 0;
     border-radius: 0;
@@ -71,31 +99,44 @@ export const codeBlockStyles = css`
     font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
     white-space: pre;
     overflow-wrap: normal;
+    scrollbar-width: thin;
   }
-  ${codeBlockPartRefs.content}[data-wrap="true"] {
+  ${codeBlock.content}[data-wrap="true"] {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
-  ${codeBlockPartRefs.root} ${codeBlockPartRefs.code} {
+  ${codeBlock.root} ${codeBlock.code} {
     padding: 0;
     background: transparent;
     font: inherit;
     white-space: inherit;
   }
-  ${codeBlockPartRefs.feedback} {
+  /* Announced always; shown only for a failure, aligned with the code. */
+  ${codeBlock.feedback} {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  ${codeBlock.feedback}[data-failed="true"] {
+    position: static;
     display: block;
-    padding: ${uiTokens.space.group} ${uiTokens.space.section};
-    font-size: ${uiTokens.type.caption};
+    width: auto;
+    height: auto;
+    padding: 0 16px 12px;
+    clip-path: none;
+    white-space: normal;
+    color: ${uiTokens.status.danger};
+    font: ${uiTokens.type.caption} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
   }
-  ${codeBlockPartRefs.feedback}:empty {
-    display: none;
-  }
-  ${codeBlockPartRefs.content}:focus-visible {
+  ${codeBlock.content}:focus-visible {
     ${ui.focus.inset}
   }
 
   @media (pointer: coarse) {
-    ${codeBlockPartRefs.actions}[data-meowui-part] > * {
+    ${codeBlock.actions}[data-meowui-part] > * {
       min-width: 44px;
       min-height: 44px;
     }

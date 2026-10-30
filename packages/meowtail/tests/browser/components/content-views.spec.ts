@@ -12,9 +12,25 @@ test("code highlighting loads asynchronously without changing source or copy", a
   const original = await code.textContent();
   await expect(code.locator('span[style*="token-keyword"]').first()).toBeVisible();
   expect(await code.textContent()).toBe(original);
-  await block.getByRole("button", { name: "Copy code", exact: true }).click();
+  const copy = block.getByRole("button", { name: "Copy code", exact: true });
+  await copy.click();
   await expect(block.getByRole("status")).toHaveText("Copied");
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(original);
+  // Success shows on the button itself: a check and the name "Copied", then back to copy.
+  const copied = block.getByRole("button", { name: "Copied", exact: true });
+  await expect(copied.locator('[data-meowui-part="code-block/copiedIcon"]')).toBeVisible();
+  await expect(copied.locator('[data-meowui-part="code-block/copyIcon"]')).toBeHidden();
+  await expect(copy).toBeVisible({ timeout: 4000 });
+  // The success text is announced, not drawn as an extra line.
+  expect(
+    await block.getByRole("status").evaluate((element) => element.getBoundingClientRect().height),
+  ).toBeLessThanOrEqual(1);
+
+  // Header text and code share one start edge.
+  const language = await block.locator('[data-meowui-part="code-block/language"]').boundingBox();
+  const content = await block.locator('[data-meowui-part="code-block/code"]').boundingBox();
+  expect(Math.abs(language!.x - content!.x)).toBeLessThanOrEqual(1);
+  await expect(block.locator('[data-meowui-part="code-block/language"]')).toHaveText("TypeScript");
 });
 
 test("output folds preserve terminal tail and copy full raw payload", async ({ page, context }) => {

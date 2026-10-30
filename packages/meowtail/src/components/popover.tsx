@@ -78,13 +78,35 @@ export function Popover(
         throw new Error("Popover requires the browser Popover API");
       panel.showPopover();
       stack.push(panel);
-      stopPosition = autoUpdate(
+      const stopAuto = autoUpdate(
         anchorRect
           ? { getBoundingClientRect: anchorRect, contextElement: anchorElement?.() ?? anchor }
           : anchor,
         panel,
         position,
+        { elementResize: false },
       );
+      // A resize is answered on the next frame: fitting the pane inside the observer callback
+      // resizes it again, which the browser reports as a ResizeObserver loop error.
+      const view = panel.ownerDocument.defaultView;
+      let frame = 0;
+      const resized = view?.ResizeObserver
+        ? new view.ResizeObserver(() => {
+            if (frame) return;
+            frame = view.requestAnimationFrame(() => {
+              frame = 0;
+              position();
+            });
+          })
+        : undefined;
+      resized?.observe(panel);
+      resized?.observe(anchorElement?.() ?? anchor);
+      stopPosition = () => {
+        stopAuto();
+        resized?.disconnect();
+        if (frame) view?.cancelAnimationFrame(frame);
+        frame = 0;
+      };
     } else if (!next && shown) {
       const hadFocus = panel.contains(activeElementInRoot(panel));
       panel.hidePopover();
@@ -159,10 +181,13 @@ export function Popover(
                       padding: 8,
                       apply({ availableWidth, availableHeight, rects }) {
                         if (!alive) return;
-                        element.style.maxWidth = `${Math.max(0, availableWidth)}px`;
-                        element.style.maxHeight = `${Math.max(0, availableHeight)}px`;
+                        // Whole pixels: a fraction that drifts between passes resizes the pane
+                        // inside its own resize observer, which the browser reports as a loop.
+                        const width = Math.max(0, Math.floor(availableWidth));
+                        element.style.maxWidth = `${width}px`;
+                        element.style.maxHeight = `${Math.max(0, Math.floor(availableHeight))}px`;
                         if (matchTriggerWidth)
-                          element.style.width = `${Math.min(rects.reference.width, Math.max(0, availableWidth))}px`;
+                          element.style.width = `${Math.min(Math.floor(rects.reference.width), width)}px`;
                       },
                     }),
                   ],

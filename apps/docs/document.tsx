@@ -156,7 +156,23 @@ const PREVIEW_FIT = `(() => {
     const body = doc.body;
     if (!body) return;
     const margin = parseFloat(getComputedStyle(body).marginBottom) || 0;
-    const content = Math.ceil(Math.max(body.scrollHeight, body.getBoundingClientRect().bottom + margin));
+    let content = Math.ceil(Math.max(body.scrollHeight, body.getBoundingClientRect().bottom + margin));
+    // An open popover is out of flow and squeezed to the room it finds: make room for its whole
+    // content below its trigger, where it opens when it fits.
+    const scroll = doc.defaultView ? doc.defaultView.scrollY : 0;
+    for (const panel of doc.querySelectorAll("[popover]")) {
+      if (!panel.matches(":popover-open")) continue;
+      const trigger = panel.id ? doc.querySelector('[aria-controls="' + CSS.escape(panel.id) + '"]') : null;
+      const top = trigger ? trigger.getBoundingClientRect().bottom + 6 : panel.getBoundingClientRect().top;
+      // The panel or a scroller inside it hides what the squeeze cut off.
+      let hidden = 0;
+      for (const node of [panel, ...panel.querySelectorAll("*")])
+        hidden = Math.max(hidden, node.scrollHeight - node.clientHeight);
+      const extent = panel.offsetHeight + hidden;
+      state.reach = Math.max(state.reach || 0, Math.ceil(scroll + top + extent + 8));
+    }
+    // Room a popover once needed stays, so closing it does not pull the page up.
+    content = Math.max(content, state.reach || 0);
     const current = frame.getBoundingClientRect().height;
     const set = (height) => {
       if (Math.abs(current - height) > 1) frame.style.height = height + "px";
@@ -174,8 +190,9 @@ const PREVIEW_FIT = `(() => {
     // Content that reaches the frame may fill it: grow, never shrink.
     if (content >= current - 1) return set(Math.max(current, Math.min(content, cap)));
     state.shrunk = content;
-    // A dialog or popover opens inside the frame, so a story that has one keeps its room.
-    const floor = doc.querySelector("dialog, [popover]") ? state.start : FLOOR;
+    // A dialog opens centered in the frame, so a story that has one keeps its room; a popover
+    // grows the frame when it opens instead.
+    const floor = doc.querySelector("dialog") ? state.start : FLOOR;
     set(Math.max(floor, Math.min(content, cap)));
   };
   for (const frame of frames) {
@@ -199,6 +216,12 @@ const PREVIEW_FIT = `(() => {
       // The story reports itself ready on its state element; fit again when it does.
       const status = doc.getElementById("story-state");
       if (status) new MutationObserver(() => fit(frame, state)).observe(status, { attributes: true });
+      // A popover positions itself after it opens; fit once it has settled.
+      doc.addEventListener(
+        "toggle",
+        () => requestAnimationFrame(() => requestAnimationFrame(() => fit(frame, state))),
+        true,
+      );
     };
     frame.addEventListener("load", watch);
     if (frame.contentDocument && frame.contentDocument.readyState === "complete") watch();

@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- `Popover` answers a resize of its pane or anchor on the next animation frame and fits the pane in
+  whole pixels. A pane squeezed by a short viewport no longer refits itself inside its own
+  ResizeObserver callback, which the browser reported as a ResizeObserver loop error while a
+  phone's press animation moved the trigger by fractions of a pixel.
+
 - The `HoverCard` `preview` variant pads its content like the compact card instead of leaving the
   text against the card edges, and a host narrower than 480px gets no 24px side inset, so on a phone
   the card lines up with the host instead of shifting right of the trigger.

@@ -43,7 +43,7 @@ jobs:
         run: bun scripts/browser-suites.ts ${{ github.event_name == 'pull_request' && format('--base {0}', github.event.pull_request.base.sha) || '' }} >> "$GITHUB_OUTPUT"
 
   browser:
-    name: Browser (${{ matrix.suite }})
+    name: Browser (${{ matrix.label || matrix.suite }})
     needs: plan
     if: needs.plan.outputs.count != '0'
     runs-on: ubuntu-latest

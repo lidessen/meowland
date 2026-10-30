@@ -81,7 +81,7 @@ export const fieldSurfaceStyles = css`
   ${invalid} {
     border-color: ${uiTokens.status.danger};
   }
-  :where(${invalid}:is(:focus-visible, :focus-within, [aria-expanded="true"])) {
+  :where(${invalid}:where(:focus-visible, :focus-within, [aria-expanded="true"])) {
     box-shadow: 0 0 0 3px color-mix(in srgb, ${uiTokens.status.danger} 22%, transparent);
   }
   ${disabled} {

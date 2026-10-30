@@ -459,7 +459,7 @@ Bubble's `auto` reads the message role through Context and the theme decides the
 
 `ChatConversation` is an optional scroll container, and the host must provide a constrained height.
 It follows appended content when near the bottom, keeps position when scrolled up, and provides a return-to-latest button.
-The return action participates in normal layout after the message viewport, claiming its own height when shown and returning the space to messages when hidden; it never floats above historical body text.
+The return action floats over the lower edge of the viewport, so showing or hiding it never resizes the transcript; while history is being read it may cover the bottom of one line.
 It does not implement history prepending, per-message anchors, or persisted reading restoration. Do not stack it on top of an existing application scroll controller;
 the Dashboard keeps using its own controller. `ChatMessageList` still provides only message-record semantics.
 

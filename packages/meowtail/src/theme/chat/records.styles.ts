@@ -137,16 +137,21 @@ export const chatRecordsStyles = css`
     max-width: 50%;
   }
 
+  /* What a row owns reads one step under its label: the row's size, regular weight, never
+  larger than the line it hangs from. */
   ${chatToolCallPartRefs.detail},
   ${chatToolCallPartRefs.body} {
     min-width: 0;
     margin: 0;
     color: ${uiTokens.ink.secondary};
-    font: ${uiTokens.type.body} / ${uiTokens.type.line.reading} ${uiTokens.type.sans};
+    font-family: ${uiTokens.type.sans};
+    font-size: calc(${chatTokens.fontBody} - 1px);
+    line-height: calc(${uiTokens.type.line.label} + var(${rowDelta}, 0px));
   }
 
   ${chatToolCallPartRefs.detail} {
     padding-inline-start: var(${rowIndent});
+    color: ${uiTokens.ink.tertiary};
   }
 
   ${chatToolCallPartRefs.body} {
@@ -251,10 +256,12 @@ export const chatRecordsStyles = css`
   before its own body. */
   ${chatProcessPartRefs.body} {
     margin: 0 0 ${uiTokens.space.group};
-    padding-block: ${uiTokens.space.group};
+    padding-block: ${uiTokens.space.group} 0;
     padding-inline: var(${rowIndent}) 0;
     border-left: 0;
-    line-height: ${uiTokens.type.line.reading};
+    color: ${uiTokens.ink.secondary};
+    font-size: calc(${chatTokens.fontBody} - 1px);
+    line-height: calc(${uiTokens.type.line.label} + var(${rowDelta}, 0px));
   }
 
   ${chatProcessPartRefs.body} > :first-child {

@@ -35,6 +35,27 @@ async function overlapsText(viewport: Locator, latest: Locator) {
   }, button);
 }
 
+/** The owned action floats: showing it must not take height from the reading viewport. */
+const viewportHeight = (viewport: Locator) =>
+  viewport.evaluate((element) => element.getBoundingClientRect().height);
+
+/** A host's normal-flow action never covers text; an owned floating action never resizes it. */
+async function expectReadable(
+  mode: string,
+  viewport: Locator,
+  geometry: Awaited<ReturnType<typeof overlapsText>>,
+) {
+  if (mode === "fragment") {
+    expect(geometry.intersections).toEqual([]);
+    return;
+  }
+  const fill = await viewport.evaluate((element) => {
+    const root = element.parentElement!.getBoundingClientRect();
+    return { root: root.height, viewport: element.getBoundingClientRect().height };
+  });
+  expect(fill.viewport).toBeCloseTo(fill.root, 0);
+}
+
 async function stableVisibility(action: Locator, hidden: boolean) {
   const states = await action.evaluate(async (element) => {
     const states = [];
@@ -81,7 +102,7 @@ for (const width of [375, 900]) {
         resolve(directory, `${phase}-${mode}-${width}.json`),
         JSON.stringify(geometry, null, 2),
       );
-      expect(geometry.intersections).toEqual([]);
+      await expectReadable(mode, viewport, geometry);
       for (const key of ["Enter", "Space"]) {
         await latest.focus();
         await latest.press(key);
@@ -120,7 +141,7 @@ for (const width of [375, 900]) {
         });
         await expect.poll(() => viewport.evaluate((element) => element.scrollTop)).toBe(top);
         await stableVisibility(latest, false);
-        expect((await overlapsText(viewport, latest)).intersections).toEqual([]);
+        await expectReadable(mode, viewport, await overlapsText(viewport, latest));
       }
       await page.locator("[data-latest-frame]").evaluate((element) => {
         (element as HTMLElement).style.height = "260px";
@@ -132,7 +153,7 @@ for (const width of [375, 900]) {
       await expect(latest).toBeInViewport();
       await stableVisibility(latest, false);
       const shortGeometry = await overlapsText(viewport, latest);
-      expect(shortGeometry.intersections).toEqual([]);
+      await expectReadable(mode, viewport, shortGeometry);
       await page.screenshot({
         path: resolve(directory, `${phase}-${mode}-${width}-short.png`),
         animations: "disabled",
@@ -146,7 +167,7 @@ for (const width of [375, 900]) {
 }
 
 for (const width of [375, 900]) {
-  test(`Assistant latest keeps real text readable, preserves history and returns by keyboard at ${width}px`, async ({
+  test(`Assistant latest floats without resizing the transcript, preserves history and returns by keyboard at ${width}px`, async ({
     page,
   }) => {
     await mkdir(directory, { recursive: true });
@@ -164,11 +185,14 @@ for (const width of [375, 900]) {
         (element) => element.scrollHeight - element.clientHeight - element.scrollTop,
       );
     await expect.poll(distance).toBeLessThan(2);
+    await expect(latest).toBeHidden();
+    const height = await viewportHeight(viewport);
     await viewport.evaluate((element) => {
       element.scrollTop = 220;
     });
     await expect(latest).toBeVisible();
     await stableVisibility(latest, false);
+    expect(await viewportHeight(viewport)).toBeCloseTo(height, 0);
     const samples = [];
     for (const readingTop of [80, 140, 220, 300]) {
       await viewport.evaluate((element, top) => {
@@ -191,7 +215,6 @@ for (const width of [375, 900]) {
       resolve(directory, `${phase}-assistant-${width}.json`),
       JSON.stringify(geometry, null, 2),
     );
-    expect(geometry.intersections).toEqual([]);
     const top = await viewport.evaluate((element) => element.scrollTop);
     const draft = page.getByRole("textbox", { name: "Message", exact: true });
     const draftValue = await draft.inputValue();
@@ -217,7 +240,6 @@ for (const width of [375, 900]) {
       resolve(directory, `${phase}-assistant-${width}-short.json`),
       JSON.stringify(shortGeometry, null, 2),
     );
-    expect(shortGeometry.intersections).toEqual([]);
     for (const key of ["Enter", "Space"]) {
       await latest.focus();
       await latest.press(key);

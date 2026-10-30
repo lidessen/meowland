@@ -24,47 +24,32 @@ jobs:
       # format:check → lint → typecheck → test; typecheck and tests consume the built dist.
       - run: bun run check
 
+  plan:
+    name: Plan browser suites
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.plan.outputs.matrix }}
+      count: ${{ steps.plan.outputs.count }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # The diff against the pull request's base needs the history between them.
+          fetch-depth: 0
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.4.2
+      # A pull request runs the suites its changes reach; a push to main or a manual run runs all.
+      - id: plan
+        run: bun scripts/browser-suites.ts ${{ github.event_name == 'pull_request' && format('--base {0}', github.event.pull_request.base.sha) || '' }} >> "$GITHUB_OUTPUT"
+
   browser:
     name: Browser (${{ matrix.suite }})
+    needs: plan
+    if: needs.plan.outputs.count != '0'
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
-      matrix:
-        include:
-          - suite: meowjsx
-            config: packages/meowjsx/playwright.config.ts
-          # Meowtail is the largest suite: its tests and its story matrix each run as two shards.
-          - suite: meowtail-1
-            config: packages/meowtail/playwright.config.ts
-            args: --grep-invert @story-matrix --shard=1/2
-          - suite: meowtail-2
-            config: packages/meowtail/playwright.config.ts
-            args: --grep-invert @story-matrix --shard=2/2
-          - suite: meowtail-story-matrix-1
-            config: packages/meowtail/playwright.config.ts
-            args: --grep @story-matrix --shard=1/2
-          - suite: meowtail-story-matrix-2
-            config: packages/meowtail/playwright.config.ts
-            args: --grep @story-matrix --shard=2/2
-          - suite: meowbook
-            config: packages/meowbook/playwright.config.ts
-          - suite: meowslides
-            config: packages/meowslides/playwright.config.ts
-          - suite: meowslides-presentation
-            config: packages/meowslides/tests/browser/presentation/playwright.config.ts
-          - suite: meowslides-authoring
-            config: packages/meowslides/tests/browser/authoring/playwright.config.ts
-          - suite: showcase
-            config: apps/showcase/playwright.config.ts
-          - suite: image-loading
-            config: examples/image-loading/tests/playwright.config.ts
-            prepare: bun examples/image-loading/build.ts
-          - suite: sunshine-welcome
-            config: examples/sunshine-welcome/tests/playwright.config.ts
-            prepare: bun examples/sunshine-welcome/build.ts
-          - suite: protecting-pandas
-            config: examples/protecting-pandas/tests/playwright.config.ts
-            prepare: bun examples/protecting-pandas/build.ts
+      matrix: ${{ fromJSON(needs.plan.outputs.matrix) }}
     env:
       # Use the Playwright-bundled Chromium instead of each config's system Chrome default.
       PLAYWRIGHT_CHANNEL: chromium

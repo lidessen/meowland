@@ -67,6 +67,10 @@ test("streamed text never shows raw markers and the finished reply keeps the con
 test("a streamed fence never falls back to plain text once it is highlighted", async ({ page }) => {
   await page.goto("/canvas.html?story=markdown");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  // The story opens with the whole reply, whose fence may highlight late. Streaming again clears
+  // it at once, so the record starts with the streamed fence alone.
+  await page.getByRole("button", { name: "Stream again" }).click();
+  await expect(page.getByText("Streaming…")).toBeVisible();
   // Record every DOM change: after the first highlight, the code must always hold spans.
   await page.evaluate(() => {
     const state = { highlighted: false, plainAfter: 0 };
@@ -79,7 +83,6 @@ test("a streamed fence never falls back to plain text once it is highlighted", a
       else if (state.highlighted && code.textContent) state.plainAfter += 1;
     }).observe(document.body, { subtree: true, childList: true, characterData: true });
   });
-  await page.getByRole("button", { name: "Stream again" }).click();
   await expect(page.getByText("Complete.")).toBeVisible({ timeout: 15_000 });
   const state = await page.evaluate(
     () =>

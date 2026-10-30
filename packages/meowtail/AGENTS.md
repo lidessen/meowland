@@ -190,9 +190,12 @@ switching to another grey. Activity is a band of full ink sweeping across muted 
 not a color. Button labels are 500 weight; titles at `type.title` and above use -0.01em tracking.
 
 Group labels share one small-caps role: `type.micro`, weight 500, 0.04em tracking, uppercase,
-`ink.tertiary` (the `eyebrow` Text role). Menu headings, ChoiceSelect groups, NavList group titles,
-and the docs, gallery and story sidebars use it; do not invent another label style. The docs app
-and the Meowbook gallery use the same tokens and roles as the library.
+`ink.tertiary` (the `eyebrow` Text role). Menu headings, ChoiceSelect groups and specimen labels use
+it; do not invent another label style. Navigation headings are the one exception: NavList group
+titles, and the docs and gallery sidebar headings around them, read in sentence case at
+`type.caption`, weight 600, `ink.primary`, because a reader scans and returns to them rather than
+glancing past a short note. The docs app and the Meowbook gallery use the same tokens and roles as
+the library.
 
 #### Component rules
 

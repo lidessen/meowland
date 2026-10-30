@@ -286,7 +286,7 @@ Meowbook's "Layout composition · Text baseline and fixed actions" covers these 
 
 ### Text and reading content
 
-`Text` is one run of copy in a theme text role: `variant` is `body` (default), `secondary`, `caption`, or `eyebrow` (the small-caps group label used by menus, navigation groups and specimen labels), and `as` is `p` (default), `span`, or `div`. Emphasis and fine print keep their native `strong`, `em` and `small` inside it. Headings stay with `PageHeader`, `Page` and `Section`, field labels with `Field`, and code with the code components; Text has no tone, because state color belongs to `Status`, `Badge` and `Alert`, which carry non-color cues.
+`Text` is one run of copy in a theme text role: `variant` is `body` (default), `secondary`, `caption`, or `eyebrow` (the small-caps group label used by menus and specimen labels), and `as` is `p` (default), `span`, or `div`. Emphasis and fine print keep their native `strong`, `em` and `small` inside it. Headings stay with `PageHeader`, `Page` and `Section`, field labels with `Field`, and code with the code components; Text has no tone, because state color belongs to `Status`, `Badge` and `Alert`, which carry non-color cues.
 
 `Prose` holds long-form reading content: native `h2`–`h4`, paragraphs, lists, quotes, `pre`/`code`, rules, tables, links and images inside it take one reading rhythm, shared with chat message content and rendered assistant markdown. `measure="reading"` (default) caps lines at `uiTokens.layout.measure`; `measure="fill"` takes the parent's width; `as` is `div`, `article`, or `section`. Arranging controls and cards stays with Stack, Inline and Grid. Neither component joins the JSON catalog, and Meowslides keeps its own presentation typography.
 

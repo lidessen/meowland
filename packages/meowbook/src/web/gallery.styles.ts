@@ -137,17 +137,15 @@ a {
 .workshop-search ${searchInput.control} {
   font-size: ${uiTokens.type.label};
 }
-/* One small-caps label role, shared with the docs sidebar and story specimens. */
+/* The catalog's heading and count, quieter than the navigation headings below it. */
 .catalog-label {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding: 24px 10px 12px;
   color: ${uiTokens.ink.tertiary};
-  font-size: ${uiTokens.type.micro};
+  font-size: ${uiTokens.type.caption};
   font-weight: ${uiTokens.type.weight.medium};
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 #story-count {
   font-family: ${uiTokens.type.mono};

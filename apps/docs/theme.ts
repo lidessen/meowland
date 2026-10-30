@@ -233,11 +233,11 @@ export const docsStyles = css`
   .docs-catalog ${navList.groupTitle}:has(.docs-nav-toggle) {
     padding: 0;
   }
-  /* A folding title keeps the shared group-label role; the button only adds the disclosure. */
+  /* A folding title keeps the NavList navigation-heading role; the button only adds the disclosure. */
   .docs-nav-toggle {
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     width: 100%;
     min-height: 28px;
     margin: 0;

@@ -105,16 +105,23 @@ const CATALOG_FILTER = `(() => {
     catalog.querySelectorAll('[data-meowui-part="nav-list/group"]'),
   );
   const empty = document.getElementById("docs-catalog-empty");
+  // Spaces do not count, so "card action", "cardaction" and "CardAction" find Card Action.
+  const plain = (text) => text.toLowerCase().replace(/\\s+/g, "");
   input.addEventListener("input", () => {
-    const query = input.value.trim().toLowerCase();
+    const query = plain(input.value);
     let visible = 0;
     for (const group of groups) {
       let shown = 0;
+      const title = group.querySelector('[data-meowui-part="nav-list/groupTitle"]');
+      // A query that names the group shows the whole group.
+      const named = !!query && !!title && plain(title.textContent || "").includes(query);
       const items = Array.from(
         group.querySelectorAll('[data-meowui-part="nav-list/item"]'),
       );
       for (const item of items) {
-        const match = !query || (item.textContent || "").toLowerCase().includes(query);
+        const terms = item.querySelector("[data-docs-terms]");
+        const text = (item.textContent || "") + " " + (terms ? terms.getAttribute("data-docs-terms") : "");
+        const match = !query || named || plain(text).includes(query);
         const row = item.closest("li") ?? item;
         row.hidden = !match;
         if (match) shown++;
@@ -507,6 +514,16 @@ const SEARCH = `(() => {
   open.hidden = false;
 })();`;
 
+/** Bring the current page's row into the rail's view, without scrolling the page itself. */
+const NAVIGATION_REVEAL = `(() => {
+  const catalog = document.getElementById("docs-catalog");
+  const current = catalog && catalog.querySelector('[aria-current="page"]');
+  if (!current || !catalog.clientHeight) return;
+  const box = catalog.getBoundingClientRect();
+  const row = current.getBoundingClientRect();
+  if (row.top < box.top || row.bottom > box.bottom) catalog.scrollTop += row.top - box.top - box.height / 3;
+})();`;
+
 /** Press "/" anywhere outside a field to filter the navigation. */
 const FILTER_SHORTCUT = `(() => {
   const input = document.querySelector('[data-meowui-part="search-input/control"]');
@@ -603,9 +620,34 @@ function sidebarGroups(catalog: Catalog, packages: DocsPackage[]): NavListGroup[
       items: group.entries.map((entry) => ({
         id: entry.path,
         href: entry.href,
-        label: entry.label,
+        label:
+          entry.part || entry.terms ? (
+            <span
+              className={entry.part ? "docs-nav-part" : undefined}
+              data-docs-terms={entry.terms}
+            >
+              {entry.label}
+            </span>
+          ) : (
+            entry.label
+          ),
       })),
     })),
+  ];
+}
+
+/** Every page in sidebar order with its plain name, for the pager. */
+function sidebarPages(
+  catalog: Catalog,
+  packages: DocsPackage[],
+): { href: string; label: string }[] {
+  return [
+    { href: "/", label: "Home" },
+    { href: "/components/", label: "Components" },
+    ...packages.map((entry) => ({ href: `/${entry.path}/`, label: entry.title })),
+    ...catalog.navigation.flatMap((group) =>
+      group.entries.map((entry) => ({ href: entry.href, label: entry.label })),
+    ),
   ];
 }
 
@@ -622,11 +664,7 @@ function Pager({
   packages: DocsPackage[];
   path: string;
 }): Child {
-  const pages = sidebarGroups(catalog, packages).flatMap((group) =>
-    group.items
-      .filter((item) => item.id !== "gallery")
-      .map((item) => ({ href: item.href!, label: String(item.label) })),
-  );
+  const pages = sidebarPages(catalog, packages);
   const index = pages.findIndex((page) => page.href === (path ? `/${path}/` : "/"));
   if (index < 0) return null;
   const previous = pages[index - 1];
@@ -854,6 +892,7 @@ function Document({
         </dialog>
         <script dangerouslySetInnerHTML={{ __html: CATALOG_FILTER }} />
         <script dangerouslySetInnerHTML={{ __html: NAVIGATION_DISCLOSURE }} />
+        <script dangerouslySetInnerHTML={{ __html: NAVIGATION_REVEAL }} />
         <script dangerouslySetInnerHTML={{ __html: PREVIEW_FIT }} />
         <script dangerouslySetInnerHTML={{ __html: APPEARANCE_MENU }} />
         <script dangerouslySetInnerHTML={{ __html: FILTER_SHORTCUT }} />

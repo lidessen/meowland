@@ -114,6 +114,11 @@ describe("the page document", () => {
     );
   });
 
+  test("the navigation filter drops whitespace, not the letter s", () => {
+    const html = document("components/button");
+    expect(html).toContain('.replace(/\\s+/g, "")');
+  });
+
   test("the rail is one NavList landmark with labelled groups", () => {
     const html = document("components/button");
     expect(html).toContain('data-meowui-part="nav-list/root"');

@@ -110,7 +110,8 @@ describe("the component catalog", () => {
     const catalog = buildCatalog([
       story({ id: "assistant", component: "AssistantView", covers: ["assistant-steps"] }),
     ]);
-    const steps = catalog.components.find((entry) => entry.title === "assistant-steps");
+    const steps = catalog.components.find((entry) => entry.slug === "assistant-steps");
+    expect(steps?.title).toBe("AssistantSteps");
     expect(steps?.usedIn.map((entry) => entry.id)).toEqual(["assistant"]);
   });
 

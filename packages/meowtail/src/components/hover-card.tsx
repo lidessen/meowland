@@ -45,6 +45,8 @@ export function HoverCard(
   let hovered = false;
   let focused = false;
   let dismissed = false;
+  // Open state when the latest touch began; undefined after a mouse or pen press.
+  let touchStartedOpen: boolean | undefined;
   let root: HTMLElement | undefined;
   let alive = true;
   let copying = false;
@@ -94,6 +96,9 @@ export function HoverCard(
     <span
       className={className}
       data-variant={variant}
+      onPointerDown={(event: PointerEvent) => {
+        touchStartedOpen = event.pointerType === "touch" ? open.value : undefined;
+      }}
       onPointerEnter={(event: PointerEvent) => {
         if (event.pointerType === "touch") return;
         hovered = true;
@@ -106,7 +111,9 @@ export function HoverCard(
             Math.max(0, openDelay),
           );
       }}
-      onPointerLeave={() => {
+      onPointerLeave={(event: PointerEvent) => {
+        // A lifted finger leaves at once; touch cards close by tap, outside tap or Escape.
+        if (event.pointerType === "touch") return;
         hovered = false;
         dismissed = false;
         clear();
@@ -167,7 +174,11 @@ export function HoverCard(
             trigger({
               ...bindings,
               onClick: () => {
-                if (!disabled) open.value = true;
+                if (disabled) return;
+                // A tap toggles; the state at touch start ignores a focus that opened it mid-tap.
+                if (touchStartedOpen) close();
+                else open.value = true;
+                touchStartedOpen = undefined;
               },
             })
           }
@@ -213,4 +224,7 @@ export function HoverCard(
     </span>
   );
 }
-HoverCard.meta = { name: "hover-card", parts: ["root", "content", "feedback"] } as const;
+HoverCard.meta = {
+  name: "hover-card",
+  parts: ["root", "content", "feedback"],
+} as const;

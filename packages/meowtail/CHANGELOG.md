@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- `HoverCard` works on touch: a tap opens the card and it stays open after the finger lifts (iOS
+  Safari closed it within 120 ms because the lifted touch counted as the pointer leaving). A second
+  tap on the trigger, an outside tap or Escape closes it.
+
+- `PathLabel` elides the start of the directory with an ellipsis instead of fading it under a mask,
+  and keeps the whole file name until the name alone is wider than the slot, where it ends in an
+  ellipsis. The `data-path-clipped` attribute and its resize observer are gone.
+
+- `HoverCard`, `ShortcutKeys` and `StateDot` each have their own story (`hover-card`,
+  `shortcut-keys`, `state-dot`); `reference-primitives` now shows `PathLabel` alone.
+
 - NavList group titles read as navigation headings: sentence case at `type.caption`, weight 600,
   primary ink, instead of the small-caps label. Menu and ChoiceSelect group headings keep the
   small-caps label.

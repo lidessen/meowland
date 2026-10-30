@@ -3,8 +3,11 @@ import { expect, test } from "@playwright/test";
 test("wide hover preview follows its host width and copies only activation, not text selection", async ({
   page,
 }) => {
-  await page.goto("/canvas.html?story=reference-primitives");
-  const trigger = page.getByRole("button", { name: "Wide preview and copy", exact: true });
+  await page.goto("/canvas.html?story=hover-card");
+  const trigger = page.getByRole("button", {
+    name: "Wide preview and copy",
+    exact: true,
+  });
   await trigger.focus();
   const panel = page.locator("#wide-reference-preview");
   await expect(panel).toBeVisible();
@@ -59,4 +62,37 @@ test("wide hover preview follows its host width and copies only activation, not 
   await page.keyboard.press("Escape");
   await expect(panel).toBeHidden();
   await expect(trigger).toBeFocused();
+});
+
+test.describe("touch preview", () => {
+  test.use({ hasTouch: true, viewport: { width: 390, height: 844 } });
+  test("a tap opens the card, it stays after the finger lifts, and a second tap closes it", async ({
+    page,
+  }) => {
+    await page.goto("/canvas.html?story=hover-card");
+    const trigger = page.getByRole("button", {
+      name: "Component notes",
+      exact: true,
+    });
+    const panel = page.locator("#reference-preview");
+    // A tap that does not move focus, as on iOS Safari: the touch leaves before the click lands.
+    await trigger.evaluate((element) => {
+      const touch = { bubbles: true, pointerType: "touch", isPrimary: true };
+      element.dispatchEvent(new PointerEvent("pointerdown", touch));
+      element.dispatchEvent(new PointerEvent("pointerup", touch));
+      element
+        .closest('[data-meowui-part="hover-card/root"]')!
+        .dispatchEvent(new PointerEvent("pointerleave", touch));
+      element.dispatchEvent(new MouseEvent("click", { bubbles: true }));
+    });
+    await expect(panel).toBeVisible();
+    await page.waitForTimeout(300);
+    await expect(panel).toBeVisible();
+    await trigger.tap();
+    await expect(panel).toBeHidden();
+    await trigger.tap();
+    await expect(panel).toBeVisible();
+    await page.mouse.click(4, 840);
+    await expect(panel).toBeHidden();
+  });
 });

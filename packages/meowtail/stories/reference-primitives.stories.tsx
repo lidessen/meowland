@@ -8,12 +8,37 @@ import { HoverCard } from "../src/components/hover-card";
 import { Specimen, Specimens } from "./specimen";
 export const ReferencePrimitivesStory = defineStory({
   id: "reference-primitives",
-  title: "Path Label · Paths, status and preview",
+  title: "Path Label · Narrow slots",
   group: "Content and inspection",
   groupOrder: 70,
   component: "PathLabel",
   description:
-    "A path only shows text; the host provides preview content, readable on hover or via keyboard focus.",
+    "A path only shows text; a narrow slot elides the start of the directory and keeps the file name.",
+  render: () => (
+    <Specimens>
+      <Specimen
+        label="Path label"
+        note="Each slot keeps the file name and extension; the directory gives way from its start."
+        align="start"
+      >
+        <Stack gap="compact">
+          {["100%", "220px", "100px"].map((width) => (
+            <div style={{ width, maxWidth: "100%" }}>
+              <PathLabel path="packages/meowtail/src/components/shortcut-keys.tsx" />
+            </div>
+          ))}
+        </Stack>
+      </Specimen>
+    </Specimens>
+  ),
+});
+export const ShortcutKeysStory = defineStory({
+  id: "shortcut-keys",
+  title: "Shortcut Keys · Platform labels",
+  group: "Content and inspection",
+  groupOrder: 70,
+  component: "ShortcutKeys",
+  description: "Key labels come from the host; the tooltip variant sits on an inverse surface.",
   render: () => (
     <Specimens>
       <Specimen label="Shortcut keys" align="start">
@@ -35,15 +60,18 @@ export const ReferencePrimitivesStory = defineStory({
           </span>
         </Inline>
       </Specimen>
-      <Specimen
-        label="Path label"
-        note="A narrow slot keeps the file name and extension."
-        align="start"
-      >
-        <div style={{ width: "260px", maxWidth: "100%" }}>
-          <PathLabel path="packages/meowtail/src/components/shortcut-keys.tsx" />
-        </div>
-      </Specimen>
+    </Specimens>
+  ),
+});
+export const StateDotStory = defineStory({
+  id: "state-dot",
+  title: "State Dot · States and steps",
+  group: "Feedback and labels",
+  groupOrder: 80,
+  component: "StateDot",
+  description: "A small mark for a run or step state; the label beside it carries the meaning.",
+  render: () => (
+    <Specimens>
       <Specimen label="State dots" align="start">
         <Inline>
           {(["done", "warning", "ongoing", "error", "idle"] as const).map((state) => (
@@ -60,9 +88,21 @@ export const ReferencePrimitivesStory = defineStory({
           Waiting
         </Inline>
       </Specimen>
+    </Specimens>
+  ),
+});
+export const HoverCardStory = defineStory({
+  id: "hover-card",
+  title: "Hover Card · Previews and copy",
+  group: "Overlays and disclosure",
+  groupOrder: 50,
+  component: "HoverCard",
+  description: "The host provides preview content, readable on hover, keyboard focus or a tap.",
+  render: () => (
+    <Specimens>
       <Specimen
         label="Hover previews"
-        note="Hover or focus a trigger to read its preview."
+        note="Hover, focus or tap a trigger to read its preview; tap again to close it."
         align="start"
       >
         <HoverCard
@@ -74,10 +114,10 @@ export const ReferencePrimitivesStory = defineStory({
           )}
           content={
             <Stack>
-              <strong>PathLabel</strong>
+              <strong>Release notes</strong>
               <p>
-                The file name keeps its extension; the full path is available through the native
-                tooltip. This is built-in copy and does not read any file.
+                The host supplies this preview. Its text stays selectable, and on touch a tap opens
+                it and a second tap, an outside tap or Escape closes it.
               </p>
               <a href="https://example.com" target="_blank" rel="noreferrer">
                 External link example

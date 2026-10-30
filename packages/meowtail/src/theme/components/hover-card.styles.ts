@@ -67,19 +67,40 @@ export const hoverCardStyles = css`
     ${ui.focus.inset}
     border-radius: ${uiTokens.radius.md};
   }
+  /* Copied: the cue turns into a check and the copied label, at full ink. */
+  ${hoverCardPartRefs.hint} svg + svg,
+  ${hoverCardPartRefs.content}[data-copy-state="copied"] ${hoverCardPartRefs.hint} svg:first-of-type {
+    display: none;
+  }
+  ${hoverCardPartRefs.content}[data-copy-state="copied"] ${hoverCardPartRefs.hint} svg + svg {
+    display: block;
+  }
+  ${hoverCardPartRefs.content}[data-copy-state="copied"] ${hoverCardPartRefs.hint} {
+    color: inherit;
+  }
+  /* The live status is announced, and shown only for a failure, on its own line below the content. */
   ${hoverCardPartRefs.feedback} {
     position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    padding: 8px;
-    border-radius: inherit;
-    background: ${uiTokens.inverse.surface};
-    pointer-events: none;
-    color: ${uiTokens.inverse.ink};
-    font: ${uiTokens.type.body} / ${uiTokens.type.line.bodyCompact} ${uiTokens.type.sans};
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
   }
-  ${hoverCardPartRefs.feedback}:empty {
-    display: none;
+  ${hoverCardPartRefs.content}[data-copy-state="failed"] ${hoverCardPartRefs.feedback} {
+    position: static;
+    grid-column: 1 / -1;
+    width: auto;
+    height: auto;
+    margin-top: 4px;
+    overflow: visible;
+    clip-path: none;
+    white-space: normal;
+    font: ${uiTokens.type.caption} / ${uiTokens.type.line.caption} ${uiTokens.type.sans};
+  }
+  ${popoverPartRefs.panel}
+  > ${hoverCardPartRefs.content}[data-variant="preview"][data-copy-state="failed"]
+  ${hoverCardPartRefs.feedback} {
+    color: ${uiTokens.status.danger};
   }
 `;

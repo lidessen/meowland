@@ -1,5 +1,5 @@
 import { h, type Child, type Props, type Context } from "meowjsx";
-import { signal } from "meowjsx/signal";
+import { mapSignal, signal } from "meowjsx/signal";
 import { Popover, type PopoverTriggerBindings } from "./popover";
 import { copyTextToClipboard } from "../clipboard";
 import { Icon } from "../icons/icon";
@@ -54,6 +54,9 @@ export function HoverCard(
   let copySession = {};
   let feedbackTimer: ReturnType<typeof setTimeout> | undefined;
   const feedback = signal("");
+  // The cue turns into the result in place; a failure stays until the next attempt or close.
+  const copyState = signal<"idle" | "copied" | "failed">("idle");
+  const cueLabel = mapSignal(copyState, (state) => (state === "copied" ? copiedLabel : copyLabel));
   const clear = () => {
     if (timer !== undefined) clearTimeout(timer);
     timer = undefined;
@@ -64,6 +67,7 @@ export function HoverCard(
     copySession = {};
     clearTimeout(feedbackTimer);
     feedback.value = "";
+    copyState.value = "idle";
   };
   context.onCleanup(clear);
   context.onCleanup(() => {
@@ -79,18 +83,26 @@ export function HoverCard(
     }
     copying = true;
     const session = copySession;
+    clearTimeout(feedbackTimer);
+    feedback.value = "";
+    copyState.value = "idle";
     try {
       await (onCopy ?? copyTextToClipboard)(copyText);
-      if (alive && open.value && session === copySession) feedback.value = copiedLabel;
-    } catch {
-      if (alive && open.value && session === copySession)
-        feedback.value = "Copy failed; select the text and try again.";
-    } finally {
-      copying = false;
-      if (alive && session === copySession)
+      if (alive && open.value && session === copySession) {
+        feedback.value = copiedLabel;
+        copyState.value = "copied";
         feedbackTimer = setTimeout(() => {
           feedback.value = "";
-        }, 1000);
+          copyState.value = "idle";
+        }, 1500);
+      }
+    } catch {
+      if (alive && open.value && session === copySession) {
+        feedback.value = "Copy failed; select the text and try again.";
+        copyState.value = "failed";
+      }
+    } finally {
+      copying = false;
     }
   };
   return (
@@ -212,6 +224,7 @@ export function HoverCard(
                       void copy(event);
                     }
               }
+              data-copy-state={copyText === undefined ? undefined : copyState}
               ref={[context.parts.content]}
             >
               {copyText === undefined ? content : <div ref={[context.parts.body]}>{content}</div>}
@@ -219,7 +232,8 @@ export function HoverCard(
                 // Says what a click or tap does; the card's own label already names the action.
                 <span aria-hidden={"true"} ref={[context.parts.hint]}>
                   <Icon name="copy" />
-                  {copyLabel}
+                  <Icon name="check" />
+                  {cueLabel}
                 </span>
               )}
               {

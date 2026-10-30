@@ -6,6 +6,17 @@ import { PathLabel } from "../src/components/path-label";
 import { StateDot } from "../src/components/state-dot";
 import { HoverCard } from "../src/components/hover-card";
 import { Specimen, Specimens } from "./specimen";
+
+/** A path or URL breaks after a separator, never inside a name such as hover-card. */
+function breakAfterSlashes(text: string) {
+  return text.split("/").flatMap((segment, index) => {
+    const name = <span style={{ whiteSpace: "nowrap" }}>{segment}</span>;
+    if (!index) return [name];
+    // "//" in a URL stays together.
+    return segment ? ["/", <wbr />, name] : ["/"];
+  });
+}
+
 export const ReferencePrimitivesStory = defineStory({
   id: "reference-primitives",
   title: "Path Label · Narrow slots",
@@ -125,6 +136,21 @@ export const HoverCardStory = defineStory({
             </Stack>
           }
         />
+        <HoverCard
+          id="failing-copy-preview"
+          copyText="https://example.com/releases/2.4.0"
+          onCopy={async () => {
+            throw new Error("The clipboard is not available in this example.");
+          }}
+          trigger={(bindings) => (
+            <Button variant="outline" {...bindings}>
+              Copy that fails
+            </Button>
+          )}
+          content={
+            <p style={{ margin: 0 }}>{breakAfterSlashes("https://example.com/releases/2.4.0")}</p>
+          }
+        />
         <section id="wide-preview-anchor" style={{ width: "min(680px, calc(100vw - 64px))" }}>
           <HoverCard
             id="wide-reference-preview"
@@ -140,14 +166,8 @@ export const HoverCardStory = defineStory({
               </Button>
             )}
             content={
-              // A path breaks after a separator, never inside a name such as hover-card.
               <p style={{ margin: 0 }}>
-                {"packages/meowtail/src/components/hover-card.tsx"
-                  .split("/")
-                  .flatMap((segment, index) => {
-                    const name = <span style={{ whiteSpace: "nowrap" }}>{segment}</span>;
-                    return index ? ["/", <wbr />, name] : [name];
-                  })}
+                {breakAfterSlashes("packages/meowtail/src/components/hover-card.tsx")}
               </p>
             }
           />

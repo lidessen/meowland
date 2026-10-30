@@ -2,6 +2,11 @@
 
 ## Unreleased
 
+- `HoverCard` copy feedback no longer covers the card. On success the copy cue turns into a check and
+  `copiedLabel` for 1.5 seconds; on failure the message takes its own line under the content and
+  stays until the next attempt or the card closes. The `feedback` part stays the live status, and
+  is visible only for a failure.
+
 - A `HoverCard` with `copyText` shows a copy cue (the `copy` icon and `copyLabel`) at the end of its
   first line, so a reader can see that a click or tap copies. The cue is hidden from assistive
   technology; the card's accessible name already says `Copy: <text>`. New parts: `body` wraps the

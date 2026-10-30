@@ -54,6 +54,11 @@ test("wide hover preview follows its host width and copies only activation, not 
     "packages/meowtail/src/components/hover-card.tsx",
   );
   await expect(panel.getByRole("status")).toHaveText("Copied");
+  // The cue turns into the result in place; the copied text stays readable.
+  const cue = card.locator('[data-meowui-part="hover-card/hint"]');
+  await expect(cue).toHaveText("Copied");
+  await expect(card.locator("p")).toBeVisible();
+  await expect(cue).toHaveText("Copy", { timeout: 3000 });
   await page.setViewportSize({ width: 390, height: 844 });
   await expect
     .poll(async () => {
@@ -114,4 +119,27 @@ test.describe("touch preview", () => {
     await page.mouse.click(4, 840);
     await expect(panel).toBeHidden();
   });
+});
+
+test("a failed copy keeps the content and explains on its own line until the card closes", async ({
+  page,
+}) => {
+  await page.goto("/canvas.html?story=hover-card");
+  const trigger = page.getByRole("button", { name: "Copy that fails", exact: true });
+  await trigger.focus();
+  const panel = page.locator("#failing-copy-preview");
+  const card = panel.getByRole("button", { name: /^Copy: / });
+  await card.focus();
+  await page.keyboard.press("Enter");
+  const failure = panel.getByText("Copy failed; select the text and try again.", { exact: true });
+  await expect(failure).toBeVisible();
+  await expect(panel.locator("p")).toBeVisible();
+  // It stays past the copied cue's timeout.
+  await page.waitForTimeout(1800);
+  await expect(failure).toBeVisible();
+  await page.keyboard.press("Escape");
+  await expect(panel).toBeHidden();
+  await trigger.click();
+  await expect(panel).toBeVisible();
+  await expect(failure).toBeHidden();
 });

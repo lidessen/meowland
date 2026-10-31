@@ -207,7 +207,7 @@ export const PresentationLayoutsStory = defineStory({
     "Reveal",
   ],
   render: () => (
-    <div style={{ height: "min(900px, calc(100dvh - 32px))" }}>
+    <div style={{ height: "min(900px, calc(100dvh - 90px))" }}>
       <Presentation
         title="Common presentation compositions"
         slides={layouts}

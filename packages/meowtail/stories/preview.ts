@@ -71,7 +71,11 @@ const preview: PreviewEnvironment = ({ root, onCleanup }) => {
     return defaultRuntime;
   }
   if (isEmbedded()) {
-    onCleanup(() => root.classList.remove("meowui-story"));
+    scope.dataset.workshopEmbedded = "";
+    onCleanup(() => {
+      root.classList.remove("meowui-story");
+      delete scope.dataset.workshopEmbedded;
+    });
     return defaultRuntime;
   }
   const toolbar = document.createElement("nav");

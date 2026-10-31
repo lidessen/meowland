@@ -40,7 +40,7 @@ export const RegionLayoutStory = defineStory({
     "short window",
   ],
   render: () => (
-    <div style={{ height: "min(680px, calc(100dvh - 32px))", minHeight: 0 }}>
+    <div style={{ height: "min(680px, var(--workshop-story-height))", minHeight: 0 }}>
       <PageFrame
         header={
           <PageHeader
@@ -228,7 +228,7 @@ export const WorkspaceRegionStory = defineStory({
     "The page shell allocates the remaining space, a long draft scrolls inside the input, and the inline toolbar expansion and native popovers stay reachable.",
   covers: ["workspace frame", "content row", "long draft", "short window", "popover"],
   render: () => (
-    <ChatFrame style={{ height: "calc(100dvh - 32px)", minHeight: 0 }}>
+    <ChatFrame style={{ height: "var(--workshop-story-height)", minHeight: 0 }}>
       <PageFrame
         variant="workspace"
         toolbar={
@@ -362,7 +362,7 @@ export const NavigationRegionStory = defineStory({
     "Two columns on desktop; a narrow window keeps navigation and content in the same group. Changing region geometry does not rebuild the input or the category.",
   covers: ["compact row", "same group", "content height", "draft identity"],
   render: () => (
-    <div style={{ height: "calc(100dvh - 32px)", minHeight: 0 }}>
+    <div style={{ height: "var(--workshop-story-height)", minHeight: 0 }}>
       <PageFrame variant="workspace">
         <div
           ref={(host: HTMLElement) => {

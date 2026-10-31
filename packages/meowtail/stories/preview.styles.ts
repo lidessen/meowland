@@ -18,9 +18,16 @@ export const previewStyles = css`
     box-sizing: border-box;
   }
   .meowui-story {
-    padding: ${uiTokens.space.panel};
+    /* The height a story that fills its viewport may take: the window less the theme toolbar
+       and this padding. An embedded canvas has no toolbar, so only the padding comes off. */
+    --workshop-story-inset: ${uiTokens.space.panel};
+    --workshop-story-height: calc(100dvh - 90px);
+    padding: var(--workshop-story-inset);
     font-size: ${uiTokens.type.body};
     line-height: ${uiTokens.type.leading};
+  }
+  [data-workshop-embedded] .meowui-story {
+    --workshop-story-height: calc(100dvh - 2 * var(--workshop-story-inset));
   }
   /* A slim strip above the specimen, ruled by the same divider as the gallery. */
   .workshop-theme-controls {
@@ -230,7 +237,7 @@ export const previewStyles = css`
   }
   @media (max-width: 480px) {
     .meowui-story {
-      padding: 16px;
+      --workshop-story-inset: 16px;
     }
   }
 

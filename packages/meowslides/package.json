@@ -54,8 +54,8 @@
   },
   "peerDependencies": {
     "meowjsx": "^0.3.0-alpha.0",
-    "meowcss": "^0.3.0-alpha.0",
-    "meowtail": "^0.4.0-alpha.0"
+    "meowcss": "^0.3.0-alpha.1",
+    "meowtail": "^0.4.0-alpha.1"
   },
   "devDependencies": {
     "meowjsx": "workspace:*",

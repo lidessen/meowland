@@ -276,7 +276,7 @@ export const PresentationBackgroundsStory = defineStory({
       },
     ];
     return (
-      <div style={{ height: "min(900px, calc(100dvh - 90px))" }}>
+      <div style={{ height: "min(900px, calc(100dvh - 32px))" }}>
         <Presentation
           title="Common presentation backgrounds"
           slides={slides}

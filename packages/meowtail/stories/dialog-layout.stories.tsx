@@ -138,7 +138,7 @@ export const CatalogFrameStory = defineStory({
   render() {
     const selected = signal("all");
     return (
-      <div style={{ height: "calc(100dvh - 90px)", minHeight: 0 }}>
+      <div style={{ height: "calc(100dvh - 32px)", minHeight: 0 }}>
         <PageFrame
           scrollOwner="layout"
           header={

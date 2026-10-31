@@ -42,7 +42,7 @@ export const WorkspaceCompositionStory = defineStory({
     const draft = signal("");
     const feedback = signal("The local draft has not been checked yet.");
     return (
-      <div style={{ height: "min(640px, calc(100dvh - 90px))" }} data-workspace-composition>
+      <div style={{ height: "min(640px, calc(100dvh - 32px))" }} data-workspace-composition>
         <PageFrame
           variant="page"
           scrollOwner="layout"

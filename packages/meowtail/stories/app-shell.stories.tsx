@@ -32,7 +32,7 @@ export const AppShellStory = defineStory({
   render: () => (
     <div
       style={{
-        height: "min(680px, calc(100dvh - 32px))",
+        height: "min(680px, var(--workshop-story-height))",
         minHeight: 0,
         width: "min(100%, 430px)",
         margin: "0 auto",

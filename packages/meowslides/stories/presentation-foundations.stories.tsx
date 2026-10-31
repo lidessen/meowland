@@ -148,7 +148,7 @@ export const PresentationFoundationsStory = defineStory({
     "Observe logical column counts, body lists, photo cover and text-diagram contain in the same real presentation, plus the height budget of a natural caption.",
   covers: ["numeric columns", "PresentationList", "PresentationImage", "fill", "cover", "contain"],
   render: () => (
-    <div style={{ height: "min(900px, calc(100dvh - 90px))" }}>
+    <div style={{ height: "min(900px, calc(100dvh - 32px))" }}>
       <Presentation
         title="Presentation foundations composition"
         slides={slides}

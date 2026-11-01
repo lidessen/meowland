@@ -63,6 +63,13 @@ The [second release run](https://github.com/lidessen/meowland/actions/runs/41319
 
 A public registry readback then confirmed all five versions with their integrity values, the `alpha` tags on the new cohort and the unchanged `latest` tags. The full cohort installed from the registry in a clean directory passed 17 of 17 installed-state checks, and `meowslides@0.2.0-alpha.0` installed from the registry on its own resolved `meowjsx@0.3.0-alpha.0`, `meowcss@0.3.0-alpha.1` and `meowtail@0.4.0-alpha.1`, exposed its root and `build` entries and its CLI binary.
 
-## The `dev` alias still points at the previous cohort
+## The `dev` alias moved to this cohort
 
-The `dev` tags were not part of this batch and remain on the `622af70` cohort (`meowjsx`, `meowcss`, `meowbook` and `meowpress` at `0.3.0-alpha.0`, `meowtail` at `0.4.0-alpha.0`; `meowslides` at `0.1.0-alpha.1`). The `tag-dev` operation is pinned in `scripts/release-tag-dev.ts` with explicit versions and integrity values, so pointing `dev` at the 2026-11-01 cohort requires updating those pinned targets first. The pinned Slides target still describes the older `0.2.0-alpha.0` bytes (`sha256 35961cd8…`), so that operation would also refuse a mismatch against the published tarball. `alpha` already carries the new code.
+The `dev` tags were a separate operation. On 2026-11-02 the maintainer asked for the alias to follow this cohort, so `88eb3b4` updated the pinned targets in `scripts/release-tag-dev.ts`: each package's version, the published tarball's SHA256 and SHA512 integrity read from the registry, and the `dev` value the tag had to hold before the move. `meowjsx` keeps `0.3.0-alpha.0` in this cohort, so its pinned `previousDev` equals its target and the script takes its existing `already-tagged` path; the tests derive the expected actions from the pinned targets instead of assuming that all five move. A read-only local preflight against the public registry reported `already-tagged` for `meowjsx` and `would-tag` for the other four and for `meowslides` before anything was dispatched.
+
+Two `tag-dev` runs then executed from `88eb3b4`:
+
+- [run `41324566169`](https://github.com/lidessen/meowland/actions/runs/41324566169) for the five-package set: `meowjsx` was `already-tagged`, and `meowcss`, `meowtail`, `meowbook` and `meowpress` were `tagged`.
+- [run `41324670419`](https://github.com/lidessen/meowland/actions/runs/41324670419) for `meowslides` alone: `tagged` at `0.2.0-alpha.0`.
+
+Both runs concluded with success and moved only the `dev` tag. A public registry readback then showed `alpha` and `dev` on the same version for all six packages, with every `latest` tag unchanged; `meowjsx` stays at `0.3.0-alpha.0` because it was not republished.

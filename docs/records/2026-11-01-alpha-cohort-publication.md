@@ -49,12 +49,20 @@ The [release run](https://github.com/lidessen/meowland/actions/runs/41241679942)
 
 An independent public registry readback confirmed the four versions, their integrity values, the moved `alpha` tags, the unchanged `latest` tags and the unchanged `dev` tags. The published versions were then installed from the registry in a clean directory outside the repository; the installed-state acceptance passed 15 of 15 checks against the registry bytes.
 
-## Slides remains unpublished
+## Slides was published in a second run
 
-`meowslides@0.2.0-alpha.0` was selected in the same batch and packed and accepted with the others, but its publish exited with `ENEEDAUTH` and produced no publish response, so the run failed at that package. The registry has no `0.2.0-alpha.0`; `alpha`, `dev` and `latest` still point to `0.1.0-alpha.1`. The other four packages had already been published and verified before that point, so the batch is partially complete by design, not by fallback.
+`meowslides@0.2.0-alpha.0` was selected in the same batch and packed and accepted with the others, but its publish exited with `ENEEDAUTH` and produced no publish response, so the first run failed at that package. The other four had already been published and verified before that point, so the batch was partially complete by design, not by fallback.
 
-The cause is unchanged: the first Slides publication did not configure a persistent npm Trusted Publisher for the package. To finish it, configure `meowslides` on npm for GitHub Actions with repository `lidessen/meowland`, workflow filename `npm-release.yml`, no environment, and allowed actions `npm publish` and `npm dist-tag`. Then re-dispatch the same source SHA and package selection. The release algorithm skips the four versions that already exist with matching integrity and publishes only Slides, so no repack or second publish of the other packages is needed.
+The cause was the missing npm Trusted Publisher for `meowslides`: the first Slides publication was a direct CLI bootstrap and never configured one. The owner configured that binding on 2026-11-01 with repository `lidessen/meowland`, workflow filename `npm-release.yml`, no environment, and allowed actions `npm publish` and `npm dist-tag`.
+
+The [second release run](https://github.com/lidessen/meowland/actions/runs/41319369687), at source [`1c44a8d`](https://github.com/lidessen/meowland/commit/1c44a8d61983fe50fb73ef31c68d1f41d0231cf7), reused the same five-package selection. The packed bytes were identical to the accepted ones, so the four existing versions were taken as a `reuse` and their tags were left alone, and only Slides was published:
+
+| Package      | Published version | Registry integrity                                                                                | `alpha` before → after            | `latest` before → after           |
+| ------------ | ----------------- | ------------------------------------------------------------------------------------------------- | --------------------------------- | --------------------------------- |
+| `meowslides` | `0.2.0-alpha.0`   | `sha512-OXIjAx7gzlL/DyICuGjB0SvXG9knV3iRZ2a/zT5CqtRODv9f0zML+zD09nMvruiRf4AZF6WU9MzvQOdi7ivEnw==` | `0.1.0-alpha.1` → `0.2.0-alpha.0` | `0.1.0-alpha.1` → `0.1.0-alpha.1` |
+
+A public registry readback then confirmed all five versions with their integrity values, the `alpha` tags on the new cohort and the unchanged `latest` tags. The full cohort installed from the registry in a clean directory passed 17 of 17 installed-state checks, and `meowslides@0.2.0-alpha.0` installed from the registry on its own resolved `meowjsx@0.3.0-alpha.0`, `meowcss@0.3.0-alpha.1` and `meowtail@0.4.0-alpha.1`, exposed its root and `build` entries and its CLI binary.
 
 ## The `dev` alias still points at the previous cohort
 
-The `dev` tags were not part of this batch and remain on the `622af70` cohort (`meowjsx`, `meowcss`, `meowbook` and `meowpress` at `0.3.0-alpha.0`, `meowtail` at `0.4.0-alpha.0`). The `tag-dev` operation is pinned in `scripts/release-tag-dev.ts` with explicit versions and integrity values, so pointing `dev` at the 2026-11-01 cohort requires updating those pinned targets first. `alpha` already carries the new code.
+The `dev` tags were not part of this batch and remain on the `622af70` cohort (`meowjsx`, `meowcss`, `meowbook` and `meowpress` at `0.3.0-alpha.0`, `meowtail` at `0.4.0-alpha.0`; `meowslides` at `0.1.0-alpha.1`). The `tag-dev` operation is pinned in `scripts/release-tag-dev.ts` with explicit versions and integrity values, so pointing `dev` at the 2026-11-01 cohort requires updating those pinned targets first. The pinned Slides target still describes the older `0.2.0-alpha.0` bytes (`sha256 35961cd8…`), so that operation would also refuse a mismatch against the published tarball. `alpha` already carries the new code.

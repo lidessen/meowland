@@ -201,7 +201,11 @@ test("Slides-only preflight rejects changed tags or tarball bytes before mutatio
 test("check mode verifies all five tarballs and reports planned tags without mutation", async () => {
   const setup = fixture();
   const results = await tagDev(commit, "check", setup.options());
-  expect(results.map((item) => item.action)).toEqual(Array(5).fill("would-tag"));
+  expect(results.map((item) => item.action)).toEqual(
+    setup.targets.map((target) =>
+      target.previousDev === target.version ? "already-tagged" : "would-tag",
+    ),
+  );
   expect(setup.mutations).toEqual([]);
   expect(setup.calls.filter((args) => args[0] === "registry").length).toBeGreaterThan(5);
 });
@@ -209,15 +213,14 @@ test("check mode verifies all five tarballs and reports planned tags without mut
 test("execution moves five pinned dev tags and preserves every other dist-tag", async () => {
   const setup = fixture();
   const results = await tagDev(commit, "execute", setup.options());
-  expect(results.map((item) => item.action)).toEqual(Array(5).fill("tagged"));
+  const moved = setup.targets.filter((target) => target.previousDev !== target.version);
+  expect(results.map((item) => item.action)).toEqual(
+    setup.targets.map((target) =>
+      target.previousDev === target.version ? "already-tagged" : "tagged",
+    ),
+  );
   expect(setup.mutations).toEqual(
-    setup.targets.map(({ name, version }) => [
-      "npm",
-      "dist-tag",
-      "add",
-      `${name}@${version}`,
-      "dev",
-    ]),
+    moved.map(({ name, version }) => ["npm", "dist-tag", "add", `${name}@${version}`, "dev"]),
   );
   for (const target of setup.targets)
     expect(setup.tags.get(target.name)).toEqual({
@@ -228,7 +231,7 @@ test("execution moves five pinned dev tags and preserves every other dist-tag", 
     });
   const second = await tagDev(commit, "execute", setup.options());
   expect(second.map((item) => item.action)).toEqual(Array(5).fill("already-tagged"));
-  expect(setup.mutations).toHaveLength(5);
+  expect(setup.mutations).toHaveLength(moved.length);
 });
 
 test("an interrupted move resumes only the still-old dev tags", async () => {
@@ -295,14 +298,17 @@ test("an altered alpha or preexisting dev target blocks all mutations", async ()
 
 test("a concurrent change stops before the next tag without rolling the first one back", async () => {
   const setup = fixture();
+  const moved = setup.targets.filter((target) => target.previousDev !== target.version);
+  const first = moved[0]!;
+  const next = moved[1]!;
   setup.onMutation((name) => {
-    if (name === "meowjsx") setup.tags.get("meowcss")!.legacy = "0.0.2";
+    if (name === first.name) setup.tags.get(next.name)!.legacy = "0.0.2";
   });
   await expect(tagDev(commit, "execute", setup.options())).rejects.toThrow(
-    "Registry tags changed during preflight: meowcss",
+    `Registry tags changed during preflight: ${next.name}`,
   );
   expect(setup.mutations).toHaveLength(1);
-  expect(setup.tags.get("meowjsx")!.dev).toBe("0.3.0-alpha.0");
+  expect(setup.tags.get(first.name)!.dev).toBe(first.version);
 });
 
 test("a failed npm response is uncertain and never causes an automatic retry", async () => {
@@ -314,8 +320,9 @@ test("a failed npm response is uncertain and never causes an automatic retry", a
 
 test("a post-mutation change to another tag fails verification", async () => {
   const setup = fixture();
+  const firstMoved = setup.targets.find((target) => target.previousDev !== target.version)!;
   setup.onMutation((name) => {
-    if (name === "meowjsx") setup.tags.get(name)!.latest = "0.2.0";
+    if (name === firstMoved.name) setup.tags.get(name)!.latest = "0.2.0";
   });
   await expect(tagDev(commit, "execute", setup.options())).rejects.toThrow(
     "Registry tags changed after dev tag action",

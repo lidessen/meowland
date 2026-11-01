@@ -3,47 +3,47 @@ import { resolve } from "node:path";
 import { valid } from "semver";
 import { assertOIDC, run, type Runner } from "./release.ts";
 
-/** The five inspected signal-entry tarballs. */
+/** The five inspected tarballs of the published alpha cohort. */
 export const devTargets = [
   {
     name: "meowjsx",
     version: "0.3.0-alpha.0",
-    previousDev: "0.2.0-alpha.0",
+    previousDev: "0.3.0-alpha.0",
     sha256: "db1c7aec34dde0bbe3734681f02713eb02f1168741b63aaf1121e4a494fa4c4c",
     integrity:
       "sha512-XldoWxfBjao6+NRkZo5G0x8nkXyg2Gd0qC797DVbw9aYdDjt3rLgibWdCs0gzSwGrUaqrNy0HD6X3cj3HgLZAQ==",
   },
   {
     name: "meowcss",
-    version: "0.3.0-alpha.0",
-    previousDev: "0.2.0-alpha.0",
-    sha256: "d8ae20f05013595774ad3f16033ca11050815ef9dd681df53b4be518ca9c07bb",
+    version: "0.3.0-alpha.1",
+    previousDev: "0.3.0-alpha.0",
+    sha256: "1e25d23720e64f76b2c005c7d8a803d4051dbf76e4432af75682923e5e6e604a",
     integrity:
-      "sha512-n1dXkLryuHCE/RTkcU8WZhHzpr/rV2tvd2adyA4WQh/256F2aeGzcIPEM9ct2TOXZoiHK7g7KSuNBeTNjzxlLQ==",
+      "sha512-zeR1RZkVwihwhBYEKUjSyoKawIJo/BQ21AOfCiUXJZAdJdwzx5RwUwF/WwFJXaT+DsER9CgFSQU+56+y2mBrag==",
   },
   {
     name: "meowtail",
-    version: "0.4.0-alpha.0",
-    previousDev: "0.3.0-alpha.0",
-    sha256: "aa20641401f9e54431728d88706c4283f336241207b9cd893ccaa4c3c686c210",
+    version: "0.4.0-alpha.1",
+    previousDev: "0.4.0-alpha.0",
+    sha256: "d0d8450014d1a4b8a56770b13da66419fd2f9ca2fd93db65978af42e2a1ba859",
     integrity:
-      "sha512-7NO6mHuoAL4yNEe1r0tJD9UVO+s1k0Mm1xSxlb0U69uYrroiRtiUhZsuQV3/zPMc9qNECFjVhD8gvmxBWMmoNA==",
+      "sha512-2HB9x9HJH3p/fdE0CKzB8cCqeP2bmOHWi75xm+Jv8cpyxnYBIK7xfjA+V8HF7xdE/YACGmUnjl9hCGil+EYH1A==",
   },
   {
     name: "meowbook",
-    version: "0.3.0-alpha.0",
-    previousDev: "0.2.0-alpha.0",
-    sha256: "15d681fff2e1522566df9312380ead1f37db5908de58ab86c535c244f2dddaeb",
+    version: "0.3.0-alpha.1",
+    previousDev: "0.3.0-alpha.0",
+    sha256: "c0c46c6becb275eb6f1f4c124fb9a1a1306213dee036c75278a8563f1d53eeaa",
     integrity:
-      "sha512-JhLDjFgLtDJioZg6dAuTy5tSpLq1bLFqVRQNVl/2UyAKkA8fep5y83qeE7PK/xykC7WLYTpIoS2pVbftgJqWgw==",
+      "sha512-GzQ8WInrQiSfwpgj0oPMvQK0p1pOS5Cx8YyXS/PWgzyWIgeHyy3gd/fepM+FoydJivaQXAPc5Wj/e6xvSMZhRQ==",
   },
   {
     name: "meowpress",
-    version: "0.3.0-alpha.0",
-    previousDev: "0.2.0-alpha.0",
-    sha256: "05a572898776e9a22b434fcd8a545155ef8e93b513c93cdfbcc8809d1389e222",
+    version: "0.3.0-alpha.1",
+    previousDev: "0.3.0-alpha.0",
+    sha256: "683866862417a82d5d3b866b487fa46a0f8fafb122f25d6918e2bb5f9ead71a4",
     integrity:
-      "sha512-V1IAqsXRgpyLwrUyTt80e2sR1HuHpHPMe2bPzY1Q2uiLE3v28hyftTsUO2IReZwuDjEBqHW4FRg+oYEkYkh/7A==",
+      "sha512-I2rBhokL7pnkhnN0QorZiRNWllVSJOKX2kttKue4IRiXvL4evzUGZlxHB0GhPNS8+ilVbeqpLSYLw7uCmf3dEg==",
   },
 ] as const;
 
@@ -53,9 +53,9 @@ export const slidesDevTargets = [
     name: "meowslides",
     version: "0.2.0-alpha.0",
     previousDev: "0.1.0-alpha.1",
-    sha256: "35961cd8cafdbf88839781f5b6a8e8e5d863820af534bf45aa93b6566d1ab3bb",
+    sha256: "7a24cdb013d3c3cb52ae7b04490ea4421447ec27ed62c542d50e5407f23df23f",
     integrity:
-      "sha512-EIHpUhPz5/Qv0w7yb66fusrYMs/OUCiWqo4k7V0XP/LMTge1sIA6skQxvh2jnntwi4oi3JH+C/ITZq1eKL5Ibg==",
+      "sha512-OXIjAx7gzlL/DyICuGjB0SvXG9knV3iRZ2a/zT5CqtRODv9f0zML+zD09nMvruiRf4AZF6WU9MzvQOdi7ivEnw==",
   },
 ] as const;
 

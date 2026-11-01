@@ -277,6 +277,17 @@ test("a dev alias ahead of the published version blocks the batch before any mut
   expect(remote.mutations).toEqual([]);
 });
 
+test("a later package's newer dev stops the batch before the first package publishes", async () => {
+  const { plan, local } = await fixture(2, "^1.2.3-alpha.0", "1.2.3-alpha.0", true, {
+    channel: "alpha",
+    selected: ["meowcss", "meowjsx"],
+  });
+  const remote = external(plan, local);
+  remote.tags.get(plan.packages[1]!.name)!.dev = "1.3.0-alpha.0";
+  await expect(release(plan, remote.runner)).rejects.toThrow("dev backwards");
+  expect(remote.mutations).toEqual([]);
+});
+
 test("a concurrent dev change during the visibility wait fails closed", async () => {
   const { plan, local } = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
   const remote = external(plan, local);
@@ -302,6 +313,74 @@ test("an uncertain dev dist-tag aborts without a second attempt", async () => {
   expect(remote.mutations.filter((call) => call[1] === "dist-tag")).toHaveLength(1);
 });
 
+test("a tag change between publication and the dev move fails closed", async () => {
+  const { plan, local } = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
+  const remote = external(plan, local);
+  let published = false;
+  let reads = 0;
+  const runner: Runner = async (args, cwd) => {
+    if (published && args[0] === "registry") {
+      reads++;
+      if (reads === 2) remote.tags.get("meowjsx")!.latest = "1.1.0";
+    }
+    const response = await remote.runner(args, cwd);
+    if (args[0] === "npm" && args[1] === "publish") published = true;
+    return response;
+  };
+  await expect(release(plan, runner)).rejects.toThrow("Registry tags changed before the dev move");
+  expect(remote.mutations.filter((call) => call[1] === "dist-tag")).toEqual([]);
+});
+
+test("a dev alias that never appears times out after the version is published", async () => {
+  const { plan, local } = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
+  const remote = external(plan, local);
+  const runner: Runner = async (args, cwd) => {
+    const response = await remote.runner(args, cwd);
+    if (args[0] === "npm" && args[1] === "dist-tag") delete remote.tags.get("meowjsx")!.dev;
+    return response;
+  };
+  await expect(
+    release(plan, runner, "execute", () => {}, {}, { reads: 2, pause: async () => {} }),
+  ).rejects.toThrow("Dev tag not yet verified");
+  expect(remote.mutations.filter((call) => call[1] === "dist-tag")).toHaveLength(1);
+});
+
+test("a registry change during the dev wait fails closed", async () => {
+  const { plan, local } = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
+  const remote = external(plan, local);
+  const runner: Runner = async (args, cwd) => {
+    const response = await remote.runner(args, cwd);
+    if (args[0] === "npm" && args[1] === "dist-tag") remote.tags.get("meowjsx")!.latest = "1.1.0";
+    return response;
+  };
+  await expect(
+    release(plan, runner, "execute", () => {}, {}, { reads: 2, pause: async () => {} }),
+  ).rejects.toThrow("Registry tags changed while awaiting the dev tag");
+});
+
+test("a registry change between packages stops the batch without rollback", async () => {
+  const { plan, local } = await fixture(2, "^1.2.3-alpha.0", "1.2.3-alpha.0", true, {
+    channel: "alpha",
+    selected: ["meowcss", "meowjsx"],
+  });
+  const remote = external(plan, local);
+  const second = plan.packages[1]!;
+  let firstMoved = false;
+  const runner: Runner = async (args, cwd) => {
+    const response = await remote.runner(args, cwd);
+    if (!firstMoved && args[0] === "npm" && args[1] === "dist-tag" && args[4] === "dev") {
+      firstMoved = true;
+      remote.tags.get(second.name)!.latest = "2.0.0";
+    }
+    return response;
+  };
+  await expect(release(plan, runner)).rejects.toThrow(
+    `Registry tags changed during preflight: ${second.name}`,
+  );
+  expect(remote.mutations).toHaveLength(2);
+  expect(remote.tags.get(second.name)!.latest).toBe("2.0.0");
+});
+
 test("the verified receipt records the dev move and stays null on stable", async () => {
   const alpha = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
   const alphaRemote = external(alpha.plan, alpha.local);
@@ -314,6 +393,17 @@ test("the verified receipt records the dev move and stays null on stable", async
     devAfter: "1.2.3-alpha.0",
     devAction: "moved",
     action: "publish",
+  });
+
+  const older = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
+  const olderRemote = external(older.plan, older.local);
+  olderRemote.tags.get("meowjsx")!.dev = "1.0.0";
+  const forwarded: Record<string, unknown>[] = [];
+  await release(older.plan, olderRemote.runner, "execute", (record) => forwarded.push(record));
+  expect(forwarded[0]).toMatchObject({
+    devBefore: "1.0.0",
+    devAfter: "1.2.3-alpha.0",
+    devAction: "moved",
   });
 
   const already = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
@@ -359,6 +449,31 @@ test("check mode previews the dev action without mutating", async () => {
     .find((value) => value?.devPreview);
   expect(preview.devPreview).toEqual([
     { name: "meowjsx", version: "1.2.3-alpha.0", dev: null, action: "would-move" },
+  ]);
+
+  const current = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
+  const currentRemote = external(current.plan, current.local);
+  currentRemote.tags.get("meowjsx")!.dev = "1.2.3-alpha.0";
+  const currentLogs: string[] = [];
+  console.log = (...args: unknown[]) => {
+    currentLogs.push(args.join(" "));
+  };
+  try {
+    await release(current.plan, currentRemote.runner, "check");
+  } finally {
+    console.log = original;
+  }
+  const currentPreview = currentLogs
+    .map((line) => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    })
+    .find((value) => value?.devPreview);
+  expect(currentPreview.devPreview).toEqual([
+    { name: "meowjsx", version: "1.2.3-alpha.0", dev: "1.2.3-alpha.0", action: "already" },
   ]);
 });
 
@@ -710,11 +825,28 @@ console.log(JSON.stringify({
       scriptsOff: true,
       workspacesOff: true,
     });
+    const tagged = await run(
+      [executable, "dist-tag", "add", "meowjsx@1.2.3-alpha.0", "dev"],
+      directory,
+    );
+    expect(tagged.code).toBe(0);
+    expect(JSON.parse(new TextDecoder().decode(tagged.stdout))).toMatchObject({
+      isolated: true,
+      configOverrides: false,
+      traditionalAuth: false,
+      oidcPresent: true,
+      registry: true,
+      scriptsOff: true,
+      workspacesOff: true,
+    });
     delete process.env.GITHUB_ACTIONS;
     await expect(run([executable, "publish", "fixture.tgz"], directory)).rejects.toThrow(
       "GitHub-hosted",
     );
     await expect(run([executable, "whoami"], directory)).rejects.toThrow("Unsupported OIDC");
+    await expect(
+      run([executable, "dist-tag", "rm", "meowjsx@1.2.3-alpha.0", "dev"], directory),
+    ).rejects.toThrow("Unsupported OIDC");
   } finally {
     for (const [key, value] of Object.entries(previous)) {
       if (value === undefined) delete process.env[key];

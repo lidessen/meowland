@@ -73,23 +73,24 @@ test("Slides and Press can be selected explicitly without expanding a four-packa
   expect(ready.calls.at(-1)).not.toContain("meowslides");
   expect(ready.calls.at(-1)).not.toContain("meowpress");
 });
-test("workflow isolates publication and pinned dev tagging with OIDC", async () => {
+test("workflow isolates publication with OIDC", async () => {
   const workflow = Bun.YAML.parse(
     await Bun.file(new URL("../.github/workflows/npm-release.yml", import.meta.url)).text(),
   ) as any;
   expect(Object.keys(workflow.on)).toEqual(["workflow_dispatch"]);
   expect(workflow.permissions).toEqual({ contents: "read" });
-  expect(workflow.on.workflow_dispatch.inputs.operation).toMatchObject({
-    default: "publish",
-    options: ["publish", "tag-dev"],
-  });
+  expect(Object.keys(workflow.on.workflow_dispatch.inputs).sort()).toEqual([
+    "channel",
+    "packages",
+    "source_sha",
+  ]);
   expect(workflow.jobs.prepare.permissions?.["id-token"]).toBeUndefined();
+  expect(workflow.jobs.prepare.if).toContain("github.repository == 'lidessen/meowland'");
+  expect(workflow.jobs.prepare.if).toContain("inputs.source_sha == github.sha");
+  expect(workflow.jobs.prepare.if).not.toContain("inputs.operation");
   expect(workflow.jobs.publish.permissions).toEqual({ contents: "read", "id-token": "write" });
   expect(workflow.jobs.publish.needs).toBe("prepare");
-  expect(workflow.jobs.prepare.if).toContain("inputs.operation == 'publish'");
-  expect(workflow.jobs.publish.if).toContain("inputs.operation == 'publish'");
-  expect(workflow.jobs["tag-dev"].permissions).toEqual({ contents: "read", "id-token": "write" });
-  expect(workflow.jobs["tag-dev"].if).toContain("inputs.operation == 'tag-dev'");
-  expect(workflow.jobs["tag-dev"].if).toContain("inputs.source_sha == github.sha");
+  expect(workflow.jobs.publish.if ?? "").not.toContain("inputs.operation");
+  expect(Object.keys(workflow.jobs).sort()).toEqual(["prepare", "publish"]);
   expect(workflow.concurrency["cancel-in-progress"]).toBe(false);
 });

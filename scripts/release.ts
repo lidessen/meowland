@@ -546,6 +546,11 @@ export async function waitForPublication(
         after.latest === before.latest,
         `latest changed during alpha release: ${item.name}; investigate without automatic rollback`,
       );
+    if (plan.channel === "alpha")
+      assert(
+        after.dev === before.dev || after.dev === item.version,
+        `dev changed during alpha release: ${item.name}; investigate without automatic rollback`,
+      );
     assert(
       after[plan.distTag] === before[plan.distTag] || after[plan.distTag] === item.version,
       `Registry tags changed while awaiting publication: ${item.name}`,
@@ -561,6 +566,36 @@ export async function waitForPublication(
   );
 }
 
+/** The dev alias follows an alpha publication; a dist-tag update is normally visible at once. */
+export async function waitForDev(
+  plan: Plan,
+  item: Package,
+  before: Record<string, string>,
+  runner: Runner,
+  { reads = 5, pause = (milliseconds) => Bun.sleep(milliseconds) }: VisibilityWait = {},
+) {
+  assert(Number.isInteger(reads) && reads > 0, "Invalid registry visibility read limit");
+  for (let index = 0; index < reads; index++) {
+    const published = await metadata(runner, plan.root, item.name);
+    assert(
+      integrityOf(published, item) === item.integrity,
+      `Registry verification failed: ${item.tag}; different bytes appeared`,
+    );
+    const after = tagsOf(published);
+    assert(
+      after.latest === before.latest &&
+        after[plan.distTag] === item.version &&
+        (after.dev === before.dev || after.dev === item.version),
+      `Registry tags changed while awaiting the dev tag: ${item.name}`,
+    );
+    if (after.dev === item.version) return after;
+    if (index + 1 < reads) await pause(30000);
+  }
+  throw new Error(
+    `Dev tag not yet verified after ${reads} registry reads: ${item.tag}; the version is published; inspect the registry without a second blind dist-tag`,
+  );
+}
+
 /** check is read-only; execute is the sole registry mutation path. No GitHub or push operations. */
 export async function release(
   plan: Plan,
@@ -568,6 +603,7 @@ export async function release(
   mode: "check" | "execute" = "execute",
   onVerified: (record: Record<string, unknown>) => void = () => {},
   visibility: VisibilityWait = {},
+  devVisibility: VisibilityWait = {},
 ) {
   assert(plan.blockers.length === 0, plan.blockers.join("\n"));
   await unchanged(plan, runner);
@@ -580,6 +616,13 @@ export async function release(
       !current || !gt(current, item.version),
       `Refusing to move ${item.name} ${plan.distTag} backwards`,
     );
+    // The dev alias follows an alpha publication, so a dev that is already newer fails the batch
+    // before any mutation instead of publishing and then aborting on every rerun.
+    if (plan.channel === "alpha")
+      assert(
+        tags.dev === undefined || tags.dev === item.version || !gt(tags.dev, item.version),
+        `Refusing to move ${item.name} dev backwards`,
+      );
     const integrity = integrityOf(packageMetadata, item);
     assert(
       integrity === null || integrity === item.integrity,
@@ -605,14 +648,29 @@ export async function release(
   }
   // All selected packages, bytes and dependencies have passed before the first mutation.
   await unchanged(plan, runner);
-  if (mode === "check") return;
+  if (mode === "check") {
+    console.log(
+      JSON.stringify({
+        devPreview: states.map(({ item, tags }) => ({
+          name: item.name,
+          version: item.version,
+          dev: tags.dev ?? null,
+          action:
+            plan.channel !== "alpha" ? null : tags.dev === item.version ? "already" : "would-move",
+        })),
+      }),
+    );
+    return;
+  }
   for (const state of states) {
     const { item } = state;
     await unchanged(plan, runner);
     // Fail if another publisher changed any tag since preflight, rather than overwrite it.
     const before = tagsOf(await metadata(runner, plan.root, item.name));
     assert(
-      before[plan.distTag] === state.tags[plan.distTag] && before.latest === state.tags.latest,
+      before[plan.distTag] === state.tags[plan.distTag] &&
+        before.latest === state.tags.latest &&
+        (plan.channel !== "alpha" || before.dev === state.tags.dev),
       `Registry tags changed during preflight: ${item.name}`,
     );
     if (!state.exists)
@@ -633,6 +691,33 @@ export async function release(
     else if (before[plan.distTag] !== item.version)
       await checked(runner, ["npm", "dist-tag", "add", item.tag, plan.distTag], plan.root);
     const after = await waitForPublication(plan, item, state.tags, runner, visibility);
+    let devAfter: string | null = null;
+    let devAction: "moved" | "already" | null = null;
+    if (plan.channel === "alpha") {
+      devAfter = after.dev ?? null;
+      if (after.dev === item.version) devAction = "already";
+      else {
+        // Re-read every relevant tag right before the move: the visibility wait may have lasted
+        // minutes, and a third-party change must fail this run rather than be overwritten.
+        const current = tagsOf(await metadata(runner, plan.root, item.name));
+        assert(
+          current[plan.distTag] === item.version &&
+            current.latest === state.tags.latest &&
+            (current.dev === state.tags.dev || current.dev === item.version),
+          `Registry tags changed before the dev move: ${item.name}`,
+        );
+        try {
+          await checked(runner, ["npm", "dist-tag", "add", item.tag, "dev"], plan.root);
+        } catch {
+          throw new Error(
+            `npm dist-tag dev outcome uncertain: ${item.tag}; the version is published; inspect the registry and re-dispatch the same batch instead of a second blind dist-tag`,
+          );
+        }
+        const confirmed = await waitForDev(plan, item, state.tags, runner, devVisibility);
+        devAfter = confirmed.dev ?? null;
+        devAction = "moved";
+      }
+    }
     onVerified({
       name: item.name,
       version: item.version,
@@ -640,6 +725,9 @@ export async function release(
       distTag: plan.distTag,
       latestBefore: state.tags.latest ?? null,
       latestAfter: after.latest ?? null,
+      devBefore: state.tags.dev ?? null,
+      devAfter,
+      devAction,
       action: state.exists ? "reuse" : "publish",
     });
   }

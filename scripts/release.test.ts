@@ -116,6 +116,7 @@ function external(plan: Plan, local: Runner) {
   const calls: string[][] = [];
   const mutations: string[][] = [];
   let failing = "";
+  let failingTag = "";
   const runner: Runner = async (args, cwd) => {
     calls.push(args);
     if (args[0] === "registry") {
@@ -150,6 +151,10 @@ function external(plan: Plan, local: Runner) {
     }
     if (args[1] === "dist-tag") {
       mutations.push(args);
+      if (args[3] === failingTag) {
+        failingTag = "";
+        return result("", 1);
+      }
       const item = plan.packages.find((candidate) => candidate.tag === args[3])!;
       tags.get(item.name)![args[4]!] = item.version;
       return result();
@@ -164,6 +169,9 @@ function external(plan: Plan, local: Runner) {
     tags,
     fail: (name: string) => {
       failing = name;
+    },
+    failTag: (tag: string) => {
+      failingTag = tag;
     },
   };
 }
@@ -222,24 +230,31 @@ test("alpha publishes explicit tags, preserves latest, and retries skip identica
   expect(
     remote.mutations.filter((args) => args[1] === "publish" && args[2] === plan.packages[0]!.path),
   ).toHaveLength(1);
-  for (const args of remote.mutations) {
+  for (const args of remote.mutations.filter((call) => call[1] === "publish")) {
     expect(args).toContain("--tag");
     expect(args[args.indexOf("--tag") + 1]).toBe("alpha");
   }
+  for (const args of remote.mutations.filter((call) => call[1] === "dist-tag")) {
+    expect(args[4]).toBe("dev");
+  }
   expect([...remote.tags.values()].every((tags) => tags.latest === "1.0.0")).toBe(true);
+  expect([...remote.tags.values()].every((tags) => tags.dev === "1.2.3-alpha.0")).toBe(true);
   expect(remote.calls.every((args) => !["gh", "push", "tag"].includes(args[0]!))).toBe(true);
 });
 
-test("same-byte versions repair only the chosen tag and preserve absent latest", async () => {
+test("same-byte versions repair the chosen tag, and dev follows the same version", async () => {
   const { plan, local } = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
   const remote = external(plan, local);
   remote.published.set(plan.packages[0]!.tag, plan.packages[0]!.integrity);
   remote.tags.set("meowjsx", { alpha: "1.2.2-alpha.0" });
   await release(plan, remote.runner);
-  expect(remote.mutations).toEqual([["npm", "dist-tag", "add", "meowjsx@1.2.3-alpha.0", "alpha"]]);
+  expect(remote.mutations).toEqual([
+    ["npm", "dist-tag", "add", "meowjsx@1.2.3-alpha.0", "alpha"],
+    ["npm", "dist-tag", "add", "meowjsx@1.2.3-alpha.0", "dev"],
+  ]);
   expect(remote.tags.get("meowjsx")!.latest).toBeUndefined();
   await release(plan, remote.runner);
-  expect(remote.mutations).toHaveLength(1);
+  expect(remote.mutations).toHaveLength(2);
 });
 
 test("stable explicitly uses latest and check never mutates", async () => {
@@ -249,6 +264,102 @@ test("stable explicitly uses latest and check never mutates", async () => {
   expect(remote.mutations).toHaveLength(0);
   await release(plan, remote.runner);
   expect(remote.mutations[0]).toContain("latest");
+  expect(remote.mutations.filter((call) => call[1] === "dist-tag")).toHaveLength(0);
+});
+
+test("a dev alias ahead of the published version blocks the batch before any mutation", async () => {
+  const { plan, local } = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
+  const remote = external(plan, local);
+  remote.tags.get("meowjsx")!.dev = "1.3.0-alpha.0";
+  await expect(release(plan, remote.runner)).rejects.toThrow("dev backwards");
+  expect(remote.mutations).toEqual([]);
+  await expect(release(plan, remote.runner)).rejects.toThrow("dev backwards");
+  expect(remote.mutations).toEqual([]);
+});
+
+test("a concurrent dev change during the visibility wait fails closed", async () => {
+  const { plan, local } = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
+  const remote = external(plan, local);
+  let moved = false;
+  const runner: Runner = async (args, cwd) => {
+    if (!moved && args[0] === "registry" && remote.published.size === 1) {
+      remote.tags.get("meowjsx")!.dev = "1.0.0";
+      moved = true;
+    }
+    return remote.runner(args, cwd);
+  };
+  await expect(
+    release(plan, runner, "execute", () => {}, { reads: 2, pause: async () => {} }),
+  ).rejects.toThrow("dev changed during alpha release");
+  expect(remote.mutations.filter((call) => call[1] === "dist-tag")).toHaveLength(0);
+});
+
+test("an uncertain dev dist-tag aborts without a second attempt", async () => {
+  const { plan, local } = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
+  const remote = external(plan, local);
+  remote.failTag("meowjsx@1.2.3-alpha.0");
+  await expect(release(plan, remote.runner)).rejects.toThrow("outcome uncertain");
+  expect(remote.mutations.filter((call) => call[1] === "dist-tag")).toHaveLength(1);
+});
+
+test("the verified receipt records the dev move and stays null on stable", async () => {
+  const alpha = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
+  const alphaRemote = external(alpha.plan, alpha.local);
+  const moved: Record<string, unknown>[] = [];
+  await release(alpha.plan, alphaRemote.runner, "execute", (record) => moved.push(record));
+  expect(moved[0]).toMatchObject({
+    name: "meowjsx",
+    distTag: "alpha",
+    devBefore: null,
+    devAfter: "1.2.3-alpha.0",
+    devAction: "moved",
+    action: "publish",
+  });
+
+  const already = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
+  const alreadyRemote = external(already.plan, already.local);
+  alreadyRemote.tags.get("meowjsx")!.dev = "1.2.3-alpha.0";
+  const kept: Record<string, unknown>[] = [];
+  await release(already.plan, alreadyRemote.runner, "execute", (record) => kept.push(record));
+  expect(kept[0]).toMatchObject({ devAction: "already" });
+  expect(alreadyRemote.mutations.filter((call) => call[1] === "dist-tag")).toEqual([]);
+
+  const stable = await fixture(1);
+  const stableRemote = external(stable.plan, stable.local);
+  const stableRecords: Record<string, unknown>[] = [];
+  await release(stable.plan, stableRemote.runner, "execute", (record) =>
+    stableRecords.push(record),
+  );
+  expect(stableRecords[0]).toMatchObject({ devBefore: null, devAfter: null, devAction: null });
+  expect(stableRemote.mutations.filter((call) => call[1] === "dist-tag")).toEqual([]);
+});
+
+test("check mode previews the dev action without mutating", async () => {
+  const { plan, local } = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
+  const remote = external(plan, local);
+  const logs: string[] = [];
+  const original = console.log;
+  console.log = (...args: unknown[]) => {
+    logs.push(args.join(" "));
+  };
+  try {
+    await release(plan, remote.runner, "check");
+  } finally {
+    console.log = original;
+  }
+  expect(remote.mutations).toEqual([]);
+  const preview = logs
+    .map((line) => {
+      try {
+        return JSON.parse(line);
+      } catch {
+        return null;
+      }
+    })
+    .find((value) => value?.devPreview);
+  expect(preview.devPreview).toEqual([
+    { name: "meowjsx", version: "1.2.3-alpha.0", dev: null, action: "would-move" },
+  ]);
 });
 
 test("all packages preflight before mutation; conflicts and tag downgrades fail closed", async () => {
@@ -365,10 +476,12 @@ test("accepted publication waits for matching bytes and tag without uploading tw
       pauses.push(ms);
     },
   });
-  expect(reads).toBe(4);
+  expect(reads).toBe(6);
   expect(pauses).toEqual([30000, 30000, 30000]);
-  expect(remote.mutations).toHaveLength(1);
-  expect(remote.mutations[0]![1]).toBe("publish");
+  expect(remote.mutations.filter((call) => call[1] === "publish")).toHaveLength(1);
+  expect(remote.mutations.filter((call) => call[1] === "dist-tag")).toEqual([
+    ["npm", "dist-tag", "add", "meowjsx@1.2.3-alpha.0", "dev"],
+  ]);
 });
 
 test("visibility timeout and concurrent changes stop after one mutation", async () => {
@@ -638,7 +751,9 @@ test("public GET transport supports a first alpha with no latest and retries the
   const { plan, local } = await fixture(1, "*", "1.2.3-alpha.0", true, { channel: "alpha" });
   const item = plan.packages[0]!;
   let published = false;
-  let mutations = 0;
+  let devTag: string | undefined;
+  let publishes = 0;
+  let tagMoves = 0;
   let reads = 0;
   const server = Bun.serve({
     hostname: "127.0.0.1",
@@ -649,7 +764,7 @@ test("public GET transport supports a first alpha with no latest and retries the
       return published
         ? Response.json({
             name: item.name,
-            "dist-tags": { alpha: item.version },
+            "dist-tags": devTag ? { alpha: item.version, dev: devTag } : { alpha: item.version },
             versions: { [item.version]: { dist: { integrity: item.integrity } } },
           })
         : Response.json({ error: "Not found" }, { status: 404 });
@@ -667,15 +782,21 @@ test("public GET transport supports a first alpha with no latest and retries the
       if (args[0] !== "npm") return local(args, cwd);
       if (args[1] === "whoami") return result('"tester"');
       if (args[1] === "access") return result('{"meowjsx":"read-write"}');
+      if (args[1] === "dist-tag") {
+        tagMoves++;
+        devTag = item.version;
+        return result();
+      }
       expect(args[1]).toBe("publish");
-      mutations++;
+      publishes++;
       published = true;
       return result();
     };
     await release(plan, runner);
     await release(plan, runner);
-    expect(mutations).toBe(1);
-    expect(reads).toBe(6);
+    expect(publishes).toBe(1);
+    expect(tagMoves).toBe(1);
+    expect(reads).toBe(8);
   } finally {
     globalThis.fetch = originalFetch;
     await server.stop(true);

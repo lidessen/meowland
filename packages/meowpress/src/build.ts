@@ -200,6 +200,9 @@ async function writeConsumerPages(
   return entrypoints;
 }
 
+/** Files the build writes itself; a page's Markdown copy may not take their place. */
+const RESERVED_MARKDOWN = new Set(["agents.md"]);
+
 /** Each page's Markdown copy, written straight into the output next to its route. */
 async function writeConsumerMarkdown(
   outputDirectory: string,
@@ -207,6 +210,8 @@ async function writeConsumerMarkdown(
 ): Promise<void> {
   for (const page of pages) {
     if (page.markdown === undefined) continue;
+    if (RESERVED_MARKDOWN.has(sitePageMarkdownFile(page.path)))
+      throw new Error(`Site page Markdown would replace the agent index: ${page.path}`);
     await writePage(
       outputDirectory,
       consumerPageFile(outputDirectory, page.path, sitePageMarkdownFile),

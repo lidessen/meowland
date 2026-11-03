@@ -68,6 +68,11 @@ describe("the Markdown copies", () => {
     );
   });
 
+  test("a fence line with an info string does not close a fence", () => {
+    const body = ["```md", "```ts", '<StoryCanvas story="kept" />', "```", "```"].join("\n");
+    expect(plainMarkdown(body)).toBe(body);
+  });
+
   test("story scaffolding is named, package exports and local components are not", () => {
     const source = `
       function Row() { return <Inline />; }
@@ -77,6 +82,16 @@ describe("the Markdown copies", () => {
       </Specimens>
     `;
     expect(storyHelpers(source)).toEqual(["Specimens", "Specimen", "Measure"]);
+  });
+
+  test("generics, types and bound names are not tags", () => {
+    const source = `
+      const sort = signal<TableSort | undefined>(undefined);
+      const node = event.target.closest<HTMLElement>("li");
+      type Row = { id: string };
+      <Stack>{marks.map(([name, Graphic]) => <Graphic />)}{ok && <Frame />}</Stack>
+    `;
+    expect(storyHelpers(source)).toEqual(["Frame"]);
   });
 
   test("the install command takes the documented channel for the package and its peers", () => {

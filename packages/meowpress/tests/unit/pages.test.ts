@@ -210,6 +210,14 @@ test("a consumer page path stays inside the site root", async () => {
         ],
       });
 
+    await expect(
+      buildSite({
+        content,
+        skillsDirectory: root,
+        outputDirectory: output,
+        pages: () => [{ path: "agents", title: "Agents", html: "<p></p>", markdown: "# Agents" }],
+      }),
+    ).rejects.toThrow("would replace the agent index");
     await expect(build("../escaped")).rejects.toThrow("stays inside the site root");
     expect(await Bun.file(join(root, "escaped/index.html")).exists()).toBe(false);
     await expect(build("components/../../escaped")).rejects.toThrow("stays inside the site root");

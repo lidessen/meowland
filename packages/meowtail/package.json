@@ -1,6 +1,6 @@
 {
   "name": "meowtail",
-  "version": "0.4.0-alpha.1",
+  "version": "0.4.0-alpha.2",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -68,8 +68,8 @@
     "shiki": "4.3.1"
   },
   "peerDependencies": {
-    "meowjsx": "^0.3.0-alpha.0",
-    "meowcss": "^0.3.0-alpha.0"
+    "meowjsx": "^0.3.0-alpha.1",
+    "meowcss": "^0.3.0-alpha.2"
   },
   "devDependencies": {
     "@fontsource-variable/inter": "^5.3.0",

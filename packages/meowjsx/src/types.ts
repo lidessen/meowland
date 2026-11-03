@@ -207,6 +207,19 @@ export interface RuntimePluginContext {
   onCleanup(cleanup: Cleanup): void;
 }
 export type RuntimePluginSetup = (context: RuntimePluginContext) => void | Cleanup;
+/** What a target renderer hands a plugin when it prepares a container for a mount. */
+export interface ContainerContext {
+  readonly runtime: Runtime;
+  /** The node the target renders into; meowjsx/web passes the container Element. */
+  readonly container: unknown;
+  /** The target that mounts, such as "web"; a plugin narrows `container` by it. */
+  readonly target: string;
+}
+/**
+ * Prepares a container before a target renders into it, such as delivering a stylesheet to its
+ * document. The returned cleanup runs after that mount's tree is removed.
+ */
+export type PrepareContainerHook = (context: ContainerContext) => void | Cleanup;
 export type RuntimePlugin = {
   name?: string;
   enforce?: RuntimePluginEnforce;
@@ -214,6 +227,8 @@ export type RuntimePlugin = {
   create?: CreateHook;
   render?: RenderHook;
   resolveComponent?: ResolveComponentHook;
+  /** Runs when a target renderer mounts into a container; not for static output. */
+  prepareContainer?: PrepareContainerHook;
   shadows?: readonly AnyShadowDefinition[];
   overrides?: Record<string, Component<any>>;
   components?: readonly RegisteredComponent[];
@@ -251,6 +266,12 @@ export interface RuntimeTargetHooks {
   };
   transformVNode(vnode: VNode): VNode;
   replacementFor(vnode: VNode): Component<any, any> | undefined;
+  /**
+   * Runs the installed plugins' `prepareContainer` hooks for one container, in plugin order, and returns
+   * the cleanup that releases them in reverse. A target renderer calls it before rendering into
+   * the container and calls the cleanup after the tree is removed.
+   */
+  prepareContainer(container: unknown, target: string): Cleanup;
 }
 export type FragmentComponent = (props: { children?: Child }) => Child;
 export type HFactory = {

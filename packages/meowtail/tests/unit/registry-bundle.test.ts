@@ -38,6 +38,18 @@ test("Button-only public registry bundle excludes optional engines from every ou
   for (const output of outputs) expect(output.text).not.toMatch(engine);
 });
 
+test("registration alone leaves theme delivery and the focus tracker out", async () => {
+  const entryPath = Bun.resolveSync("meowtail", repository);
+  const outputs = await bundleSource(`
+    import { Button, createMeowUI } from ${JSON.stringify(entryPath)};
+    export const plugin = createMeowUI({ components: [Button] });
+  `);
+  for (const output of outputs) {
+    expect(output.text).not.toContain("data-meowui-focus-modality");
+    expect(output.text).not.toContain("meow-ui-theme");
+  }
+});
+
 test("standard theme bundle excludes optional engines from every output", async () => {
   const themePath = Bun.resolveSync("meowtail/theme", repository);
   const outputs = await bundleSource(`

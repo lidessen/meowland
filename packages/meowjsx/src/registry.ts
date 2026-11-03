@@ -14,6 +14,7 @@ import type {
   RegisteredComponent,
   RenderHook,
   ResolveComponentHook,
+  PrepareContainerHook,
   Runtime,
   RuntimePluginEnforce,
   ShadowRegistry,
@@ -30,6 +31,7 @@ export interface RuntimeState {
   createHooks: HookEntry<CreateHook>[];
   renderHooks: HookEntry<RenderHook>[];
   resolveComponentHooks: HookEntry<ResolveComponentHook>[];
+  containerHooks: HookEntry<PrepareContainerHook>[];
   shadowRegistry: ShadowRegistry;
   overrides: Map<string, Component<any>>;
 }

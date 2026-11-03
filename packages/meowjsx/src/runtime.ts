@@ -32,6 +32,7 @@ import type {
   ComponentMeta,
   Component,
   HFactory,
+  PrepareContainerHook,
   ShadowDefinition,
   ShadowSetup,
   CreateHook,
@@ -69,6 +70,7 @@ export type {
   LifecycleScope,
   MaybeSignal,
   MountResult,
+  PrepareContainerHook,
   Props,
   ReadableSignal,
   RegisteredComponent,
@@ -79,6 +81,7 @@ export type {
   ResolveComponentContext,
   ResolveComponentHook,
   Runtime,
+  ContainerContext,
   RuntimeOptions,
   RuntimePlugin,
   RuntimePluginContext,
@@ -161,12 +164,15 @@ export function createRuntime(options: RuntimeOptions = {}): Runtime {
     createHooks: [],
     renderHooks: [],
     resolveComponentHooks: [],
+    containerHooks: [],
     shadowRegistry: createShadowRegistry(options.shadows),
     overrides: new Map(Object.entries(options.overrides ?? {})),
   };
   const registry = createComponentRegistry(options.components ?? []);
 
   const runtime = {} as Runtime;
+  // The cleanups each mount hook still owes, so uninstalling its plugin can release them.
+  const activeMounts = new Map<HookEntry<PrepareContainerHook>, Set<Cleanup>>();
 
   const installPlugin = (plugin: RuntimePlugin): Cleanup => {
     let createEntry: HookEntry<CreateHook> | undefined;
@@ -216,6 +222,17 @@ export function createRuntime(options: RuntimeOptions = {}): Runtime {
       if (plugin.render) {
         renderEntry = addHook(state.renderHooks, plugin.render, plugin.enforce);
         contributionCleanups.push(() => removeHook(state.renderHooks, renderEntry!));
+      }
+      if (plugin.prepareContainer) {
+        const entry = addHook(state.containerHooks, plugin.prepareContainer, plugin.enforce);
+        const owed = new Set<Cleanup>();
+        activeMounts.set(entry, owed);
+        contributionCleanups.push(() => {
+          removeHook(state.containerHooks, entry);
+          activeMounts.delete(entry);
+        });
+        // Runs before the hook is removed: a mount the plugin prepared does not outlive it.
+        contributionCleanups.push(() => disposeCleanups([...owed]));
       }
       if (plugin.resolveComponent) {
         const entry = addHook(state.resolveComponentHooks, plugin.resolveComponent, plugin.enforce);
@@ -329,6 +346,38 @@ export function createRuntime(options: RuntimeOptions = {}): Runtime {
     },
     transformVNode: (vnode) => runRenderHooks(state, runtime, vnode),
     replacementFor: (vnode) => replacementFor(state, vnode),
+    prepareContainer(container, target) {
+      const acquired: Cleanup[] = [];
+      try {
+        for (const entry of state.containerHooks.slice()) {
+          const cleanup = entry.handler({ runtime, container, target });
+          if (typeof cleanup !== "function") continue;
+          const owed = activeMounts.get(entry);
+          let released = false;
+          const once: Cleanup = () => {
+            if (released) return;
+            released = true;
+            owed?.delete(once);
+            cleanup();
+          };
+          owed?.add(once);
+          acquired.push(once);
+        }
+      } catch (error) {
+        try {
+          disposeCleanups(acquired);
+        } catch {
+          // Preserve the mount hook's error; rollback is best-effort.
+        }
+        throw error;
+      }
+      let active = true;
+      return () => {
+        if (!active) return;
+        active = false;
+        disposeCleanups(acquired);
+      };
+    },
   };
   const createRenderer = <TNode>(
     strategy: RenderStrategy<TNode>,

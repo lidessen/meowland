@@ -51,3 +51,28 @@ test("existing host configuration updates, restores inheritance and disposes sub
   expect(attributes.get("data-meowui-color-scheme")).toBe("light");
   clear();
 });
+
+test("holders of the same stylesheet in one document share one style element", async () => {
+  const { Window } = await import("happy-dom");
+  const { mountStyles } = await import("meowcss/web");
+  const document = new Window().document as unknown as Document;
+  const count = (text: string) =>
+    [...document.head.querySelectorAll("style")].filter((style) => style.textContent === text)
+      .length;
+  const first = mountStyles(document, "a{}");
+  const second = mountStyles(document, "a{}");
+  const other = mountStyles(document, "b{}");
+  expect(count("a{}")).toBe(1);
+  expect(count("b{}")).toBe(1);
+  first();
+  first();
+  expect(count("a{}")).toBe(1);
+  second();
+  expect(count("a{}")).toBe(0);
+  // A later holder gets a fresh element.
+  const third = mountStyles(document, "a{}");
+  expect(count("a{}")).toBe(1);
+  third();
+  other();
+  expect(document.head.querySelectorAll("style")).toHaveLength(0);
+});

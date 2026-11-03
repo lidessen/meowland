@@ -3,39 +3,38 @@
 Meowtail provides cross-application components, semantic layout, the standard theme and the complete
 Assistant composition. Networking, execution, permissions and persistence stay with the host.
 
-## Three steps to a working page
+## Two plugins and a render
 
-Register the components on the runtime that renders the page, deliver the stylesheet, then bind the
-theme root. This browser entry assumes the page contains `<main id="app"></main>`.
+Install two plugins on the runtime that renders the page: `createMeowUI` registers the components
+and `createMeowUITheme` delivers the theme to every mount. This browser entry assumes the page
+contains `<main id="app"></main>`.
 
 ```tsx
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
-import { applyTheme, mountStyles } from "meowcss/web";
 import { Button, createMeowUI } from "meowtail";
 import { standardTheme } from "meowtail/theme";
+import { createMeowUITheme } from "meowtail/web";
 
 const host = document.querySelector<HTMLElement>("#app");
 if (!host) throw new Error("Missing app root");
 
-const runtime = createRuntime();
-const uninstall = runtime.use(createMeowUI({ components: [Button] }));
-const removeStyles = mountStyles(host.ownerDocument, standardTheme.cssText);
-const removeTheme = applyTheme(host, standardTheme);
+const runtime = createRuntime({
+  plugins: [createMeowUI({ components: [Button] }), createMeowUITheme({ theme: standardTheme })],
+});
 const mounted = createWebRenderer(runtime).render(<Button>Save</Button>, host);
 
 export function dispose() {
   mounted.unmount();
-  removeTheme();
-  removeStyles();
-  uninstall();
 }
 ```
 
-Call `dispose` when the host is destroyed. Component imports, registration and theme delivery each
-have a separate job. Register every family rendered by the host and its compositions. A host that
-needs the full catalog can import `meowUIComponents` from `meowtail` and pass it as `components`.
-The selective factory does not import the full catalog itself.
+For each mount, the theme plugin puts the stylesheet in the document once, binds the theme root to
+the container and tracks focus modality; `unmount()` releases all of it. Register every family
+rendered by the host and its compositions. A host that needs the full catalog can import
+`meowUIComponents` from `meowtail` and pass it as `components`; the selective factory does not
+import the full catalog itself. Static pages deliver the CSS at build time instead; see the package
+README for that path.
 
 The standard theme provides typography, component rules and utility classes. It does not reset
 `html` or `body` margins or allocate the page layout. Compose a page with `Page`, `Stack`, `Inline`

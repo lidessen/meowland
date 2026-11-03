@@ -34,11 +34,35 @@ export function applyTheme(
 }
 
 /** Dynamic hosts own the returned stylesheet lifetime; static hosts emit cssText directly. */
+/** One `<style>` per document and stylesheet text, with the number of holders still using it. */
+const stylesheets = new WeakMap<Document, Map<string, { count: number; element: Element }>>();
+
+/**
+ * Puts `cssText` in the document head and returns the cleanup. Holders of the same text share one
+ * `<style>`, which the last cleanup removes, so a host and a runtime plugin delivering the same
+ * theme do not paint it twice. Each cleanup counts once.
+ */
 export function mountStyles(document: Document, cssText: string): () => void {
-  const style = document.createElement("style");
-  style.textContent = cssText;
-  document.head.append(style);
-  return () => style.remove();
+  let sheets = stylesheets.get(document);
+  if (!sheets) stylesheets.set(document, (sheets = new Map()));
+  let entry = sheets.get(cssText);
+  if (!entry) {
+    const element = document.createElement("style");
+    element.textContent = cssText;
+    document.head.append(element);
+    sheets.set(cssText, (entry = { count: 0, element }));
+  }
+  entry.count++;
+  const shared = entry;
+  const owner = sheets;
+  let released = false;
+  return () => {
+    if (released) return;
+    released = true;
+    if (--shared.count > 0) return;
+    shared.element.remove();
+    owner.delete(cssText);
+  };
 }
 
 export interface ThemeProps {

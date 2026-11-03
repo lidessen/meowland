@@ -16,6 +16,18 @@ Synchronous HTML output follows the same ancestor rule, but still does not suppo
 It is called in the order `pre`, normal, `post`, and within each group's registration order; the first non-`undefined` result wins, and returning the original function also stops resolution; the result is not resolved recursively. Selection happens before the lifecycle scope is created, and the selected component uses its own metadata, parts and cleanup logic while the original component does not execute. `props` is a read-only typed view and does not copy or freeze the object.
 
 This hook belongs to the execution runtime: pre-created VNodes, Signal/Promise deferred mounts and synchronous HTML all apply. The cleanup returned by `runtime.use()` unmounts rules and does not rewrite already mounted instances; other runtimes are unaffected.
+
+`RuntimePlugin.prepareContainer({ runtime, container, target })` prepares a container before a target
+renderer mounts into it, such as delivering a stylesheet to its document, and returns the cleanup.
+The core types the container as `unknown`; the plugin narrows it by `target` (`"web"` passes the
+container Element). `runtime.targetHooks.prepareContainer(container, target)` runs the hooks in
+`pre`, normal, `post` order and returns one cleanup that releases them in reverse; a target calls it,
+hosts do not. `meowjsx/web` `render` prepares the container before the tree mounts and releases it
+after `unmount()` removes the tree. If a hook or the synchronous first render throws, what was
+acquired is released and the error propagates; asynchronous render failures go to `onError` and
+release nothing early. Release continues past a failing cleanup and rethrows the first error.
+`renderToHtml` runs no hook. Uninstalling a plugin releases the containers it prepared, and a plugin
+installed after a render reaches only later renders.
 It does not intercept module side effects or direct function calls, and does not change the meaning of the `create` / `render` hooks.
 
 ## Development metadata and instance observation

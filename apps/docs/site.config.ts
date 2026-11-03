@@ -1,6 +1,8 @@
 import { resolve } from "node:path";
 import { meowSite, type SiteConfig } from "meowpress/build";
 import { buildPages, type DocsState } from "./pages";
+import { AGENT_GUIDE } from "./agent-guide";
+import { withMarkdown } from "./markdown";
 import { StoryCanvas } from "./mdx";
 import { journalFonts } from "meowtail/theme";
 import { docsTheme } from "./theme";
@@ -30,7 +32,9 @@ export function createSiteConfig(state: DocsState, outputDirectory: string): Sit
     fonts: journalFonts,
     // The provider paints the pages with the theme the configuration resolved,
     // so there is one theme and one way to reach it.
-    pages: ({ posts, theme }) => buildPages(state, posts, theme),
+    pages: ({ posts, theme }) => withMarkdown(buildPages(state, posts, theme), state, posts),
+    // Every page also has a Markdown copy; llms.txt opens with what an agent needs first.
+    agentGuide: AGENT_GUIDE,
     mdxComponents: { StoryCanvas },
   });
 }

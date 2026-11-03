@@ -16,6 +16,20 @@ A standalone Bun / TypeScript UI toolkit repository. The original five packages 
 The [Meowtail component catalog](packages/meowtail/COMPONENTS.md) lists the components by purpose
 and records their current status.
 
+## Building with an agent
+
+Coding agents get the same entry points people do, in the form they read best:
+
+- **Skill.** `npx skills add lidessen/meowland --skill meowland` installs the
+  [Meowland skill](skills/meowland/SKILL.md) in an application: the install channel, the JSX
+  configuration, the one-time setup, how to find and read a component, the signal rules that replace
+  React habits, and styling with `ui` values and tokens instead of utility classes.
+- **Markdown docs.** Every page of [meowland.dev](https://meowland.dev) has a Markdown copy next to
+  its route (`/components/button.md`). [`llms.txt`](https://meowland.dev/llms.txt) opens with what to
+  know before writing code and links each page; `llms-full.txt` holds all of them in one file.
+- **Version-matched docs.** The `meowtail` package ships its README, component catalog, authoring
+  guide and type declarations, so an agent can read the installed version from `node_modules`.
+
 [`apps/showcase`](apps/showcase/README.md) is a private showcase board, not a sixth published package. This round's complete Assistant and finite JSON-to-UI work have completed local implementation and limited independent acceptance; see the [local migration receipt](docs/local-migration-receipt.md) for the actual same-source inputs, artifacts and uncovered scope. Passing earlier mixed artifacts is not evidence for this round's same-source work, and does not mean the Rossovia product has switched or been released.
 
 Browser presentations start from the [MDX authoring example](examples/presentation/README.md); authoring methods are in the [presentation-authoring skill](.agents/skills/presentation-authoring/SKILL.md). Regular authors maintain scripts, assets and any necessary MeowJSX interactive components; shared playback, default themes, builds and previews come from `meowslides`, with Meowbook used for extra review. [The image-loading explainer](examples/image-loading/README.md) is a complete five-page custom interactive work built around encoding, network-speed estimates and real controlled screen recordings; its source, dedicated animations and review tools each have an owner, while generic audio-track display lives in the package stories. This is the first browser deliverable; PPT export is left for later. [The package split and MDX design](docs/designs/2026-10-18-presentation-package-mdx.md) records responsibilities and trust boundaries; the early history is in the [original implementation receipt](docs/records/2026-10-17-presentation-authoring.md).

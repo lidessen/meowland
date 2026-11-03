@@ -12,6 +12,10 @@ The presentation player, Reveal, media lifecycle, presentation content layouts, 
 
 This package's npm name is `meowtail`; existing APIs such as `createMeowUI`, `installMeowUI`, and `createMeowUICatalog`, along with runtime style identity, stay unchanged. Use the new package import path; do not derive new function names, `data-*` markers, or CSS variables from the package name.
 
+Agents building an application with this package start with the
+[Meowland skill](https://github.com/lidessen/meowland/blob/main/skills/meowland/SKILL.md) (`npx skills add lidessen/meowland --skill meowland`)
+and the Markdown component pages listed in [meowland.dev/llms.txt](https://meowland.dev/llms.txt).
+
 Application authors writing their own components (the shadcn/ui and Tailwind equivalents, the style floor and the audit) start with [Authoring](AUTHORING.md). See [Assistant](ASSISTANT.md) for the usage contract of the complete composition and [JSON catalog](JSON.md) for the finite JSON entry point. Implementation and independent acceptance of both are still in progress; the API descriptions and early artifact verification on this page do not equal a same-source acceptance pass for all current source code.
 
 ## Runtime compatibility

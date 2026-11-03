@@ -38,6 +38,7 @@ const packages: DocsPackage[] = [
     version: "0.2.0",
     summary: "The component library.",
     path: "packages/meowtail",
+    install: "bun add meowtail@dev meowjsx@dev meowcss@dev",
   },
 ];
 

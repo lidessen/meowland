@@ -1,5 +1,5 @@
-import { readdir } from "node:fs/promises";
-import { resolve } from "node:path";
+import { cp, mkdir, readdir } from "node:fs/promises";
+import { dirname, resolve } from "node:path";
 import { buildStories, discoverStories } from "meowbook/bun";
 import { buildSite } from "meowpress/build";
 import { buildCatalog } from "./catalog";
@@ -21,6 +21,9 @@ import slidesConfig from "./slides.meowbook.config";
 
 /** The repository root. */
 export const root = resolve(import.meta.dir, "../..");
+
+/** The skill for agents that build with the packages, published at the same path on the site. */
+export const AGENT_SKILL = "skills/meowland/SKILL.md";
 
 /** Where the site is written. */
 export const outputDirectory = resolve(import.meta.dir, "dist");
@@ -63,6 +66,9 @@ export async function buildDocs(): Promise<void> {
   await highlightStaticCode(outputDirectory);
   await writeSearchIndex(outputDirectory);
   await writeFavicon(outputDirectory);
+  // The consumer skill is published as written, so an agent without the Skills CLI can read it.
+  await mkdir(dirname(resolve(outputDirectory, AGENT_SKILL)), { recursive: true });
+  await cp(resolve(root, AGENT_SKILL), resolve(outputDirectory, AGENT_SKILL));
 
   // The site build fingerprints the marks again, so the playgrounds take the names it wrote.
   const written = await readdir(outputDirectory);

@@ -81,7 +81,7 @@ function inheritedText(extended: readonly string[]): string | undefined {
     lines.push(
       "It also takes exactly one of these shapes:",
       "",
-      ...unions.map((shape) => `- \`${cell(shape)}\``),
+      ...unions.map((shape) => `- \`${shape.replace(/\s+/g, " ").trim()}\``),
     );
   return lines.length ? lines.join("\n") : undefined;
 }
@@ -123,11 +123,18 @@ export function propsMarkdown(
  * package.
  */
 export function storyHelpers(source: string): string[] {
-  const local = new Set(
-    [...source.matchAll(/(?:function|const|let|class)\s+([A-Z][\w$]*)/g)].map((match) => match[1]!),
-  );
+  const local = new Set([
+    // Declared here: functions, variables, classes and types.
+    ...[...source.matchAll(/(?:function|const|let|var|class|type|interface)\s+([A-Z][\w$]*)/g)].map(
+      (match) => match[1]!,
+    ),
+    // Bound here: a parameter or a destructured name, such as `([name, Graphic]) =>`.
+    ...[...source.matchAll(/[[(,{]\s*([A-Z][\w$]*)\s*(?=[\]),}=:])/g)].map((match) => match[1]!),
+  ]);
   const helpers = new Set<string>();
-  for (const match of source.matchAll(/<([A-Z][\w$]*)[\s/>]/g)) {
+  // A tag only where an expression can start, so a generic such as `signal<Child>()` is no tag.
+  const tags = /(?:^|[\s(){},;:?>=&|[]|return)<([A-Z][\w$]*)[\s/>]/g;
+  for (const match of source.matchAll(tags)) {
     const name = match[1]!;
     if (name === "Fragment" || local.has(name)) continue;
     if (name in meowtail || name in meowtailIcons) continue;
@@ -280,7 +287,13 @@ export function plainMarkdown(body: string): string {
   for (const line of body.split("\n")) {
     const marks = /^\s*(`{3,}|~{3,})/.exec(line)?.[1];
     if (fenceMarks) {
-      if (marks && marks[0] === fenceMarks[0] && marks.length >= fenceMarks.length)
+      // A closing fence carries no info string.
+      if (
+        marks &&
+        marks[0] === fenceMarks[0] &&
+        marks.length >= fenceMarks.length &&
+        /^\s*[`~]+\s*$/.test(line)
+      )
         fenceMarks = undefined;
       out.push(line);
       continue;

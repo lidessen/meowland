@@ -27,8 +27,9 @@ Coding agents get the same entry points people do, in the form they read best:
 - **Markdown docs.** Every page of [meowland.dev](https://meowland.dev) has a Markdown copy next to
   its route (`/components/button.md`). [`llms.txt`](https://meowland.dev/llms.txt) opens with what to
   know before writing code and links each page; `llms-full.txt` holds all of them in one file.
-- **Version-matched docs.** The `meowtail` package ships its README, component catalog, authoring
-  guide and type declarations, so an agent can read the installed version from `node_modules`.
+- **Version-matched docs.** The `meowtail` package ships its README, component catalog and type
+  declarations, so an agent can read the installed version from `node_modules`; releases after
+  `0.4.0-alpha.1` also ship the authoring guide.
 
 [`apps/showcase`](apps/showcase/README.md) is a private showcase board, not a sixth published package. This round's complete Assistant and finite JSON-to-UI work have completed local implementation and limited independent acceptance; see the [local migration receipt](docs/local-migration-receipt.md) for the actual same-source inputs, artifacts and uncovered scope. Passing earlier mixed artifacts is not evidence for this round's same-source work, and does not mean the Rossovia product has switched or been released.
 

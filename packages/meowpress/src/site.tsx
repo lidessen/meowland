@@ -1266,7 +1266,11 @@ function consumerLlmText(
     ]),
     "## Optional",
     "",
-    ...(full ? ["- [Full text](/llms-full.txt): every page below as Markdown, in one file"] : []),
+    ...(full
+      ? [
+          "- [Full text](/llms-full.txt): every page linked here as Markdown, in one file; large, so fetch single pages first",
+        ]
+      : []),
     "- [Agent Markdown](/agents.md): the site map",
     "",
   ].join("\n");

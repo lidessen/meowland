@@ -101,11 +101,11 @@ mountMeowland(document.querySelector<HTMLElement>("#app")!, () => <App />);
   instead of `standardTheme.cssText`).
 - Other themes: `journalTheme` and `meowTheme` from `meowtail/theme`. `scheme` is `"light"`,
   `"dark"` or `"auto"`. A static or server-rendered page writes the CSS to a file and uses
-  `themeAttributes` instead; see "Component installation and style delivery" in the meowtail README.
+  `themeAttributes` from `meowcss` instead; see "Component installation and style delivery" in the meowtail README.
 
 ## 4. Find the component before writing markup
 
-Meowtail has about 130 components, including complete compositions: `PageFrame` and page shells,
+Meowtail has about 140 components, including complete compositions: `PageFrame` and page shells,
 `Form`, `Dialog`, `Table`, `Tabs`, `CommandPalette`, chat parts and the whole `AssistantView`.
 Writing a `<div>` structure for something the library has is the most common mistake.
 
@@ -151,7 +151,8 @@ export function Counter({ step = 1 }: { step?: number }) {
 - Derive with `derived(() => ...)` or `mapSignal(source, fn)`. Do not write one signal from an
   effect to mirror another.
 - Show and hide with the `hidden` attribute bound to a Signal; render lists with
-  `keyed(items, key, render)` from `meowjsx`. A Signal whose value is a whole JSX subtree remounts
+  `keyed(items, key, render)` from `meowjsx`. `render` receives each item as a read-only Signal, so
+  bind `mapSignal(item, (row) => row.title)` rather than reading `item.title`. A Signal whose value is a whole JSX subtree remounts
   that subtree on every change and loses focus and drafts.
 - In event handlers read the current value: `count.value` or `unwrap(prop)`.
 - `context.effect(fn)` and `context.onCleanup(fn)` (the component's second argument) are for the
@@ -159,7 +160,7 @@ export function Counter({ step = 1 }: { step?: number }) {
 - Props a component may receive live are typed `MaybeSignal<T>`; a component's docs say when a prop
   such as `items` or `options` is fixed for the mount.
 - Events are DOM events with camel-case names (`onClick`, `onInput`, `onChange`, `onKeyDown`).
-- Presence decides who owns a value. Omit `value` and the component keeps its own state. Pass
+- Presence decides who owns a value. Omit `value` and the component keeps its own state, starting from `defaultValue`. Pass
   `value={selected}` (a Signal) and the host owns it: set `selected.value` in `onValueChange`, or
   the control will not move. `Checkbox` and `Switch` use `checked` with the native `onChange`.
 
@@ -174,8 +175,9 @@ Components arrive styled; a host rarely writes CSS. When it does:
   same tokens. `auditCSS(fragment, standardAuditRules)` reports literals.
 - A host component that needs its own look declares `meta = { name: "app-…", parts: [...] }`, binds
   `ref={context.parts.root}` and gets a `css` fragment addressed with `parts<typeof X>("app-…")`.
-  `node_modules/meowtail/AUTHORING.md` walks through it, including variants with
-  `defineOptions` (the `cva` equivalent).
+  The authoring guide walks through it, including variants with `defineOptions` (the `cva`
+  equivalent): `node_modules/meowtail/AUTHORING.md` in releases after 0.4.0-alpha.1, otherwise
+  [AUTHORING.md on GitHub](https://github.com/lidessen/meowland/blob/main/packages/meowtail/AUTHORING.md).
 - Do not restyle a library component by targeting its internal markup; pass the props, variant
   options or `className` it documents.
 

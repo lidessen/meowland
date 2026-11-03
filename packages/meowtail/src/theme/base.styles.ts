@@ -1,6 +1,7 @@
 import { css } from "meowcss/meowjsx";
 import { logoTokens, uiTokens } from "./tokens";
 import { ui } from "./utilities";
+import { pageAttribute } from "../shared/page-attribute";
 export const cornerShapeStyles = css`
   @supports (corner-shape: superellipse(1.5)) {
     :where([data-meowui-part]),
@@ -28,6 +29,19 @@ export const textEntry = [
 ].join(", ");
 
 export const foundationStyles = css`
+  /* A themed page: the document takes the canvas and tells the browser its scheme, so native
+     controls, scrollbars and the overscroll area match instead of leaving a white page around a
+     dark one. Only the theme plugin marks a page; an embedded region keeps its host's ground. */
+  :where(html[${pageAttribute}][data-meowui-scope]) {
+    background-color: ${uiTokens.surface.canvas};
+    color-scheme: light;
+  }
+  :where(html[${pageAttribute}][data-meowui-color-scheme="dark"]) {
+    color-scheme: dark;
+  }
+  :where(html[${pageAttribute}][data-meowui-color-scheme="auto"]) {
+    color-scheme: light dark;
+  }
   :where(
     [data-meowui-theme-root="meowui"],
     [data-meowui-theme-root="meowui"] *,

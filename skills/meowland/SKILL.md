@@ -190,8 +190,9 @@ Components arrive styled; a host rarely writes CSS. When it does:
   runtime from the one that renders.
 - Look at a narrow viewport (about 390px) and at `scheme: "dark"`; both come from the theme, so a
   layout that breaks there usually hard-codes widths or colors.
-- The theme does not paint `html` or `body`. Give the app's outermost element a page surface, such
-  as `className={ui.bg.canvas}` with the full viewport height, or a dark scheme sits on a white page.
+- With `createMeowUITheme` the page itself takes the theme's canvas and color scheme. A region
+  embedded in someone else's page passes `page: false` and leaves the ground to that page; on
+  0.4.0-alpha.1 and earlier, give the app's outermost element `className={ui.bg.canvas}` instead.
 - Keyboard: Tab through the page; focus rings appear after keystrokes, not after clicks.
 
 ## Boundaries

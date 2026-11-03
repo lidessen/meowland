@@ -55,12 +55,33 @@ export function createWebRenderer(
     const child = options.observation
       ? h(WebObservationContext.Provider, { value: options.observation }, node)
       : node;
-    const mounted = renderer.render(
-      child as unknown as RenderableChild,
-      container as unknown as DomNode,
-      null,
-    );
-    return { unmount: () => mounted.unmount() };
+    // Plugins prepare the container first, so a stylesheet or theme root exists when component
+    // setup and refs run; they are released after the tree is gone.
+    const release = runtime.targetHooks.prepareContainer(container, "web");
+    let mounted: { unmount(): void };
+    try {
+      mounted = renderer.render(
+        child as unknown as RenderableChild,
+        container as unknown as DomNode,
+        null,
+      );
+    } catch (error) {
+      try {
+        release();
+      } catch {
+        // Preserve the render error; the release is best-effort.
+      }
+      throw error;
+    }
+    return {
+      unmount: () => {
+        try {
+          mounted.unmount();
+        } finally {
+          release();
+        }
+      },
+    };
   };
 
   return {

@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+- `createMeowUITheme({ theme, config })` from `meowtail/web` is a runtime plugin that delivers a
+  theme to every Web mount: the stylesheet (shared per document through `meowcss/web`
+  `mountStyles`), the theme attributes on the container and the focus-modality tracker, all
+  released by `unmount()`. A browser page is now `createMeowUI` plus `createMeowUITheme` in one
+  `plugins` list and MeowJSX's `render`. It is built on MeowJSX's new `prepareContainer` plugin hook,
+  refuses a second themed mount into one container and containers inside a shadow root, and stays
+  out of bundles that only register components. See the
+  [design](../../docs/designs/2026-11-03-theme-delivery-plugin.md).
+
 - The package ships `AUTHORING.md`, which the README links as the guide for host components; an
   agent or author can read it from `node_modules/meowtail` at the installed version.
 

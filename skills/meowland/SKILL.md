@@ -7,7 +7,7 @@ description: Build browser UI with Meowland's packages - meowtail components and
 
 Meowland is a component library with its own runtime. If you know shadcn/ui and Tailwind, most
 of the vocabulary carries over, but three habits do not: components are not React, styles are not
-utility classes, and nothing renders styled until the theme is mounted. This skill is the path an
+utility classes, and nothing renders styled until the theme plugin is installed. This skill is the path an
 agent takes in a host application. It does not cover developing the Meowland repository itself.
 
 | You would reach for                | In Meowland                                                               |
@@ -56,51 +56,52 @@ The classic transform also works (`"jsx": "react"`, `"jsxFactory": "h"`,
 settings from `tsconfig.json`; another bundler needs the same automatic runtime and
 `jsxImportSource: "meowjsx"` in its own JSX options.
 
-## 3. Mount once: registry, stylesheet, theme root
+## 3. Install two plugins, then render
 
-A page needs all three on one runtime; missing any one leaves unstyled native controls. Put them in
-one module and render every view through it:
-
-```ts
-// src/meowland.ts
-import { createRuntime, type Child } from "meowjsx";
-import { createWebRenderer } from "meowjsx/web";
-import { applyTheme, mountStyles } from "meowcss/web";
-import { createMeowUI, meowUIComponents } from "meowtail";
-import { standardOptions, standardTheme } from "meowtail/theme";
-import { installFocusModality } from "meowtail/web";
-
-export function mountMeowland(root: HTMLElement, view: () => Child): () => void {
-  const runtime = createRuntime({ plugins: [createMeowUI({ components: meowUIComponents })] });
-  const removeStyles = mountStyles(root.ownerDocument, standardTheme.cssText);
-  const removeTheme = applyTheme(root, standardTheme, standardOptions.select({ scheme: "auto" }));
-  const removeFocusModality = installFocusModality(root.ownerDocument);
-  const mounted = createWebRenderer(runtime).render(view(), root);
-  return () => {
-    mounted.unmount();
-    removeFocusModality();
-    removeTheme();
-    removeStyles();
-  };
-}
-```
+The runtime carries the library: `createMeowUI` registers the components and `createMeowUITheme`
+delivers the theme to every mount (the stylesheet, the theme root on the container and keyboard
+focus rings). Rendering is MeowJSX's own `render`, and `unmount()` releases everything.
 
 ```tsx
 // src/main.tsx
-import { mountMeowland } from "./meowland";
+import { createRuntime } from "meowjsx";
+import { createWebRenderer } from "meowjsx/web";
+import { createMeowUI, meowUIComponents } from "meowtail";
+import { standardTheme } from "meowtail/theme";
+import { createMeowUITheme } from "meowtail/web";
 import { App } from "./app";
 
-mountMeowland(document.querySelector<HTMLElement>("#app")!, () => <App />);
+const runtime = createRuntime({
+  plugins: [
+    createMeowUI({ components: meowUIComponents }),
+    createMeowUITheme({ theme: standardTheme }),
+  ],
+});
+createWebRenderer(runtime).render(<App />, document.querySelector<HTMLElement>("#app")!);
+```
+
+Without the theme plugin, components render as bare native controls and nothing reports an error.
+`meowtail@0.4.0-alpha.1` and earlier do not export `createMeowUITheme`; there, do its work by hand
+on the same root before rendering:
+
+```ts
+import { applyTheme, mountStyles } from "meowcss/web";
+import { installFocusModality } from "meowtail/web";
+
+mountStyles(root.ownerDocument, standardTheme.cssText);
+applyTheme(root, standardTheme);
+installFocusModality(root.ownerDocument);
 ```
 
 - `meowUIComponents` registers the whole library, which is the simplest correct start. To cut the
   bundle later, pass only the components the app renders, including the ones its compositions
   render, for example `components: [Button, Card, Stack]`.
 - Host components with their own `meta` join the same list; their style fragments join the theme
-  through `extendStandardTheme({ styles: [...] })` from `meowtail/theme` (mount its `cssText`
-  instead of `standardTheme.cssText`).
-- Other themes: `journalTheme` and `meowTheme` from `meowtail/theme`. `scheme` is `"light"`,
-  `"dark"` or `"auto"`. A static or server-rendered page writes the CSS to a file and uses
+  through `extendStandardTheme({ styles: [...] })` from `meowtail/theme`; pass that theme to
+  `createMeowUITheme` instead of `standardTheme`.
+- Other themes: `journalTheme` and `meowTheme` from `meowtail/theme`. Choose the scheme with
+  `createMeowUITheme({ theme, config: standardOptions.select({ scheme: "dark" }) })`; it is
+  `"light"`, `"dark"` or `"auto"` (the default), and a Signal `config` switches it live. A static or server-rendered page writes the CSS to a file and uses
   `themeAttributes` from `meowcss` instead; see "Component installation and style delivery" in the meowtail README.
 
 ## 4. Find the component before writing markup
@@ -185,10 +186,12 @@ Components arrive styled; a host rarely writes CSS. When it does:
 
 - Type-check (`tsc --noEmit`), then open the page in a browser. Unit tests and types do not show a
   missing theme.
-- If controls look like bare browser defaults, one of the three mount steps is missing or ran on a
-  different runtime from the one that renders.
+- If controls look like bare browser defaults, the theme plugin is missing or sits on a different
+  runtime from the one that renders.
 - Look at a narrow viewport (about 390px) and at `scheme: "dark"`; both come from the theme, so a
   layout that breaks there usually hard-codes widths or colors.
+- The theme does not paint `html` or `body`. Give the app's outermost element a page surface, such
+  as `className={ui.bg.canvas}` with the full viewport height, or a dark scheme sits on a white page.
 - Keyboard: Tab through the page; focus rings appear after keystrokes, not after clicks.
 
 ## Boundaries

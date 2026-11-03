@@ -27,24 +27,25 @@ The published releases remain listed in the root README.
 
 ## Minimal browser integration
 
-In a browser entry point containing `<main id="app"></main>`, first complete component registration on the same runtime, full CSS loading, and theme root binding, then render content.
-Importing components only, installing the registry only, or using `Theme` only cannot replace these three steps; if any one is missing, the page may still show native controls without the standard theme's sizes and states.
+In a browser entry point containing `<main id="app"></main>`, install two plugins on the runtime that
+renders the page: `createMeowUI` registers the components and `createMeowUITheme` delivers the theme
+to every Web mount. Rendering is then MeowJSX's own `render`.
 
 ```tsx
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { Button, Inline, Stack, createMeowUI } from "meowtail";
-import { standardTheme, standardOptions } from "meowtail/theme";
-import { installFocusModality } from "meowtail/web";
-import { applyTheme, mountStyles } from "meowcss/web";
+import { standardTheme } from "meowtail/theme";
+import { createMeowUITheme } from "meowtail/web";
 
 const root = document.querySelector<HTMLElement>("#app");
 if (!root) throw new Error("Missing app root");
-const runtime = createRuntime();
-const uninstall = runtime.use(createMeowUI({ components: [Button, Inline, Stack] }));
-const removeStyles = mountStyles(root.ownerDocument, standardTheme.cssText);
-const removeTheme = applyTheme(root, standardTheme, standardOptions.select({ scheme: "light" }));
-const removeFocusModality = installFocusModality(root.ownerDocument);
+const runtime = createRuntime({
+  plugins: [
+    createMeowUI({ components: [Button, Inline, Stack] }),
+    createMeowUITheme({ theme: standardTheme }),
+  ],
+});
 const mounted = createWebRenderer(runtime).render(
   <Stack align="start">
     <strong>Connection settings</strong>
@@ -56,15 +57,20 @@ const mounted = createWebRenderer(runtime).render(
   root,
 );
 
-// Dispose with the host that owns this mount.
-const dispose = () => {
-  mounted.unmount();
-  removeFocusModality();
-  removeTheme();
-  removeStyles();
-  uninstall();
-};
+// Dispose with the host that owns this mount; it also releases the theme delivery.
+const dispose = () => mounted.unmount();
 ```
+
+For each mount, `createMeowUITheme` puts `theme.cssText` in the container's document (one shared
+`<style>` per document), binds the theme attributes to the container (`config` selects the scheme
+and other options; a Signal keeps it live) and installs the focus-modality tracker. A second themed
+render into the same container, or a container inside a shadow root, throws instead of leaving a
+page half-styled. Registration alone (`createMeowUI` without the theme plugin) changes nothing in the
+document, and a bundle that only registers components carries no theme delivery. Static output does
+not run the theme plugin; deliver CSS at build time as described in
+[Component installation and style delivery](#component-installation-and-style-delivery).
+Hosts whose theme is assembled with extra CSS, or whose theme root is not the render container,
+keep the explicit `mountStyles` and `applyTheme` steps.
 
 `installFocusModality` from `meowtail/web` makes focus rings follow the keyboard. Browsers disagree on
 `:focus-visible`: Safari also matches it when script moves focus after a tap, so a ring lands on
@@ -72,7 +78,8 @@ what the reader just touched. Like React Aria's input modality, the tracker reco
 input was a pointer or a key on the document element (`data-meowui-focus-modality`). After a pointer,
 the theme hides every outline focus ring until the next keystroke. Text entry (text inputs, textarea,
 select, `contenteditable`, `role="textbox"`) keeps its focus state either way, and a Menu keeps its
-active row. Install it once per document, the canvas iframe of a gallery included; calls are counted.
+active row. `createMeowUITheme` installs it with each mount; a host without that plugin installs it
+once per document, the canvas iframe of a gallery included; calls are counted.
 A page rendered ahead of time inlines `focusModalityScript` instead. Without the tracker, rings follow
 the browser's own `:focus-visible`. Styles inside shadow roots do not see the attribute.
 
@@ -655,7 +662,11 @@ These relationships inform composition; theme values and component behavior are 
 
 ### Component installation and style delivery
 
-Component installation and style loading are two explicit steps. `createMeowUI({ components })` registers
+A browser host normally installs both through the runtime, as in
+[Minimal browser integration](#minimal-browser-integration). The pieces below are what those two
+plugins do, and what a static host or a host with its own delivery uses directly.
+
+`createMeowUI({ components })` registers
 an explicit list of component functions and the style-props adapter. `standardTheme.cssText` provides
 the complete CSS with variable declarations, component rules and built-in utility classes. A dynamic
 host can assemble it like this:
@@ -700,7 +711,9 @@ A static host that bundles that `.css` file with Bun runs `removeLegacyIsFallbac
 `meowcss/bundle` over the output: Bun writes legacy `:-moz-any()` copies of the theme's `:is()`
 rules, and iOS Safari matches one of them on every container of a focused control.
 Source code maintains no `.css` files, and generated CSS is still a browser asset. Module imports themselves do not access the DOM;
-`mountStyles` does not deduplicate across calls, so the host should assemble once within the document or application lifecycle.
+`mountStyles` shares one `<style>` per document and stylesheet text across its holders, including
+`createMeowUITheme`, and the last cleanup removes it; a host that assembles its own CSS text still
+assembles it once per document.
 
 ### Root configuration and local overrides
 

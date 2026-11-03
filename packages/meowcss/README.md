@@ -69,7 +69,8 @@ installed MeowJSX copy is the usual cause.
 ## Web lifecycle
 
 `meowcss/web` provides `applyTheme`, `mountStyles` and the Web JSX `Theme`; that entry requires the DOM and a compatible
-MeowJSX. Style delivery is an explicit operation: `mountStyles(document, theme.cssText)` returns a cleanup function;
+MeowJSX. Style delivery is an explicit operation: `mountStyles(document, theme.cssText)` returns a cleanup function.
+Holders of the same text in one document share one `<style>`, which the last cleanup removes;
 `Theme` only manages the scope attribute, and `applyTheme` can subscribe to a Signal configuration and restore the original attributes on cleanup.
 Importing the module itself does not touch the DOM, automatically register components or automatically load themes.
 

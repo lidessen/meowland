@@ -114,7 +114,8 @@ parts. Hover rules can interpolate `options.attribute` when the selector names t
 explicit `meowUIComponents` catalog covers the full library; a selective host supplies its own list.
 A new library family goes in that catalog, and its fragment goes in `standardThemeStyles`.
 Components do not hand-write generated marker or option attributes. Importing a styles module does
-not insert CSS; the host mounts `standardTheme.cssText`.
+not insert CSS; a browser host installs `createMeowUITheme` from `meowtail/web`, which mounts the
+theme's `cssText` per document, or mounts it itself with `mountStyles`.
 
 ### Design system
 
@@ -525,7 +526,10 @@ component a host can use alone gets its own module (`dialog.tsx` re-exports `dia
 items) or a parent's internal pieces may share a module. `tests/unit/tree-shaking.test.ts` guards
 the token, `ui`, Signal-only, presentation-options and Dialog bundles.
 `standardTheme.cssText` is handed to the host for explicit composition: static builds generate CSS
-assets, dynamic documents use `mountStyles` and clean up; root configuration uses `Theme`,
-`applyTheme`, or `themeAttributes`.
+assets; dynamic documents install `createMeowUITheme` (the theme delivery plugin in `meowtail/web`,
+built on MeowJSX's `prepareContainer` hook) or use `mountStyles` and clean up; root configuration
+uses `Theme`, `applyTheme`, or `themeAttributes`. Theme delivery stays out of the registry factory,
+so a host that only registers components carries no DOM delivery code
+(`tests/unit/registry-bundle.test.ts`).
 Importing style modules does not touch the DOM. Business layout stays in the application; installing
 styles and configuration does not replace component registration.

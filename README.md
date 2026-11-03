@@ -77,6 +77,12 @@ passed local and Actions preparation, but its OIDC publish failed with `ENEEDAUT
 The accepted Slides candidate and the exact publication and registry evidence are in the
 [signal-entry publication receipt](docs/records/2026-10-25-signal-entry-alpha-publication.md).
 
+The agent-support batch is published under `alpha` and `dev` as JSX `0.3.0-alpha.1`, CSS
+`0.3.0-alpha.2`, Tail `0.4.0-alpha.2` and Press `0.3.0-alpha.2`: the runtime `prepareContainer` hook,
+shared stylesheets, `createMeowUITheme` with page painting, and per-page Markdown with the
+llms.txt agent guide. Book and Slides keep their versions. The exact source, bytes and registry
+consumption are in the [agent-support publication receipt](docs/records/2026-11-03-agent-support-alpha-publication.md).
+
 The public source repository is [lidessen/meowland](https://github.com/lidessen/meowland). Current official versions are `meowjsx@0.1.0`, `meowcss@0.1.0`, `meowtail@0.1.0`, `meowbook@0.1.1` and `meowpress@0.1.0`, all of which have completed npm publishing, independent-registry installation acceptance and official GitHub Releases. The original JSX/CSS tags and assets remain unchanged; see the [release receipt](docs/records/2026-10-17-tail-book-press-publish.md) for this batch's exact candidates, artifacts and acceptance scope.
 
 JSX `0.1.1-alpha.1` and Tail `0.2.0-alpha.2` are now published under `alpha` from [source `5b46614`](https://github.com/lidessen/meowland/commit/5b4661479035178a4e0aaa39ee39b4b691387842), with matching local/runner/registry bytes and isolated exact registry consumption accepted. JSX adds `derived`; Tail requires that new JSX baseline and includes the common component batch, live prop bindings, and the corrected Composer surface/actions/external hint. CSS, Book, and Press remain at their existing alpha versions, and all `latest` tags are unchanged. See the [publication receipt](docs/records/2026-10-19-jsx-tail-alpha-publication.md).

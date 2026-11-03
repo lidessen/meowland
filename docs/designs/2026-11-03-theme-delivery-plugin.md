@@ -87,7 +87,12 @@ function createMeowUITheme(options: MeowUIThemeOptions): RuntimePlugin;
 
 On the `web` target its `prepareContainer` hook mounts `theme.cssText` with `mountStyles`, applies
 the theme attributes to the container with `applyTheme` and installs the focus-modality tracker,
-releasing them in reverse. It throws instead of leaving a page half-styled when:
+releasing them in reverse. Unless `page: false`, it also owns the page: the document element takes
+the same theme and selection (the first mount in a document decides, the last releases) and the
+`data-meowui-page` marker, and the foundation styles paint a marked page with `surface.canvas` and
+the matching CSS `color-scheme`. Without that, the theme root set dark ink while `html` stayed white,
+so a dark scheme rendered light text on a white page. Only the plugin marks a page, so static output,
+the documentation site and embedded regions keep their host's ground. It throws instead of leaving a page half-styled when:
 
 - the container is already bound by a theme plugin (a second render into the same container would
   make the two `applyTheme` bindings restore each other's attributes);

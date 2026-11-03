@@ -156,3 +156,51 @@ test("registration alone leaves the document alone", () => {
   expect(root.querySelector("button")?.getAttribute("data-meowui-part")).toBe("button/root");
   mounted.unmount();
 });
+
+test("a themed mount paints the page in its scheme until the last mount releases it", async () => {
+  const document = freshDocument();
+  const html = document.documentElement;
+  const [first, second] = [document.createElement("main"), document.createElement("aside")];
+  const config = signal(standardOptions.select({ scheme: "dark" }));
+  const web = createWebRenderer(themed(config));
+
+  const a = web.render(h(Button, {}, "Save"), first);
+  const b = web.render(h(Button, {}, "Cancel"), second);
+  expect(html.hasAttribute("data-meowui-page")).toBe(true);
+  expect(html.getAttribute("data-meowui-theme-root")).toBe("meowui");
+  expect(html.getAttribute("data-meowui-color-scheme")).toBe("dark");
+  // The page follows a live selection with the container.
+  config.value = standardOptions.select({ scheme: "light" });
+  await Promise.resolve();
+  expect(html.getAttribute("data-meowui-color-scheme")).toBe("light");
+
+  a.unmount();
+  expect(html.hasAttribute("data-meowui-page")).toBe(true);
+  b.unmount();
+  expect(html.hasAttribute("data-meowui-page")).toBe(false);
+  expect(html.hasAttribute("data-meowui-theme-root")).toBe(false);
+});
+
+test("an embedded region leaves the page to its host", () => {
+  const document = freshDocument();
+  const root = document.createElement("main");
+  const runtime = createRuntime({
+    plugins: [
+      createMeowUI({ components: [Button] }),
+      createMeowUITheme({ theme: standardTheme, page: false }),
+    ],
+  });
+  const mounted = createWebRenderer(runtime).render(h(Button, {}, "Save"), root);
+  expect(root.getAttribute("data-meowui-theme-root")).toBe("meowui");
+  expect(document.documentElement.hasAttribute("data-meowui-page")).toBe(false);
+  expect(document.documentElement.hasAttribute("data-meowui-theme-root")).toBe(false);
+  mounted.unmount();
+});
+
+test("the theme paints a marked page with its canvas and color scheme", () => {
+  const css = standardTheme.cssText;
+  expect(css).toContain(":where(html[data-meowui-page][data-meowui-scope])");
+  expect(css).toMatch(
+    /html\[data-meowui-page\]\[data-meowui-color-scheme="dark"\]\)\s*\{\s*color-scheme: dark;/,
+  );
+});

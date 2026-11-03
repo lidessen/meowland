@@ -63,7 +63,12 @@ const dispose = () => mounted.unmount();
 
 For each mount, `createMeowUITheme` puts `theme.cssText` in the container's document (one shared
 `<style>` per document), binds the theme attributes to the container (`config` selects the scheme
-and other options; a Signal keeps it live) and installs the focus-modality tracker. A second themed
+and other options; a Signal keeps it live) and installs the focus-modality tracker. It also owns the
+page: the document element takes the same theme and selection and is marked `data-meowui-page`, so
+the foundation styles paint it with `surface.canvas` and the matching CSS `color-scheme`, and a dark
+scheme never sits on a white page. The first mount in a document sets the page's selection and the
+last one releases it. A region embedded in a page whose ground belongs to the host passes
+`page: false`. A second themed
 render into the same container, or a container inside a shadow root, throws instead of leaving a
 page half-styled. Registration alone (`createMeowUI` without the theme plugin) changes nothing in the
 document, and a bundle that only registers components carries no theme delivery. Static output does
@@ -84,7 +89,7 @@ A page rendered ahead of time inlines `focusModalityScript` instead. Without the
 the browser's own `:focus-visible`. Styles inside shadow roots do not see the attribute.
 
 The theme root provides an inheritable body font, font size, line height, and text color; local theme configuration inherits the outer typography, while components still own their own control and heading scales.
-This does not include a global `html/body` margin reset, page background, or page whitespace, and does not automatically reset arbitrary `h1/h2/p`.
+This does not include a global `html/body` margin reset or page whitespace, and does not automatically reset arbitrary `h1/h2/p`; the page background and color scheme come only from a page that `createMeowUITheme` owns.
 Use `PageFrame` / `Container` for page space, `Stack` for related content, and `Inline` for a group of actions; the complete Assistant can use `AssistantView` directly, without rebuilding a page from bare Cards.
 `CardHeader/Title/Content/Footer` express relationships inside a card, while native content follows document semantics; do not wrap every layer of content in its own surface.
 Compare Meowbook's `buttons`, `card-composition`, and `workspace-composition`; they show action relationships, card structure, and a scrolling workspace respectively. A stress state does not mean the product must display all states at once.

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- The package ships `AUTHORING.md`, which the README links as the guide for host components; an
+  agent or author can read it from `node_modules/meowtail` at the installed version.
+
 - `HoverCard` copy feedback no longer covers the card. On success the copy cue turns into a check and
   `copiedLabel` for 1.5 seconds; on failure the message takes its own line under the content and
   stays until the next attempt or the card closes. The `feedback` part stays the live status, and

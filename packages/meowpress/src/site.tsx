@@ -4,7 +4,7 @@ import { Fragment, h, type Child } from "meowjsx/runtime";
 import { renderToHtml } from "meowjsx/web";
 import { withoutLeadingHeading, type ContentItem } from "./content";
 import { DEFAULT_SITE, type SiteIdentity } from "./identity";
-import { sitePageUrl, type SitePage } from "./pages";
+import { sitePageAgentUrl, type SitePage } from "./pages";
 import type { Skill, SkillFile } from "./skills";
 import { layoutSkillGraph, type SkillGraphNode } from "./skill-graph";
 
@@ -1146,7 +1146,7 @@ export function agentMarkdown(
   pages?: readonly SitePage[],
 ): string {
   const siteMap = pages
-    ? pages.map((page) => `- [${page.title}](${sitePageUrl(page.path)})`)
+    ? pages.map((page) => `- [${page.title}](${sitePageAgentUrl(page)})`)
     : [
         "- [Home](/)",
         "- [Posts](/posts/)",
@@ -1199,38 +1199,101 @@ export function llmText(
   thoughts: ContentItem[],
   site: SiteIdentity = DEFAULT_SITE,
   pages?: readonly SitePage[],
+  agentGuide?: string,
 ): string {
-  const routes = pages
-    ? pages.map((page) => `- ${page.title}: ${sitePageUrl(page.path)}`)
-    : [
-        "- Home: /",
-        "- Posts: /posts/",
-        "- Thoughts: /thoughts/",
-        "- Skills: /skills/",
-        "- About: /about/",
-      ];
+  // A consumer that owns the site map owns the routes of its content too, so its index follows
+  // the llms.txt shape: the summary, the guide, then one section of links per page group.
+  if (pages) return consumerLlmText(site, pages, agentGuide);
   return [
     `# ${site.name}`,
     `> ${site.description}`,
     "",
     "## Pages",
-    ...routes,
+    "- Home: /",
+    "- Posts: /posts/",
+    "- Thoughts: /thoughts/",
+    "- Skills: /skills/",
+    "- About: /about/",
     "- Agent Markdown: /agents.md",
     "",
-    // A consumer that owns the site map owns the routes of its content too;
-    // listing the content under routes the site does not publish would be wrong.
-    ...(pages
-      ? []
-      : [
-          "## Posts",
-          ...posts.map((post) => `- ${post.title}: ${itemUrl(post)}`),
-          "",
-          "## Thoughts",
-          ...thoughts.map((thought) => `- ${thought.title}: ${itemUrl(thought)}`),
-          "",
-        ]),
+    "## Posts",
+    ...posts.map((post) => `- ${post.title}: ${itemUrl(post)}`),
+    "",
+    "## Thoughts",
+    ...thoughts.map((thought) => `- ${thought.title}: ${itemUrl(thought)}`),
+    "",
     "## Rules",
     "- Only the public build output is considered presentable content.",
     "- Drafts whose names start with _ under posts are not published or rendered.",
+  ].join("\n");
+}
+
+/** The pages by group, in the order each group first appears. */
+function pageGroups(pages: readonly SitePage[]): [string, SitePage[]][] {
+  const groups = new Map<string, SitePage[]>();
+  for (const page of pages) {
+    const group = page.group ?? "Pages";
+    const members = groups.get(group);
+    if (members) members.push(page);
+    else groups.set(group, [page]);
+  }
+  return [...groups];
+}
+
+/** One llms.txt link: the page's Markdown when it has one, and its description after a colon. */
+function llmLink(page: SitePage): string {
+  const description = page.description?.replace(/\s+/g, " ").trim();
+  return `- [${page.title}](${sitePageAgentUrl(page)})${description ? `: ${description}` : ""}`;
+}
+
+function consumerLlmText(
+  site: SiteIdentity,
+  pages: readonly SitePage[],
+  agentGuide: string | undefined,
+): string {
+  const full = pages.some((page) => page.markdown !== undefined);
+  return [
+    `# ${site.name}`,
+    "",
+    `> ${site.description}`,
+    "",
+    ...(agentGuide ? [agentGuide.trim(), ""] : []),
+    ...pageGroups(pages).flatMap(([group, members]) => [
+      `## ${group}`,
+      "",
+      ...members.map(llmLink),
+      "",
+    ]),
+    "## Optional",
+    "",
+    ...(full ? ["- [Full text](/llms-full.txt): every page below as Markdown, in one file"] : []),
+    "- [Agent Markdown](/agents.md): the site map",
+    "",
+  ].join("\n");
+}
+
+/**
+ * Every page's Markdown in one file, after the same summary and guide as llms.txt. Pages without
+ * a Markdown copy are left out; llms.txt still links their HTML.
+ */
+export function llmFullText(
+  site: SiteIdentity,
+  pages: readonly SitePage[],
+  agentGuide?: string,
+): string | undefined {
+  const documents = pages.flatMap((page) =>
+    page.markdown === undefined
+      ? []
+      : [`<!-- Source: ${sitePageAgentUrl(page)} -->\n\n${page.markdown.trim()}`],
+  );
+  if (!documents.length) return undefined;
+  return [
+    `# ${site.name}`,
+    "",
+    `> ${site.description}`,
+    "",
+    ...(agentGuide ? [agentGuide.trim(), ""] : []),
+    documents.join("\n\n---\n\n"),
+    "",
   ].join("\n");
 }

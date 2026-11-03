@@ -13,6 +13,12 @@ export interface DocsPackage {
   summary: string;
   /** Site path without a leading slash. */
   path: string;
+  /**
+   * The command that installs the package and the peers its users import, on the `dev` channel.
+   * The site documents the workspace source; `dev` is the published line closest to it, while
+   * `latest` may still be a release that predates the documented API.
+   */
+  install: string;
 }
 
 /** The packages the site covers, in the order the site lists them. */
@@ -45,6 +51,12 @@ interface PackageManifest {
   name?: string;
   version?: string;
   description?: string;
+  peerDependencies?: Record<string, string>;
+}
+
+/** The install command for a package and its peers, all on the `dev` channel. */
+export function installCommand(name: string, peers: readonly string[] = []): string {
+  return `bun add ${[name, ...peers].map((entry) => `${entry}@dev`).join(" ")}`;
 }
 
 /** Read the documented packages from the workspace manifests. */
@@ -64,6 +76,7 @@ export async function readPackages(root: string): Promise<DocsPackage[]> {
       version: manifest.version ?? "unpublished",
       summary: SUMMARIES[name] ?? manifest.description ?? "",
       path: `packages/${name}`,
+      install: installCommand(manifest.name ?? name, Object.keys(manifest.peerDependencies ?? {})),
     });
   }
   return packages;

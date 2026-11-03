@@ -50,6 +50,14 @@ export default meowSite({
 
 - `pages` is a provider of complete HTML documents. A path that resolves above the site root is
   refused rather than clamped.
+- A page's optional `markdown` is the same page for agents. It is published next to the route
+  (`components/button.md` for `/components/button/`, `index.md` for the root), and `llms.txt`,
+  `llm.txt` and `agents.md` link it instead of the HTML. `llms.txt` follows the
+  [llms.txt](https://llmstxt.org/) shape: the site summary, then one section of links per page
+  `group` with each page's `description`. `llms-full.txt` holds every Markdown copy in one file.
+- `agentGuide` is Markdown that opens `llms.txt` and `llms-full.txt` after the summary: what an
+  agent must know before following any link, such as how to install and set up the documented
+  packages.
 - `mdxComponents` adds named components to the MDX content pages; the built-in `Callout` stays
   available.
 - `themeStylesheet` names the theme stylesheet the build writes, so a consumer page can link it. It

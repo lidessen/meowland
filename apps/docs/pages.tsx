@@ -33,7 +33,7 @@ export interface DocsState {
 }
 
 /** The index of every component page. */
-const COMPONENTS_PATH = "components";
+export const COMPONENTS_PATH = "components";
 
 /** The package that owns the component library. */
 export const COMPONENT_PACKAGE = "meowtail";
@@ -73,7 +73,7 @@ export function storyLabel(story: StoryEntry): string {
   return label.length > 0 ? label : story.title;
 }
 
-function sourceFor(
+export function sourceFor(
   state: DocsState,
   story: StoryEntry,
 ): { source?: string; file?: string; line?: number } {
@@ -180,7 +180,7 @@ function HomePage({ state }: { state: DocsState }): Child {
           <aside className="docs-home-route" aria-label="Start building">
             <p className="docs-home-route-label">Start building</p>
             <h2>From a component to your interface</h2>
-            <InstallLine name={COMPONENT_PACKAGE} />
+            <InstallLine command={componentInstall(state)} />
             <ol>
               <li>
                 <a href="/packages/meowtail/">
@@ -329,7 +329,7 @@ function ComponentList({ state }: { state: DocsState }): Child {
  * The import line of a public component and, when an example draws it in a few lines, that
  * first use as a snippet: the code a reader copies first.
  */
-function usageFor(
+export function usageFor(
   component: CatalogComponent,
   state: DocsState,
 ): { importLine: string; snippet?: string } | undefined {
@@ -350,8 +350,14 @@ function notesFor(props: ComponentProps | undefined): Child {
   return rest ? <InlineCodeNote text={rest} /> : null;
 }
 
+/** The command that installs the component library and the peers its users import. */
+export function componentInstall(state: DocsState): string {
+  const entry = state.packages.find((candidate) => candidate.name === COMPONENT_PACKAGE);
+  return entry?.install ?? `bun add ${COMPONENT_PACKAGE}@dev`;
+}
+
 /** The line that imports a component, when its name is a public export of the package. */
-function importLineFor(name: string): string | undefined {
+export function importLineFor(name: string): string | undefined {
   return /^[A-Z][A-Za-z0-9]*$/.test(name) && name in meowtail
     ? `import { ${name} } from "${COMPONENT_PACKAGE}";`
     : undefined;
@@ -372,7 +378,7 @@ function PackagePage({
       title: "Installation",
       children: (
         <Stack gap="compact">
-          <InstallLine name={entry.name} />
+          <InstallLine command={entry.install} />
           <Note>
             This guide follows the workspace source. The version badge comes from its package
             manifest; local candidates may include APIs absent from npm. Check the repository's{" "}
@@ -467,7 +473,7 @@ function ComponentPage({
   sections.push({
     id: "installation",
     title: "Installation",
-    children: <InstallLine name={COMPONENT_PACKAGE} />,
+    children: <InstallLine command={componentInstall(state)} />,
   });
   const usage = usageFor(component, state);
   if (usage) {
@@ -594,7 +600,7 @@ function ExamplePage({ example, state }: { example: CatalogExample; state: DocsS
   );
 }
 
-const COMPONENTS_SUMMARY =
+export const COMPONENTS_SUMMARY =
   "Every component the library publishes, grouped by what it is for. Each page has a live preview, its usage and its props.";
 
 /** The components index: every group with its components and one line on each. */

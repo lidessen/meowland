@@ -20,6 +20,7 @@ import {
   DEFAULT_THEME_STYLESHEET,
   homePage,
   listPage,
+  llmFullText,
   llmText,
   postPage,
   skillPage,
@@ -27,8 +28,9 @@ import {
   thoughtPage,
 } from "./site";
 import { loadSkills } from "./skills";
-import { sitePageFile, type SitePage, type SitePageProvider } from "./pages";
+import { sitePageFile, sitePageMarkdownFile, type SitePage, type SitePageProvider } from "./pages";
 
+export { sitePageMarkdownFile } from "./pages";
 export type { SitePage, SitePageContext, SitePageProvider } from "./pages";
 export type { ContentItem } from "./content";
 export type { SiteFont } from "./fonts";
@@ -49,6 +51,11 @@ export interface SiteConfig {
   site?: Partial<SiteIdentity>;
   /** Consumer-supplied pages; the site writes and indexes them next to its own. */
   pages?: SitePageProvider;
+  /**
+   * Markdown that opens `llms.txt` and `llms-full.txt` after the site summary: what an agent must
+   * know before following any link, such as how to install and set up what the site documents.
+   */
+  agentGuide?: string;
   /** Extra components available to MDX content pages. */
   mdxComponents?: Record<string, MdxComponent>;
   /** Stylesheet file name for the theme; defaults to "blog-theme.css". */
@@ -68,6 +75,7 @@ export interface ResolvedSiteConfig {
   projectRootDirectory?: string;
   site: SiteIdentity;
   pages?: SitePageProvider;
+  agentGuide?: string;
   mdxComponents: Record<string, MdxComponent>;
   themeStylesheet: string;
   fonts: readonly SiteFont[];
@@ -85,6 +93,7 @@ export function meowSite(config: SiteConfig): ResolvedSiteConfig {
       : undefined,
     site: { ...DEFAULT_SITE, ...config.site },
     pages: config.pages,
+    agentGuide: config.agentGuide,
     mdxComponents: config.mdxComponents ?? {},
     themeStylesheet: config.themeStylesheet ?? DEFAULT_THEME_STYLESHEET,
     fonts:
@@ -160,8 +169,12 @@ async function buildStaticHtmlFromEntrypoints(
 }
 
 /** Consumer pages are written inside the generated directory and never above it. */
-function consumerPageFile(generatedDirectory: string, path: string): string {
-  const file = sitePageFile(path);
+function consumerPageFile(
+  generatedDirectory: string,
+  path: string,
+  fileFor: (path: string) => string = sitePageFile,
+): string {
+  const file = fileFor(path);
   const target = resolve(generatedDirectory, file);
   const inside = relative(generatedDirectory, target);
   if (!inside || inside.startsWith("..") || isAbsolute(inside)) {
@@ -185,6 +198,21 @@ async function writeConsumerPages(
     );
   }
   return entrypoints;
+}
+
+/** Each page's Markdown copy, written straight into the output next to its route. */
+async function writeConsumerMarkdown(
+  outputDirectory: string,
+  pages: readonly SitePage[],
+): Promise<void> {
+  for (const page of pages) {
+    if (page.markdown === undefined) continue;
+    await writePage(
+      outputDirectory,
+      consumerPageFile(outputDirectory, page.path, sitePageMarkdownFile),
+      page.markdown,
+    );
+  }
 }
 
 async function writeContentPages(
@@ -315,17 +343,22 @@ export async function buildSite(input: SiteConfig | ResolvedSiteConfig): Promise
   await stageAssets(generatedDirectory, config.content);
   await buildStaticHtmlFromEntrypoints(entrypoints, generatedDirectory, config.outputDirectory);
   await copyPostAssets(config.outputDirectory, config.content);
+  if (pages) await writeConsumerMarkdown(config.outputDirectory, pages);
+  const full = pages ? llmFullText(config.site, pages, config.agentGuide) : undefined;
   await Promise.all([
     writeFile(
       join(config.outputDirectory, "llm.txt"),
-      llmText(posts, thoughts, config.site, pages),
+      llmText(posts, thoughts, config.site, pages, config.agentGuide),
       "utf8",
     ),
     writeFile(
       join(config.outputDirectory, "llms.txt"),
-      llmText(posts, thoughts, config.site, pages),
+      llmText(posts, thoughts, config.site, pages, config.agentGuide),
       "utf8",
     ),
+    ...(full === undefined
+      ? []
+      : [writeFile(join(config.outputDirectory, "llms-full.txt"), full, "utf8")]),
     writeFile(
       join(config.outputDirectory, "agents.md"),
       agentMarkdown(posts, thoughts, config.site, pages),

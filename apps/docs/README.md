@@ -9,8 +9,9 @@ at [meowland.dev](https://meowland.dev).
 Two engines and one app.
 
 - **Meowpress** owns the build pipeline: it reads the content, renders the MDX package pages, stages
-  the assets, writes the theme stylesheet and publishes `llm.txt`, `llms.txt` and `agents.md`. This
-  app supplies the pages through the `pages` provider and the MDX components through
+  the assets, writes the theme stylesheet and publishes `llm.txt`, `llms.txt`, `llms-full.txt`,
+  `agents.md` and each page's Markdown copy. This app supplies the pages, their Markdown and the
+  agent guide through the `pages` provider and `agentGuide`, and the MDX components through
   `mdxComponents`.
 - **Meowbook** owns the story manifest and the live canvas. The site embeds the canvas in an iframe,
   so every example runs in its own document, with its own runtime and its own theme root.
@@ -59,6 +60,8 @@ follow their separate manual workflow.
 | `pages.tsx`               | The page builders: the home page, the package pages, the component pages.               |
 | `theme.ts`                | The site theme: the standard theme, the site layout and the Meow values.                |
 | `site.config.ts`          | The Meowpress configuration, including the pages provider.                              |
+| `markdown.ts`             | Each page's Markdown copy for agents: import, install, props table and example code.    |
+| `agent-guide.ts`          | What `llms.txt` tells an agent first: the install channel, JSX, setup and styling.      |
 | `serve.ts`                | The loopback static server.                                                             |
 | `content/posts/packages/` | The hand-written MDX page of each package.                                              |
 
@@ -73,7 +76,15 @@ dist/
   gallery/                       the Meowbook playground and its live canvas
   gallery/slides/                the presentation playground
   llm.txt  llms.txt  agents.md   the agent-facing indexes
+  llms-full.txt                  every page's Markdown in one file
+  index.md  components.md        the Markdown copy of each page, next to its route:
+  components/<kebab>.md          /components/button/ is also /components/button.md
 ```
+
+The Markdown copies are for agents. A component's copy carries what its page shows minus the live
+preview: the install command, the import line, the registration, the props table, the DOM parts
+and the code of every example. The [Meowland skill](../../skills/meowland/SKILL.md) and `llms.txt`
+point agents at them.
 
 ## The boundaries
 

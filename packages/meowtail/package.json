@@ -12,6 +12,7 @@
   "files": [
     "dist",
     "AGENT-COMPONENTS.md",
+    "AUTHORING.md",
     "CHANGELOG.md",
     "COMPONENTS.md",
     "README.md",

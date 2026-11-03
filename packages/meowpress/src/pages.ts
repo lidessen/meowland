@@ -9,6 +9,11 @@ export interface SitePage {
   title: string;
   /** A complete HTML document for the route. */
   html: string;
+  /**
+   * The same page as Markdown for agents. When present it is published next to the route (see
+   * `sitePageMarkdownFile`), and the agent-facing indexes link it instead of the HTML document.
+   */
+  markdown?: string;
   description?: string;
   /** Grouping used by the site index and the agent-facing indexes. */
   group?: string;
@@ -38,4 +43,20 @@ export function sitePageUrl(path: string): string {
 export function sitePageFile(path: string): string {
   const normalized = path.replace(/^\/+|\/+$/g, "");
   return normalized ? `${normalized}/index.html` : "index.html";
+}
+
+/**
+ * The Markdown copy of a page, relative to the site root: "index.md" for the root and
+ * "components/button.md" for /components/button/, the convention llms.txt readers expect.
+ */
+export function sitePageMarkdownFile(path: string): string {
+  const normalized = path.replace(/^\/+|\/+$/g, "");
+  return normalized ? `${normalized}.md` : "index.md";
+}
+
+/** Where an agent reads a page: its Markdown copy when it has one, its HTML route otherwise. */
+export function sitePageAgentUrl(page: SitePage): string {
+  return page.markdown === undefined
+    ? sitePageUrl(page.path)
+    : `/${sitePageMarkdownFile(page.path)}`;
 }

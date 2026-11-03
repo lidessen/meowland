@@ -18,6 +18,11 @@ Routine button copy does not need package release acceptance, and a local implem
 
 The single entry point for check commands is [docs/development-checks.md](../docs/development-checks.md), and the single entry point for release commands is [docs/releasing.md](../docs/releasing.md). Skills do not maintain a second command table, project progress or release status; check the root README and the current receipt for current package names, license blockers and similar, and do not turn historical failures into permanent rules.
 
+The [Meowland skill](../skills/meowland/SKILL.md) in the root `skills/` directory is different: it
+is for agents that build applications with the published packages, and users install it with
+`npx skills add lidessen/meowland --skill meowland`. Keep it in step with the public setup and
+authoring contracts when they change; it is not a development method.
+
 The five project-owned skills remain here. The four general methods above are installed from the public
 [lidessen/skills](https://github.com/lidessen/skills) repository with the official Skills CLI 1.7.4 in
 project-level copy mode. Their upstream content keeps its source language; project-authored guidance

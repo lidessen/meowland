@@ -53,12 +53,82 @@ test("consumer pages replace the package's own routes and reach the MDX content"
       expect(await Bun.file(join(output, file)).exists()).toBe(false);
     }
     const llm = await Bun.file(join(output, "llm.txt")).text();
-    expect(llm).toContain("- Button: /components/button/");
-    expect(llm).not.toContain("- Posts: /posts/");
+    expect(llm).toContain("## Basic controls\n\n- [Button](/components/button/)");
+    expect(llm).not.toContain("/posts/");
+    // Without a Markdown copy there is no full text to point at.
+    expect(llm).not.toContain("llms-full.txt");
+    expect(await Bun.file(join(output, "llms-full.txt")).exists()).toBe(false);
     // The content has no route of its own once the consumer owns the site map.
     expect(llm).not.toContain("/posts/packages/meowtail/");
     const agents = await Bun.file(join(output, "agents.md")).text();
     expect(agents).not.toContain("/posts/packages/meowtail/");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("a page's Markdown copy is published and the agent indexes link it", async () => {
+  const root = await mkdtemp(join(tmpdir(), "meowpress-markdown-"));
+  try {
+    const content = join(root, "content");
+    const output = join(root, "dist");
+    await mkdir(content, { recursive: true });
+
+    await buildSite({
+      content,
+      skillsDirectory: root,
+      outputDirectory: output,
+      site: { name: "Meowland", description: "UI packages." },
+      agentGuide: "## Setup\n\nInstall `meowtail@dev` first.",
+      pages: () => [
+        {
+          path: "",
+          title: "Meowland",
+          description: "The home page.",
+          group: "Overview",
+          html: "<!doctype html><html><body><h1>Meowland</h1></body></html>",
+          markdown: "# Meowland\n\nThe home page.\n",
+        },
+        {
+          path: "components/button",
+          title: "Button",
+          description: "Runs an action.",
+          group: "Basic controls",
+          html: "<!doctype html><html><body><h1>Button</h1></body></html>",
+          markdown: "# Button\n\nRuns an action.\n",
+        },
+        {
+          path: "examples/board",
+          title: "Board",
+          group: "Examples",
+          html: "<!doctype html><html><body><h1>Board</h1></body></html>",
+        },
+      ],
+    });
+
+    expect(await Bun.file(join(output, "index.md")).text()).toBe("# Meowland\n\nThe home page.\n");
+    expect(await Bun.file(join(output, "components/button.md")).text()).toContain(
+      "Runs an action.",
+    );
+    expect(await Bun.file(join(output, "examples/board.md")).exists()).toBe(false);
+
+    const llms = await Bun.file(join(output, "llms.txt")).text();
+    expect(llms.startsWith("# Meowland\n\n> UI packages.\n")).toBe(true);
+    expect(llms).toContain("## Setup\n\nInstall `meowtail@dev` first.");
+    expect(llms).toContain("## Overview\n\n- [Meowland](/index.md): The home page.");
+    expect(llms).toContain("- [Button](/components/button.md): Runs an action.");
+    // A page without a Markdown copy keeps its HTML route.
+    expect(llms).toContain("- [Board](/examples/board/)");
+    expect(llms).toContain("- [Full text](/llms-full.txt)");
+    expect(await Bun.file(join(output, "llm.txt")).text()).toBe(llms);
+
+    const full = await Bun.file(join(output, "llms-full.txt")).text();
+    expect(full).toContain("Install `meowtail@dev` first.");
+    expect(full).toContain("<!-- Source: /components/button.md -->\n\n# Button");
+    expect(full).not.toContain("# Board");
+
+    const agents = await Bun.file(join(output, "agents.md")).text();
+    expect(agents).toContain("- [Button](/components/button.md)");
   } finally {
     await rm(root, { recursive: true, force: true });
   }

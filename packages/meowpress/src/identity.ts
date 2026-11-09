@@ -16,6 +16,13 @@ export interface SiteAbout {
   links?: readonly SiteProfileLink[];
 }
 
+/** Optional copy for the built-in 404 page. */
+export interface SiteNotFound {
+  title?: string;
+  message?: string;
+  homeLabel?: string;
+}
+
 /** Site-owned identity and copy. The application supplies it; the library keeps neutral defaults. */
 export interface SiteIdentity {
   /** Display name used in header, footer and document titles. */

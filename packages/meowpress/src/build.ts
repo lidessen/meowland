@@ -2,9 +2,10 @@ import { type ThemeDefinition } from "meowcss";
 import { removeLegacyIsFallbacks } from "meowcss/bundle";
 import { blogFonts, blogTheme } from "./theme";
 import { FONT_EXTERNAL, publishFonts, type SiteFont } from "./fonts";
-import { DEFAULT_SITE, type SiteIdentity } from "./identity";
-import { mkdir, readFile, rm, writeFile, cp } from "node:fs/promises";
-import { isAbsolute, join, relative, resolve } from "node:path";
+import { DEFAULT_SITE, type SiteIdentity, type SiteNotFound } from "./identity";
+import { constants } from "node:fs";
+import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
 import {
   collectContentAssets,
   isDraftAsset,
@@ -22,6 +23,7 @@ import {
   listPage,
   llmFullText,
   llmText,
+  notFoundPage,
   postPage,
   skillPage,
   skillsIndexPage,
@@ -29,28 +31,33 @@ import {
 } from "./site";
 import { loadSkills } from "./skills";
 import { sitePageFile, sitePageMarkdownFile, type SitePage, type SitePageProvider } from "./pages";
+import { publishSite, validateBuildDestination, validateOutputDirectory } from "./output";
 
 export { sitePageMarkdownFile } from "./pages";
 export type { SitePage, SitePageContext, SitePageProvider } from "./pages";
-export type { ContentItem } from "./content";
+export type { ContentItem, ContentSource, ContentSourceInput } from "./content";
 export type { SiteFont } from "./fonts";
-export type { SiteIdentity } from "./identity";
+export type { SiteIdentity, SiteNotFound } from "./identity";
 
 export interface SiteConfig {
-  /** One or more roots containing `posts/`, `thoughts/`, and optional assets. */
-  content: ContentSourceInput | readonly ContentSourceInput[];
-  /** Workspace root used to discover public `skills/` and project `.agents/skills/`. */
-  skillsDirectory: string;
-  /** Static output directory for the generated site. */
-  outputDirectory: string;
+  /** Roots containing posts, thoughts and optional assets. Defaults to `content/`. */
+  content?: ContentSourceInput | readonly ContentSourceInput[];
+  /** Root used to discover public `skills/`. Defaults to the current project directory. */
+  skillsDirectory?: string;
+  /** Static output directory for the generated site. Defaults to `dist/`. */
+  outputDirectory?: string;
   /** Defaults to this package's own Blog theme. */
   theme?: ThemeDefinition;
-  /** Optional project root when project Skills live outside `skillsDirectory`. */
+  /** Include project `.agents/skills/` in the public build. Defaults to false. */
+  includeProjectSkills?: boolean;
+  /** Alternate root for `.agents/skills/` when `includeProjectSkills` is enabled. */
   projectRootDirectory?: string;
   /** Site name, description, repository links and About copy; unset fields use neutral defaults. */
   site?: Partial<SiteIdentity>;
-  /** Consumer-supplied pages; the site writes and indexes them next to its own. */
+  /** Consumer-supplied pages replace the built-in site map. */
   pages?: SitePageProvider;
+  /** Copy for the built-in root `404.html`, or false to omit it. */
+  notFound?: SiteNotFound | false;
   /**
    * Markdown that opens `llms.txt` and `llms-full.txt` after the site summary: what an agent must
    * know before following any link, such as how to install and set up what the site documents.
@@ -72,9 +79,11 @@ export interface ResolvedSiteConfig {
   skillsDirectory: string;
   outputDirectory: string;
   theme: ThemeDefinition;
+  includeProjectSkills?: boolean;
   projectRootDirectory?: string;
   site: SiteIdentity;
   pages?: SitePageProvider;
+  notFound?: SiteNotFound | false;
   agentGuide?: string;
   mdxComponents: Record<string, MdxComponent>;
   themeStylesheet: string;
@@ -82,20 +91,25 @@ export interface ResolvedSiteConfig {
 }
 
 /** Define a site config in the app package without taking on the build pipeline. */
-export function meowSite(config: SiteConfig): ResolvedSiteConfig {
+export function meowSite(config: SiteConfig = {}): ResolvedSiteConfig {
+  const themeStylesheet = config.themeStylesheet ?? DEFAULT_THEME_STYLESHEET;
+  if (basename(themeStylesheet) !== themeStylesheet || !themeStylesheet.endsWith(".css"))
+    throw new Error(`Expected a theme stylesheet file name: ${themeStylesheet}`);
   return {
-    content: normalizeContentSources(config.content),
-    skillsDirectory: resolve(config.skillsDirectory),
-    outputDirectory: resolve(config.outputDirectory),
+    content: normalizeContentSources(config.content ?? "content"),
+    skillsDirectory: resolve(config.skillsDirectory ?? "."),
+    outputDirectory: resolve(config.outputDirectory ?? "dist"),
     theme: config.theme ?? blogTheme,
+    includeProjectSkills: config.includeProjectSkills,
     projectRootDirectory: config.projectRootDirectory
       ? resolve(config.projectRootDirectory)
       : undefined,
     site: { ...DEFAULT_SITE, ...config.site },
     pages: config.pages,
+    notFound: config.notFound,
     agentGuide: config.agentGuide,
     mdxComponents: config.mdxComponents ?? {},
-    themeStylesheet: config.themeStylesheet ?? DEFAULT_THEME_STYLESHEET,
+    themeStylesheet,
     fonts:
       config.fonts ?? (config.theme === undefined || config.theme === blogTheme ? blogFonts : []),
   };
@@ -112,36 +126,24 @@ async function writePage(
   return target;
 }
 
-async function stageAssets(
-  generatedDirectory: string,
+async function writeAssets(
+  destination: string,
   sources: readonly ContentSourceInput[],
+  directory: "assets" | "posts/assets",
 ): Promise<void> {
-  const assets = await collectContentAssets(sources, { directory: "assets" });
-  await Promise.all(
-    assets
-      .filter((asset) => !isDraftAsset(asset.sourcePath, asset.assetRoot))
-      .map(async (asset) => {
-        const target = join(generatedDirectory, asset.relativePath);
-        await mkdir(resolve(target, ".."), { recursive: true });
-        await cp(asset.sourcePath, target, { force: true });
-      }),
-  );
-}
-
-async function copyPostAssets(
-  outputDirectory: string,
-  sources: readonly ContentSourceInput[],
-): Promise<void> {
-  const assets = await collectContentAssets(sources, { directory: "posts/assets" });
-  await Promise.all(
-    assets
-      .filter((asset) => !isDraftAsset(asset.sourcePath, asset.assetRoot))
-      .map(async (asset) => {
-        const target = join(outputDirectory, "posts/assets", asset.relativePath);
-        await mkdir(resolve(target, ".."), { recursive: true });
-        await cp(asset.sourcePath, target, { force: true });
-      }),
-  );
+  const assets = await collectContentAssets(sources, { directory });
+  for (const asset of assets) {
+    if (isDraftAsset(asset.sourcePath, asset.assetRoot)) continue;
+    const path = directory === "assets" ? asset.relativePath : join(directory, asset.relativePath);
+    const target = join(destination, path);
+    await mkdir(dirname(target), { recursive: true });
+    try {
+      await copyFile(asset.sourcePath, target, constants.COPYFILE_EXCL);
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "EEXIST") throw error;
+      throw new Error(`Content asset would replace a generated file: ${path}`);
+    }
+  }
 }
 
 async function buildStaticHtmlFromEntrypoints(
@@ -155,13 +157,14 @@ async function buildStaticHtmlFromEntrypoints(
     outdir: outputDirectory,
     target: "browser",
     minify: true,
+    throw: false,
     // Published font files stay separate, so subsets load by unicode-range instead of inline.
     external: [FONT_EXTERNAL],
   });
-  if (!result.success) {
-    console.error(result.logs);
-    throw new Error("Unable to build site static HTML");
-  }
+  if (!result.success)
+    throw new Error(
+      ["Unable to build site static HTML", ...result.logs.map((log) => log.message)].join("\n"),
+    );
   // Bun writes legacy :-webkit-any()/:-moz-any() copies of every :is() rule; Safari misreads them.
   for (const output of result.outputs)
     if (output.path.endsWith(".css"))
@@ -250,16 +253,32 @@ async function writeContentPages(
   return entrypoints;
 }
 
-export async function buildSite(input: SiteConfig | ResolvedSiteConfig): Promise<void> {
+export async function buildSite(input: SiteConfig | ResolvedSiteConfig = {}): Promise<void> {
   const config = meowSite(input);
-  const generatedDirectory = resolve(config.outputDirectory, "../.generated");
+  await validateOutputDirectory(config);
+  await validateBuildDestination(config.outputDirectory);
+  const outputParent = dirname(config.outputDirectory);
+  await mkdir(outputParent, { recursive: true });
+  const workspace = await mkdtemp(join(outputParent, ".meowpress-build-"));
+  try {
+    const outputDirectory = join(workspace, "output");
+    const result = await writeSite({ ...config, outputDirectory }, join(workspace, "source"));
+    await validateBuildDestination(config.outputDirectory);
+    await publishSite(outputDirectory, config.outputDirectory);
+    console.log(`Built ${result} into ${config.outputDirectory}.`);
+  } finally {
+    await rm(workspace, { recursive: true, force: true });
+  }
+}
 
+async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string): Promise<string> {
   const [posts, thoughts, skills] = await Promise.all([
     loadSection(config.content, "post", { components: config.mdxComponents }),
     loadSection(config.content, "thought", { components: config.mdxComponents }),
     config.pages
       ? Promise.resolve([] as Awaited<ReturnType<typeof loadSkills>>)
       : loadSkills(config.skillsDirectory, {
+          includeProjectSkills: config.includeProjectSkills,
           projectRootDirectory: config.projectRootDirectory,
         }),
   ]);
@@ -267,8 +286,6 @@ export async function buildSite(input: SiteConfig | ResolvedSiteConfig): Promise
     (left, right) => (right.date?.getTime() ?? 0) - (left.date?.getTime() ?? 0),
   );
 
-  await rm(config.outputDirectory, { recursive: true, force: true });
-  await rm(generatedDirectory, { recursive: true, force: true });
   await mkdir(config.outputDirectory, { recursive: true });
   await mkdir(generatedDirectory, { recursive: true });
 
@@ -324,6 +341,15 @@ export async function buildSite(input: SiteConfig | ResolvedSiteConfig): Promise
         config.themeStylesheet,
       )),
     );
+    if (config.notFound !== false) {
+      entrypoints.push(
+        await writePage(
+          generatedDirectory,
+          "404.html",
+          notFoundPage(config.notFound ?? {}, config.theme, config.site, config.themeStylesheet),
+        ),
+      );
+    }
     for (const skill of skills) {
       const skillPath =
         skill.scope === "public" ? `skills/${skill.slug}` : `skills/project/${skill.slug}`;
@@ -345,10 +371,10 @@ export async function buildSite(input: SiteConfig | ResolvedSiteConfig): Promise
     fontFaces ? `${fontFaces}\n${config.theme.cssText}` : config.theme.cssText,
     "utf8",
   );
-  await stageAssets(generatedDirectory, config.content);
+  await writeAssets(generatedDirectory, config.content, "assets");
   await buildStaticHtmlFromEntrypoints(entrypoints, generatedDirectory, config.outputDirectory);
-  await copyPostAssets(config.outputDirectory, config.content);
   if (pages) await writeConsumerMarkdown(config.outputDirectory, pages);
+  await writeAssets(config.outputDirectory, config.content, "posts/assets");
   const full = pages ? llmFullText(config.site, pages, config.agentGuide) : undefined;
   await Promise.all([
     writeFile(
@@ -366,15 +392,21 @@ export async function buildSite(input: SiteConfig | ResolvedSiteConfig): Promise
       : [writeFile(join(config.outputDirectory, "llms-full.txt"), full, "utf8")]),
     writeFile(
       join(config.outputDirectory, "agents.md"),
-      agentMarkdown(posts, thoughts, config.site, pages),
+      agentMarkdown(
+        posts,
+        thoughts,
+        config.site,
+        pages,
+        config.content.some(
+          (source) =>
+            typeof source !== "string" &&
+            (source.postsDirectory !== undefined || source.thoughtsDirectory !== undefined),
+        ),
+      ),
       "utf8",
     ),
   ]);
-  await rm(generatedDirectory, { recursive: true, force: true });
-
-  console.log(
-    pages
-      ? `Built ${posts.length} content items and ${pages.length} site pages into site dist/.`
-      : `Built ${posts.length} posts and ${thoughts.length} thoughts into site dist/.`,
-  );
+  return pages
+    ? `${posts.length} content items and ${pages.length} site pages`
+    : `${posts.length} posts and ${thoughts.length} thoughts`;
 }

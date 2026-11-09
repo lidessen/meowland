@@ -1,4 +1,4 @@
-import { readdir, readFile } from "node:fs/promises";
+import { lstat, readdir, readFile } from "node:fs/promises";
 import { extname, posix, relative, resolve, sep } from "node:path";
 import { fromMarkdown } from "mdast-util-from-markdown";
 import { parse as parseYaml } from "yaml";
@@ -162,7 +162,7 @@ async function collectFiles(directory: string): Promise<string[]> {
     if (entry.name.startsWith(".")) continue;
     const path = resolve(directory, entry.name);
     if (entry.isDirectory()) files.push(...(await collectFiles(path)));
-    else files.push(path);
+    else if (entry.isFile()) files.push(path);
   }
   return files;
 }
@@ -385,6 +385,7 @@ async function loadSkill(
 }
 
 export interface LoadSkillsOptions {
+  includeProjectSkills?: boolean;
   projectRootDirectory?: string;
 }
 
@@ -399,15 +400,20 @@ async function skillDirectories(
       base: "skills",
       scope: "public" as const,
     },
-    {
-      root: resolve(projectRootDirectory, ".agents/skills"),
-      base: ".agents/skills",
-      scope: "project" as const,
-    },
+    ...(options.includeProjectSkills
+      ? [
+          {
+            root: resolve(projectRootDirectory, ".agents/skills"),
+            base: ".agents/skills",
+            scope: "project" as const,
+          },
+        ]
+      : []),
   ];
   const directories: { root: string; base: string; scope: SkillScope }[] = [];
   for (const candidate of candidates) {
     try {
+      if ((await lstat(candidate.root)).isSymbolicLink()) continue;
       const entries = await readdir(candidate.root, { withFileTypes: true });
       directories.push(
         ...entries

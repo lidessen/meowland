@@ -1,7 +1,7 @@
 import { compile, run } from "@mdx-js/mdx";
 import remarkGfm from "remark-gfm";
-import { readdir, readFile, stat } from "node:fs/promises";
-import { relative, resolve, sep } from "node:path";
+import { lstat, readdir, readFile, stat } from "node:fs/promises";
+import { isAbsolute, relative, resolve, sep } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { Fragment, h, type Child, type Props } from "meowjsx/runtime";
 import { renderToHtml } from "meowjsx/web";
@@ -13,6 +13,14 @@ export type Frontmatter = Record<string, unknown>;
 /** A content root containing `posts/`, `thoughts/`, and optional asset folders. */
 export interface ContentSource {
   directory: string;
+  /** Markdown and MDX posts, relative to the source root. Defaults to "posts". */
+  postsDirectory?: string;
+  /** Markdown and MDX thoughts, relative to the source root. Defaults to "thoughts". */
+  thoughtsDirectory?: string;
+  /** Assets for site pages and styles, relative to the source root. Defaults to "assets". */
+  assetsDirectory?: string;
+  /** Assets copied to /posts/assets/, relative to the source root. Defaults to "posts/assets". */
+  postAssetsDirectory?: string;
   /** Namespace slugs and asset paths from this source to avoid collisions. */
   slugPrefix?: string;
 }
@@ -103,14 +111,23 @@ function parseDate(value: unknown): Date | undefined {
 function makeDateKey(value: unknown, date: Date | undefined): string {
   const text = asText(value);
   const explicitDate = text?.match(/^\d{4}-\d{2}-\d{2}/)?.[0];
-  if (explicitDate) return explicitDate;
+  if (explicitDate) {
+    const parsed = new Date(`${explicitDate}T00:00:00Z`);
+    if (!Number.isNaN(parsed.getTime()) && parsed.toISOString().startsWith(explicitDate)) {
+      return explicitDate;
+    }
+  }
   if (!date) return "undated";
-  return new Intl.DateTimeFormat("en-CA", {
+  const parts = new Intl.DateTimeFormat("en-US", {
     timeZone: "Asia/Shanghai",
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-  }).format(date);
+  }).formatToParts(date);
+  const year = parts.find((part) => part.type === "year")!.value;
+  const month = parts.find((part) => part.type === "month")!.value;
+  const day = parts.find((part) => part.type === "day")!.value;
+  return `${year.padStart(4, "0")}-${month}-${day}`;
 }
 
 function makeTimeLabel(value: unknown, date: Date | undefined): string {
@@ -201,7 +218,7 @@ async function renderSource(
   sourcePath: string,
   components: Record<string, MdxComponent>,
 ): Promise<string> {
-  if (sourcePath.endsWith(".md")) {
+  if (sourcePath.toLowerCase().endsWith(".md")) {
     return Bun.markdown.html(source, {
       tagFilter: true,
     });
@@ -209,7 +226,11 @@ async function renderSource(
   return renderMdx(source, components);
 }
 
-async function collectFiles(directory: string): Promise<string[]> {
+async function collectFiles(
+  directory: string,
+  assetRoots: ReadonlySet<string>,
+  skipNestedAssets: boolean,
+): Promise<string[]> {
   const entries = await readdir(directory, { withFileTypes: true });
   const files: string[] = [];
 
@@ -217,10 +238,12 @@ async function collectFiles(directory: string): Promise<string[]> {
     if (entry.name.startsWith(".")) continue;
     const entryPath = resolve(directory, entry.name);
     if (entry.isDirectory()) {
-      files.push(...(await collectFiles(entryPath)));
+      if (assetRoots.has(entryPath) || (skipNestedAssets && entry.name === "assets")) continue;
+      files.push(...(await collectFiles(entryPath, assetRoots, skipNestedAssets)));
       continue;
     }
-    if (CONTENT_EXTENSIONS.has(entry.name.slice(entry.name.lastIndexOf(".")))) {
+    const extension = entry.name.slice(entry.name.lastIndexOf(".")).toLowerCase();
+    if (entry.isFile() && CONTENT_EXTENSIONS.has(extension)) {
       files.push(entryPath);
     }
   }
@@ -243,10 +266,14 @@ function makeSlug(sourcePath: string, sectionDirectory: string): string {
 }
 
 function normalizeSlugPrefix(prefix: string | undefined): string {
-  return (prefix ?? "")
+  const normalized = (prefix ?? "")
     .replaceAll("\\", "/")
     .replace(/^\/+|\/+$/g, "")
     .replaceAll(/\/+/g, "/");
+  if (normalized.split("/").some((segment) => segment === "." || segment === "..")) {
+    throw new Error(`Content slug prefix must not contain "." or "..": ${prefix}`);
+  }
+  return normalized;
 }
 
 function withSlugPrefix(prefix: string | undefined, slug: string): string {
@@ -256,15 +283,61 @@ function withSlugPrefix(prefix: string | undefined, slug: string): string {
 
 export function normalizeContentSources(
   input: ContentSourceInput | readonly ContentSourceInput[],
+  baseDirectory = process.cwd(),
 ): ContentSource[] {
   const sources = Array.isArray(input) ? input : [input];
   return sources.map((source) => {
-    const normalized = typeof source === "string" ? { directory: source } : source;
+    const normalized: ContentSource = typeof source === "string" ? { directory: source } : source;
+    const directory = resolve(baseDirectory, normalized.directory);
+    for (const mapping of [
+      normalized.postsDirectory,
+      normalized.thoughtsDirectory,
+      normalized.assetsDirectory,
+      normalized.postAssetsDirectory,
+    ]) {
+      if (mapping !== undefined) sourceDirectory(directory, mapping);
+    }
     return {
-      directory: resolve(normalized.directory),
+      ...normalized,
+      directory,
       slugPrefix: normalizeSlugPrefix(normalized.slugPrefix) || undefined,
     };
   });
+}
+
+function sourceDirectory(root: string, path: string): string {
+  const target = resolve(root, path);
+  const local = relative(root, target);
+  if (isAbsolute(path) || local === ".." || local.startsWith(`..${sep}`) || isAbsolute(local)) {
+    throw new Error(`Content directory must stay inside its source root: ${path}`);
+  }
+  return target;
+}
+
+/** Check every segment below a source root before walking a configured directory. */
+async function isSourceDirectory(root: string, target: string): Promise<boolean> {
+  try {
+    let path = root;
+    if (!(await lstat(path)).isDirectory()) return false;
+    for (const segment of relative(root, target).split(sep).filter(Boolean)) {
+      path = resolve(path, segment);
+      if (!(await lstat(path)).isDirectory()) return false;
+    }
+    return true;
+  } catch (error) {
+    if ((error as NodeJS.ErrnoException).code === "ENOENT") return false;
+    throw error;
+  }
+}
+
+function assetDirectory(source: ContentSource, directory: string): string {
+  const mapping =
+    directory === "assets"
+      ? source.assetsDirectory
+      : directory === "posts/assets"
+        ? source.postAssetsDirectory
+        : undefined;
+  return sourceDirectory(source.directory, mapping ?? directory);
 }
 
 function duplicateContentError(kind: ContentKind, slug: string): Error {
@@ -276,14 +349,15 @@ async function loadSectionFromSource(
   kind: ContentKind,
   options: LoadSectionOptions,
 ): Promise<ContentItem[]> {
-  const sectionDirectory = resolve(source.directory, `${kind}s`);
-  let sourceFiles: string[];
-  try {
-    sourceFiles = await collectFiles(sectionDirectory);
-  } catch (error) {
-    if ((error as NodeJS.ErrnoException).code === "ENOENT") return [];
-    throw error;
-  }
+  const mapping = kind === "post" ? source.postsDirectory : source.thoughtsDirectory;
+  const sectionDirectory = sourceDirectory(source.directory, mapping ?? `${kind}s`);
+  if (!(await isSourceDirectory(source.directory, sectionDirectory))) return [];
+  const assetRoots = new Set([
+    assetDirectory(source, "assets"),
+    assetDirectory(source, "posts/assets"),
+  ]);
+  if (assetRoots.has(sectionDirectory)) return [];
+  const sourceFiles = await collectFiles(sectionDirectory, assetRoots, mapping !== undefined);
 
   const items: ContentItem[] = [];
   for (const sourcePath of sourceFiles) {
@@ -374,7 +448,7 @@ async function collectFilesForAssets(directory: string): Promise<string[]> {
     const entryPath = resolve(directory, entry.name);
     if (entry.isDirectory()) {
       files.push(...(await collectFilesForAssets(entryPath)));
-    } else {
+    } else if (entry.isFile()) {
       files.push(entryPath);
     }
   }
@@ -390,7 +464,8 @@ export async function collectContentAssets(
   const assets = new Map<string, ContentAsset>();
 
   for (const source of normalizeContentSources(sources)) {
-    const assetRoot = resolve(source.directory, directory);
+    const assetRoot = assetDirectory(source, directory);
+    if (!(await isSourceDirectory(source.directory, assetRoot))) continue;
     const sourceFiles = await collectAssetFiles(assetRoot);
     for (const sourcePath of sourceFiles) {
       const localPath = relative(assetRoot, sourcePath).split(sep).join("/");

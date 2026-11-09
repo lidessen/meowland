@@ -1,29 +1,74 @@
 # Meowpress
 
-`meowpress` provides content reading, page rendering, themes and the build pipeline for static sites.
-Consumers own the site configuration and content and build through this package; the package does not own the application's posts or output directory.
+Meowpress builds a static blog from Markdown and MDX, with a built-in theme for posts, short notes
+and public skills. A project can supply its own theme or page map through `meowpress/build`.
 
-Published history: `0.1.1-alpha.0` was accepted from the registry, followed by `0.1.1-alpha.1` with the English site and CLI defaults; `latest` remained `0.1.0`. The current workspace package is `0.2.0-alpha.0`, and its required CSS and JSX peer ranges accept `^0.2.0-alpha.0`. The host selects the shared CSS/JSX modules, and this package does not privately install another CSS copy; it does not depend on Meowtail or MeowSlides. Out-of-package builds and theme identity acceptance are bound to exact package archives, and peer contracts are not bypassed through overrides. Publishing requires separate explicit authorization.
+## Build and preview a site
 
-This package is a standalone content publishing library with source in `packages/meowpress`; it already has a public build entry, independent tests and typechecking,
-and does not depend on Assistant, WorkCell, Deno or the content and runtime state of a specific Blog. Style generation comes from `meowcss`,
-and HTML rendering comes from `meowjsx/web`; MeowUI does not need to be installed.
+Use Bun and install this version of `meowpress` with compatible `meowcss` and `meowjsx` peers.
+When trying a workspace build, install the archives from `bun run build` and `bun run pack` in your
+project. From that project, add your first post and build the site.
 
-## Entries
+```sh
+mkdir -p content/posts
+printf '# First post\n\nHello from Meowpress.\n' > content/posts/first.md
+bunx --no-install meowpress build
+```
 
-- `meowpress/build`: `meowSite()` defines configuration and `buildSite()` performs the build; this is the only public export.
-  Content reading, page rendering, skill indexing and themes are internal package modules.
-- `meowpress --config ./site.config.ts`: Bun CLI that loads the consumer-provided configuration and builds.
+Meowpress builds `dist/index.html` and `dist/posts/first/index.html`. Put short notes in
+`content/thoughts/` and public skills in `skills/<name>/SKILL.md`. `llms.txt` and `agents.md`
+describe the generated site. The default theme includes `404.html` for static hosts that serve a
+custom error page.
+
+Run `bunx --no-install meowpress preview` to serve the built files at `http://127.0.0.1:4173`.
+Run the build again after editing content. Deploy the `dist/` directory to a static host.
+
+## Configure an existing repository
+
+Place `meowpress.config.ts` in the project root when your content lives outside the default
+folders or when you want to change the site name. This example uses `blog/` for posts, `notes/`
+for short notes and `blog/assets/images/` for the homepage image.
 
 ```ts
 import { meowSite } from "meowpress/build";
 
 export default meowSite({
-  content: [{ directory: "/path/to/content" }],
-  skillsDirectory: "/path/to/workspace",
-  outputDirectory: "/path/to/dist",
+  content: {
+    directory: ".",
+    postsDirectory: "blog",
+    thoughtsDirectory: "notes",
+    assetsDirectory: "blog/assets",
+  },
+  site: {
+    name: "My site",
+    images: { hero: "images/cover.svg" },
+  },
 });
 ```
+
+The directory names in `content` are relative to its `directory`. Posts from `blog/` still have
+URLs under `/posts/`, and notes still have URLs under `/thoughts/`. Meowpress copies `posts/assets/`
+to `/posts/assets/`. Set `postAssetsDirectory` to change the source of those files. Posts and assets
+whose paths contain a file or folder name starting with `_` are treated as drafts.
+
+Pass a project path after `build` or `preview` to run from another directory. The project root
+defaults to the current directory and is the base for relative config paths and output.
+The CLI looks for `meowpress.config.ts`, then `site.config.ts`. Use `--config <file>` to choose a
+file explicitly. `meowpress` and `meowpress --config ./site.config.ts` also build, and `preview`
+accepts `--port <port>`.
+
+Builds replace the generated output after they succeed. Meowpress reuses a nonempty default
+`dist/` only when it contains the previous build's `agents.md` and `llms.txt`. If another tool
+owns `dist/`, set `outputDirectory` to a separate directory and reserve it for generated files.
+
+`includeProjectSkills: true` opts in to publishing `.agents/skills/`. Set `projectRootDirectory`
+to choose the root for those skills. Set `notFound: false` to omit the built-in `404.html`, or
+supply `notFound: { title, message, homeLabel }` to change its copy.
+
+## Build from code
+
+`meowSite()` resolves configuration and `buildSite()` writes the site. Both are exported from
+`meowpress/build`. Use trusted local configuration and MDX, which execute code during a build.
 
 ## Pages a consumer owns
 
@@ -64,7 +109,6 @@ export default meowSite({
   applies to the built-in pages as well, so a renamed stylesheet never leaves a page linking a file
   that was not written.
 
-Directories in the configuration are provided explicitly by the application; the default theme resolves from this package and does not depend on the startup directory.
 The whole theme can be replaced with `theme: defineTheme(...)`; all static pages output that theme's root attributes and default options.
 The build writes `theme.cssText` to a temporary CSS file, then lets Bun handle the other assets, and finally delivers through a stylesheet link,
 so the theme applies without client-side JavaScript.
@@ -80,19 +124,8 @@ Install the listed packages in the site; nothing depends on an external font ser
 Default illustrations use in-package vectors and CSS and require no business images. The `hero`, `feed` and `about` keys of `site.images`
 can explicitly set decorative image paths, for example `images/cover.svg`; paths are relative to the content root's `assets/`, the library handles each page depth,
 and assets are delivered along the existing asset build flow. When no About image is set, the first letter of the site name is used.
-The content source contains `posts/`, `thoughts/` and optional assets; drafts whose names start with an underscore do not enter the published output.
-The site has its own theme and does not implicitly install MeowUI's application theme.
-
-## Verification and build
-
-After installing `meowpress` and its `meowcss` and `meowjsx` dependencies, run in the consumer directory:
-
-```sh
-bunx --no-install meowpress --config ./site.config.ts
-```
-
-The CLI requires Bun, and the output location is determined by `outputDirectory`. Font packages resolve from the startup directory first, then from
-this package, which carries the default Geist, so consumers are not required to copy source, install workspace-root dependencies or access an external font service.
+Font packages resolve from the project root first, then from this package, which carries the
+default Geist.
 
 ## Independent verification
 

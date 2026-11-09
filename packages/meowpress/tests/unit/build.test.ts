@@ -136,3 +136,83 @@ test("builds explicit site artwork from the content assets root across page dept
     await rm(root, { recursive: true, force: true });
   }
 });
+
+test("refuses to replace a configured input directory", async () => {
+  const root = await mkdtemp(join(tmpdir(), "meowpress-overlap-"));
+  const posts = join(root, "blog");
+  const post = join(posts, "hello.md");
+  try {
+    await mkdir(posts);
+    await writeFile(post, "# Keep this post");
+    await expect(
+      buildSite({
+        content: { directory: root, postsDirectory: "blog" },
+        outputDirectory: posts,
+      }),
+    ).rejects.toThrow("Output directory overlaps project files");
+    expect(await Bun.file(post).text()).toBe("# Keep this post");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("a generated-file collision leaves the last successful output intact", async () => {
+  const root = await mkdtemp(join(tmpdir(), "meowpress-collision-"));
+  const content = join(root, "content");
+  const outputDirectory = join(root, "dist");
+  const config = { content, outputDirectory, fonts: [] };
+  const notFound = Bun.file(join(outputDirectory, "404.html"));
+  try {
+    await mkdir(join(content, "assets"), { recursive: true });
+    await buildSite(config);
+    const previous = await notFound.text();
+    await writeFile(join(content, "assets/404.html"), "<h1>Asset collision</h1>");
+    await expect(buildSite(config)).rejects.toThrow(
+      "Content asset would replace a generated file: 404.html",
+    );
+    expect(await notFound.text()).toBe(previous);
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("raw post assets cannot replace generated HTML or Markdown", async () => {
+  const root = await mkdtemp(join(tmpdir(), "meowpress-post-asset-collision-"));
+  const rawAssets = join(root, "content/raw");
+  const outputDirectory = join(root, "dist");
+  const config = {
+    content: { directory: join(root, "content"), postAssetsDirectory: "raw" },
+    outputDirectory,
+    fonts: [],
+    pages: () => [
+      {
+        path: "posts/assets",
+        title: "Assets",
+        html: "<!doctype html><h1>Generated assets page</h1>",
+      },
+      {
+        path: "posts/assets/topic",
+        title: "Topic",
+        html: "<!doctype html><h1>Generated topic page</h1>",
+        markdown: "# Generated Markdown",
+      },
+    ],
+  };
+  try {
+    await mkdir(rawAssets, { recursive: true });
+    await buildSite(config);
+    for (const path of ["index.html", "topic.md"]) {
+      const original = Bun.file(join(outputDirectory, "posts/assets", path));
+      const previous = await original.text();
+      const asset = join(rawAssets, path);
+      await writeFile(asset, "Raw asset");
+      await expect(buildSite(config)).rejects.toThrow(
+        `Content asset would replace a generated file: posts/assets/${path}`,
+      );
+      expect(await original.text()).toBe(previous);
+      await rm(asset);
+    }
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});

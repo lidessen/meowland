@@ -3,7 +3,7 @@ import { blogTheme } from "./theme";
 import { Fragment, h, type Child } from "meowjsx/runtime";
 import { renderToHtml } from "meowjsx/web";
 import { withoutLeadingHeading, type ContentItem } from "./content";
-import { DEFAULT_SITE, type SiteIdentity } from "./identity";
+import { DEFAULT_SITE, type SiteIdentity, type SiteNotFound } from "./identity";
 import { sitePageAgentUrl, type SitePage } from "./pages";
 import type { Skill, SkillFile } from "./skills";
 import { layoutSkillGraph, type SkillGraphNode } from "./skill-graph";
@@ -15,6 +15,7 @@ interface DocumentProps {
   description?: string;
   activePath?: string;
   styleHref: string;
+  baseHref?: string;
   children: Child;
 }
 
@@ -67,6 +68,7 @@ function Document({
   description,
   activePath,
   styleHref,
+  baseHref,
   children,
   theme,
   site,
@@ -80,6 +82,7 @@ function Document({
         <meta name="description" content={description ?? site.description} />
         <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf8f3" />
         <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#191816" />
+        {baseHref ? <base href={baseHref} /> : null}
         <link rel="stylesheet" href={styleHref} />
         <title>{documentTitle}</title>
       </head>
@@ -99,19 +102,19 @@ function pageHtml(props: DocumentProps): string {
 }
 
 function dateLabel(dateKey: string): { date: string; weekday: string } {
-  if (dateKey === "undated") return { date: "Undated", weekday: "" };
-  const date = new Date(`${dateKey}T00:00:00+08:00`);
+  const date = new Date(`${dateKey}T00:00:00Z`);
+  if (Number.isNaN(date.getTime())) return { date: "Undated", weekday: "" };
+  const weekday = new Intl.DateTimeFormat("en-US", {
+    timeZone: "UTC",
+    weekday: "short",
+  }).format(date);
   return {
     date: new Intl.DateTimeFormat("en-US", {
-      timeZone: "Asia/Shanghai",
+      timeZone: "UTC",
       month: "long",
       day: "numeric",
     }).format(date),
-    weekday: new Intl.DateTimeFormat("en-US", {
-      timeZone: "Asia/Shanghai",
-      weekday: "short",
-      year: "numeric",
-    }).format(date),
+    weekday: `${date.getUTCFullYear()} ${weekday}`,
   };
 }
 
@@ -444,6 +447,37 @@ export function listPage(
               isPost ? <PostCard item={item} /> : <ThoughtCard item={item} linked />,
             )
           )}
+        </div>
+      </main>
+    ),
+  });
+}
+
+export function notFoundPage(
+  copy: SiteNotFound,
+  theme: ThemeDefinition,
+  site: SiteIdentity,
+  stylesheet: string,
+): string {
+  const title = copy.title ?? "Page not found";
+  const message = copy.message ?? "This page may have moved or been removed.";
+  return pageHtml({
+    site,
+    theme,
+    title,
+    description: message,
+    styleHref: styleHref(0, stylesheet),
+    // Static hosts can serve 404.html at the missing URL, including deep paths.
+    baseHref: "/",
+    children: (
+      <main className="listing">
+        <header className="listing-head">
+          <span className="kind">404</span>
+          <h1>{title}</h1>
+          <p>{message}</p>
+        </header>
+        <div className="prose">
+          <a href="/">{copy.homeLabel ?? "Back to home"}</a>
         </div>
       </main>
     ),
@@ -1144,6 +1178,7 @@ export function agentMarkdown(
   thoughts: ContentItem[],
   site: SiteIdentity = DEFAULT_SITE,
   pages?: readonly SitePage[],
+  mappedSections = false,
 ): string {
   const siteMap = pages
     ? pages.map((page) => `- [${page.title}](${sitePageAgentUrl(page)})`)
@@ -1165,8 +1200,12 @@ export function agentMarkdown(
     "",
     "## Content model",
     "",
-    `- \`${site.contentDirectory}/thoughts/\` stores trimmed, directly presentable short thoughts.`,
-    `- \`${site.contentDirectory}/posts/\` stores full posts; files whose name or path segment starts with \`_\` are drafts and are not published or rendered.`,
+    mappedSections
+      ? "- Thoughts are trimmed, directly presentable notes."
+      : `- \`${site.contentDirectory}/thoughts/\` stores trimmed, directly presentable short thoughts.`,
+    mappedSections
+      ? "- Posts are full articles. Post files whose name or path segment starts with `_` are drafts."
+      : `- \`${site.contentDirectory}/posts/\` stores full posts; files whose name or path segment starts with \`_\` are drafts and are not published or rendered.`,
     "- Content files support `.md` and `.mdx`, and may start with YAML frontmatter.",
     "- Frontmatter currently has no required fields; `title`, `date`, `created_at`, `category` and `tags` are recognized by the site.",
     "",

@@ -1,8 +1,8 @@
 import { afterEach, expect, test } from "bun:test";
-import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, rm, symlink, utimes, writeFile } from "node:fs/promises";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
-import { collectContentAssets, loadSection } from "../../src/content";
+import { collectContentAssets, loadSection, normalizeContentSources } from "../../src/content";
 
 const temporaryDirectories: string[] = [];
 
@@ -77,4 +77,80 @@ test("collectContentAssets merges assets and keeps source namespaces", async () 
     "images/cat.svg",
     "archive/images/cat.svg",
   ]);
+});
+
+test("maps sections and both asset directories without staging the source tree", async () => {
+  const root = await contentRoot();
+  for (const directory of ["blog/topic/assets", "blog/media/images", "notes", "downloads"]) {
+    await mkdir(join(root, directory), { recursive: true });
+  }
+  await writeFile(
+    join(root, "blog/topic/story.MD"),
+    "# Public Story\n\n![Cat](../../../images/cat.svg)\n",
+  );
+  await writeFile(join(root, "blog/topic/_draft.md"), "# Draft");
+  await writeFile(join(root, "blog/topic/assets/reference.md"), "# Nested asset");
+  await writeFile(join(root, "blog/media/reference.md"), "# Site asset");
+  await writeFile(join(root, "blog/media/images/cat.svg"), "<svg/>");
+  await writeFile(join(root, "notes/note.mdx"), "# Note\n\n<Callout>MDX thought</Callout>");
+  await writeFile(join(root, "downloads/appendix.txt"), "Appendix");
+  await writePost(root, "default.md", "Default post", "2026-09-02");
+
+  const sources = normalizeContentSources(
+    {
+      directory: ".",
+      postsDirectory: "blog",
+      thoughtsDirectory: "notes",
+      assetsDirectory: "blog/media",
+      postAssetsDirectory: "downloads",
+    },
+    root,
+  );
+  const [posts, thoughts, assets, postAssets] = await Promise.all([
+    loadSection(sources, "post"),
+    loadSection(sources, "thought"),
+    collectContentAssets(sources),
+    collectContentAssets(sources, { directory: "posts/assets" }),
+  ]);
+
+  expect(posts.map((post) => post.slug)).toEqual(["topic/story"]);
+  expect(posts[0]?.html).toContain('src="../../../images/cat.svg"');
+  expect(thoughts.map((thought) => thought.slug)).toEqual(["note"]);
+  expect(thoughts[0]?.html).toContain("MDX thought");
+  expect(assets.map((asset) => asset.relativePath)).toEqual(["images/cat.svg", "reference.md"]);
+  expect(postAssets.map((asset) => asset.relativePath)).toEqual(["appendix.txt"]);
+});
+
+test("keeps mapped content and assets inside the selected source tree", async () => {
+  const root = await contentRoot();
+  const privateRoot = await contentRoot();
+  await writePost(privateRoot, "secret.md", "Secret", "2026-09-02");
+  await symlink(join(privateRoot, "posts/secret.md"), join(root, "posts/linked.md"));
+  await symlink(privateRoot, join(root, "linked"), "dir");
+  await mkdir(join(root, "assets"));
+  await symlink(join(privateRoot, "posts/secret.md"), join(root, "assets/linked.md"));
+
+  const linkedSection = { directory: root, postsDirectory: "linked/posts" };
+  const linkedAssets = { directory: root, assetsDirectory: "linked/posts" };
+  expect(await loadSection(root, "post")).toEqual([]);
+  expect(await loadSection(linkedSection, "post")).toEqual([]);
+  expect(await collectContentAssets(root)).toEqual([]);
+  expect(await collectContentAssets(linkedAssets)).toEqual([]);
+  expect(() => normalizeContentSources({ directory: root, postsDirectory: "../outside" })).toThrow(
+    "Content directory must stay inside its source root",
+  );
+  expect(() =>
+    normalizeContentSources({ directory: root, slugPrefix: "archive/../../outside" }),
+  ).toThrow("Content slug prefix");
+});
+
+test("falls back to a stable calendar key when frontmatter has an invalid date", async () => {
+  const root = await contentRoot();
+  await writePost(root, "invalid-date.md", "Invalid Date", "2026-13-01");
+  const modified = new Date("2026-09-01T18:00:00Z");
+  await utimes(join(root, "posts/invalid-date.md"), modified, modified);
+
+  const posts = await loadSection(root, "post");
+
+  expect(posts[0]?.dateKey).toBe("2026-09-02");
 });

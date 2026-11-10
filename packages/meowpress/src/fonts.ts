@@ -22,7 +22,7 @@ export const FONT_EXTERNAL = `./${FONT_DIRECTORY}/*`;
 
 /**
  * Resolve a package file from the site first (where a host installs its theme's fonts), then from
- * this package (which carries the default Geist).
+ * this package (which carries the default Journal fonts).
  */
 function resolveFontFile(specifier: string): string {
   for (const from of [process.cwd(), dirname(fileURLToPath(import.meta.url))]) {

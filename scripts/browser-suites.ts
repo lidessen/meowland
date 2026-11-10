@@ -57,6 +57,11 @@ export const browserSuites: readonly BrowserSuite[] = [
     config: "packages/meowslides/tests/browser/authoring/playwright.config.ts",
     root: "packages/meowslides",
   },
+  {
+    suite: "meowpress",
+    config: "packages/meowpress/tests/browser/playwright.config.ts",
+    root: "packages/meowpress",
+  },
   { suite: "showcase", config: "apps/showcase/playwright.config.ts", root: "apps/showcase" },
   ...["image-loading", "sunshine-welcome", "protecting-pandas"].map((work) => ({
     suite: work,

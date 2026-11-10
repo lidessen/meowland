@@ -4,7 +4,7 @@ import { mkdir, mkdtemp, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import { buildSite } from "meowpress/build";
-import { blogTokens } from "../../src/theme";
+import { uiTokens } from "meowtail/theme";
 
 test("builds Markdown and MDX while excluding draft pages and assets", async () => {
   const root = await mkdtemp(join(tmpdir(), "meowpress-build-"));
@@ -56,9 +56,9 @@ test("builds Markdown and MDX while excluding draft pages and assets", async () 
     const styleHref = markdown.match(/href="([^" ]+\.css)"/)![1]!;
     const cssText = await Bun.file(join(output, "posts/public", styleHref)).text();
     expect(cssText).toContain(tokens.ink.name);
-    expect(cssText).not.toContain(blogTokens.bg.name);
+    expect(cssText).not.toContain(uiTokens.surface.canvas.name);
     // A theme without fonts publishes no font files or licenses.
-    expect(await Bun.file(join(output, "licenses/geist-OFL.txt")).exists()).toBe(false);
+    expect(await Bun.file(join(output, "licenses/newsreader-OFL.txt")).exists()).toBe(false);
     expect(cssText).not.toContain("@font-face");
     expect(mdx).toContain("MDX fixture content");
     expect(mdx).toContain("mdx-callout");
@@ -74,10 +74,10 @@ test("builds Markdown and MDX while excluding draft pages and assets", async () 
       expect(text).not.toContain("Draft secret");
       expect(text).not.toContain("DO_NOT_PUBLISH");
     }
-    // The default font must also build from a consumer outside this workspace.
+    // Journal fonts must also build from a consumer outside this workspace.
     await buildSite({ content, skillsDirectory: root, outputDirectory: output });
     const home = await Bun.file(join(output, "index.html")).text();
-    expect(home).toContain('data-meowui-theme-root="blog"');
+    expect(home).toContain('data-meowui-theme-root="meowui"');
     expect(home).not.toContain("<img");
     const about = await Bun.file(join(output, "about/index.html")).text();
     expect(about).toContain('class="avatar-initial"');
@@ -92,14 +92,23 @@ test("builds Markdown and MDX while excluding draft pages and assets", async () 
     const fontFiles = [...defaultCSS.matchAll(/url\(\.\/(fonts\/[^)]+\.woff2)\)/g)].map(
       (match) => match[1]!,
     );
-    expect(fontFiles.some((file) => /geist-latin-wght-normal-[0-9a-f]{8}\.woff2$/.test(file))).toBe(
-      true,
-    );
+    for (const name of ["newsreader", "inter", "jetbrains-mono"]) {
+      expect(fontFiles.some((file) => file.includes(`${name}-latin-wght-normal-`))).toBe(true);
+      expect(await Bun.file(join(output, `licenses/${name}-OFL.txt`)).text()).toContain(
+        "SIL OPEN FONT LICENSE Version 1.1",
+      );
+    }
+    expect(fontFiles.some((file) => file.includes("newsreader-latin-wght-italic-"))).toBe(true);
     for (const file of fontFiles) expect(await Bun.file(join(output, file)).exists()).toBe(true);
     expect(defaultCSS).not.toContain("node_modules");
-    expect(await Bun.file(join(output, "licenses/geist-OFL.txt")).text()).toContain(
-      "SIL OPEN FONT LICENSE Version 1.1",
-    );
+    // An explicit empty font list overrides the default without changing the Journal theme.
+    await buildSite({ content, skillsDirectory: root, outputDirectory: output, fonts: [] });
+    const noFontsHome = await Bun.file(join(output, "index.html")).text();
+    const noFontsHref = noFontsHome.match(/href="([^" ]+\.css)"/)![1]!;
+    const noFontsCSS = await Bun.file(join(output, noFontsHref)).text();
+    expect(noFontsCSS).toContain(uiTokens.surface.canvas.name);
+    expect(noFontsCSS).not.toContain("@font-face");
+    expect(await Bun.file(join(output, "licenses/newsreader-OFL.txt")).exists()).toBe(false);
   } finally {
     await rm(root, { recursive: true, force: true });
   }

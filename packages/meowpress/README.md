@@ -1,6 +1,6 @@
 # Meowpress
 
-Meowpress builds a static blog from Markdown and MDX, with a built-in theme for posts, short notes
+Meowpress builds a static blog from Markdown and MDX, with a built-in Journal-based theme for posts, short notes
 and public skills. A project can supply its own theme or page map through `meowpress/build`.
 
 ## Build and preview a site
@@ -119,13 +119,16 @@ each package's weight-axis `woff2` files into `fonts/` with a content hash, puts
 rules first in the theme stylesheet with each subset's `unicode-range`, and copies each license to
 `licenses/<name>-OFL.txt`. A browser fetches only the files a page's text and families use, and
 nothing for a family the page does not use, so a site with a theme switch pays only for the active
-theme. The default Blog theme defaults to `blogFonts` (Geist); any other theme defaults to none.
+theme. The built-in blog theme defaults to `blogFonts`, which shares Journal’s font list:
+Newsreader (normal and italic), Inter,
+and JetBrains Mono. Any other theme defaults to no fonts; set `fonts` explicitly to provide them,
+or set `fonts: []` to omit font assets.
 Install the listed packages in the site; nothing depends on an external font service.
-Default illustrations use in-package vectors and CSS and require no business images. The `hero`, `feed` and `about` keys of `site.images`
+The default pages need no images. The `hero`, `feed` and `about` keys of `site.images`
 can explicitly set decorative image paths, for example `images/cover.svg`; paths are relative to the content root's `assets/`, the library handles each page depth,
 and assets are delivered along the existing asset build flow. When no About image is set, the first letter of the site name is used.
 Font packages resolve from the project root first, then from this package, which carries the
-default Geist.
+three default font families.
 
 ## Independent verification
 
@@ -133,3 +136,9 @@ Once repository dependencies are ready, run `bun run --cwd packages/meowpress te
 `bun run --cwd packages/meowpress typecheck`. Tests live in `tests/unit/`; real build tests create temporary content, themes and images through the public
 `meowpress/build` entry,
 covering Markdown, MDX, Thought output and draft page/asset exclusion, without reading Blog content or invoking the Blog build.
+
+After `bun run build`, run `bun run --cwd packages/meowpress test:browser` for the Journal
+browser regressions. The fixture server builds a temporary site through `meowpress/build` and
+cleans it up on exit. The suite covers desktop and mobile widths in light and dark schemes,
+repeated feed and skill-browser interactions, clipboard copy, deep 404 stylesheets, no-JavaScript
+content, and wide-content containment. Screenshots are written to `packages/meowpress/test-results/`.

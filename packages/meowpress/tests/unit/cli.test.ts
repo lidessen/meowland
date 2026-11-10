@@ -40,14 +40,14 @@ test("the CLI builds conventional directories without a config", async () => {
     );
     const home = await Bun.file(join(output, "index.html")).text();
     expect(home).toContain("September 1");
-    expect(home).toContain(">2026 Tue</span>");
+    expect(home).toMatch(/data-meowui-part="section\/description"[^>]*>2026 Tue<\/p>/);
     expect(await Bun.file(join(output, "skills/project/internal/index.html")).exists()).toBe(false);
     const publicPage = await Bun.file(join(output, "skills/public/index.html")).text();
     expect(publicPage).toContain("A public fixture.");
     expect(publicPage).not.toContain("Internal-only fixture");
     expect(await Bun.file(join(root, ".generated/keep.txt")).exists()).toBe(true);
     const notFound = await Bun.file(join(output, "404.html")).text();
-    expect(notFound).toContain("<h1>Page not found</h1>");
+    expect(notFound).toMatch(/<h1[^>]*>Page not found<\/h1>/);
     expect(notFound).toContain('<base href="/">');
     const stylesheet = notFound.match(/href="([^" ]+\.css)"/)?.[1];
     expect(stylesheet).toBeDefined();
@@ -124,7 +124,7 @@ test("the CLI resolves config and its directories from an explicit project root"
     expect(agentGuide).toContain("[A mapped post](/posts/hello/)");
     expect(agentGuide).not.toContain("content/posts");
     const notFound = await Bun.file(join(output, "404.html")).text();
-    expect(notFound).toContain("<h1>Lost page</h1>");
+    expect(notFound).toMatch(/<h1[^>]*>Lost page<\/h1>/);
     expect(notFound).toContain("Try the home page.");
     expect(notFound).toContain('href="/">Go home</a>');
     expect(await Bun.file(join(site, "legacy/index.html")).exists()).toBe(false);

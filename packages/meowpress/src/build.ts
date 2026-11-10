@@ -46,7 +46,7 @@ export interface SiteConfig {
   skillsDirectory?: string;
   /** Static output directory for the generated site. Defaults to `dist/`. */
   outputDirectory?: string;
-  /** Defaults to this package's own Blog theme. */
+  /** Defaults to the Journal-based Blog theme. */
   theme?: ThemeDefinition;
   /** Include project `.agents/skills/` in the public build. Defaults to false. */
   includeProjectSkills?: boolean;
@@ -68,7 +68,7 @@ export interface SiteConfig {
   /** Stylesheet file name for the theme; defaults to "blog-theme.css". */
   themeStylesheet?: string;
   /**
-   * Web fonts the theme names, published as separate files with their licenses. Defaults to Geist
+   * Web fonts the theme names, published as separate files with their licenses. Defaults to Journal fonts
    * for the default Blog theme and to none for any other theme.
    */
   fonts?: readonly SiteFont[];

@@ -383,34 +383,50 @@ const tokens=defineTokens("consumer-press",{ink:["black","white"]});const theme=
   const home = await readFile(join(output, "index.html"), "utf8");
   const href = home.match(/href="([^" ]+\.css)"/)?.[1];
   assert(
-    href && home.includes('data-meowui-theme-root="blog"'),
+    href && home.includes('data-meowui-theme-root="meowui"'),
     "Press default theme/root missing",
   );
   const defaultCSS = await readFile(join(output, href), "utf8");
-  const geistFile = defaultCSS.match(
-    /url\(\.\/(fonts\/geist-latin-wght-normal-[0-9a-f]{8}\.woff2)\)/,
-  )?.[1];
   assert(
     defaultCSS.includes("@font-face") &&
-      geistFile !== undefined &&
-      existsSync(join(output, geistFile)) &&
       !defaultCSS.includes("data:font") &&
       !defaultCSS.includes("@import") &&
       !defaultCSS.includes("node_modules"),
-    "Press default Geist font did not build from installed dependencies",
+    "Press Journal font stylesheet did not build from installed dependencies",
+  );
+  for (const family of ["newsreader", "inter", "jetbrains-mono"]) {
+    const fontFile = defaultCSS.match(
+      new RegExp(`url\\(\\.\\/(fonts/${family}-latin-wght-normal-[0-9a-f]{8}\\.woff2)\\)`),
+    )?.[1];
+    assert(
+      fontFile && existsSync(join(output, fontFile)),
+      `Press output omitted the ${family} font`,
+    );
+    assert(
+      (await readFile(join(output, `licenses/${family}-OFL.txt`), "utf8")).includes(
+        "SIL OPEN FONT LICENSE",
+      ),
+      `Press output omitted the ${family} OFL license`,
+    );
+  }
+  const italicFile = defaultCSS.match(
+    /url\(\.\/(fonts\/newsreader-latin-wght-italic-[0-9a-f]{8}\.woff2)\)/,
+  )?.[1];
+  assert(
+    italicFile && existsSync(join(output, italicFile)),
+    "Press output omitted Journal's italic reading font",
   );
   assert(
-    (await readFile(join(output, "licenses/geist-OFL.txt"), "utf8")).includes(
-      "SIL OPEN FONT LICENSE Version 1.1",
-    ),
-    "Press output omitted the Geist OFL license",
+    home.includes('data-meowui-part="page-header/title"') &&
+      markdown.includes('data-meowui-part="prose/root"'),
+    "Press default pages lost Journal component styling",
   );
   await command(["bun", "../custom.ts"], join(site, "runner"));
   checks.push(
     "installed Press CLI from nested external cwd: Markdown/MDX/thoughts, draft exclusion and public local assets",
   );
   checks.push(
-    "Press default Geist font embedded with OFL; Press/consumer public CSS resolution and defineTheme identity match; custom ThemeDefinition/token/options round-trip preserved",
+    "Press default Journal fonts published as local assets with OFL; Press/consumer public CSS resolution and defineTheme identity match; custom ThemeDefinition/token/options round-trip preserved",
   );
 }
 export async function consume(options: ConsumerOptions) {

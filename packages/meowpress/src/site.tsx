@@ -1,7 +1,22 @@
 import { themeAttributes, type ThemeDefinition } from "meowcss";
+import { createRuntime, Fragment, h, type Child } from "meowjsx";
+import { renderToHtmlWithRuntime } from "meowjsx/web";
+import {
+  Button,
+  Container,
+  Entry,
+  EntryList,
+  Inline,
+  MetaRow,
+  Page,
+  PageHeader,
+  Prose,
+  Section,
+  Tag,
+  Text,
+  createMeowUI,
+} from "meowtail";
 import { blogTheme } from "./theme";
-import { Fragment, h, type Child } from "meowjsx/runtime";
-import { renderToHtml } from "meowjsx/web";
 import { withoutLeadingHeading, type ContentItem } from "./content";
 import { DEFAULT_SITE, type SiteIdentity, type SiteNotFound } from "./identity";
 import { sitePageAgentUrl, type SitePage } from "./pages";
@@ -16,35 +31,39 @@ interface DocumentProps {
   activePath?: string;
   styleHref: string;
   baseHref?: string;
+  wide?: boolean;
   children: Child;
 }
 
 /** The name of the theme stylesheet the package writes by default. */
 export const DEFAULT_THEME_STYLESHEET = "blog-theme.css";
 
-/** The href of the theme stylesheet for a page at a given depth. */
 function styleHref(depth: number, stylesheet: string): string {
   return `${"../".repeat(depth)}${stylesheet}`;
 }
 
-/** The number of directories a slug puts a page below its section. */
 function slugDepth(slug: string): number {
   return slug.split("/").filter(Boolean).length;
 }
 
 function SiteHeader({ activePath, site }: { activePath?: string; site: SiteIdentity }): Child {
+  const links = [
+    ["/posts/", "Posts"],
+    ["/thoughts/", "Thoughts"],
+    ["/skills/", "Skills"],
+    ["/about/", "About"],
+  ] as const;
   return (
-    <header className="site">
+    <header className="site-header">
       <a className="site-name" href="/">
         {site.name}
       </a>
       <nav className="site-nav" aria-label="Primary navigation">
-        <a className={activePath === "/skills/" ? "active" : ""} href="/skills/">
-          Skills
-        </a>
-        <a className={activePath === "/about/" ? "active" : ""} href="/about/">
-          About
-        </a>
+        {links.map(([href, label]) => (
+          <a href={href} aria-current={activePath === href ? "page" : undefined}>
+            {label}
+          </a>
+        ))}
       </nav>
     </header>
   );
@@ -52,13 +71,14 @@ function SiteHeader({ activePath, site }: { activePath?: string; site: SiteIdent
 
 function SiteFooter({ site }: { site: SiteIdentity }): Child {
   return (
-    <footer className="site">
-      <span className="brand">
+    <footer className="site-footer">
+      <Text variant="caption">
         © {new Date().getFullYear()} {site.name}
-      </span>
-      <span>
-        <a href="/llm.txt">llm.txt</a> · <a href="/agents.md">agents.md</a>
-      </span>
+      </Text>
+      <Inline gap="compact">
+        <a href="/llm.txt">llm.txt</a>
+        <a href="/agents.md">agents.md</a>
+      </Inline>
     </footer>
   );
 }
@@ -69,28 +89,33 @@ function Document({
   activePath,
   styleHref,
   baseHref,
+  wide,
   children,
   theme,
   site,
 }: DocumentProps): Child {
-  const documentTitle = title === site.name ? site.name : `${title} · ${site.name}`;
   return (
-    <html lang="en" {...themeAttributes(theme)}>
+    <html lang="en" data-meowui-page="" {...themeAttributes(theme)}>
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <meta name="description" content={description ?? site.description} />
-        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf8f3" />
-        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#191816" />
         {baseHref ? <base href={baseHref} /> : null}
         <link rel="stylesheet" href={styleHref} />
-        <title>{documentTitle}</title>
+        <title>{title === site.name ? site.name : `${title} · ${site.name}`}</title>
       </head>
       <body data-site={site.id}>
-        <div className="container">
-          <SiteHeader activePath={activePath} site={site} />
-          {children}
-          <SiteFooter site={site} />
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
+        <div className="site-shell">
+          <Container width={wide ? "wide" : "content"}>
+            <SiteHeader activePath={activePath} site={site} />
+            <main id="main-content" tabIndex={-1}>
+              {children}
+            </main>
+            <SiteFooter site={site} />
+          </Container>
         </div>
       </body>
     </html>
@@ -98,23 +123,40 @@ function Document({
 }
 
 function pageHtml(props: DocumentProps): string {
-  return `<!doctype html>\n${renderToHtml(<Document {...props} />)}`;
+  // Static rendering needs the same part/option adapter as a browser mount. No hydration is needed.
+  const runtime = createRuntime({
+    plugins: [
+      createMeowUI({
+        components: [
+          Button,
+          Container,
+          Entry,
+          EntryList,
+          Inline,
+          MetaRow,
+          Page,
+          PageHeader,
+          Prose,
+          Section,
+          Tag,
+          Text,
+        ],
+      }),
+    ],
+  });
+  return `<!doctype html>\n${renderToHtmlWithRuntime(runtime, <Document {...props} />)}`;
 }
 
 function dateLabel(dateKey: string): { date: string; weekday: string } {
   const date = new Date(`${dateKey}T00:00:00Z`);
   if (Number.isNaN(date.getTime())) return { date: "Undated", weekday: "" };
-  const weekday = new Intl.DateTimeFormat("en-US", {
-    timeZone: "UTC",
-    weekday: "short",
-  }).format(date);
   return {
     date: new Intl.DateTimeFormat("en-US", {
       timeZone: "UTC",
       month: "long",
       day: "numeric",
     }).format(date),
-    weekday: `${date.getUTCFullYear()} ${weekday}`,
+    weekday: `${date.getUTCFullYear()} ${new Intl.DateTimeFormat("en-US", { timeZone: "UTC", weekday: "short" }).format(date)}`,
   };
 }
 
@@ -122,119 +164,53 @@ function itemUrl(item: ContentItem): string {
   return `/${item.kind}s/${item.slug}/`;
 }
 
-function Hero({ image }: { image?: string }): Child {
-  return (
-    <section className="hero" aria-labelledby="hero-title">
-      <div className="hero-copy">
-        <h1 id="hero-title">
-          Ten thousand years is too long;
-          <br />
-          <em>only this day is true.</em>
-        </h1>
-      </div>
-      <div className="hero-work" aria-hidden="true">
-        <svg className="hero-doodle" viewBox="0 0 260 190">
-          <path
-            className="doodle-loop"
-            d="M24 96C20 45 58 18 122 20c72 2 116 33 114 84-2 48-48 70-113 68-65-2-96-27-99-76Z"
-          />
-          <circle className="doodle-sun" cx="194" cy="55" r="27" />
-          <path className="doodle-page" d="M47 100c28-9 57-5 83 11v49c-24-13-52-16-83-7Z" />
-          <path className="doodle-page" d="M130 111c24-15 52-19 82-9v51c-31-7-58-4-82 7Z" />
-          <path className="doodle-spine" d="M130 111v49" />
-          <path
-            className="doodle-writing"
-            d="M61 118c18-3 36-1 53 5M61 132c17-2 32 0 46 5M148 119c17-4 33-5 50-1M148 133c14-3 29-3 44 0"
-          />
-          <circle className="doodle-dot" cx="41" cy="61" r="5" />
-          <path className="doodle-spark" d="M72 44v12M66 50h12" />
-        </svg>
-        {image ? <img className="hero-image" src={image} alt="" decoding="async" /> : null}
-      </div>
-    </section>
-  );
-}
-
-function DoodleGithubIcon(): Child {
-  return (
-    <svg className="github-icon" viewBox="0 0 48 48" aria-hidden="true">
-      <path
-        className="github-icon-ring"
-        d="M24 3.8C11.7 3.5 4.2 11.2 4.6 24.1c.3 12.1 7.8 20.1 19.6 20 12.2-.1 19.4-7.7 19.2-20C43.2 11.7 36.2 4.1 24 3.8Z"
-      />
-      <path
-        className="github-icon-cat"
-        d="M14.3 18.8c-.7-2.4-.3-5.1.8-7.1 3.2.1 5.4 1.3 6.6 2.2 1.5-.4 3.1-.6 4.8-.4 1.4-1 3.7-1.9 6.7-1.8 1 2.2 1.3 4.9.5 7.1 1.5 1.8 2.2 4.1 2 6.8-.4 5.2-3.2 8.2-8.2 8.8.8.7 1.3 1.9 1.3 3.8v4.3c-1.5.4-3.1.6-4.8.6-1.4 0-2.8-.1-4.2-.5v-3.4c0-1.8.5-3.1 1.4-4-4.8-.6-7.7-3.5-8.2-8.7-.3-2.7.4-5 1.3-6.7Z"
-      />
-      <path
-        className="github-icon-face"
-        d="M20.2 24.3h.1M29.2 24.3h.1M21.2 28.9c2.2 1.4 4.5 1.4 6.8 0"
-      />
-    </svg>
-  );
-}
-
-function DoodleExternalArrow(): Child {
-  return (
-    <svg className="external-arrow" viewBox="0 0 28 28" aria-hidden="true">
-      <path d="M7 21 21 7M12 7h9v9" />
-    </svg>
-  );
-}
-
 function Tags({ item }: { item: ContentItem }): Child {
-  if (item.tags.length === 0) return null;
-  return (
-    <div className="tags">
+  return item.tags.length ? (
+    <Inline gap="compact">
       {item.tags.map((tag) => (
-        <span>#{tag}</span>
+        <Tag>{tag}</Tag>
       ))}
-    </div>
-  );
+    </Inline>
+  ) : null;
 }
 
 function ThoughtCard({ item, linked = false }: { item: ContentItem; linked?: boolean }): Child {
-  const body = (
-    <Fragment>
-      <div className="time">
-        <span className="t">{item.timeLabel || item.dateKey}</span> · Thought
-      </div>
-      <div
-        className="body"
-        dangerouslySetInnerHTML={{ __html: withoutLeadingHeading(item.html) }}
-      />
-      <Tags item={item} />
-    </Fragment>
-  );
-  if (!linked)
-    return (
-      <article className="thought" data-kind="thought">
-        {body}
-      </article>
-    );
   return (
-    <article className="thought" data-kind="thought">
-      <a className="thought-link" href={itemUrl(item)}>
-        {body}
-      </a>
-    </article>
+    <Entry
+      className="thought"
+      data-kind="thought"
+      title={item.title}
+      href={linked ? itemUrl(item) : undefined}
+      eyebrow={`${item.timeLabel || item.dateKey} · Thought`}
+    >
+      <Prose dangerouslySetInnerHTML={{ __html: withoutLeadingHeading(item.html) }} />
+      <Tags item={item} />
+    </Entry>
   );
 }
 
 function PostCard({ item }: { item: ContentItem }): Child {
   const category = typeof item.metadata.category === "string" ? item.metadata.category : "Post";
   return (
-    <a className="post-card" href={itemUrl(item)} data-kind="post">
-      <div className="card-top">
-        <span className="kind">{category}</span>
-        <span className="meta">
-          About {item.readingMinutes} min · {item.characterCount} characters
-        </span>
-      </div>
-      <h3>{item.title}</h3>
-      <p className="excerpt">{item.excerpt || "This post has no summary yet."}</p>
+    <Entry
+      size="feature"
+      data-kind="post"
+      title={item.title}
+      href={itemUrl(item)}
+      eyebrow={category}
+      description={item.excerpt || "This post has no summary yet."}
+      meta={
+        <MetaRow
+          items={[
+            { label: item.dateKey },
+            { label: `${item.readingMinutes} min read` },
+            { label: `${item.characterCount} characters` },
+          ]}
+        />
+      }
+    >
       <Tags item={item} />
-    </a>
+    </Entry>
   );
 }
 
@@ -248,99 +224,57 @@ function groupByDate(items: ContentItem[]): Map<string, ContentItem[]> {
   return groups;
 }
 
-function FeedDecor({ image }: { image?: string }): Child {
-  return (
-    <div className="feed-decor" aria-hidden="true">
-      <svg className="yarn-doodle" viewBox="0 0 88 70">
-        <path
-          className="yarn-tail"
-          d="M42 48c-10 7-17 4-22 9-5 4-2 9 4 8 8-1 11-8 18-6 6 1 10 6 16 4"
-        />
-        <circle className="yarn-fill" cx="48" cy="34" r="22" />
-        <path
-          className="yarn-line"
-          d="M31 23c11 1 22 7 34 18M28 34c12-7 24-9 39-5M34 49c7-14 16-24 28-31M28 42c13 1 24 5 33 12"
-        />
-      </svg>
-      <svg className="paw-trail" viewBox="0 0 130 82">
-        <g className="paw-print" transform="translate(12 54) rotate(-18)">
-          <ellipse cx="9" cy="11" rx="6" ry="5" />
-          <circle cx="3" cy="3" r="2.5" />
-          <circle cx="9" cy="1" r="2.5" />
-          <circle cx="15" cy="3" r="2.5" />
-        </g>
-        <g className="paw-print" transform="translate(45 37) rotate(8)">
-          <ellipse cx="9" cy="11" rx="6" ry="5" />
-          <circle cx="3" cy="3" r="2.5" />
-          <circle cx="9" cy="1" r="2.5" />
-          <circle cx="15" cy="3" r="2.5" />
-        </g>
-        <g className="paw-print" transform="translate(79 19) rotate(-12)">
-          <ellipse cx="9" cy="11" rx="6" ry="5" />
-          <circle cx="3" cy="3" r="2.5" />
-          <circle cx="9" cy="1" r="2.5" />
-          <circle cx="15" cy="3" r="2.5" />
-        </g>
-        <g className="paw-print paw-print-accent" transform="translate(111 5) rotate(11)">
-          <ellipse cx="7" cy="9" rx="5" ry="4" />
-          <circle cx="2" cy="2" r="2" />
-          <circle cx="7" cy="1" r="2" />
-          <circle cx="12" cy="2" r="2" />
-        </g>
-      </svg>
-      {image ? <img className="feed-image" src={image} alt="" decoding="async" /> : null}
-    </div>
-  );
-}
-
 function Feed({ items, image }: { items: ContentItem[]; image?: string }): Child {
-  if (items.length === 0) {
-    return (
-      <main className="feed feed-empty">
-        <p className="empty-state">No public content yet.</p>
-        <FeedDecor image={image} />
-      </main>
-    );
-  }
-
   return (
-    <main className="feed">
-      {[...groupByDate(items)].map(([dateKey, group]) => {
-        const label = dateLabel(dateKey);
-        return (
-          <section className="day">
-            <h2 className="day-header">
-              {label.date} <span className="weekday">{label.weekday}</span>
-            </h2>
-            {group.map((item) =>
-              item.kind === "thought" ? (
-                <ThoughtCard item={item} linked />
-              ) : (
-                <PostCard item={item} />
-              ),
-            )}
-          </section>
-        );
-      })}
-      <FeedDecor image={image} />
-    </main>
+    <div className="feed">
+      {items.length === 0 ? (
+        <Text variant="secondary">No public content yet.</Text>
+      ) : (
+        [...groupByDate(items)].map(([dateKey, group]) => {
+          const label = dateLabel(dateKey);
+          return (
+            <Section className="day" title={label.date} description={label.weekday}>
+              <EntryList>
+                {group.map((item) =>
+                  item.kind === "thought" ? (
+                    <ThoughtCard item={item} linked />
+                  ) : (
+                    <PostCard item={item} />
+                  ),
+                )}
+              </EntryList>
+            </Section>
+          );
+        })
+      )}
+      {image ? (
+        <img className="feed-image" src={image} alt="" loading="lazy" decoding="async" />
+      ) : null}
+    </div>
   );
 }
 
 function Filter({ posts, thoughts }: { posts: number; thoughts: number }): Child {
-  const total = posts + thoughts;
   return (
-    <div className="tag-filter" data-filter-group="feed" role="group" aria-label="Filter home feed">
-      <button type="button" data-filter="all" className="active" aria-pressed="true">
-        All<i>{total}</i>
-      </button>
-      <button type="button" data-filter="post" aria-pressed="false">
-        Posts<i>{posts}</i>
-      </button>
-      <button type="button" data-filter="thought" aria-pressed="false">
-        Thoughts<i>{thoughts}</i>
-      </button>
-    </div>
+    <Inline
+      className="feed-filter"
+      gap="compact"
+      data-filter-group="feed"
+      role="group"
+      aria-label="Filter home feed"
+    >
+      {(
+        [
+          ["all", "All", posts + thoughts],
+          ["post", "Posts", posts],
+          ["thought", "Thoughts", thoughts],
+        ] as const
+      ).map(([value, label, count]) => (
+        <Button variant="quiet" data-filter={value} aria-pressed={String(value === "all")}>
+          {label} <span className="filter-count">{count}</span>
+        </Button>
+      ))}
+    </Inline>
   );
 }
 
@@ -348,44 +282,11 @@ const FILTER_SCRIPT = `(() => {
   const links = document.querySelectorAll('[data-filter-group="feed"] [data-filter]');
   const items = document.querySelectorAll('.feed [data-kind]');
   const days = document.querySelectorAll('.feed .day');
-  const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  if ('IntersectionObserver' in window && !reduced) {
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('in');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.08 });
-    days.forEach((day) => observer.observe(day));
-  } else {
-    days.forEach((day) => day.classList.add('in'));
-  }
-  links.forEach((link) => link.addEventListener('click', (event) => {
-    event.preventDefault();
+  links.forEach((link) => link.addEventListener('click', () => {
     const filter = link.dataset.filter;
-    links.forEach((item) => {
-      const active = item === link;
-      item.classList.toggle('active', active);
-      item.setAttribute('aria-pressed', String(active));
-    });
-    items.forEach((item) => {
-      item.style.display = filter === 'all' || item.dataset.kind === filter ? '' : 'none';
-    });
-    days.forEach((day) => {
-      const visible = Array.from(day.querySelectorAll('[data-kind]'))
-        .some((item) => item.style.display !== 'none');
-      day.style.display = visible ? '' : 'none';
-      if (!visible) day.classList.remove('in');
-    });
-    if (!reduced) {
-      requestAnimationFrame(() => requestAnimationFrame(() => {
-        days.forEach((day) => {
-          if (day.style.display !== 'none') day.classList.add('in');
-        });
-      }));
-    }
+    links.forEach((button) => button.setAttribute('aria-pressed', String(button === link)));
+    items.forEach((item) => { item.hidden = filter !== 'all' && item.dataset.kind !== filter; });
+    days.forEach((day) => { day.hidden = !Array.from(day.querySelectorAll('[data-kind]')).some((item) => !item.hidden); });
   }));
 })();`;
 
@@ -401,15 +302,28 @@ export function homePage(
     title: site.name,
     styleHref: styleHref(0, stylesheet),
     children: (
-      <Fragment>
-        <Hero image={site.images?.hero ? `./${site.images.hero}` : undefined} />
-        <Filter
-          posts={items.filter((item) => item.kind === "post").length}
-          thoughts={items.filter((item) => item.kind === "thought").length}
-        />
+      <Page
+        header={
+          <div className="home-heading">
+            <div className="home-heading-copy">
+              <Text variant="eyebrow">Journal</Text>
+              <PageHeader title={site.name} description={site.description} />
+            </div>
+            {site.images?.hero ? (
+              <img className="hero-image" src={`./${site.images.hero}`} alt="" decoding="async" />
+            ) : null}
+          </div>
+        }
+        toolbar={
+          <Filter
+            posts={items.filter((item) => item.kind === "post").length}
+            thoughts={items.filter((item) => item.kind === "thought").length}
+          />
+        }
+      >
         <Feed items={items} image={site.images?.feed ? `./${site.images.feed}` : undefined} />
         <script dangerouslySetInnerHTML={{ __html: FILTER_SCRIPT }} />
-      </Fragment>
+      </Page>
     ),
   });
 }
@@ -422,33 +336,33 @@ export function listPage(
   stylesheet: string = DEFAULT_THEME_STYLESHEET,
 ): string {
   const isPost = kind === "post";
+  const title = isPost ? "Posts" : "Thoughts";
   return pageHtml({
     site,
     theme,
-    title: isPost ? "Posts" : "Thoughts",
+    title,
     activePath: isPost ? "/posts/" : "/thoughts/",
     styleHref: styleHref(1, stylesheet),
     children: (
-      <main className="listing">
-        <header className="listing-head">
-          <span className="kind">{isPost ? "Posts" : "Thoughts"}</span>
-          <h1>{isPost ? "Posts" : "Thoughts"}</h1>
-          <p>
-            {isPost
-              ? "Complete arguments grown from fragments."
-              : "Short, trimmed thoughts ready to show as they are."}
-          </p>
-        </header>
-        <div className={isPost ? "post-list" : "thought-list"}>
-          {items.length === 0 ? (
-            <p className="empty-state">No public content yet.</p>
-          ) : (
-            items.map((item) =>
+      <Page
+        title={title}
+        eyebrow="Archive"
+        description={
+          isPost
+            ? "Complete arguments grown from fragments."
+            : "Short, trimmed thoughts ready to show as they are."
+        }
+      >
+        {items.length ? (
+          <EntryList>
+            {items.map((item) =>
               isPost ? <PostCard item={item} /> : <ThoughtCard item={item} linked />,
-            )
-          )}
-        </div>
-      </main>
+            )}
+          </EntryList>
+        ) : (
+          <Text variant="secondary">No public content yet.</Text>
+        )}
+      </Page>
     ),
   });
 }
@@ -467,19 +381,13 @@ export function notFoundPage(
     title,
     description: message,
     styleHref: styleHref(0, stylesheet),
-    // Static hosts can serve 404.html at the missing URL, including deep paths.
     baseHref: "/",
     children: (
-      <main className="listing">
-        <header className="listing-head">
-          <span className="kind">404</span>
-          <h1>{title}</h1>
-          <p>{message}</p>
-        </header>
-        <div className="prose">
+      <Page eyebrow="404" title={title} description={message}>
+        <Prose>
           <a href="/">{copy.homeLabel ?? "Back to home"}</a>
-        </div>
-      </main>
+        </Prose>
+      </Page>
     ),
   });
 }
@@ -491,22 +399,14 @@ function PostNavigation({ item, posts }: { item: ContentItem; posts: ContentItem
   return (
     <nav className="post-nav" aria-label="Post navigation">
       {older ? (
-        <a href={itemUrl(older)}>
-          <span className="label">← Previous post (older)</span>
-          {older.title}
-        </a>
+        <Entry eyebrow="← Previous post (older)" title={older.title} href={itemUrl(older)} />
       ) : (
         <span />
       )}
       {newer ? (
-        <a className="next" href={itemUrl(newer)}>
-          <span className="label">Next post (newer) →</span>
-          {newer.title}
-        </a>
+        <Entry eyebrow="Next post (newer) →" title={newer.title} href={itemUrl(newer)} />
       ) : (
-        <span className="next">
-          <span className="label">Next post (newer) →</span>Nothing newer — this is the latest post.
-        </span>
+        <Text variant="caption">Nothing newer — this is the latest post.</Text>
       )}
     </nav>
   );
@@ -520,15 +420,15 @@ function RelatedThoughts({
   thoughts: ContentItem[];
 }): Child {
   const related = thoughts.filter((thought) => thought.dateKey === item.dateKey).slice(0, 3);
-  if (related.length === 0) return null;
-  return (
-    <aside className="related-thoughts">
-      <h2>Thoughts from the same day</h2>
-      {related.map((thought) => (
-        <ThoughtCard item={thought} linked />
-      ))}
-    </aside>
-  );
+  return related.length ? (
+    <Section title="Thoughts from the same day">
+      <EntryList>
+        {related.map((thought) => (
+          <ThoughtCard item={thought} linked />
+        ))}
+      </EntryList>
+    </Section>
+  ) : null;
 }
 
 export function postPage(
@@ -548,20 +448,22 @@ export function postPage(
     activePath: "/posts/",
     styleHref: styleHref(1 + slugDepth(item.slug), stylesheet),
     children: (
-      <main>
-        <article>
-          <header className="post-head">
-            <span className="kind">{category}</span>
-            <h1>{item.title}</h1>
-            <div className="meta">
-              {item.dateKey} · about {item.readingMinutes} min · {item.characterCount} characters
-            </div>
-          </header>
-          <div className="prose" dangerouslySetInnerHTML={{ __html: item.html }} />
-          <RelatedThoughts item={item} thoughts={thoughts} />
-          <PostNavigation item={item} posts={posts} />
-        </article>
-      </main>
+      <Page title={item.title} eyebrow={category}>
+        <MetaRow
+          items={[
+            { label: item.dateKey },
+            { label: `${item.readingMinutes} min read` },
+            { label: `${item.characterCount} characters` },
+          ]}
+        />
+        <Prose
+          as="article"
+          dangerouslySetInnerHTML={{ __html: withoutLeadingHeading(item.html) }}
+        />
+        <Tags item={item} />
+        <RelatedThoughts item={item} thoughts={thoughts} />
+        <PostNavigation item={item} posts={posts} />
+      </Page>
     ),
   });
 }
@@ -580,19 +482,16 @@ export function thoughtPage(
     activePath: "/thoughts/",
     styleHref: styleHref(1 + slugDepth(item.slug), stylesheet),
     children: (
-      <main>
-        <article>
-          <header className="post-head">
-            <span className="kind">Thought</span>
-            <h1>{item.title}</h1>
-            <div className="meta">
-              {item.dateKey}
-              {item.timeLabel ? ` · ${item.timeLabel}` : ""}
-            </div>
-          </header>
-          <div className="prose" dangerouslySetInnerHTML={{ __html: item.html }} />
-        </article>
-      </main>
+      <Page title={item.title} eyebrow="Thought">
+        <MetaRow
+          items={[{ label: item.dateKey }, ...(item.timeLabel ? [{ label: item.timeLabel }] : [])]}
+        />
+        <Prose
+          as="article"
+          dangerouslySetInnerHTML={{ __html: withoutLeadingHeading(item.html) }}
+        />
+        <Tags item={item} />
+      </Page>
     ),
   });
 }
@@ -610,8 +509,8 @@ export function aboutPage(
     activePath: "/about/",
     styleHref: styleHref(1, stylesheet),
     children: (
-      <main className="about">
-        <div className="avatar" aria-hidden="true">
+      <Page eyebrow="About" title={about?.heading ?? site.name}>
+        <div className="site-avatar" aria-hidden="true">
           {site.images?.about ? (
             <img src={`../${site.images.about}`} alt="" decoding="async" />
           ) : (
@@ -619,36 +518,29 @@ export function aboutPage(
           )}
         </div>
         {about ? (
-          <Fragment>
-            <h1>{about.heading}</h1>
+          <Prose>
             {about.paragraphs.map((paragraph) => (
               <p>{paragraph}</p>
             ))}
-            {about.links && about.links.length > 0 ? (
-              <Fragment>
-                <h2>{about.linksHeading ?? "Find me"}</h2>
-                {about.links.map((link) => (
-                  <a
-                    className="github-link"
-                    href={link.href}
-                    target="_blank"
-                    rel="me noopener noreferrer"
-                  >
-                    <DoodleGithubIcon />
-                    <span className="github-copy">
-                      <span>{link.label}</span>
-                      <strong>{link.handle}</strong>
-                    </span>
-                    <DoodleExternalArrow />
-                  </a>
-                ))}
-              </Fragment>
-            ) : null}
-          </Fragment>
-        ) : (
-          <h1>{site.name}</h1>
-        )}
-      </main>
+          </Prose>
+        ) : null}
+        {about?.links?.length ? (
+          <Section title={about.linksHeading ?? "Find me"}>
+            <EntryList>
+              {about.links.map((link) => (
+                <Entry
+                  title={
+                    <a href={link.href} target="_blank" rel="me noopener noreferrer">
+                      {link.handle} ↗
+                    </a>
+                  }
+                  eyebrow={link.label}
+                />
+              ))}
+            </EntryList>
+          </Section>
+        ) : null}
+      </Page>
     ),
   });
 }
@@ -665,29 +557,26 @@ function skillInstallCommand(site: SiteIdentity, skill: Skill): string {
 
 function SkillCard({ skill, site }: { skill: Skill; site: SiteIdentity }): Child {
   return (
-    <a
-      className={`skill-card${skill.scope === "project" ? " project-skill" : ""}`}
+    <Entry
       href={skillUrl(skill)}
+      title={skill.name}
+      description={skill.description}
+      eyebrow={skill.scope === "project" ? "Project Skill" : "Public Skill"}
+      meta={
+        <MetaRow
+          items={[
+            { label: `${skill.files.length} Markdown files` },
+            { label: `${skill.relations.length} references` },
+          ]}
+        />
+      }
     >
-      <span className="skill-card-source">
-        <span className="skill-card-path">
+      <Text variant="caption">
+        <code className="skill-command-text">
           {skill.scope === "public" ? skillInstallCommand(site, skill) : skill.sourceBasePath}
-        </span>
-        {skill.scope === "project" ? (
-          <span className="skill-scope-badge">Project Skill</span>
-        ) : null}
-      </span>
-      <span className="skill-card-main">
-        <strong>{skill.name}</strong>
-        <span>{skill.description}</span>
-      </span>
-      <span className="skill-card-foot">
-        <span>
-          {skill.files.length} Markdown files · {skill.relations.length} references
-        </span>
-        <span className="skill-open">Open directory&nbsp; →</span>
-      </span>
-    </a>
+        </code>
+      </Text>
+    </Entry>
   );
 }
 
@@ -786,6 +675,8 @@ function SkillRelationGraph({ skill, direction }: { skill: Skill; direction: "LR
     <svg
       className={`skill-graph-svg skill-graph-${direction.toLowerCase()}`}
       viewBox={`0 0 ${graph.width} ${graph.height}`}
+      width={graph.width}
+      height={graph.height}
       aria-label={`${skill.name} file reference graph`}
     >
       <defs>
@@ -862,9 +753,13 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
 
       {hasRelations ? (
         <Fragment>
-          <div className={`skill-graph-canvas${compactGraph ? " compact" : ""}`}>
+          <div
+            className={`skill-graph-canvas${compactGraph ? " compact" : ""}`}
+            tabIndex={0}
+            role="region"
+            aria-label="Scrollable file reference graph"
+          >
             <SkillRelationGraph skill={skill} direction="LR" />
-            <SkillRelationGraph skill={skill} direction="TB" />
           </div>
           <section className="skill-reading-paths" aria-labelledby={`${skill.slug}-paths`}>
             <h3 id={`${skill.slug}-paths`}>Where references happen</h3>
@@ -1045,48 +940,39 @@ export function skillsIndexPage(
     activePath: "/skills/",
     styleHref: styleHref(1, stylesheet),
     children: (
-      <main className="skills-index">
-        <header className="skills-head">
-          <span className="skill-path">~/skills</span>
-          <h1>Skills</h1>
-          <p>Methods shared publicly and usable directly by an Agent.</p>
-        </header>
-        <section className="skill-group" aria-labelledby="public-skills-heading">
-          <header className="skill-group-head">
-            <h2 id="public-skills-heading">Public Skills</h2>
-            <span>Public content</span>
-          </header>
-          {publicSkills.length > 0 ? (
-            <div className="skill-list">
+      <Page
+        eyebrow="~/skills"
+        title="Skills"
+        description="Methods shared publicly and usable directly by an Agent."
+      >
+        <Section title="Public Skills">
+          {publicSkills.length ? (
+            <EntryList>
               {publicSkills.map((skill) => (
                 <SkillCard skill={skill} site={site} />
               ))}
-            </div>
+            </EntryList>
           ) : (
-            <p className="skill-group-empty">Public Skills have no content yet.</p>
+            <Text variant="secondary">Public Skills have no content yet.</Text>
           )}
-        </section>
-        {projectSkills.length > 0 ? (
-          <section className="skill-group project-skills" aria-labelledby="project-skills-heading">
-            <header className="skill-group-head">
-              <div>
-                <h2 id="project-skills-heading">Project Skills</h2>
-                <small>Development and content workflows used inside this project</small>
-              </div>
-              <span>.agents/skills/</span>
-            </header>
-            <div className="skill-list">
+        </Section>
+        {projectSkills.length ? (
+          <Section
+            title="Project Skills"
+            description="Development and content workflows used inside this project"
+          >
+            <EntryList>
               {projectSkills.map((skill) => (
                 <SkillCard skill={skill} site={site} />
               ))}
-            </div>
-          </section>
+            </EntryList>
+          </Section>
         ) : null}
-        <p className="skills-prototype-note">
+        <Text variant="caption">
           The reference graph starts from SKILL.md and is generated at build time from Markdown
           links.
-        </p>
-      </main>
+        </Text>
+      </Page>
     ),
   });
 }
@@ -1104,6 +990,7 @@ export function skillPage(
     site,
     theme,
     title: skill.name,
+    wide: true,
     description: skill.description,
     activePath: "/skills/",
     styleHref:
@@ -1111,7 +998,13 @@ export function skillPage(
         ? styleHref(1 + slugDepth(skill.slug), stylesheet)
         : styleHref(2 + slugDepth(skill.slug), stylesheet),
     children: (
-      <main className="skill-page">
+      <Page
+        width="full"
+        className="skill-page"
+        title={skill.name}
+        eyebrow="Skill"
+        description={skill.description}
+      >
         <a className="skill-back" href="/skills/">
           ← All Skills
         </a>
@@ -1154,12 +1047,20 @@ export function skillPage(
                 <span>Markdown</span>
               </header>
               {skill.files.map((file, index) => (
-                <article
-                  className={`skill-file-panel prose${index === 0 ? " active" : ""}`}
+                <Prose
+                  as="article"
+                  className={`skill-file-panel${index === 0 ? " active" : ""}`}
                   data-skill-panel={file.path}
                   hidden={index !== 0}
                   dangerouslySetInnerHTML={{
-                    __html: Bun.markdown.html(file.content, { tagFilter: true }),
+                    // The page owns h1; file headings nest under it without dropping any content.
+                    __html: Bun.markdown
+                      .html(file.content, { tagFilter: true })
+                      .replace(
+                        /<(\/?)h([1-6])(\s[^>]*)?>/g,
+                        (_, closing, level, attributes = "") =>
+                          `<${closing}h${Math.min(6, Number(level) + 1)}${attributes}>`,
+                      ),
                   }}
                 />
               ))}
@@ -1168,7 +1069,7 @@ export function skillPage(
           <SkillRelations skill={skill} />
         </div>
         <script dangerouslySetInnerHTML={{ __html: SKILL_BROWSER_SCRIPT }} />
-      </main>
+      </Page>
     ),
   });
 }

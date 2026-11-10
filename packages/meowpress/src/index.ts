@@ -25,7 +25,7 @@ export {
   thoughtPage,
 } from "./site";
 export { DEFAULT_SITE, type SiteAbout, type SiteIdentity, type SiteProfileLink } from "./identity";
-export { blogFonts, blogTheme, blogTokens, blogOptions } from "./theme";
+export { blogFonts, blogTheme } from "./theme";
 export type { SiteFont } from "./fonts";
 export {
   loadSkills,

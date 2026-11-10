@@ -90,7 +90,7 @@
     },
     "packages/meowpress": {
       "name": "meowpress",
-      "version": "0.3.0-alpha.4",
+      "version": "0.3.0-alpha.5",
       "bin": {
         "meowpress": "./dist/src/cli.js",
       },

@@ -7,6 +7,39 @@ async function expectContained(page: Page) {
   );
 }
 
+test("SVG link icons preserve accessible names and keyboard navigation", async ({
+  page,
+}, testInfo) => {
+  await page.goto("/about/");
+  const profile = page.getByRole("link", { name: "@example", exact: true });
+  await expect(profile.locator('svg[data-icon="arrow-up-right"]')).toBeVisible();
+  await expect(profile).toHaveAttribute("href", "https://github.com/example");
+  await expectContained(page);
+  await page.screenshot({ path: testInfo.outputPath("profile-icons.png"), fullPage: true });
+  await page.goto("/skills/writing/");
+  const source = page.getByRole("link", { name: "GitHub", exact: true });
+  await expect(source.locator("svg.meow-github-icon")).toBeVisible();
+  await expect(source.locator('svg[data-icon="arrow-up-right"]')).toBeVisible();
+  await expect(source).toHaveAttribute(
+    "href",
+    "https://github.com/example/writing/tree/main/skills/writing",
+  );
+  for (const svg of await page.locator("svg.meow-icon, svg.meow-github-icon").all()) {
+    await expect(svg).toHaveAttribute("aria-hidden", "true");
+    await expect(svg).toHaveAttribute("focusable", "false");
+  }
+  await expectContained(page);
+  await page.screenshot({ path: testInfo.outputPath("skill-icons.png"), fullPage: true });
+  await page.locator("[data-copy-command]").focus();
+  await page.keyboard.press("Tab");
+  await expect(source).toBeFocused();
+  await page.keyboard.press("Tab");
+  await expect(page.getByRole("button", { name: "File browser", exact: true })).toBeFocused();
+  await page.getByRole("link", { name: "All Skills", exact: true }).focus();
+  await page.keyboard.press("Enter");
+  await expect(page).toHaveURL(/\/skills\/$/);
+});
+
 test("Journal routes keep readable content and contain wide tables and code", async ({
   page,
 }, testInfo) => {
@@ -129,6 +162,14 @@ test("deep missing routes load their stylesheet and content works without JavaSc
     await page.goto("/skills/writing/");
     await expect(page.locator("h1")).toHaveCount(1);
     await expect(page.locator('[data-skill-panel="SKILL.md"]')).toBeVisible();
+    await expect(
+      page.getByRole("link", { name: "GitHub", exact: true }).locator("svg"),
+    ).toHaveCount(2);
+    await expect(page.locator('.skill-back svg[data-icon="arrow-left"]')).toBeVisible();
+    await page.goto("/about/");
+    await expect(
+      page.getByRole("link", { name: "@example", exact: true }).locator("svg"),
+    ).toBeVisible();
   } finally {
     await context.close();
   }

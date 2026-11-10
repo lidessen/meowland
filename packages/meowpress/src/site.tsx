@@ -16,6 +16,7 @@ import {
   Text,
   createMeowUI,
 } from "meowtail";
+import { GithubIcon, Icon } from "meowtail/icons";
 import { blogTheme } from "./theme";
 import { withoutLeadingHeading, type ContentItem } from "./content";
 import { DEFAULT_SITE, type SiteIdentity, type SiteNotFound } from "./identity";
@@ -399,12 +400,28 @@ function PostNavigation({ item, posts }: { item: ContentItem; posts: ContentItem
   return (
     <nav className="post-nav" aria-label="Post navigation">
       {older ? (
-        <Entry eyebrow="← Previous post (older)" title={older.title} href={itemUrl(older)} />
+        <Entry
+          eyebrow={
+            <span className="site-icon-label">
+              <Icon name="chevron-left" size={14} /> Previous post (older)
+            </span>
+          }
+          title={older.title}
+          href={itemUrl(older)}
+        />
       ) : (
         <span />
       )}
       {newer ? (
-        <Entry eyebrow="Next post (newer) →" title={newer.title} href={itemUrl(newer)} />
+        <Entry
+          eyebrow={
+            <span className="site-icon-label">
+              Next post (newer) <Icon name="chevron-right" size={14} />
+            </span>
+          }
+          title={newer.title}
+          href={itemUrl(newer)}
+        />
       ) : (
         <Text variant="caption">Nothing newer — this is the latest post.</Text>
       )}
@@ -530,8 +547,13 @@ export function aboutPage(
               {about.links.map((link) => (
                 <Entry
                   title={
-                    <a href={link.href} target="_blank" rel="me noopener noreferrer">
-                      {link.handle} ↗
+                    <a
+                      className="site-icon-label"
+                      href={link.href}
+                      target="_blank"
+                      rel="me noopener noreferrer"
+                    >
+                      {link.handle} <Icon name="arrow-up-right" size={16} />
                     </a>
                   }
                   eyebrow={link.label}
@@ -770,7 +792,7 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
                   <li className={sourceFile?.reachable ? "" : "unreachable"}>
                     <span className="skill-reading-edge">
                       <code title={relation.source}>{relation.source}</code>
-                      <span aria-hidden="true">→</span>
+                      <Icon name="arrow-right" size={14} />
                       <code title={relation.target}>{relation.target}</code>
                     </span>
                     <span className="skill-reading-context">
@@ -1005,8 +1027,8 @@ export function skillPage(
         eyebrow="Skill"
         description={skill.description}
       >
-        <a className="skill-back" href="/skills/">
-          ← All Skills
+        <a className="skill-back site-icon-label" href="/skills/">
+          <Icon name="arrow-left" size={14} /> All Skills
         </a>
         <header className="skill-browser-head">
           <span className="skill-command">
@@ -1021,11 +1043,12 @@ export function skillPage(
             </button>
             {site.repositorySourceUrl ? (
               <a
+                className="site-icon-label"
                 href={`${site.repositorySourceUrl}/${skill.sourceBasePath}`}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                GitHub ↗
+                <GithubIcon /> GitHub <Icon name="arrow-up-right" size={14} />
               </a>
             ) : null}
           </span>

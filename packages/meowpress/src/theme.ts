@@ -24,6 +24,16 @@ const siteStyles = css`
   .site-shell {
     padding: 0 ${uiTokens.space.pageInline};
   }
+  .site-icon-label {
+    display: inline-flex;
+    align-items: center;
+    gap: ${uiTokens.space.group};
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+  .site-icon-label .meow-github-icon {
+    flex-shrink: 0;
+  }
   .site-header,
   .site-footer {
     display: flex;
@@ -398,7 +408,7 @@ const siteStyles = css`
     flex-wrap: wrap;
     gap: ${uiTokens.space.group};
   }
-  .skill-reading-edge > span {
+  .skill-reading-edge > .meow-icon {
     color: ${uiTokens.accent.ink};
   }
   .skill-reading-context {

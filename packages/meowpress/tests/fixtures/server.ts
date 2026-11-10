@@ -33,7 +33,16 @@ await buildSite({
   content,
   skillsDirectory: root,
   outputDirectory: output,
-  site: { name: "Journal fixture", skillsPackage: "example/writing" },
+  site: {
+    name: "Journal fixture",
+    skillsPackage: "example/writing",
+    repositorySourceUrl: "https://github.com/example/writing/tree/main",
+    about: {
+      heading: "Journal author",
+      paragraphs: ["An author profile with an external link."],
+      links: [{ label: "GitHub", handle: "@example", href: "https://github.com/example" }],
+    },
+  },
 });
 const server = await serveSite(output, 13016);
 for (const signal of ["SIGTERM", "SIGINT"] as const) {

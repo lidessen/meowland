@@ -1,7 +1,9 @@
 import { expect, test } from "bun:test";
 import { Window } from "happy-dom";
 import type { ContentItem } from "../../src/content";
-import { homePage, listPage, postPage, thoughtPage } from "../../src/site";
+import { aboutPage, homePage, listPage, postPage, skillPage, thoughtPage } from "../../src/site";
+import { DEFAULT_SITE } from "../../src/identity";
+import type { Skill } from "../../src/skills";
 
 const post: ContentItem = {
   kind: "post",
@@ -75,4 +77,99 @@ test("article and archive routes keep one title, prose semantics, and depth-awar
   expect(archive.querySelector('link[rel="stylesheet"]')?.getAttribute("href")).toBe(
     "../blog-theme.css",
   );
+});
+
+test("profile and post navigation use decorative SVG icons without changing links or labels", () => {
+  const dom = document(
+    aboutPage(undefined, {
+      ...DEFAULT_SITE,
+      about: {
+        heading: "Author",
+        paragraphs: [],
+        links: [{ label: "GitHub", handle: "@author", href: "https://github.com/author" }],
+      },
+    }),
+  );
+  const profile = dom.querySelector('a[rel="me noopener noreferrer"]');
+  expect(profile?.getAttribute("href")).toBe("https://github.com/author");
+  expect(profile?.getAttribute("target")).toBe("_blank");
+  expect(profile?.textContent?.trim()).toBe("@author");
+  expect(profile?.querySelector('svg[data-icon="arrow-up-right"]')).not.toBeNull();
+
+  const newer = { ...post, slug: "newer", title: "Newer post" };
+  const older = { ...post, slug: "older", title: "Older post" };
+  const navigation = document(postPage(post, [newer, post, older], []));
+  const entries = navigation.querySelectorAll('.post-nav [data-meowui-part="entry/root"]');
+  expect(entries).toHaveLength(2);
+  for (const [index, label, icon, href] of [
+    [0, "Previous post (older)", "chevron-left", "/posts/older/"],
+    [1, "Next post (newer)", "chevron-right", "/posts/newer/"],
+  ] as const) {
+    expect(
+      entries[index]?.querySelector('[data-meowui-part="entry/eyebrow"]')?.textContent?.trim(),
+    ).toBe(label);
+    expect(entries[index]?.querySelector(`svg[data-icon="${icon}"]`)).not.toBeNull();
+    expect(entries[index]?.querySelector("a")?.getAttribute("href")).toBe(href);
+  }
+  for (const page of [dom, navigation]) {
+    for (const icon of page.querySelectorAll("svg.meow-icon")) {
+      expect(icon.namespaceURI).toBe("http://www.w3.org/2000/svg");
+      expect(icon.getAttribute("aria-hidden")).toBe("true");
+      expect(icon.getAttribute("focusable")).toBe("false");
+      expect(icon.getAttribute("stroke")).toBe("currentColor");
+      expect(icon.querySelector("path")).not.toBeNull();
+    }
+  }
+});
+
+test("skill chrome renders Lucide directions and separate GitHub brand artwork during SSR", () => {
+  const skill: Skill = {
+    slug: "writing",
+    name: "Writing",
+    description: "A writing guide.",
+    scope: "public",
+    sourceBasePath: "skills/writing",
+    files: [
+      {
+        path: "SKILL.md",
+        role: "entry",
+        detail: "Entry",
+        content: "# Writing",
+        reachable: true,
+        depth: 0,
+      },
+      {
+        path: "reference.md",
+        role: "reference",
+        detail: "Reference",
+        content: "# Reference",
+        reachable: true,
+        depth: 1,
+      },
+    ],
+    externalNodes: [],
+    relations: [{ source: "SKILL.md", target: "reference.md", label: "Reference", contexts: [] }],
+  };
+  const html = skillPage(skill, undefined, {
+    ...DEFAULT_SITE,
+    repositorySourceUrl: "https://github.com/example/writing/tree/main",
+  });
+  const dom = document(html);
+  const source = dom.querySelector(".skill-browser-actions a");
+  expect(source?.textContent?.trim()).toBe("GitHub");
+  expect(source?.getAttribute("href")).toBe(
+    "https://github.com/example/writing/tree/main/skills/writing",
+  );
+  expect(source?.getAttribute("rel")).toBe("noopener noreferrer");
+  expect(source?.querySelector("svg.meow-github-icon path")).not.toBeNull();
+  expect(source?.querySelector('svg[data-icon="arrow-up-right"]')).not.toBeNull();
+  expect(dom.querySelector('.skill-back svg[data-icon="arrow-left"]')).not.toBeNull();
+  expect(dom.querySelector('.skill-reading-edge svg[data-icon="arrow-right"]')).not.toBeNull();
+  for (const icon of dom.querySelectorAll("svg.meow-icon, svg.meow-github-icon")) {
+    expect(icon.namespaceURI).toBe("http://www.w3.org/2000/svg");
+    expect(icon.getAttribute("aria-hidden")).toBe("true");
+    expect(icon.getAttribute("focusable")).toBe("false");
+  }
+  expect(html).not.toMatch(/[↗←→]/);
+  expect(document(skillPage(skill)).querySelector(".skill-browser-actions a")).toBeNull();
 });

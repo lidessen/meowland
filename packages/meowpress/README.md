@@ -3,6 +3,11 @@
 Meowpress builds a static blog from Markdown and MDX, with a built-in Journal-based theme for posts, short notes
 and public skills. A project can supply its own theme or page map through `meowpress/build`.
 
+The built-in theme renders functional icons as inline SVG through Meowtail's Lucide-backed
+`Icon`, not font glyphs. Custom pages can use `Icon` or `IconSource` from `meowtail/icons`
+and the full Lucide set from `meowtail/icons/lucide`; brand artwork such as `GithubIcon`
+stays separate. Icons render at build time and need no browser script or icon font.
+
 ## Build and preview a site
 
 Use Bun and install this version of `meowpress` with compatible `meowcss` and `meowjsx` peers.

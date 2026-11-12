@@ -118,7 +118,13 @@ export async function checkPrepared(config: StoryConfig, prepared: PreparedStori
     tsconfig,
     JSON.stringify({
       extends: project,
-      compilerOptions: { noEmit: true, incremental: false, composite: false },
+      // Generated stories import the component by its real file name, extension included.
+      compilerOptions: {
+        noEmit: true,
+        incremental: false,
+        composite: false,
+        allowImportingTsExtensions: true,
+      },
       files: [...prepared.modules.values()]
         .map((module) => module.file)
         .concat(

@@ -228,6 +228,15 @@ test("without a config file or preview, a component that takes no props is check
     await expect(checkStories(config)).rejects.toThrow("No stories found");
     await writeFile(join(root, "App.tsx"), "export const App = () => 'Hello';");
     await writeFile(join(root, "mocks.json"), '{"GET /api/users":[{"id":1}]}');
+    // A consumer tsconfig does not allow .tsx import paths; the generated project must not need it.
+    await writeFile(
+      join(root, "tsconfig.json"),
+      JSON.stringify({
+        extends: join(root, "../tsconfig.json"),
+        compilerOptions: { allowImportingTsExtensions: false },
+        include: ["*.tsx", "*.ts"],
+      }),
+    );
     const temporary = { component: "App.tsx", exportName: "App", mocksFile: "mocks.json" };
     expect((await checkStories(config, temporary))[0]?.id).toBe("temporary/component");
     await writeFile(join(root, "mocks.json"), "[]");

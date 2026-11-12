@@ -10,6 +10,7 @@ import { cleanupScope } from "./lifecycle";
 import { inspectCanvas } from "./inspect";
 import { createMeasurements, isMeasurementMode } from "./measure";
 import { createCaptureProjection } from "./capture";
+import { installMocks } from "./mocks";
 
 export interface CanvasOptions {
   capture?: boolean;
@@ -220,6 +221,14 @@ export async function bootCanvas(options: CanvasOptions): Promise<() => void> {
         covers: story.covers,
       },
     });
+    // After the story module is imported and before render, so only the story's own requests
+    // count. Capture always counts, so a story without mocks still reports what went unmocked.
+    // The environment scope is released after unmount, so requests made while unmounting are
+    // still answered.
+    if (story.mocks || captureMode) {
+      const installed = installMocks(story.mocks ?? {});
+      environment.add(installed.restore);
+    }
     const container = story.container === false ? undefined : (story.container ?? defaultContainer);
     const content = story.render(context);
     const collectRoots = (child: Child): RenderableChild[] =>

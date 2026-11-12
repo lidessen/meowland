@@ -276,6 +276,38 @@ test("capture traverses transparent providers and keeps repeated instances and t
   expect(all.manifest.scenes[0]!.nodes.filter((node) => node.image)).toHaveLength(3);
 });
 
+test("capture reports mocked routes and the requests that matched none", async ({ page }, info) => {
+  await page.goto("/canvas.html?story=capture/requests");
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  await expect(page.getByTestId("requests-output")).toHaveText("Ada · missing 404");
+  const result = await capturePage(page, { out: info.outputPath("shots") });
+  const scene = result.manifest.scenes[0]!;
+  // Only the story's own requests count, and the query string is not kept.
+  expect(scene.requests).toEqual({
+    mocks: [{ route: "GET /api/users", hits: 1 }],
+    unmocked: [{ method: "GET", url: `${new URL(page.url()).origin}/api/missing`, count: 1 }],
+  });
+  expect(JSON.stringify(scene.requests)).not.toContain("private");
+  const report = await page.context().newPage();
+  try {
+    await report.goto(pathToFileURL(result.reportPath).href);
+    await expect(report.locator("#scene-0")).toContainText("1 mocked · 1 unmocked");
+  } finally {
+    await report.close();
+  }
+  await page.goto("/canvas.html?story=capture/no-mocks");
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  expect(
+    (await capturePage(page, { out: info.outputPath("shots") })).manifest.scenes[0]!.requests,
+  ).toBeUndefined();
+  // Leaving the story restores the real fetch.
+  await page.goto("/canvas.html?story=capture/tree");
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  expect(await page.evaluate(() => fetch("/api/users").then((response) => response.status))).toBe(
+    404,
+  );
+});
+
 test("replacement identity controls transparency and explicit transparent selection remains possible", async ({
   page,
 }, info) => {

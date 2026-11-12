@@ -70,6 +70,8 @@ export async function bootCanvas(options: CanvasOptions): Promise<() => void> {
   const listeners = cleanupScope(fail);
   let captureReplacements: NonNullable<import("../capture/types").CaptureSnapshot["replacements"]> =
     [];
+  let captureRequests: () => import("../capture/types").CaptureSnapshot["requests"] = () =>
+    undefined;
   const entry = options.manifest.find((entry) => entry.id === id);
   let observationRoots: RenderableChild[] = [];
   const observation = createComponentObservation<Node>({
@@ -80,7 +82,12 @@ export async function bootCanvas(options: CanvasOptions): Promise<() => void> {
   });
   const capture =
     captureMode && entry
-      ? createCaptureProjection(entry, () => captureReplacements, observation)
+      ? createCaptureProjection(
+          entry,
+          () => captureReplacements,
+          () => captureRequests(),
+          observation,
+        )
       : undefined;
   if (capture) resources.add(capture.dispose);
   const measurements = createMeasurements(root, (detail) => send({ type: "measurement", detail }));
@@ -228,6 +235,10 @@ export async function bootCanvas(options: CanvasOptions): Promise<() => void> {
     if (story.mocks || captureMode) {
       const installed = installMocks(story.mocks ?? {});
       environment.add(installed.restore);
+      captureRequests = () => {
+        const seen = installed.requests();
+        return story.mocks || seen.unmocked.length ? seen : undefined;
+      };
     }
     const container = story.container === false ? undefined : (story.container ?? defaultContainer);
     const content = story.render(context);

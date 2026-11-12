@@ -373,6 +373,7 @@ export async function captureScene(
     result.story = snapshot.story;
     result.boundaries = snapshot.boundaries;
     result.replacements = snapshot.replacements;
+    result.requests = snapshot.requests;
     result.activeFocus = snapshot.activeFocus;
     result.scrollViews = snapshot.scrollViews;
     const selection = selectCaptureNodes(snapshot.nodes, options.depth, options.select);

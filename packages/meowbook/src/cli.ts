@@ -3,7 +3,7 @@ import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
 import { resolveConfig } from "./bun/config";
 import type { StoryConfig } from "./types";
-import type { GuideOptions } from "./capture/types";
+import type { CaptureScene, GuideOptions } from "./capture/types";
 import {
   capturePages,
   validatePageOptions,
@@ -201,6 +201,24 @@ export function parseCLI(argv: readonly string[]) {
   };
 }
 
+/** The lines an agent acts on: where the pictures are, what failed and which requests had no answer. */
+function captureLines(scenes: CaptureScene[], directory: string): string[] {
+  const lines: string[] = [];
+  for (const scene of scenes) {
+    if (scene.frame) lines.push(`Scene ${scene.story.id}: ${resolve(directory, scene.frame)}`);
+    if (scene.fullPage)
+      lines.push(`Scene ${scene.story.id} full page: ${resolve(directory, scene.fullPage)}`);
+    if (scene.status === "failed") lines.push(`Failed ${scene.story.id}: ${scene.error}`);
+    if (scene.requests?.unmocked.length)
+      lines.push(
+        `Unmocked requests in ${scene.story.id}: ${scene.requests.unmocked
+          .map((request) => `${request.method} ${request.url} (${request.count}x)`)
+          .join(", ")}`,
+      );
+  }
+  return lines;
+}
+
 async function main() {
   const parsed = parseCLI(process.argv.slice(2));
   const { command, json, temporary, port } = parsed;
@@ -266,6 +284,7 @@ async function main() {
           story: scene.story.id,
           frame: scene.frame ? resolve(result.directory, scene.frame) : undefined,
           fullPage: scene.fullPage ? resolve(result.directory, scene.fullPage) : undefined,
+          requests: scene.requests,
           focus: scene.focus
             ? {
                 frame: resolve(result.directory, scene.focus.frame),
@@ -303,7 +322,12 @@ async function main() {
       console.log(
         json
           ? JSON.stringify(summary)
-          : `${manifest.status}: ${manifest.summary!.successful} successful, ${manifest.summary!.failed} failed, ${manifest.summary!.unexecuted} unexecuted; ${manifest.summary!.matched} matched instances, ${manifest.summary!.images} local images, ${summary.notPhotographed} nodes without local images, ${manifest.summary!.unmatched} unmatched stories\nReport: ${result.reportPath}\nManifest: ${result.manifestPath}`,
+          : [
+              `${manifest.status}: ${manifest.summary!.successful} successful, ${manifest.summary!.failed} failed, ${manifest.summary!.unexecuted} unexecuted; ${manifest.summary!.matched} matched instances, ${manifest.summary!.images} local images, ${summary.notPhotographed} nodes without local images, ${manifest.summary!.unmatched} unmatched stories`,
+              `Report: ${result.reportPath}`,
+              `Manifest: ${result.manifestPath}`,
+              ...captureLines(manifest.scenes, result.directory),
+            ].join("\n"),
       );
       if (summary.selectionError) console.error(summary.selectionError);
       if (manifest.status !== "complete") process.exitCode = controller.signal.aborted ? 130 : 1;

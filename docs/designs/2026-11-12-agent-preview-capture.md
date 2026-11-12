@@ -1,6 +1,6 @@
 # Screenshots and mock data for agents building with Meowland
 
-Status: proposed. The challenger review and the implementation outcome are recorded in the last
+Status: implemented. The challenger review and the implementation outcome are recorded in the last
 section.
 
 ## The problem
@@ -210,4 +210,19 @@ place props travel; the privacy sentence; and the `{ts,tsx}` glob. It also judge
 request into the `serve` gallery unnecessary, and it was dropped. The single-`meowtail`-identity
 assumption is stated rather than solved.
 
-Implementation outcome: pending.
+Implementation outcome (2026-11-12): implemented as written in four work packages. Config
+resolution lives in `src/bun/config.ts`; `Story.mocks` and the pure matcher and interceptor in
+`src/web/mocks.ts`; the `requests` fact flows through `web/capture.ts`, `capture/page.ts`, the
+offline report and the CLI. Deviations: (1) capture mode always installs the interceptor, with an
+empty table when the story has no mocks, because otherwise a story without mocks could not report
+unmocked requests; outside capture it is installed only for stories with `mocks`. (2) The
+observed acceptance found that `capture --component` failed in a plain consumer project with
+TS5097, because the generated story imports the component by its `.tsx` file name and the skill's
+tsconfig does not set `allowImportingTsExtensions`; the generated type-check project now sets it.
+Verified: format, lint, typecheck, Meowbook unit tests, both Meowbook Playwright configs (including
+a new spec with one mocked and one unmocked request), the docs tests and build, and the English
+sweep. In a scratch consumer outside the repository, linked to the built packages with no
+Meowbook config, the three capture commands printed PNGs that were opened and show the themed
+component in light, in dark at 390px, and the mocked story with its data; the receipt named the
+unmocked `/api/presence` request. Not verified: installed-state consumption from packed tarballs,
+and the `meowtail` peer range against a published install.

@@ -20,6 +20,23 @@ export interface ComponentReplacement {
   component: Component<any, any>;
   replacement: Component<any, any>;
 }
+/** A JSON value; the answer to a mocked route is its `200` response body. */
+export type MockJson = null | boolean | number | string | readonly MockJson[] | MockJsonObject;
+export interface MockJsonObject {
+  readonly [key: string]: MockJson;
+}
+export interface MockContext {
+  request: Request;
+  url: URL;
+  /** The decoded `:name` segments of the route. */
+  params: Record<string, string>;
+}
+/** A JSON value, a `Response` used as is, `undefined` for an empty `204`, or a promise of any. */
+export type MockHandler = (
+  context: MockContext,
+) => MockJson | Response | undefined | void | Promise<MockJson | Response | undefined | void>;
+/** A JSON value answers `200` JSON; a function decides per request. */
+export type MockAnswer = MockJson | MockHandler;
 export interface Story {
   id: string;
   title?: string;
@@ -35,6 +52,11 @@ export interface Story {
   setup?(context: StoryContext): void | Promise<void>;
   ready?(context: StoryContext): void | Promise<void>;
   replacements?: readonly ComponentReplacement[];
+  /**
+   * Answers for `fetch`, keyed by `"<METHOD> <path>"` or `"<path>"`, applied from before `render`
+   * until the story is released. A request that matches no route reaches the real `fetch`.
+   */
+  mocks?: Readonly<Record<string, MockAnswer>>;
 }
 export interface StoryEntry {
   id: string;
@@ -54,7 +76,11 @@ export interface StoryConfig {
   /** Workspace root; relative paths below resolve from here. */
   root: string;
   stories: readonly string[];
-  preview: string;
+  /**
+   * The module whose default export prepares each story's runtime. Omitted, the canvas uses
+   * Meowbook's built-in standard preview (`meowbook/web/default-preview`).
+   */
+  preview?: string;
   tsconfig: string;
   /** How the gallery presents itself inside a host site; omitted, it is Meowbook's own chrome. */
   gallery?: GalleryConfig;

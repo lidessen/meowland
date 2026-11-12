@@ -71,8 +71,12 @@ export async function prepareStories(
           `import { h } from ${JSON.stringify(jsxEntry)};`,
           `import { defineStory } from ${JSON.stringify(join(sourceDirectory, `index${moduleExtension}`))};`,
           `import { ${story.generated.component} as Target } from ${JSON.stringify(story.file)};`,
-          `const props = ${literal(story.generated.props)} satisfies Parameters<typeof Target>[0];`,
-          `export const Generated = defineStory({ id: ${JSON.stringify(story.id)}, title: ${JSON.stringify(story.title)}, render: () => <Target {...props} /> });`,
+          ...(story.generated.props
+            ? [
+                `const props = ${literal(story.generated.props)} satisfies Parameters<typeof Target>[0];`,
+              ]
+            : []),
+          `export const Generated = defineStory({ id: ${JSON.stringify(story.id)}, title: ${JSON.stringify(story.title)}, ${story.generated.mocks ? `mocks: ${literal(story.generated.mocks)}, ` : ""}render: () => ${story.generated.props ? "<Target {...props} />" : "<Target />"} });`,
         ].join("\n"),
       );
       modules.set(story.id, { file, exportName: "Generated" });
@@ -85,6 +89,10 @@ export async function prepareStories(
 }
 
 export async function checkPrepared(config: StoryConfig, prepared: PreparedStories): Promise<void> {
+  if (!prepared.modules.size)
+    throw new Error(
+      `No stories found. Add a *.stories.tsx file under ${config.stories.join(", ")} or pass --component <file> --export <name>.`,
+    );
   const project = await sourcePath(config.root, config.tsconfig);
   const tsconfig = join(prepared.directory, "tsconfig.json");
   const tsc = join(
@@ -113,7 +121,10 @@ export async function checkPrepared(config: StoryConfig, prepared: PreparedStori
       compilerOptions: { noEmit: true, incremental: false, composite: false },
       files: [...prepared.modules.values()]
         .map((module) => module.file)
-        .concat(await sourcePath(config.root, config.preview), ...existingFiles),
+        .concat(
+          ...(config.preview ? [await sourcePath(config.root, config.preview)] : []),
+          ...existingFiles,
+        ),
     }),
   );
   const process = Bun.spawn(["bun", tsc, "--project", tsconfig, "--pretty", "false"], {
@@ -209,7 +220,11 @@ export async function buildStories(
           `${JSON.stringify(id)}: () => import(${JSON.stringify(module.file)}).then(module => module[${JSON.stringify(module.exportName)}])`,
       )
       .join(",\n");
-    const preview = await sourcePath(config.root, config.preview);
+    // Without a preview the canvas imports the built-in one by package specifier; a dynamic
+    // import keeps its component set out of bundles that bring their own preview.
+    const environment = config.preview
+      ? `import(${JSON.stringify(await sourcePath(config.root, config.preview))})`
+      : `import("meowbook/web/default-preview")`;
     await writeFile(join(prepared.directory, "canvas.css"), canvasStyles.text);
     await writeFile(
       join(prepared.directory, "gallery.css"),
@@ -220,7 +235,7 @@ export async function buildStories(
       [
         `import { bootCanvas } from ${JSON.stringify(join(sourceDirectory, `web/index${moduleExtension}`))};`,
         `const loaders = {${loaders}};`,
-        `void bootCanvas({ capture: ${Boolean(options.capture)}, manifest: ${JSON.stringify(entries)}, loadStory(id) { const load = loaders[id]; if (!load) throw new Error("Unknown story: " + id); return load(); }, loadEnvironment: () => import(${JSON.stringify(preview)}).then(module => module.default) });`,
+        `void bootCanvas({ capture: ${Boolean(options.capture)}, manifest: ${JSON.stringify(entries)}, loadStory(id) { const load = loaders[id]; if (!load) throw new Error("Unknown story: " + id); return load(); }, loadEnvironment: () => ${environment}.then(module => module.default) });`,
       ].join("\n"),
     );
     await writeFile(

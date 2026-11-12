@@ -73,6 +73,7 @@ function replay(
   options: CaptureOptions,
   story: StoryEntry,
   environment: BrowserContextOptions,
+  root: string,
 ): string {
   const args = [
     "bun",
@@ -83,6 +84,7 @@ function replay(
   if (options.temporary) {
     args.push("--component", options.temporary.component, "--export", options.temporary.exportName);
     if (options.temporary.propsFile) args.push("--props-file", options.temporary.propsFile);
+    if (options.temporary.mocksFile) args.push("--mocks-file", options.temporary.mocksFile);
   } else args.push("--story", story.id);
   if (options.select !== undefined) args.push("--select", options.select);
   if (options.fullPage) args.push("--full-page");
@@ -107,7 +109,8 @@ function replay(
     environment.colorScheme!,
   );
   args.push("--timeout", String(options.timeout ?? 30_000));
-  return args.map(quote).join(" ");
+  // Without a config file the working directory is the root, so the rerun starts there.
+  return `${options.configFile ? "" : `cd ${quote(resolve(root))} && `}${args.map(quote).join(" ")}`;
 }
 
 async function reference(file: string): Promise<{ path: string; sha256: string }> {
@@ -182,11 +185,14 @@ export async function captureStories(
   if (options.configFile) references.config = await reference(resolve(options.configFile));
   if (options.temporary?.propsFile)
     references.props = await reference(await sourcePath(config.root, options.temporary.propsFile));
+  if (options.temporary?.mocksFile)
+    references.mocks = await reference(await sourcePath(config.root, options.temporary.mocksFile));
   const manifest: CaptureManifest = {
     version: 1,
     createdAt: new Date().toISOString(),
     status: "complete",
     input: {
+      ...(options.configFile ? {} : { config: "builtin" }),
       configRoot: resolve(config.root),
       stories: entries.map((story) => story.id),
       selection: options.all ? "all" : options.temporary ? "temporary" : "story",
@@ -195,6 +201,7 @@ export async function captureStories(
             component: options.temporary.component,
             exportName: options.temporary.exportName,
             propsFile: options.temporary.propsFile,
+            mocksFile: options.temporary.mocksFile,
           }
         : undefined,
       select: options.select,
@@ -209,7 +216,9 @@ export async function captureStories(
     environment: { browser: "chromium", ...environment },
     references,
     git: await gitState(config.root),
-    scenes: entries.map((story) => unexecuted(story, replay(options, story, environment))),
+    scenes: entries.map((story) =>
+      unexecuted(story, replay(options, story, environment, config.root)),
+    ),
   };
   let service: Awaited<ReturnType<typeof serveStories>> | undefined;
   let browser: Browser | undefined;
@@ -287,7 +296,7 @@ export async function captureStories(
           if (deadline !== undefined) clearTimeout(deadline);
           await activeContext?.close().catch(() => {});
           activeContext = undefined;
-          manifest.scenes[index]!.replay = replay(options, story, environment);
+          manifest.scenes[index]!.replay = replay(options, story, environment, config.root);
           manifest.scenes[index]!.durationMs = Math.round(performance.now() - started);
           if (manifest.scenes[index]!.status === "failed")
             options.progress?.(`Failed ${story.id}: ${manifest.scenes[index]!.error}`);

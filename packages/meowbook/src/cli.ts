@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
-import { resolve, dirname } from "node:path";
+import { resolve } from "node:path";
 import { pathToFileURL } from "node:url";
+import { resolveConfig } from "./bun/config";
 import type { StoryConfig } from "./types";
 import type { GuideOptions } from "./capture/types";
 import {
@@ -20,8 +21,9 @@ import {
 } from "./bun";
 
 const usage = [
-  "Usage: meowbook list|check|serve|capture --config <file> [--json]",
-  "Capture: --story <id> | --all | --component <file> --export <name> [--props-file <file>]",
+  "Usage: meowbook list|check|serve|capture [--config <file>] [--json]",
+  "Config: --config, else meowbook.config.ts, else story.config.ts in the current directory, else built-in defaults (src/**/*.stories.{ts,tsx}, tsconfig.json, standard preview).",
+  "Capture: --story <id> | --all | --component <file> --export <name> [--props-file <file>] [--mocks-file <file>]",
   "Live capture: --url <HTTP(S) URL> --ready <CSS selector> [--root <CSS selector>]",
   "  or --url <HTTP(S) URL> --pages <local plan file> (--all | --scene <id>) [--channel <chrome|chromium> | --cdp <loopback URL>]",
   "  [--select <name>] [--depth <n|all>] [--viewport <width>x<height>] [--device <name>] [--dpr <number>]",
@@ -30,7 +32,7 @@ const usage = [
   "  [--focus <CSS selector> (repeatable)] [--focus-padding <0..128 CSS px>]",
   "Focus: preserves selected regions and skeletonizes peripheral details, with 12 CSS px context padding by default.",
   "Guides: --guides uses selected components; --guide uses explicit DOM groups. Choose any comma-separated guide lines (default: all). Saves annotated PNGs and CSS-pixel measurements beside originals.",
-  "Serve: [--port <port>] [--capture] [--component <file> --export <name> --props-file <file>]",
+  "Serve: [--port <port>] [--capture] [--component <file> --export <name> [--props-file <file>] [--mocks-file <file>]]",
   "List: [--query <text>] filters story id, title, group, component and variant (case-insensitive).",
   "Use list --json to discover available stories; narrow large catalogs with --query.",
 ].join("\n");
@@ -43,7 +45,7 @@ export function parseCLI(argv: readonly string[]) {
   const guideSelectors: string[] = [];
   const focusSelectors: string[] = [];
   const common = ["--config"];
-  const temporaryFlags = ["--component", "--export", "--props-file"];
+  const temporaryFlags = ["--component", "--export", "--props-file", "--mocks-file"];
   const allowed =
     command === "capture"
       ? [
@@ -105,6 +107,7 @@ export function parseCLI(argv: readonly string[]) {
       component: values.get("--component")!,
       exportName: values.get("--export")!,
       propsFile: values.get("--props-file"),
+      mocksFile: values.get("--mocks-file"),
     };
   }
   const capture: CaptureOptions = {
@@ -186,7 +189,7 @@ export function parseCLI(argv: readonly string[]) {
     throw new Error("List query must contain between 1 and 256 characters");
   return {
     command: command!,
-    configFile: resolve(values.get("--config") ?? "story.config.ts"),
+    configFile: values.has("--config") ? resolve(values.get("--config")!) : undefined,
     json: flags.has("--json"),
     port,
     temporary,
@@ -200,20 +203,10 @@ export function parseCLI(argv: readonly string[]) {
 
 async function main() {
   const parsed = parseCLI(process.argv.slice(2));
-  const { command, configFile, json, temporary, port } = parsed;
+  const { command, json, temporary, port } = parsed;
   let config: StoryConfig | undefined;
-  if (!parsed.live) {
-    const imported = (await import(pathToFileURL(configFile).href)).default as StoryConfig;
-    if (
-      !imported ||
-      typeof imported.root !== "string" ||
-      !Array.isArray(imported.stories) ||
-      typeof imported.preview !== "string" ||
-      typeof imported.tsconfig !== "string"
-    )
-      throw new Error("Invalid story config: expected root, stories, preview and tsconfig");
-    config = { ...imported, root: resolve(dirname(configFile), imported.root) };
-  }
+  let configFile: string | undefined;
+  if (!parsed.live) ({ config, configFile } = await resolveConfig(parsed.configFile));
   if (command === "list") {
     const query = parsed.query?.toLocaleLowerCase();
     const entries = (await discoverStories(config!))

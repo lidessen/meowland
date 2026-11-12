@@ -247,3 +247,37 @@ describe("capture command inputs", () => {
     expect(() => parseCLI(["serve", "--full-page"])).toThrow("Unknown option");
   });
 });
+
+describe("config and temporary mocks inputs", () => {
+  test("--config is optional and --mocks-file travels with the temporary component", () => {
+    expect(parseCLI(["list"]).configFile).toBeUndefined();
+    expect(parseCLI(["check"]).configFile).toBeUndefined();
+    expect(parseCLI(["list", "--config", "a.config.ts"]).configFile).toBe(
+      `${process.cwd()}/a.config.ts`,
+    );
+    const capture = parseCLI([
+      "capture",
+      "--component",
+      "src/app.tsx",
+      "--export",
+      "App",
+      "--mocks-file",
+      "mocks.json",
+    ]);
+    expect(capture.configFile).toBeUndefined();
+    expect(capture.temporary).toEqual({
+      component: "src/app.tsx",
+      exportName: "App",
+      propsFile: undefined,
+      mocksFile: "mocks.json",
+    });
+    expect(
+      parseCLI(["serve", "--component", "a.tsx", "--export", "A", "--mocks-file", "m.json"])
+        .temporary?.mocksFile,
+    ).toBe("m.json");
+    expect(() => parseCLI(["capture", "--story", "a", "--mocks-file", "m.json"])).toThrow(
+      "requires --component",
+    );
+    expect(() => parseCLI(["check", "--mocks-file", "m.json"])).toThrow("Unknown option");
+  });
+});

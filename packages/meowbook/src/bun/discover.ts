@@ -4,7 +4,10 @@ import { isAbsolute, relative, resolve } from "node:path";
 import type { StoryConfig, StoryEntry } from "../types";
 
 export interface GeneratedInput {
-  props: Record<string, unknown>;
+  /** Omitted for a temporary component without a props file, which renders as `<Target />`. */
+  props?: Record<string, unknown>;
+  /** JSON routes from `--mocks-file`. */
+  mocks?: Record<string, unknown>;
   component: string;
 }
 export interface DiscoveredStory extends StoryEntry {
@@ -14,6 +17,7 @@ export interface TemporaryStory {
   component: string;
   exportName: string;
   propsFile?: string;
+  mocksFile?: string;
 }
 
 export function insideRoot(root: string, path: string): string {
@@ -320,15 +324,25 @@ export async function discoverStories(
       throw new Error("Temporary component requires a named export");
     const props: unknown = temporary.propsFile
       ? JSON.parse(await readFile(await sourcePath(config.root, temporary.propsFile), "utf8"))
-      : {};
-    if (!object(props)) throw new Error("Temporary props must be a JSON object");
+      : undefined;
+    if (props !== undefined && !object(props))
+      throw new Error("Temporary props must be a JSON object");
+    const mocks: unknown = temporary.mocksFile
+      ? JSON.parse(await readFile(await sourcePath(config.root, temporary.mocksFile), "utf8"))
+      : undefined;
+    if (mocks !== undefined && !object(mocks))
+      throw new Error("Temporary mocks must be a JSON object from route to JSON value");
     result.push({
       id: "temporary/component",
       title: temporary.exportName,
       file,
       exportName: temporary.exportName,
       line: 1,
-      generated: { component: temporary.exportName, props },
+      generated: {
+        component: temporary.exportName,
+        ...(props !== undefined ? { props } : {}),
+        ...(mocks !== undefined ? { mocks } : {}),
+      },
     });
   }
   const ids = new Set<string>();

@@ -222,6 +222,27 @@ test("temporary preview uses the same checker and accepts the actual open props 
     await expect(checkStories(config, temporary)).rejects.toThrow("not assignable");
   }));
 
+test("without a config file or preview, a component that takes no props is checked and rendered as <Target />", async () =>
+  fixture(async (fixtureConfig, root) => {
+    const config: StoryConfig = { root, stories: fixtureConfig.stories, tsconfig: "tsconfig.json" };
+    await expect(checkStories(config)).rejects.toThrow("No stories found");
+    await writeFile(join(root, "App.tsx"), "export const App = () => 'Hello';");
+    await writeFile(join(root, "mocks.json"), '{"GET /api/users":[{"id":1}]}');
+    const temporary = { component: "App.tsx", exportName: "App", mocksFile: "mocks.json" };
+    expect((await checkStories(config, temporary))[0]?.id).toBe("temporary/component");
+    await writeFile(join(root, "mocks.json"), "[]");
+    await expect(checkStories(config, temporary)).rejects.toThrow("Temporary mocks");
+    // A props file still gets the strict check; only the absent props file lifts it.
+    await writeFile(
+      join(root, "App.tsx"),
+      "export const App = (props: {label: string}) => props.label;",
+    );
+    await writeFile(join(root, "mocks.json"), "{}");
+    await expect(checkStories(config, { component: "App.tsx", exportName: "App" })).rejects.toThrow(
+      "label",
+    );
+  }));
+
 test("build emits a static gallery, independent canvas and manifest, then removes generation sources", async () =>
   fixture(async (config, root) => {
     await writeFile(

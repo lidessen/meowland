@@ -23,6 +23,10 @@
       "types": "./dist/src/web/index.d.ts",
       "import": "./dist/src/web/index.js"
     },
+    "./web/default-preview": {
+      "types": "./dist/src/web/default-preview.d.ts",
+      "import": "./dist/src/web/default-preview.js"
+    },
     "./bun": {
       "types": "./dist/src/bun/index.d.ts",
       "import": "./dist/src/bun/index.js"

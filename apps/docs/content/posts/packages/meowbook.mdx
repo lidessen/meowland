@@ -3,6 +3,23 @@
 Meowbook is the component workbench. It reads the stories a package declares, builds a catalog from
 them, and runs each story in an isolated canvas. It does not depend on Storybook.
 
+## See what you built
+
+In a project with `meowtail` and `meowbook` installed and a `tsconfig.json`, no Meowbook config is
+needed. One command prints the path of a themed PNG:
+
+```sh
+bun add -d meowbook@dev
+bunx --no-install playwright install chromium   # once
+bunx --no-install meowbook capture --component src/app.tsx --export App
+bunx --no-install meowbook capture --component src/app.tsx --export App --viewport 390x844 --color-scheme dark
+bunx --no-install meowbook capture --story users/loaded
+```
+
+Read the `Scene` line of the output for the absolute path of the viewport PNG. When a page needs
+data, write a story with `mocks`; when the real application is already running, use
+`capture --url`. Captures go to `dist/meowbook/captures`, which belongs in `.gitignore`.
+
 ## A story is data
 
 A story declares what to show, in which group, and which component it belongs to.
@@ -29,7 +46,9 @@ the build.
 ## Register components in the preview
 
 A story that renders Meowtail components needs a preview environment that registers them and mounts
-their theme. Point `preview` in `meowbook.config.ts` at this file.
+their theme. Point `preview` in `meowbook.config.ts` at this file. Without a config or a `preview`, Meowbook uses
+a built-in standard preview that does the same, so this step is only for a project with its own
+theme, host components or providers.
 
 ```ts
 import { createRuntime } from "meowjsx";
@@ -46,6 +65,29 @@ export default (({ root, onCleanup }) => {
 }) satisfies PreviewEnvironment;
 ```
 
+## Mock fetch for a story
+
+A page that calls `fetch` shows its loading or error state unless the story answers the request.
+`mocks` maps routes to answers for the life of the story.
+
+```tsx
+export const Loaded = defineStory({
+  id: "users/loaded",
+  mocks: {
+    "GET /api/users": [{ id: 1, name: "Ada" }],
+    "GET /api/users/:id": ({ params }) => ({ id: Number(params.id), name: "Ada" }),
+    "POST /api/users": () => Response.json({ id: 2 }, { status: 201 }),
+  },
+  render: () => <UsersPage />,
+});
+```
+
+A route is `"<METHOD> <path>"` or just a path; `:name` matches one segment and a final `*` the rest.
+A JSON value answers `200`; a function receives `{ request, url, params }` and returns JSON or a
+`Response`. A request that matches no route reaches the real `fetch`. Only `fetch` is intercepted.
+A temporary component takes JSON routes from `--mocks-file`. A capture reports which routes were hit
+and which requests went unmocked.
+
 ## The canvas is a separate document
 
 Every example runs in its own document, with its own runtime and its own theme root. That is what
@@ -61,6 +103,9 @@ bunx --no-install meowbook check --config meowbook.config.ts
 bunx --no-install meowbook serve --config meowbook.config.ts --port 13003
 bunx --no-install meowbook capture --config meowbook.config.ts --story buttons --depth all
 ```
+
+`--config` is optional: Meowbook falls back to `meowbook.config.ts`, then `story.config.ts`, then
+built-in defaults.
 
 The server only listens on loopback and runs in the foreground. There is no hot reload yet; restart
 the server after a source change.

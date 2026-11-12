@@ -2,6 +2,28 @@
 
 `meowbook` is the MeowJSX Web component development package. It provides a static story index, an isolated canvas, selective component replacement and an ordinary browser test entry point; it does not depend on Storybook and does not include the old Notes/Tasks application.
 
+## See what you built
+
+In a project that has `meowtail` and `meowbook` installed and a `tsconfig.json`, no Meowbook config is needed. One command prints the path of a themed PNG:
+
+```sh
+bun add -d meowbook@dev
+bunx --no-install playwright install chromium   # once
+bunx --no-install meowbook capture --component src/app.tsx --export App
+bunx --no-install meowbook capture --component src/app.tsx --export App --viewport 390x844 --color-scheme dark
+bunx --no-install meowbook capture --story users/loaded
+```
+
+Read the `Scene ...` line of the output: it is the absolute path of the viewport PNG. A failed scene prints its error, and `Unmocked requests in ...` names the `fetch` calls that had no answer, which is usually why a page photographs as empty. Then:
+
+- When a page needs data, write a `src/*.stories.tsx` with [`mocks`](#mocking-fetch-in-a-story).
+- When the real application is already running with its backend, use `capture --url`; a `--pages` plan can call Playwright's `page.route` ([Batch capture of real pages](#batch-capture-of-real-pages)).
+- A whole app is photographed as a story or temporary component that renders its root component, so keep `App` in its own module apart from `main.tsx`.
+
+Without `--config`, Meowbook uses `meowbook.config.ts` in the current directory, then `story.config.ts`, then built-in defaults: the current directory is the root, stories come from `src/**/*.stories.{ts,tsx}`, the TypeScript project is `tsconfig.json`, and the canvas uses the built-in standard preview (Meowtail components, the standard theme and focus modality; `--color-scheme dark` photographs the dark theme). A project with its own theme, host components or providers still writes a `preview.ts`. Under the built-in defaults the capture manifest records `input.config: "builtin"`, has no `references.config`, and its rerun command starts with `cd <root> &&`.
+
+Captures go to `dist/meowbook/captures` under the root; add that directory to `.gitignore`.
+
 The Gallery is itself rendered by MeowJSX and reuses Meowtail's Button, Input, Icon and standard theme through its own runtime, so it does not affect the story execution environment. Meowbook only maintains the tool's catalog, canvas and inspection drawer layout. Inspection notes are collapsed by default, and a narrow screen chooses stories through the catalog button.
 
 The tool centers on the canvas: it fits the available space by default, and fixed device widths are for explicit comparison. The latest interaction feedback appears directly at the bottom, and the full log expands on demand. Search shows the match count; on a narrow screen the catalog supports closing with the backdrop, Escape and focus return. The appearance menu in the header holds one choice for light, dark or follow system, and it paints both the tool and the story: the gallery opens its canvas with `embedded=1&scheme=<choice>`, so an environment that reads `embedded` draws no controls of its own, and a later change reaches the open canvas without remounting it. The standalone link in the header opens the canvas without `embedded`, where the environment keeps its own controls, for example to inspect a dark story apart from the tool.
@@ -41,7 +63,7 @@ export default defineConfig({
 
 ## Usage
 
-Meowbook assembles stories from the consumer's own config. After installing the package, run in the consumer directory:
+Meowbook assembles stories from the consumer's own config, or from the built-in defaults described above when there is none. `--config` is optional for `list`, `check`, `serve` and `capture`. After installing the package, run in the consumer directory:
 
 ```sh
 bunx --no-install meowbook list --config meowbook.config.ts --json
@@ -51,7 +73,7 @@ bunx --no-install meowbook capture --config meowbook.config.ts --story composer 
 ```
 
 The CLI requires Bun. After installing `meowbook` and its `meowjsx`, `meowcss` and `meowtail` peers, use the installed CLI commands above in the consumer directory.
-The public entry points are `meowbook`, `meowbook/web`, `meowbook/bun` and `meowbook/playwright`.
+The public entry points are `meowbook`, `meowbook/web`, `meowbook/web/default-preview` (the built-in preview, which the canvas imports when a config has no `preview`), `meowbook/bun` and `meowbook/playwright`.
 The published package ships compiled JS, declaration files and the gallery HTML; building and capture do not read the library repository's source directories.
 Static builds use `buildStories(config, outdir)` from `meowbook/bun`; the CLI provides list, check, serve and capture.
 `meowbook/bun` is the Bun tool entry point, and `meowbook/playwright` is for Node/Bun capture scripts;
@@ -64,7 +86,7 @@ import { defineConfig } from "meowbook";
 export default defineConfig({
   root: import.meta.dir,
   stories: ["src/**/*.stories.tsx", "src/components/**/*.tsx"],
-  preview: "preview.ts",
+  preview: "preview.ts", // optional: omitted, the built-in standard preview is used
   tsconfig: "tsconfig.json",
 });
 ```
@@ -124,7 +146,38 @@ The annotation generates real typed JSX, which the consumer's TypeScript config 
 
 Temporary previews reuse the same check and build chain without writing a permanent story, using the installed CLI and consumer config described above. The `meowbook.config.ts` and story ids in this document are consumer examples; when viewing shared stories inside the library repository from the root, use `--config apps/showcase/meowbook.config.ts`. A local tarball install does not mean the package has been published publicly.
 
-Paths resolve inside the config root. Omitting the props file means `{}`; required properties still error as usual.
+Paths resolve inside the config root. Omitting the props file renders `<Target />`; required properties still error as usual.
+
+## Mocking fetch in a story
+
+A page that calls `fetch` renders its loading or error state unless the story answers the request. `mocks` is a table from route to answer, applied to `fetch` for the life of the story:
+
+```tsx
+export const Loaded = defineStory({
+  id: "users/loaded",
+  mocks: {
+    "GET /api/users": [{ id: 1, name: "Ada" }],
+    "GET /api/users/:id": ({ params }) => ({ id: Number(params.id), name: "Ada" }),
+    "POST /api/users": () => Response.json({ id: 2 }, { status: 201 }),
+    "GET /api/slow": () => new Promise(() => {}), // stays loading
+    "GET /api/broken": () => new Response(null, { status: 500 }),
+  },
+  render: () => <UsersPage />,
+});
+```
+
+- **Route.** `"<METHOD> <path>"`, or `"<path>"` for any method. The path is matched against the request URL's pathname whatever its origin, and the query string is ignored. `:name` matches one segment and is decoded into `params`; a final `*` matches the rest. A route that starts with `http://` or `https://` must also match the origin. The first matching route in declaration order wins. A malformed route fails the story before it renders.
+- **Answer.** A JSON value becomes a `200` JSON response. A function receives `{ request, url, params }` and returns a JSON value, a `Response` used as is, or a promise of either; `undefined` becomes an empty `204`. Status, headers and delay are a `Response` and an `await`. A function that throws makes `fetch` reject with a `TypeError` whose `cause` is the thrown value.
+- **Lifecycle.** The canvas installs the interceptor after it loads the story and before `render`, and restores the original `fetch` after unmount. A request that matches no route goes to the real `fetch`.
+- **Limits.** Only `fetch` is intercepted. `XMLHttpRequest`, `WebSocket`, `EventSource`, images, fonts and navigation are not, requests made by the preview or while the story module is imported are not, and neither is a `fetch` reference a module captured at import time. Mocks are story code, trusted like the story.
+
+A temporary component takes the JSON subset with `--mocks-file <file>` next to `--props-file`: a JSON object from route to JSON value, resolved inside the config root and recorded in the manifest by path and hash. Functions need a story.
+
+```sh
+bunx --no-install meowbook capture --component src/app.tsx --export App --mocks-file mocks.json
+```
+
+Mock data stays with the host: Meowbook provides the seam and its lifecycle, you write the routes and the facts. Meowtail components do not fetch.
 
 ## Selective child component replacement
 
@@ -162,7 +215,13 @@ bunx --no-install meowbook capture --config meowbook.config.ts \
   --component packages/meowtail/src/components/button.tsx --export Button
 ```
 
-`--story`, `--all` and the temporary component entry point are mutually exclusive. Temporary props are still provided by `--props-file`, with paths relative to the config root.
+`--story`, `--all` and the temporary component entry point are mutually exclusive. Temporary props are still provided by `--props-file` and temporary mocks by `--mocks-file`, with paths relative to the config root. A temporary component without a props file is rendered as `<Target />`, so a component that takes no props, such as an app root, works; required props still fail the type check.
+
+Plain output keeps the summary, `Report:` and `Manifest:` lines and adds one `Scene <id>: <absolute PNG path>` line per photographed scene (plus `full page:` when `--full-page` is given), a `Failed <id>: <error>` line per failed scene, and an `Unmocked requests in <id>: ...` line. `--json` carries the same facts per artifact.
+
+### Requests fact
+
+A story or temporary component scene reports what `fetch` saw since the story installed its mocks, so the preview's own requests never appear. `requests` holds `mocks: { route, hits }[]` (a route with zero hits is reported, not judged) and `unmocked: { method, url, count }[]`, with origin and pathname but no query or fragment, at most 50 distinct entries. It is present when the story has mocks or any request went unmocked, shows in the offline report next to the replacement log, and is absent from `--url` captures. Pathnames can carry identifiers; like the rest of the capture artifacts, this fact is not desensitized.
 The default depth is `1`, and the first non-transparent component layer is `0`; fragments and built-in Context Providers are transparent automatically.
 Other transparent components are marked next to their declaration; core does not interpret capture metadata:
 

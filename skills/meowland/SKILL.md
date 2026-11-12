@@ -184,12 +184,31 @@ Components arrive styled; a host rarely writes CSS. When it does:
 
 ## 7. Check the result
 
-- Type-check (`tsc --noEmit`), then open the page in a browser. Unit tests and types do not show a
-  missing theme.
-- If controls look like bare browser defaults, the theme plugin is missing or sits on a different
-  runtime from the one that renders.
-- Look at a narrow viewport (about 390px) and at `scheme: "dark"`; both come from the theme, so a
-  layout that breaks there usually hard-codes widths or colors.
+Look at the result before calling it done: a missing theme or an empty list does not show in types
+or unit tests. An agent in a terminal photographs the app with Meowbook (this describes source newer
+than the published `dev` tag; on an older install, `meowbook` needs a config and a `preview.ts`
+first, see its README):
+
+```sh
+bun add -d meowbook@dev
+bunx --no-install playwright install chromium   # once
+bunx --no-install meowbook capture --component src/app.tsx --export App
+bunx --no-install meowbook capture --component src/app.tsx --export App --viewport 390x844 --color-scheme dark
+bunx --no-install meowbook capture --story users/loaded
+```
+
+No config is needed. The `Scene` line of the output is the absolute path of a themed PNG; read it.
+Keep `App` in its own module apart from `main.tsx`, so it can be photographed as a temporary
+component. Add `dist/meowbook/captures` to `.gitignore`.
+
+- If the page photographs as an empty list or a loading state, the `Unmocked requests` line names
+  the `fetch` that had no answer. Write `src/*.stories.tsx` with `mocks` (`"GET /api/users": [...]`,
+  or a function returning JSON or a `Response`) and capture it with `--story <id>`. If the real
+  application and its backend are already running, `capture --url` photographs that instead.
+- Type-check (`tsc --noEmit`). If controls look like bare browser defaults, the theme plugin is
+  missing or sits on a different runtime from the one that renders.
+- Look at about 390px and at `--color-scheme dark`; both come from the theme, so a layout that
+  breaks there usually hard-codes widths or colors.
 - With `createMeowUITheme` the page itself takes the theme's canvas and color scheme. A region
   embedded in someone else's page passes `page: false` and leaves the ground to that page; on
   0.4.0-alpha.1 and earlier, give the app's outermost element `className={ui.bg.canvas}` instead.

@@ -60,6 +60,16 @@ export interface CaptureScrollView {
   scrollTop: number;
 }
 
+/**
+ * What `fetch` saw since the story's mocks were installed. `unmocked` holds origin and pathname
+ * without query or fragment, at most 50 distinct entries. Pathnames can carry identifiers; like
+ * the rest of the capture artifacts, this fact is not desensitized.
+ */
+export interface CaptureRequests {
+  mocks: { route: string; hits: number }[];
+  unmocked: { method: string; url: string; count: number }[];
+}
+
 export interface CaptureSnapshot {
   story: StoryEntry;
   nodes: CaptureInstance[];
@@ -67,6 +77,8 @@ export interface CaptureSnapshot {
   dpr: number;
   boundaries?: string[];
   replacements?: { component: string; replacement?: string; hits: number }[];
+  /** Present when the story has mocks or any request went unmocked. */
+  requests?: CaptureRequests;
   activeFocus?: CaptureActiveFocus;
   scrollViews?: CaptureScrollView[];
 }
@@ -118,6 +130,7 @@ export interface CaptureScene {
   environment?: Record<string, unknown>;
   boundaries?: string[];
   replacements?: CaptureSnapshot["replacements"];
+  requests?: CaptureRequests;
   activeFocus?: CaptureActiveFocus;
   scrollViews?: CaptureScrollView[];
   replay?: string;

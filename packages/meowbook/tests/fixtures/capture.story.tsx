@@ -223,3 +223,21 @@ export const Inspector = defineStory({
     );
   },
 });
+function RequestsApp() {
+  return <output data-testid="requests-output">Loading</output>;
+}
+export const Requests = defineStory({
+  id: "capture/requests",
+  mocks: { "GET /api/users": [{ id: 1, name: "Ada" }] },
+  render: () => <RequestsApp />,
+  async setup({ root }) {
+    const users = (await (await fetch("/api/users")).json()) as { name: string }[];
+    // The second request has no route, so it reaches the real fetch and is reported.
+    const missing = await fetch("/api/missing?token=private");
+    root.querySelector("output")!.textContent = `${users[0]!.name} · missing ${missing.status}`;
+  },
+});
+export const NoMocks = defineStory({
+  id: "capture/no-mocks",
+  render: () => <RequestsApp />,
+});

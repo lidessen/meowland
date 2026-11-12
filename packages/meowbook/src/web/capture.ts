@@ -120,6 +120,7 @@ function geometry(
 export function createCaptureProjection(
   story: StoryEntry,
   replacements: () => CaptureSnapshot["replacements"],
+  requests: () => CaptureSnapshot["requests"],
   observation: ComponentObservation<Node>,
 ) {
   const snapshot = (): CaptureSnapshot => {
@@ -130,6 +131,7 @@ export function createCaptureProjection(
       viewport: { width: innerWidth, height: innerHeight },
       dpr: devicePixelRatio,
       replacements: replacements(),
+      requests: requests(),
       ...readCaptureFacts(document, instances),
       boundaries: [
         "Direct function calls, private renderers, closed shadow roots and native popups have no observable internal component boundary.",

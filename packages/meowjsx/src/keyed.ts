@@ -1,3 +1,4 @@
+import { outsideComponentBody } from "./context";
 import { isSignal } from "./reactive";
 import type { Child, Key, MaybeSignal, ReadableSignal } from "./types";
 
@@ -16,7 +17,12 @@ export function keyed<T>(
   key: (item: T) => Key,
   render: (item: ReadableSignal<T>) => Child,
 ): KeyedChild<T> {
-  return { [keyedBrand]: true, items, key, render };
+  return {
+    [keyedBrand]: true,
+    items,
+    key: (item) => outsideComponentBody(() => key(item)),
+    render: (row) => outsideComponentBody(() => render(row)),
+  };
 }
 
 export function isKeyedChild(value: unknown): value is KeyedChild<unknown> {

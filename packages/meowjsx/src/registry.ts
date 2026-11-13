@@ -20,7 +20,7 @@ import type {
   ShadowRegistry,
   VNode,
 } from "./types";
-import { contextScopeForProvider, withContextScope, type ContextScope } from "./context";
+import { contextScopeForProvider, runComponentBody, type ContextScope } from "./context";
 import { createLifecycleScope } from "./lifecycle";
 
 export interface HookEntry<Hook> {
@@ -141,7 +141,7 @@ export function invokeComponent(
   const componentContext = createComponentContext(runtime, component, props, scope);
   try {
     return {
-      child: withContextScope(contextScope, () => component(props, componentContext)),
+      child: runComponentBody(contextScope, () => component(props, componentContext)),
       contextScope: contextScopeForProvider(component, props.value, contextScope),
       dispose: scope.dispose,
     };

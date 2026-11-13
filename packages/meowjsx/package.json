@@ -33,6 +33,10 @@
       "types": "./dist/src/i18n.d.ts",
       "import": "./dist/src/i18n.js"
     },
+    "./i18n/audit": {
+      "types": "./dist/src/i18n-audit.d.ts",
+      "import": "./dist/src/i18n-audit.js"
+    },
     "./renderer": {
       "types": "./dist/src/renderer.d.ts",
       "import": "./dist/src/renderer.js"

@@ -1,13 +1,11 @@
 # Multilingual support for MeowJSX and Meowpress
 
-Status: proposed, second revision. Nothing is implemented. The first revision followed the
-mainstream shape (key catalogs, a `t`/`text` pair, hand-maintained sibling translations); this one
-re-derives the design from who does the work now. The mainstream shape is kept under
-[What changed from the mainstream design](#what-changed-from-the-mainstream-design) with the
-reason for each departure. The independent challenger review the
-[design-change method](../../.agents/skills/design-change/SKILL.md) requires before a mechanism
-changes has not run yet; decisions that belong to the project owner are in
-[Open decisions](#open-decisions).
+Status: accepted for implementation, third revision. The project owner chose the direction of the
+second revision (source text as identity, one `t`, provenance, a work list). An independent
+challenger then tested it against the code; its findings and how each changed the text are in
+[Challenger review](#challenger-review). Implementation progress is recorded in
+[Work packages](#work-packages). The mainstream shape of the first revision is kept under
+[What changed from the mainstream design](#what-changed-from-the-mainstream-design).
 
 ## The problem
 
@@ -116,38 +114,52 @@ i18n.locale.value = "en"; // mounted text and attributes update in place
 
 - **One function, one return type.** `t(source, params?, options?)` returns a
   `ReadableSignal<string>`. A mounted child or attribute binds to it and follows a locale change;
-  static HTML reads it once. There is no separate string form to choose between. A prop typed
-  `string` rejects it at compile time, and the author writes `.value` there on purpose; the
-  mistake that used to render a stale string silently is now a type error.
-- **The source must be a literal.** `t`'s type refuses a value of type `string`, so a dynamic
-  sentence cannot be passed. This is what makes the audit below complete: every message in a
-  program is visible to a scanner.
+  static HTML reads it once. There is no separate string form to choose between.
+- **A message Signal never becomes a string by accident.** TypeScript accepts an object in a
+  template literal, in `+` and in `join`, and host attributes are typed `unknown`, so types alone
+  do not catch `${t("Posts")} · ${name}`. The returned Signal therefore carries a `toString` and
+  `Symbol.toPrimitive` that throw, naming `.value` and the `t(template, params)` form. A prop
+  typed `string` still rejects it at compile time. String builders (document titles, Markdown
+  indexes) read `.value` on purpose.
+- **The source is written as a literal.** `t`'s type refuses a value of type `string`. Types
+  cannot require a syntactic literal (a `const` union passes), so completeness is the audit's
+  job, not the type's; see [The audit](#the-audit).
 - **Message format is ICU MessageFormat**, the subset `{name}`, `plural`, `selectordinal`,
-  `select` and `#`. It is one string per message, so a catalog is a flat JSON object and a
-  message is never split across keys. It is also the format models already write correctly for
-  languages with several plural categories. Placeholders are inferred from the literal, so a
-  missing parameter is a type error for simple arguments and an audit error for all of them.
-- **Context is also the translator's note.** `t("Post", undefined, { context: "noun: a blog
-article" })` separates homographs and tells the translator what a two-word string means, which
-  is where short interface copy goes wrong. In the catalog such a source maps to an object from
-  context to translation instead of to a string.
+  `select` and `#`, one string per message. An apostrophe is literal unless it directly precedes
+  `{`, `}` or `#`; catalogs should prefer U+2019 in prose. Parsed messages are cached per
+  instance. Parameter names are inferred from the literal only when it has no `,` inside braces,
+  no nested brace and no apostrophe; any other template takes loose parameters and is checked by
+  the audit.
+- **Context and note are separate.** `options.context` is part of the identity and separates
+  homographs. `options.note` is the translator's note and is not identity, so rewording it does
+  not orphan a translation. Both are literals.
+- **Catalog shape.** A flat object from source to translation. A source that has contexts maps to
+  an object from context to translation, with `""` as the entry without context. An empty string
+  is a missing translation. Lookup uses own properties only.
 - **Lookup.** The locale, then its parents by dropping subtags (`zh-Hant-TW`, `zh-Hant`, `zh`),
   then the source text itself. The source text is a correct degraded state, not a key on screen.
   `onMissing({ source, context, locale })` reports each miss once.
-- **Ambient and explicit.** The module-level `t` reads the nearest `I18nProvider` during
-  synchronous render and binds the returned Signal to that instance, so reading `.value` later in
-  an event handler still follows the locale. Without a provider it yields the source text.
-  `i18n.t` has the same signature for code that runs outside render. Nested providers give a
-  subtree its own locale.
+- **Ambient `t` is for component bodies only.** The module-level `t` reads the nearest
+  `I18nProvider` while a component function runs and binds the returned Signal to that instance,
+  so reading `.value` later in a handler still follows the locale. Inside a component without a
+  provider it yields the source text. **Anywhere else it throws**: a handler, a `derived` body, a
+  `keyed` row callback, code after `await`, module top level, or JSX built in a plain function
+  before it is rendered. The error names `i18n.t` and `defineMessages`. This needs one core
+  addition: `context.ts` exposes whether a component body is running, which `useContext` alone
+  cannot tell from "rendering without a provider".
+- **`i18n.t`** has the same signature and works anywhere. Code that is not a component body, such
+  as Meowpress's page functions and Markdown indexes, receives the instance and uses it.
 - **Instance.** `createI18n({ source, locale, catalogs, load?, timeZone?, onMissing? })` returns a
   plain object independent of any `Runtime`: `locale` (writable Signal), `direction` (Signal,
   derived from the locale's script because Bun exposes neither `getTextInfo` nor `textInfo`), `t`,
-  `number`, `date`, `addCatalog` and `setLocale` (loads through `load` first and writes the Signal
-  after, so a switch never flashes the source language; the last call wins).
+  `lookup`, `number`, `date`, `addCatalog` and `setLocale` (loads through `load` first and writes
+  the Signal after, so a switch never flashes the source language; the last call wins).
 - **`lang` and `dir`** are bound by the host on the element it owns:
   `lang={i18n.locale} dir={i18n.direction}`. The entry never touches the document.
-- **Identity.** The Context lives in this module only; `entry-identity.test.ts` gains a case that
-  provides through the built entry and reads from a separately bundled component.
+- **Identity.** The Context and the in-render fact live in one module each;
+  `entry-identity.test.ts` gains a case that provides through the built entry and reads from a
+  separately bundled component. `./i18n` and `./i18n/audit` use no Bun or DOM globals, because
+  release acceptance imports every export under Node.
 
 ### Variables and dynamic text
 
@@ -169,9 +181,10 @@ each with one answer:
   markup. A tag the caller did not supply is an `invalid` audit item.
 - **`defineMessages`** is how a literal is declared away from its use: at module level, in a
   table keyed by a status or an error code. It returns typed descriptors and does not look
-  anything up; `t` accepts a literal or a descriptor and nothing else. A value read from a
-  Signal is `t(labels[status.value])` inside `derived`, or one `select` template with the Signal
-  as a parameter.
+  anything up; `t` accepts a literal, a descriptor or a Signal of a descriptor, and nothing else.
+  A choice that changes at run time is `t(derived(() => labels[status.value]))`, called in the
+  component body, or one `select` template with the Signal as a parameter. `t` is never called
+  inside `derived`: that body runs outside the component and would throw.
 - **Data is not copy.** A post title, a user's name or a message a server composed is content.
   It reaches the component already in the right language from whoever owns it: Meowpress content
   files for a site, the host's backend for an application. Passing it through a catalog would
@@ -187,20 +200,25 @@ each with one answer:
 
 Two pure, IO-free functions exported from `meowjsx/i18n/audit`:
 
-- `extractMessages(code, file)` returns every literal `t(...)` call with its source, context,
-  placeholders and position.
+- `extractMessages(code, file)` finds call sites of `t`, `.t`, `t.rich`, `.lookup` and
+  `defineMessages` and parses only the argument list at each one. A first argument that is one
+  string literal becomes a message with its source, context, note and position. Anything else,
+  including a template literal, a concatenation or an identifier that is not a descriptor table
+  member, is returned as a `dynamic` item with file and line; it is reported, never skipped.
+  Importing `t` under another name is reported as well. The scanner does not claim to understand
+  the program: what it cannot read becomes a work item.
 - `auditCatalog(messages, catalog, locale)` returns the work list:
-  - `missing`: a source with no translation;
+  - `missing`: a source with no translation, or an empty one;
   - `unused`: a catalog entry no code refers to, paired with the closest missing source when one
     is similar, so an edited sentence carries its old translation as a starting point;
-  - `invalid`: a translation that does not parse, or whose arguments differ from the source's.
+  - `invalid`: a translation that does not parse, whose arguments differ from the source's
+    (which also catches an apostrophe that swallowed a placeholder), or that uses a rich tag the
+    source does not have.
 
-`meowjsx i18n check [--json] [--write]` wraps them for an application: it scans the project,
-prints the list, exits non-zero when it is not empty, and with `--write` adds the missing sources
-to each catalog with an empty value for the agent to fill. The JSON form is the contract; the
-plain form prints one actionable line per item, following the
-[capture design](2026-11-12-agent-preview-capture.md)'s rule that output must be something an
-agent can act on.
+A command for applications, `meowjsx i18n check`, is deferred: MeowJSX has no bin today, a Bun
+shebang would be its first Bun requirement, and Meowpress does not need it (its theme declares a
+message table). The functions ship first; the command is the last work package and is only added
+once an application needs the loop.
 
 A later slice adds a pseudo-locale (accented, lengthened text generated from the source). A
 Meowbook capture in that locale shows any sentence that bypassed `t` as plain text and any layout
@@ -347,42 +365,113 @@ What the mainstream shape does better, stated plainly:
   tools speak; only the identity differs.
 - **`.value` at string-typed props** is a visible cost of the single return type.
 
+## Challenger review
+
+An independent challenger read the second revision against the code and ran two probes (a runtime
+probe against `packages/meowjsx/src`, a type probe with TypeScript 6.0.2; the pinned 7.0.2 was not
+installed there). Verdict: ready after changes. The findings that changed the mechanism:
+
+- **Ambient `t` missed the provider in about half of the theme.** Meowpress's page functions
+  build JSX in plain functions, where no context scope is active, and `agentMarkdown`/`llmText`
+  never render. The probe rendered the source text there. Result: ambient `t` is restricted to
+  component bodies and throws elsewhere; page functions take the instance.
+- **"Outside render returns the source text" was a silent bug**, and the second revision's own
+  `t` inside `derived` advice hit it. Result: the throw above, the in-render fact in
+  `context.ts`, and `t` accepting a Signal of a descriptor.
+- **Types do not stop a Signal from being stringified.** The probe printed
+  `[object Object] · Site` with no type error. Result: the throwing `toString`.
+- **Literal types do not make a scan complete.** A `const` union passes the type and has no
+  literal at the call. Result: the scanner reports what it cannot read as `dynamic`, and
+  Meowpress fails its build when a source reaches an instance that is not in its message table.
+- **Meowpress conflated two source languages** and never said where the theme's messages come
+  from at a consumer, where the theme is compiled code. Result: the rules below.
+
+### Amendments to Part 2
+
+These override the earlier text where they differ.
+
+- **Two sources.** The theme's interface source is always `en`. Every configured locale other
+  than `en`, including the content source locale, needs a catalog for theme sentences. Config
+  copy is written in the content source locale and is a work item only for target locales.
+- **The theme declares its messages** in one exported `defineMessages` table. `meowpress locales`
+  reads that table and the config; it runs no scanner and needs no `meowjsx` command.
+- **Config copy that goes through `lookup`:** `site.name`, `site.description`, `about.heading`,
+  `about.paragraphs[]`, `about.linksHeading`, `about.links[].label` and the three `notFound`
+  strings. The `title === site.name` comparison happens before lookup. `agentGuide` stays in the
+  source language.
+- **Pairing.** The duplicate key becomes slug and locale, and pairing happens after the source
+  overlay. `first.md` together with `first.<source>.md` is an error. A set with no source-locale
+  member has no original: its members are each originals in their own language and none is
+  stale. A translation inherits `date`, `tags` and `category` from its original unless it sets
+  them. When configuring a locale changes an existing slug (`notes.fr.md` was `/posts/notes.fr/`),
+  the build reports it. `SitePageContext.posts` and `thoughts` stay originals only; translations
+  arrive on each item.
+- **Provenance hash.** The first 12 hex characters of SHA-256 over the original's resolved title,
+  a newline, and its body with line endings normalised to LF. The work list gives the current
+  hash and the recorded one; it does not promise a diff, which the agent gets from the
+  repository's history. `stamp` rewrites frontmatter through a YAML document round-trip and adds
+  frontmatter to a file that has none.
+- **Disclosure** of unreviewed translations is switched with `locales.disclosure: false`, not by
+  emptying a catalog entry.
+- **Routes.** `localePath` falls back to the source route for routes that exist only there
+  (skills). Stylesheet and image paths gain one level under a prefix. Translated bodies are not
+  rewritten: root-absolute links an author wrote stay as written, and post assets are referenced
+  root-absolutely. The root `404.html` links each locale's home; per-locale `404.html` files are
+  written and described as host-dependent. A locale tag that collides with a route, an asset
+  directory or a consumer page is refused during the build, when all of them are known. The URL
+  segment and the file suffix are the canonical tag in lower case.
+- **Client script copy** ("Copy", "Copied" in the skill browser) moves to `data-*` attributes
+  written at build time.
+- **`/translations.json`** is reserved like `agents.md` and is written only when `locales` is
+  configured. `site.url` is an origin without a path.
+- **Unchanged output.** One snapshot of the current HTML is taken before the theme moves to
+  `t`, because JSX whitespace at split sentences decides whether the output stays identical.
+- **CLI.** `locales` and `stamp <file>` need the argument parser reworked; the project root for
+  them is `--root`, not a positional.
+
 ## Work packages
 
-1. **`meowjsx/i18n`**: `t`, instance, provider, ICU subset, types. Tests fail on: a mounted text
-   or attribute that does not follow `locale.value`; a parent tag skipped in lookup; `ru` with
-   count 3 not selecting `few`; a `setLocale` race where the earlier load wins; a `.value` read
-   in a handler that ignores a later locale change; a context read across the built entry.
-2. **Audit**: `extractMessages`, `auditCatalog`, `meowjsx i18n check`. Tests fail on: a literal
-   call the scanner misses; a translation with different arguments passing; an edited sentence
-   not paired with its old entry.
-3. **Meowpress, one locale**: theme sentences through `t`, `locales` with only a source,
-   `site.timeZone`, `localePath`. Existing site and build tests pass unchanged; a new test builds
-   a site whose source locale is `fr`.
-4. **Meowpress, targets**: suffix pairing, provenance and the three states, routes, notices,
-   switch, alternates, manifest, agent indexes, `meowpress locales` and `stamp`. Tests build a
-   temporary two-locale site through `meowpress/build` and edit the original to prove the
-   translation turns stale. One browser pass over the switch and the notices.
-5. **Documentation and the consumer skill**, including the list-fill-stamp loop in
+Reordered after the review so each one fits one implementer and the mechanism is proved end to end
+by the second.
+
+1. **Core `t`.** `src/i18n.ts` and the `./i18n` export: `t` with `{name}` and `plural`,
+   `createI18n`, `I18nProvider`, lookup chain, the throwing `toString`, the in-render fact and
+   the throw outside component bodies, `number`, `date`, `direction`, `setLocale`. Tests fail
+   on: a mounted text or attribute that does not follow `locale.value`; a parent tag skipped in
+   lookup; `ru` with count 3 not selecting `few`; a `setLocale` race where the earlier load
+   wins; `t` in a handler or a `derived` body not throwing; a `.value` read in a handler that
+   ignores a later locale change; a stringified message not throwing; a context read across the
+   built entry.
+2. **Meowpress interface locales.** The message table, the instance in page functions,
+   `locales`, `site.timeZone`, `localePath` with depth, `<html lang dir>`, prefixed routes with
+   untranslated content always linked. The snapshot of current output passes unchanged; a new
+   test builds a two-locale site and reads `/fr/index.html`.
+3. **Rest of the message surface.** `select`, `selectordinal`, `t.rich`, `defineMessages` with
+   Signal descriptors, `lookup`, and the audit functions.
+4. **Content.** Suffix pairing, provenance, the three states, notices, inheritance.
+5. **Publishing and the loop.** Manifest, per-locale agent indexes, alternates, the language
+   switch, `meowpress locales` and `stamp`. One browser pass over the switch and the notices.
+6. **Documentation and the consumer skill**, including the list-fill-stamp loop in
    [skills/meowland](../../skills/meowland/SKILL.md).
+7. **Deferred:** `meowjsx i18n check` and the pseudo-locale.
 
 Meowpress's `meowjsx` peer range rises to the first version that exports `./i18n`. Release follows
 [local releasing](../releasing.md) and is not part of this work.
 
 ## Open decisions
 
-The recommendation is first in each.
+The project owner accepted the recommendations below; they are kept as the record of what was
+chosen and what the alternative was.
 
 1. **Source text as identity.** Recommended as above. Keeping keys is the conservative choice if
    handing catalogs to an external translation team is a real near-term need.
-2. **A `meowjsx` command.** Recommended: add the `meowjsx i18n check` bin, because the loop needs
-   one command. MeowJSX has no CLI today; the alternative is to export only the audit functions
-   and let Meowpress and each application wrap them.
+2. **A `meowjsx` command.** Decided after the review: deferred. The audit functions ship first
+   and Meowpress wraps them; the command is added when an application needs it.
 3. **Where provenance lives.** Recommended: the translation's frontmatter, so it travels with the
    file. The alternative is a lock file next to the content, in the manner of `skills-lock.json`,
    which keeps machine state out of authored files but drifts when files move.
 4. **Disclosure of unreviewed translations.** Recommended: on by default. A site can remove the
-   line by marking translations reviewed or by emptying that catalog entry.
+   line by marking translations reviewed or with `locales.disclosure: false`.
 5. **Published catalogs for the built-in theme.** Recommended: none in the package; a site's
    agent fills `locales/<locale>.json` from the work list in one pass. Shipping translated
    catalogs would need a new exception to the English-only rule in the root AGENTS file.

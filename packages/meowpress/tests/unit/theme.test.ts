@@ -22,3 +22,11 @@ test("blog theme keeps Journal tokens and component styling with automatic color
     { family: "JetBrains Mono Variable", styles: ["normal"] },
   ]);
 });
+
+test("translation notices style their link instead of leaving the browser default", () => {
+  // The rich message renders a bare `<a>`; without this rule it would be the browser's link.
+  const rules = blogTheme.cssText.match(/\.translation-notices a[^{]*\{[^}]*\}/g) ?? [];
+  expect(rules.length).toBeGreaterThan(0);
+  expect(rules.join("\n")).toContain("text-decoration: underline");
+  expect(rules.join("\n")).toContain(String(uiTokens.accent.ink));
+});

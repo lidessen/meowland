@@ -98,6 +98,19 @@ const siteStyles = css`
     gap: ${uiTokens.space.group};
     color: ${uiTokens.ink.tertiary};
   }
+  /* The notice's rich message links the original; without a rule the anchor would fall back to
+     the browser's default link styling. Match the prose reading rhythm's link treatment. */
+  .translation-notices a {
+    color: ${uiTokens.accent.ink};
+    text-decoration: underline;
+    text-decoration-thickness: 1px;
+    text-decoration-color: color-mix(in srgb, ${uiTokens.accent.ink} 55%, transparent);
+    text-underline-offset: 3px;
+  }
+  .translation-notices a:hover {
+    color: ${uiTokens.ink.primary};
+    text-decoration-color: ${uiTokens.ink.primary};
+  }
   #main-content {
     padding-block: ${uiTokens.space.pageBlock};
   }

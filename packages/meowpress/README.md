@@ -70,6 +70,11 @@ owns `dist/`, set `outputDirectory` to a separate directory and reserve it for g
 to choose the root for those skills. Set `notFound: false` to omit the built-in `404.html`, or
 supply `notFound: { title, message, homeLabel }` to change its copy.
 
+A skill's `SKILL.md` may declare the language of its material: `lang: zh` in the frontmatter, or
+`lang: zh` under `metadata`. The build then marks the skill's material with that language on
+every page that shows it, so a page in another language says what the material is written in. A
+skill that declares no language keeps the page's own.
+
 ## Site URL and time zone
 
 `site.url` is the public origin of the site, without a path, such as `https://example.com`. It is
@@ -118,10 +123,12 @@ export default meowSite({
   each link `label`, and the three `notFound` strings. The source tree prints them as written.
   `agentGuide` is not translated.
 - Each target gets `/<tag>/` (home), `/<tag>/about/`, `/<tag>/posts/`, `/<tag>/thoughts/`,
-  `/<tag>/404.html` (a host decides whether it serves the file) and a page for every content item
-  written in that language. Dates follow the page locale. Every internal link goes through one
-  helper that points a route that exists only in the source tree, such as skills, to its source
-  URL. Skills pages exist once, in the source locale.
+  `/<tag>/skills/` with a page per skill, `/<tag>/404.html` (a host decides whether it serves the
+  file) and a page for every content item written in that language. Dates follow the page locale.
+  Every internal link goes through one helper that points a route to the tree that publishes it.
+- Skill files are repository material and are not translated: every tree publishes the same skill
+  pages, with the theme in that tree's language and the material in the language the skill
+  declares. The source tree links the root agent indexes; a target links its own.
 - With more than one locale the header shows a script-free language switch that points to the same
   page where the translation exists and to that locale's home otherwise. With `site.url`, pages
   also carry `<link rel="canonical">`, one `<link rel="alternate" hreflang>` per version and

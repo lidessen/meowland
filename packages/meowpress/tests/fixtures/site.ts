@@ -74,6 +74,7 @@ export async function writeFixtureSite(root: string): Promise<void> {
       "---",
       "name: Writing",
       "description: A writing guide.",
+      "lang: en",
       "---",
       "",
       "# Writing",

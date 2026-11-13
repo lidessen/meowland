@@ -114,6 +114,40 @@ test("builds Markdown and MDX while excluding draft pages and assets", async () 
   }
 });
 
+test("a skill declares the language of its material in the frontmatter or under metadata", async () => {
+  const root = await mkdtemp(join(tmpdir(), "meowpress-skill-lang-"));
+  const content = join(root, "content");
+  const output = join(root, "dist");
+  try {
+    await mkdir(join(content, "posts"), { recursive: true });
+    await mkdir(join(root, "skills", "plain"), { recursive: true });
+    await mkdir(join(root, "skills", "nested"), { recursive: true });
+    await writeFile(
+      join(root, "skills", "plain", "SKILL.md"),
+      "---\nname: Plain\ndescription: A plain skill.\nlang: zh\n---\n\n# Plain\n",
+    );
+    await writeFile(
+      join(root, "skills", "nested", "SKILL.md"),
+      "---\nname: Nested\ndescription: A nested skill.\nmetadata:\n  lang: zh\n---\n\n# Nested\n",
+    );
+    await buildSite({
+      content,
+      skillsDirectory: root,
+      outputDirectory: output,
+      locales: { source: "en", targets: { fr: { label: "Français" } } },
+    });
+    // The material of a skill is marked with the language the skill declares.
+    const index = await Bun.file(join(output, "fr/skills/index.html")).text();
+    expect(index).toContain('<span lang="zh">Plain</span>');
+    expect(index).toContain('<span lang="zh">Nested</span>');
+    // The source tree reads in English and marks the same material the same way.
+    const source = await Bun.file(join(output, "skills/index.html")).text();
+    expect(source).toContain('<span lang="zh">Plain</span>');
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
 test("builds explicit site artwork from the content assets root across page depths", async () => {
   const root = await mkdtemp(join(tmpdir(), "meowpress-artwork-"));
   try {

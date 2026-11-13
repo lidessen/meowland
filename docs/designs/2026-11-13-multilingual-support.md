@@ -333,6 +333,8 @@ rewrite the provider's HTML.
 ### Limits stated up front
 
 - Skills pages exist once, in the source locale; skill files are repository material, not posts.
+  Every tree publishes them now, with the theme in the tree's own language and the material marked
+  with the language its skill declares.
 - `dir="rtl"` is emitted. A browser pass over an Arabic target has looked at the theme in that
   direction: the chrome, feed and prose mirror correctly (Meowtail's prose uses logical
   properties), and Meowpress's own theme keeps code blocks left-to-right. Inline code inside
@@ -525,9 +527,12 @@ What a successor needs to know:
 - **A consumer provider can build page locales.** `SitePageContext.pageLocale(tag)` returns the
   same locale instance the built-in pages use, with the site's catalogs, time zone and
   missing-message reporting, and throws for a tag the site does not configure.
-- **A skills page shows the language switch too.** Skills exist once in the source tree; their
-  switch lists every locale, sends the target ones home, and emits an alternate only for the
-  source language, so a target reader is not stranded on a source-only page.
+- **A skills page shows the language switch too.** Every tree publishes the skills index and a page
+  per skill, so the switch points at the same skill in the other tree instead of sending a target
+  reader home. The theme of those pages is the tree's own; the skill material is the repository's
+  own and is not translated. A skill that declares `lang` in its frontmatter is marked with that
+  language wherever it is shown, and a skill that declares none keeps the page's language. A
+  tree's footer links that tree's agent indexes, so `/fr/llm.txt` is not a link to the root one.
 - **Two instances per page.** Theme sentences use an instance whose source is always `en`; site
   config copy uses a second one whose source is the content source locale.
 - **Counts are not pluralized in English.** "min read", "characters" and similar pass the count

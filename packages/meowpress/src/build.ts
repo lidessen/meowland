@@ -43,10 +43,15 @@ import {
   skillsIndexPage,
   thoughtPage,
 } from "./site";
-import { loadSkills } from "./skills";
+import { loadSkills, type Skill } from "./skills";
 import { contentRoute, reportedPath, translationReport } from "./translations";
 import { sitePageFile, sitePageMarkdownFile, type SitePage, type SitePageProvider } from "./pages";
 import { publishSite, validateBuildDestination, validateOutputDirectory } from "./output";
+
+/** The output path of a skill page, below the tree of the locale that renders it. */
+function skillPathOf(skill: Skill): string {
+  return skill.scope === "public" ? `skills/${skill.slug}` : `skills/project/${skill.slug}`;
+}
 
 export { sitePageMarkdownFile } from "./pages";
 export type { SitePage, SitePageContext, SitePageProvider } from "./pages";
@@ -598,18 +603,18 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
       );
     }
     for (const skill of skills) {
-      const skillPath =
-        skill.scope === "public" ? `skills/${skill.slug}` : `skills/project/${skill.slug}`;
       entrypoints.push(
         await writePage(
           generatedDirectory,
-          `${skillPath}/index.html`,
+          `${skillPathOf(skill)}/index.html`,
           skillPage(skill, config.theme, config.site, config.themeStylesheet, rootLocale),
         ),
       );
     }
-    // Skills pages exist once, in the source tree. Every target tree has its own home, About,
-    // the two archives, a 404 and a page for each content item written in its language.
+    // Every locale tree publishes the same pages, each with its own locale: home, About, the two
+    // archives, the skills index and a page for every skill (the skill material is the
+    // repository's own and stays in the language it is written in), a 404, and a page for each
+    // content item written in that language.
     for (const tree of targetTrees) {
       const prefix = `${tree.target.segment}/`;
       entrypoints.push(
@@ -623,6 +628,18 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
             generatedDirectory,
             `${prefix}about/index.html`,
             aboutPage(config.theme, config.site, config.themeStylesheet, tree.locale),
+          ),
+          writePage(
+            generatedDirectory,
+            `${prefix}skills/index.html`,
+            skillsIndexPage(skills, config.theme, config.site, config.themeStylesheet, tree.locale),
+          ),
+          ...skills.map((skill) =>
+            writePage(
+              generatedDirectory,
+              `${prefix}${skillPathOf(skill)}/index.html`,
+              skillPage(skill, config.theme, config.site, config.themeStylesheet, tree.locale),
+            ),
           ),
           writePage(
             generatedDirectory,

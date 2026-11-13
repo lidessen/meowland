@@ -110,20 +110,6 @@ function contentPage(locale: PageLocale, item: ContentItem): PageLanguages | und
   };
 }
 
-/**
- * A page that exists once, in the source language, such as a skill. The switch still shows every
- * locale and sends the others to their home page, so a target reader is not stranded.
- */
-function sourceOnlyPage(locale: PageLocale, path: string): PageLanguages | undefined {
-  if (locale.entries.length < 2) return undefined;
-  return {
-    path,
-    versions: locale.entries
-      .filter((entry) => entry.isSource)
-      .map((entry) => ({ tag: entry.tag, label: entry.label, href: path })),
-  };
-}
-
 /** An absolute URL for alternate and canonical links; `site.url` has no trailing slash. */
 function absoluteHref(site: SiteIdentity, path: string): string {
   return site.url === undefined ? path : `${site.url}${path}`;
@@ -222,6 +208,11 @@ function SiteHeader({
   );
 }
 
+/** The agent index a tree publishes next to its pages: at the root for the source, else the segment. */
+function indexHref(locale: PageLocale, file: string): string {
+  return locale.segment === "" ? `/${file}` : `/${locale.segment}/${file}`;
+}
+
 function SiteFooter({ site, locale }: { site: SiteIdentity; locale: PageLocale }): Child {
   return (
     <footer className="site-footer">
@@ -232,8 +223,8 @@ function SiteFooter({ site, locale }: { site: SiteIdentity; locale: PageLocale }
         })}
       </Text>
       <Inline gap="compact">
-        <a href="/llm.txt">llm.txt</a>
-        <a href="/agents.md">agents.md</a>
+        <a href={indexHref(locale, "llm.txt")}>llm.txt</a>
+        <a href={indexHref(locale, "agents.md")}>agents.md</a>
       </Inline>
     </footer>
   );
@@ -888,6 +879,16 @@ function skillUrl(skill: Skill): string {
   return skill.scope === "public" ? `/skills/${skill.slug}/` : `/skills/project/${skill.slug}/`;
 }
 
+/**
+ * The language of the skill material, when the repository declares one and the page is written
+ * in another. Skill files are repository material and are not translated, so a tree that is not
+ * the material's language marks it as such.
+ */
+function skillLang(skill: Skill, locale: PageLocale): string | undefined {
+  if (!skill.lang || skill.lang === locale.tag) return undefined;
+  return skill.lang;
+}
+
 function skillInstallCommand(site: SiteIdentity, skill: Skill): string {
   return site.skillsPackage
     ? `npx skills add ${site.skillsPackage} --skill ${skill.slug}`
@@ -903,11 +904,12 @@ function SkillCard({
   site: SiteIdentity;
   locale: PageLocale;
 }): Child {
+  const lang = skillLang(skill, locale);
   return (
     <Entry
-      href={skillUrl(skill)}
-      title={skill.name}
-      description={skill.description}
+      href={localePath(locale, skillUrl(skill))}
+      title={lang ? <span lang={lang}>{skill.name}</span> : skill.name}
+      description={lang ? <span lang={lang}>{skill.description}</span> : skill.description}
       eyebrow={text(
         locale,
         skill.scope === "project" ? M.projectSkillEyebrow : M.publicSkillEyebrow,
@@ -1310,7 +1312,7 @@ export function skillsIndexPage(
     title: text(locale, M.skills),
     description: text(locale, M.skillsIndexDescription),
     activePath: "/skills/",
-    page: sourceOnlyPage(locale, "/skills/"),
+    page: staticPage(locale, "/skills/"),
     styleHref: styleHref(1 + localeDepth(locale), stylesheet),
     children: (
       <Page
@@ -1355,6 +1357,7 @@ export function skillPage(
   locale: PageLocale = defaultPageLocale(),
 ): string {
   const firstFile = skill.files[0];
+  const lang = skillLang(skill, locale);
   const command =
     skill.scope === "public" ? skillInstallCommand(site, skill) : skill.sourceBasePath;
   return pageHtml({
@@ -1365,7 +1368,7 @@ export function skillPage(
     wide: true,
     description: skill.description,
     activePath: "/skills/",
-    page: sourceOnlyPage(locale, skillUrl(skill)),
+    page: staticPage(locale, skillUrl(skill)),
     styleHref:
       skill.scope === "public"
         ? styleHref(1 + slugDepth(skill.slug) + localeDepth(locale), stylesheet)
@@ -1374,9 +1377,9 @@ export function skillPage(
       <Page
         width="full"
         className="skill-page"
-        title={skill.name}
+        title={lang ? <span lang={lang}>{skill.name}</span> : skill.name}
         eyebrow={text(locale, M.skill)}
-        description={skill.description}
+        description={lang ? <span lang={lang}>{skill.description}</span> : skill.description}
       >
         <a className="skill-back site-icon-label" href={localePath(locale, "/skills/")}>
           <Icon name="arrow-left" size={14} /> {text(locale, M.allSkills)}
@@ -1431,6 +1434,7 @@ export function skillPage(
                   className={`skill-file-panel${index === 0 ? " active" : ""}`}
                   data-skill-panel={file.path}
                   hidden={index !== 0}
+                  lang={lang}
                   dangerouslySetInnerHTML={{
                     // The page owns h1; file headings nest under it without dropping any content.
                     __html: Bun.markdown

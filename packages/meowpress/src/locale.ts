@@ -160,12 +160,28 @@ export function defaultPageLocale(): PageLocale {
 }
 
 /** Routes that exist once per locale; every other route exists only in the source tree. */
-const TRANSLATED_ROUTES: ReadonlySet<string> = new Set(["/", "/posts/", "/thoughts/", "/about/"]);
+const TRANSLATED_ROUTES: ReadonlySet<string> = new Set([
+  "/",
+  "/posts/",
+  "/thoughts/",
+  "/about/",
+  "/skills/",
+]);
+
+/** Routes whose pages below them exist once per locale too. The content sections are not
+ * here: their pages live in the tree of the language they are written in. */
+const TRANSLATED_SECTIONS: ReadonlySet<string> = new Set(["/skills/"]);
+
+/** Whether a route is published in every locale tree, the pages below it included. */
+function isTranslatedRoute(path: string): boolean {
+  if (TRANSLATED_ROUTES.has(path)) return true;
+  return [...TRANSLATED_SECTIONS].some((section) => path.startsWith(section));
+}
 
 /** The URL of an internal route for a locale. Every internal link of the theme goes through
- * it. A route that exists only in the source tree (skills) keeps its source URL. */
+ * it. Every route it knows is published in every locale tree. */
 export function localePath(locale: PageLocale, path: string): string {
-  if (locale.segment === "" || !TRANSLATED_ROUTES.has(path)) return path;
+  if (locale.segment === "" || !isTranslatedRoute(path)) return path;
   return `/${locale.segment}${path}`;
 }
 

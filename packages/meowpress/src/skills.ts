@@ -42,6 +42,8 @@ export interface Skill {
   description: string;
   scope: SkillScope;
   sourceBasePath: string;
+  /** The language the skill material is written in, when the repository declares it. */
+  lang?: string;
   files: SkillFile[];
   externalNodes: SkillReferenceNode[];
   relations: SkillRelation[];
@@ -77,6 +79,20 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function textValue(value: unknown): string | undefined {
   return typeof value === "string" && value.trim() ? value.trim() : undefined;
+}
+
+/**
+ * The language a skill declares for its material: `lang` or `language`, in the frontmatter or
+ * under its `metadata`. A skill that declares none has no language of its own.
+ */
+function declaredLang(metadata: Record<string, unknown>): string | undefined {
+  const nested = isRecord(metadata.metadata) ? metadata.metadata : {};
+  return (
+    textValue(metadata.lang) ??
+    textValue(metadata.language) ??
+    textValue(nested.lang) ??
+    textValue(nested.language)
+  );
 }
 
 function parseDocument(source: string): ParsedSkillDocument {
@@ -361,6 +377,7 @@ async function loadSkill(
       inferredDescription(entry.body),
     scope,
     sourceBasePath,
+    lang: declaredLang(entry.metadata),
     files: markdownPaths.map((path) => {
       const depth = depths.get(path);
       const reachable = depth !== undefined;

@@ -84,10 +84,10 @@ test("a target locale publishes its own tree with translated chrome and honest f
     expect(home).toContain('<a class="site-name" href="/fr/">Mon site</a>');
     expect(home).toContain("<title>Mon site</title>");
     expect(home).toContain('content="Un site pour les tests."');
-    // Links stay inside the tree, except the routes that exist only in the source tree.
+    // Links stay inside the tree, every route included.
     expect(home).toContain('<a href="/fr/posts/">Articles</a>');
     expect(home).toContain('<a href="/fr/thoughts/">Pensées</a>');
-    expect(home).toContain('<a href="/skills/">Compétences</a>');
+    expect(home).toContain('<a href="/fr/skills/">Compétences</a>');
     expect(home).toContain('<a href="/fr/about/">À propos</a>');
     // A sentence without a translation shows the English source.
     expect(home).toContain('aria-label="Filter home feed"');
@@ -120,7 +120,7 @@ test("a target locale publishes its own tree with translated chrome and honest f
     const about = await read(output, "fr/about/index.html");
     expect(about).toContain('src="../../');
 
-    // Posts, thoughts and skills pages are not duplicated under the prefix.
+    // The skills section is published in every tree with the same skill content.
     const written = (await files(join(output, "fr"))).map((file) => relative(output, file));
     expect(written.sort()).toEqual([
       "fr/404.html",
@@ -130,6 +130,9 @@ test("a target locale publishes its own tree with translated chrome and honest f
       "fr/llm.txt",
       "fr/llms.txt",
       "fr/posts/index.html",
+      "fr/skills/broken/index.html",
+      "fr/skills/index.html",
+      "fr/skills/writing/index.html",
       "fr/thoughts/index.html",
     ]);
   });
@@ -205,10 +208,14 @@ test("adding targets changes the source tree only in the language switch and ind
     // The root indexes end with a link to each target's own index.
     expect(await read(output, "llms.txt")).toContain("## Languages\n\n- [Français](/fr/llms.txt)");
     expect(await read(output, "agents.md")).toContain("- [Français](/fr/llms.txt)");
-    // A skills page exists once, in the source tree; its switch sends the target home.
+    // The skills index exists in both trees; its switch points at the same path in the other tree.
     const skillsPage = await read(output, "skills/index.html");
     expect(skillsPage).toContain('<nav class="site-locale-switch"');
-    expect(skillsPage).toContain('<a href="/fr/" lang="fr" hreflang="fr">Français</a>');
+    expect(skillsPage).toContain('<a href="/fr/skills/" lang="fr" hreflang="fr">Français</a>');
+    const frenchSkills = await read(output, "fr/skills/index.html");
+    expect(frenchSkills).toContain("<title>Compétences · Mon site</title>");
+    expect(frenchSkills).toContain('href="/fr/skills/writing/"');
+    expect(frenchSkills).not.toContain('href="/skills/writing/"');
     const frenchIndex = await read(output, "fr/llms.txt");
     expect(frenchIndex).toContain("- Articles: /fr/posts/");
     // A target's index points back at the source index, never at itself.
@@ -219,6 +226,39 @@ test("adding targets changes the source tree only in the language switch and ind
     expect(notFound).toContain('<base href="/fr/">');
     expect(notFound).toContain('<a href="/fr/">Back to home</a>');
     expect(notFound).not.toContain("hreflang");
+  });
+});
+
+test("a target tree publishes the skills with its own chrome and the material's language", async () => {
+  await withSite(async (root, output) => {
+    await buildSite(
+      config(root, output, {
+        locales: { source: "en", targets: { fr: { label: "Français" } }, catalogs: { fr: FRENCH } },
+      }),
+    );
+    // The skills section exists in the target tree, in the tree's own language.
+    const index = await read(output, "fr/skills/index.html");
+    expect(index).toContain("<title>Compétences · Mon site</title>");
+    expect(index).toContain('href="/fr/skills/writing/"');
+    expect(index).not.toContain('href="/skills/writing/"');
+    // The skill material stays in the language it is written in and says so. The skill that
+    // declares no language keeps the page's own.
+    expect(index).toMatch(/<span lang="en">Writing<\/span>/);
+    expect(index).toContain(
+      '<a href="/fr/skills/broken/" data-meowui-part="entry/link">Broken</a>',
+    );
+    // A skill page of the target tree links back inside its own tree.
+    const page = await read(output, "fr/skills/writing/index.html");
+    expect(page).toContain('<a class="skill-back site-icon-label" href="/fr/skills/">');
+    expect(page).toMatch(/<span lang="en">Writing<\/span>/);
+    expect(page).toMatch(/<article[^>]*lang="en"/);
+    // The footer of a tree links that tree's own agent indexes.
+    expect(page).toContain('<a href="/fr/llm.txt">llm.txt</a>');
+    expect(page).toContain('<a href="/fr/agents.md">agents.md</a>');
+    // The source tree keeps the root indexes and marks nothing, because it reads in that language.
+    const source = await read(output, "skills/writing/index.html");
+    expect(source).toContain('<a href="/llm.txt">llm.txt</a>');
+    expect(source).not.toContain('lang="en"><span');
   });
 });
 
@@ -587,7 +627,7 @@ test("localePath prefixes only the routes a target tree has", () => {
   expect(localePath(french, "/posts/")).toBe("/fr/posts/");
   expect(localePath(french, "/thoughts/")).toBe("/fr/thoughts/");
   expect(localePath(french, "/about/")).toBe("/fr/about/");
-  expect(localePath(french, "/skills/")).toBe("/skills/");
+  expect(localePath(french, "/skills/")).toBe("/fr/skills/");
   expect(localePath(french, "/posts/first/")).toBe("/posts/first/");
   expect(localePath(french, "/llm.txt")).toBe("/llm.txt");
 });

@@ -1,6 +1,7 @@
 import type { ThemeDefinition } from "meowcss";
 import type { ContentItem } from "./content";
 import type { SiteIdentity } from "./identity";
+import type { ResolvedLocales } from "./locales";
 
 /** A page supplied by the consumer of the site. */
 export interface SitePage {
@@ -26,6 +27,8 @@ export interface SitePageContext {
   thoughts: readonly ContentItem[];
   site: SiteIdentity;
   theme: ThemeDefinition;
+  /** The resolved `locales` option; undefined for a single-locale site. */
+  locales?: ResolvedLocales;
 }
 
 /** Supplies the consumer's own pages for the site. */

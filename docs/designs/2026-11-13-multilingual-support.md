@@ -453,6 +453,65 @@ by the second.
    [skills/meowland](../../skills/meowland/SKILL.md).
 7. **Deferred:** `meowjsx i18n check` and the pseudo-locale.
 
+### Implementation status and handoff
+
+Recorded on 2026-11-13 on branch `ccr-f569f565-518h28`. Work package numbers are the ones above;
+package 3 was done before package 2 because the theme needs `defineMessages` and `lookup`.
+
+| Package                        | State                                                                      |
+| ------------------------------ | -------------------------------------------------------------------------- |
+| 1. Core `t`                    | Done and committed.                                                        |
+| 3. Rest of the message surface | Done and committed, including `meowjsx/i18n/audit`.                        |
+| 2. Meowpress interface locales | Done and committed.                                                        |
+| 4. Content                     | Not started.                                                               |
+| 5. Publishing and the loop     | Not started.                                                               |
+| 6. Documentation and the skill | Not started, apart from the README sections each package wrote for itself. |
+| 7. Deferred                    | `meowjsx i18n check` and the pseudo-locale, by decision.                   |
+
+Evidence, kept separate by who ran it:
+
+- **Run by the lead after each package:** the package's own unit tests and typecheck, the
+  repository lint and format check, and a hand-written probe of the new behavior (packages 1 and 3) or a rebuilt two-locale site (package 2).
+- **Reported by the implementers and not repeated by the lead:** the full `bun run test` (974
+  passing after package 2) and `bun run typecheck`, the docs app build, and the Meowpress browser
+  suite (20 passing).
+- **Not done by anyone:** a look at a target-locale page in a browser, right-to-left layout, and
+  installed-state acceptance from packed archives.
+
+What a successor needs to know:
+
+- **Unchanged English output is pinned.** `tests/unit/output-snapshot.test.ts` compares two
+  fixture sites byte for byte against snapshots taken from the source before the theme moved to
+  messages. The only accepted difference is on skill pages: the copy button gained
+  `data-copy-label` and `data-copied-label`, and the inline script reads them. Regenerate only on
+  purpose, with `MEOWPRESS_UPDATE_SNAPSHOTS=1`.
+- **Scope of package 2.** Target locales get home, about, the two archives and `404.html`. Post
+  and thought detail pages under a prefix, suffix pairing and provenance are package 4. Entries
+  in a target tree carry the source locale as `lang` today; package 4 replaces that with the
+  item's own locale.
+- **Two instances per page.** Theme sentences use an instance whose source is always `en`; site
+  config copy uses a second one whose source is the content source locale.
+- **Counts are not pluralized in English.** "min read", "characters" and similar pass the count
+  as text with a plain `{count}` placeholder, because ICU `#` would group digits and change
+  today's output ("1 characters" is preserved). A translation may still use `plural`.
+- **Not in the message table.** Skill-graph roles and details are produced in `skills.ts` as data
+  and stay English.
+- **New theme sentences go into `src/messages.ts` first**, or the build throws: the theme's
+  instance refuses a source that is not in the table.
+- **Core change wider than the design said.** The in-render fact needed `reactive.ts` and
+  `keyed.ts` to mark `derived` reads, effects, flushed jobs, `mapSignal` functions and `keyed`
+  callbacks as outside a component body, not only `context.ts`. `mapSignal` allocates one closure
+  per read as a result. It is correct and tested, and worth a look before release.
+- **Known gaps in package 3.** The scanner is heuristic for unusual TSX (`<T>x` assertions, type
+  positions) and has no tests there. `auditCatalog` does not validate plural categories against
+  the locale.
+- **The English-only sweep is slow here.** The exact command from the root AGENTS file did not
+  finish within two minutes in this container. Running the same pattern over
+  `git ls-files -co --exclude-standard` gives the same answer quickly.
+- **Tests that import `meowpress/build` run the built `dist`,** so `bun run build` comes first.
+- **Release.** Nothing is versioned, packed or published. Meowpress's `meowjsx` peer range still
+  has to rise to the first version that exports `./i18n`.
+
 Meowpress's `meowjsx` peer range rises to the first version that exports `./i18n`. Release follows
 [local releasing](../releasing.md) and is not part of this work.
 

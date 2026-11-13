@@ -2,7 +2,18 @@ import { type ThemeDefinition } from "meowcss";
 import { removeLegacyIsFallbacks } from "meowcss/bundle";
 import { blogFonts, blogTheme } from "./theme";
 import { FONT_EXTERNAL, publishFonts, type SiteFont } from "./fonts";
-import { DEFAULT_SITE, type SiteIdentity, type SiteNotFound } from "./identity";
+import { DEFAULT_SITE, DEFAULT_TIME_ZONE, type SiteIdentity, type SiteNotFound } from "./identity";
+import { createPageLocale, localePath, type PageLocale } from "./locale";
+import {
+  assertNoRouteCollisions,
+  firstSegment,
+  loadLocaleCatalogs,
+  localeSegment,
+  RESERVED_SEGMENTS,
+  resolveLocales,
+  type ResolvedLocales,
+  type SiteLocales,
+} from "./locales";
 import { constants } from "node:fs";
 import { copyFile, mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { basename, dirname, isAbsolute, join, relative, resolve } from "node:path";
@@ -38,6 +49,7 @@ export type { SitePage, SitePageContext, SitePageProvider } from "./pages";
 export type { ContentItem, ContentSource, ContentSourceInput } from "./content";
 export type { SiteFont } from "./fonts";
 export type { SiteIdentity, SiteNotFound } from "./identity";
+export type { ResolvedLocaleTarget, ResolvedLocales, SiteLocales } from "./locales";
 
 export interface SiteConfig {
   /** Roots containing posts, thoughts and optional assets. Defaults to `content/`. */
@@ -72,6 +84,17 @@ export interface SiteConfig {
    * for the default Blog theme and to none for any other theme.
    */
   fonts?: readonly SiteFont[];
+  /**
+   * Languages the site publishes. The source locale keeps today's unprefixed routes and each
+   * target is published under `/<tag>/`. Without it the site has one locale, English, and its
+   * output does not change.
+   */
+  locales?: SiteLocales | ResolvedLocales;
+  /**
+   * Directory of `<tag>.json` interface catalogs, one per configured locale, resolved against the
+   * project directory. Defaults to `locales/`.
+   */
+  localesDirectory?: string;
 }
 
 export interface ResolvedSiteConfig {
@@ -88,6 +111,42 @@ export interface ResolvedSiteConfig {
   mdxComponents: Record<string, MdxComponent>;
   themeStylesheet: string;
   fonts: readonly SiteFont[];
+  locales?: ResolvedLocales;
+  localesDirectory: string;
+}
+
+/** Validate the origin of `site.url` and store it without a trailing slash. */
+function resolveSiteUrl(value: string): string {
+  let url: URL;
+  try {
+    url = new URL(value);
+  } catch {
+    throw new Error(`site.url must be an origin such as https://example.com: ${value}`);
+  }
+  if (
+    (url.protocol !== "https:" && url.protocol !== "http:") ||
+    url.pathname !== "/" ||
+    url.search !== "" ||
+    url.hash !== "" ||
+    url.username !== "" ||
+    url.password !== "" ||
+    value.includes("#") ||
+    value.includes("?")
+  ) {
+    throw new Error(
+      `site.url must be an origin without a path, such as https://example.com: ${value}`,
+    );
+  }
+  return url.origin;
+}
+
+function validateTimeZone(timeZone: string): string {
+  try {
+    new Intl.DateTimeFormat("en", { timeZone });
+  } catch {
+    throw new Error(`site.timeZone must be an IANA time zone such as Asia/Shanghai: ${timeZone}`);
+  }
+  return timeZone;
 }
 
 /** Define a site config in the app package without taking on the build pipeline. */
@@ -104,7 +163,7 @@ export function meowSite(config: SiteConfig = {}): ResolvedSiteConfig {
     projectRootDirectory: config.projectRootDirectory
       ? resolve(config.projectRootDirectory)
       : undefined,
-    site: { ...DEFAULT_SITE, ...config.site },
+    site: resolveSite(config.site),
     pages: config.pages,
     notFound: config.notFound,
     agentGuide: config.agentGuide,
@@ -112,7 +171,17 @@ export function meowSite(config: SiteConfig = {}): ResolvedSiteConfig {
     themeStylesheet,
     fonts:
       config.fonts ?? (config.theme === undefined || config.theme === blogTheme ? blogFonts : []),
+    locales: resolveLocales(config.locales),
+    localesDirectory: resolve(config.localesDirectory ?? "locales"),
   };
+}
+
+function resolveSite(site: Partial<SiteIdentity> | undefined): SiteIdentity {
+  const resolved = { ...DEFAULT_SITE, ...site };
+  if (site?.url !== undefined) resolved.url = resolveSiteUrl(site.url);
+  else delete resolved.url;
+  resolved.timeZone = validateTimeZone(site?.timeZone ?? DEFAULT_TIME_ZONE);
+  return resolved;
 }
 
 async function writePage(
@@ -230,6 +299,7 @@ async function writeContentPages(
   theme: ThemeDefinition,
   site: SiteIdentity,
   stylesheet: string,
+  locale: PageLocale,
 ): Promise<string[]> {
   const entrypoints: string[] = [];
   for (const post of posts) {
@@ -237,7 +307,7 @@ async function writeContentPages(
       await writePage(
         generatedDirectory,
         `posts/${post.slug}/index.html`,
-        postPage(post, posts, thoughts, theme, site, stylesheet),
+        postPage(post, posts, thoughts, theme, site, stylesheet, locale),
       ),
     );
   }
@@ -246,7 +316,7 @@ async function writeContentPages(
       await writePage(
         generatedDirectory,
         `thoughts/${thought.slug}/index.html`,
-        thoughtPage(thought, theme, site, stylesheet),
+        thoughtPage(thought, theme, site, stylesheet, locale),
       ),
     );
   }
@@ -271,16 +341,63 @@ export async function buildSite(input: SiteConfig | ResolvedSiteConfig = {}): Pr
   }
 }
 
+/** Collects, per locale, the theme and site sentences that had no translation. */
+function createMissingLog() {
+  const byLocale = new Map<string, Set<string>>();
+  return {
+    record(miss: { source: string; context?: string; locale: string }): void {
+      const keys = byLocale.get(miss.locale) ?? new Set<string>();
+      keys.add(JSON.stringify([miss.context ?? "", miss.source]));
+      byLocale.set(miss.locale, keys);
+    },
+    report(directory: string, segmentOf: (tag: string) => string): void {
+      for (const [tag, keys] of byLocale) {
+        const path = join(directory, `${segmentOf(tag)}.json`);
+        const local = relative(process.cwd(), path);
+        const file = local.startsWith("..") || isAbsolute(local) ? path : local;
+        console.log(
+          `Locale ${tag}: ${keys.size} messages have no translation and fall back to the source text. Fill ${file}.`,
+        );
+      }
+    },
+  };
+}
+
+/** Top-level names of the output that a locale's URL segment may not take. */
+async function takenSegments(
+  config: ResolvedSiteConfig,
+  pages: readonly SitePage[] | undefined,
+): Promise<Set<string>> {
+  const taken = new Set<string>(RESERVED_SEGMENTS);
+  for (const asset of await collectContentAssets(config.content, { directory: "assets" })) {
+    const segment = firstSegment(asset.relativePath);
+    if (segment) taken.add(segment);
+  }
+  for (const source of normalizeContentSources(config.content)) {
+    const segment = source.slugPrefix ? firstSegment(source.slugPrefix) : undefined;
+    if (segment) taken.add(segment);
+  }
+  for (const page of pages ?? []) {
+    const segment = firstSegment(page.path);
+    if (segment) taken.add(segment);
+  }
+  return taken;
+}
+
 async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string): Promise<string> {
-  const [posts, thoughts, skills] = await Promise.all([
-    loadSection(config.content, "post", { components: config.mdxComponents }),
-    loadSection(config.content, "thought", { components: config.mdxComponents }),
+  const timeZone = config.site.timeZone ?? DEFAULT_TIME_ZONE;
+  const [posts, thoughts, skills, catalogs] = await Promise.all([
+    loadSection(config.content, "post", { components: config.mdxComponents, timeZone }),
+    loadSection(config.content, "thought", { components: config.mdxComponents, timeZone }),
     config.pages
       ? Promise.resolve([] as Awaited<ReturnType<typeof loadSkills>>)
       : loadSkills(config.skillsDirectory, {
           includeProjectSkills: config.includeProjectSkills,
           projectRootDirectory: config.projectRootDirectory,
         }),
+    config.locales
+      ? loadLocaleCatalogs(config.locales, config.localesDirectory)
+      : Promise.resolve({}),
   ]);
   const timeline = [...posts, ...thoughts].sort(
     (left, right) => (right.date?.getTime() ?? 0) - (left.date?.getTime() ?? 0),
@@ -297,8 +414,28 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
         thoughts,
         site: config.site,
         theme: config.theme,
+        locales: config.locales,
       })
     : undefined;
+
+  const locales = config.locales;
+  const missing = createMissingLog();
+  const localeFor = (tag: string, segment: string): PageLocale =>
+    createPageLocale({
+      tag,
+      source: locales?.source ?? "en",
+      segment,
+      catalogs,
+      timeZone,
+      onMissing: (miss) => missing.record(miss),
+    });
+  const rootLocale = localeFor(locales?.source ?? "en", "");
+  const targetLocales = (locales?.targets ?? []).map((target) => ({
+    target,
+    locale: localeFor(target.tag, target.segment),
+  }));
+  // Everything that decides what a locale's URL segment may be is known here.
+  if (locales) assertNoRouteCollisions(locales, await takenSegments(config, pages));
 
   const entrypoints: string[] = [];
   if (pages) {
@@ -309,27 +446,34 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
         writePage(
           generatedDirectory,
           "index.html",
-          homePage(timeline, config.theme, config.site, config.themeStylesheet),
+          homePage(timeline, config.theme, config.site, config.themeStylesheet, rootLocale),
         ),
         writePage(
           generatedDirectory,
           "about/index.html",
-          aboutPage(config.theme, config.site, config.themeStylesheet),
+          aboutPage(config.theme, config.site, config.themeStylesheet, rootLocale),
         ),
         writePage(
           generatedDirectory,
           "posts/index.html",
-          listPage("post", posts, config.theme, config.site, config.themeStylesheet),
+          listPage("post", posts, config.theme, config.site, config.themeStylesheet, rootLocale),
         ),
         writePage(
           generatedDirectory,
           "thoughts/index.html",
-          listPage("thought", thoughts, config.theme, config.site, config.themeStylesheet),
+          listPage(
+            "thought",
+            thoughts,
+            config.theme,
+            config.site,
+            config.themeStylesheet,
+            rootLocale,
+          ),
         ),
         writePage(
           generatedDirectory,
           "skills/index.html",
-          skillsIndexPage(skills, config.theme, config.site, config.themeStylesheet),
+          skillsIndexPage(skills, config.theme, config.site, config.themeStylesheet, rootLocale),
         ),
       ])),
       ...(await writeContentPages(
@@ -339,6 +483,7 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
         config.theme,
         config.site,
         config.themeStylesheet,
+        rootLocale,
       )),
     );
     if (config.notFound !== false) {
@@ -346,7 +491,18 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
         await writePage(
           generatedDirectory,
           "404.html",
-          notFoundPage(config.notFound ?? {}, config.theme, config.site, config.themeStylesheet),
+          notFoundPage(
+            config.notFound ?? {},
+            config.theme,
+            config.site,
+            config.themeStylesheet,
+            rootLocale,
+            targetLocales.map(({ target, locale }) => ({
+              tag: target.tag,
+              label: target.label,
+              href: localePath(locale, "/"),
+            })),
+          ),
         ),
       );
     }
@@ -357,9 +513,72 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
         await writePage(
           generatedDirectory,
           `${skillPath}/index.html`,
-          skillPage(skill, config.theme, config.site, config.themeStylesheet),
+          skillPage(skill, config.theme, config.site, config.themeStylesheet, rootLocale),
         ),
       );
+    }
+    // Skills pages and the post and thought pages exist once, in the source tree. A target tree
+    // has its own home, About, the two archives and a 404; untranslated originals are listed in
+    // it and link to the source tree.
+    const omitted = locales?.untranslated === "omit";
+    for (const { target, locale } of targetLocales) {
+      const prefix = `${target.segment}/`;
+      const targetPosts = omitted ? [] : posts;
+      const targetThoughts = omitted ? [] : thoughts;
+      const targetTimeline = omitted ? [] : timeline;
+      entrypoints.push(
+        ...(await Promise.all([
+          writePage(
+            generatedDirectory,
+            `${prefix}index.html`,
+            homePage(targetTimeline, config.theme, config.site, config.themeStylesheet, locale),
+          ),
+          writePage(
+            generatedDirectory,
+            `${prefix}about/index.html`,
+            aboutPage(config.theme, config.site, config.themeStylesheet, locale),
+          ),
+          writePage(
+            generatedDirectory,
+            `${prefix}posts/index.html`,
+            listPage(
+              "post",
+              targetPosts,
+              config.theme,
+              config.site,
+              config.themeStylesheet,
+              locale,
+            ),
+          ),
+          writePage(
+            generatedDirectory,
+            `${prefix}thoughts/index.html`,
+            listPage(
+              "thought",
+              targetThoughts,
+              config.theme,
+              config.site,
+              config.themeStylesheet,
+              locale,
+            ),
+          ),
+        ])),
+      );
+      if (config.notFound !== false) {
+        entrypoints.push(
+          await writePage(
+            generatedDirectory,
+            `${prefix}404.html`,
+            notFoundPage(
+              config.notFound ?? {},
+              config.theme,
+              config.site,
+              config.themeStylesheet,
+              locale,
+            ),
+          ),
+        );
+      }
     }
   }
 
@@ -375,16 +594,16 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
   await buildStaticHtmlFromEntrypoints(entrypoints, generatedDirectory, config.outputDirectory);
   if (pages) await writeConsumerMarkdown(config.outputDirectory, pages);
   await writeAssets(config.outputDirectory, config.content, "posts/assets");
-  const full = pages ? llmFullText(config.site, pages, config.agentGuide) : undefined;
+  const full = pages ? llmFullText(config.site, pages, config.agentGuide, rootLocale) : undefined;
   await Promise.all([
     writeFile(
       join(config.outputDirectory, "llm.txt"),
-      llmText(posts, thoughts, config.site, pages, config.agentGuide),
+      llmText(posts, thoughts, config.site, pages, config.agentGuide, rootLocale),
       "utf8",
     ),
     writeFile(
       join(config.outputDirectory, "llms.txt"),
-      llmText(posts, thoughts, config.site, pages, config.agentGuide),
+      llmText(posts, thoughts, config.site, pages, config.agentGuide, rootLocale),
       "utf8",
     ),
     ...(full === undefined
@@ -402,10 +621,12 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
             typeof source !== "string" &&
             (source.postsDirectory !== undefined || source.thoughtsDirectory !== undefined),
         ),
+        rootLocale,
       ),
       "utf8",
     ),
   ]);
+  missing.report(config.localesDirectory, (tag) => localeSegment(tag));
   return pages
     ? `${posts.length} content items and ${pages.length} site pages`
     : `${posts.length} posts and ${thoughts.length} thoughts`;

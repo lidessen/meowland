@@ -1,0 +1,29 @@
+# Meowpress site
+
+> Site index and content conventions for Agents to read.
+
+## Site map
+
+- [Home](/)
+- [Posts](/posts/)
+- [Thoughts](/thoughts/)
+- [Skills](/skills/) (browse files and the auto-generated Markdown reference graph)
+- [About](/about/)
+
+## Content model
+
+- `content/thoughts/` stores trimmed, directly presentable short thoughts.
+- `content/posts/` stores full posts; files whose name or path segment starts with `_` are drafts and are not published or rendered.
+- Content files support `.md` and `.mdx`, and may start with YAML frontmatter.
+- Frontmatter currently has no required fields; `title`, `date`, `created_at`, `category` and `tags` are recognized by the site.
+
+## Public content
+
+Public posts: 0.
+Public thoughts: 0.
+
+### Posts
+
+
+### Thoughts
+

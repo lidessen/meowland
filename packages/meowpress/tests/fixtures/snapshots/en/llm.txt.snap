@@ -1,0 +1,22 @@
+# Snapshot site
+> A fixture site.
+
+## Pages
+- Home: /
+- Posts: /posts/
+- Thoughts: /thoughts/
+- Skills: /skills/
+- About: /about/
+- Agent Markdown: /agents.md
+
+## Posts
+- First post: /posts/first/
+- Second post: /posts/nested/second/
+
+## Thoughts
+- Later thought: /thoughts/later/
+- A short note: /thoughts/note/
+
+## Rules
+- Only the public build output is considered presentable content.
+- Drafts whose names start with _ under posts are not published or rendered.

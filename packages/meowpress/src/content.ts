@@ -5,6 +5,7 @@ import { isAbsolute, relative, resolve, sep } from "node:path";
 import { parse as parseYaml } from "yaml";
 import { Fragment, h, type Child, type Props } from "meowjsx/runtime";
 import { renderToHtml } from "meowjsx/web";
+import { DEFAULT_TIME_ZONE } from "./identity";
 
 export type ContentKind = "post" | "thought";
 
@@ -33,6 +34,8 @@ export interface LoadSectionOptions {
   duplicate?: DuplicateContentPolicy;
   /** Extra components available to MDX content pages. */
   components?: Record<string, MdxComponent>;
+  /** IANA time zone for day keys and time labels. Defaults to "Asia/Shanghai". */
+  timeZone?: string;
 }
 
 /** A component an MDX content page may use by name. */
@@ -108,7 +111,7 @@ function parseDate(value: unknown): Date | undefined {
   return Number.isNaN(date.getTime()) ? undefined : date;
 }
 
-function makeDateKey(value: unknown, date: Date | undefined): string {
+function makeDateKey(value: unknown, date: Date | undefined, timeZone: string): string {
   const text = asText(value);
   const explicitDate = text?.match(/^\d{4}-\d{2}-\d{2}/)?.[0];
   if (explicitDate) {
@@ -118,8 +121,9 @@ function makeDateKey(value: unknown, date: Date | undefined): string {
     }
   }
   if (!date) return "undated";
+  // The "en-US" formatter only produces the numeric parts that are read back below.
   const parts = new Intl.DateTimeFormat("en-US", {
-    timeZone: "Asia/Shanghai",
+    timeZone,
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -130,14 +134,15 @@ function makeDateKey(value: unknown, date: Date | undefined): string {
   return `${year.padStart(4, "0")}-${month}-${day}`;
 }
 
-function makeTimeLabel(value: unknown, date: Date | undefined): string {
+function makeTimeLabel(value: unknown, date: Date | undefined, timeZone: string): string {
   const text = asText(value);
   if (text) {
     return text.match(/(?:T|\s)(\d{2}:\d{2})/)?.[1] ?? "";
   }
   if (!date) return "";
+  // "zh-CN" with hour12 false is only the way to print a 24-hour HH:mm; it is not a display locale.
   return new Intl.DateTimeFormat("zh-CN", {
-    timeZone: "Asia/Shanghai",
+    timeZone,
     hour: "2-digit",
     minute: "2-digit",
     hour12: false,
@@ -359,6 +364,7 @@ async function loadSectionFromSource(
   if (assetRoots.has(sectionDirectory)) return [];
   const sourceFiles = await collectFiles(sectionDirectory, assetRoots, mapping !== undefined);
 
+  const timeZone = options.timeZone ?? DEFAULT_TIME_ZONE;
   const items: ContentItem[] = [];
   for (const sourcePath of sourceFiles) {
     if (isDraft(sourcePath, sectionDirectory, kind)) continue;
@@ -393,8 +399,8 @@ async function loadSectionFromSource(
       html,
       metadata: document.metadata,
       date,
-      dateKey: makeDateKey(dateValue, date),
-      timeLabel: makeTimeLabel(dateValue, date),
+      dateKey: makeDateKey(dateValue, date, timeZone),
+      timeLabel: makeTimeLabel(dateValue, date, timeZone),
       tags: getTags(document.metadata),
       readingMinutes: getReadingMinutes(plainText),
       characterCount: plainText.length,

@@ -149,6 +149,40 @@ article" })` separates homographs and tells the translator what a two-word strin
 - **Identity.** The Context lives in this module only; `entry-identity.test.ts` gains a case that
   provides through the built entry and reads from a separately bundled component.
 
+### Variables and dynamic text
+
+The identity is the **template**, never the rendered sentence. What varies falls into five cases,
+each with one answer:
+
+| What varies                                 | How it is written                                                                                 | Visible to the audit |
+| ------------------------------------------- | ------------------------------------------------------------------------------------------------- | -------------------- |
+| A value inside a sentence                   | `t("Hello, {name}", { name })`; a parameter may be a Signal, and numbers use the locale's format  | yes, one message     |
+| Number, gender or another grammatical form  | `plural`, `selectordinal` and `select` inside the same template                                   | yes, one message     |
+| An element inside a sentence                | `t.rich("Read <link>the guide</link>", { link: (children) => <a href="/guide/">{children}</a> })` | yes, one message     |
+| One of a known set, chosen at run time      | `defineMessages({ open: "Open", closed: "Closed" })`, then `t(labels[status])`                    | yes, each member     |
+| Text that is data (titles, names, API text) | not interface copy; the owner of the data supplies it per locale                                  | not applicable       |
+
+- **Sentences are never concatenated.** `t("Hello, ") + name` breaks in languages with a different
+  word order and is reported by the audit, as is a template literal passed to `t`.
+- **`t.rich`** returns a `ReadableSignal<Child>`. Tags are named, carry no attributes and map to
+  functions the caller supplies, so a translation can move or reorder a link but cannot introduce
+  markup. A tag the caller did not supply is an `invalid` audit item.
+- **`defineMessages`** is how a literal is declared away from its use: at module level, in a
+  table keyed by a status or an error code. It returns typed descriptors and does not look
+  anything up; `t` accepts a literal or a descriptor and nothing else. A value read from a
+  Signal is `t(labels[status.value])` inside `derived`, or one `select` template with the Signal
+  as a parameter.
+- **Data is not copy.** A post title, a user's name or a message a server composed is content.
+  It reaches the component already in the right language from whoever owns it: Meowpress content
+  files for a site, the host's backend for an application. Passing it through a catalog would
+  make the catalog an unbounded second database.
+- **One named exception: `i18n.lookup(text, options?)`.** Some strings are data to the code but a
+  small set known to their owner, such as `site.name` and `site.description` in a Meowpress
+  config. `lookup` translates a non-literal string and, because the scanner cannot see it, the
+  owner must hand the same set to `auditCatalog` as extra messages. Meowpress does this for its
+  config copy. It is deliberately a different name from `t`, so a reader of the code can tell
+  which strings the audit guarantees and which it was told about.
+
 ### The audit
 
 Two pure, IO-free functions exported from `meowjsx/i18n/audit`:
@@ -188,7 +222,7 @@ export default meowSite({
   format as Part 1. The built-in theme keeps its English sentences inline through `t`, so its
   source stays readable and existing tests keep matching.
 - Site-owned copy (`site.name`, `site.description`, `site.about`, `notFound`) is translated
-  through the same catalog: the theme passes those configured strings through the instance, and
+  through the same catalog: the theme passes those configured strings through `i18n.lookup`, and
   the work list includes them. No per-locale copy of `SiteIdentity` is configured.
 - `site.url` is new, the public origin that absolute `hreflang` and canonical links need.
   `site.timeZone` is new and replaces the two hard-coded `Asia/Shanghai` uses, keeping that value

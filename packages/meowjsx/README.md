@@ -97,6 +97,9 @@ meowjsx (this package: core + JSX contract)
 - `./signal`: `signal`, `batch`, `mapSignal`, `derived`, `isSignal`, `unwrap`, and the
   `ReadableSignal`, `WritableSignal`, `Signal` and `MaybeSignal` types. This DOM-free entry loads
   the reactive implementation without creating a runtime or renderer.
+- `./i18n`: `createI18n`, `t`, `I18nProvider`, `useI18n` and the `Catalog`, `Message` and `I18n` types;
+  see [Internationalization](#internationalization). DOM-free (ECMAScript and `Intl` only) and not
+  re-exported from the root.
 - `./renderer`: `RenderStrategy<TNode>`, `createRenderer()`, `Renderer`/`Rendered`/
   `RendererOptions`, `ComponentObserver`/`ObservedComponent` and other target-seam types. `createRenderer()` injects component lifecycle,
   render hooks, overrides and `key`/`componentPart` identity; the target only implements node and attribute placement.
@@ -211,6 +214,71 @@ Signals, Context or types leaves the runtime and renderer out.
 
 - `bun test packages/meowjsx/tests/unit`: Signal, VNode, plugin, metadata, part/ref bindings, fake target seam and Web host tests.
 - `tests/types/` checks core and Web type cases separately; the core type environment does not include the DOM.
+
+## Internationalization
+
+`meowjsx/i18n` translates by source sentence: the literal text is the message identity, so a
+single-language application needs no provider, catalog or key.
+
+```tsx
+import { t } from "meowjsx/i18n";
+
+function Header() {
+  return (
+    <nav aria-label={t("Primary navigation")}>
+      <a href="/posts/">{t("Posts")}</a>
+      <span>{t("{count, plural, one {# min read} other {# mins read}}", { count })}</span>
+    </nav>
+  );
+}
+```
+
+```tsx
+import { createI18n, I18nProvider } from "meowjsx/i18n";
+
+const i18n = createI18n({ source: "en", locale: "fr", catalogs: { fr: { Posts: "Articles" } } });
+render(
+  <I18nProvider value={i18n}>
+    <App />
+  </I18nProvider>,
+  container,
+);
+i18n.locale.value = "en"; // mounted text and attributes update in place
+```
+
+- `t(source, params?, options?)` returns a `ReadableSignal<string>` that follows the locale, the
+  catalogs and any Signal parameter. A mounted child, attribute or `className` binds to it; static
+  HTML reads it once. `options.context` is part of the identity; `options.note` is ignored at run time.
+- The message Signal throws from `toString` and `Symbol.toPrimitive`, so `` `${t("Posts")}` `` and
+  `t("a") + "b"` fail loudly. Read `.value` for a string, or pass variables through
+  `t("Hello, {name}", { name })`.
+- `source` must be written as a literal: a value of type `string` or a template literal with a
+  runtime part is a type error. Required parameter names are inferred only when the literal has no
+  `,` inside braces, no nested brace, no space inside a name and no apostrophe; otherwise
+  parameters are loose.
+- Messages support `{name}`, `{count, plural, =0 {...} one {...} other {...}}` and `#` (the
+  locale-formatted number). An apostrophe is literal unless it directly precedes `{`, `}` or `#`,
+  where it starts a quoted section ending at the next apostrophe (`''` is a literal apostrophe), so
+  `l'{name}` does not interpolate; write `l’{name}`. A placeholder with no parameter stays visible
+  as written, and a template that does not parse throws an error naming it. `select` and
+  `selectordinal` are not supported yet.
+- A catalog is a flat object from source to translation, or to an object from context to
+  translation with `""` for no context. An empty string counts as missing; only own properties are
+  read. Lookup tries the locale, then its parents (`zh-Hant-TW`, `zh-Hant`, `zh`), then the source
+  text. A locale equal to, or a child of, `source` uses the source text without a miss;
+  otherwise `onMissing({ source, context?, locale })` is called once per source, context and locale.
+- `createI18n` returns a plain object: `locale` (writable Signal of a canonical tag; an invalid tag
+  throws), `direction` (`"ltr"` or `"rtl"`, derived from the locale's script because Bun has no
+  `getTextInfo`), `t`, `number(value, options?)` and `date(value, options?)` (Signals of strings;
+  `date` uses the instance `timeZone` unless the options set one), `addCatalog` and
+  `setLocale(locale)`. `setLocale` loads through `load` first when the locale has no catalog, then
+  writes `locale`, and with concurrent calls only the last one writes. Bind `lang` and `dir` on your
+  own element; the entry never touches the document.
+- The module-level `t` reads the nearest `I18nProvider` and works only while a component function
+  body runs, binding the message to that instance for good. Without a provider it renders the
+  source text, with the plural rules of `"en"`. In a handler, a `derived` body, an effect, a `keyed`
+  callback, after `await`, at module top level or in a plain function it throws; use `i18n.t`
+  there, which has the same signature and works anywhere.
 
 ## Web module
 

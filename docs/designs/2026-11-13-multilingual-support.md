@@ -77,9 +77,7 @@ function Header() {
   return (
     <nav aria-label={t("Primary navigation")}>
       <a href="/posts/">{t("Posts")}</a>
-      <span>
-        {t("{count, plural, one {# min read} other {# mins read}}", { count })}
-      </span>
+      <span>{t("{count, plural, one {# min read} other {# mins read}}", { count })}</span>
     </nav>
   );
 }

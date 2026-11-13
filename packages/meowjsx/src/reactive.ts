@@ -1,3 +1,4 @@
+import { outsideComponentBody } from "./context";
 import type { Cleanup, Effect, MaybeSignal, ReadableSignal, WritableSignal } from "./types";
 
 type Job = () => void;
@@ -25,7 +26,7 @@ function flushJobs(): void {
   while (pendingJobs.size > 0) {
     const jobs = [...pendingJobs];
     pendingJobs.clear();
-    for (const job of jobs) job();
+    for (const job of jobs) outsideComponentBody(job);
   }
 }
 
@@ -118,7 +119,7 @@ export function createReactiveEffect(run: Effect): Cleanup {
     const previousEffect = activeEffect;
     activeEffect = state;
     try {
-      currentCleanup = run() ?? undefined;
+      currentCleanup = outsideComponentBody(run) ?? undefined;
     } finally {
       activeEffect = previousEffect;
     }
@@ -181,10 +182,10 @@ export function mapSignal<T, M>(
   const mapped: ReadableSignal<M> = {
     get value(): M {
       trackSignal(mapped);
-      return map(source.value);
+      return outsideComponentBody(() => map(source.value));
     },
     subscribe(listener: (value: M) => void): () => void {
-      return source.subscribe((value) => listener(map(value)));
+      return source.subscribe((value) => listener(outsideComponentBody(() => map(value))));
     },
   };
   return mapped;
@@ -224,7 +225,7 @@ export function derived<T>(read: () => T): ReadableSignal<T> {
     computing = true;
     let next: T;
     try {
-      next = read();
+      next = outsideComponentBody(read);
     } finally {
       activeEffect = previousEffect;
       computing = false;
@@ -251,7 +252,7 @@ export function derived<T>(read: () => T): ReadableSignal<T> {
       trackSignal(computed);
       computing = true;
       try {
-        return read();
+        return outsideComponentBody(read);
       } finally {
         computing = false;
       }

@@ -29,6 +29,10 @@
       "types": "./dist/src/signal.d.ts",
       "import": "./dist/src/signal.js"
     },
+    "./i18n": {
+      "types": "./dist/src/i18n.d.ts",
+      "import": "./dist/src/i18n.js"
+    },
     "./renderer": {
       "types": "./dist/src/renderer.d.ts",
       "import": "./dist/src/renderer.js"

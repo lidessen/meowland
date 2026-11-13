@@ -1,167 +1,176 @@
 # Multilingual support for MeowJSX and Meowpress
 
-Status: proposed. Nothing is implemented. The independent challenger review the
+Status: proposed, second revision. Nothing is implemented. The first revision followed the
+mainstream shape (key catalogs, a `t`/`text` pair, hand-maintained sibling translations); this one
+re-derives the design from who does the work now. The mainstream shape is kept under
+[What changed from the mainstream design](#what-changed-from-the-mainstream-design) with the
+reason for each departure. The independent challenger review the
 [design-change method](../../.agents/skills/design-change/SKILL.md) requires before a mechanism
-changes has not run yet; the author's own counterexamples are in
-[Counterexamples that shaped the design](#counterexamples-that-shaped-the-design), and the
-decisions that belong to the project owner are in [Open decisions](#open-decisions).
+changes has not run yet; decisions that belong to the project owner are in
+[Open decisions](#open-decisions).
 
 ## The problem
 
 Neither package can serve a reader in a second language today.
 
-- **MeowJSX** has no notion of a locale. An application keeps its own lookup table, and because
-  setup runs once per mount, a language switch either remounts the tree (losing state) or is wired
-  by hand through Signals in every component.
-- **Meowpress** hard-codes English in the built-in theme. `src/site.tsx` holds about 60 visible
-  strings (navigation, headings, empty states, `aria-label`s, "min read"), every document says
-  `<html lang="en">`, and dates are formatted with `en-US`. `src/content.ts` formats time labels
-  with `zh-CN` and pins both date keys and time labels to `Asia/Shanghai`. One site has one
-  language tree: a slug is one page, and there is no way to publish a translation next to it or to
-  tell a reader or a crawler that one exists. Internal links are root-absolute (`/posts/`), so a
-  second tree cannot be added by copying the first.
+- **MeowJSX** has no notion of a locale. Setup runs once per mount, so a language switch either
+  remounts the tree or is wired by hand through Signals in every component.
+- **Meowpress** hard-codes English in the built-in theme (about 60 visible strings in
+  `src/site.tsx`), every document says `<html lang="en">`, dates use `en-US`, and `src/content.ts`
+  pins date keys and time labels to `Asia/Shanghai`. A slug is one page; a translation cannot be
+  published next to it, and internal links are root-absolute, so a second tree cannot be added by
+  copying the first.
 
-The expected behavior:
+## Who does the work now
 
-1. A MeowJSX component reads translated copy and locale-aware formatting from its render-tree
-   environment. Static HTML gets the strings for the render's locale; a mounted tree follows a
-   locale change through Signals without remounting.
-2. A Meowpress site declares its locales, puts translations next to the original content, and gets
-   one route tree per locale with translated chrome, correct `lang`/`dir`, a language switch,
-   `hreflang` alternates and per-locale agent indexes. A site that declares nothing builds
-   byte-for-byte what it builds today.
+Mainstream i18n was shaped by a division of labor: a developer writes code, a translator works
+later in separate files through a vendor or a translation system, and the two never see each
+other's material. Message keys, extraction pipelines, catalog files per locale and silent runtime
+fallback all exist to decouple those two people in time.
+
+In this repository's working model the author of the code, the translator and the reviewer's first
+pass are the same agent, in the same session, with the source in front of it. Translation is no
+longer the scarce step. What is scarce is what the
+[component-usage design](2026-10-20-agent-era-component-usage.md) already measured: the size of the
+minimum correct program, and the cost to **verify** and **repair** it. Applied here:
+
+| Cost     | Mainstream shape                                                        | What lowers it                                                  |
+| -------- | ----------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Discover | provider, hook, two lookup functions, catalog layout, plural format     | one function; the first working program needs no setup          |
+| Decide   | invent a key name; choose the reactive or the string form per call site | the source text is the identity; one return type                |
+| Assemble | add the key to every catalog, keep them aligned                         | nothing to add until a locale is added; then one generated list |
+| Verify   | a stale or missing translation is invisible until a reader finds it     | staleness is a mechanical fact a command reports                |
+| Repair   | a wrong choice (string child in a mounted tree) fails silently          | wrong choices are type errors or listed work items              |
+
+Four consequences drive the design:
+
+1. **Source text is the identity.** The agent writes the sentence where it is used. Code stays
+   readable without opening a catalog, a single-language application is already correct, and
+   editing the sentence invalidates its translations by construction instead of leaving them
+   silently wrong.
+2. **Translation is derived state with provenance.** A translation records what it was translated
+   from. "Missing" and "stale" become facts the build computes, not judgment.
+3. **The tool emits a work list, not a warning.** One command prints, as JSON, every missing and
+   stale item with its source, context and file. That is the loop an agent runs: list, fill,
+   list again until empty. The library never calls a model; the host's agent does the translating.
+4. **Agents are also readers.** An agent reading the site wants the original and the status of
+   each translation, not N parallel trees to crawl.
 
 ## Scope
 
-In scope: a DOM-free `meowjsx/i18n` entry, and Meowpress locales for content, routes, the built-in
-theme and the agent indexes.
+In scope: a DOM-free `meowjsx/i18n` entry with its audit functions, and Meowpress locales for
+content, routes, the built-in theme, the agent indexes and a work-list command.
 
-Not in this design:
-
-- **Meowtail's default labels** (`"Send"`, `"Close"`, `"Previous"` and similar prop defaults).
-  Hosts already override them through props. Reading them from the same context is a follow-up
-  that Meowtail owns; this design only guarantees the seam it would use (an optional context read
-  that returns `undefined` without a provider).
-- **Translating content.** Meowpress pairs files an author wrote; it does not translate.
-- **Language negotiation.** No redirect by `Accept-Language` or `navigator.language`; the output
-  stays static and script-free, and the reader chooses with a link.
-- **ICU MessageFormat** in the core. A `format` seam lets a host plug one in.
-- **Messages in the JSON entry.** JSON descriptions keep carrying resolved text from the host.
-- **Meowslides and Meowbook.**
+Not in this design: Meowtail's default labels (a follow-up Meowtail owns; they are props today),
+language negotiation or redirects (the output stays static and script-free), messages in the JSON
+entry, Meowslides and Meowbook, and any call to a translation model from the packages.
 
 ## Part 1: `meowjsx/i18n`
 
-A new DOM-free subpath. It is not re-exported from the root, so applications that do not translate
-pay nothing, and it uses only ECMAScript `Intl`, which the core `tsconfig` (no `dom` lib,
-`types: []`) already allows. It joins `tsconfig.core.json`'s `include`.
+A DOM-free subpath, not re-exported from the root. It uses only ECMAScript `Intl`, which the core
+`tsconfig` already allows, and joins `tsconfig.core.json`'s `include`.
 
-### Shape
+### The minimum program
 
 ```tsx
-import { createI18n, I18nProvider, useI18n } from "meowjsx/i18n";
+import { t } from "meowjsx/i18n";
 
-const i18n = createI18n({
-  locale: "fr", // a string, or a WritableSignal<string> the host already owns
-  fallbackLocale: "en",
-  messages: {
-    en: {
-      "nav.posts": "Posts",
-      "post.minutes": { one: "{count} min read", other: "{count} mins read" },
-      greeting: "Hello, {name}",
-    },
-    fr: { "nav.posts": "Articles", greeting: "Bonjour, {name}" },
-  },
-});
-
-function Header(_props: {}, _ctx: Context<typeof Header>) {
-  const { t, text } = useI18n();
+function Header() {
   return (
-    <nav aria-label={text("nav.label")}>
-      <a href="/posts/">{text("nav.posts")}</a>
+    <nav aria-label={t("Primary navigation")}>
+      <a href="/posts/">{t("Posts")}</a>
+      <span>
+        {t("{count, plural, one {# min read} other {# mins read}}", { count })}
+      </span>
     </nav>
   );
 }
+```
 
+That is a complete, correct single-language component: no provider, no catalog, no key. Adding a
+language is additive and touches no component:
+
+```tsx
+import { createI18n, I18nProvider } from "meowjsx/i18n";
+import fr from "./locales/fr.json";
+
+const i18n = createI18n({ source: "en", locale: "fr", catalogs: { fr } });
 render(
   <I18nProvider value={i18n}>
-    <Header />
+    <App />
   </I18nProvider>,
   container,
 );
 i18n.locale.value = "en"; // mounted text and attributes update in place
 ```
 
+```json
+{
+  "Primary navigation": "Navigation principale",
+  "Posts": "Articles",
+  "{count, plural, one {# min read} other {# mins read}}": "{count, plural, one {# min de lecture} other {# min de lecture}}"
+}
+```
+
 ### Contract
 
-- **Instance.** `createI18n(options)` returns a plain object that is independent of any `Runtime`:
-  `locale` (a `WritableSignal<string>`), `direction` (a `ReadableSignal<"ltr" | "rtl">`), `t`,
-  `text`, `has`, `number`, `date`, `plural`, `addMessages(locale, messages)` and
-  `setLocale(locale)`. Locale tags are canonicalized with `Intl.getCanonicalLocales`; an invalid
-  tag throws at creation or at the write.
-- **`t(key, params?)` returns a string** computed from the current locale. It reads the locale
-  Signal, so it is tracked wherever a Signal read is tracked. Static HTML and one-shot code call it
-  directly.
-- **`text(key, params?)` returns a `ReadableSignal<string>`**, which is `derived(() => t(...))`
-  with `params` values unwrapped when they are Signals. Mounted components use it for children and
-  attributes; it is the form that keeps "setup runs once, Signals carry later changes" true. There
-  is no third mechanism: no whole-tree re-render and no remount on a locale change.
-- **Messages are data.** A catalog is a flat record from key to a string or a plural record keyed
-  by `Intl.PluralRules` categories (`zero`, `one`, `two`, `few`, `many`, `other`; `other` is
-  required). A plural record is selected by `params.count`. No functions, so a catalog can be a
-  JSON file and never becomes an execution capability.
-- **Interpolation.** `{name}` is replaced by the parameter; numbers are formatted with the
-  locale's `Intl.NumberFormat`. `{{` and `}}` are literal braces. A placeholder without a parameter
-  stays visible as written and is reported as missing.
-- **Lookup order.** The locale, then its parents by dropping subtags (`zh-Hant-TW`, `zh-Hant`,
-  `zh`), then `fallbackLocale` and its parents, then the key itself. Every miss that reaches the
-  fallback or the key calls `onMissing({ key, locale, resolved })` once per key and locale; the
-  default reports nothing, so the host decides whether a miss is a warning or a build failure.
-- **Types.** Keys are checked against the `fallbackLocale` catalog; other catalogs are `Partial`
-  of it. Parameters are `Record<string, string | number>` in the first slice (see open decisions).
-- **Formatting.** `number(value, options?)`, `date(value, options?)` and `plural(count)` wrap
-  `Intl` with a per-locale formatter cache and read the locale Signal like `t`.
-  `createI18n({ timeZone })` sets the default zone for `date`, so a static build does not depend on
-  the machine that runs it.
-- **Direction.** `direction` comes from the locale's script after `Intl.Locale#maximize()`,
-  checked against a short list of right-to-left scripts. `getTextInfo()` is not used: the Bun
-  version in this repository exposes neither `getTextInfo` nor `textInfo`.
-- **Lazy catalogs.** With `load: (locale) => Promise<Messages>`, `setLocale(locale)` loads and
-  adds the catalog first and writes the Signal after, so a switch never flashes the fallback.
-  Writing `locale.value` directly stays synchronous and uses what is loaded. Concurrent
-  `setLocale` calls resolve in order; only the last one writes.
-- **Environment.** `I18nProvider` is the `Provider` of one module-level Context whose default is
-  `undefined`. `useI18n()` throws a named error without a provider, because silently rendering keys
-  hides the mistake; `useOptionalI18n()` returns `undefined` for libraries whose defaults work
-  without one. Nested providers are valid and give a subtree its own locale, such as a quotation.
-  Like every Context read, both run only during synchronous render.
-- **`lang` and `dir`.** The host owns its container and document. It binds
-  `lang={i18n.locale} dir={i18n.direction}` on the element it controls; the entry installs no
-  `prepareContainer` hook and never touches `document.documentElement`.
-- **`format` seam.** `createI18n({ format })` replaces interpolation and plural selection with
-  `(message, params, locale) => string` for hosts that need ICU MessageFormat. Lookup, fallback,
-  Signals and context are unchanged.
+- **One function, one return type.** `t(source, params?, options?)` returns a
+  `ReadableSignal<string>`. A mounted child or attribute binds to it and follows a locale change;
+  static HTML reads it once. There is no separate string form to choose between. A prop typed
+  `string` rejects it at compile time, and the author writes `.value` there on purpose; the
+  mistake that used to render a stale string silently is now a type error.
+- **The source must be a literal.** `t`'s type refuses a value of type `string`, so a dynamic
+  sentence cannot be passed. This is what makes the audit below complete: every message in a
+  program is visible to a scanner.
+- **Message format is ICU MessageFormat**, the subset `{name}`, `plural`, `selectordinal`,
+  `select` and `#`. It is one string per message, so a catalog is a flat JSON object and a
+  message is never split across keys. It is also the format models already write correctly for
+  languages with several plural categories. Placeholders are inferred from the literal, so a
+  missing parameter is a type error for simple arguments and an audit error for all of them.
+- **Context is also the translator's note.** `t("Post", undefined, { context: "noun: a blog
+article" })` separates homographs and tells the translator what a two-word string means, which
+  is where short interface copy goes wrong. In the catalog such a source maps to an object from
+  context to translation instead of to a string.
+- **Lookup.** The locale, then its parents by dropping subtags (`zh-Hant-TW`, `zh-Hant`, `zh`),
+  then the source text itself. The source text is a correct degraded state, not a key on screen.
+  `onMissing({ source, context, locale })` reports each miss once.
+- **Ambient and explicit.** The module-level `t` reads the nearest `I18nProvider` during
+  synchronous render and binds the returned Signal to that instance, so reading `.value` later in
+  an event handler still follows the locale. Without a provider it yields the source text.
+  `i18n.t` has the same signature for code that runs outside render. Nested providers give a
+  subtree its own locale.
+- **Instance.** `createI18n({ source, locale, catalogs, load?, timeZone?, onMissing? })` returns a
+  plain object independent of any `Runtime`: `locale` (writable Signal), `direction` (Signal,
+  derived from the locale's script because Bun exposes neither `getTextInfo` nor `textInfo`), `t`,
+  `number`, `date`, `addCatalog` and `setLocale` (loads through `load` first and writes the Signal
+  after, so a switch never flashes the source language; the last call wins).
+- **`lang` and `dir`** are bound by the host on the element it owns:
+  `lang={i18n.locale} dir={i18n.direction}`. The entry never touches the document.
+- **Identity.** The Context lives in this module only; `entry-identity.test.ts` gains a case that
+  provides through the built entry and reads from a separately bundled component.
 
-### Identity
+### The audit
 
-The Context lives in the `meowjsx/i18n` module and nowhere else, under the same rule as the other
-entries: one render graph, one copy. `entry-identity.test.ts` gains a case that provides through
-the built `./i18n` export and reads through a component bundled separately. Two `createI18n`
-instances remain valid isolation, as two Runtimes are.
+Two pure, IO-free functions exported from `meowjsx/i18n/audit`:
 
-### Alternatives
+- `extractMessages(code, file)` returns every literal `t(...)` call with its source, context,
+  placeholders and position.
+- `auditCatalog(messages, catalog, locale)` returns the work list:
+  - `missing`: a source with no translation;
+  - `unused`: a catalog entry no code refers to, paired with the closest missing source when one
+    is similar, so an edited sentence carries its old translation as a starting point;
+  - `invalid`: a translation that does not parse, or whose arguments differ from the source's.
 
-- **Nothing in MeowJSX; Meowpress keeps a private table.** The smallest change, and enough for a
-  static build. It leaves mounted applications with the remount-or-hand-wire choice and gives
-  Meowtail nothing to read later, so the second consumer would create a second mechanism.
-- **A third-party library (i18next, FormatJS).** Works for strings, but none is Signal-aware, so
-  each needs the same adapter this entry is, and each brings a parser the common case does not
-  use. The `format` seam keeps them available.
-- **A runtime plugin instead of Context.** A plugin is per Runtime; locale is per subtree and must
-  reach static HTML and deferred regions, which Context already does.
-- **`t` returns a Signal.** One function instead of two, but every string-typed prop (most of
-  Meowtail's labels) and every static caller would need `.value`. The string form stays primary
-  and `text` is the reactive form.
-- **Root export.** Rejected to keep the root's surface and bundle unchanged.
+`meowjsx i18n check [--json] [--write]` wraps them for an application: it scans the project,
+prints the list, exits non-zero when it is not empty, and with `--write` adds the missing sources
+to each catalog with an empty value for the agent to fill. The JSON form is the contract; the
+plain form prints one actionable line per item, following the
+[capture design](2026-11-12-agent-preview-capture.md)'s rule that output must be something an
+agent can act on.
+
+A later slice adds a pseudo-locale (accented, lengthened text generated from the source). A
+Meowbook capture in that locale shows any sentence that bypassed `t` as plain text and any layout
+that breaks under longer copy, which turns "did I wrap everything" into a picture.
 
 ## Part 2: Meowpress
 
@@ -169,192 +178,179 @@ instances remain valid isolation, as two Runtimes are.
 
 ```ts
 export default meowSite({
-  locales: {
-    default: "en",
-    available: {
-      en: { label: "English" },
-      fr: {
-        label: "Français",
-        site: { description: "Un journal de billets et de notes." },
-        messages: { "nav.posts": "Articles", "nav.about": "À propos" },
-      },
-    },
-  },
+  locales: { source: "en", targets: { fr: { label: "Français" } } },
   site: { name: "My site", url: "https://example.com" },
 });
 ```
 
-- Without `locales` the site has one locale, `en`, and the build output does not change.
-- `available[locale].label` is the name the language switch shows, written in that language.
-- `available[locale].site` overrides `SiteIdentity` copy for that locale: `name`, `description`
-  and `about`. Identity that is not copy (`id`, `url`, `repositorySourceUrl`, `images`) is shared.
-- `available[locale].messages` overrides keys of the built-in theme catalog. The package ships the
-  `en` catalog; a missing key falls back to English, and the build prints one line per locale with
-  the count of fallen-back keys (`--strict-locales` turns that line into a failure).
-- `notFound: { title, message, homeLabel }` keeps working as the default locale's override of the
-  three matching catalog keys.
-- `site.url` is new: the public origin. It is needed for `hreflang` and canonical links, which
-  must be absolute.
-- `site.timeZone` is new and replaces the two hard-coded `Asia/Shanghai` uses. Its default stays
-  `Asia/Shanghai` so existing sites keep their date keys; changing that default is a separate
-  decision.
+- Without `locales` the build output does not change.
+- Interface copy for a target comes from `locales/<locale>.json` in the project, the same catalog
+  format as Part 1. The built-in theme keeps its English sentences inline through `t`, so its
+  source stays readable and existing tests keep matching.
+- Site-owned copy (`site.name`, `site.description`, `site.about`, `notFound`) is translated
+  through the same catalog: the theme passes those configured strings through the instance, and
+  the work list includes them. No per-locale copy of `SiteIdentity` is configured.
+- `site.url` is new, the public origin that absolute `hreflang` and canonical links need.
+  `site.timeZone` is new and replaces the two hard-coded `Asia/Shanghai` uses, keeping that value
+  as its default so existing date keys do not move.
 
-A single-language site in another language is the degenerate case and needs no second mechanism:
-`locales: { default: "fr", available: { fr: { label: "Français", messages } } }`.
-
-### Content
-
-A translation is a sibling file with the locale before the extension:
+### Content: translations with provenance
 
 ```text
-content/posts/first.md        default locale
-content/posts/first.fr.md     the same post in French
-content/posts/only-fr.fr.md   a post that exists only in French
+content/posts/first.md        the original
+content/posts/first.fr.md     its French translation
+content/posts/only-fr.fr.md   an original written in French
 ```
 
-- The suffix is read only when it canonicalizes to a configured locale, so `notes.v2.md` keeps its
-  slug `notes.v2`. Both files above have the slug `first`; the pair is the translation set.
-- `ContentItem` gains `locale: string` and `translations: Readonly<Record<string, string>>` (the
-  locales in which the same slug exists, mapped to their URLs). Duplicate detection is keyed by
-  locale and slug. Drafts, assets, `slugPrefix` and source overlay order are unchanged, and assets
-  are shared between locales.
-- Thoughts follow the same rule.
-- Public skills are repository files and are not translated; see the limits below.
+A locale suffix is read only when it is a configured locale, so `notes.v2.md` keeps its slug. Files
+that share a slug are one translation set; the one in the source locale is the original, and a set
+without one treats its only member as an original in its own language.
 
-### Routes
+A translation records what it came from:
 
-The default locale keeps today's unprefixed routes. Every other locale is published under its
-canonical tag:
-
-```text
-/                      /fr/
-/posts/                /fr/posts/
-/posts/first/          /fr/posts/first/
-/about/                /fr/about/
-/404.html              /fr/404.html
+```yaml
+---
+title: Premier billet
+translation:
+  source: 3f9a1c2e # hash of the original's body and title when this was translated
+  reviewed: false # optional; set by a person
+---
 ```
 
-All internal links in the built-in theme go through one `localePath(locale, path)` helper instead
-of string literals. A locale tag that equals an existing top-level route or content slug
-(`posts`, `thoughts`, `skills`, `about`, `assets`, `fonts`, `licenses`) is refused at config time.
+From that the build knows three states without anyone tracking them: **current** (the hash matches
+the original), **stale** (the original changed since) and **missing**. `ContentItem` gains
+`locale`, `translations` and `translationState`.
 
-**Untranslated items.** A reader of `/fr/` still sees a post that exists only in English: it is
-listed in the French timeline and archive with its language marked, the entry carries
-`lang="en"`, and it links to the English URL. No second copy of the page is published, so there is
-no duplicate content and no page whose chrome and body disagree silently.
-`locales.untranslated: "omit"` leaves such items out of the other trees instead; the default is
-`"link"`.
+- A **stale** translation is still published, with a short notice that the original has changed
+  and a link to it. `locales.stale: "fail"` makes it a build error for sites that would rather not
+  publish it.
+- A translation without `reviewed: true` carries a quiet line saying it is a translation and
+  linking the original. Readers are told what they are reading; the wording is in the catalog.
+- A **missing** translation does not produce a page. In the target locale's timeline and archive
+  the original is listed with its language marked and `lang` set on the entry, linking to the
+  original's URL. `locales.untranslated: "omit"` leaves it out instead.
 
-### Documents
+### The work list
 
-Each built-in page is rendered inside `<I18nProvider>` with an instance created for the page's
-locale, and the theme's components read copy through `useI18n()`. This is the consumer that proves
-Part 1 in static HTML.
+```sh
+meowpress locales            # plain: one line per item
+meowpress locales --json     # the contract
+meowpress locales stamp content/posts/first.fr.md
+```
 
-- `<html lang dir>` come from the page locale.
-- Dates use the page locale and `site.timeZone`. Date keys (`2026-11-13`) stay locale-neutral
-  because they are also grouping keys.
-- With `site.url`, a page that has translations links each one and itself with
-  `<link rel="alternate" hreflang>` plus `x-default` for the default locale, and every page gets a
-  canonical link. Without `site.url` the build emits neither and says so once; relative
-  `hreflang` values are not valid.
-- The header gains a language switch when more than one locale is configured: a plain list of
-  links, each with `lang` and `hreflang`, pointing to the same page in that locale when the
-  translation exists and to that locale's home otherwise. No script.
-- The feed filter script selects by `data-*` values and is not affected.
+`--json` prints, per target locale, the interface messages from Part 1's audit (theme sentences
+and site copy, with context) and the content items that are missing or stale: source path, target
+path, the current source hash, and for a stale item the hash it was translated from, so the agent
+can diff the original between the two and revise only what changed. `stamp` writes the current
+source hash into a translation's frontmatter after it has been written or revised.
 
-### Agent indexes
+The loop for "add French to this blog" is therefore: add the locale to the config, run the list,
+write what it names, stamp, run the list until it is empty, build. Nothing in the loop needs the
+agent to know the theme's strings or the content tree in advance.
 
-`/llms.txt`, `/llm.txt` and `/agents.md` stay at the root, describe the default locale, and gain a
-`Languages` section that links `/<locale>/llms.txt`. Each other locale gets its own `llms.txt`
-below its prefix. The root markers that `hasBuiltSite` checks do not move.
+### Routes and documents
+
+The source locale keeps today's unprefixed routes; each target is published under its tag
+(`/fr/`, `/fr/posts/first/`, `/fr/404.html`). Internal links go through one
+`localePath(locale, path)` helper. A locale tag equal to an existing top-level route is refused at
+config time.
+
+Each page renders inside an `I18nProvider` for its locale. `<html lang dir>` and date formatting
+follow the page locale. With `site.url`, pages link their translations with
+`<link rel="alternate" hreflang>` and `x-default`, plus a canonical link; without it neither is
+emitted and the build says so once. With more than one locale the header shows a script-free
+language switch that points to the same page where the translation exists and to that locale's
+home otherwise.
+
+### Agents as readers
+
+- `/translations.json` is the same manifest the work list prints, published: every page, its
+  locale, its original, its state and hashes. An agent reads one file to know what exists and what
+  to trust.
+- `/llms.txt`, `/llm.txt` and `/agents.md` stay at the root and index **originals**, each in its
+  own language with that language marked, followed by one line per target locale linking
+  `/<locale>/llms.txt`. An agent that can read the original is never sent to a derived copy by
+  default.
+- Markdown copies of pages carry `lang` and, for translations, the original's URL and state.
 
 ### Consumer-owned pages
 
-A `pages` provider still owns the whole site map, including its languages. It receives
-`locales` in `SitePageContext` and content items that carry `locale` and `translations`, and it
-may set `locale` on a `SitePage`; pages with a non-default locale are indexed in that locale's
-`llms.txt`. The package does not rewrite the provider's HTML, so `lang`, alternates and the
-language switch inside those documents are the provider's.
+A `pages` provider still owns the whole site map. It receives `locales` and the instance factory
+in `SitePageContext`, content items with the fields above, and may set `locale` and `original` on
+a `SitePage` so its pages enter the manifest and the per-locale index. The package does not
+rewrite the provider's HTML.
 
 ### Limits stated up front
 
-- **Skills pages exist once**, in the default locale. Other locales' navigation links there. A
-  translated chrome around untranslated skill files is the alternative; it doubles the pages for
-  no translated content, so it is left out until someone needs it.
-- **Right-to-left layout is not claimed.** `dir="rtl"` is emitted, but the Journal theme's layout
-  has not been checked in that direction; that needs a browser pass before the README promises it.
-- **Fonts.** The default faces (Newsreader, Inter, JetBrains Mono) cover Latin, Cyrillic and
-  Greek subsets. Other scripts fall back to system fonts unless the site lists faces in `fonts`.
-- **Reading time and excerpts** stay character-based (`length / 400`, first 180 characters), which
-  reads differently per script. Not changed here.
+- Skills pages exist once, in the source locale; skill files are repository material, not posts.
+- `dir="rtl"` is emitted, but the Journal theme's layout is not claimed in that direction until a
+  browser pass has looked at it.
+- The default faces cover Latin, Cyrillic and Greek; other scripts use system fonts unless the
+  site lists faces in `fonts`.
+- Reading time and excerpts stay character-based.
 
-## Counterexamples that shaped the design
+## What changed from the mainstream design
 
-- **A post that exists in one language only.** A strict "one tree per locale, every page
-  translated" model would drop it from the other trees or force a duplicate. This produced the
-  `untranslated: "link"` default and the per-entry `lang`.
-- **`hreflang` without an origin.** `SiteIdentity` has no URL today and search engines ignore
-  relative alternates. This produced `site.url` and the rule to emit nothing rather than invalid
-  links.
-- **Setup runs once.** A `t` that returns a string, used as a child of a mounted component, would
-  never update. This produced `text` as a derived Signal, and kept `t` for static and string-typed
-  callers.
-- **A static host with one `404.html`.** GitHub Pages serves only the root file. Per-locale
-  `404.html` files are still written for hosts that pick the nearest one; the root page stays in
-  the default locale.
-- **A file named `changelog.v2.md`.** Suffix detection by "anything after the last dot" would
-  change its slug. Only configured locales are read as a suffix.
-- **A locale named `posts`.** It would collide with a route; refused at config time.
-- **English-only repository rule.** Shipping translated catalogs in the package would add
-  non-English strings to the repository. The package ships `en` and takes the rest from the site
-  (see open decisions).
-- **Build machine time zone and Bun's `Intl`.** Dates must not move with the CI region, and
-  `getTextInfo` is missing in Bun; hence the explicit `timeZone` and the script-based direction.
+| Mainstream (first revision)                              | Now                                                    | Why                                                                                                          |
+| -------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------ |
+| Keys (`"nav.posts"`) with catalogs per locale            | The source sentence is the identity                    | No name to invent or align; code is readable; an edited sentence cannot keep a wrong translation silently    |
+| `t` returns a string, `text` returns a Signal            | One `t` returning a Signal                             | The wrong choice was a silent bug in mounted trees; now it is a type error                                   |
+| Provider required, `useI18n()` throws without it         | Works with no setup; provider adds languages           | The first program is correct; internationalizing is additive                                                 |
+| Plural records keyed by category; ICU left to a seam     | ICU subset in the core                                 | One string per message keeps catalogs flat and auditable; it is the format translators, human or model, know |
+| Missing translations fall back at run time, with a count | A command lists missing, stale and invalid items       | The gap becomes a finite, machine-readable task                                                              |
+| Sibling translation files with no relation recorded      | Translations record the source hash                    | Staleness is the failure a multilingual site actually has, and it was invisible                              |
+| Per-locale copies of site identity in config             | Site copy goes through the same catalog                | One mechanism and one work list                                                                              |
+| Parallel `llms.txt` trees                                | Originals first, plus a published translation manifest | An agent reader wants the source and the state                                                               |
+
+What the mainstream shape does better, stated plainly:
+
+- **Fixing a typo in the source invalidates its translations.** With keys it would not. Here the
+  audit pairs the unused entry with the new source so the old translation is carried over in one
+  step, but it is a step.
+- **Long sentences are long keys**, and catalogs are less pleasant to read by hand.
+- **A human translation team with its own tooling** expects key catalogs. A site that works that
+  way can still do it: the catalog is a flat JSON object and ICU is the interchange format those
+  tools speak; only the identity differs.
+- **`.value` at string-typed props** is a visible cost of the single return type.
 
 ## Work packages
 
-Each slice ends in an observable result and can ship on its own.
+1. **`meowjsx/i18n`**: `t`, instance, provider, ICU subset, types. Tests fail on: a mounted text
+   or attribute that does not follow `locale.value`; a parent tag skipped in lookup; `ru` with
+   count 3 not selecting `few`; a `setLocale` race where the earlier load wins; a `.value` read
+   in a handler that ignores a later locale change; a context read across the built entry.
+2. **Audit**: `extractMessages`, `auditCatalog`, `meowjsx i18n check`. Tests fail on: a literal
+   call the scanner misses; a translation with different arguments passing; an edited sentence
+   not paired with its old entry.
+3. **Meowpress, one locale**: theme sentences through `t`, `locales` with only a source,
+   `site.timeZone`, `localePath`. Existing site and build tests pass unchanged; a new test builds
+   a site whose source locale is `fr`.
+4. **Meowpress, targets**: suffix pairing, provenance and the three states, routes, notices,
+   switch, alternates, manifest, agent indexes, `meowpress locales` and `stamp`. Tests build a
+   temporary two-locale site through `meowpress/build` and edit the original to prove the
+   translation turns stale. One browser pass over the switch and the notices.
+5. **Documentation and the consumer skill**, including the list-fill-stamp loop in
+   [skills/meowland](../../skills/meowland/SKILL.md).
 
-1. **`meowjsx/i18n`.** New `src/i18n.ts`, the `./i18n` export, `tsconfig.core.json` include,
-   README section. Tests fail on: a mounted text or attribute that does not change when
-   `locale.value` changes; a fallback chain that skips a parent tag; a plural record resolved with
-   the wrong category (`ru`, count 3 is `few`); a `setLocale` race where the earlier load wins; a
-   context read across the built entry boundary.
-2. **Meowpress catalog, one locale.** Move the theme's strings to the `en` catalog and render
-   through `useI18n()`; add `locales` with a single entry, `site.timeZone` and `localePath`. The
-   existing site and build tests must pass unchanged (same HTML for a site without `locales`); a
-   new test builds a single-locale `fr` site and asserts `lang="fr"` and overridden copy.
-3. **Meowpress multiple locales.** Suffix pairing, prefixed routes, untranslated policy, language
-   switch, alternates, per-locale agent indexes and 404, `SitePageContext.locales`. Tests build a
-   temporary two-locale site through `meowpress/build`. One browser pass over the switch at
-   desktop and mobile widths in both schemes.
-4. **Documentation and the consumer skill.** Meowpress and MeowJSX READMEs,
-   [skills/meowland](../../skills/meowland/SKILL.md), and a record of the outcome here.
-
-Meowpress's `meowjsx` peer range must rise to the first version that exports `./i18n`; slices 2
-and 3 cannot be published before slice 1 is. Release follows [local releasing](../releasing.md)
-and is not part of this work.
+Meowpress's `meowjsx` peer range rises to the first version that exports `./i18n`. Release follows
+[local releasing](../releasing.md) and is not part of this work.
 
 ## Open decisions
 
-These belong to the project owner; the recommendation is first in each.
+The recommendation is first in each.
 
-1. **Translated catalogs in the package.** Recommended: ship `en` only and let the site provide
-   the rest. Bundling other languages (for example `zh-CN`) is friendlier for site authors but
-   needs a new, explicit exception to the English-only rule in the root AGENTS file.
-2. **Translation layout.** Recommended: the file suffix (`first.fr.md`). The alternative is a
-   `locale` field on `ContentSource`, which suits translations kept in another directory or
-   repository; it can be added later on the same `(locale, slug)` key without changing the first.
-3. **Default-locale prefix.** Recommended: unprefixed, so existing URLs survive. A
-   `prefixDefaultLocale` option would need a root redirect page, which is the first script or
-   meta refresh in the output.
-4. **Typed message parameters.** Recommended: keys only in the first slice. Inferring `{name}`
-   from the fallback catalog with template literal types is possible and can be added without a
-   runtime change.
-5. **Rich messages** (a link or emphasis inside a translated sentence). Recommended: a later
-   slice, `rich(key, { link: (children) => <a>{children}</a> })`. Until then such sentences are
-   split into separate keys.
-6. **Default `site.timeZone`.** Recommended for now: keep `Asia/Shanghai` to preserve output.
-   A neutral `UTC` default is more defensible for a library and would be a visible change for
-   existing sites.
+1. **Source text as identity.** Recommended as above. Keeping keys is the conservative choice if
+   handing catalogs to an external translation team is a real near-term need.
+2. **A `meowjsx` command.** Recommended: add the `meowjsx i18n check` bin, because the loop needs
+   one command. MeowJSX has no CLI today; the alternative is to export only the audit functions
+   and let Meowpress and each application wrap them.
+3. **Where provenance lives.** Recommended: the translation's frontmatter, so it travels with the
+   file. The alternative is a lock file next to the content, in the manner of `skills-lock.json`,
+   which keeps machine state out of authored files but drifts when files move.
+4. **Disclosure of unreviewed translations.** Recommended: on by default. A site can remove the
+   line by marking translations reviewed or by emptying that catalog entry.
+5. **Published catalogs for the built-in theme.** Recommended: none in the package; a site's
+   agent fills `locales/<locale>.json` from the work list in one pass. Shipping translated
+   catalogs would need a new exception to the English-only rule in the root AGENTS file.
+6. **Default `site.timeZone`.** Recommended for now: keep `Asia/Shanghai` to preserve output;
+   `UTC` is the neutral default and a visible change for existing sites.

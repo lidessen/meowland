@@ -1,6 +1,7 @@
 import { createContext, isInComponentBody, useContext } from "./context";
-import { derived, signal, unwrap } from "./reactive";
-import type { MaybeSignal, ReadableSignal, WritableSignal } from "./types";
+import { type MessageNode, ParseFailure, parseTemplate } from "./i18n-message";
+import { derived, isSignal, signal, unwrap } from "./reactive";
+import type { Child, MaybeSignal, ReadableSignal, WritableSignal } from "./types";
 
 /**
  * Internationalization for MeowJSX. DOM-free: it uses only ECMAScript and `Intl`.
@@ -66,21 +67,91 @@ type TranslateArguments<S extends string> = [ParamNames<S>] extends [never]
     ? [params?: MessageParams, options?: TranslateOptions]
     : [params: { readonly [Name in ParamNames<S>]: MessageParam }, options?: TranslateOptions];
 
+/** A literal source, or `never` for a value of type `string`. */
+type Literal<S extends string> = {} extends Record<S, 1> ? never : S;
+
+/**
+ * Tag names of a rich template: `<link>` and `<b>` give `"link" | "b"`. Closing tags, and
+ * angle brackets that cannot be a tag (a space inside), are not names.
+ */
+type TagNames<
+  S extends string,
+  Found extends string = never,
+> = S extends `${string}<${infer Name}>${infer Rest}`
+  ? Name extends `/${string}` | `${string}${" " | "<" | ">"}${string}` | ""
+    ? TagNames<Rest, Found>
+    : TagNames<Rest, Found | Name>
+  : Found;
+
+/** Wraps the formatted content of one tag; the result replaces `<tag>...</tag>`. */
+export type RichPart = (children: Child) => Child;
+export type RichParts<S extends string = string> = {
+  readonly [Name in TagNames<S>]: RichPart;
+};
+
+/**
+ * A message declared away from its use. It carries its own context and note; `t` accepts it,
+ * or a Signal of it, where it accepts a literal.
+ */
+export interface MessageDescriptor<S extends string = string> {
+  readonly source: S;
+  readonly context?: string;
+  readonly note?: string;
+}
+/** One entry of a `defineMessages` table. */
+export type MessageSpec = string | MessageDescriptor;
+type SpecSource<V> = V extends string ? V : V extends { readonly source: infer S } ? S : never;
+/** A spec whose source has type `string` becomes `never`, so the table must use literals. */
+type CheckedSpec<V> = [SpecSource<V>] extends [never]
+  ? never
+  : SpecSource<V> extends infer S extends string
+    ? {} extends Record<S, 1>
+      ? never
+      : V
+    : never;
+export type MessageTable<T> = {
+  readonly [Key in keyof T]: MessageDescriptor<Extract<SpecSource<T[Key]>, string>>;
+};
+
 /**
  * `t(source, params?, options?)`. The source must be written as a literal: a value of
- * type `string`, or a template literal with a runtime part, is refused. Named parameters are required when the literal is simple.
+ * type `string`, or a template literal with a runtime part, is refused. Named parameters are
+ * required when the literal is simple. A descriptor from `defineMessages`, or a Signal of one,
+ * is accepted in place of the literal; its parameters are not inferred.
  */
 export interface Translate {
-  <S extends string>(
-    source: {} extends Record<S, 1> ? never : S,
-    ...rest: TranslateArguments<S>
+  <S extends string>(source: Literal<S>, ...rest: TranslateArguments<S>): Message;
+  (
+    message: MessageDescriptor | ReadableSignal<MessageDescriptor>,
+    params?: MessageParams,
+    options?: TranslateOptions,
   ): Message;
+  /**
+   * A message with named tags: `<link>the guide</link>`. `parts` maps each tag to a function
+   * that wraps its content. Tags carry no attributes, so a translation can move or reorder a
+   * tag but cannot introduce markup.
+   */
+  readonly rich: TranslateRich;
+}
+
+export interface TranslateRich {
+  <S extends string>(
+    source: Literal<S>,
+    parts: RichParts<S>,
+    ...rest: TranslateArguments<S>
+  ): ReadableSignal<Child>;
 }
 
 export interface I18n {
   readonly locale: WritableSignal<string>;
   readonly direction: ReadableSignal<"ltr" | "rtl">;
   readonly t: Translate;
+  /**
+   * Translates text the scanner cannot see, such as site configuration copy. The text and its
+   * translation are literal: no placeholder, plural or apostrophe is interpreted. Its owner
+   * hands the same set to `auditCatalog` as extra literal messages.
+   */
+  lookup(text: string, options?: TranslateOptions): Message;
   number(value: MaybeSignal<number>, options?: Intl.NumberFormatOptions): ReadableSignal<string>;
   date(
     value: MaybeSignal<Date | number>,
@@ -94,148 +165,49 @@ export interface I18n {
   setLocale(locale: string): Promise<void>;
 }
 
-// ---------------------------------------------------------------------------
-// Message format: {name}, {name, plural, =N {...} one {...} other {...}} and #.
-// The AST is a union so `select` and `selectordinal` can be added as node types.
-// ---------------------------------------------------------------------------
-
-const PLURAL_CATEGORIES = new Set(["zero", "one", "two", "few", "many", "other"]);
-
-type Node =
-  | { readonly type: "text"; readonly value: string }
-  | { readonly type: "arg"; readonly name: string }
-  | { readonly type: "pound" }
-  | {
-      readonly type: "plural";
-      readonly name: string;
-      readonly exact: ReadonlyMap<number, readonly Node[]>;
-      readonly categories: ReadonlyMap<string, readonly Node[]>;
+/**
+ * Declares messages at module level, away from their use. It performs no lookup: each entry
+ * becomes a frozen descriptor that `t` translates where it is used.
+ */
+export function defineMessages<const T extends { readonly [name: string]: MessageSpec }>(table: {
+  readonly [Key in keyof T]: CheckedSpec<T[Key]>;
+}): MessageTable<T> {
+  const entries: [string, MessageDescriptor][] = [];
+  for (const [name, spec] of Object.entries(table as { [name: string]: unknown })) {
+    const value = typeof spec === "string" ? { source: spec } : spec;
+    if (
+      typeof value !== "object" ||
+      value === null ||
+      typeof (value as { source?: unknown }).source !== "string"
+    ) {
+      throw new Error(
+        `meowjsx/i18n: defineMessages entry ${JSON.stringify(name)} must be a source string or ` +
+          "an object with a string source.",
+      );
+    }
+    const { source, context, note } = value as {
+      source: string;
+      context?: unknown;
+      note?: unknown;
     };
-
-class ParseFailure extends Error {}
-
-function parseTemplate(template: string): readonly Node[] {
-  let index = 0;
-
-  const fail = (reason: string): never => {
-    throw new ParseFailure(`${reason} at position ${index}`);
-  };
-  const skipSpace = (): void => {
-    while (index < template.length && /\s/.test(template[index]!)) index += 1;
-  };
-  const readToken = (stop: RegExp): string => {
-    const start = index;
-    while (index < template.length && !stop.test(template[index]!)) index += 1;
-    return template.slice(start, index);
-  };
-
-  function parseNodes(inPlural: boolean, nested: boolean): Node[] {
-    const nodes: Node[] = [];
-    let text = "";
-    const flush = (): void => {
-      if (text) nodes.push({ type: "text", value: text });
-      text = "";
-    };
-    while (index < template.length) {
-      const char = template[index]!;
-      if (char === "'") {
-        const next = template[index + 1];
-        if (next === "'") {
-          text += "'";
-          index += 2;
-        } else if (next === "{" || next === "}" || next === "#") {
-          index += 1;
-          // A quoted section runs to the next apostrophe, or to the end of the text.
-          while (index < template.length) {
-            if (template[index] === "'") {
-              if (template[index + 1] === "'") {
-                text += "'";
-                index += 2;
-                continue;
-              }
-              index += 1;
-              break;
-            }
-            text += template[index];
-            index += 1;
-          }
-        } else {
-          text += "'";
-          index += 1;
-        }
-      } else if (char === "{") {
-        flush();
-        index += 1;
-        nodes.push(parseArgument());
-      } else if (char === "}") {
-        if (!nested) fail("Unmatched }");
-        break;
-      } else if (char === "#" && inPlural) {
-        flush();
-        nodes.push({ type: "pound" });
-        index += 1;
-      } else {
-        text += char;
-        index += 1;
-      }
+    if (
+      (context !== undefined && typeof context !== "string") ||
+      (note !== undefined && typeof note !== "string")
+    ) {
+      throw new Error(
+        `meowjsx/i18n: defineMessages entry ${JSON.stringify(name)} has a non-string context or note.`,
+      );
     }
-    flush();
-    return nodes;
+    entries.push([
+      name,
+      Object.freeze({
+        source,
+        ...(context === undefined ? {} : { context }),
+        ...(note === undefined ? {} : { note }),
+      }),
+    ]);
   }
-
-  function parseArgument(): Node {
-    skipSpace();
-    const name = readToken(/[\s,{}]/);
-    if (!name) fail("Missing argument name");
-    skipSpace();
-    if (template[index] === "}") {
-      index += 1;
-      return { type: "arg", name };
-    }
-    if (template[index] !== ",") return fail("Expected , or }");
-    index += 1;
-    skipSpace();
-    const kind = readToken(/[\s,{}]/);
-    if (kind !== "plural") return fail(`Unsupported argument type "${kind}"`);
-    skipSpace();
-    if (template[index] !== ",") return fail("Expected , after plural");
-    index += 1;
-    return parsePluralBranches(name);
-  }
-
-  function parsePluralBranches(name: string): Node {
-    const exact = new Map<number, readonly Node[]>();
-    const categories = new Map<string, readonly Node[]>();
-    for (;;) {
-      skipSpace();
-      if (index >= template.length) return fail("Unclosed plural argument");
-      if (template[index] === "}") {
-        index += 1;
-        break;
-      }
-      const selector = readToken(/[\s{}]/);
-      skipSpace();
-      if (!selector || template[index] !== "{") return fail("Expected a selector and {");
-      index += 1;
-      const body = parseNodes(true, true);
-      if (template[index] !== "}") return fail("Unclosed plural branch");
-      index += 1;
-      if (selector.startsWith("=")) {
-        if (!/^=\d+$/.test(selector)) return fail(`Invalid selector "${selector}"`);
-        const value = Number(selector.slice(1));
-        if (exact.has(value)) return fail(`Duplicate selector "${selector}"`);
-        exact.set(value, body);
-      } else {
-        if (!PLURAL_CATEGORIES.has(selector)) return fail(`Invalid selector "${selector}"`);
-        if (categories.has(selector)) return fail(`Duplicate selector "${selector}"`);
-        categories.set(selector, body);
-      }
-    }
-    if (!categories.has("other")) return fail('A plural needs an "other" branch');
-    return { type: "plural", name, exact, categories };
-  }
-
-  return parseNodes(false, false);
+  return Object.freeze(Object.fromEntries(entries)) as MessageTable<T>;
 }
 
 // ---------------------------------------------------------------------------
@@ -307,7 +279,7 @@ function refuseString(): never {
   throw new Error(MESSAGE_IS_A_SIGNAL);
 }
 
-function messageSignal(read: () => string): Message {
+function messageSignal<T>(read: () => T): ReadableSignal<T> {
   const message = derived(read);
   Object.defineProperties(message, {
     toString: { value: refuseString },
@@ -331,7 +303,8 @@ export function createI18n(options: CreateI18nOptions): I18n {
 
   const catalogs = new Map<string, Catalog>();
   const catalogVersion = signal(0);
-  const parsed = new Map<string, readonly Node[]>();
+  const parsed = new Map<string, readonly MessageNode[]>();
+  const parsedRich = new Map<string, readonly MessageNode[]>();
   const reported = new Set<string>();
   const formatters = new Map<string, Intl.NumberFormat | Intl.DateTimeFormat | Intl.PluralRules>();
   const canonicalCache = new Map<string, string>();
@@ -371,49 +344,86 @@ export function createI18n(options: CreateI18nOptions): I18n {
   const numberFormat = (tag: string, formatOptions?: Intl.NumberFormatOptions) =>
     formatter("number", tag, formatOptions, () => new Intl.NumberFormat(tag, formatOptions));
 
-  const parse = (template: string, describe: string): readonly Node[] => {
-    let nodes = parsed.get(template);
+  const parse = (template: string, describe: string, rich: boolean): readonly MessageNode[] => {
+    const cache = rich ? parsedRich : parsed;
+    let nodes = cache.get(template);
     if (!nodes) {
       try {
-        nodes = parseTemplate(template);
+        nodes = parseTemplate(template, { rich });
       } catch (error) {
         if (!(error instanceof ParseFailure)) throw error;
         throw new Error(
           `meowjsx/i18n: cannot parse ${describe} ${JSON.stringify(template)}: ${error.message}`,
         );
       }
-      parsed.set(template, nodes);
+      cache.set(template, nodes);
     }
     return nodes;
   };
 
-  const format = (nodes: readonly Node[], values: ParamValues, tag: string, pound?: string) => {
-    let output = "";
+  type RenderTag = (name: string, children: Child) => Child;
+
+  /** Appends the formatted nodes to `out`; adjacent text is merged into one string. */
+  const emit = (
+    nodes: readonly MessageNode[],
+    values: ParamValues,
+    tag: string,
+    pound: string | undefined,
+    out: Child[],
+    renderTag: RenderTag | undefined,
+  ): void => {
+    const pushText = (value: string): void => {
+      const last = out.length - 1;
+      if (last >= 0 && typeof out[last] === "string") out[last] += value;
+      else out.push(value);
+    };
     for (const node of nodes) {
-      if (node.type === "text") output += node.value;
-      else if (node.type === "pound") output += pound ?? "#";
+      if (node.type === "text") pushText(node.value);
+      else if (node.type === "pound") pushText(pound ?? "#");
       else if (node.type === "arg") {
         const value = values.get(node.name);
-        if (value === undefined) output += `{${node.name}}`;
-        else output += typeof value === "number" ? numberFormat(tag).format(value) : String(value);
+        if (value === undefined) pushText(`{${node.name}}`);
+        else pushText(typeof value === "number" ? numberFormat(tag).format(value) : String(value));
+      } else if (node.type === "tag") {
+        const inner: Child[] = [];
+        emit(node.children, values, tag, pound, inner, renderTag);
+        if (!renderTag) throw new Error("meowjsx/i18n: a tag is only valid in t.rich messages");
+        out.push(renderTag(node.name, inner));
+      } else if (node.type === "select") {
+        const value = values.get(node.name);
+        if (value === undefined) {
+          pushText(`{${node.name}}`);
+          continue;
+        }
+        const branch = node.branches.get(String(value)) ?? node.branches.get("other")!;
+        emit(branch, values, tag, pound, out, renderTag);
       } else {
         const value = values.get(node.name);
         if (value === undefined) {
-          output += `{${node.name}}`;
+          pushText(`{${node.name}}`);
           continue;
         }
         const count = typeof value === "number" ? value : Number(value);
         const display = Number.isNaN(count) ? String(value) : numberFormat(tag).format(count);
+        const rules = formatter(
+          node.ordinal ? "ordinal" : "plural",
+          tag,
+          undefined,
+          () => new Intl.PluralRules(tag, node.ordinal ? { type: "ordinal" } : undefined),
+        );
         const branch =
           node.exact.get(count) ??
-          node.categories.get(
-            formatter("plural", tag, undefined, () => new Intl.PluralRules(tag)).select(count),
-          ) ??
+          node.categories.get(rules.select(count)) ??
           node.categories.get("other")!;
-        output += format(branch, values, tag, display);
+        emit(branch, values, tag, display, out, renderTag);
       }
     }
-    return output;
+  };
+
+  const format = (nodes: readonly MessageNode[], values: ParamValues, tag: string): string => {
+    const out: Child[] = [];
+    emit(nodes, values, tag, undefined, out, undefined);
+    return out.join("");
   };
 
   const report = (source: string, context: string | undefined, tag: string): void => {
@@ -435,23 +445,77 @@ export function createI18n(options: CreateI18nOptions): I18n {
     return { template: source, describe: "message" };
   };
 
+  const paramValues = (params: MessageParams | undefined): Map<string, unknown> => {
+    const values = new Map<string, unknown>();
+    if (params) {
+      for (const name of Object.keys(params)) values.set(name, unwrap(params[name]));
+    }
+    return values;
+  };
+
+  /** The source and context behind a literal, a descriptor or a Signal of a descriptor. */
+  const readSource = (
+    input: string | MessageDescriptor | ReadableSignal<MessageDescriptor>,
+    translateOptions: TranslateOptions | undefined,
+  ): { source: string; context: string | undefined } => {
+    const value = isSignal<MessageDescriptor | string>(input) ? input.value : input;
+    if (typeof value === "string") return { source: value, context: translateOptions?.context };
+    if (typeof value === "object" && value !== null && typeof value.source === "string") {
+      return { source: value.source, context: value.context ?? translateOptions?.context };
+    }
+    throw new Error(
+      "meowjsx/i18n: t() needs a literal source, a defineMessages descriptor or a Signal of one.",
+    );
+  };
+
   const translate = (
-    source: string,
+    input: string | MessageDescriptor | ReadableSignal<MessageDescriptor>,
     params?: MessageParams,
     translateOptions?: TranslateOptions,
-  ): Message => {
-    const context = translateOptions?.context;
-    return messageSignal(() => {
+  ): Message =>
+    messageSignal(() => {
       const tag = currentLocale();
       void catalogVersion.value;
-      const values = new Map<string, unknown>();
-      if (params) {
-        for (const name of Object.keys(params)) values.set(name, unwrap(params[name]));
-      }
+      const values = paramValues(params);
+      const { source, context } = readSource(input, translateOptions);
       const { template, describe } = resolve(source, context, tag);
-      return format(parse(template, describe), values, tag);
+      return format(parse(template, describe, false), values, tag);
     });
-  };
+
+  const translateRich = (
+    input: string,
+    parts: { readonly [name: string]: RichPart },
+    params?: MessageParams,
+    translateOptions?: TranslateOptions,
+  ): ReadableSignal<Child> =>
+    messageSignal<Child>(() => {
+      const tag = currentLocale();
+      void catalogVersion.value;
+      const values = paramValues(params);
+      const { source, context } = readSource(input, translateOptions);
+      const { template, describe } = resolve(source, context, tag);
+      const out: Child[] = [];
+      emit(parse(template, describe, true), values, tag, undefined, out, (name, children) => {
+        const part = Object.hasOwn(parts, name) ? parts[name] : undefined;
+        if (typeof part !== "function") {
+          throw new Error(
+            `meowjsx/i18n: the ${describe === "message" ? "message" : describe} uses the tag ` +
+              `<${name}> but t.rich(${JSON.stringify(source)}) was given no part for it ` +
+              `(parts: ${Object.keys(parts).join(", ") || "none"}).`,
+          );
+        }
+        return part(children);
+      });
+      return out;
+    });
+
+  const lookup = (text: string, lookupOptions?: TranslateOptions): Message =>
+    messageSignal(() => {
+      const tag = currentLocale();
+      void catalogVersion.value;
+      // Both the text and its translation are literal: no placeholder is interpreted.
+      return resolve(text, lookupOptions?.context, tag).template;
+    });
 
   const number: I18n["number"] = (value, formatOptions) =>
     derived(() => numberFormat(currentLocale(), formatOptions).format(unwrap(value)));
@@ -485,7 +549,8 @@ export function createI18n(options: CreateI18nOptions): I18n {
   return {
     locale,
     direction,
-    t: translate as Translate,
+    t: Object.assign(translate, { rich: translateRich }) as unknown as Translate,
+    lookup,
     number,
     date,
     addCatalog,
@@ -507,29 +572,52 @@ export function useI18n(): I18n | undefined {
   return useContext(I18nContext);
 }
 
-type AnyTranslate = (source: string, params?: MessageParams, options?: TranslateOptions) => Message;
+type AnyTranslate = (
+  input: string | MessageDescriptor | ReadableSignal<MessageDescriptor>,
+  params?: MessageParams,
+  options?: TranslateOptions,
+) => Message;
+type AnyRich = (
+  source: string,
+  parts: { readonly [name: string]: RichPart },
+  params?: MessageParams,
+  options?: TranslateOptions,
+) => ReadableSignal<Child>;
 
 let sourceOnly: I18n | undefined;
 
-function ambientTranslate(
-  source: string,
-  params?: MessageParams,
-  options?: TranslateOptions,
-): Message {
+function ambientInstance(name: string): I18n {
   if (!isInComponentBody()) {
     throw new Error(
-      "meowjsx/i18n: t() reads the nearest I18nProvider and works only while a component " +
+      `meowjsx/i18n: ${name} reads the nearest I18nProvider and works only while a component ` +
         "function body runs. In a handler, a derived body, a keyed callback, after await, at " +
-        "module top level or in a plain function, use the instance: i18n.t(...).",
+        "module top level or in a plain function, use the instance: i18n.t(...). Declare " +
+        "messages away from their use with defineMessages.",
     );
   }
   // Without a provider the message is its source text; plural rules are those of "en".
-  const instance = useContext(I18nContext) ?? (sourceOnly ??= createI18n({ source: "en" }));
-  return (instance.t as AnyTranslate)(source, params, options);
+  return useContext(I18nContext) ?? (sourceOnly ??= createI18n({ source: "en" }));
+}
+
+function ambientTranslate(
+  input: string | MessageDescriptor | ReadableSignal<MessageDescriptor>,
+  params?: MessageParams,
+  options?: TranslateOptions,
+): Message {
+  return (ambientInstance("t()").t as unknown as AnyTranslate)(input, params, options);
+}
+
+function ambientRich(
+  source: string,
+  parts: { readonly [name: string]: RichPart },
+  params?: MessageParams,
+  options?: TranslateOptions,
+): ReadableSignal<Child> {
+  return (ambientInstance("t.rich()").t.rich as unknown as AnyRich)(source, parts, params, options);
 }
 
 /**
- * Translates `source` with the nearest `I18nProvider`, or renders the source text when
- * there is none. Callable only while a component function body runs; elsewhere it throws.
+ * Translates with the nearest `I18nProvider`, or renders the source text when there is none.
+ * Callable only while a component function body runs; elsewhere it throws.
  */
-export const t = ambientTranslate as Translate;
+export const t = Object.assign(ambientTranslate, { rich: ambientRich }) as unknown as Translate;

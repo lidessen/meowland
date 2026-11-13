@@ -1,7 +1,7 @@
 import { describe, expect, test } from "bun:test";
 import { createRuntime, derived, h, isSignal, keyed, signal, type Child } from "../../src/index";
 import { type RenderStrategy } from "../../src/renderer";
-import { I18nProvider, createI18n, t, useI18n, type Message } from "../../src/i18n";
+import { I18nProvider, createI18n, defineMessages, t, useI18n, type Message } from "../../src/i18n";
 import { createWebRenderer } from "../../web/index";
 
 type FakeNode = {
@@ -310,7 +310,9 @@ describe("message format", () => {
     });
     expect(() => i18n.t("Hello, {name").value).toThrow('"Hello, {name"');
     expect(() => i18n.t("{n, plural, one {x}}", { n: 1 } as never).value).toThrow("other");
-    expect(() => i18n.t("{n, select, a {x} other {y}}", { n: 1 } as never).value).toThrow("select");
+    expect(() => i18n.t("{n, number}", { n: 1 } as never).value).toThrow(
+      'Unsupported argument type "number"',
+    );
     expect(() => i18n.t("a } b").value).toThrow('"a } b"');
     const broken = i18n.t("Fine");
     expect(() => broken.value).toThrow('translation of "Fine" "{unclosed"');
@@ -535,5 +537,309 @@ describe("a message is never a string by accident", () => {
     expect(() => [message].join(",")).toThrow("Signal");
     expect(() => `${i18n.number(1)}`).not.toThrow();
     expect(message.value).toBe("Posts");
+  });
+});
+
+describe("select and selectordinal", () => {
+  const ordinal = "{n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}";
+
+  test("English ordinals pick one, two, few and other", () => {
+    const i18n = createI18n({ source: "en" });
+    const read = (n: number) => i18n.t(ordinal, { n }).value;
+    expect([1, 2, 3, 4, 11, 12, 13, 21, 22, 23, 101, 111].map(read)).toEqual([
+      "1st",
+      "2nd",
+      "3rd",
+      "4th",
+      "11th",
+      "12th",
+      "13th",
+      "21st",
+      "22nd",
+      "23rd",
+      "101st",
+      "111th",
+    ]);
+  });
+
+  test("selectordinal uses ordinal rules, not cardinal ones, and supports =N", () => {
+    const template = "{n, selectordinal, =0 {zeroth} one {#st} other {#th}}";
+    const i18n = createI18n({ source: "en" });
+    // Cardinal English would select "other" for 21; ordinal rules select "one".
+    expect(i18n.t(template, { n: 21 }).value).toBe("21st");
+    expect(i18n.t(template, { n: 0 }).value).toBe("zeroth");
+    expect(i18n.t("{n, plural, one {#st} other {#th}}", { n: 21 }).value).toBe("21th");
+  });
+
+  test("select picks the matching branch, falls back to other and keeps a missing value visible", () => {
+    const template = "{gender, select, female {She} male {He} other {They}} replied";
+    const i18n = createI18n({ source: "en" });
+    expect(i18n.t(template, { gender: "female" }).value).toBe("She replied");
+    expect(i18n.t(template, { gender: "male" }).value).toBe("He replied");
+    expect(i18n.t(template, { gender: "x" }).value).toBe("They replied");
+    expect(i18n.t(template, { gender: "__proto__" }).value).toBe("They replied");
+    expect(i18n.t(template, {} as never).value).toBe("{gender} replied");
+  });
+
+  test("a plural nested in a select, and # inside a select inside a plural", () => {
+    const nested =
+      "{kind, select, post {{n, plural, one {# post} other {# posts}}} other {{n, plural, one {# item} other {# items}}}}";
+    const i18n = createI18n({ source: "en" });
+    expect(i18n.t(nested, { kind: "post", n: 1 }).value).toBe("1 post");
+    expect(i18n.t(nested, { kind: "post", n: 1500 }).value).toBe("1,500 posts");
+    expect(i18n.t(nested, { kind: "tag", n: 2 }).value).toBe("2 items");
+    const pound = "{n, plural, other {{kind, select, a {# of A} other {# of other}}}}";
+    expect(i18n.t(pound, { n: 3, kind: "a" }).value).toBe("3 of A");
+    expect(i18n.t(pound, { n: 4, kind: "z" }).value).toBe("4 of other");
+  });
+
+  test("a select parameter may be a Signal and the translation may use its own branches", async () => {
+    const template = "{state, select, on {On} other {Off}}";
+    const state = signal("on");
+    const i18n = createI18n({
+      source: "en",
+      locale: "fr",
+      catalogs: { fr: { [template]: "{state, select, on {Actif} other {Inactif}}" } },
+    });
+    const message = i18n.t(template, { state });
+    const seen: string[] = [];
+    const stop = message.subscribe((value) => seen.push(value));
+    expect(message.value).toBe("Actif");
+    state.value = "off";
+    await tick();
+    expect(seen).toEqual(["Inactif"]);
+    stop();
+  });
+
+  test("a select or selectordinal needs an other branch and unique selectors", () => {
+    const i18n = createI18n({ source: "en" });
+    expect(() => i18n.t("{a, select, x {1}}", { a: "x" } as never).value).toThrow('"other"');
+    expect(() => i18n.t("{a, selectordinal, one {1}}", { a: 1 } as never).value).toThrow(
+      'selectordinal needs an "other"',
+    );
+    expect(() => i18n.t("{a, select, x {1} x {2} other {3}}", { a: "x" } as never).value).toThrow(
+      'Duplicate selector "x"',
+    );
+    expect(() => i18n.t("{a, select, x {1} other {3}", { a: "x" } as never).value).toThrow(
+      "Unclosed",
+    );
+  });
+});
+
+describe("defineMessages", () => {
+  const labels = defineMessages({
+    open: "Open",
+    closed: { source: "Closed", context: "status", note: "A badge" },
+  });
+  const fr = {
+    Open: "Ouvert",
+    Closed: { status: "Ferme", "": "Fermer" },
+  };
+
+  test("returns frozen descriptors at module level without a lookup", () => {
+    expect(labels.open).toEqual({ source: "Open" });
+    expect(labels.closed).toEqual({ source: "Closed", context: "status", note: "A badge" });
+    expect(Object.isFrozen(labels)).toBe(true);
+    expect(Object.isFrozen(labels.open)).toBe(true);
+    expect(() => defineMessages({ bad: 3 } as never)).toThrow('"bad"');
+    expect(() => defineMessages({ bad: { source: 1 } } as never)).toThrow("string source");
+    expect(() => defineMessages({ bad: { source: "x", context: 1 } } as never)).toThrow(
+      "non-string context",
+    );
+  });
+
+  test("t translates a descriptor in a component and honors its own context", async () => {
+    const i18n = createI18n({ source: "en", locale: "en", catalogs: { fr } });
+    const Badge = () => h("p", {}, t(labels.open), "/", t(labels.closed));
+    const { root, mounted } = mount(withProvider(i18n, h(Badge, {})));
+    expect(text(root)).toBe("Open/Closed");
+    i18n.locale.value = "fr";
+    await tick();
+    expect(text(root)).toBe("Ouvert/Ferme");
+    // The descriptor's context wins over a context passed in the options.
+    expect(i18n.t(labels.closed, undefined, { context: "other" }).value).toBe("Ferme");
+    expect(i18n.t({ source: "Closed" }).value).toBe("Fermer");
+    expect(i18n.t({ source: "Closed" }, undefined, { context: "status" }).value).toBe("Ferme");
+    mounted.unmount();
+  });
+
+  test("a Signal of a descriptor follows both the descriptor and the locale", async () => {
+    const i18n = createI18n({ source: "en", locale: "en", catalogs: { fr } });
+    const status = signal<"open" | "closed">("open");
+    const Badge = () => h("p", {}, t(derived(() => labels[status.value])));
+    const { root, mounted } = mount(withProvider(i18n, h(Badge, {})));
+    const paragraph = root.children[0]!;
+    expect(text(paragraph)).toBe("Open");
+    status.value = "closed";
+    await tick();
+    expect(text(paragraph)).toBe("Closed");
+    i18n.locale.value = "fr";
+    await tick();
+    expect(text(paragraph)).toBe("Ferme");
+    status.value = "open";
+    await tick();
+    expect(text(paragraph)).toBe("Ouvert");
+    expect(root.children[0]).toBe(paragraph);
+    mounted.unmount();
+  });
+
+  test("descriptor parameters are formatted, and a non-descriptor value throws", () => {
+    const i18n = createI18n({ source: "en" });
+    const messages = defineMessages({ count: "{n, plural, one {# row} other {# rows}}" });
+    expect(i18n.t(messages.count, { n: 2 }).value).toBe("2 rows");
+    expect(() => i18n.t({} as never).value).toThrow("descriptor");
+    expect(() => i18n.t(signal(7) as never).value).toThrow("descriptor");
+  });
+});
+
+describe("t.rich", () => {
+  const guide = "Read <link>the guide</link> now";
+  const link = (children: Child): Child => h("a", { href: "/guide/" }, children);
+
+  test("static HTML wraps the tag content with the part", () => {
+    const Page = () => h("p", {}, t.rich(guide, { link }));
+    const web = createWebRenderer(createRuntime());
+    expect(web.renderToHtml(h(Page, {}))).toBe('<p>Read <a href="/guide/">the guide</a> now</p>');
+  });
+
+  test("text and ICU arguments inside and outside tags are formatted", () => {
+    const i18n = createI18n({ source: "en" });
+    const web = createWebRenderer(createRuntime());
+    const message = i18n.t.rich(
+      "<b>{count, plural, one {# post} other {# posts}}</b> by {who}, <i>{n, select, a {A} other {B}}</i>",
+      { b: (children) => h("b", {}, children), i: (children) => h("i", {}, children) },
+      { count: 1200, who: "Ada", n: "a" },
+    );
+    expect(web.renderToHtml(h("p", {}, message))).toBe(
+      "<p><b>1,200 posts</b> by Ada, <i>A</i></p>",
+    );
+  });
+
+  test("a translation may reorder tags, move them and drop the text between", () => {
+    const template = "<a>First</a> and <b>second</b>";
+    const i18n = createI18n({
+      source: "en",
+      locale: "fr",
+      catalogs: { fr: { [template]: "<b>Deuxieme</b> puis <a>premier</a>" } },
+    });
+    const web = createWebRenderer(createRuntime());
+    const parts = {
+      a: (children: Child) => h("a", {}, children),
+      b: (children: Child) => h("b", {}, children),
+    };
+    expect(web.renderToHtml(h("p", {}, i18n.t.rich(template, parts)))).toBe(
+      "<p><b>Deuxieme</b> puis <a>premier</a></p>",
+    );
+  });
+
+  test("mounted rich text updates in place on a locale change", async () => {
+    const i18n = createI18n({
+      source: "en",
+      locale: "en",
+      catalogs: { fr: { [guide]: "Lisez <link>le guide</link> maintenant" } },
+    });
+    const Page = () => h("p", {}, t.rich(guide, { link }));
+    const { root, mounted } = mount(withProvider(i18n, h(Page, {})));
+    const paragraph = root.children[0]!;
+    expect(text(paragraph)).toBe("Read the guide now");
+    const anchor = () => paragraph.children.flatMap((child) => [child, ...child.children]);
+    expect(anchor().some((node) => node.kind === "element" && node.value === "a")).toBe(true);
+    i18n.locale.value = "fr";
+    await tick();
+    expect(text(paragraph)).toBe("Lisez le guide maintenant");
+    const link2 = anchor().find((node) => node.kind === "element" && node.value === "a")!;
+    expect(link2.properties.href).toBe("/guide/");
+    expect(text(link2)).toBe("le guide");
+    mounted.unmount();
+  });
+
+  test("a tag without a part throws, naming the tag and the source", () => {
+    const i18n = createI18n({ source: "en" });
+    const message = i18n.t.rich(guide, {} as never);
+    expect(() => message.value).toThrow("<link>");
+    expect(() => message.value).toThrow(JSON.stringify(guide));
+    // A translation that introduces a tag the caller did not supply fails the same way.
+    const french = createI18n({
+      source: "en",
+      locale: "fr",
+      catalogs: { fr: { [guide]: "Lisez <strong>le guide</strong>" } },
+    });
+    expect(() => french.t.rich(guide, { link }).value).toThrow("<strong>");
+  });
+
+  test("malformed tags fail to parse, and an inherited part name is not a part", () => {
+    const i18n = createI18n({ source: "en" });
+    expect(() => i18n.t.rich("<a>x", { a: link } as never).value).toThrow("Unclosed tag <a>");
+    expect(() => i18n.t.rich("<a>x</b>", { a: link } as never).value).toThrow("does not match");
+    expect(() => i18n.t.rich("x</a>", {} as never).value).toThrow("Unexpected closing tag");
+    expect(() => i18n.t.rich("<toString>x</toString>", {} as never).value).toThrow("<toString>");
+  });
+
+  test("ordinary text with < stays text in rich messages that are not tags", () => {
+    const i18n = createI18n({ source: "en" });
+    expect(i18n.t.rich("1 < 2 and 3 > 2", {}).value).toEqual(["1 < 2 and 3 > 2"]);
+  });
+
+  test("the ambient t.rich throws outside a component body, and a rich Signal refuses strings", () => {
+    expect(() => t.rich("Read <link>x</link>", { link })).toThrow("t.rich()");
+    const message = createI18n({ source: "en" }).t.rich(guide, { link });
+    expect(() => `${message as never}`).toThrow(".value");
+    expect(() => String(message)).toThrow("Signal");
+  });
+
+  test("literal < in a plain t message is text", () => {
+    const i18n = createI18n({ source: "en" });
+    expect(i18n.t("a <b>bold</b> claim").value).toBe("a <b>bold</b> claim");
+    expect(i18n.t("x < y").value).toBe("x < y");
+  });
+});
+
+describe("i18n.lookup", () => {
+  test("translates config copy literally: braces and apostrophes are not parsed", () => {
+    const description = "Notes {draft} on 'quoting' and l'{name} #1";
+    const i18n = createI18n({
+      source: "en",
+      locale: "fr",
+      catalogs: { fr: { [description]: "Notes {brouillon} sur 'citer' et l'{nom} #1" } },
+    });
+    expect(i18n.lookup(description).value).toBe("Notes {brouillon} sur 'citer' et l'{nom} #1");
+    // The same text through t would be parsed; lookup must not parse it.
+    expect(() => i18n.t(description).value).not.toThrow();
+    expect(i18n.t(description).value).not.toBe(i18n.lookup(description).value);
+  });
+
+  test("a text with an unmatched brace does not throw, and falls back with onMissing", () => {
+    const misses: unknown[] = [];
+    const i18n = createI18n({
+      source: "en",
+      locale: "de",
+      catalogs: { de: {} },
+      onMissing: (miss) => misses.push(miss),
+    });
+    const copy = "A site {with an open brace";
+    const message = i18n.lookup(copy);
+    expect(message.value).toBe(copy);
+    expect(message.value).toBe(copy);
+    expect(misses).toEqual([{ source: copy, locale: "de" }]);
+    expect(i18n.lookup(copy, { context: "title" }).value).toBe(copy);
+    expect(misses).toHaveLength(2);
+  });
+
+  test("follows the locale and catalogs, uses context, and refuses string conversion", async () => {
+    const i18n = createI18n({
+      source: "en",
+      locale: "en",
+      catalogs: { fr: { "My site": { "": "Mon site", title: "Titre" } } },
+    });
+    const name = i18n.lookup("My site");
+    const title = i18n.lookup("My site", { context: "title" });
+    expect(name.value).toBe("My site");
+    i18n.locale.value = "fr";
+    await tick();
+    expect(name.value).toBe("Mon site");
+    expect(title.value).toBe("Titre");
+    expect(() => `${name}`).toThrow(".value");
+    const dynamicText: string = ["My", "site"].join(" ");
+    expect(i18n.lookup(dynamicText).value).toBe("Mon site");
   });
 });

@@ -15,6 +15,7 @@
       "meowjsx": ["./src/index.ts"],
       "meowjsx/signal": ["./src/signal.ts"],
       "meowjsx/i18n": ["./src/i18n.ts"],
+      "meowjsx/i18n/audit": ["./src/i18n-audit.ts"],
       "meowjsx/web": ["./web/index.ts"],
       "meowjsx/json": ["./src/json/index.ts"]
     }
@@ -26,6 +27,7 @@
     "src/jsx-runtime.ts",
     "src/jsx-dev-runtime.ts",
     "src/i18n.ts",
+    "src/i18n-audit.ts",
     "tests/types/i18n.types.ts",
     "tests/types/runtime.types.tsx",
     "tests/types/metadata.types.ts",

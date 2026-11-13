@@ -89,3 +89,27 @@ test("the i18n entry shares Context and reactive modules with the root and autom
   expect("createI18n" in rootSignals).toBe(false);
   expect("t" in rootSignals).toBe(false);
 });
+
+test("the audit entry imports only the message parser, never the runtime, renderer or DOM", async () => {
+  const importsOf = async (file: string): Promise<string[]> => {
+    const text = await Bun.file(new URL(`../../src/${file}`, import.meta.url)).text();
+    return [...text.matchAll(/(?:^|\n)\s*(?:import|export)\b[^;]*?from\s+["']([^"']+)["']/g)].map(
+      (match) => match[1]!,
+    );
+  };
+  expect(await importsOf("i18n-audit.ts")).toEqual(["./i18n-message"]);
+  expect(await importsOf("i18n-message.ts")).toEqual([]);
+  // The message parser is shared, not copied: the runtime entry imports the same module.
+  expect(await importsOf("i18n.ts")).toContain("./i18n-message");
+  // The audit works without a provider, a runtime or a DOM global.
+  const audit = await import("../../src/i18n-audit");
+  expect(audit.extractMessages('t("Posts")', "a.ts").messages.map((m) => m.source)).toEqual([
+    "Posts",
+  ]);
+  expect(Object.keys(audit).sort()).toEqual([
+    "CLOSEST_SIMILARITY",
+    "auditCatalog",
+    "extractMessages",
+    "messageArguments",
+  ]);
+});

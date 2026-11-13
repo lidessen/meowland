@@ -97,9 +97,12 @@ meowjsx (this package: core + JSX contract)
 - `./signal`: `signal`, `batch`, `mapSignal`, `derived`, `isSignal`, `unwrap`, and the
   `ReadableSignal`, `WritableSignal`, `Signal` and `MaybeSignal` types. This DOM-free entry loads
   the reactive implementation without creating a runtime or renderer.
-- `./i18n`: `createI18n`, `t`, `I18nProvider`, `useI18n` and the `Catalog`, `Message` and `I18n` types;
-  see [Internationalization](#internationalization). DOM-free (ECMAScript and `Intl` only) and not
-  re-exported from the root.
+- `./i18n`: `createI18n`, `t`, `defineMessages`, `I18nProvider`, `useI18n` and the `Catalog`,
+  `Message`, `MessageDescriptor` and `I18n` types; see [Internationalization](#internationalization).
+  DOM-free (ECMAScript and `Intl` only) and not re-exported from the root.
+- `./i18n/audit`: `extractMessages`, `messageArguments`, `auditCatalog` and `CLOSEST_SIMILARITY`;
+  see [Audit](#audit). Pure functions over strings: no IO, no DOM, and no import of the runtime or
+  renderer.
 - `./renderer`: `RenderStrategy<TNode>`, `createRenderer()`, `Renderer`/`Rendered`/
   `RendererOptions`, `ComponentObserver`/`ObservedComponent` and other target-seam types. `createRenderer()` injects component lifecycle,
   render hooks, overrides and `key`/`componentPart` identity; the target only implements node and attribute placement.
@@ -260,8 +263,13 @@ i18n.locale.value = "en"; // mounted text and attributes update in place
   locale-formatted number). An apostrophe is literal unless it directly precedes `{`, `}` or `#`,
   where it starts a quoted section ending at the next apostrophe (`''` is a literal apostrophe), so
   `l'{name}` does not interpolate; write `l’{name}`. A placeholder with no parameter stays visible
-  as written, and a template that does not parse throws an error naming it. `select` and
-  `selectordinal` are not supported yet.
+  as written, and a template that does not parse throws an error naming it.
+- `{kind, select, a {...} b {...} other {...}}` picks the branch whose selector equals the value
+  (`other` otherwise). `{n, selectordinal, one {#st} two {#nd} few {#rd} other {#th}}` selects
+  with the locale's ordinal rules (`Intl.PluralRules` with `type: "ordinal"`) and accepts `=N`
+  and `#` like `plural`. `other` is required in all three; branches may nest arguments, and a `#`
+  in a `select` branch inside a `plural` is the plural's number. Any other argument type
+  (`number`, `date`) is a parse error.
 - A catalog is a flat object from source to translation, or to an object from context to
   translation with `""` for no context. An empty string counts as missing; only own properties are
   read. Lookup tries the locale, then its parents (`zh-Hant-TW`, `zh-Hant`, `zh`), then the source
@@ -279,6 +287,89 @@ i18n.locale.value = "en"; // mounted text and attributes update in place
   source text, with the plural rules of `"en"`. In a handler, a `derived` body, an effect, a `keyed`
   callback, after `await`, at module top level or in a plain function it throws; use `i18n.t`
   there, which has the same signature and works anywhere.
+- `defineMessages(table)` declares messages away from their use, at module top level or in a table
+  keyed by a status or error code. Each entry is a literal source or `{ source, context?, note? }`;
+  the result is a frozen object of frozen descriptors with the same keys, and no lookup happens.
+  `t` and `i18n.t` accept a literal, a descriptor, or a Signal of a descriptor as the first
+  argument. With a Signal, the message follows both the locale and the descriptor, so
+  `t(derived(() => labels[status.value]))` called in the component body works. A descriptor's own
+  `context` wins over `options.context`; parameters of a descriptor are not inferred. A value of
+  type `string` is still a type error for `t` and for a table entry.
+- `t.rich(source, parts, params?, options?)` (also `i18n.t.rich`) returns a `ReadableSignal<Child>`
+  for a message with named tag pairs: `t.rich("Read <link>the guide</link>", { link: (children) =>
+  <a href="/guide/">{children}</a> })`. A tag is `<name>` ... `</name>` with no attributes and no
+  self-closing form; `parts` maps each tag name in the literal to `(children: Child) => Child`
+  and a missing part is a type error. Arguments, plurals and selects work inside and outside
+  tags, and a translation may move or reorder tags. The result is an array of strings and part
+  results that the renderer and `renderToHtml` accept. A tag in the message (or in its
+  translation) with no matching part throws an error naming the tag and the source when the
+  Signal is read. `<` is only interpreted by `t.rich`: in `t` it is ordinary text, and in `t.rich`
+  a `<` that does not start `<name>` or `</name>` is text. Parts run when the Signal is evaluated,
+  outside the component body, so they should not call the ambient `t`. The ambient `t.rich` has the
+  same in-component-body rule as `t` and the rich Signal refuses string conversion like a message.
+- `i18n.lookup(text, options?)` translates a string that is not a literal, such as site
+  configuration copy, through the same catalogs, the same fallback chain and the same `onMissing`
+  reporting, and returns a message Signal. The text and its translation are **literal**: no
+  placeholder, plural or apostrophe is interpreted, because such copy may contain braces and
+  apostrophes. It is an instance method only; there is no ambient `lookup`. The scanner cannot see
+  these strings, so their owner passes the same set to `auditCatalog` as extra messages.
+
+### Audit
+
+`meowjsx/i18n/audit` turns "did every string get translated" into a list. It runs at build time
+and imports nothing but the message parser the run time also uses, so the audit and the run time
+cannot disagree about what a template contains.
+
+- `extractMessages(code, file)` returns `{ messages, dynamic, aliases }`. It is a scanner, not a
+  TypeScript parser: it lexes enough TS and TSX to skip comments, string and template literals
+  (including `${}` nesting), regex literals and JSX text, then reads only the argument list of
+  each call to `t(`, `.t(`, `t.rich(`, `.t.rich(`, `.lookup(` and `defineMessages(`. Matching is by
+  name, so an unrelated `.t(` also appears; filter by file. A first argument that is one string
+  literal (single or double quoted, or a template without substitutions, with escapes decoded) is
+  a message `{ source, context?, note?, kind: "t" | "rich" | "defined", key?, literal?, file, line,
+  column, placeholders, tags }`. `context` and `note` come from an options object literal (third
+  argument of `t`, fourth of `t.rich`, second of `lookup`); a `context` that is not a literal
+  makes the call dynamic. `defineMessages` members with a literal source, or an object literal
+  with a literal `source`, are messages of kind `"defined"` with their `key`. A `.lookup("...")`
+  call with a literal is a message with `literal: true`.
+- Everything else is reported in `dynamic` as `{ file, line, column, callee, argument, reason }`
+  and never skipped: template literals with substitutions, concatenations, identifiers, member
+  accesses (the scanner does not try to prove one is a descriptor), calls, other expressions,
+  every non-literal `.lookup(...)`, and unreadable `defineMessages` members. `reason` is one of
+  `missing-argument`, `template-literal`, `concatenation`, `identifier`, `member-access`, `call`,
+  `expression`, `lookup`, `context`, `options`, `not-an-object-literal` and `unreadable-member`.
+  `aliases` lists `import { t as x } from "meowjsx/i18n"` (and the same for `defineMessages`),
+  and calls through the alias are scanned. Line and column are 1-based and point at the callee
+  name, or at the member key for `defineMessages`. An unterminated construct ends the scan of that
+  region without throwing.
+- `messageArguments(source, { rich? })` returns `{ names, tags }` from the shared parser and
+  throws when the template does not parse.
+- `auditCatalog(messages, catalog, locale, { extra?, extraLiteral? })` compares messages with one
+  locale's catalog (source to string, or to an object from context to string, `""` for none) and
+  returns `{ locale, missing, unused, invalid }`:
+  - `missing`: `{ source, context?, note?, file?, line? }` for a message with no translation or an
+    empty one;
+  - `unused`: `{ source, context?, translation, closest? }` for a non-empty catalog entry that no
+    message refers to. `closest` is the first missing item with the highest normalized
+    edit-distance similarity (case-insensitive, `1 - distance / longer length`) of at least
+    `CLOSEST_SIMILARITY` (0.6), so an edited sentence carries its old translation as a starting
+    point;
+  - `invalid`: `{ source, context?, translation, reason }` when the source or the translation does
+    not parse, when the set of argument names differs (this also catches `l'{name}`, where the
+    apostrophe swallows the placeholder), or, for messages of kind `"rich"`, when the set of tag
+    names differs. Plural categories are not validated against `locale`; it is recorded in the
+    result.
+  - `extra` adds messages the scanner cannot see; with `extraLiteral` (default `true`) they are
+    literal text, as `lookup` treats them, and only their presence is checked.
+
+```ts
+import { auditCatalog, extractMessages } from "meowjsx/i18n/audit";
+
+const { messages, dynamic } = extractMessages(await readSource(file), file);
+const { missing, unused, invalid } = auditCatalog(messages, catalog, "fr", {
+  extra: [{ source: site.description }],
+});
+```
 
 ## Web module
 

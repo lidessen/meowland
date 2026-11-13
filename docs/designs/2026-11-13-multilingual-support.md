@@ -333,8 +333,10 @@ rewrite the provider's HTML.
 ### Limits stated up front
 
 - Skills pages exist once, in the source locale; skill files are repository material, not posts.
-- `dir="rtl"` is emitted, but the Journal theme's layout is not claimed in that direction until a
-  browser pass has looked at it.
+- `dir="rtl"` is emitted. A browser pass over an Arabic target has looked at the theme in that
+  direction: the chrome, feed and prose mirror correctly (Meowtail's prose uses logical
+  properties), and Meowpress's own theme keeps code blocks left-to-right. Inline code inside
+  right-to-left prose is still subject to the Unicode bidi algorithm, as on any site.
 - The default faces cover Latin, Cyrillic and Greek; other scripts use system fonts unless the
   site lists faces in `fonts`.
 - Reading time and excerpts stay character-based.
@@ -457,38 +459,75 @@ by the second.
 
 Recorded on 2026-11-13 on branch `ccr-f569f565-518h28`. Work package numbers are the ones above;
 package 3 was done before package 2 because the theme needs `defineMessages` and `lookup`.
+Packages 4–6 were completed on 2026-11-13 on `main`.
 
-| Package                        | State                                                                      |
-| ------------------------------ | -------------------------------------------------------------------------- |
-| 1. Core `t`                    | Done and committed.                                                        |
-| 3. Rest of the message surface | Done and committed, including `meowjsx/i18n/audit`.                        |
-| 2. Meowpress interface locales | Done and committed.                                                        |
-| 4. Content                     | Not started.                                                               |
-| 5. Publishing and the loop     | Not started.                                                               |
-| 6. Documentation and the skill | Not started, apart from the README sections each package wrote for itself. |
-| 7. Deferred                    | `meowjsx i18n check` and the pseudo-locale, by decision.                   |
+| Package                        | State                                                                                          |
+| ------------------------------ | ---------------------------------------------------------------------------------------------- |
+| 1. Core `t`                    | Done and committed.                                                                            |
+| 3. Rest of the message surface | Done and committed, including `meowjsx/i18n/audit`.                                            |
+| 2. Meowpress interface locales | Done and committed.                                                                            |
+| 4. Content                     | Done: suffix pairing, provenance, the three states, notices, inheritance, tests.               |
+| 5. Publishing and the loop     | Done: manifest, per-locale agent indexes, alternates, switch, `locales` and `stamp`, tests.    |
+| 6. Documentation and the skill | Done: both READMEs, the docs pages and the list-fill-stamp loop in `skills/meowland/SKILL.md`. |
+| 7. Deferred                    | `meowjsx i18n check` and the pseudo-locale, by decision.                                       |
 
 Evidence, kept separate by who ran it:
 
 - **Run by the lead after each package:** the package's own unit tests and typecheck, the
   repository lint and format check, and a hand-written probe of the new behavior (packages 1 and 3) or a rebuilt two-locale site (package 2).
-- **Reported by the implementers and not repeated by the lead:** the full `bun run test` (974
-  passing after package 2) and `bun run typecheck`, the docs app build, and the Meowpress browser
-  suite (20 passing).
-- **Not done by anyone:** a look at a target-locale page in a browser, right-to-left layout, and
-  installed-state acceptance from packed archives.
+- **Run for packages 4–6:** `bun run build`, the Meowpress unit suite (58 passing, 13 of them new
+  in `tests/unit/translations.test.ts`, plus two new CLI tests), the repository lint, format check
+  and typecheck, the full `bun run test` (989 passing, 0 failing across 147 files), the Meowpress
+  browser suite (20 passing), the docs app build, and the language sweep, which printed only the
+  two approved test files. The output snapshots were regenerated once on purpose because the added
+  theme CSS changes the content hash in the stylesheet's name; the HTML differs only in that hash.
+- **A latent direction bug surfaced and is fixed:** `Intl.Locale("ur").maximize()` reports the
+  Nastaliq script `Aran` in this Bun's ICU, not `Arab`, so `direction` returned `ltr` for Urdu.
+  The existing test caught it once the whole suite ran; `RTL_SCRIPTS` now includes `Aran`.
+- **Reported by the implementers and not repeated by the lead at that time:** the full
+  `bun run test` (974 passing after package 2) and `bun run typecheck`, the docs app build, and
+  the Meowpress browser suite (20 passing).
+- **A browser pass over a rebuilt two-locale site** (1440px and 375px, light and dark): the switch
+  sits in the header and wraps above the page title without overflow on mobile; both notices read
+  in the target language and sit above the body; the stale and unreviewed lines can appear
+  together; untranslated entries and French pages share the feed. Screenshots were temporary and
+  are not committed.
+- **A browser pass over a right-to-left target** (Arabic, 1440px and 375px, light and dark): the
+  chrome, feed and blockquotes mirror through logical properties, and dates follow the page
+  locale. It found one real defect, which is fixed in the theme: a `pre` inherited the page's
+  `direction: rtl` and the browser bidi-reordered the code (`const rtl = "…";` rendered as
+  `;"const rtl = …"`), so the theme now pins `pre` to `direction: ltr`; the theme's remaining
+  physical `left` properties became logical ones, which are byte-identical in left-to-right
+  output. Meowtail's own `pre` sets no direction; a library-level fix there is a follow-up for
+  Meowtail. Screenshots were temporary and are not committed.
+- **Not done by anyone:** installed-state acceptance from packed archives, which waits for the
+  release (the `meowjsx` peer range).
 
 What a successor needs to know:
 
 - **Unchanged English output is pinned.** `tests/unit/output-snapshot.test.ts` compares two
   fixture sites byte for byte against snapshots taken from the source before the theme moved to
-  messages. The only accepted difference is on skill pages: the copy button gained
-  `data-copy-label` and `data-copied-label`, and the inline script reads them. Regenerate only on
-  purpose, with `MEOWPRESS_UPDATE_SNAPSHOTS=1`.
+  messages. Differences accepted so far: skill pages' copy button gained `data-copy-label` and
+  `data-copied-label`, and the locale support added CSS, which changes the content hash in the
+  stylesheet's file name on every page. Regenerate only on purpose, with
+  `MEOWPRESS_UPDATE_SNAPSHOTS=1`.
 - **Scope of package 2.** Target locales get home, about, the two archives and `404.html`. Post
-  and thought detail pages under a prefix, suffix pairing and provenance are package 4. Entries
-  in a target tree carry the source locale as `lang` today; package 4 replaces that with the
-  item's own locale.
+  and thought detail pages under a prefix, suffix pairing and provenance are package 4, which is
+  now in place: a target also publishes one page per translation and per original written in it,
+  and archive entries carry the item's own locale as `lang`.
+- **Root agent indexes mark languages only when targets exist.** With more than one locale, the
+  root `llms.txt`, `llm.txt` and `agents.md` mark every original with its language and append a
+  `## Languages` section; each target gets its own three indexes next to its pages. A
+  single-locale site's indexes are byte-identical to before.
+- **A consumer page's Markdown copy records its language and original**, as
+  `<!-- lang: fr; original: /guides/ -->`, but not the translation state; the state is in
+  `/translations.json`, which lists consumer pages that set `locale` or `original`.
+- **A consumer provider can build page locales.** `SitePageContext.pageLocale(tag)` returns the
+  same locale instance the built-in pages use, with the site's catalogs, time zone and
+  missing-message reporting, and throws for a tag the site does not configure.
+- **A skills page shows the language switch too.** Skills exist once in the source tree; their
+  switch lists every locale, sends the target ones home, and emits an alternate only for the
+  source language, so a target reader is not stranded on a source-only page.
 - **Two instances per page.** Theme sentences use an instance whose source is always `en`; site
   config copy uses a second one whose source is the content source locale.
 - **Counts are not pluralized in English.** "min read", "characters" and similar pass the count
@@ -505,9 +544,9 @@ What a successor needs to know:
 - **Known gaps in package 3.** The scanner is heuristic for unusual TSX (`<T>x` assertions, type
   positions) and has no tests there. `auditCatalog` does not validate plural categories against
   the locale.
-- **The English-only sweep is slow here.** The exact command from the root AGENTS file did not
-  finish within two minutes in this container. Running the same pattern over
-  `git ls-files -co --exclude-standard` gives the same answer quickly.
+- **The English-only sweep** from the root AGENTS file printed only the two approved test files
+  in this run; it can be slow in a container, and the same pattern over
+  `git ls-files -co --exclude-standard` gives the same answer faster.
 - **Tests that import `meowpress/build` run the built `dist`,** so `bun run build` comes first.
 - **Release.** Nothing is versioned, packed or published. Meowpress's `meowjsx` peer range still
   has to rise to the first version that exports `./i18n`.

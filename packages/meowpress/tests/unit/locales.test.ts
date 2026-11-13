@@ -125,7 +125,10 @@ test("a target locale publishes its own tree with translated chrome and honest f
     expect(written.sort()).toEqual([
       "fr/404.html",
       "fr/about/index.html",
+      "fr/agents.md",
       "fr/index.html",
+      "fr/llm.txt",
+      "fr/llms.txt",
       "fr/posts/index.html",
       "fr/thoughts/index.html",
     ]);
@@ -156,7 +159,7 @@ test("omit leaves untranslated originals out of the target tree", async () => {
   });
 });
 
-test("the source tree and agent indexes do not change when targets are added, except the 404", async () => {
+test("adding targets changes the source tree only in the language switch and index links", async () => {
   await withSite(async (root, output) => {
     const plain = join(root, "plain");
     await buildSite(config(root, plain));
@@ -165,6 +168,16 @@ test("the source tree and agent indexes do not change when targets are added, ex
         locales: { source: "en", targets: { fr: { label: "Français" } }, catalogs: { fr: FRENCH } },
       }),
     );
+    // Every page of the source tree keeps its content; a multilingual site adds the switch to
+    // the header, marks each original's language in agents.md, and ends the agent indexes with
+    // one link per other language.
+    const sourceView = (text: string): string =>
+      text
+        .replace(/<nav class="site-locale-switch"[\s\S]*?<\/nav>/, "")
+        .replace(/ · [a-z][a-z-]*$/gm, "")
+        .replace(/ \([a-z][a-z-]*\):/g, ":")
+        .split("\n## Languages\n")[0]!
+        .replace(/\n+$/, "");
     const compared: string[] = [];
     for (const file of await listTextFiles(plain)) {
       const path = relative(plain, file);
@@ -177,13 +190,30 @@ test("the source tree and agent indexes do not change when targets are added, ex
         expect(after).toContain('<nav aria-label="Languages">');
         expect(before).not.toContain("hreflang");
       } else {
-        expect(after).toBe(before);
+        expect(sourceView(after)).toBe(sourceView(before));
       }
     }
     expect(compared).toContain("index.html");
     expect(compared).toContain("posts/first/index.html");
     expect(compared).toContain("llms.txt");
     expect(compared).toContain("agents.md");
+    // The switch marks the current language and points at the same page in the other tree.
+    const about = await read(output, "about/index.html");
+    expect(about).toContain(
+      '<nav class="site-locale-switch" aria-label="Languages"><a href="/about/" lang="en" hreflang="en" aria-current="true">en</a><a href="/fr/about/" lang="fr" hreflang="fr">Français</a></nav>',
+    );
+    // The root indexes end with a link to each target's own index.
+    expect(await read(output, "llms.txt")).toContain("## Languages\n\n- [Français](/fr/llms.txt)");
+    expect(await read(output, "agents.md")).toContain("- [Français](/fr/llms.txt)");
+    // A skills page exists once, in the source tree; its switch sends the target home.
+    const skillsPage = await read(output, "skills/index.html");
+    expect(skillsPage).toContain('<nav class="site-locale-switch"');
+    expect(skillsPage).toContain('<a href="/fr/" lang="fr" hreflang="fr">Français</a>');
+    const frenchIndex = await read(output, "fr/llms.txt");
+    expect(frenchIndex).toContain("- Articles: /fr/posts/");
+    // A target's index points back at the source index, never at itself.
+    expect(frenchIndex).toContain("- [en](/llms.txt)");
+    expect(frenchIndex).not.toContain("/fr/llms.txt");
     // The per-locale 404 links home inside its tree and sets its own base.
     const notFound = await read(output, "fr/404.html");
     expect(notFound).toContain('<base href="/fr/">');

@@ -1,6 +1,6 @@
 ---
 name: meowland
-description: Build browser UI with Meowland's packages - meowtail components and themes, meowjsx JSX and signals (not React), meowcss styles. Use when a project depends on meowtail, meowjsx or meowcss, when the user asks to add Meowland to an app, or to build a page, form, dashboard, settings screen or agent chat with it. Covers installation, the one-time setup, choosing and reading components, signals, styling with ui class values and tokens, and checking the result.
+description: Build browser UI with Meowland's packages - meowtail components and themes, meowjsx JSX and signals (not React), meowcss styles. Use when a project depends on meowtail, meowjsx or meowcss, when the user asks to add Meowland to an app, or to build a page, form, dashboard, settings screen or agent chat with it, or to translate an interface or a Meowpress site. Covers installation, the one-time setup, choosing and reading components, signals, styling with ui class values and tokens, checking the result, and the list-fill-stamp translation loop.
 ---
 
 # Building with Meowland
@@ -213,6 +213,33 @@ component. Add `dist/meowbook/captures` to `.gitignore`.
   embedded in someone else's page passes `page: false` and leaves the ground to that page; on
   0.4.0-alpha.1 and earlier, give the app's outermost element `className={ui.bg.canvas}` instead.
 - Keyboard: Tab through the page; focus rings appear after keystrokes, not after clicks.
+
+## Translating a Meowpress site
+
+Interface copy in an application goes through `meowjsx/i18n`: write the sentence where it is used
+with `t("Posts")`, and add a language by giving `createI18n` a catalog from source sentence to
+translation. The source sentence is the identity, so there are no keys to invent, and an edited
+sentence is reported as an unused catalog entry rather than silently keeping a wrong translation.
+`auditCatalog` from `meowjsx/i18n/audit` turns a locale into a missing, unused and invalid list.
+
+A Meowpress site adds content and publishing on top. Run the list, fill what it names, stamp, and
+repeat until it is empty; the loop is the same one a person follows.
+
+```sh
+bunx --no-install meowpress locales                    # missing and stale items, one per line
+bunx --no-install meowpress locales --json             # the same list as a contract
+bunx --no-install meowpress locales stamp content/posts/first.fr.md
+```
+
+- Configure the locale in `meowpress.config.ts`; the site's sentences are filled in
+  `locales/<tag>.json`, and a content translation is a sibling file: `first.md` becomes
+  `first.fr.md`.
+- A translation records the hash of the original it came from in its frontmatter
+  (`translation.source`). After writing or revising one, `stamp` records the current hash. A
+  missing or stale translation is still published with a notice to readers; `locales.stale:
+  "fail"` turns a stale one into a build error instead.
+- Run `locales` again until it prints nothing, then build. `/translations.json` in the output is
+  the same report for an agent reading the published site.
 
 ## Boundaries
 

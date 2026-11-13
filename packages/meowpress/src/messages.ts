@@ -249,6 +249,17 @@ export const themeMessages = defineMessages({
     note: "Status line under the graph. The part after the semicolon appears only when links leave the skill.",
   },
 
+  // Translations
+  translationNotice: {
+    source: "This is a translation of <link>the original</link>.",
+    note: "Shown above a translation nobody has marked as reviewed; the link points to the original.",
+  },
+  translationStaleNotice: {
+    source:
+      "This translation follows an earlier version; <link>the original</link> has changed since.",
+    note: "Shown above a translation whose original changed after it was translated.",
+  },
+
   // Markdown indexes for agents
   agentIndexSummary: {
     source: "Site index and content conventions for Agents to read.",

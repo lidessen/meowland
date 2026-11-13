@@ -56,6 +56,38 @@ The body of the note.
 MDX executes code at build time, so use trusted files. MDX pages may use components supplied by the
 site, which is how this site embeds a live story in a package page.
 
+## More languages
+
+Set `locales` to publish the theme and the content in more languages. The source locale keeps the
+unprefixed routes; each target lives under `/<tag>/`.
+
+```ts
+import { meowSite } from "meowpress/build";
+
+export default meowSite({
+  locales: { source: "en", targets: { fr: { label: "Français" } } },
+});
+```
+
+The theme's and the site's sentences go into `locales/<tag>.json`, a flat object from the English
+(or source) sentence to its translation. A content translation is a sibling file with a locale
+suffix, such as `content/posts/first.fr.md`, and records the hash of the original it was
+translated from:
+
+```yaml
+---
+title: Premier billet
+translation:
+  source: 3f9a1c2e
+---
+```
+
+`meowpress locales` lists what a locale still needs, both interface sentences and missing or stale
+content, and `meowpress locales stamp <file>` records the original's current hash once a
+translation is written. Translate what the list names, stamp, then run the list again until it is
+empty and build. The published `translations.json` is the same report for an agent reading the
+site.
+
 ## Pages a consumer owns
 
 A consumer that supplies its own pages owns the whole site map. The provider receives the content

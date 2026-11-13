@@ -82,6 +82,80 @@ test("the CLI preserves unrelated default output and refuses to preview project 
   }
 });
 
+test("the CLI lists translation work and stamps a translation", async () => {
+  const root = await mkdtemp(join(tmpdir(), "meowpress-translate-"));
+  try {
+    await mkdir(join(root, "content/posts"), { recursive: true });
+    await writeFile(
+      join(root, "content/posts/first.md"),
+      "---\ntitle: First post\ndate: 2026-09-01\n---\n\n# First post\n\nThe original body.\n",
+    );
+    await writeFile(
+      join(root, "meowpress.config.ts"),
+      `import { meowSite } from ${JSON.stringify(buildEntry)};
+       export default meowSite({
+         outputDirectory: "dist",
+         locales: { source: "en", targets: { fr: { label: "Français" } } },
+       });`,
+    );
+
+    // The work list is the contract; an agent reads it and fills what it names.
+    const list = runCli(root, "locales", "--json");
+    expect(list.stderr.toString()).toBe("");
+    expect(list.exitCode).toBe(0);
+    const report = JSON.parse(list.stdout.toString());
+    expect(report.source).toBe("en");
+    expect(report.work.fr.content).toEqual([
+      expect.objectContaining({
+        kind: "post",
+        slug: "first",
+        state: "missing",
+        target: expect.objectContaining({ locale: "fr", file: "content/posts/first.fr.md" }),
+      }),
+    ]);
+    const plain = runCli(root, "locales");
+    expect(plain.exitCode).toBe(0);
+    expect(plain.stdout.toString()).toContain("fr missing: content/posts/first.fr.md");
+
+    // Stamp records the original's current hash in the translation's frontmatter.
+    await writeFile(
+      join(root, "content/posts/first.fr.md"),
+      "---\ntitle: Premier billet\n---\n\n# Premier billet\n\nLe corps traduit.\n",
+    );
+    const stamp = runCli(root, "locales", "stamp", "content/posts/first.fr.md");
+    expect(stamp.stderr.toString()).toBe("");
+    expect(stamp.exitCode).toBe(0);
+    expect(stamp.stdout.toString()).toContain("Stamped");
+    const stamped = await Bun.file(join(root, "content/posts/first.fr.md")).text();
+    expect(stamped).toMatch(/translation:\n  source: [0-9a-f]{12}/);
+    const after = JSON.parse(runCli(root, "locales", "--json").stdout.toString());
+    expect(after.work.fr.content).toEqual([]);
+
+    // `--root` selects the project when the command runs from elsewhere.
+    const elsewhere = runCli(tmpdir(), "locales", "--root", root, "--json");
+    expect(elsewhere.exitCode).toBe(0);
+    expect(JSON.parse(elsewhere.stdout.toString()).source).toBe("en");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
+test("a site without locales refuses the translation commands", async () => {
+  const root = await mkdtemp(join(tmpdir(), "meowpress-no-locales-"));
+  try {
+    await mkdir(join(root, "content/posts"), { recursive: true });
+    await writeFile(join(root, "content/posts/one.md"), "# One\n\nBody.");
+    const list = runCli(root, "locales");
+    expect(list.exitCode).toBe(1);
+    expect(list.stderr.toString()).toContain("configures no locales");
+    const stamp = runCli(root, "locales", "stamp", "content/posts/one.md");
+    expect(stamp.exitCode).toBe(1);
+    expect(stamp.stderr.toString()).toContain("configures no locales");
+  } finally {
+    await rm(root, { recursive: true, force: true });
+  }
+});
+
 test("the CLI resolves config and its directories from an explicit project root", async () => {
   const root = await mkdtemp(join(tmpdir(), "meowpress-config-"));
   const site = join(root, "site");

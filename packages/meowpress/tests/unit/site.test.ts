@@ -19,6 +19,8 @@ const post: ContentItem = {
   tags: ["Writing"],
   readingMinutes: 1,
   characterCount: 13,
+  locale: "en",
+  translations: [],
 };
 const thought: ContentItem = {
   ...post,

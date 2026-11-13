@@ -1,5 +1,6 @@
 import { compile, run } from "@mdx-js/mdx";
 import remarkGfm from "remark-gfm";
+import { createHash } from "node:crypto";
 import { lstat, readdir, readFile, stat } from "node:fs/promises";
 import { isAbsolute, relative, resolve, sep } from "node:path";
 import { parse as parseYaml } from "yaml";
@@ -10,6 +11,20 @@ import { DEFAULT_TIME_ZONE } from "./identity";
 export type ContentKind = "post" | "thought";
 
 export type Frontmatter = Record<string, unknown>;
+
+/** Whether a translation still matches the original it records. */
+export type TranslationState = "current" | "stale";
+
+/**
+ * The locales a content tree may carry, so a file-name suffix is read only when it names a
+ * configured locale: `notes.v2.md` keeps its slug, `notes.fr.md` is a French translation.
+ */
+export interface ContentLocales {
+  /** The language of an unsuffixed file, and the one whose file in a set is the original. */
+  source: string;
+  /** Other canonical tags, written as a lower-case file-name suffix. */
+  targets?: readonly string[];
+}
 
 /** A content root containing `posts/`, `thoughts/`, and optional asset folders. */
 export interface ContentSource {
@@ -36,6 +51,8 @@ export interface LoadSectionOptions {
   components?: Record<string, MdxComponent>;
   /** IANA time zone for day keys and time labels. Defaults to "Asia/Shanghai". */
   timeZone?: string;
+  /** Locales a file-name suffix may name. Without it every item is written in English. */
+  locales?: ContentLocales;
 }
 
 /** A component an MDX content page may use by name. */
@@ -56,6 +73,29 @@ export interface ContentItem {
   tags: string[];
   readingMinutes: number;
   characterCount: number;
+  /** Canonical tag of the language the item is written in. */
+  locale: string;
+  /**
+   * The slug the file name would have without locale suffixes, set only when a suffix was read.
+   * `notes.fr.md` reports `notes.fr` here and resolves to `notes`.
+   */
+  previousSlug?: string;
+  /** On an original: the translations that share its slug, sorted by language. */
+  translations: ContentItem[];
+  /** On a translation: whether it still matches the original it records. */
+  translationState?: TranslationState;
+  /** On a translation: the original it was translated from. */
+  original?: ContentItem;
+  /** On a translation: the source hash recorded in its frontmatter, when it has one. */
+  translatedFrom?: string;
+}
+
+/** The `translation` frontmatter block of a translation. */
+export interface TranslationRecord {
+  /** The provenance hash of the original when this file was translated. */
+  source?: string;
+  /** A person marked the translation as reviewed; unset means it was not. */
+  reviewed?: boolean;
 }
 
 export interface ParsedDocument {
@@ -76,6 +116,17 @@ export interface CollectContentAssetsOptions {
 }
 
 const CONTENT_EXTENSIONS = new Set([".md", ".mdx"]);
+
+/** Frontmatter keys a date may be written under, in precedence order. */
+const DATE_KEYS = [
+  "published_at",
+  "publishedAt",
+  "date",
+  "created_at",
+  "createdAt",
+  "updated_at",
+  "updatedAt",
+];
 
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
@@ -270,6 +321,105 @@ function makeSlug(sourcePath: string, sectionDirectory: string): string {
     .join("/");
 }
 
+/** Canonical tag by lower-cased file-name suffix, for the locales a content tree may carry. */
+function localeSuffixes(locales: ContentLocales | undefined): Map<string, string> {
+  const suffixes = new Map<string, string>();
+  if (!locales) return suffixes;
+  for (const tag of [locales.source, ...(locales.targets ?? [])]) {
+    suffixes.set(tag.toLowerCase(), tag);
+  }
+  return suffixes;
+}
+
+/**
+ * Split a configured locale off the last segment of a slug. The suffix is read only when it
+ * names a configured locale, so `notes.v2.md` keeps its slug and `notes.fr.md` is French.
+ */
+function splitLocaleSuffix(
+  slug: string,
+  suffixes: ReadonlyMap<string, string>,
+): { slug: string; locale?: string } {
+  const slash = slug.lastIndexOf("/");
+  const name = slug.slice(slash + 1);
+  const dot = name.lastIndexOf(".");
+  if (dot <= 0) return { slug };
+  const locale = suffixes.get(name.slice(dot + 1).toLowerCase());
+  if (locale === undefined) return { slug };
+  return { slug: `${slug.slice(0, slash + 1)}${name.slice(0, dot)}`, locale };
+}
+
+/**
+ * The provenance hash of an original: the first 12 hex characters of SHA-256 over its resolved
+ * title, a newline, and its body with line endings normalised to LF.
+ */
+export function translationHash(item: { title: string; body: string }): string {
+  return createHash("sha256")
+    .update(`${item.title}\n${item.body.replaceAll("\r\n", "\n")}`)
+    .digest("hex")
+    .slice(0, 12);
+}
+
+/** The `translation` frontmatter block, when it has the expected shape. */
+export function translationRecord(metadata: Frontmatter): TranslationRecord {
+  const value = metadata.translation;
+  if (!isRecord(value)) return {};
+  return {
+    source: typeof value.source === "string" ? value.source : undefined,
+    reviewed: value.reviewed === true,
+  };
+}
+
+/** A translation inherits the date, tags and category of its original unless it sets them. */
+function inheritFromOriginal(item: ContentItem, original: ContentItem): void {
+  if (metadataValue(item.metadata, DATE_KEYS) === undefined) {
+    item.date = original.date;
+    item.dateKey = original.dateKey;
+    item.timeLabel = original.timeLabel;
+  }
+  if (metadataValue(item.metadata, ["tags"]) === undefined) item.tags = [...original.tags];
+  if (item.metadata.category === undefined && original.metadata.category !== undefined) {
+    item.metadata.category = original.metadata.category;
+  }
+}
+
+/**
+ * Group items that share a slug into translation sets. With a source-locale member it is the
+ * original and the others record provenance against it; without one every member is an original
+ * in its own language and none is stale.
+ */
+function pairTranslations(items: ContentItem[], source: string): ContentItem[] {
+  const sets = new Map<string, ContentItem[]>();
+  for (const item of items) {
+    const key = `${item.kind}\u0000${item.slug}`;
+    const members = sets.get(key) ?? [];
+    members.push(item);
+    sets.set(key, members);
+  }
+
+  const originals: ContentItem[] = [];
+  for (const members of sets.values()) {
+    members.sort((left, right) => left.locale.localeCompare(right.locale));
+    const original = members.find((member) => member.locale === source);
+    if (!original) {
+      originals.push(...members);
+      continue;
+    }
+    original.translations = members.filter((member) => member !== original);
+    for (const translation of original.translations) {
+      translation.original = original;
+      translation.translatedFrom = translationRecord(translation.metadata).source;
+      translation.translationState =
+        translation.translatedFrom === translationHash(original) ? "current" : "stale";
+      inheritFromOriginal(translation, original);
+    }
+    originals.push(original);
+  }
+
+  return originals.sort((left, right) => {
+    return (right.date?.getTime() ?? 0) - (left.date?.getTime() ?? 0);
+  });
+}
+
 function normalizeSlugPrefix(prefix: string | undefined): string {
   const normalized = (prefix ?? "")
     .replaceAll("\\", "/")
@@ -365,22 +515,27 @@ async function loadSectionFromSource(
   const sourceFiles = await collectFiles(sectionDirectory, assetRoots, mapping !== undefined);
 
   const timeZone = options.timeZone ?? DEFAULT_TIME_ZONE;
+  const sourceLocale = options.locales?.source ?? "en";
+  const suffixes = localeSuffixes(options.locales);
   const items: ContentItem[] = [];
+  const seen = new Map<string, string>();
   for (const sourcePath of sourceFiles) {
     if (isDraft(sourcePath, sectionDirectory, kind)) continue;
 
     const sourceText = await readFile(sourcePath, "utf8");
     const document = parseFrontmatter(sourceText);
-    const slug = withSlugPrefix(source.slugPrefix, makeSlug(sourcePath, sectionDirectory));
-    const dateValue = metadataValue(document.metadata, [
-      "published_at",
-      "publishedAt",
-      "date",
-      "created_at",
-      "createdAt",
-      "updated_at",
-      "updatedAt",
-    ]);
+    const fileSlug = withSlugPrefix(source.slugPrefix, makeSlug(sourcePath, sectionDirectory));
+    const { slug, locale: suffixLocale } = splitLocaleSuffix(fileSlug, suffixes);
+    const locale = suffixLocale ?? sourceLocale;
+    const key = `${locale}\u0000${slug}`;
+    const clash = seen.get(key);
+    if (clash !== undefined) {
+      throw new Error(
+        `Duplicate ${kind} "${slug}" for locale "${locale}": ${clash} and ${sourcePath}`,
+      );
+    }
+    seen.set(key, sourcePath);
+    const dateValue = metadataValue(document.metadata, DATE_KEYS);
     const date = parseDate(dateValue) ?? (await stat(sourcePath)).mtime;
     const bodyWithoutLeadingHeading = document.body.replace(/^\s*#\s+.+?(?:\r?\n|$)+/, "");
     const plainText = stripMarkdown(bodyWithoutLeadingHeading);
@@ -404,6 +559,9 @@ async function loadSectionFromSource(
       tags: getTags(document.metadata),
       readingMinutes: getReadingMinutes(plainText),
       characterCount: plainText.length,
+      locale,
+      ...(suffixLocale === undefined ? {} : { previousSlug: fileSlug }),
+      translations: [],
     });
   }
 
@@ -420,17 +578,47 @@ export async function loadSection(
   for (const source of normalizeContentSources(sources)) {
     const items = await loadSectionFromSource(source, kind, options);
     for (const item of items) {
-      if (merged.has(item.slug)) {
+      // Pairing happens after the overlay, so a translation and its original are different keys.
+      const key = `${item.locale}\u0000${item.slug}`;
+      if (merged.has(key)) {
         if (duplicatePolicy === "error") throw duplicateContentError(kind, item.slug);
         continue;
       }
-      merged.set(item.slug, item);
+      merged.set(key, item);
     }
   }
 
-  return [...merged.values()].sort((left, right) => {
-    return (right.date?.getTime() ?? 0) - (left.date?.getTime() ?? 0);
-  });
+  return pairTranslations([...merged.values()], options.locales?.source ?? "en");
+}
+
+/**
+ * Every item written in one locale: the originals in that language and the translations of
+ * originals written in another one. These are the pages a locale's tree publishes.
+ */
+export function localizedItems(originals: readonly ContentItem[], locale: string): ContentItem[] {
+  return originals
+    .flatMap((original) => [original, ...original.translations])
+    .filter((item) => item.locale === locale)
+    .sort((left, right) => (right.date?.getTime() ?? 0) - (left.date?.getTime() ?? 0));
+}
+
+/**
+ * The entries a locale's tree lists: its own pages, and the original of anything not translated
+ * into it — marked with the original's language and linked to where it is published.
+ */
+export function treeItems(
+  originals: readonly ContentItem[],
+  locale: string,
+  options: { source: string; untranslated: "link" | "omit" },
+): ContentItem[] {
+  const items: ContentItem[] = [];
+  for (const original of originals) {
+    const translation = original.translations.find((item) => item.locale === locale);
+    if (original.locale === locale) items.push(original);
+    else if (translation) items.push(translation);
+    else if (options.untranslated === "link") items.push(original);
+  }
+  return items.sort((left, right) => (right.date?.getTime() ?? 0) - (left.date?.getTime() ?? 0));
 }
 
 export function withoutLeadingHeading(html: string): string {

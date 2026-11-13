@@ -10,9 +10,9 @@ export interface SiteLocales {
   targets?: Record<string, { label: string }>;
   /** `link` lists originals that have no translation in a target tree; `omit` leaves them out. */
   untranslated?: "link" | "omit";
-  /** Accepted and stored; stale translations are handled with content pairing. */
+  /** `fail` refuses to publish a translation whose recorded source hash is behind the original. */
   stale?: "notice" | "fail";
-  /** Accepted and stored; unreviewed-translation notices are handled with content pairing. */
+  /** `false` removes the translation notice from every page. */
   disclosure?: boolean;
   /** Inline catalogs by locale; they win over `locales/<tag>.json`. */
   catalogs?: Record<string, Catalog>;

@@ -3,7 +3,7 @@ import { removeLegacyIsFallbacks } from "meowcss/bundle";
 import { blogFonts, blogTheme } from "./theme";
 import { FONT_EXTERNAL, publishFonts, type SiteFont } from "./fonts";
 import { DEFAULT_SITE, DEFAULT_TIME_ZONE, type SiteIdentity, type SiteNotFound } from "./identity";
-import { createPageLocale, localePath, type PageLocale } from "./locale";
+import { createPageLocale, localePath, type LocaleEntry, type PageLocale } from "./locale";
 import {
   assertNoRouteCollisions,
   firstSegment,
@@ -21,8 +21,11 @@ import {
   collectContentAssets,
   isDraftAsset,
   loadSection,
+  localizedItems,
   normalizeContentSources,
+  treeItems,
   type ContentItem,
+  type ContentLocales,
   type ContentSourceInput,
   type MdxComponent,
 } from "./content";
@@ -41,6 +44,7 @@ import {
   thoughtPage,
 } from "./site";
 import { loadSkills } from "./skills";
+import { contentRoute, reportedPath, translationReport } from "./translations";
 import { sitePageFile, sitePageMarkdownFile, type SitePage, type SitePageProvider } from "./pages";
 import { publishSite, validateBuildDestination, validateOutputDirectory } from "./output";
 
@@ -275,6 +279,14 @@ async function writeConsumerPages(
 /** Files the build writes itself; a page's Markdown copy may not take their place. */
 const RESERVED_MARKDOWN = new Set(["agents.md"]);
 
+/** A Markdown copy names its language, and a translation the original it comes from. */
+function pageMarkdownCopy(page: SitePage): string {
+  if (page.locale === undefined) return page.markdown!;
+  const markers = [`lang: ${page.locale}`];
+  if (page.original !== undefined) markers.push(`original: ${page.original}`);
+  return `<!-- ${markers.join("; ")} -->\n\n${page.markdown!.trim()}\n`;
+}
+
 /** Each page's Markdown copy, written straight into the output next to its route. */
 async function writeConsumerMarkdown(
   outputDirectory: string,
@@ -287,7 +299,7 @@ async function writeConsumerMarkdown(
     await writePage(
       outputDirectory,
       consumerPageFile(outputDirectory, page.path, sitePageMarkdownFile),
-      page.markdown,
+      pageMarkdownCopy(page),
     );
   }
 }
@@ -302,11 +314,12 @@ async function writeContentPages(
   locale: PageLocale,
 ): Promise<string[]> {
   const entrypoints: string[] = [];
+  const prefix = locale.segment === "" ? "" : `${locale.segment}/`;
   for (const post of posts) {
     entrypoints.push(
       await writePage(
         generatedDirectory,
-        `posts/${post.slug}/index.html`,
+        `${prefix}posts/${post.slug}/index.html`,
         postPage(post, posts, thoughts, theme, site, stylesheet, locale),
       ),
     );
@@ -315,7 +328,7 @@ async function writeContentPages(
     entrypoints.push(
       await writePage(
         generatedDirectory,
-        `thoughts/${thought.slug}/index.html`,
+        `${prefix}thoughts/${thought.slug}/index.html`,
         thoughtPage(thought, theme, site, stylesheet, locale),
       ),
     );
@@ -386,9 +399,22 @@ async function takenSegments(
 
 async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string): Promise<string> {
   const timeZone = config.site.timeZone ?? DEFAULT_TIME_ZONE;
+  const locales = config.locales;
+  // A locale suffix is read only for a configured locale, so pairing follows the site's config.
+  const contentLocales: ContentLocales | undefined = locales
+    ? { source: locales.source, targets: locales.targets.map((target) => target.tag) }
+    : undefined;
   const [posts, thoughts, skills, catalogs] = await Promise.all([
-    loadSection(config.content, "post", { components: config.mdxComponents, timeZone }),
-    loadSection(config.content, "thought", { components: config.mdxComponents, timeZone }),
+    loadSection(config.content, "post", {
+      components: config.mdxComponents,
+      timeZone,
+      locales: contentLocales,
+    }),
+    loadSection(config.content, "thought", {
+      components: config.mdxComponents,
+      timeZone,
+      locales: contentLocales,
+    }),
     config.pages
       ? Promise.resolve([] as Awaited<ReturnType<typeof loadSkills>>)
       : loadSkills(config.skillsDirectory, {
@@ -399,15 +425,67 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
       ? loadLocaleCatalogs(config.locales, config.localesDirectory)
       : Promise.resolve({}),
   ]);
-  const timeline = [...posts, ...thoughts].sort(
+  const source = locales?.source ?? "en";
+  // A site that would rather not publish an outdated translation fails the build instead.
+  if (locales?.stale === "fail") {
+    for (const translation of [...posts, ...thoughts].flatMap((item) => item.translations)) {
+      if (translation.translationState !== "stale") continue;
+      throw new Error(
+        `Stale translation ${reportedPath(translation.sourcePath)}: its original changed since it was translated. Revise it and run meowpress locales stamp, or set locales.stale to "notice".`,
+      );
+    }
+  }
+  // The source tree lists the originals written in its own language; originals in a target
+  // language live in that language's tree.
+  const sourcePosts = posts.filter((post) => post.locale === source);
+  const sourceThoughts = thoughts.filter((thought) => thought.locale === source);
+  const timeline = [...sourcePosts, ...sourceThoughts].sort(
     (left, right) => (right.date?.getTime() ?? 0) - (left.date?.getTime() ?? 0),
   );
 
   await mkdir(config.outputDirectory, { recursive: true });
   await mkdir(generatedDirectory, { recursive: true });
 
-  // A consumer that supplies its own pages owns the whole site map; the package's
-  // own blog routes are not published alongside them.
+  const missing = createMissingLog();
+  const entries: LocaleEntry[] | undefined = locales
+    ? [
+        { tag: locales.source, segment: "", label: locales.source, isSource: true },
+        ...locales.targets.map((target) => ({
+          tag: target.tag,
+          segment: target.segment,
+          label: target.label,
+          isSource: false,
+        })),
+      ]
+    : undefined;
+  const localeFor = (tag: string, segment: string): PageLocale =>
+    createPageLocale({
+      tag,
+      source,
+      segment,
+      catalogs,
+      timeZone,
+      entries,
+      disclosure: locales?.disclosure ?? true,
+      onMissing: (miss) => missing.record(miss),
+    });
+  const rootLocale = localeFor(source, "");
+  const targetLocales = (locales?.targets ?? []).map((target) => ({
+    target,
+    locale: localeFor(target.tag, target.segment),
+  }));
+  /** The locale a consumer page is written in, with the site's catalogs and time zone. */
+  const pageLocaleFor = (tag: string): PageLocale => {
+    if (tag === source) return rootLocale;
+    const target = locales?.targets.find((candidate) => candidate.tag === tag);
+    if (!target)
+      throw new Error(
+        `Page locale "${tag}" is not configured: add it to locales.targets or use "${source}".`,
+      );
+    return localeFor(target.tag, target.segment);
+  };
+  // A consumer that supplies its own pages owns the whole site map; the package's own blog
+  // routes are not published alongside them.
   const pages = config.pages
     ? await config.pages({
         posts,
@@ -415,27 +493,33 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
         site: config.site,
         theme: config.theme,
         locales: config.locales,
+        pageLocale: pageLocaleFor,
       })
     : undefined;
-
-  const locales = config.locales;
-  const missing = createMissingLog();
-  const localeFor = (tag: string, segment: string): PageLocale =>
-    createPageLocale({
-      tag,
-      source: locales?.source ?? "en",
-      segment,
-      catalogs,
-      timeZone,
-      onMissing: (miss) => missing.record(miss),
-    });
-  const rootLocale = localeFor(locales?.source ?? "en", "");
-  const targetLocales = (locales?.targets ?? []).map((target) => ({
-    target,
-    locale: localeFor(target.tag, target.segment),
-  }));
   // Everything that decides what a locale's URL segment may be is known here.
   if (locales) assertNoRouteCollisions(locales, await takenSegments(config, pages));
+
+  // What each target tree shows and publishes. `treeItems` lists an original where no
+  // translation exists; `localizedItems` is the set of pages that tree owns.
+  const targetTrees = targetLocales.map(({ target, locale }) => {
+    const treePosts = treeItems(posts, target.tag, {
+      source,
+      untranslated: locales?.untranslated ?? "link",
+    });
+    const treeThoughts = treeItems(thoughts, target.tag, {
+      source,
+      untranslated: locales?.untranslated ?? "link",
+    });
+    return {
+      target,
+      locale,
+      posts: treePosts,
+      thoughts: treeThoughts,
+      timeline: [...treePosts, ...treeThoughts].sort(
+        (left, right) => (right.date?.getTime() ?? 0) - (left.date?.getTime() ?? 0),
+      ),
+    };
+  });
 
   const entrypoints: string[] = [];
   if (pages) {
@@ -456,14 +540,21 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
         writePage(
           generatedDirectory,
           "posts/index.html",
-          listPage("post", posts, config.theme, config.site, config.themeStylesheet, rootLocale),
+          listPage(
+            "post",
+            sourcePosts,
+            config.theme,
+            config.site,
+            config.themeStylesheet,
+            rootLocale,
+          ),
         ),
         writePage(
           generatedDirectory,
           "thoughts/index.html",
           listPage(
             "thought",
-            thoughts,
+            sourceThoughts,
             config.theme,
             config.site,
             config.themeStylesheet,
@@ -478,8 +569,8 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
       ])),
       ...(await writeContentPages(
         generatedDirectory,
-        posts,
-        thoughts,
+        sourcePosts,
+        sourceThoughts,
         config.theme,
         config.site,
         config.themeStylesheet,
@@ -517,37 +608,32 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
         ),
       );
     }
-    // Skills pages and the post and thought pages exist once, in the source tree. A target tree
-    // has its own home, About, the two archives and a 404; untranslated originals are listed in
-    // it and link to the source tree.
-    const omitted = locales?.untranslated === "omit";
-    for (const { target, locale } of targetLocales) {
-      const prefix = `${target.segment}/`;
-      const targetPosts = omitted ? [] : posts;
-      const targetThoughts = omitted ? [] : thoughts;
-      const targetTimeline = omitted ? [] : timeline;
+    // Skills pages exist once, in the source tree. Every target tree has its own home, About,
+    // the two archives, a 404 and a page for each content item written in its language.
+    for (const tree of targetTrees) {
+      const prefix = `${tree.target.segment}/`;
       entrypoints.push(
         ...(await Promise.all([
           writePage(
             generatedDirectory,
             `${prefix}index.html`,
-            homePage(targetTimeline, config.theme, config.site, config.themeStylesheet, locale),
+            homePage(tree.timeline, config.theme, config.site, config.themeStylesheet, tree.locale),
           ),
           writePage(
             generatedDirectory,
             `${prefix}about/index.html`,
-            aboutPage(config.theme, config.site, config.themeStylesheet, locale),
+            aboutPage(config.theme, config.site, config.themeStylesheet, tree.locale),
           ),
           writePage(
             generatedDirectory,
             `${prefix}posts/index.html`,
             listPage(
               "post",
-              targetPosts,
+              tree.posts,
               config.theme,
               config.site,
               config.themeStylesheet,
-              locale,
+              tree.locale,
             ),
           ),
           writePage(
@@ -555,14 +641,23 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
             `${prefix}thoughts/index.html`,
             listPage(
               "thought",
-              targetThoughts,
+              tree.thoughts,
               config.theme,
               config.site,
               config.themeStylesheet,
-              locale,
+              tree.locale,
             ),
           ),
         ])),
+        ...(await writeContentPages(
+          generatedDirectory,
+          localizedItems(posts, tree.target.tag),
+          localizedItems(thoughts, tree.target.tag),
+          config.theme,
+          config.site,
+          config.themeStylesheet,
+          tree.locale,
+        )),
       );
       if (config.notFound !== false) {
         entrypoints.push(
@@ -574,7 +669,7 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
               config.theme,
               config.site,
               config.themeStylesheet,
-              locale,
+              tree.locale,
             ),
           ),
         );
@@ -595,37 +690,97 @@ async function writeSite(config: ResolvedSiteConfig, generatedDirectory: string)
   if (pages) await writeConsumerMarkdown(config.outputDirectory, pages);
   await writeAssets(config.outputDirectory, config.content, "posts/assets");
   const full = pages ? llmFullText(config.site, pages, config.agentGuide, rootLocale) : undefined;
-  await Promise.all([
-    writeFile(
-      join(config.outputDirectory, "llm.txt"),
-      llmText(posts, thoughts, config.site, pages, config.agentGuide, rootLocale),
+  const mappedSections = config.content.some(
+    (input) =>
+      typeof input !== "string" &&
+      (input.postsDirectory !== undefined || input.thoughtsDirectory !== undefined),
+  );
+  const indexes: [string, string][] = [
+    ["llm.txt", llmText(posts, thoughts, config.site, pages, config.agentGuide, rootLocale)],
+    ["llms.txt", llmText(posts, thoughts, config.site, pages, config.agentGuide, rootLocale)],
+    ...(full === undefined ? [] : ([["llms-full.txt", full]] as [string, string][])),
+    ["agents.md", agentMarkdown(posts, thoughts, config.site, pages, mappedSections, rootLocale)],
+  ];
+  // A target locale gets its own agent indexes next to the pages it publishes. A consumer that
+  // owns the site map owns its indexes too, so no locale tree is written for it.
+  if (!pages) {
+    for (const tree of targetTrees) {
+      indexes.push(
+        [
+          `${tree.target.segment}/llm.txt`,
+          llmText(
+            tree.posts,
+            tree.thoughts,
+            config.site,
+            undefined,
+            config.agentGuide,
+            tree.locale,
+          ),
+        ],
+        [
+          `${tree.target.segment}/llms.txt`,
+          llmText(
+            tree.posts,
+            tree.thoughts,
+            config.site,
+            undefined,
+            config.agentGuide,
+            tree.locale,
+          ),
+        ],
+        [
+          `${tree.target.segment}/agents.md`,
+          agentMarkdown(
+            tree.posts,
+            tree.thoughts,
+            config.site,
+            undefined,
+            mappedSections,
+            tree.locale,
+          ),
+        ],
+      );
+    }
+  }
+  await Promise.all(
+    indexes.map(([path, text]) => writeFile(join(config.outputDirectory, path), text, "utf8")),
+  );
+  // The manifest is published only when locales are configured: it is the same work list the
+  // `locales` command prints, for an agent that reads the site instead of its source.
+  if (locales) {
+    const report = translationReport({
+      locales,
+      catalogs,
+      site: config.site,
+      notFound: config.notFound,
+      posts,
+      thoughts,
+      pages,
+    });
+    await writeFile(
+      join(config.outputDirectory, "translations.json"),
+      `${JSON.stringify(report, null, 2)}\n`,
       "utf8",
-    ),
-    writeFile(
-      join(config.outputDirectory, "llms.txt"),
-      llmText(posts, thoughts, config.site, pages, config.agentGuide, rootLocale),
-      "utf8",
-    ),
-    ...(full === undefined
-      ? []
-      : [writeFile(join(config.outputDirectory, "llms-full.txt"), full, "utf8")]),
-    writeFile(
-      join(config.outputDirectory, "agents.md"),
-      agentMarkdown(
-        posts,
-        thoughts,
-        config.site,
-        pages,
-        config.content.some(
-          (source) =>
-            typeof source !== "string" &&
-            (source.postsDirectory !== undefined || source.thoughtsDirectory !== undefined),
-        ),
-        rootLocale,
-      ),
-      "utf8",
-    ),
-  ]);
+    );
+    if (!config.site.url && locales.targets.length > 0)
+      console.log(
+        "Site url is not set, so pages carry no alternate or canonical links. Set site.url to the public origin.",
+      );
+  }
+  // A file that used to carry its locale in its slug now reads it as a suffix; say which URL
+  // changed rather than leaving it to be discovered.
+  const allItems = [...posts, ...thoughts].flatMap((item) => [item, ...item.translations]);
+  for (const item of allItems) {
+    if (item.previousSlug === undefined) continue;
+    console.log(
+      `Locale ${item.locale}: ${reportedPath(item.sourcePath)} publishes at ${contentRoute(
+        item.kind,
+        item.slug,
+        item.locale,
+        source,
+      )}; the file name used to make /${item.kind}s/${item.previousSlug}/.`,
+    );
+  }
   missing.report(config.localesDirectory, (tag) => localeSegment(tag));
   return pages
     ? `${posts.length} content items and ${pages.length} site pages`

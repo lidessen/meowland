@@ -1,6 +1,7 @@
 import type { ThemeDefinition } from "meowcss";
 import type { ContentItem } from "./content";
 import type { SiteIdentity } from "./identity";
+import type { PageLocale } from "./locale";
 import type { ResolvedLocales } from "./locales";
 
 /** A page supplied by the consumer of the site. */
@@ -19,6 +20,10 @@ export interface SitePage {
   /** Grouping used by the site index and the agent-facing indexes. */
   group?: string;
   order?: number;
+  /** Canonical tag of the language this page is written in, when it is not the content source. */
+  locale?: string;
+  /** The route of the page this one translates, when it is a translation. */
+  original?: string;
 }
 
 /** What a page provider receives when the site is built. */
@@ -29,6 +34,11 @@ export interface SitePageContext {
   theme: ThemeDefinition;
   /** The resolved `locales` option; undefined for a single-locale site. */
   locales?: ResolvedLocales;
+  /**
+   * The page locale for a configured tag, with the site's catalogs, time zone and `onMissing`
+   * reporting — the same instance the built-in pages use. An unconfigured tag throws.
+   */
+  pageLocale: (tag: string) => PageLocale;
 }
 
 /** Supplies the consumer's own pages for the site. */

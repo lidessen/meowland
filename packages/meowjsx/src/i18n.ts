@@ -216,6 +216,7 @@ export function defineMessages<const T extends { readonly [name: string]: Messag
 
 const RTL_SCRIPTS = new Set([
   "Arab",
+  "Aran",
   "Hebr",
   "Thaa",
   "Syrc",

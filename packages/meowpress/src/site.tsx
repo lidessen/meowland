@@ -19,13 +19,30 @@ import {
 } from "meowtail";
 import { GithubIcon, Icon } from "meowtail/icons";
 import { blogTheme } from "./theme";
-import { withoutLeadingHeading, type ContentItem } from "./content";
+import { translationRecord, withoutLeadingHeading, type ContentItem } from "./content";
 import { DEFAULT_SITE, type SiteIdentity, type SiteNotFound } from "./identity";
-import { defaultPageLocale, localePath, richMessage, type PageLocale } from "./locale";
+import { contentUrl, defaultPageLocale, localePath, richMessage, type PageLocale } from "./locale";
 import { themeMessages as M } from "./messages";
 import { sitePageAgentUrl, type SitePage } from "./pages";
 import type { Skill, SkillFile } from "./skills";
 import { layoutSkillGraph, type SkillGraphNode } from "./skill-graph";
+
+/** A link to one language version of something: a language switch entry or an alternate link. */
+export interface LocaleLink {
+  tag: string;
+  label: string;
+  href: string;
+}
+
+/**
+ * The language versions of one page. `versions` holds only the locales where the page exists;
+ * the language switch falls back to a locale's home page for the rest.
+ */
+export interface PageLanguages {
+  /** The page's own route, for example "/fr/posts/first/". */
+  path: string;
+  versions: readonly LocaleLink[];
+}
 
 interface DocumentProps {
   theme: ThemeDefinition;
@@ -38,6 +55,8 @@ interface DocumentProps {
   baseHref?: string;
   wide?: boolean;
   locale: PageLocale;
+  /** The page's language versions; absent on a single-language site and on pages written once. */
+  page?: PageLanguages;
   children: Child;
 }
 
@@ -60,6 +79,54 @@ function localeDepth(locale: PageLocale): number {
 
 function slugDepth(slug: string): number {
   return slug.split("/").filter(Boolean).length;
+}
+
+/** A page's language versions when the site publishes more than one language. */
+function staticPage(locale: PageLocale, path: string): PageLanguages | undefined {
+  if (locale.entries.length < 2) return undefined;
+  return {
+    path: localePath(locale, path),
+    versions: locale.entries.map((entry) => ({
+      tag: entry.tag,
+      label: entry.label,
+      href: entry.segment === "" ? path : `/${entry.segment}${path}`,
+    })),
+  };
+}
+
+/** A content item's language versions: the original and every translation that exists. */
+function contentPage(locale: PageLocale, item: ContentItem): PageLanguages | undefined {
+  if (locale.entries.length < 2) return undefined;
+  const original = item.original ?? item;
+  const members = [original, ...original.translations];
+  return {
+    path: contentUrl(locale, item),
+    versions: locale.entries.flatMap((entry) => {
+      const member = members.find((candidate) => candidate.locale === entry.tag);
+      return member
+        ? [{ tag: entry.tag, label: entry.label, href: contentUrl(locale, member) }]
+        : [];
+    }),
+  };
+}
+
+/**
+ * A page that exists once, in the source language, such as a skill. The switch still shows every
+ * locale and sends the others to their home page, so a target reader is not stranded.
+ */
+function sourceOnlyPage(locale: PageLocale, path: string): PageLanguages | undefined {
+  if (locale.entries.length < 2) return undefined;
+  return {
+    path,
+    versions: locale.entries
+      .filter((entry) => entry.isSource)
+      .map((entry) => ({ tag: entry.tag, label: entry.label, href: path })),
+  };
+}
+
+/** An absolute URL for alternate and canonical links; `site.url` has no trailing slash. */
+function absoluteHref(site: SiteIdentity, path: string): string {
+  return site.url === undefined ? path : `${site.url}${path}`;
 }
 
 /** A theme sentence as a string. Pages are static, so the message is read once. */
@@ -89,14 +156,45 @@ function siteView(site: SiteIdentity, locale: PageLocale): SiteIdentity {
   };
 }
 
+/** Links to the same page in every language, or to a language's home page when it has none. */
+function LanguageSwitch({
+  locale,
+  page,
+}: {
+  locale: PageLocale;
+  page: PageLanguages | undefined;
+}): Child {
+  if (!page || locale.entries.length < 2) return null;
+  return (
+    <nav className="site-locale-switch" aria-label={text(locale, M.languages)}>
+      {locale.entries.map((entry) => {
+        const version = page.versions.find((candidate) => candidate.tag === entry.tag);
+        const href = version?.href ?? (entry.segment === "" ? "/" : `/${entry.segment}/`);
+        return (
+          <a
+            href={href}
+            lang={entry.tag}
+            hreflang={entry.tag}
+            aria-current={entry.tag === locale.tag ? "true" : undefined}
+          >
+            {entry.label}
+          </a>
+        );
+      })}
+    </nav>
+  );
+}
+
 function SiteHeader({
   activePath,
   site,
   locale,
+  page,
 }: {
   activePath?: string;
   site: SiteIdentity;
   locale: PageLocale;
+  page?: PageLanguages;
 }): Child {
   const links = [
     ["/posts/", M.posts],
@@ -119,6 +217,7 @@ function SiteHeader({
           </a>
         ))}
       </nav>
+      <LanguageSwitch locale={locale} page={page} />
     </header>
   );
 }
@@ -151,9 +250,11 @@ function Document({
   theme,
   site,
   locale,
+  page,
 }: DocumentProps): Child {
   // Compare with the configured name before it is translated.
   const view = siteView(site, locale);
+  const xDefault = page?.versions.find((version) => version.tag === locale.source)?.href;
   return (
     <html
       lang={locale.tag}
@@ -167,6 +268,24 @@ function Document({
         <meta name="description" content={description ?? view.description} />
         {baseHref ? <base href={baseHref} /> : null}
         <link rel="stylesheet" href={styleHref} />
+        {/* Alternate and canonical links need the public origin; without it only the switch remains. */}
+        {site.url !== undefined && page !== undefined ? (
+          <Fragment>
+            <link rel="canonical" href={absoluteHref(site, page.path)} />
+            {page.versions.map((version) => (
+              <link
+                rel="alternate"
+                hreflang={version.tag}
+                href={absoluteHref(site, version.href)}
+              />
+            ))}
+            <link
+              rel="alternate"
+              hreflang="x-default"
+              href={absoluteHref(site, xDefault ?? page.path)}
+            />
+          </Fragment>
+        ) : null}
         <title>{title === site.name ? view.name : `${title} · ${view.name}`}</title>
       </head>
       <body data-site={site.id}>
@@ -175,7 +294,7 @@ function Document({
         </a>
         <div className="site-shell">
           <Container width={wide ? "wide" : "content"}>
-            <SiteHeader activePath={activePath} site={view} locale={locale} />
+            <SiteHeader activePath={activePath} site={view} locale={locale} page={page} />
             <main id="main-content" tabIndex={-1}>
               {children}
             </main>
@@ -230,13 +349,13 @@ function dateLabel(dateKey: string, locale: PageLocale): { date: string; weekday
   };
 }
 
-function itemUrl(item: ContentItem): string {
-  return `/${item.kind}s/${item.slug}/`;
+function itemUrl(locale: PageLocale, item: ContentItem): string {
+  return contentUrl(locale, item);
 }
 
 /** An entry written in another language than the page marks it; the source tree marks nothing. */
-function entryLang(locale: PageLocale): string | undefined {
-  return locale.isSource ? undefined : locale.source;
+function entryLang(item: ContentItem, locale: PageLocale): string | undefined {
+  return item.locale === locale.tag ? undefined : item.locale;
 }
 
 function Tags({ item }: { item: ContentItem }): Child {
@@ -262,9 +381,9 @@ function ThoughtCard({
     <Entry
       className="thought"
       data-kind="thought"
-      lang={entryLang(locale)}
+      lang={entryLang(item, locale)}
       title={item.title}
-      href={linked ? localePath(locale, itemUrl(item)) : undefined}
+      href={linked ? itemUrl(locale, item) : undefined}
       eyebrow={text(locale, M.thoughtEntryEyebrow, { when: item.timeLabel || item.dateKey })}
     >
       <Prose dangerouslySetInnerHTML={{ __html: withoutLeadingHeading(item.html) }} />
@@ -294,9 +413,9 @@ function PostCard({ item, locale }: { item: ContentItem; locale: PageLocale }): 
     <Entry
       size="feature"
       data-kind="post"
-      lang={entryLang(locale)}
+      lang={entryLang(item, locale)}
       title={item.title}
-      href={localePath(locale, itemUrl(item))}
+      href={itemUrl(locale, item)}
       eyebrow={category}
       description={item.excerpt || text(locale, M.noSummary)}
       meta={<ReadingMeta item={item} locale={locale} />}
@@ -412,6 +531,7 @@ export function homePage(
     theme,
     locale,
     title: site.name,
+    page: staticPage(locale, "/"),
     styleHref: styleHref(depth, stylesheet),
     children: (
       <Page
@@ -460,12 +580,14 @@ export function listPage(
 ): string {
   const isPost = kind === "post";
   const title = text(locale, isPost ? M.posts : M.thoughts);
+  const path = isPost ? "/posts/" : "/thoughts/";
   return pageHtml({
     site,
     theme,
     locale,
     title,
-    activePath: isPost ? "/posts/" : "/thoughts/",
+    activePath: path,
+    page: staticPage(locale, path),
     styleHref: styleHref(1 + localeDepth(locale), stylesheet),
     children: (
       <Page
@@ -489,13 +611,6 @@ export function listPage(
       </Page>
     ),
   });
-}
-
-/** A link from the root 404 page to the home page of another locale. */
-export interface LocaleLink {
-  tag: string;
-  label: string;
-  href: string;
 }
 
 export function notFoundPage(
@@ -562,7 +677,7 @@ function PostNavigation({
             </span>
           }
           title={older.title}
-          href={localePath(locale, itemUrl(older))}
+          href={itemUrl(locale, older)}
         />
       ) : (
         <span />
@@ -575,7 +690,7 @@ function PostNavigation({
             </span>
           }
           title={newer.title}
-          href={localePath(locale, itemUrl(newer))}
+          href={itemUrl(locale, newer)}
         />
       ) : (
         <Text variant="caption">{text(locale, M.nothingNewer)}</Text>
@@ -605,6 +720,38 @@ function RelatedThoughts({
   ) : null;
 }
 
+/**
+ * What a reader is told about a translation: that the original changed since, and that nobody
+ * has marked it as reviewed. Both link to the original in the source tree.
+ */
+function TranslationNotices({ item, locale }: { item: ContentItem; locale: PageLocale }): Child {
+  const original = item.original;
+  if (!original) return null;
+  const href = contentUrl(locale, original);
+  const parts = { link: (children: Child) => <a href={href}>{children}</a> };
+  const stale = item.translationState === "stale";
+  const unreviewed = locale.disclosure && translationRecord(item.metadata).reviewed !== true;
+  if (!stale && !unreviewed) return null;
+  return (
+    <div className="translation-notices">
+      {stale ? (
+        <Text variant="caption">
+          <span data-translation="stale">
+            {richMessage(locale, M.translationStaleNotice, parts)}
+          </span>
+        </Text>
+      ) : null}
+      {unreviewed ? (
+        <Text variant="caption">
+          <span data-translation="unreviewed">
+            {richMessage(locale, M.translationNotice, parts)}
+          </span>
+        </Text>
+      ) : null}
+    </div>
+  );
+}
+
 export function postPage(
   item: ContentItem,
   posts: ContentItem[],
@@ -625,9 +772,11 @@ export function postPage(
     title: item.title,
     description: item.excerpt,
     activePath: "/posts/",
+    page: contentPage(locale, item),
     styleHref: styleHref(1 + slugDepth(item.slug) + localeDepth(locale), stylesheet),
     children: (
       <Page title={item.title} eyebrow={category}>
+        <TranslationNotices item={item} locale={locale} />
         <ReadingMeta item={item} locale={locale} />
         <Prose
           as="article"
@@ -655,9 +804,11 @@ export function thoughtPage(
     title: item.title,
     description: item.excerpt,
     activePath: "/thoughts/",
+    page: contentPage(locale, item),
     styleHref: styleHref(1 + slugDepth(item.slug) + localeDepth(locale), stylesheet),
     children: (
       <Page title={item.title} eyebrow={text(locale, M.thought)}>
+        <TranslationNotices item={item} locale={locale} />
         <MetaRow
           items={[{ label: item.dateKey }, ...(item.timeLabel ? [{ label: item.timeLabel }] : [])]}
         />
@@ -686,6 +837,7 @@ export function aboutPage(
     locale,
     title: text(locale, M.about),
     activePath: "/about/",
+    page: staticPage(locale, "/about/"),
     styleHref: styleHref(1 + depth, stylesheet),
     children: (
       <Page eyebrow={text(locale, M.about)} title={about?.heading ?? view.name}>
@@ -1158,6 +1310,7 @@ export function skillsIndexPage(
     title: text(locale, M.skills),
     description: text(locale, M.skillsIndexDescription),
     activePath: "/skills/",
+    page: sourceOnlyPage(locale, "/skills/"),
     styleHref: styleHref(1 + localeDepth(locale), stylesheet),
     children: (
       <Page
@@ -1212,6 +1365,7 @@ export function skillPage(
     wide: true,
     description: skill.description,
     activePath: "/skills/",
+    page: sourceOnlyPage(locale, skillUrl(skill)),
     styleHref:
       skill.scope === "public"
         ? styleHref(1 + slugDepth(skill.slug) + localeDepth(locale), stylesheet)
@@ -1299,6 +1453,24 @@ export function skillPage(
   });
 }
 
+/**
+ * One section listing the other languages' agent indexes; empty on a single-locale site. The
+ * source tree's index sits at the site root, a target's under its segment.
+ */
+function agentLanguageLines(locale: PageLocale, file: string): string[] {
+  const others = locale.entries.filter((entry) => entry.tag !== locale.tag);
+  if (!others.length) return [];
+  return [
+    `## ${text(locale, M.languages)}`,
+    "",
+    ...others.map(
+      (entry) =>
+        `- [${entry.label}](${entry.segment === "" ? `/${file}` : `/${entry.segment}/${file}`})`,
+    ),
+    "",
+  ];
+}
+
 export function agentMarkdown(
   posts: ContentItem[],
   thoughts: ContentItem[],
@@ -1309,6 +1481,10 @@ export function agentMarkdown(
 ): string {
   const view = siteView(site, locale);
   const t = (message: MessageDescriptor, params?: MessageParams) => text(locale, message, params);
+  // The root index marks every original's language; a target's index marks what is not in it.
+  const marks = (item: ContentItem): boolean =>
+    item.locale !== locale.tag || (locale.isSource && locale.entries.length > 1);
+  const languageMark = (item: ContentItem): string => (marks(item) ? ` · ${item.locale}` : "");
   const siteMap = pages
     ? pages.map((page) => `- [${page.title}](${sitePageAgentUrl(page)})`)
     : [
@@ -1349,15 +1525,20 @@ export function agentMarkdown(
           "",
           `### ${t(M.posts)}`,
           "",
-          ...posts.map((post) => `- [${post.title}](${itemUrl(post)}) — ${post.dateKey}`),
+          ...posts.map(
+            (post) =>
+              `- [${post.title}](${contentUrl(locale, post)}) — ${post.dateKey}${languageMark(post)}`,
+          ),
           "",
           `### ${t(M.thoughts)}`,
           "",
           ...thoughts.map(
-            (thought) => `- [${thought.title}](${itemUrl(thought)}) — ${thought.dateKey}`,
+            (thought) =>
+              `- [${thought.title}](${contentUrl(locale, thought)}) — ${thought.dateKey}${languageMark(thought)}`,
           ),
           "",
         ]),
+    ...agentLanguageLines(locale, "llms.txt"),
   ];
   return lines.join("\n");
 }
@@ -1375,6 +1556,10 @@ export function llmText(
   if (pages) return consumerLlmText(site, pages, agentGuide, locale);
   const view = siteView(site, locale);
   const t = (message: MessageDescriptor) => text(locale, message);
+  const marks = (item: ContentItem): boolean =>
+    item.locale !== locale.tag || (locale.isSource && locale.entries.length > 1);
+  const languageMark = (item: ContentItem): string => (marks(item) ? ` (${item.locale})` : "");
+  const languages = agentLanguageLines(locale, "llms.txt");
   return [
     `# ${view.name}`,
     `> ${view.description}`,
@@ -1385,17 +1570,22 @@ export function llmText(
     `- ${t(M.thoughts)}: ${localePath(locale, "/thoughts/")}`,
     `- ${t(M.skills)}: ${localePath(locale, "/skills/")}`,
     `- ${t(M.about)}: ${localePath(locale, "/about/")}`,
-    `- ${t(M.agentMarkdown)}: /agents.md`,
+    // A target's agent index sits next to its pages, not at the site root.
+    `- ${t(M.agentMarkdown)}: ${locale.segment === "" ? "" : `/${locale.segment}`}/agents.md`,
     "",
     `## ${t(M.posts)}`,
-    ...posts.map((post) => `- ${post.title}: ${itemUrl(post)}`),
+    ...posts.map((post) => `- ${post.title}${languageMark(post)}: ${contentUrl(locale, post)}`),
     "",
     `## ${t(M.thoughts)}`,
-    ...thoughts.map((thought) => `- ${thought.title}: ${itemUrl(thought)}`),
+    ...thoughts.map(
+      (thought) => `- ${thought.title}${languageMark(thought)}: ${contentUrl(locale, thought)}`,
+    ),
     "",
     `## ${t(M.rules)}`,
     `- ${t(M.rulePublicOnly)}`,
     `- ${t(M.ruleDrafts)}`,
+    // A single-locale site keeps its old byte-for-byte index, without a trailing blank line.
+    ...(languages.length ? ["", ...languages] : []),
   ].join("\n");
 }
 

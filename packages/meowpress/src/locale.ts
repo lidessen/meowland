@@ -73,6 +73,17 @@ export function createThemeI18n(options: CreateI18nOptions): I18n {
   return { ...inner, t: Object.assign(translate, { rich }) as unknown as Translate };
 }
 
+/** A locale the site publishes, as a page sees it for the language switch and alternate links. */
+export interface LocaleEntry {
+  /** Canonical tag, written to `lang` and `hreflang`. */
+  tag: string;
+  /** URL segment, "" for the source tree. */
+  segment: string;
+  /** The language's own name, shown by the language switch. */
+  label: string;
+  isSource: boolean;
+}
+
 /**
  * What a page needs to know about the locale it is rendered for. Page functions receive it
  * explicitly because they are plain functions: the ambient `t` works only in component bodies.
@@ -87,6 +98,10 @@ export interface PageLocale {
   readonly source: string;
   /** The tree that keeps the unprefixed routes. */
   readonly isSource: boolean;
+  /** Every locale the site publishes, the source first; one entry on a single-locale site. */
+  readonly entries: readonly LocaleEntry[];
+  /** Whether an unreviewed translation says so on the page. */
+  readonly disclosure: boolean;
   /** Theme sentences. Its source language is always English. */
   readonly i18n: I18n;
   /** Site-owned copy (name, description, About, 404) in this locale, written in `source`. */
@@ -100,6 +115,8 @@ export interface PageLocaleOptions {
   catalogs: Readonly<Record<string, Catalog>>;
   timeZone?: string;
   onMissing?: (miss: MissingMessage) => void;
+  entries?: readonly LocaleEntry[];
+  disclosure?: boolean;
 }
 
 export function createPageLocale(options: PageLocaleOptions): PageLocale {
@@ -118,12 +135,17 @@ export function createPageLocale(options: PageLocaleOptions): PageLocale {
     timeZone: options.timeZone,
     onMissing: options.onMissing,
   });
+  const tag = i18n.locale.value;
   return {
-    tag: i18n.locale.value,
+    tag,
     direction: i18n.direction.value,
     segment: options.segment,
     source: options.source,
     isSource: options.segment === "",
+    entries: options.entries ?? [
+      { tag, segment: options.segment, label: tag, isSource: options.segment === "" },
+    ],
+    disclosure: options.disclosure ?? true,
     i18n,
     copy: (text) => (text === "" ? text : copyI18n.lookup(text).value),
   };
@@ -140,14 +162,25 @@ export function defaultPageLocale(): PageLocale {
 /** Routes that exist once per locale; every other route exists only in the source tree. */
 const TRANSLATED_ROUTES: ReadonlySet<string> = new Set(["/", "/posts/", "/thoughts/", "/about/"]);
 
-/**
- * The URL of an internal route for a locale. Every internal link of the theme goes through
- * it. A route that exists only in the source tree (skills, post and thought pages) keeps its
- * source URL.
- */
+/** The URL of an internal route for a locale. Every internal link of the theme goes through
+ * it. A route that exists only in the source tree (skills) keeps its source URL. */
 export function localePath(locale: PageLocale, path: string): string {
   if (locale.segment === "" || !TRANSLATED_ROUTES.has(path)) return path;
   return `/${locale.segment}${path}`;
+}
+
+/**
+ * The URL of a content item, in the tree of the language it is written in. An original in the
+ * source locale keeps the unprefixed route; anything else lives under its locale's segment.
+ */
+export function contentUrl(
+  locale: PageLocale,
+  item: { kind: string; slug: string; locale: string },
+): string {
+  const route = `/${item.kind}s/${item.slug}/`;
+  if (item.locale === locale.source) return route;
+  const entry = locale.entries.find((candidate) => candidate.tag === item.locale);
+  return `/${entry?.segment ?? item.locale.toLowerCase()}${route}`;
 }
 
 /** The text of a message that carries named tags, with the parts supplied by the page. */

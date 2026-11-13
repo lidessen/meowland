@@ -131,6 +131,34 @@ The core `defineShadow` keeps the host handle generic for other targets. `contex
 `context.onCleanup` follow the same mount lifecycle as components. The former `shadow` function alias
 is removed; `defineShadow` is the declaration API.
 
+## Internationalization
+
+`meowjsx/i18n` translates by source sentence: the literal text is the message identity, so a
+single-language application needs no provider, catalog or key. The entry is DOM-free and apart
+from the root.
+
+```tsx
+import { t } from "meowjsx/i18n";
+
+function Header() {
+  return (
+    <nav aria-label={t("Primary navigation")}>
+      <a href="/posts/">{t("Posts")}</a>
+      <span>{t("{count, plural, one {# min read} other {# mins read}}", { count })}</span>
+    </nav>
+  );
+}
+```
+
+Add a language with `createI18n` and `I18nProvider`; mounted text and attributes follow
+`i18n.locale.value` in place. A message Signal refuses string conversion, so `` `${t("Posts")}` ``
+throws and the missing `.value` is found. Templates support `{name}`, `plural`, `select` and
+`selectordinal`; `t.rich` places a link inside a sentence, `defineMessages` declares a message
+chosen at run time, and `i18n.lookup` translates a string that is not a literal, such as site
+configuration copy. `meowjsx/i18n/audit` scans source files for messages and compares a catalog
+with them, returning the missing, unused and invalid items. Meowpress's `locales` command uses it
+to translate a whole site; the full contract is in the package README.
+
 ## Bundling
 
 The package declares `sideEffects: false`. The default runtime, JSX runtime and Web renderer are

@@ -78,13 +78,37 @@ const siteStyles = css`
     text-decoration: underline;
     text-underline-offset: 0.25em;
   }
+  .site-locale-switch {
+    display: flex;
+    flex-wrap: wrap;
+    gap: ${uiTokens.space.insetBlock};
+  }
+  .site-locale-switch a {
+    color: ${uiTokens.ink.tertiary};
+    text-decoration: none;
+  }
+  .site-locale-switch a:hover,
+  .site-locale-switch a[aria-current="true"] {
+    color: ${uiTokens.accent.ink};
+    text-decoration: underline;
+    text-underline-offset: 0.25em;
+  }
+  .translation-notices {
+    display: grid;
+    gap: ${uiTokens.space.group};
+    color: ${uiTokens.ink.tertiary};
+  }
   #main-content {
     padding-block: ${uiTokens.space.pageBlock};
+  }
+  /* Code stays left-to-right on a right-to-left page; the page direction would reorder it. */
+  pre {
+    direction: ltr;
   }
   .skip-link {
     position: absolute;
     top: 0;
-    left: ${uiTokens.space.pageInlineCompact};
+    inset-inline-start: ${uiTokens.space.pageInlineCompact};
     transform: translateY(-110%);
     padding: ${uiTokens.space.group};
     background: ${uiTokens.surface.raised};
@@ -139,7 +163,7 @@ const siteStyles = css`
     object-fit: contain;
   }
   .hero-image {
-    margin-left: auto;
+    margin-inline-start: auto;
   }
   .feed-image {
     margin: ${uiTokens.space.section} auto 0;
@@ -262,7 +286,7 @@ const siteStyles = css`
     padding: 0;
   }
   .skill-files ul ul {
-    padding-left: ${uiTokens.space.group};
+    padding-inline-start: ${uiTokens.space.group};
   }
   .skill-files .folder > span {
     display: block;
@@ -272,12 +296,12 @@ const siteStyles = css`
   }
   .skill-files button {
     width: 100%;
-    text-align: left;
+    text-align: start;
     overflow-wrap: anywhere;
   }
   .skill-viewer {
     min-width: 0;
-    border-left: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-inline-start: ${uiTokens.line.width} solid ${uiTokens.line.edge};
   }
   .skill-viewer-bar {
     display: flex;
@@ -435,7 +459,7 @@ const siteStyles = css`
   .mdx-callout {
     padding: ${uiTokens.space.insetBlock};
     background: ${uiTokens.accent.soft};
-    border-left: 3px solid ${uiTokens.accent.base};
+    border-inline-start: 3px solid ${uiTokens.accent.base};
   }
   @media (max-width: 720px) {
     .site-shell {
@@ -456,7 +480,7 @@ const siteStyles = css`
       border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     }
     .skill-viewer {
-      border-left: 0;
+      border-inline-start: 0;
     }
     .skill-file-panel,
     .skill-reading-paths,

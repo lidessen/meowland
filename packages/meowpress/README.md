@@ -82,7 +82,7 @@ timestamp keeps its written day. An invalid value fails when the config is resol
 ## Languages
 
 Without `locales`, a site has one locale, English, unprefixed routes and no catalogs. Setting
-`locales` publishes the built-in theme in more languages. Content is not translated yet.
+`locales` publishes the theme and the content in more languages.
 
 ```ts
 export default meowSite({
@@ -90,6 +90,8 @@ export default meowSite({
     source: "en",
     targets: { fr: { label: "Français" } },
     untranslated: "link",
+    stale: "notice",
+    disclosure: true,
   },
 });
 ```
@@ -99,8 +101,7 @@ export default meowSite({
   (`zh-Hant` becomes `/zh-hant/`); `<html lang>` keeps the canonical tag, and `dir="rtl"` is added
   for right-to-left scripts. `label` is the language's own name. A target equal to the source, an
   invalid tag, or two tags that are the same after canonicalisation fail when the config is
-  resolved. `stale`, `disclosure` and `catalogs` are accepted; `stale` and `disclosure` have no
-  effect until translated content exists.
+  resolved.
 - The theme's own sentences are written in English and declared in one table, exported as
   `themeMessages`. Every locale other than English takes them from `locales/<tag>.json`, a flat
   object from the English sentence to its translation (a sentence with a `context` maps to an
@@ -116,20 +117,92 @@ export default meowSite({
   `source`: `site.name`, `site.description`, `site.about.heading`, `paragraphs`, `linksHeading` and
   each link `label`, and the three `notFound` strings. The source tree prints them as written.
   `agentGuide` is not translated.
-- Each target gets `/<tag>/` (home), `/<tag>/about/`, `/<tag>/posts/`, `/<tag>/thoughts/` and
-  `/<tag>/404.html` (a host decides whether it serves the file). Dates follow the page locale.
-  Every internal link goes through one helper that points a route that exists only in the source
-  tree to its source URL.
-- Posts, thoughts and skills have no translated pages yet, so the posts and thoughts pages and
-  `/skills/` exist once, in the source tree. Each target tree lists the originals, marked with the
-  source language on the entry, and links them to the source URL; `untranslated: "omit"` leaves
-  them out. The root `404.html` also links each target's home with `lang` and `hreflang`.
+- Each target gets `/<tag>/` (home), `/<tag>/about/`, `/<tag>/posts/`, `/<tag>/thoughts/`,
+  `/<tag>/404.html` (a host decides whether it serves the file) and a page for every content item
+  written in that language. Dates follow the page locale. Every internal link goes through one
+  helper that points a route that exists only in the source tree, such as skills, to its source
+  URL. Skills pages exist once, in the source locale.
+- With more than one locale the header shows a script-free language switch that points to the same
+  page where the translation exists and to that locale's home otherwise. With `site.url`, pages
+  also carry `<link rel="canonical">`, one `<link rel="alternate" hreflang>` per version and
+  `x-default` for the source; without `site.url` neither is emitted and the build says so once.
 - A target's tag may not equal a top-level route, content asset directory, slug prefix or
   consumer page path; the build fails and names the tag. A `pages` provider still owns the whole
   site map: no locale tree is written for it, and it receives the resolved `locales` in its
   context.
-- Not available yet: translated content files, language switch, alternate links, per-locale
-  `llms.txt`, a translation manifest, and the `locales` and `stamp` commands.
+
+### Translated content
+
+A file name may carry a locale suffix. `content/posts/first.fr.md` is the French translation of
+`content/posts/first.md`; `only-fr.fr.md` without a `only-fr.md` is an original written in French.
+The suffix is read only for a configured locale, so `notes.v2.md` keeps its slug, and it uses the
+canonical tag in lower case. Files that share a kind and slug are one translation set; the member
+in the source locale is the original, and a set without one is a set of originals, one per
+language. `first.md` next to `first.en.md` is an error, because both claim the same slug in the
+source locale.
+
+A translation records what it was translated from:
+
+```yaml
+---
+title: Premier billet
+translation:
+  source: 3f9a1c2e
+  reviewed: false
+---
+```
+
+`translation.source` is the first 12 hex characters of SHA-256 over the original's resolved title,
+a newline and its body with line endings normalised to LF. `reviewed: true` marks a translation a
+person has checked. Both fields are optional; a translation without a recorded hash counts as
+stale. From that the build knows three states without anyone maintaining them: **current** (the
+recorded hash matches the original), **stale** (the original changed since) and **missing**.
+
+- A current or stale translation is published under `/<tag>/<kind>s/<slug>/`.
+- A stale translation is still published, with a notice that the original has changed and a link
+  to it. `stale: "fail"` makes it a build error instead, for a site that would rather not publish
+  it.
+- A translation without `reviewed: true` carries a quiet line saying it is a translation and
+  linking the original; `disclosure: false` removes that line.
+- A missing translation produces no page. In the target's timeline and archives the original is
+  listed with its language marked and `lang` on the entry, linking the original's URL;
+  `untranslated: "omit"` leaves it out instead.
+- A translation inherits `date`, `tags` and `category` from its original unless it sets them. A
+  file whose name used to be its slug (`notes.fr.md` used to publish at `/posts/notes.fr/`) now
+  reads as a suffix, and the build reports the URL that changed.
+
+### The work list
+
+```sh
+meowpress locales                    # one line per missing or stale item
+meowpress locales --json             # the same list as a contract
+meowpress locales stamp content/posts/first.fr.md
+```
+
+The report holds, for each target locale, the interface messages the audit finds missing, unused
+or invalid (theme sentences and site copy), and the content items that are missing or stale with
+the original's file, URL and current hash, the target file and, for a stale item, the hash it was
+translated from. `stamp` writes the original's current hash into a translation's frontmatter after
+it has been written or revised, and adds frontmatter to a file that has none. The loop for "add
+French to this blog" is: configure the locale, run `locales`, write what it names, stamp, run
+`locales` again until it is empty, then build. A site without `locales` refuses both commands.
+
+### Agents as readers
+
+`/translations.json` is published when `locales` is configured and is reserved like `agents.md`:
+it is the same report the work list prints, so an agent can read one file to know what exists and
+what to trust. The root `/llms.txt`, `/llm.txt` and `/agents.md` index the originals, each in its
+own language with that language marked, then link each target's index. A target tree gets
+`/<tag>/llms.txt`, `/<tag>/llm.txt` and `/<tag>/agents.md` next to its pages; they list that tree's
+pages and the originals it shows untranslated, marked with their language and linked to the source
+URL. A `pages` provider that sets `locale` and `original` on a `SitePage` enters the manifest and
+the per-locale index; its Markdown copy starts with `<!-- lang: fr; original: /guides/ -->`.
+
+A right-to-left target is laid out in that direction: the theme's chrome and Meowtail's prose
+mirror through logical properties, dates follow the page locale, and code blocks stay
+left-to-right. Inline code inside right-to-left prose is still subject to the Unicode bidi
+algorithm, as on any site. The default faces cover Latin, Cyrillic and Greek; other scripts use
+system fonts unless the site lists faces in `fonts`.
 
 ## Build from code
 
@@ -161,6 +234,9 @@ export default meowSite({
 
 - `pages` is a provider of complete HTML documents. A path that resolves above the site root is
   refused rather than clamped.
+- `SitePageContext` carries the resolved `locales` and `pageLocale(tag)`, the locale instance the
+  built-in pages use, with the site's catalogs, time zone and missing-message reporting. A page
+  that sets `locale` and `original` enters `/translations.json` and the per-locale index.
 - A page's optional `markdown` is the same page for agents. It is published next to the route
   (`components/button.md` for `/components/button/`, `index.md` for the root), and `llms.txt`,
   `llm.txt` and `agents.md` link it instead of the HTML. `llms.txt` follows the

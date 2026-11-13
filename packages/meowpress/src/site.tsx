@@ -853,7 +853,7 @@ export function aboutPage(
                 <Entry
                   title={
                     <a
-                      className="site-icon-label"
+                      className="site-icon-label site-link"
                       href={link.href}
                       target="_blank"
                       rel="me noopener noreferrer"

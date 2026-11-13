@@ -95,6 +95,8 @@ test("profile and post navigation use decorative SVG icons without changing link
   const profile = dom.querySelector('a[rel="me noopener noreferrer"]');
   expect(profile?.getAttribute("href")).toBe("https://github.com/author");
   expect(profile?.getAttribute("target")).toBe("_blank");
+  // The link sits inside an entry title, so it carries the site's own link class for the theme.
+  expect(profile?.classList.contains("site-link")).toBe(true);
   expect(profile?.textContent?.trim()).toBe("@author");
   expect(profile?.querySelector('svg[data-icon="arrow-up-right"]')).not.toBeNull();
 

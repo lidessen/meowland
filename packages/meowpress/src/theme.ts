@@ -111,8 +111,26 @@ const siteStyles = css`
     color: ${uiTokens.ink.primary};
     text-decoration-color: ${uiTokens.ink.primary};
   }
+  /* The About page's links are anchors the site puts inside an entry title, so no component rule
+     covers them; without this one they fall back to the browser's default link styling. They read
+     with the entry title they sit in. */
+  .site-link {
+    color: inherit;
+    text-decoration: none;
+    text-underline-offset: 0.18em;
+  }
+  .site-link:hover {
+    color: ${uiTokens.accent.ink};
+    text-decoration: underline;
+    text-decoration-color: ${uiTokens.accent.line};
+  }
   #main-content {
     padding-block: ${uiTokens.space.pageBlock};
+  }
+  /* The skip link moves focus to the reading region. The jump is the feedback; a ring around the
+     whole column reads as an error, and the region is a scroll target rather than a control. */
+  #main-content:focus-visible {
+    outline: none;
   }
   /* Code stays left-to-right on a right-to-left page; the page direction would reorder it. */
   pre {

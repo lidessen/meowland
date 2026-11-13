@@ -30,3 +30,16 @@ test("translation notices style their link instead of leaving the browser defaul
   expect(rules.join("\n")).toContain("text-decoration: underline");
   expect(rules.join("\n")).toContain(String(uiTokens.accent.ink));
 });
+
+test("the About page's links read with the entry title instead of the browser default", () => {
+  const rules = blogTheme.cssText.match(/\.site-link[^{]*\{[^}]*\}/g) ?? [];
+  expect(rules.length).toBeGreaterThan(0);
+  expect(rules.join("\n")).toContain("text-decoration: none");
+  expect(rules.join("\n")).toContain(String(uiTokens.accent.ink));
+});
+
+test("the skip link's target takes focus without ringing the whole reading column", () => {
+  const rules = blogTheme.cssText.match(/#main-content:focus-visible[^{]*\{[^}]*\}/g) ?? [];
+  expect(rules.length).toBeGreaterThan(0);
+  expect(rules.join("\n")).toContain("outline: none");
+});

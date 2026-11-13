@@ -70,6 +70,67 @@ owns `dist/`, set `outputDirectory` to a separate directory and reserve it for g
 to choose the root for those skills. Set `notFound: false` to omit the built-in `404.html`, or
 supply `notFound: { title, message, homeLabel }` to change its copy.
 
+## Site URL and time zone
+
+`site.url` is the public origin of the site, without a path, such as `https://example.com`. It is
+validated and stored without a trailing slash; the build does not use it for output yet. `site.timeZone`
+is an IANA time zone, `Asia/Shanghai` by default. It decides the day key and the `HH:mm` label of a
+post or thought whose date has no calendar date in its text (a date from the file's modified time,
+or text such as `September 1, 2026 23:30 UTC`). A date written as `2026-09-01` or as an ISO
+timestamp keeps its written day. An invalid value fails when the config is resolved.
+
+## Languages
+
+Without `locales`, a site has one locale, English, unprefixed routes and no catalogs. Setting
+`locales` publishes the built-in theme in more languages. Content is not translated yet.
+
+```ts
+export default meowSite({
+  locales: {
+    source: "en",
+    targets: { fr: { label: "Français" } },
+    untranslated: "link",
+  },
+});
+```
+
+- `source` is the language the content and the site-owned copy are written in. It keeps today's
+  unprefixed routes. Each `targets` tag is published under `/<tag>/`, with the tag in lower case
+  (`zh-Hant` becomes `/zh-hant/`); `<html lang>` keeps the canonical tag, and `dir="rtl"` is added
+  for right-to-left scripts. `label` is the language's own name. A target equal to the source, an
+  invalid tag, or two tags that are the same after canonicalisation fail when the config is
+  resolved. `stale`, `disclosure` and `catalogs` are accepted; `stale` and `disclosure` have no
+  effect until translated content exists.
+- The theme's own sentences are written in English and declared in one table, exported as
+  `themeMessages`. Every locale other than English takes them from `locales/<tag>.json`, a flat
+  object from the English sentence to its translation (a sentence with a `context` maps to an
+  object from context to translation). `localesDirectory` changes the directory, which resolves
+  against the project directory. `locales.catalogs.<tag>` supplies the same format inline and wins
+  over the file. A missing file is an empty catalog; invalid JSON, or a file that is not an object
+  of strings, fails the build and names the file. The source locale needs a catalog too when it is
+  not English.
+- A sentence with no translation shows its English text. After the build, one line per locale
+  reports how many sentences fell back and which file to fill. A site without `locales` prints
+  nothing.
+- Site-owned copy is translated through the same catalogs, keyed by the text as written in
+  `source`: `site.name`, `site.description`, `site.about.heading`, `paragraphs`, `linksHeading` and
+  each link `label`, and the three `notFound` strings. The source tree prints them as written.
+  `agentGuide` is not translated.
+- Each target gets `/<tag>/` (home), `/<tag>/about/`, `/<tag>/posts/`, `/<tag>/thoughts/` and
+  `/<tag>/404.html` (a host decides whether it serves the file). Dates follow the page locale.
+  Every internal link goes through one helper that points a route that exists only in the source
+  tree to its source URL.
+- Posts, thoughts and skills have no translated pages yet, so the posts and thoughts pages and
+  `/skills/` exist once, in the source tree. Each target tree lists the originals, marked with the
+  source language on the entry, and links them to the source URL; `untranslated: "omit"` leaves
+  them out. The root `404.html` also links each target's home with `lang` and `hreflang`.
+- A target's tag may not equal a top-level route, content asset directory, slug prefix or
+  consumer page path; the build fails and names the tag. A `pages` provider still owns the whole
+  site map: no locale tree is written for it, and it receives the resolved `locales` in its
+  context.
+- Not available yet: translated content files, language switch, alternate links, per-locale
+  `llms.txt`, a translation manifest, and the `locales` and `stamp` commands.
+
 ## Build from code
 
 `meowSite()` resolves configuration and `buildSite()` writes the site. Both are exported from

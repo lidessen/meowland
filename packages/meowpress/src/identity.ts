@@ -43,7 +43,20 @@ export interface SiteIdentity {
     about?: string;
   };
   about?: SiteAbout;
+  /**
+   * Public origin of the site, without a path: `https://example.com`. It is validated and stored
+   * without a trailing slash; later releases use it for absolute alternate and canonical links.
+   */
+  url?: string;
+  /**
+   * IANA time zone that turns a date with a time into a day key and an `HH:mm` label. Defaults to
+   * `Asia/Shanghai`, the value earlier releases hard-coded, so existing day keys do not move.
+   */
+  timeZone?: string;
 }
+
+/** The time zone date keys and time labels use when a site sets none. */
+export const DEFAULT_TIME_ZONE = "Asia/Shanghai";
 
 export const DEFAULT_SITE: SiteIdentity = {
   name: "Meowpress site",

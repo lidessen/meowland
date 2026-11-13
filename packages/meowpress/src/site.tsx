@@ -1,5 +1,6 @@
 import { themeAttributes, type ThemeDefinition } from "meowcss";
 import { createRuntime, Fragment, h, type Child } from "meowjsx";
+import { I18nProvider, type MessageDescriptor, type MessageParams } from "meowjsx/i18n";
 import { renderToHtmlWithRuntime } from "meowjsx/web";
 import {
   Button,
@@ -20,12 +21,15 @@ import { GithubIcon, Icon } from "meowtail/icons";
 import { blogTheme } from "./theme";
 import { withoutLeadingHeading, type ContentItem } from "./content";
 import { DEFAULT_SITE, type SiteIdentity, type SiteNotFound } from "./identity";
+import { defaultPageLocale, localePath, richMessage, type PageLocale } from "./locale";
+import { themeMessages as M } from "./messages";
 import { sitePageAgentUrl, type SitePage } from "./pages";
 import type { Skill, SkillFile } from "./skills";
 import { layoutSkillGraph, type SkillGraphNode } from "./skill-graph";
 
 interface DocumentProps {
   theme: ThemeDefinition;
+  /** The site as configured; the document shows its copy in the page locale. */
   site: SiteIdentity;
   title: string;
   description?: string;
@@ -33,6 +37,7 @@ interface DocumentProps {
   styleHref: string;
   baseHref?: string;
   wide?: boolean;
+  locale: PageLocale;
   children: Child;
 }
 
@@ -43,26 +48,74 @@ function styleHref(depth: number, stylesheet: string): string {
   return `${"../".repeat(depth)}${stylesheet}`;
 }
 
+/** A path below the site root, written relative to a page `levels` directories deep. */
+function assetHref(levels: number, path: string): string {
+  return levels === 0 ? `./${path}` : `${"../".repeat(levels)}${path}`;
+}
+
+/** Directories a target locale's pages sit below the site root. */
+function localeDepth(locale: PageLocale): number {
+  return locale.isSource ? 0 : 1;
+}
+
 function slugDepth(slug: string): number {
   return slug.split("/").filter(Boolean).length;
 }
 
-function SiteHeader({ activePath, site }: { activePath?: string; site: SiteIdentity }): Child {
+/** A theme sentence as a string. Pages are static, so the message is read once. */
+function text(locale: PageLocale, message: MessageDescriptor, params?: MessageParams): string {
+  return locale.i18n.t(message, params).value;
+}
+
+/** Counts are passed as text so digits stay ungrouped, as the English pages have always printed. */
+function count(value: number): string {
+  return String(value);
+}
+
+/** The site's own copy in the page locale. */
+function siteView(site: SiteIdentity, locale: PageLocale): SiteIdentity {
+  const about = site.about;
+  return {
+    ...site,
+    name: locale.copy(site.name),
+    description: locale.copy(site.description),
+    about: about && {
+      ...about,
+      heading: locale.copy(about.heading),
+      paragraphs: about.paragraphs.map(locale.copy),
+      linksHeading: about.linksHeading === undefined ? undefined : locale.copy(about.linksHeading),
+      links: about.links?.map((link) => ({ ...link, label: locale.copy(link.label) })),
+    },
+  };
+}
+
+function SiteHeader({
+  activePath,
+  site,
+  locale,
+}: {
+  activePath?: string;
+  site: SiteIdentity;
+  locale: PageLocale;
+}): Child {
   const links = [
-    ["/posts/", "Posts"],
-    ["/thoughts/", "Thoughts"],
-    ["/skills/", "Skills"],
-    ["/about/", "About"],
+    ["/posts/", M.posts],
+    ["/thoughts/", M.thoughts],
+    ["/skills/", M.skills],
+    ["/about/", M.about],
   ] as const;
   return (
     <header className="site-header">
-      <a className="site-name" href="/">
+      <a className="site-name" href={localePath(locale, "/")}>
         {site.name}
       </a>
-      <nav className="site-nav" aria-label="Primary navigation">
+      <nav className="site-nav" aria-label={text(locale, M.primaryNavigation)}>
         {links.map(([href, label]) => (
-          <a href={href} aria-current={activePath === href ? "page" : undefined}>
-            {label}
+          <a
+            href={localePath(locale, href)}
+            aria-current={activePath === href ? "page" : undefined}
+          >
+            {text(locale, label)}
           </a>
         ))}
       </nav>
@@ -70,11 +123,14 @@ function SiteHeader({ activePath, site }: { activePath?: string; site: SiteIdent
   );
 }
 
-function SiteFooter({ site }: { site: SiteIdentity }): Child {
+function SiteFooter({ site, locale }: { site: SiteIdentity; locale: PageLocale }): Child {
   return (
     <footer className="site-footer">
       <Text variant="caption">
-        © {new Date().getFullYear()} {site.name}
+        {text(locale, M.footerCopyright, {
+          year: String(new Date().getFullYear()),
+          name: site.name,
+        })}
       </Text>
       <Inline gap="compact">
         <a href="/llm.txt">llm.txt</a>
@@ -94,28 +150,36 @@ function Document({
   children,
   theme,
   site,
+  locale,
 }: DocumentProps): Child {
+  // Compare with the configured name before it is translated.
+  const view = siteView(site, locale);
   return (
-    <html lang="en" data-meowui-page="" {...themeAttributes(theme)}>
+    <html
+      lang={locale.tag}
+      dir={locale.direction === "rtl" ? "rtl" : undefined}
+      data-meowui-page=""
+      {...themeAttributes(theme)}
+    >
       <head>
         <meta charSet="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
-        <meta name="description" content={description ?? site.description} />
+        <meta name="description" content={description ?? view.description} />
         {baseHref ? <base href={baseHref} /> : null}
         <link rel="stylesheet" href={styleHref} />
-        <title>{title === site.name ? site.name : `${title} · ${site.name}`}</title>
+        <title>{title === site.name ? view.name : `${title} · ${view.name}`}</title>
       </head>
       <body data-site={site.id}>
         <a className="skip-link" href="#main-content">
-          Skip to content
+          {text(locale, M.skipLink)}
         </a>
         <div className="site-shell">
           <Container width={wide ? "wide" : "content"}>
-            <SiteHeader activePath={activePath} site={site} />
+            <SiteHeader activePath={activePath} site={view} locale={locale} />
             <main id="main-content" tabIndex={-1}>
               {children}
             </main>
-            <SiteFooter site={site} />
+            <SiteFooter site={view} locale={locale} />
           </Container>
         </div>
       </body>
@@ -145,24 +209,34 @@ function pageHtml(props: DocumentProps): string {
       }),
     ],
   });
-  return `<!doctype html>\n${renderToHtmlWithRuntime(runtime, <Document {...props} />)}`;
+  // Components below the provider may use the ambient `t`; the page functions use the instance.
+  return `<!doctype html>\n${renderToHtmlWithRuntime(
+    runtime,
+    <I18nProvider value={props.locale.i18n}>
+      <Document {...props} />
+    </I18nProvider>,
+  )}`;
 }
 
-function dateLabel(dateKey: string): { date: string; weekday: string } {
+function dateLabel(dateKey: string, locale: PageLocale): { date: string; weekday: string } {
   const date = new Date(`${dateKey}T00:00:00Z`);
-  if (Number.isNaN(date.getTime())) return { date: "Undated", weekday: "" };
+  if (Number.isNaN(date.getTime())) return { date: text(locale, M.undated), weekday: "" };
   return {
-    date: new Intl.DateTimeFormat("en-US", {
-      timeZone: "UTC",
-      month: "long",
-      day: "numeric",
-    }).format(date),
-    weekday: `${date.getUTCFullYear()} ${new Intl.DateTimeFormat("en-US", { timeZone: "UTC", weekday: "short" }).format(date)}`,
+    date: locale.i18n.date(date, { timeZone: "UTC", month: "long", day: "numeric" }).value,
+    weekday: text(locale, M.dateWeekday, {
+      year: String(date.getUTCFullYear()),
+      weekday: locale.i18n.date(date, { timeZone: "UTC", weekday: "short" }).value,
+    }),
   };
 }
 
 function itemUrl(item: ContentItem): string {
   return `/${item.kind}s/${item.slug}/`;
+}
+
+/** An entry written in another language than the page marks it; the source tree marks nothing. */
+function entryLang(locale: PageLocale): string | undefined {
+  return locale.isSource ? undefined : locale.source;
 }
 
 function Tags({ item }: { item: ContentItem }): Child {
@@ -175,14 +249,23 @@ function Tags({ item }: { item: ContentItem }): Child {
   ) : null;
 }
 
-function ThoughtCard({ item, linked = false }: { item: ContentItem; linked?: boolean }): Child {
+function ThoughtCard({
+  item,
+  locale,
+  linked = false,
+}: {
+  item: ContentItem;
+  locale: PageLocale;
+  linked?: boolean;
+}): Child {
   return (
     <Entry
       className="thought"
       data-kind="thought"
+      lang={entryLang(locale)}
       title={item.title}
-      href={linked ? itemUrl(item) : undefined}
-      eyebrow={`${item.timeLabel || item.dateKey} · Thought`}
+      href={linked ? localePath(locale, itemUrl(item)) : undefined}
+      eyebrow={text(locale, M.thoughtEntryEyebrow, { when: item.timeLabel || item.dateKey })}
     >
       <Prose dangerouslySetInnerHTML={{ __html: withoutLeadingHeading(item.html) }} />
       <Tags item={item} />
@@ -190,25 +273,33 @@ function ThoughtCard({ item, linked = false }: { item: ContentItem; linked?: boo
   );
 }
 
-function PostCard({ item }: { item: ContentItem }): Child {
-  const category = typeof item.metadata.category === "string" ? item.metadata.category : "Post";
+function ReadingMeta({ item, locale }: { item: ContentItem; locale: PageLocale }): Child {
+  return (
+    <MetaRow
+      items={[
+        { label: item.dateKey },
+        { label: text(locale, M.minRead, { minutes: count(item.readingMinutes) }) },
+        { label: text(locale, M.characters, { count: count(item.characterCount) }) },
+      ]}
+    />
+  );
+}
+
+function PostCard({ item, locale }: { item: ContentItem; locale: PageLocale }): Child {
+  const category =
+    typeof item.metadata.category === "string"
+      ? item.metadata.category
+      : text(locale, M.postFallbackCategory);
   return (
     <Entry
       size="feature"
       data-kind="post"
+      lang={entryLang(locale)}
       title={item.title}
-      href={itemUrl(item)}
+      href={localePath(locale, itemUrl(item))}
       eyebrow={category}
-      description={item.excerpt || "This post has no summary yet."}
-      meta={
-        <MetaRow
-          items={[
-            { label: item.dateKey },
-            { label: `${item.readingMinutes} min read` },
-            { label: `${item.characterCount} characters` },
-          ]}
-        />
-      }
+      description={item.excerpt || text(locale, M.noSummary)}
+      meta={<ReadingMeta item={item} locale={locale} />}
     >
       <Tags item={item} />
     </Entry>
@@ -225,22 +316,30 @@ function groupByDate(items: ContentItem[]): Map<string, ContentItem[]> {
   return groups;
 }
 
-function Feed({ items, image }: { items: ContentItem[]; image?: string }): Child {
+function Feed({
+  items,
+  image,
+  locale,
+}: {
+  items: ContentItem[];
+  image?: string;
+  locale: PageLocale;
+}): Child {
   return (
     <div className="feed">
       {items.length === 0 ? (
-        <Text variant="secondary">No public content yet.</Text>
+        <Text variant="secondary">{text(locale, M.noContent)}</Text>
       ) : (
         [...groupByDate(items)].map(([dateKey, group]) => {
-          const label = dateLabel(dateKey);
+          const label = dateLabel(dateKey, locale);
           return (
             <Section className="day" title={label.date} description={label.weekday}>
               <EntryList>
                 {group.map((item) =>
                   item.kind === "thought" ? (
-                    <ThoughtCard item={item} linked />
+                    <ThoughtCard item={item} locale={locale} linked />
                   ) : (
-                    <PostCard item={item} />
+                    <PostCard item={item} locale={locale} />
                   ),
                 )}
               </EntryList>
@@ -255,24 +354,32 @@ function Feed({ items, image }: { items: ContentItem[]; image?: string }): Child
   );
 }
 
-function Filter({ posts, thoughts }: { posts: number; thoughts: number }): Child {
+function Filter({
+  posts,
+  thoughts,
+  locale,
+}: {
+  posts: number;
+  thoughts: number;
+  locale: PageLocale;
+}): Child {
   return (
     <Inline
       className="feed-filter"
       gap="compact"
       data-filter-group="feed"
       role="group"
-      aria-label="Filter home feed"
+      aria-label={text(locale, M.filterHome)}
     >
       {(
         [
-          ["all", "All", posts + thoughts],
-          ["post", "Posts", posts],
-          ["thought", "Thoughts", thoughts],
+          ["all", M.filterAll, posts + thoughts],
+          ["post", M.posts, posts],
+          ["thought", M.thoughts, thoughts],
         ] as const
-      ).map(([value, label, count]) => (
+      ).map(([value, label, total]) => (
         <Button variant="quiet" data-filter={value} aria-pressed={String(value === "all")}>
-          {label} <span className="filter-count">{count}</span>
+          {text(locale, label)} <span className="filter-count">{total}</span>
         </Button>
       ))}
     </Inline>
@@ -296,22 +403,31 @@ export function homePage(
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
   stylesheet: string = DEFAULT_THEME_STYLESHEET,
+  locale: PageLocale = defaultPageLocale(),
 ): string {
+  const view = siteView(site, locale);
+  const depth = localeDepth(locale);
   return pageHtml({
     site,
     theme,
+    locale,
     title: site.name,
-    styleHref: styleHref(0, stylesheet),
+    styleHref: styleHref(depth, stylesheet),
     children: (
       <Page
         header={
           <div className="home-heading">
             <div className="home-heading-copy">
-              <Text variant="eyebrow">Journal</Text>
-              <PageHeader title={site.name} description={site.description} />
+              <Text variant="eyebrow">{text(locale, M.journal)}</Text>
+              <PageHeader title={view.name} description={view.description} />
             </div>
             {site.images?.hero ? (
-              <img className="hero-image" src={`./${site.images.hero}`} alt="" decoding="async" />
+              <img
+                className="hero-image"
+                src={assetHref(depth, site.images.hero)}
+                alt=""
+                decoding="async"
+              />
             ) : null}
           </div>
         }
@@ -319,10 +435,15 @@ export function homePage(
           <Filter
             posts={items.filter((item) => item.kind === "post").length}
             thoughts={items.filter((item) => item.kind === "thought").length}
+            locale={locale}
           />
         }
       >
-        <Feed items={items} image={site.images?.feed ? `./${site.images.feed}` : undefined} />
+        <Feed
+          items={items}
+          locale={locale}
+          image={site.images?.feed ? assetHref(depth, site.images.feed) : undefined}
+        />
         <script dangerouslySetInnerHTML={{ __html: FILTER_SCRIPT }} />
       </Page>
     ),
@@ -335,37 +456,46 @@ export function listPage(
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
   stylesheet: string = DEFAULT_THEME_STYLESHEET,
+  locale: PageLocale = defaultPageLocale(),
 ): string {
   const isPost = kind === "post";
-  const title = isPost ? "Posts" : "Thoughts";
+  const title = text(locale, isPost ? M.posts : M.thoughts);
   return pageHtml({
     site,
     theme,
+    locale,
     title,
     activePath: isPost ? "/posts/" : "/thoughts/",
-    styleHref: styleHref(1, stylesheet),
+    styleHref: styleHref(1 + localeDepth(locale), stylesheet),
     children: (
       <Page
         title={title}
-        eyebrow="Archive"
-        description={
-          isPost
-            ? "Complete arguments grown from fragments."
-            : "Short, trimmed thoughts ready to show as they are."
-        }
+        eyebrow={text(locale, M.archive)}
+        description={text(locale, isPost ? M.postsDescription : M.thoughtsDescription)}
       >
         {items.length ? (
           <EntryList>
             {items.map((item) =>
-              isPost ? <PostCard item={item} /> : <ThoughtCard item={item} linked />,
+              isPost ? (
+                <PostCard item={item} locale={locale} />
+              ) : (
+                <ThoughtCard item={item} locale={locale} linked />
+              ),
             )}
           </EntryList>
         ) : (
-          <Text variant="secondary">No public content yet.</Text>
+          <Text variant="secondary">{text(locale, M.noContent)}</Text>
         )}
       </Page>
     ),
   });
+}
+
+/** A link from the root 404 page to the home page of another locale. */
+export interface LocaleLink {
+  tag: string;
+  label: string;
+  href: string;
 }
 
 export function notFoundPage(
@@ -373,41 +503,66 @@ export function notFoundPage(
   theme: ThemeDefinition,
   site: SiteIdentity,
   stylesheet: string,
+  locale: PageLocale = defaultPageLocale(),
+  localeLinks: readonly LocaleLink[] = [],
 ): string {
-  const title = copy.title ?? "Page not found";
-  const message = copy.message ?? "This page may have moved or been removed.";
+  const title = copy.title === undefined ? text(locale, M.notFoundTitle) : locale.copy(copy.title);
+  const message =
+    copy.message === undefined ? text(locale, M.notFoundMessage) : locale.copy(copy.message);
+  const homeLabel =
+    copy.homeLabel === undefined ? text(locale, M.notFoundHome) : locale.copy(copy.homeLabel);
   return pageHtml({
     site,
     theme,
+    locale,
     title,
     description: message,
-    styleHref: styleHref(0, stylesheet),
-    baseHref: "/",
+    styleHref: styleHref(localeDepth(locale), stylesheet),
+    baseHref: locale.isSource ? "/" : `/${locale.segment}/`,
     children: (
       <Page eyebrow="404" title={title} description={message}>
         <Prose>
-          <a href="/">{copy.homeLabel ?? "Back to home"}</a>
+          <a href={localePath(locale, "/")}>{homeLabel}</a>
         </Prose>
+        {localeLinks.length ? (
+          <nav aria-label={text(locale, M.languages)}>
+            <Inline gap="compact">
+              {localeLinks.map((link) => (
+                <a href={link.href} lang={link.tag} hreflang={link.tag}>
+                  {link.label}
+                </a>
+              ))}
+            </Inline>
+          </nav>
+        ) : null}
       </Page>
     ),
   });
 }
 
-function PostNavigation({ item, posts }: { item: ContentItem; posts: ContentItem[] }): Child {
+function PostNavigation({
+  item,
+  posts,
+  locale,
+}: {
+  item: ContentItem;
+  posts: ContentItem[];
+  locale: PageLocale;
+}): Child {
   const index = posts.findIndex((post) => post.slug === item.slug);
   const older = index >= 0 ? posts[index + 1] : undefined;
   const newer = index > 0 ? posts[index - 1] : undefined;
   return (
-    <nav className="post-nav" aria-label="Post navigation">
+    <nav className="post-nav" aria-label={text(locale, M.postNavigation)}>
       {older ? (
         <Entry
           eyebrow={
             <span className="site-icon-label">
-              <Icon name="chevron-left" size={14} /> Previous post (older)
+              <Icon name="chevron-left" size={14} /> {text(locale, M.previousPost)}
             </span>
           }
           title={older.title}
-          href={itemUrl(older)}
+          href={localePath(locale, itemUrl(older))}
         />
       ) : (
         <span />
@@ -416,14 +571,14 @@ function PostNavigation({ item, posts }: { item: ContentItem; posts: ContentItem
         <Entry
           eyebrow={
             <span className="site-icon-label">
-              Next post (newer) <Icon name="chevron-right" size={14} />
+              {text(locale, M.nextPost)} <Icon name="chevron-right" size={14} />
             </span>
           }
           title={newer.title}
-          href={itemUrl(newer)}
+          href={localePath(locale, itemUrl(newer))}
         />
       ) : (
-        <Text variant="caption">Nothing newer — this is the latest post.</Text>
+        <Text variant="caption">{text(locale, M.nothingNewer)}</Text>
       )}
     </nav>
   );
@@ -432,16 +587,18 @@ function PostNavigation({ item, posts }: { item: ContentItem; posts: ContentItem
 function RelatedThoughts({
   item,
   thoughts,
+  locale,
 }: {
   item: ContentItem;
   thoughts: ContentItem[];
+  locale: PageLocale;
 }): Child {
   const related = thoughts.filter((thought) => thought.dateKey === item.dateKey).slice(0, 3);
   return related.length ? (
-    <Section title="Thoughts from the same day">
+    <Section title={text(locale, M.sameDayThoughts)}>
       <EntryList>
         {related.map((thought) => (
-          <ThoughtCard item={thought} linked />
+          <ThoughtCard item={thought} locale={locale} linked />
         ))}
       </EntryList>
     </Section>
@@ -455,31 +612,30 @@ export function postPage(
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
   stylesheet: string = DEFAULT_THEME_STYLESHEET,
+  locale: PageLocale = defaultPageLocale(),
 ): string {
-  const category = typeof item.metadata.category === "string" ? item.metadata.category : "Post";
+  const category =
+    typeof item.metadata.category === "string"
+      ? item.metadata.category
+      : text(locale, M.postFallbackCategory);
   return pageHtml({
     site,
     theme,
+    locale,
     title: item.title,
     description: item.excerpt,
     activePath: "/posts/",
-    styleHref: styleHref(1 + slugDepth(item.slug), stylesheet),
+    styleHref: styleHref(1 + slugDepth(item.slug) + localeDepth(locale), stylesheet),
     children: (
       <Page title={item.title} eyebrow={category}>
-        <MetaRow
-          items={[
-            { label: item.dateKey },
-            { label: `${item.readingMinutes} min read` },
-            { label: `${item.characterCount} characters` },
-          ]}
-        />
+        <ReadingMeta item={item} locale={locale} />
         <Prose
           as="article"
           dangerouslySetInnerHTML={{ __html: withoutLeadingHeading(item.html) }}
         />
         <Tags item={item} />
-        <RelatedThoughts item={item} thoughts={thoughts} />
-        <PostNavigation item={item} posts={posts} />
+        <RelatedThoughts item={item} thoughts={thoughts} locale={locale} />
+        <PostNavigation item={item} posts={posts} locale={locale} />
       </Page>
     ),
   });
@@ -490,16 +646,18 @@ export function thoughtPage(
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
   stylesheet: string = DEFAULT_THEME_STYLESHEET,
+  locale: PageLocale = defaultPageLocale(),
 ): string {
   return pageHtml({
     site,
     theme,
+    locale,
     title: item.title,
     description: item.excerpt,
     activePath: "/thoughts/",
-    styleHref: styleHref(1 + slugDepth(item.slug), stylesheet),
+    styleHref: styleHref(1 + slugDepth(item.slug) + localeDepth(locale), stylesheet),
     children: (
-      <Page title={item.title} eyebrow="Thought">
+      <Page title={item.title} eyebrow={text(locale, M.thought)}>
         <MetaRow
           items={[{ label: item.dateKey }, ...(item.timeLabel ? [{ label: item.timeLabel }] : [])]}
         />
@@ -517,21 +675,25 @@ export function aboutPage(
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
   stylesheet: string = DEFAULT_THEME_STYLESHEET,
+  locale: PageLocale = defaultPageLocale(),
 ): string {
-  const about = site.about;
+  const view = siteView(site, locale);
+  const about = view.about;
+  const depth = localeDepth(locale);
   return pageHtml({
     site,
     theme,
-    title: "About",
+    locale,
+    title: text(locale, M.about),
     activePath: "/about/",
-    styleHref: styleHref(1, stylesheet),
+    styleHref: styleHref(1 + depth, stylesheet),
     children: (
-      <Page eyebrow="About" title={about?.heading ?? site.name}>
+      <Page eyebrow={text(locale, M.about)} title={about?.heading ?? view.name}>
         <div className="site-avatar" aria-hidden="true">
           {site.images?.about ? (
-            <img src={`../${site.images.about}`} alt="" decoding="async" />
+            <img src={assetHref(1 + depth, site.images.about)} alt="" decoding="async" />
           ) : (
-            <span className="avatar-initial">{Array.from(site.name.trim())[0] ?? "M"}</span>
+            <span className="avatar-initial">{Array.from(view.name.trim())[0] ?? "M"}</span>
           )}
         </div>
         {about ? (
@@ -542,7 +704,7 @@ export function aboutPage(
           </Prose>
         ) : null}
         {about?.links?.length ? (
-          <Section title={about.linksHeading ?? "Find me"}>
+          <Section title={about.linksHeading ?? text(locale, M.findMe)}>
             <EntryList>
               {about.links.map((link) => (
                 <Entry
@@ -567,6 +729,9 @@ export function aboutPage(
   });
 }
 
+const strong = (children: Child): Child => <strong>{children}</strong>;
+const code = (children: Child): Child => <code>{children}</code>;
+
 function skillUrl(skill: Skill): string {
   return skill.scope === "public" ? `/skills/${skill.slug}/` : `/skills/project/${skill.slug}/`;
 }
@@ -577,18 +742,29 @@ function skillInstallCommand(site: SiteIdentity, skill: Skill): string {
     : skill.sourceBasePath;
 }
 
-function SkillCard({ skill, site }: { skill: Skill; site: SiteIdentity }): Child {
+function SkillCard({
+  skill,
+  site,
+  locale,
+}: {
+  skill: Skill;
+  site: SiteIdentity;
+  locale: PageLocale;
+}): Child {
   return (
     <Entry
       href={skillUrl(skill)}
       title={skill.name}
       description={skill.description}
-      eyebrow={skill.scope === "project" ? "Project Skill" : "Public Skill"}
+      eyebrow={text(
+        locale,
+        skill.scope === "project" ? M.projectSkillEyebrow : M.publicSkillEyebrow,
+      )}
       meta={
         <MetaRow
           items={[
-            { label: `${skill.files.length} Markdown files` },
-            { label: `${skill.relations.length} references` },
+            { label: text(locale, M.markdownFiles, { count: count(skill.files.length) }) },
+            { label: text(locale, M.references, { count: count(skill.relations.length) }) },
           ]}
         />
       }
@@ -658,10 +834,18 @@ function SkillTreeNodes({
   );
 }
 
-function SkillFileTree({ skill, activePath }: { skill: Skill; activePath: string }): Child {
+function SkillFileTree({
+  skill,
+  activePath,
+  locale,
+}: {
+  skill: Skill;
+  activePath: string;
+  locale: PageLocale;
+}): Child {
   return (
-    <nav className="skill-files" aria-label={`${skill.name} file tree`}>
-      <span className="skill-files-label">Files</span>
+    <nav className="skill-files" aria-label={text(locale, M.fileTree, { name: skill.name })}>
+      <span className="skill-files-label">{text(locale, M.files)}</span>
       <SkillTreeNodes nodes={skillTree(skill.files)} activePath={activePath} />
     </nav>
   );
@@ -690,7 +874,15 @@ function SkillGraphNodeView({ node }: { node: SkillGraphNode }): Child {
   );
 }
 
-function SkillRelationGraph({ skill, direction }: { skill: Skill; direction: "LR" | "TB" }): Child {
+function SkillRelationGraph({
+  skill,
+  direction,
+  locale,
+}: {
+  skill: Skill;
+  direction: "LR" | "TB";
+  locale: PageLocale;
+}): Child {
   const graph = layoutSkillGraph(skill, direction);
   const markerId = `skill-arrow-${skill.slug}-${direction.toLowerCase()}`;
   return (
@@ -699,7 +891,7 @@ function SkillRelationGraph({ skill, direction }: { skill: Skill; direction: "LR
       viewBox={`0 0 ${graph.width} ${graph.height}`}
       width={graph.width}
       height={graph.height}
-      aria-label={`${skill.name} file reference graph`}
+      aria-label={text(locale, M.fileGraph, { name: skill.name })}
     >
       <defs>
         <marker
@@ -745,7 +937,7 @@ function SkillRelationGraph({ skill, direction }: { skill: Skill; direction: "LR
   );
 }
 
-function SkillRelations({ skill }: { skill: Skill }): Child {
+function SkillRelations({ skill, locale }: { skill: Skill; locale: PageLocale }): Child {
   const reachableFiles = skill.files.filter((file) => file.reachable).length;
   const unreferencedFiles = skill.files.filter((file) => !file.reachable);
   const missingNodes = skill.externalNodes.filter((node) => node.kind === "missing");
@@ -755,21 +947,26 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
   const compactGraph = skill.files.length + skill.externalNodes.length <= 3;
   return (
     <section className="skill-relations" data-skill-view-panel="relations" hidden>
-      <div className="skill-reading-summary" aria-label="Reading structure summary">
+      <div className="skill-reading-summary" aria-label={text(locale, M.summaryLabel)}>
         <span>
-          <strong>
-            {reachableFiles}/{skill.files.length}
-          </strong>
-          reachable docs
+          {richMessage(
+            locale,
+            M.summaryReachable,
+            { strong },
+            { reachable: count(reachableFiles), total: count(skill.files.length) },
+          )}
         </span>
         <span>
-          <strong>{skill.relations.length}</strong> references
+          {richMessage(
+            locale,
+            M.summaryReferences,
+            { strong },
+            { count: count(skill.relations.length) },
+          )}
         </span>
-        <span>
-          <strong>{maxDepth}</strong> max depth
-        </span>
+        <span>{richMessage(locale, M.summaryDepth, { strong }, { depth: count(maxDepth) })}</span>
         <span className={missingNodes.length > 0 ? "has-issue" : ""}>
-          <strong>{missingNodes.length}</strong> missing targets
+          {richMessage(locale, M.summaryMissing, { strong }, { count: count(missingNodes.length) })}
         </span>
       </div>
 
@@ -779,12 +976,12 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
             className={`skill-graph-canvas${compactGraph ? " compact" : ""}`}
             tabIndex={0}
             role="region"
-            aria-label="Scrollable file reference graph"
+            aria-label={text(locale, M.graphScroll)}
           >
-            <SkillRelationGraph skill={skill} direction="LR" />
+            <SkillRelationGraph skill={skill} direction="LR" locale={locale} />
           </div>
           <section className="skill-reading-paths" aria-labelledby={`${skill.slug}-paths`}>
-            <h3 id={`${skill.slug}-paths`}>Where references happen</h3>
+            <h3 id={`${skill.slug}-paths`}>{text(locale, M.whereReferences)}</h3>
             <ol>
               {skill.relations.map((relation) => {
                 const sourceFile = skill.files.find((file) => file.path === relation.source);
@@ -798,10 +995,16 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
                     <span className="skill-reading-context">
                       {relation.contexts.map((context) => (
                         <span>
-                          {context.section}
-                          {context.line ? ` · line ${context.line}` : ""}
-                          {context.linkText !== relation.label ? ` · "${context.linkText}"` : ""}
-                          {!sourceFile?.reachable ? " · entry unreachable" : ""}
+                          {[
+                            context.section,
+                            ...(context.line
+                              ? [text(locale, M.contextLine, { line: count(context.line) })]
+                              : []),
+                            ...(context.linkText !== relation.label
+                              ? [text(locale, M.contextLinkText, { text: context.linkText })]
+                              : []),
+                            ...(!sourceFile?.reachable ? [text(locale, M.contextUnreachable)] : []),
+                          ].join(" · ")}
                         </span>
                       ))}
                     </span>
@@ -813,20 +1016,17 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
         </Fragment>
       ) : (
         <div className="skill-reading-empty">
-          <strong>No cross-file reading paths</strong>
-          <p>
-            Once the Agent enters, it only reads <code>SKILL.md</code>. If other reference material
-            must be read, link it explicitly from the relevant sections with Markdown links.
-          </p>
+          <strong>{text(locale, M.noReadingPaths)}</strong>
+          <p>{richMessage(locale, M.noReadingPathsBody, { code })}</p>
         </div>
       )}
 
       {unreferencedFiles.length > 0 || missingNodes.length > 0 ? (
-        <aside className="skill-reading-issues" aria-label="Information structure issues">
-          <strong>Needs attention</strong>
+        <aside className="skill-reading-issues" aria-label={text(locale, M.issuesLabel)}>
+          <strong>{text(locale, M.needsAttention)}</strong>
           {unreferencedFiles.length > 0 ? (
             <p>
-              Unreachable from the entry:
+              {text(locale, M.unreachableFiles)}
               {unreferencedFiles.map((file) => (
                 <code>{file.path}</code>
               ))}
@@ -834,7 +1034,7 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
           ) : null}
           {missingNodes.length > 0 ? (
             <p>
-              Missing link targets:
+              {text(locale, M.missingTargets)}
               {missingNodes.map((node) => (
                 <code>{node.path}</code>
               ))}
@@ -845,11 +1045,7 @@ function SkillRelations({ skill }: { skill: Skill }): Child {
 
       {hasRelations ? (
         <div className="skill-graph-status" data-map-status aria-live="polite">
-          Select a node in the graph to see its role in the reading chain
-          {externalNodes.length > 0
-            ? `; ${externalNodes.length} targets outside the Skill currently`
-            : ""}
-          .
+          {text(locale, M.graphStatus, { external: count(externalNodes.length) })}
         </div>
       ) : null}
     </section>
@@ -940,8 +1136,8 @@ const SKILL_BROWSER_SCRIPT = `(() => {
       const command = copyButton.dataset.copyCommand;
       if (!command) return;
       await navigator.clipboard.writeText(command);
-      copyButton.textContent = 'Copied';
-      window.setTimeout(() => { copyButton.textContent = 'Copy'; }, 1400);
+      copyButton.textContent = copyButton.dataset.copiedLabel;
+      window.setTimeout(() => { copyButton.textContent = copyButton.dataset.copyLabel; }, 1400);
     });
   });
 })();`;
@@ -951,49 +1147,48 @@ export function skillsIndexPage(
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
   stylesheet: string = DEFAULT_THEME_STYLESHEET,
+  locale: PageLocale = defaultPageLocale(),
 ): string {
   const publicSkills = skills.filter((skill) => skill.scope === "public");
   const projectSkills = skills.filter((skill) => skill.scope === "project");
   return pageHtml({
     site,
     theme,
-    title: "Skills",
-    description: "Methods and working conventions that can be handed to an Agent.",
+    locale,
+    title: text(locale, M.skills),
+    description: text(locale, M.skillsIndexDescription),
     activePath: "/skills/",
-    styleHref: styleHref(1, stylesheet),
+    styleHref: styleHref(1 + localeDepth(locale), stylesheet),
     children: (
       <Page
         eyebrow="~/skills"
-        title="Skills"
-        description="Methods shared publicly and usable directly by an Agent."
+        title={text(locale, M.skills)}
+        description={text(locale, M.skillsIntro)}
       >
-        <Section title="Public Skills">
+        <Section title={text(locale, M.publicSkills)}>
           {publicSkills.length ? (
             <EntryList>
               {publicSkills.map((skill) => (
-                <SkillCard skill={skill} site={site} />
+                <SkillCard skill={skill} site={site} locale={locale} />
               ))}
             </EntryList>
           ) : (
-            <Text variant="secondary">Public Skills have no content yet.</Text>
+            <Text variant="secondary">{text(locale, M.publicSkillsEmpty)}</Text>
           )}
         </Section>
         {projectSkills.length ? (
           <Section
-            title="Project Skills"
-            description="Development and content workflows used inside this project"
+            title={text(locale, M.projectSkills)}
+            description={text(locale, M.projectSkillsDescription)}
           >
             <EntryList>
               {projectSkills.map((skill) => (
-                <SkillCard skill={skill} site={site} />
+                <SkillCard skill={skill} site={site} locale={locale} />
               ))}
             </EntryList>
           </Section>
         ) : null}
-        <Text variant="caption">
-          The reference graph starts from SKILL.md and is generated at build time from Markdown
-          links.
-        </Text>
+        <Text variant="caption">{text(locale, M.referenceGraphNote)}</Text>
       </Page>
     ),
   });
@@ -1004,6 +1199,7 @@ export function skillPage(
   theme: ThemeDefinition = blogTheme,
   site: SiteIdentity = DEFAULT_SITE,
   stylesheet: string = DEFAULT_THEME_STYLESHEET,
+  locale: PageLocale = defaultPageLocale(),
 ): string {
   const firstFile = skill.files[0];
   const command =
@@ -1011,35 +1207,41 @@ export function skillPage(
   return pageHtml({
     site,
     theme,
+    locale,
     title: skill.name,
     wide: true,
     description: skill.description,
     activePath: "/skills/",
     styleHref:
       skill.scope === "public"
-        ? styleHref(1 + slugDepth(skill.slug), stylesheet)
-        : styleHref(2 + slugDepth(skill.slug), stylesheet),
+        ? styleHref(1 + slugDepth(skill.slug) + localeDepth(locale), stylesheet)
+        : styleHref(2 + slugDepth(skill.slug) + localeDepth(locale), stylesheet),
     children: (
       <Page
         width="full"
         className="skill-page"
         title={skill.name}
-        eyebrow="Skill"
+        eyebrow={text(locale, M.skill)}
         description={skill.description}
       >
-        <a className="skill-back site-icon-label" href="/skills/">
-          <Icon name="arrow-left" size={14} /> All Skills
+        <a className="skill-back site-icon-label" href={localePath(locale, "/skills/")}>
+          <Icon name="arrow-left" size={14} /> {text(locale, M.allSkills)}
         </a>
         <header className="skill-browser-head">
           <span className="skill-command">
             {skill.scope === "project" ? (
-              <span className="skill-scope-badge">Project Skill · Internal</span>
+              <span className="skill-scope-badge">{text(locale, M.projectInternal)}</span>
             ) : null}
             <code>{command}</code>
           </span>
           <span className="skill-browser-actions">
-            <button type="button" data-copy-command={command}>
-              {skill.scope === "public" ? "Copy" : "Copy path"}
+            <button
+              type="button"
+              data-copy-command={command}
+              data-copy-label={text(locale, M.copy)}
+              data-copied-label={text(locale, M.copied)}
+            >
+              {text(locale, skill.scope === "public" ? M.copy : M.copyPath)}
             </button>
             {site.repositorySourceUrl ? (
               <a
@@ -1054,16 +1256,16 @@ export function skillPage(
           </span>
         </header>
         <div className="skill-stage" data-skill-browser>
-          <nav className="skill-view-tabs" aria-label="Skill view mode">
+          <nav className="skill-view-tabs" aria-label={text(locale, M.skillViewMode)}>
             <button type="button" data-skill-view="files" aria-pressed="true">
-              File browser
+              {text(locale, M.fileBrowser)}
             </button>
             <button type="button" data-skill-view="relations" aria-pressed="false">
-              Reference graph
+              {text(locale, M.referenceGraph)}
             </button>
           </nav>
           <div className="skill-browser" data-skill-view-panel="files">
-            <SkillFileTree skill={skill} activePath={firstFile.path} />
+            <SkillFileTree skill={skill} activePath={firstFile.path} locale={locale} />
             <section className="skill-viewer" aria-live="polite">
               <header className="skill-viewer-bar">
                 <span data-current-file>{firstFile.path}</span>
@@ -1089,7 +1291,7 @@ export function skillPage(
               ))}
             </section>
           </div>
-          <SkillRelations skill={skill} />
+          <SkillRelations skill={skill} locale={locale} />
         </div>
         <script dangerouslySetInnerHTML={{ __html: SKILL_BROWSER_SCRIPT }} />
       </Page>
@@ -1103,50 +1305,53 @@ export function agentMarkdown(
   site: SiteIdentity = DEFAULT_SITE,
   pages?: readonly SitePage[],
   mappedSections = false,
+  locale: PageLocale = defaultPageLocale(),
 ): string {
+  const view = siteView(site, locale);
+  const t = (message: MessageDescriptor, params?: MessageParams) => text(locale, message, params);
   const siteMap = pages
     ? pages.map((page) => `- [${page.title}](${sitePageAgentUrl(page)})`)
     : [
-        "- [Home](/)",
-        "- [Posts](/posts/)",
-        "- [Thoughts](/thoughts/)",
-        "- [Skills](/skills/) (browse files and the auto-generated Markdown reference graph)",
-        "- [About](/about/)",
+        `- [${t(M.home)}](${localePath(locale, "/")})`,
+        `- [${t(M.posts)}](${localePath(locale, "/posts/")})`,
+        `- [${t(M.thoughts)}](${localePath(locale, "/thoughts/")})`,
+        `- [${t(M.skills)}](${localePath(locale, "/skills/")}) ${t(M.skillsMapNote)}`,
+        `- [${t(M.about)}](${localePath(locale, "/about/")})`,
       ];
   const lines = [
-    `# ${site.name}`,
+    `# ${view.name}`,
     "",
-    "> Site index and content conventions for Agents to read.",
+    `> ${t(M.agentIndexSummary)}`,
     "",
-    "## Site map",
+    `## ${t(M.siteMap)}`,
     "",
     ...siteMap,
     "",
-    "## Content model",
+    `## ${t(M.contentModel)}`,
     "",
     mappedSections
-      ? "- Thoughts are trimmed, directly presentable notes."
-      : `- \`${site.contentDirectory}/thoughts/\` stores trimmed, directly presentable short thoughts.`,
+      ? `- ${t(M.thoughtsDescribed)}`
+      : `- ${t(M.thoughtsDirectory, { directory: site.contentDirectory })}`,
     mappedSections
-      ? "- Posts are full articles. Post files whose name or path segment starts with `_` are drafts."
-      : `- \`${site.contentDirectory}/posts/\` stores full posts; files whose name or path segment starts with \`_\` are drafts and are not published or rendered.`,
-    "- Content files support `.md` and `.mdx`, and may start with YAML frontmatter.",
-    "- Frontmatter currently has no required fields; `title`, `date`, `created_at`, `category` and `tags` are recognized by the site.",
+      ? `- ${t(M.postsDescribed)}`
+      : `- ${t(M.postsDirectory, { directory: site.contentDirectory })}`,
+    `- ${t(M.contentFormats)}`,
+    `- ${t(M.frontmatterFields)}`,
     "",
     // A consumer that owns the site map owns the routes of its content too.
     ...(pages
       ? []
       : [
-          "## Public content",
+          `## ${t(M.publicContent)}`,
           "",
-          `Public posts: ${posts.length}.`,
-          `Public thoughts: ${thoughts.length}.`,
+          t(M.publicPosts, { count: count(posts.length) }),
+          t(M.publicThoughts, { count: count(thoughts.length) }),
           "",
-          "### Posts",
+          `### ${t(M.posts)}`,
           "",
           ...posts.map((post) => `- [${post.title}](${itemUrl(post)}) — ${post.dateKey}`),
           "",
-          "### Thoughts",
+          `### ${t(M.thoughts)}`,
           "",
           ...thoughts.map(
             (thought) => `- [${thought.title}](${itemUrl(thought)}) — ${thought.dateKey}`,
@@ -1163,39 +1368,42 @@ export function llmText(
   site: SiteIdentity = DEFAULT_SITE,
   pages?: readonly SitePage[],
   agentGuide?: string,
+  locale: PageLocale = defaultPageLocale(),
 ): string {
   // A consumer that owns the site map owns the routes of its content too, so its index follows
   // the llms.txt shape: the summary, the guide, then one section of links per page group.
-  if (pages) return consumerLlmText(site, pages, agentGuide);
+  if (pages) return consumerLlmText(site, pages, agentGuide, locale);
+  const view = siteView(site, locale);
+  const t = (message: MessageDescriptor) => text(locale, message);
   return [
-    `# ${site.name}`,
-    `> ${site.description}`,
+    `# ${view.name}`,
+    `> ${view.description}`,
     "",
-    "## Pages",
-    "- Home: /",
-    "- Posts: /posts/",
-    "- Thoughts: /thoughts/",
-    "- Skills: /skills/",
-    "- About: /about/",
-    "- Agent Markdown: /agents.md",
+    `## ${t(M.pages)}`,
+    `- ${t(M.home)}: ${localePath(locale, "/")}`,
+    `- ${t(M.posts)}: ${localePath(locale, "/posts/")}`,
+    `- ${t(M.thoughts)}: ${localePath(locale, "/thoughts/")}`,
+    `- ${t(M.skills)}: ${localePath(locale, "/skills/")}`,
+    `- ${t(M.about)}: ${localePath(locale, "/about/")}`,
+    `- ${t(M.agentMarkdown)}: /agents.md`,
     "",
-    "## Posts",
+    `## ${t(M.posts)}`,
     ...posts.map((post) => `- ${post.title}: ${itemUrl(post)}`),
     "",
-    "## Thoughts",
+    `## ${t(M.thoughts)}`,
     ...thoughts.map((thought) => `- ${thought.title}: ${itemUrl(thought)}`),
     "",
-    "## Rules",
-    "- Only the public build output is considered presentable content.",
-    "- Drafts whose names start with _ under posts are not published or rendered.",
+    `## ${t(M.rules)}`,
+    `- ${t(M.rulePublicOnly)}`,
+    `- ${t(M.ruleDrafts)}`,
   ].join("\n");
 }
 
 /** The pages by group, in the order each group first appears. */
-function pageGroups(pages: readonly SitePage[]): [string, SitePage[]][] {
+function pageGroups(pages: readonly SitePage[], defaultGroup: string): [string, SitePage[]][] {
   const groups = new Map<string, SitePage[]>();
   for (const page of pages) {
-    const group = page.group ?? "Pages";
+    const group = page.group ?? defaultGroup;
     const members = groups.get(group);
     if (members) members.push(page);
     else groups.set(group, [page]);
@@ -1213,28 +1421,27 @@ function consumerLlmText(
   site: SiteIdentity,
   pages: readonly SitePage[],
   agentGuide: string | undefined,
+  locale: PageLocale,
 ): string {
+  const view = siteView(site, locale);
+  const t = (message: MessageDescriptor) => text(locale, message);
   const full = pages.some((page) => page.markdown !== undefined);
   return [
-    `# ${site.name}`,
+    `# ${view.name}`,
     "",
-    `> ${site.description}`,
+    `> ${view.description}`,
     "",
     ...(agentGuide ? [agentGuide.trim(), ""] : []),
-    ...pageGroups(pages).flatMap(([group, members]) => [
+    ...pageGroups(pages, t(M.pages)).flatMap(([group, members]) => [
       `## ${group}`,
       "",
       ...members.map(llmLink),
       "",
     ]),
-    "## Optional",
+    `## ${t(M.optional)}`,
     "",
-    ...(full
-      ? [
-          "- [Full text](/llms-full.txt): every page linked here as Markdown, in one file; large, so fetch single pages first",
-        ]
-      : []),
-    "- [Agent Markdown](/agents.md): the site map",
+    ...(full ? [`- [${t(M.fullText)}](/llms-full.txt): ${t(M.fullTextDescription)}`] : []),
+    `- [${t(M.agentMarkdown)}](/agents.md): ${t(M.agentMarkdownDescription)}`,
     "",
   ].join("\n");
 }
@@ -1247,7 +1454,9 @@ export function llmFullText(
   site: SiteIdentity,
   pages: readonly SitePage[],
   agentGuide?: string,
+  locale: PageLocale = defaultPageLocale(),
 ): string | undefined {
+  const view = siteView(site, locale);
   const documents = pages.flatMap((page) =>
     page.markdown === undefined
       ? []
@@ -1255,9 +1464,9 @@ export function llmFullText(
   );
   if (!documents.length) return undefined;
   return [
-    `# ${site.name}`,
+    `# ${view.name}`,
     "",
-    `> ${site.description}`,
+    `> ${view.description}`,
     "",
     ...(agentGuide ? [agentGuide.trim(), ""] : []),
     documents.join("\n\n---\n\n"),

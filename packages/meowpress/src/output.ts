@@ -53,6 +53,7 @@ export async function validateOutputDirectory(config: ResolvedSiteConfig): Promi
     join(project, ".agents"),
     join(project, ".git"),
   );
+  if (config.locales) inputs.push(config.localesDirectory);
   if (config.includeProjectSkills)
     inputs.push(join(config.projectRootDirectory ?? config.skillsDirectory, ".agents/skills"));
 

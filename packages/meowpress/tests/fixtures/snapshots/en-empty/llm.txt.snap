@@ -1,0 +1,18 @@
+# Meowpress site
+> A mixed timeline of long-form posts and fragmentary thoughts.
+
+## Pages
+- Home: /
+- Posts: /posts/
+- Thoughts: /thoughts/
+- Skills: /skills/
+- About: /about/
+- Agent Markdown: /agents.md
+
+## Posts
+
+## Thoughts
+
+## Rules
+- Only the public build output is considered presentable content.
+- Drafts whose names start with _ under posts are not published or rendered.

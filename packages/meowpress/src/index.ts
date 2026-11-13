@@ -12,7 +12,17 @@ export {
   type DuplicateContentPolicy,
   type LoadSectionOptions,
 } from "./content";
-export { buildSite, meowSite, type ResolvedSiteConfig, type SiteConfig } from "./build";
+export {
+  buildSite,
+  meowSite,
+  type ResolvedLocaleTarget,
+  type ResolvedLocales,
+  type ResolvedSiteConfig,
+  type SiteConfig,
+  type SiteLocales,
+} from "./build";
+export { createPageLocale, localePath, type PageLocale } from "./locale";
+export { themeMessages } from "./messages";
 export {
   aboutPage,
   agentMarkdown,

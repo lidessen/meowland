@@ -27,12 +27,12 @@ meowjsx (DOM-free reactive runtime; /web adapter)   +   meowcss (DOM-free token/
 (presentations & MDX)     (component gallery & inspect)     (Markdown/MDX static site)
 ```
 
-| Part | Responsibility | Boundary / Non-responsibility | Key Entry | Status |
-| --- | --- | --- | --- | --- |
-| Core Runtime & Styling | Signals (`meowjsx`), token/CSS generation (`meowcss`), explicit `/web` adapters | Root entries must stay DOM-free; never duplicate runtime/theme registries | [meowjsx](packages/meowjsx/README.md), [meowcss](packages/meowcss/README.md) | Available |
-| Component Library | Generic UI components, Assistant, finite `/json` catalog, concrete themes | No product persistence, uploads, or arbitrary code execution from JSON | [meowtail](packages/meowtail/README.md), [COMPONENTS](packages/meowtail/COMPONENTS.md) | Available |
-| Tooling Packages | Slide playback/MDX (`meowslides`), showcase & screenshot (`meowbook`), static site (`meowpress`) | One-way dependency on lower packages; MDX is trusted local code only | [meowslides](packages/meowslides/README.md), [meowbook](packages/meowbook/README.md), [meowpress](packages/meowpress/README.md) | Available |
-| Showcase & Examples | Private `apps/showcase` board, image-loading explainer, classroom courseware examples | Pass scenario data only; do not duplicate `meowtail` implementations | [apps/showcase](apps/showcase/README.md), [examples](examples/README.md) | Available |
+| Part                   | Responsibility                                                                                   | Boundary / Non-responsibility                                             | Key Entry                                                                                                                       | Status    |
+| ---------------------- | ------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------- | --------- |
+| Core Runtime & Styling | Signals (`meowjsx`), token/CSS generation (`meowcss`), explicit `/web` adapters                  | Root entries must stay DOM-free; never duplicate runtime/theme registries | [meowjsx](packages/meowjsx/README.md), [meowcss](packages/meowcss/README.md)                                                    | Available |
+| Component Library      | Generic UI components, Assistant, finite `/json` catalog, concrete themes                        | No product persistence, uploads, or arbitrary code execution from JSON    | [meowtail](packages/meowtail/README.md), [COMPONENTS](packages/meowtail/COMPONENTS.md)                                          | Available |
+| Tooling Packages       | Slide playback/MDX (`meowslides`), showcase & screenshot (`meowbook`), static site (`meowpress`) | One-way dependency on lower packages; MDX is trusted local code only      | [meowslides](packages/meowslides/README.md), [meowbook](packages/meowbook/README.md), [meowpress](packages/meowpress/README.md) | Available |
+| Showcase & Examples    | Private `apps/showcase` board, image-loading explainer, classroom courseware examples            | Pass scenario data only; do not duplicate `meowtail` implementations      | [apps/showcase](apps/showcase/README.md), [examples](examples/README.md)                                                        | Available |
 
 ## 3. Primary Work
 
@@ -52,12 +52,12 @@ meowjsx (DOM-free reactive runtime; /web adapter)   +   meowcss (DOM-free token/
 - **Signal & theme integrity**: One render graph shares core `meowjsx` modules; one theme assembly shares CSS token identity without bundler inlining duplicates.
 - **Public-export verification**: `typecheck` and unit tests consume built `dist` exports, requiring `bun run build` after source changes; package releases go through [releasing.md](docs/releasing.md).
 
-| Command | Purpose | Status | Reference |
-| --- | --- | --- | --- |
-| `bun install` / `bun run build` / `bun run pack` | Install deps, emit ESM + declarations, pack local tarballs | Available | [README.md](README.md#local-development) |
-| `bun run check` | Run Oxfmt check, Oxlint, TypeScript check, and unit tests | Available | [docs/development-checks.md](docs/development-checks.md) |
-| `bun run --cwd apps/showcase check` | Verify private showcase board | Available | [apps/showcase/README.md](apps/showcase/README.md) |
-| `bun run test:presentation` | Browser contract tests for presentation runtime | Available | [docs/development-checks.md](docs/development-checks.md) |
+| Command                                          | Purpose                                                    | Status    | Reference                                                |
+| ------------------------------------------------ | ---------------------------------------------------------- | --------- | -------------------------------------------------------- |
+| `bun install` / `bun run build` / `bun run pack` | Install deps, emit ESM + declarations, pack local tarballs | Available | [README.md](README.md#local-development)                 |
+| `bun run check`                                  | Run Oxfmt check, Oxlint, TypeScript check, and unit tests  | Available | [docs/development-checks.md](docs/development-checks.md) |
+| `bun run --cwd apps/showcase check`              | Verify private showcase board                              | Available | [apps/showcase/README.md](apps/showcase/README.md)       |
+| `bun run test:presentation`                      | Browser contract tests for presentation runtime            | Available | [docs/development-checks.md](docs/development-checks.md) |
 
 ## 6. Changes, Risks & Health
 

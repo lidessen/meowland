@@ -1,6 +1,6 @@
 # Meowland development entry point
 
-This is a standalone UI capability library. Start with the [root README](README.md), the owning package's README and any deeper AGENTS file; then load methods per task from the [skill index](.agents/README.md). Do not pre-read all skills or historical records.
+This is a standalone UI capability library. Start with the [root README](README.md), [PROJECT-MAP.md](PROJECT-MAP.md), the owning package's README and any deeper AGENTS file; then load methods per task from the [skill index](.agents/README.md). Do not pre-read all skills or historical records. `CLAUDE.md` delegates here via `@AGENTS.md`.
 
 ## Boundaries that break easily
 
@@ -52,4 +52,4 @@ Independent work may run in parallel; align the owner of shared files first and 
 
 Check commands and coverage are in [development checks](docs/development-checks.md). For visual and interaction changes, actually open the relevant scenario; report static checks, behavior observation, installed-state acceptance and official release separately. Once the necessary checks hold, add tests only for new changes, failures or unresolved risks; do not repeat the full matrix in place of judgment.
 
-The release contract is in [local releasing](docs/releasing.md). Actions on regular push/PR only run checks (build, format, lint, types, unit and browser tests); npm publishing only goes through the user-authorized manual workflow_dispatch + Trusted Publishing OIDC and does not deploy; building, packing, tagging or a draft Release does not equal a completed release. Commits, pushes and real releases still follow the authorization for this task.
+The release contract is in [local releasing](docs/releasing.md). Actions on regular push/PR only run checks (build, format, lint, types, unit and browser tests); npm publishing only goes through the user-authorized manual workflow_dispatch + Trusted Publishing OIDC and does not deploy; building, packing, tagging or a draft Release does not equal a completed release. Commits, pushes and real releases still follow the authorization for this task. Keep linear history on `main`, never commit local logs or machine-local home paths, and record cross-session work in `~/.workcells` (`task/local` record mode, zero plaintext credentials).

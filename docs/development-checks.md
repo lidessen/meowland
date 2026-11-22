@@ -1,6 +1,6 @@
 # Development checks
 
-Status: being implemented; commands follow the root `package.json`. Checks and fixes are separate: a failing check returns non-zero and does not automatically change source, update golden files, or publish packages.
+Status: current; commands follow the root `package.json`. Checks and fixes are separate: a failing check returns non-zero and does not automatically change source, update golden files, or publish packages.
 
 ## Installation and versions
 

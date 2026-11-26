@@ -2,9 +2,6 @@
 
 ## Unreleased
 
-- Add `doodleTheme`, an editorial paper-and-ink theme with crisp outlines and optional Geist.
-  It supports light and dark schemes and appears in the documentation and component gallery.
-
 - `createMeowUITheme({ theme, config })` from `meowtail/web` is a runtime plugin that delivers a
   theme to every Web mount: the stylesheet (shared per document through `meowcss/web`
   `mountStyles`), the theme attributes on the container and the focus-modality tracker, all
@@ -118,6 +115,11 @@
 - The Meowbook gallery's Theme control switches every story between Standard, Journal and Meow.
 - Add `journalFonts` and the `ThemeFont` type: the Fontsource packages that carry the faces Journal
   names. Meowtail ships no font files. The gallery paints Journal stories with those faces.
+
+## 0.4.0-alpha.4
+
+- Add `doodleTheme`, an editorial paper-and-ink theme with crisp outlines and optional Geist.
+  It supports light and dark schemes and appears in the documentation and component gallery.
 
 ## 0.4.0-alpha.3
 

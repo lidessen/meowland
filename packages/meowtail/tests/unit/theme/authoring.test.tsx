@@ -113,7 +113,7 @@ describe("host authoring floor", () => {
     const raised = css`
       ${ui.surface.raised}
     `.text;
-    expect(raised).toContain(`border: ${uiTokens.line.width} solid ${uiTokens.line.edge};`);
+    expect(raised).toContain(`border: ${uiTokens.line.raisedWidth} solid ${uiTokens.line.edge};`);
     expect(raised).toContain(`background: ${uiTokens.surface.raised};`);
     const flat = css`
       ${ui.interactive.flat}

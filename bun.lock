@@ -69,7 +69,7 @@
       "peerDependencies": {
         "meowcss": "^0.3.0-alpha.1",
         "meowjsx": "^0.3.0-alpha.0",
-        "meowtail": "^0.4.0-alpha.4",
+        "meowtail": "^0.4.0-alpha.5",
       },
     },
     "packages/meowcss": {
@@ -142,7 +142,7 @@
     },
     "packages/meowtail": {
       "name": "meowtail",
-      "version": "0.4.0-alpha.4",
+      "version": "0.4.0-alpha.5",
       "dependencies": {
         "@floating-ui/dom": "^1.8.0",
         "@shikijs/langs": "4.3.1",

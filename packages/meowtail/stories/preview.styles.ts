@@ -14,6 +14,11 @@ export const previewStyles = css`
     color: ${uiTokens.ink.primary};
     font-family: ${uiTokens.type.sans};
   }
+  body {
+    min-height: 100vh;
+    background-image: ${uiTokens.canvas.wash};
+    background-attachment: fixed;
+  }
   * {
     box-sizing: border-box;
   }

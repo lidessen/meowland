@@ -14,6 +14,7 @@ import {
   Pencil,
   PawPrint,
   Sun,
+  TreePine,
   Waves,
 } from "meowtail/icons/lucide";
 import type { Catalog, NavigationGroup } from "./catalog";
@@ -940,6 +941,9 @@ function Document({
                     </AppearanceChoice>
                     <AppearanceChoice group="docs-theme" value="doodle" icon={Pencil}>
                       {DOCS_THEME_LABELS.doodle}
+                    </AppearanceChoice>
+                    <AppearanceChoice group="docs-theme" value="pine" icon={TreePine}>
+                      {DOCS_THEME_LABELS.pine}
                     </AppearanceChoice>
                   </fieldset>
                   <fieldset>

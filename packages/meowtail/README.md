@@ -595,6 +595,24 @@ import { createMeowUITheme } from "meowtail/web";
 const theme = createMeowUITheme({ theme: doodleTheme });
 ```
 
+Doodle uses independent control stroke, resting lift, and press roles, so the ink border stays
+visible as the button sinks. The canvas wash and marker colors are decorative; status colors remain
+separate. Compare the same form and metric cards in the gallery's Theme Workbench.
+
+### Pine theme
+
+`pineTheme` uses cool paper and deep pine green in light mode, and blue-black with mint in dark
+mode. Its TerminalBlock stays dark in either scheme. Command and prompt ink use mint, ANSI
+magenta maps to lavender, and exit status has a separate color. `pineFonts` names the optional
+Inter web font. The monospace stack prefers IBM Plex Mono when supplied by the host.
+
+```ts
+import { pineTheme } from "meowtail/theme";
+import { createMeowUITheme } from "meowtail/web";
+
+const theme = createMeowUITheme({ theme: pineTheme });
+```
+
 All built-in themes share one theme root name and one set of `--ui-*` variables, so mount one theme per document. `standardUiTokenValues` and the `UiTokenValues` type let a host value the same roles for its own
 theme; a value tree that misses or adds a role does not typecheck. In Meowbook, the gallery's Theme
 control paints every story with any of them, and a query such as `?theme=doodle` selects one in a link.

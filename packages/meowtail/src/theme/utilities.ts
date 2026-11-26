@@ -79,7 +79,7 @@ function surfaceDeclarations(key: SurfaceKey): string {
     case "canvas":
       return `background: ${uiTokens.surface.canvas}; color: ${uiTokens.ink.primary};`;
     case "raised":
-      return `border: ${uiTokens.line.width} solid ${uiTokens.line.edge}; border-radius: ${uiTokens.radius.xl}; background: ${uiTokens.surface.raised}; box-shadow: ${uiTokens.shadow.raised}; color: ${uiTokens.ink.primary}; --meowui-focus-halo: ${uiTokens.surface.raised};`;
+      return `border: ${uiTokens.line.raisedWidth} solid ${uiTokens.line.edge}; border-radius: ${uiTokens.radius.xl}; background: ${uiTokens.surface.raised}; box-shadow: ${uiTokens.shadow.raised}; color: ${uiTokens.ink.primary}; --meowui-focus-halo: ${uiTokens.surface.raised};`;
     case "overlay":
       return `border: 0; border-radius: ${uiTokens.radius.xl}; background: ${uiTokens.surface.overlay}; box-shadow: ${uiTokens.shadow.float}; color: ${uiTokens.ink.primary}; --meowui-focus-halo: ${uiTokens.surface.overlay};`;
     case "fill":

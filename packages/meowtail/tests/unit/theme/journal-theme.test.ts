@@ -1,6 +1,13 @@
 import { expect, test } from "bun:test";
 import { auditCSS } from "meowcss";
-import { doodleTheme, doodleUiTokenValues, ottrTheme, ottrUiTokenValues } from "meowtail/theme";
+import {
+  doodleTheme,
+  doodleUiTokenValues,
+  ottrTheme,
+  ottrUiTokenValues,
+  pineTheme,
+  pineUiTokenValues,
+} from "meowtail/theme";
 import {
   journalFonts,
   journalTheme,
@@ -116,6 +123,7 @@ test("all concrete themes keep text, actions and focus readable in both schemes"
     ["meow", meowUiTokenValues],
     ["ottr", ottrUiTokenValues],
     ["doodle", doodleUiTokenValues],
+    ["pine", pineUiTokenValues],
   ] as const) {
     for (const scheme of [0, 1] as const) {
       for (const [ink, surface, minimum] of pairs) {
@@ -141,4 +149,13 @@ test("Ottr can use its accent for compact text on canvas and chrome", () => {
       );
     }
   }
+});
+
+test("Pine's fixed dark terminal preserves readable command, output and state colors", () => {
+  const { surface, divider, focus, ...inks } = pineUiTokenValues.terminal;
+  expect(pineTheme.name).toBe(standardTheme.name);
+  expect(declaredNames(pineTheme.cssText)).toEqual(declaredNames(standardTheme.cssText));
+  for (const ink of Object.values(inks)) expect(contrast(ink, surface)).toBeGreaterThanOrEqual(4.5);
+  expect(contrast(focus, surface)).toBeGreaterThanOrEqual(3);
+  expect(divider).not.toBe(focus);
 });

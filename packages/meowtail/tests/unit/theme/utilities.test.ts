@@ -31,7 +31,7 @@ describe("built-in theme utility values", () => {
 
   test("surface and text utility declarations preserve complete token roles", () => {
     const raised = declarations(ui.surface.raised);
-    expect(raised).toContain(`border: ${uiTokens.line.width} solid ${uiTokens.line.edge};`);
+    expect(raised).toContain(`border: ${uiTokens.line.raisedWidth} solid ${uiTokens.line.edge};`);
     expect(raised).toContain(`border-radius: ${uiTokens.radius.xl};`);
     expect(raised).toContain(`background: ${uiTokens.surface.raised};`);
     expect(raised).toContain(`box-shadow: ${uiTokens.shadow.raised};`);

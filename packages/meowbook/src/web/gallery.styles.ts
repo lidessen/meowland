@@ -5,6 +5,7 @@ import {
   journalUiTokens,
   meowUiTokens,
   ottrUiTokens,
+  pineUiTokens,
   uiTokens,
 } from "meowtail/theme";
 import type { Button, Disclosure, NavList, SearchInput } from "meowtail";
@@ -17,7 +18,7 @@ const navList = parts<typeof NavList>("nav-list");
 const searchInput = parts<typeof SearchInput>("search-input");
 
 /** The Meowtail themes that can paint the gallery's own chrome; standard when none is named. */
-export const chromeThemes = ["standard", "journal", "meow", "ottr", "doodle"] as const;
+export const chromeThemes = ["standard", "journal", "meow", "ottr", "doodle", "pine"] as const;
 export type ChromeTheme = (typeof chromeThemes)[number];
 /** The root attribute that selects a chrome theme other than standard. */
 export const chromeThemeAttribute = "data-meowbook-chrome";
@@ -44,6 +45,7 @@ export const chromeThemeStyles = [
   scopedTokens("meow", meowUiTokens),
   scopedTokens("ottr", ottrUiTokens),
   scopedTokens("doodle", doodleUiTokens),
+  scopedTokens("pine", pineUiTokens),
 ].join("\n");
 
 export const galleryStyles = css`
@@ -51,7 +53,8 @@ export const galleryStyles = css`
   font-family: ${uiTokens.type.sans};
   font-size: ${uiTokens.type.label};
   color: ${uiTokens.ink.primary};
-  background: ${uiTokens.surface.canvas};
+  background: ${uiTokens.canvas.wash} ${uiTokens.surface.canvas};
+  background-attachment: fixed;
 }
 * {
   box-sizing: border-box;

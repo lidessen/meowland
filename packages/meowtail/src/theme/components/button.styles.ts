@@ -30,9 +30,12 @@ export const buttonStyles = css`
     box-shadow ${uiTokens.motion.settle} ${uiTokens.motion.ease},
     transform ${uiTokens.motion.response} ${uiTokens.motion.ease};
 }
-/* A press settles the action half a pixel, so a click is felt, not only seen. */
-:where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}):active:not(:disabled) {
+/* A press settles the action; themes can coordinate its offset with the resting lift. */
+:where(${iconButtonPartRefs.root}):active:not(:disabled) {
   transform: translateY(0.5px);
+}
+:where(${buttonPartRefs.root}):active:not(:disabled) {
+  transform: translateY(${uiTokens.button.pressOffset});
 }
 ${iconButtonPartRefs.root} {
   width: ${uiTokens.control.regular};
@@ -51,22 +54,33 @@ ${buttonPartRefs.root} {
   ${buttonOptions.when({ variant: "primary" })} {
     background: ${uiTokens.action.primary};
     color: ${uiTokens.action.onPrimary};
+    border: ${uiTokens.button.filledStroke} solid ${uiTokens.line.edge};
     box-shadow: ${uiTokens.shadow.filled};
+    &:active:not(:disabled) {
+      box-shadow: ${uiTokens.button.filledPressed};
+    }
   }
 }
 ${buttonPartRefs.root} {
   ${buttonOptions.when({ variant: "danger" })} {
     background: ${uiTokens.action.danger};
     color: ${uiTokens.action.onDanger};
+    border: ${uiTokens.button.filledStroke} solid ${uiTokens.line.edge};
     box-shadow: ${uiTokens.shadow.filled};
+    &:active:not(:disabled) {
+      box-shadow: ${uiTokens.button.filledPressed};
+    }
   }
 }
 ${buttonPartRefs.root} {
   ${buttonOptions.when({ variant: "outline" })} {
-    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border: ${uiTokens.button.outlineStroke} solid ${uiTokens.line.edge};
     background: ${uiTokens.surface.raised};
     /* A one-pixel drop lifts the outline action off the page without a heavier border. */
     box-shadow: ${uiTokens.shadow.action};
+    &:active:not(:disabled) {
+      box-shadow: ${uiTokens.button.outlinePressed};
+    }
   }
 }
 ${buttonPartRefs.root} {

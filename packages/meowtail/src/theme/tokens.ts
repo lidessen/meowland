@@ -1,6 +1,10 @@
 import { alertOptions } from "../components/alert.options";
 import { defineOptions, defineTokens, tokenRef } from "meowcss";
 
+// A component role can inherit a palette role while remaining independently overridable.
+const uiRole = (...path: string[]) => String(tokenRef("ui", ...path));
+const codeRole = (...path: string[]) => String(tokenRef("code-highlight", ...path));
+
 /** Shared standard-theme parameters; scheme is built in, no fixed density axis. */
 export const standardOptions = defineOptions("meowui", {});
 
@@ -30,6 +34,37 @@ export const standardUiTokenValues = {
     knockout: ["#ffffff", "#1a1a1a"],
     scrim: ["rgb(0 0 0 / 24%)", "rgb(0 0 0 / 50%)"],
   },
+  /** Decorative canvas layers never replace the readable background color. */
+  canvas: { wash: "none", selection: "revert" },
+  /** Non-semantic illustration fills; never use these to communicate outcome. */
+  marker: {
+    blue: ["#cce7fa", "#254359"],
+    ochre: ["#f4e6b6", "#4c3d24"],
+    coral: ["#f6cbc1", "#59322d"],
+  },
+  /** The ink edge stays independent of the shadow that collapses when pressed. */
+  button: {
+    filledStroke: "0",
+    outlineStroke: uiRole("line", "width"),
+    pressOffset: "0.5px",
+    filledPressed: uiRole("shadow", "filled"),
+    outlinePressed: uiRole("shadow", "action"),
+  },
+  /** A terminal can keep its own contrast and syntax colors regardless of the host scheme. */
+  terminal: {
+    surface: uiRole("surface", "fill"),
+    ink: uiRole("ink", "primary"),
+    muted: uiRole("ink", "tertiary"),
+    command: uiRole("ink", "primary"),
+    prompt: uiRole("ink", "tertiary"),
+    divider: uiRole("line", "divider"),
+    focus: uiRole("state", "focus"),
+    danger: uiRole("status", "danger"),
+    success: uiRole("status", "success"),
+    warning: uiRole("status", "warning"),
+    info: uiRole("status", "info"),
+    reference: codeRole("function"),
+  },
   /** Tooltip and toast: a dark surface in both schemes. */
   inverse: {
     surface: ["#262626", "#404040"],
@@ -43,6 +78,7 @@ export const standardUiTokenValues = {
    */
   line: {
     width: "1px",
+    raisedWidth: uiRole("line", "width"),
     edge: ["rgb(0 0 0 / 8%)", "rgb(255 255 255 / 9%)"],
     divider: ["rgb(0 0 0 / 6%)", "rgb(255 255 255 / 6%)"],
     control: ["rgb(0 0 0 / 13%)", "rgb(255 255 255 / 14%)"],

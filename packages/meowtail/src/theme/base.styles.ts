@@ -34,6 +34,8 @@ export const foundationStyles = css`
      dark one. Only the theme plugin marks a page; an embedded region keeps its host's ground. */
   :where(html[${pageAttribute}][data-meowui-scope]) {
     background-color: ${uiTokens.surface.canvas};
+    background-image: ${uiTokens.canvas.wash};
+    background-attachment: fixed;
     color-scheme: light;
   }
   :where(html[${pageAttribute}][data-meowui-color-scheme="dark"]) {
@@ -49,6 +51,9 @@ export const foundationStyles = css`
     [data-meowui-theme-root="meowui"] ::after
   ) {
     box-sizing: border-box;
+  }
+  :where([data-meowui-theme-root="meowui"]) ::selection {
+    background-color: ${uiTokens.canvas.selection};
   }
   :where([data-meowui-theme-root="meowui"] :is(img, video)) {
     max-width: 100%;

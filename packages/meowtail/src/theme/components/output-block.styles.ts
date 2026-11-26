@@ -1,17 +1,20 @@
 import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
-import { codeHighlightTokens } from "../shared/code-highlight.tokens";
 
 import type { DiffBlock } from "../../components/diff-block";
 import type { OutputBlock } from "../../components/output-block";
 import type { ReadBlock } from "../../components/read-block";
 import type { SearchBlock } from "../../components/search-block";
+import type { StatusDot } from "../../components/status-dot";
+import type { StateDot } from "../../components/state-dot";
 import type { TerminalBlock } from "../../components/terminal-block";
 import { ui } from "../utilities";
 const outputBlockPartRefs = parts<typeof OutputBlock>("output-block");
 const diffBlockPartRefs = parts<typeof DiffBlock>("diff-block");
 const readBlockPartRefs = parts<typeof ReadBlock>("read-block");
 const searchBlockPartRefs = parts<typeof SearchBlock>("search-block");
+const statusDotPartRefs = parts<typeof StatusDot>("status-dot");
+const stateDotPartRefs = parts<typeof StateDot>("state-dot");
 const terminalBlockPartRefs = parts<typeof TerminalBlock>("terminal-block");
 export const outputBlockStyles = css`
   ${outputBlockPartRefs.root} {
@@ -146,7 +149,31 @@ export const outputBlockStyles = css`
   ${searchBlockPartRefs.number} {
     color: ${uiTokens.ink.tertiary};
   }
+  ${terminalBlockPartRefs.root} ${outputBlockPartRefs.root} {
+    background: ${uiTokens.terminal.surface};
+    color: ${uiTokens.terminal.ink};
+  }
+  ${terminalBlockPartRefs.root} :is(${outputBlockPartRefs.actions}, ${outputBlockPartRefs.toggle}) {
+    color: ${uiTokens.terminal.muted};
+  }
+  ${terminalBlockPartRefs.root} :is(${outputBlockPartRefs.actions}, ${outputBlockPartRefs.toggle}, ${outputBlockPartRefs.body}):focus-visible {
+    outline-color: ${uiTokens.terminal.focus};
+  }
+  ${terminalBlockPartRefs.status}[data-tone="danger"] {
+    color: ${uiTokens.terminal.danger};
+    background: color-mix(in srgb, ${uiTokens.terminal.danger} 10%, transparent);
+  }
+  ${terminalBlockPartRefs.status}[data-tone="danger"] > ${statusDotPartRefs.root} {
+    background: currentColor;
+  }
+  ${terminalBlockPartRefs.runState} ${stateDotPartRefs.root}[data-state="done"] {
+    color: ${uiTokens.terminal.success};
+  }
+  ${terminalBlockPartRefs.runState} ${stateDotPartRefs.root}[data-state="warning"] {
+    color: ${uiTokens.terminal.warning};
+  }
   ${terminalBlockPartRefs.command} {
+    color: ${uiTokens.terminal.command};
     margin: 0;
     min-width: 0;
     overflow: hidden;
@@ -158,7 +185,7 @@ export const outputBlockStyles = css`
     padding-left: 30px;
     max-height: 150px;
     overflow-y: auto;
-    background: ${uiTokens.surface.fill};
+    background: ${uiTokens.terminal.surface};
   }
   ${terminalBlockPartRefs.root} ${outputBlockPartRefs.title} > div {
     display: flex;
@@ -167,7 +194,7 @@ export const outputBlockStyles = css`
     min-width: 0;
   }
   ${terminalBlockPartRefs.root}[data-terminal-body="true"] ${outputBlockPartRefs.header} {
-    border-bottom: 1px solid ${uiTokens.line.divider};
+    border-bottom: 1px solid ${uiTokens.terminal.divider};
   }
   ${terminalBlockPartRefs.root} ${outputBlockPartRefs.body} {
     padding-left: 30px;
@@ -192,7 +219,7 @@ export const outputBlockStyles = css`
   }
   ${terminalBlockPartRefs.cwd} {
     flex: none;
-    color: ${uiTokens.ink.tertiary};
+    color: ${uiTokens.terminal.prompt};
   }
   ${terminalBlockPartRefs.runState} {
     position: absolute;
@@ -217,22 +244,22 @@ export const outputBlockStyles = css`
     font-weight: ${uiTokens.type.weight.semibold};
   }
   ${terminalBlockPartRefs.span}:is([data-ansi-color="31"], [data-ansi-color="91"]) {
-    color: ${uiTokens.status.danger};
+    color: ${uiTokens.terminal.danger};
   }
   ${terminalBlockPartRefs.span}:is([data-ansi-color="32"], [data-ansi-color="92"]) {
-    color: ${uiTokens.status.success};
+    color: ${uiTokens.terminal.success};
   }
   ${terminalBlockPartRefs.span}:is([data-ansi-color="33"], [data-ansi-color="93"]) {
-    color: ${uiTokens.status.warning};
+    color: ${uiTokens.terminal.warning};
   }
   ${terminalBlockPartRefs.span}:is([data-ansi-color="34"], [data-ansi-color="94"], [data-ansi-color="36"], [data-ansi-color="96"]) {
-    color: ${uiTokens.status.info};
+    color: ${uiTokens.terminal.info};
   }
   ${terminalBlockPartRefs.span}:is([data-ansi-color="35"], [data-ansi-color="95"]) {
-    color: ${codeHighlightTokens.function};
+    color: ${uiTokens.terminal.reference};
   }
   ${terminalBlockPartRefs.span}[data-ansi-color="90"] {
-    color: ${uiTokens.ink.tertiary};
+    color: ${uiTokens.terminal.muted};
   }
 
   @media (pointer: coarse) {

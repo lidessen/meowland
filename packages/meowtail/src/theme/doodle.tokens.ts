@@ -1,4 +1,4 @@
-import { defineTokens } from "meowcss";
+import { defineTokens, tokenRef } from "meowcss";
 import type { ThemeFont } from "./journal.tokens";
 import { standardUiTokenValues, type UiTokenValues } from "./tokens";
 
@@ -17,6 +17,25 @@ const drawnEdge = [
  */
 export const doodleUiTokenValues = {
   ...standardUiTokenValues,
+  canvas: {
+    wash: [
+      "radial-gradient(ellipse 540px 430px at 0% 0%, #f1e5ca 0%, transparent 96%), radial-gradient(ellipse 500px 420px at 100% 60%, #dceef8 0%, transparent 96%)",
+      "radial-gradient(ellipse 540px 430px at 0% 0%, #33291e 0%, transparent 96%), radial-gradient(ellipse 500px 420px at 100% 60%, #202e38 0%, transparent 96%)",
+    ],
+    selection: ["#f6db87", "#745927"],
+  },
+  marker: {
+    blue: ["#a8d8ef", "#2d536d"],
+    ochre: ["#f6db87", "#66512a"],
+    coral: ["#ff9787", "#723b31"],
+  },
+  button: {
+    filledStroke: "2px",
+    outlineStroke: "2px",
+    pressOffset: "2px",
+    filledPressed: String(tokenRef("ui", "shadow", "pressed")),
+    outlinePressed: String(tokenRef("ui", "shadow", "pressed")),
+  },
   surface: {
     canvas: ["#f9f8f4", "#191714"],
     reading: ["#f9f8f4", "#191714"],
@@ -30,7 +49,9 @@ export const doodleUiTokenValues = {
   },
   inverse: { surface: ["#171715", "#393126"], ink: "#fbf3e5", action: "#a8d6ff" },
   line: {
+    ...standardUiTokenValues.line,
     width: "1px",
+    raisedWidth: "2px",
     edge: ["#171715", "#c6b59c"],
     divider: ["#ddd8ce", "#504638"],
     control: ["#57534c", "#9f907a"],
@@ -59,6 +80,8 @@ export const doodleUiTokenValues = {
   },
   control: {
     ...standardUiTokenValues.control,
+    regular: "44px",
+    large: "48px",
     thumb: ["#ffffff", "#514333"],
     knob: ["#ffffff", "#fbf3e5"],
   },
@@ -95,10 +118,10 @@ export const doodleUiTokenValues = {
   },
   shadow: {
     ...standardUiTokenValues.shadow,
-    raised: drawnEdge,
+    raised: inkLift,
     field: ["none", "none"],
     action: inkLift,
-    filled: drawnEdge,
+    filled: inkLift,
     pressed: "none",
     float: drawnEdge,
     dock: drawnEdge,

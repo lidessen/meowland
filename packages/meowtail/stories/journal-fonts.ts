@@ -25,3 +25,6 @@ export const journalFontFaces = [
 
 /** The Doodle canvas uses Geist for Latin and lets system fonts handle other scripts. */
 export const doodleFontFaces = face("Geist Variable", geistLatin, "100 900");
+
+/** Pine uses the same Latin Inter file as Journal. */
+export const pineFontFaces = face("Inter Variable", interLatin, "100 900");

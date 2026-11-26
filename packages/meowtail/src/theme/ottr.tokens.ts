@@ -37,6 +37,7 @@ export const ottrUiTokenValues = {
     action: "#8ad3bd",
   },
   line: {
+    ...standardUiTokenValues.line,
     width: "1px",
     edge: ["#e3dfd3", "#3b3834"],
     divider: ["#ece9df", "#34322f"],

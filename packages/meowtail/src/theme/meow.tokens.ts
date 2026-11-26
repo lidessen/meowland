@@ -9,6 +9,7 @@ import { standardUiTokenValues, type UiTokenValues } from "./tokens";
  * component keeps its geometry and behavior.
  */
 export const meowUiTokenValues = {
+  ...standardUiTokenValues,
   surface: {
     canvas: ["#faf8f3", "#0a0a0a"],
     reading: ["#fffdf8", "#0a0a0a"],
@@ -26,6 +27,7 @@ export const meowUiTokenValues = {
     action: "#ff6b6e",
   },
   line: {
+    ...standardUiTokenValues.line,
     width: "1px",
     edge: ["rgb(10 10 10 / 10%)", "rgb(255 255 255 / 10%)"],
     divider: ["rgb(10 10 10 / 7%)", "rgb(255 255 255 / 7%)"],

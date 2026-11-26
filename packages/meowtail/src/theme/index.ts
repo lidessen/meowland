@@ -20,6 +20,7 @@ import { standardOptions, uiTokens, chatTokens, alertTokens } from "./tokens";
 import { journalUiTokens } from "./journal.tokens";
 import { ottrUiTokens } from "./ottr.tokens";
 import { doodleUiTokens } from "./doodle.tokens";
+import { pineUiTokens } from "./pine.tokens";
 import { meowUiTokens } from "./meow.tokens";
 import { utilityStyles } from "./utilities";
 import { choiceSelectStyles } from "./components/choice-select.styles";
@@ -133,6 +134,7 @@ export {
 export { meowUiTokenValues, meowUiTokens } from "./meow.tokens";
 export { ottrUiTokenValues, ottrUiTokens } from "./ottr.tokens";
 export { doodleFonts, doodleUiTokenValues, doodleUiTokens } from "./doodle.tokens";
+export { pineFonts, pineUiTokenValues, pineUiTokens } from "./pine.tokens";
 export { ui, utilityStyles } from "./utilities";
 export { chartTokens } from "./shared/chart.tokens";
 
@@ -337,6 +339,22 @@ export const doodleTheme = /* @__PURE__ */ defineTheme({
   options: standardOptions,
   defaults: { scheme: "auto" },
   tokens: doodleThemeTokens,
+  styles: standardThemeStyles,
+});
+
+/** Pine pairs a pine-green interface with a fixed-dark developer terminal. */
+export const pineThemeTokens = [
+  pineUiTokens,
+  chatTokens,
+  alertTokens,
+  codeHighlightTokens,
+  chartTokens,
+] as const;
+
+export const pineTheme = /* @__PURE__ */ defineTheme({
+  options: standardOptions,
+  defaults: { scheme: "auto" },
+  tokens: pineThemeTokens,
   styles: standardThemeStyles,
 });
 

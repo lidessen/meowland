@@ -18,6 +18,7 @@ const mono =
  * component keeps its geometry and behavior.
  */
 export const journalUiTokenValues = {
+  ...standardUiTokenValues,
   surface: {
     canvas: ["#fbf9f4", "#121110"],
     reading: ["#fbf9f4", "#121110"],
@@ -35,6 +36,7 @@ export const journalUiTokenValues = {
     action: "#ec9284",
   },
   line: {
+    ...standardUiTokenValues.line,
     width: "1px",
     edge: ["#e4ddd1", "#2c2925"],
     divider: ["#ebe5da", "#24221f"],

@@ -17,6 +17,7 @@ import {
   journalUiTokens,
   meowUiTokens,
   ottrUiTokens,
+  pineUiTokens,
   standardOptions,
   standardThemeStyles,
   standardThemeTokens,
@@ -53,7 +54,7 @@ export const DOCS_APPEARANCE_STORE = "meowland-docs-appearance";
 export const DOCS_THEME_STORE = "meowland-docs-theme";
 
 /** The site themes a reader can choose besides standard, as the gallery's `theme` parameter names them. */
-export const DOCS_THEMES = ["journal", "meow", "ottr", "doodle"] as const;
+export const DOCS_THEMES = ["journal", "meow", "ottr", "doodle", "pine"] as const;
 export type DocsTheme = "standard" | (typeof DOCS_THEMES)[number];
 
 export const DOCS_THEME_LABELS = {
@@ -62,6 +63,7 @@ export const DOCS_THEME_LABELS = {
   meow: "Meow",
   ottr: "Ottr",
   doodle: "Doodle",
+  pine: "Pine",
 } as const satisfies Record<DocsTheme, string>;
 
 /**
@@ -89,6 +91,7 @@ export const docsJournalTokenStyles = scopedThemeTokens("journal", journalUiToke
 export const docsMeowTokenStyles = scopedThemeTokens("meow", meowUiTokens);
 export const docsOttrTokenStyles = scopedThemeTokens("ottr", ottrUiTokens);
 export const docsDoodleTokenStyles = scopedThemeTokens("doodle", doodleUiTokens);
+export const docsPineTokenStyles = scopedThemeTokens("pine", pineUiTokens);
 
 /** A reading environment built from the shared palette and component metadata. */
 export const docsStyles = css`
@@ -101,7 +104,8 @@ export const docsStyles = css`
     scroll-padding-top: 88px;
   }
   body {
-    background: ${uiTokens.surface.canvas};
+    background: ${uiTokens.canvas.wash} ${uiTokens.surface.canvas};
+    background-attachment: fixed;
     color: ${uiTokens.ink.primary};
     font: ${uiTokens.type.body} / ${uiTokens.type.line.reading} ${uiTokens.type.sans};
     -webkit-font-smoothing: antialiased;
@@ -1547,6 +1551,7 @@ export const docsTheme = defineTheme({
     docsMeowTokenStyles,
     docsOttrTokenStyles,
     docsDoodleTokenStyles,
+    docsPineTokenStyles,
     docsStyles,
   ],
 });

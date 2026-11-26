@@ -2,7 +2,7 @@ import { themeAttributes, type ThemeDefinition } from "meowcss";
 import "./runtime";
 import { h, type Child } from "meowjsx";
 import { renderToHtml } from "meowjsx/web";
-import { Breadcrumb, NavList, SearchInput, type NavListGroup } from "meowtail";
+import { Breadcrumb, NavList, SearchInput, tabsIndex, type NavListGroup } from "meowtail";
 import { Icon, IconSource, type IconSourceProps } from "meowtail/icons";
 import { focusModalityScript } from "meowtail/web";
 import {
@@ -395,7 +395,7 @@ const CODE_ACTIONS = `(() => {
     });
   }
   for (const button of document.querySelectorAll(".docs-install-copy")) {
-    const text = button.parentElement && button.parentElement.querySelector("span");
+    const text = button.parentElement?.querySelector("[data-docs-install-command]");
     if (!text) continue;
     button.addEventListener("click", async () => {
       try {
@@ -420,25 +420,14 @@ const CODE_ACTIONS = `(() => {
  * tabs with the preview selected, so the source stays one click away instead of filling the page.
  */
 const EXAMPLE_TABS = `(() => {
-  let count = 0;
   for (const example of document.querySelectorAll("[data-docs-tabs]")) {
     const list = example.querySelector('[role="tablist"]');
     if (!list) continue;
     const tabs = Array.from(list.querySelectorAll('[role="tab"]'));
-    const panels = tabs.map((tab) =>
-      example.querySelector('[data-docs-panel="' + tab.getAttribute("data-docs-tab") + '"]'),
-    );
+    const panels = tabs.map((tab) => document.getElementById(tab.getAttribute("aria-controls")));
     if (!tabs.length || panels.some((panel) => !panel)) continue;
-    count += 1;
-    tabs.forEach((tab, index) => {
-      const panel = panels[index];
-      tab.id = "docs-tab-" + count + "-" + index;
-      panel.id = "docs-panel-" + count + "-" + index;
-      tab.setAttribute("aria-controls", panel.id);
-      panel.setAttribute("role", "tabpanel");
-      panel.setAttribute("aria-labelledby", tab.id);
-    });
     const select = (selected, focus) => {
+      list.style.setProperty("${tabsIndex.name}", String(selected));
       tabs.forEach((tab, index) => {
         const on = index === selected;
         tab.setAttribute("aria-selected", String(on));
@@ -463,7 +452,6 @@ const EXAMPLE_TABS = `(() => {
       });
     });
     select(0, false);
-    list.hidden = false;
     example.setAttribute("data-docs-tabs", "ready");
   }
 })();`;

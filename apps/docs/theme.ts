@@ -2,7 +2,6 @@ import { compileTokens, defineTokens, type TokenSet } from "meowcss";
 import { css, defineTheme, parts } from "meowcss/meowjsx";
 import type {
   Breadcrumb,
-  Card,
   CodeBlock,
   NavList,
   Page,
@@ -11,6 +10,7 @@ import type {
   SearchInput,
   Section,
   Table,
+  Tabs,
 } from "meowtail";
 import {
   doodleUiTokens,
@@ -25,7 +25,6 @@ import {
 } from "meowtail/theme";
 
 const breadcrumb = parts<typeof Breadcrumb>("breadcrumb");
-const card = parts<typeof Card>("card");
 const codeBlock = parts<typeof CodeBlock>("code-block");
 const navList = parts<typeof NavList>("nav-list");
 const page = parts<typeof Page>("page");
@@ -34,6 +33,7 @@ const prose = parts<typeof Prose>("prose");
 const searchInput = parts<typeof SearchInput>("search-input");
 const section = parts<typeof Section>("section");
 const table = parts<typeof Table>("table");
+const tabs = parts<typeof Tabs>("tabs");
 
 /** Measurements owned by the documentation layout. */
 export const docsTokens = defineTokens("docs", {
@@ -714,12 +714,6 @@ export const docsStyles = css`
   .docs-article ${pageHeader.copy} {
     gap: 14px;
   }
-  .docs-article ${pageHeader.title} {
-    font-size: ${uiTokens.type.hero};
-    line-height: ${uiTokens.type.line.hero};
-    font-weight: ${uiTokens.type.weight.semibold};
-    letter-spacing: -0.035em;
-  }
   .docs-article ${pageHeader.description} {
     max-width: 62ch;
     font-size: ${uiTokens.type.title};
@@ -792,9 +786,6 @@ export const docsStyles = css`
   .docs-toc a {
     display: block;
   }
-  .docs-toc a:hover {
-    color: ${uiTokens.ink.primary};
-  }
   .docs-note {
     margin: 0;
     color: ${uiTokens.ink.secondary};
@@ -821,23 +812,10 @@ export const docsStyles = css`
     align-items: center;
     gap: 8px;
   }
-  /* One specimen: the live preview on the raised surface, its code recessed
-     beneath it, inside a single hairline frame. */
-  .docs-specimen {
-    min-width: 0;
-    overflow: hidden;
-    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
-    border-radius: ${uiTokens.radius.xl};
-    background: ${uiTokens.surface.raised};
-    box-shadow: ${uiTokens.shadow.raised};
-  }
-  ${card.root}.docs-preview-card {
+  .docs-preview {
+    /* The embedded canvas supplies its own layout and inset. */
     padding: 0;
     overflow: hidden;
-    border: 0;
-    border-radius: 0;
-    background: ${uiTokens.surface.canvas};
-    box-shadow: none;
   }
   .docs-preview-frame {
     display: block;
@@ -849,23 +827,6 @@ export const docsStyles = css`
     height: ${docsTokens.previewHeightTall};
   }
 
-  /* Code scrolls locally. Static pages omit actions that require a runtime. */
-  .docs-article ${codeBlock.root} {
-    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
-    border-radius: ${uiTokens.radius.xl};
-  }
-  .docs-specimen ${codeBlock.root} {
-    border: 0;
-    border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
-    border-radius: 0;
-  }
-  /* Once tabs show one panel at a time, the code fills the frame on its own. */
-  [data-docs-tabs="ready"] .docs-specimen ${codeBlock.root} {
-    border-top: 0;
-  }
-  [data-docs-panel][hidden] {
-    display: none;
-  }
   /* Props: the name, a required mark and its JSDoc stack in the first column; types wrap. */
   .docs-prop {
     display: grid;
@@ -905,58 +866,24 @@ export const docsStyles = css`
   .docs-prop-none {
     color: ${uiTokens.ink.tertiary};
   }
-  /* Preview and Code: text tabs on a hairline, the selected one underlined in ink; the way into
-     the playground sits at the far end of the same line. */
   .docs-example-bar {
     display: flex;
-    align-items: center;
-    gap: 16px;
-    border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 8px 16px;
   }
-  .docs-tabs {
-    display: flex;
-    gap: 20px;
-  }
-  a.docs-example-open {
+  .docs-example-open {
     display: inline-flex;
     align-items: center;
     gap: 4px;
-    margin-left: auto;
-    padding: 6px 0 8px;
-    color: ${uiTokens.ink.secondary};
-    font-size: ${uiTokens.type.label};
-    font-weight: ${uiTokens.type.weight.medium};
-    white-space: nowrap;
+    margin-inline-start: auto;
   }
-  a.docs-example-open:hover {
-    color: ${uiTokens.ink.primary};
-  }
-  .docs-tabs[hidden] {
+  /* Static fallback: both panels are readable until the page binds the tabs. */
+  [data-docs-tabs=""] > ${tabs.list} {
     display: none;
   }
-  .docs-tabs button {
-    margin: 0 0 -1px;
-    padding: 6px 0 8px;
-    border: 0;
-    border-bottom: 2px solid transparent;
-    background: none;
-    color: ${uiTokens.ink.secondary};
-    font: inherit;
-    font-size: ${uiTokens.type.label};
-    font-weight: ${uiTokens.type.weight.medium};
-    cursor: pointer;
-  }
-  .docs-tabs button:hover {
-    color: ${uiTokens.ink.primary};
-  }
-  .docs-tabs button[aria-selected="true"] {
-    border-bottom-color: ${uiTokens.ink.primary};
-    color: ${uiTokens.ink.primary};
-  }
-  .docs-article ${codeBlock.header} {
-    padding: 6px 6px 6px 16px;
-    border-bottom: ${uiTokens.line.width} solid ${uiTokens.line.divider};
-    background: transparent;
+  [data-docs-tabs=""] > ${tabs.panel}[hidden] {
+    display: block !important;
   }
   /* The code actions need script; they appear once the page wires them. */
   .docs-article ${codeBlock.actions} {
@@ -967,53 +894,23 @@ export const docsStyles = css`
   }
   .docs-article ${codeBlock.content} {
     max-height: ${docsTokens.codeHeight};
-    padding: 16px;
-    font-size: ${uiTokens.type.code};
-    line-height: ${uiTokens.type.line.code};
-    scrollbar-width: thin;
   }
   .docs-install {
     display: flex;
     align-items: center;
     gap: 10px;
     width: 100%;
-    min-width: 0;
-    padding: 12px 16px;
-    border: ${uiTokens.line.width} solid ${uiTokens.line.edge};
-    border-radius: ${uiTokens.radius.lg};
-    background: ${uiTokens.surface.raised};
-    color: ${uiTokens.ink.primary};
-    font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
+    padding: 8px 12px;
   }
   .docs-install > svg {
     flex: none;
     color: ${uiTokens.ink.secondary};
   }
-  .docs-install > span {
+  .docs-install > code {
     flex: 1;
     min-width: 0;
+    font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
     overflow-wrap: anywhere;
-  }
-  .docs-install-copy {
-    display: inline-grid;
-    place-items: center;
-    flex: none;
-    width: 28px;
-    height: 28px;
-    margin: -4px -8px -4px 0;
-    padding: 0;
-    border: 0;
-    border-radius: ${uiTokens.radius.md};
-    background: transparent;
-    color: ${uiTokens.ink.tertiary};
-    cursor: pointer;
-  }
-  .docs-install-copy[hidden] {
-    display: none;
-  }
-  .docs-install-copy:hover {
-    background: ${uiTokens.state.hover};
-    color: ${uiTokens.ink.primary};
   }
   .docs-install-copy > svg:last-child,
   .docs-install-copy[data-copied] > svg:first-child {
@@ -1471,10 +1368,6 @@ export const docsStyles = css`
     }
     .docs-content {
       padding: 32px 20px 0;
-    }
-    .docs-article ${pageHeader.title} {
-      font-size: ${uiTokens.type.pageTitle};
-      line-height: ${uiTokens.type.line.pageTitle};
     }
     .docs-article ${pageHeader.description} {
       font-size: ${uiTokens.type.body};

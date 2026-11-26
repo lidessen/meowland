@@ -129,7 +129,7 @@ function ReadingSections({ sections }: { sections: ReadingSection[] }): Child {
   const links = () => (
     <nav aria-label="On this page">
       {sections.map((section) => (
-        <a href={`#${section.id}`}>{section.title}</a>
+        <Link href={`#${section.id}`}>{section.title}</Link>
       ))}
     </nav>
   );
@@ -579,11 +579,7 @@ function ExamplePage({ example, state }: { example: CatalogExample; state: DocsS
             description: example.name === example.title ? undefined : storyLabel(example.story),
             // The same framed specimen as a component page. An example is a whole page that
             // sizes itself from its viewport, so it takes the tall frame.
-            children: (
-              <div className="docs-specimen">
-                <Preview storyId={example.story.id} title={example.title} tall />
-              </div>
-            ),
+            children: <Preview storyId={example.story.id} title={example.title} tall />,
           },
           {
             id: "code",

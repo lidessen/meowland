@@ -191,6 +191,7 @@ describe("the docs pages", () => {
     expect(html).toContain('data-meowui-part="section/root"');
     expect(html).toContain('data-meowui-part="section/title"');
     expect(html).toContain("API reference");
+    expect(html).toMatch(/<div(?=[^>]*class="docs-preview")(?=[^>]*data-meowui-part="card\/root")/);
     expect(html).toContain("docs-preview-frame");
     expect(html).toContain("Component reference");
   });
@@ -217,6 +218,9 @@ describe("the docs pages", () => {
     );
     expect(html).toContain("Browse components");
     expect(html).toContain("bun add meowtail");
+    expect(html).toMatch(
+      /<button(?=[^>]*aria-label="Copy install command")(?=[^>]*data-meowui-part="icon-button\/root")/,
+    );
     expect(html.indexOf("Start building")).toBeLessThan(html.indexOf("Six packages"));
     expect(html).not.toContain("Six published packages");
   });
@@ -224,7 +228,7 @@ describe("the docs pages", () => {
   test("a component table of contents only links to sections that exist", () => {
     const html = page("components/button");
     const toc = html.match(/<nav aria-label="On this page">([\s\S]*?)<\/nav>/)?.[1] ?? "";
-    expect(toc).toContain('href="#preview"');
+    expect(toc).toMatch(/<a(?=[^>]*href="#preview")(?=[^>]*data-meowui-part="link\/root")/);
     expect(toc).toContain('href="#installation"');
     expect(toc).toContain('href="#usage"');
     expect(toc).toContain('href="#api-reference"');
@@ -239,9 +243,11 @@ describe("the docs pages", () => {
 
   test("examples ship a preview and code tab pair, and usage shows a real first use", () => {
     const html = page("components/button");
-    expect(html).toMatch(/<div class="docs-tabs" role="tablist"[^>]*hidden/);
-    expect(html).toContain('data-docs-tab="preview"');
-    expect(html).toContain('data-docs-panel="code"');
+    expect(html).toContain('data-meowui-part="tabs/list"');
+    expect(html).toContain('data-meowui-part="tabs/panel"');
+    expect(html).toMatch(
+      /<button(?=[^>]*data-meowui-part="tabs\/tab")(?=[^>]*aria-selected="true")[^>]*>Preview<\/button>/,
+    );
     expect(html).toContain(`example.setAttribute("data-docs-tabs", "ready")`);
     const usage = html.match(/<section[^>]*id="usage"[\s\S]*?<\/section>/)?.[0] ?? "";
     expect(usage).toContain("usage.tsx");

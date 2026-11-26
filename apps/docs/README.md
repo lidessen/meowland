@@ -15,8 +15,10 @@ Two engines and one app.
   `mdxComponents`.
 - **Meowbook** owns the story manifest and the live canvas. The site embeds the canvas in an iframe,
   so every example runs in its own document, with its own runtime and its own theme root.
-- **This app** owns the information architecture: the page map, the prose, the theme and the
-  component-page generator. It copies no component implementation and no story.
+- **This app** owns the information architecture: the page map, prose, reading layout, theme
+  selection and component-page generator. Use public Meowtail components for shared UI; those
+  components and the selected theme own their appearance. Docs styles handle layout and static
+  behavior, not adaptations for individual themes.
 
 ## Commands
 

@@ -1,6 +1,6 @@
 import { Fragment, h, type Child } from "meowjsx";
 import "./runtime";
-import { Badge, Card, CodeBlock, Inline, Stack, Table } from "meowtail";
+import { Badge, Card, CodeBlock, IconButton, Inline, Link, Stack, Table, Tabs } from "meowtail";
 import { Icon } from "meowtail/icons";
 import { styleAxes, type CatalogStyleProps } from "./catalog";
 import { splitTopLevel } from "./code";
@@ -24,7 +24,7 @@ export function Preview({
   tall?: boolean;
 }): Child {
   return (
-    <Card variant="surface" className="docs-preview-card">
+    <Card variant="surface" className="docs-preview">
       <iframe
         className={tall ? "docs-preview-frame docs-preview-frame-tall" : "docs-preview-frame"}
         src={`/gallery/canvas.html?story=${encodeURIComponent(storyId)}&embedded=1&theme=standard`}
@@ -58,7 +58,7 @@ export function CodeSample({
   );
 }
 
-/** One example: the live preview, then the code behind it, framed as one specimen. */
+/** One example: the live preview and the code behind it. */
 export function StoryExample({
   storyId,
   title,
@@ -76,39 +76,35 @@ export function StoryExample({
   line?: number;
   tall?: boolean;
 }): Child {
+  const preview = <Preview storyId={storyId} title={title} tall={tall} />;
   return (
-    <Stack gap="compact" className="docs-example" data-docs-tabs={source ? "" : undefined}>
-      <div className="docs-example-head">
-        <h3 className="docs-example-title">{title}</h3>
-        {description ? <p className="docs-note">{description}</p> : null}
-      </div>
+    <Stack gap="compact" className="docs-example">
       <div className="docs-example-bar">
-        {/* Wired by the page script; without it the preview and its code both stay in view. */}
-        {source ? (
-          <div className="docs-tabs" role="tablist" aria-label={`${title}: preview or code`} hidden>
-            <button type="button" role="tab" aria-selected="true" data-docs-tab="preview">
-              Preview
-            </button>
-            <button type="button" role="tab" aria-selected="false" data-docs-tab="code">
-              Code
-            </button>
-          </div>
-        ) : null}
-        <a className="docs-example-open" href={`/gallery/?story=${encodeURIComponent(storyId)}`}>
+        <div className="docs-example-head">
+          <h3 className="docs-example-title">{title}</h3>
+          {description ? <p className="docs-note">{description}</p> : null}
+        </div>
+        <Link className="docs-example-open" href={`/gallery/?story=${encodeURIComponent(storyId)}`}>
           Open in playground
           <Icon name="arrow-right" size={14} />
-        </a>
+        </Link>
       </div>
-      <div className="docs-specimen">
-        <div data-docs-panel="preview">
-          <Preview storyId={storyId} title={title} tall={tall} />
-        </div>
-        {source ? (
-          <div data-docs-panel="code">
-            <CodeSample source={source} file={file} line={line} />
-          </div>
-        ) : null}
-      </div>
+      {source ? (
+        <Tabs
+          label={`${title}: preview or code`}
+          data-docs-tabs=""
+          items={[
+            { value: "preview", label: "Preview", content: preview },
+            {
+              value: "code",
+              label: "Code",
+              content: <CodeSample source={source} file={file} line={line} />,
+            },
+          ]}
+        />
+      ) : (
+        preview
+      )}
     </Stack>
   );
 }
@@ -116,15 +112,15 @@ export function StoryExample({
 /** The install command for a package. */
 export function InstallLine({ command }: { command: string }): Child {
   return (
-    <div className="docs-install">
+    <Card variant="surface" className="docs-install">
       <Icon name="terminal" size={14} />
-      <span>{command}</span>
+      <code data-docs-install-command="">{command}</code>
       {/* Wired by the page script; without it the command is still selectable text. */}
-      <button className="docs-install-copy" type="button" aria-label="Copy install command" hidden>
+      <IconButton className="docs-install-copy" size="small" label="Copy install command" hidden>
         <Icon name="copy" size={14} />
         <Icon name="check" size={14} />
-      </button>
-    </div>
+      </IconButton>
+    </Card>
   );
 }
 

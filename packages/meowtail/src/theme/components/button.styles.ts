@@ -31,10 +31,10 @@ export const buttonStyles = css`
     transform ${uiTokens.motion.response} ${uiTokens.motion.ease};
 }
 /* A press settles the action; themes can coordinate its offset with the resting lift. */
-:where(${iconButtonPartRefs.root}):active:not(:disabled) {
+:where(${iconButtonPartRefs.root}):active:not(:disabled, [aria-disabled="true"]) {
   transform: translateY(0.5px);
 }
-:where(${buttonPartRefs.root}):active:not(:disabled) {
+:where(${buttonPartRefs.root}):active:not(:disabled, [aria-disabled="true"]) {
   transform: translateY(${uiTokens.button.pressOffset});
 }
 ${iconButtonPartRefs.root} {
@@ -56,7 +56,7 @@ ${buttonPartRefs.root} {
     color: ${uiTokens.action.onPrimary};
     border: ${uiTokens.button.filledStroke} solid ${uiTokens.line.edge};
     box-shadow: ${uiTokens.shadow.filled};
-    &:active:not(:disabled) {
+    &:active:not(:disabled, [aria-disabled="true"]) {
       box-shadow: ${uiTokens.button.filledPressed};
     }
   }
@@ -67,7 +67,7 @@ ${buttonPartRefs.root} {
     color: ${uiTokens.action.onDanger};
     border: ${uiTokens.button.filledStroke} solid ${uiTokens.line.edge};
     box-shadow: ${uiTokens.shadow.filled};
-    &:active:not(:disabled) {
+    &:active:not(:disabled, [aria-disabled="true"]) {
       box-shadow: ${uiTokens.button.filledPressed};
     }
   }
@@ -78,7 +78,7 @@ ${buttonPartRefs.root} {
     background: ${uiTokens.surface.raised};
     /* A one-pixel drop lifts the outline action off the page without a heavier border. */
     box-shadow: ${uiTokens.shadow.action};
-    &:active:not(:disabled) {
+    &:active:not(:disabled, [aria-disabled="true"]) {
       box-shadow: ${uiTokens.button.outlinePressed};
     }
   }
@@ -100,34 +100,34 @@ ${buttonPartRefs.root} {
       ${iconButtonPartRefs.root},
       ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="quiet"],
       ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="outline"]
-    ):hover:not(:disabled) {
+    ):hover:not(:disabled, [aria-disabled="true"]) {
     background: ${uiTokens.state.hover};
     color: ${uiTokens.ink.primary};
   }
-  ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="primary"]:hover:not(:disabled) {
+  ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="primary"]:hover:not(:disabled, [aria-disabled="true"]) {
     background: ${uiTokens.action.primaryHover};
   }
-  ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="danger"]:hover:not(:disabled) {
+  ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="danger"]:hover:not(:disabled, [aria-disabled="true"]) {
     background: color-mix(in srgb, ${uiTokens.action.danger} 88%, ${uiTokens.ink.primary});
   }
-  ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="accent"]:hover:not(:disabled) {
+  ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="accent"]:hover:not(:disabled, [aria-disabled="true"]) {
     background: color-mix(in srgb, ${uiTokens.accent.base} 14%, ${uiTokens.accent.soft});
   }
-  ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="stop"]:hover:not(:disabled) {
+  ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="stop"]:hover:not(:disabled, [aria-disabled="true"]) {
     background: color-mix(in srgb, ${uiTokens.status.danger} 8%, transparent);
   }
 }
-:where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="quiet"], ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="outline"]):active:not(:disabled) {
+:where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="quiet"], ${buttonPartRefs.root}[${buttonOptions.attribute("variant")}="outline"]):active:not(:disabled, [aria-disabled="true"]) {
   background: ${uiTokens.state.active};
 }
 :where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}):focus-visible {
   ${ui.focus.ring}
 }
-:where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}):disabled {
+:where(${iconButtonPartRefs.root}, ${buttonPartRefs.root}):is(:disabled, [aria-disabled="true"]) {
   cursor: not-allowed;
   opacity: 0.4;
 }
-${buttonPartRefs.root}:disabled {
+${buttonPartRefs.root}:is(:disabled, [aria-disabled="true"]) {
   box-shadow: none;
 }
 ${buttonPartRefs.root} {

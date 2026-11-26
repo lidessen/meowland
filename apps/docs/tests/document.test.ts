@@ -212,7 +212,9 @@ describe("the docs pages", () => {
 
   test("the home page offers a starting route before its package directory", () => {
     const html = page("");
-    expect(html).toContain("Start with Meowtail");
+    expect(html).toMatch(
+      /<a(?=[^>]*href="\/packages\/meowtail\/")(?=[^>]*data-meowui-part="button\/root")[^>]*>Start with Meowtail<\/a>/,
+    );
     expect(html).toContain("Browse components");
     expect(html).toContain("bun add meowtail");
     expect(html.indexOf("Start building")).toBeLessThan(html.indexOf("Six packages"));

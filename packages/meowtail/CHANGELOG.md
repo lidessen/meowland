@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Button accepts an `href` for navigation with native link semantics and the same theme styling as
+  button actions. The documentation's home entry uses it instead of a separately styled link.
+- Doodle dark uses quieter ink edges and a darker blue and rust action palette.
+
 - `createMeowUITheme({ theme, config })` from `meowtail/web` is a runtime plugin that delivers a
   theme to every Web mount: the stylesheet (shared per document through `meowcss/web`
   `mountStyles`), the theme attributes on the container and the focus-modality tracker, all

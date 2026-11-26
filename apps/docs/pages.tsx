@@ -1,6 +1,6 @@
 import { h, type Child } from "meowjsx";
 import type { ThemeDefinition } from "meowcss";
-import { Badge, Link, Page, PageHeader, Prose, Section, Stack } from "meowtail";
+import { Badge, Button, Link, Page, PageHeader, Prose, Section, Stack } from "meowtail";
 import * as meowtail from "meowtail";
 import { Icon, IconSource } from "meowtail/icons";
 import type { ContentItem, SitePage } from "meowpress/build";
@@ -171,9 +171,9 @@ function HomePage({ state }: { state: DocsState }): Child {
               description="Build interfaces with a signal-driven runtime, a shared style system and components that fit together."
             />
             <div className="docs-home-actions">
-              <Link className="docs-home-primary" href="/packages/meowtail/">
+              <Button size="large" href="/packages/meowtail/">
                 Start with Meowtail
-              </Link>
+              </Button>
               <Link href="/packages/meowtail/#components">Browse components</Link>
             </div>
           </div>

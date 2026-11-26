@@ -1066,21 +1066,6 @@ export const docsStyles = css`
     margin-top: 28px;
     font-size: ${uiTokens.type.label};
   }
-  .docs-home-actions .docs-home-primary {
-    display: inline-flex;
-    align-items: center;
-    min-height: 38px;
-    padding: 7px 14px;
-    border-radius: ${uiTokens.radius.md};
-    background: ${uiTokens.action.primary};
-    color: ${uiTokens.action.onPrimary};
-    font-weight: ${uiTokens.type.weight.medium};
-    text-decoration: none;
-  }
-  .docs-home-actions .docs-home-primary:hover {
-    background: ${uiTokens.action.primaryHover};
-    color: ${uiTokens.action.onPrimary};
-  }
   .docs-home-route {
     min-width: 0;
     padding-top: 6px;
@@ -1148,7 +1133,7 @@ export const docsStyles = css`
     grid-template-columns: 36px minmax(0, 1fr);
     gap: 16px;
     padding-block: 24px;
-    border-top: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
     min-width: 0;
   }
   /* Each entry leads with its icon on a soft accent tile, the same icon the sidebar uses. */

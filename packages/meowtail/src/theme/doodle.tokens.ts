@@ -4,10 +4,10 @@ import { standardUiTokenValues, type UiTokenValues } from "./tokens";
 
 const sans =
   '"Geist Variable", Geist, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans CJK SC", system-ui, sans-serif';
-const inkLift = ["0 2px 0 #171715", "0 2px 0 #c6b59c"] as const;
+const inkLift = ["0 2px 0 #171715", "0 2px 0 #0a0a09"] as const;
 const drawnEdge = [
   "0 0 0 1px #171715, 0 3px 0 1px #171715",
-  "0 0 0 1px #c6b59c, 0 3px 0 1px #c6b59c",
+  "0 0 0 1px #655d53, 0 3px 0 1px #0a0a09",
 ] as const;
 
 /**
@@ -20,7 +20,7 @@ export const doodleUiTokenValues = {
   canvas: {
     wash: [
       "radial-gradient(ellipse 540px 430px at 0% 0%, #f1e5ca 0%, transparent 96%), radial-gradient(ellipse 500px 420px at 100% 60%, #dceef8 0%, transparent 96%)",
-      "radial-gradient(ellipse 540px 430px at 0% 0%, #33291e 0%, transparent 96%), radial-gradient(ellipse 500px 420px at 100% 60%, #202e38 0%, transparent 96%)",
+      "radial-gradient(ellipse 540px 430px at 0% 0%, #29231f 0%, transparent 96%), radial-gradient(ellipse 500px 420px at 100% 60%, #222934 0%, transparent 96%)",
     ],
     selection: ["#f6db87", "#745927"],
   },
@@ -37,25 +37,25 @@ export const doodleUiTokenValues = {
     outlinePressed: String(tokenRef("ui", "shadow", "pressed")),
   },
   surface: {
-    canvas: ["#f9f8f4", "#191714"],
-    reading: ["#f9f8f4", "#191714"],
-    raised: ["#ffffff", "#231f19"],
-    overlay: ["#fffdf6", "#2b261f"],
-    fill: ["#f3f1ea", "#302a22"],
-    field: ["#fffefa", "#1d1a16"],
+    canvas: ["#f9f8f4", "#191817"],
+    reading: ["#f9f8f4", "#191817"],
+    raised: ["#ffffff", "#24221f"],
+    overlay: ["#fffdf6", "#2b2824"],
+    fill: ["#f3f1ea", "#302d29"],
+    field: ["#fffefa", "#201e1b"],
     tint: ["rgb(23 23 21 / 5%)", "rgb(251 243 229 / 8%)"],
-    knockout: ["#ffffff", "#231f19"],
+    knockout: ["#ffffff", "#24221f"],
     scrim: ["rgb(23 23 21 / 26%)", "rgb(0 0 0 / 58%)"],
   },
-  inverse: { surface: ["#171715", "#393126"], ink: "#fbf3e5", action: "#a8d6ff" },
+  inverse: { surface: ["#171715", "#393126"], ink: "#fbf3e5", action: "#acc7ec" },
   line: {
     ...standardUiTokenValues.line,
     width: "1px",
     raisedWidth: "2px",
-    edge: ["#171715", "#c6b59c"],
-    divider: ["#ddd8ce", "#504638"],
-    control: ["#57534c", "#9f907a"],
-    controlHover: ["#171715", "#e5d7c3"],
+    edge: ["#171715", "#746a5d"],
+    divider: ["#ddd8ce", "#443e37"],
+    control: ["#57534c", "#877b6c"],
+    controlHover: ["#171715", "#b6a790"],
   },
   ink: {
     primary: ["#171715", "#fbf3e5"],
@@ -67,16 +67,16 @@ export const doodleUiTokenValues = {
   state: {
     hover: ["rgb(0 109 204 / 7%)", "rgb(129 194 255 / 9%)"],
     active: ["rgb(0 109 204 / 13%)", "rgb(129 194 255 / 16%)"],
-    focus: ["#006dcc", "#81c2ff"],
+    focus: ["#006dcc", "#94b9e7"],
     focusRing: ["rgb(0 109 204 / 23%)", "rgb(129 194 255 / 30%)"],
   },
   action: {
-    primary: ["#0065be", "#81c2ff"],
-    primaryHover: ["#0055a2", "#a4d4ff"],
-    onPrimary: ["#ffffff", "#17222d"],
+    primary: ["#0065be", "#345e96"],
+    primaryHover: ["#0055a2", "#3f6ea9"],
+    onPrimary: ["#ffffff", "#f7fbff"],
     soft: ["#f7e9bc", "#3e3220"],
-    danger: ["#b93125", "#ff7966"],
-    onDanger: ["#ffffff", "#27150f"],
+    danger: ["#b93125", "#8b4139"],
+    onDanger: ["#ffffff", "#fff2ee"],
   },
   control: {
     ...standardUiTokenValues.control,
@@ -86,18 +86,18 @@ export const doodleUiTokenValues = {
     knob: ["#ffffff", "#fbf3e5"],
   },
   accent: {
-    base: ["#0065be", "#81c2ff"],
+    base: ["#0065be", "#94b9e7"],
     soft: ["#eaf4fc", "#23364a"],
     selected: ["#dceefb", "#2a4056"],
-    ink: ["#00599f", "#a8d6ff"],
+    ink: ["#00599f", "#acc7ec"],
     line: ["#a6c9e6", "#54718e"],
     halo: ["rgb(0 109 204 / 25%)", "rgb(129 194 255 / 30%)"],
   },
   status: {
-    info: ["#0065be", "#81c2ff"],
+    info: ["#0065be", "#94b9e7"],
     success: ["#235b43", "#a0e0bf"],
     warning: ["#8a460f", "#ffd29a"],
-    danger: ["#b93125", "#ff8d7a"],
+    danger: ["#b93125", "#f0a392"],
     unknown: ["#827a6c", "#a79b89"],
   },
   type: {

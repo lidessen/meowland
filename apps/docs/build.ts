@@ -14,7 +14,7 @@ import { readComponentProps, splitSummary } from "./props";
 import { createSiteConfig } from "./site.config";
 import { type DocsState } from "./pages";
 import { DARK_LOGO, LIGHT_LOGO, SITE_NAME } from "./document";
-import { DOCS_APPEARANCE_STORE, DOCS_THEME_STORE } from "./theme";
+import { DOCS_APPEARANCE_STORE, DOCS_THEME_STORE, DOCS_THEMES, DOCS_THEME_LABELS } from "./theme";
 import type { GalleryConfig, StoryConfig } from "meowbook";
 import meowbookConfig from "./meowbook.config";
 import slidesConfig from "./slides.meowbook.config";
@@ -105,11 +105,11 @@ export async function buildDocs(): Promise<void> {
         schemeStorageKey: DOCS_APPEARANCE_STORE,
         themeStorageKey: DOCS_THEME_STORE,
         // The values are the `theme` parameter the Meowtail stories' environment reads.
-        themes: [
-          { value: "standard", label: "Standard", chrome: "standard" },
-          { value: "journal", label: "Journal", chrome: "journal" },
-          { value: "meow", label: "Meow", chrome: "meow" },
-        ],
+        themes: (["standard", ...DOCS_THEMES] as const).map((value) => ({
+          value,
+          label: DOCS_THEME_LABELS[value],
+          chrome: value,
+        })),
       },
     }),
     resolve(outputDirectory, "gallery"),

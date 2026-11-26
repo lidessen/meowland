@@ -1,6 +1,6 @@
 import { css, parts } from "meowcss/meowjsx";
 import { compileTokens, tokenRef, type TokenSet } from "meowcss";
-import { journalUiTokens, meowUiTokens, uiTokens } from "meowtail/theme";
+import { journalUiTokens, meowUiTokens, ottrUiTokens, uiTokens } from "meowtail/theme";
 import type { Button, Disclosure, NavList, SearchInput } from "meowtail";
 import { buttonOptions } from "meowtail";
 export const inspectionHeight = tokenRef("workshop", "inspection", "height");
@@ -11,7 +11,7 @@ const navList = parts<typeof NavList>("nav-list");
 const searchInput = parts<typeof SearchInput>("search-input");
 
 /** The Meowtail themes that can paint the gallery's own chrome; standard when none is named. */
-export const chromeThemes = ["standard", "journal", "meow"] as const;
+export const chromeThemes = ["standard", "journal", "meow", "ottr"] as const;
 export type ChromeTheme = (typeof chromeThemes)[number];
 /** The root attribute that selects a chrome theme other than standard. */
 export const chromeThemeAttribute = "data-meowbook-chrome";
@@ -36,6 +36,7 @@ function scopedTokens(name: Exclude<ChromeTheme, "standard">, tokens: TokenSet) 
 export const chromeThemeStyles = [
   scopedTokens("journal", journalUiTokens),
   scopedTokens("meow", meowUiTokens),
+  scopedTokens("ottr", ottrUiTokens),
 ].join("\n");
 
 export const galleryStyles = css`

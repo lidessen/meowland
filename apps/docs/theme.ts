@@ -55,6 +55,13 @@ export const DOCS_THEME_STORE = "meowland-docs-theme";
 export const DOCS_THEMES = ["journal", "meow", "ottr"] as const;
 export type DocsTheme = "standard" | (typeof DOCS_THEMES)[number];
 
+export const DOCS_THEME_LABELS = {
+  standard: "Standard",
+  journal: "Journal",
+  meow: "Meow",
+  ottr: "Ottr",
+} as const satisfies Record<DocsTheme, string>;
+
 /**
  * One theme's values of the same `--ui-*` roles, in force under `data-docs-theme="<name>"`. The
  * site keeps one stylesheet and one theme root, so switching themes is one attribute and needs no

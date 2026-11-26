@@ -23,6 +23,7 @@ import {
   DOCS_THEME_ATTRIBUTE,
   DOCS_THEME_STORE,
   DOCS_THEMES,
+  DOCS_THEME_LABELS,
 } from "./theme";
 
 /** The name the site gives itself. */
@@ -263,7 +264,7 @@ const APPEARANCE_MENU = `(() => {
   const names = { auto: "System", light: "Light", dark: "Dark" };
   const root = document.documentElement;
   const scheme = () => root.getAttribute("data-meowui-color-scheme") || "auto";
-  const themes = { standard: "Standard", journal: "Journal", meow: "Meow", ottr: "Ottr" };
+  const themes = ${JSON.stringify(DOCS_THEME_LABELS)};
   const theme = () => {
     const choice = root.getAttribute("${DOCS_THEME_ATTRIBUTE}");
     return choice in themes ? choice : "standard";
@@ -924,16 +925,16 @@ function Document({
                   <fieldset>
                     <legend>Theme</legend>
                     <AppearanceChoice group="docs-theme" value="standard" icon={Palette}>
-                      Standard
+                      {DOCS_THEME_LABELS.standard}
                     </AppearanceChoice>
                     <AppearanceChoice group="docs-theme" value="journal" icon={BookOpen}>
-                      Journal
+                      {DOCS_THEME_LABELS.journal}
                     </AppearanceChoice>
                     <AppearanceChoice group="docs-theme" value="meow" icon={PawPrint}>
-                      Meow
+                      {DOCS_THEME_LABELS.meow}
                     </AppearanceChoice>
                     <AppearanceChoice group="docs-theme" value="ottr" icon={Waves}>
-                      Ottr
+                      {DOCS_THEME_LABELS.ottr}
                     </AppearanceChoice>
                   </fieldset>
                   <fieldset>

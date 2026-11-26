@@ -96,7 +96,7 @@ export interface GalleryTheme {
   value: string;
   label: string;
   /** The Meowtail theme that paints the gallery's own chrome while this theme is chosen. */
-  chrome?: "standard" | "journal" | "meow";
+  chrome?: "standard" | "journal" | "meow" | "ottr";
 }
 export interface GalleryConfig {
   /** The brand at the top of the catalog. Defaults: "Meowbook", "UI", a notebook mark, "./". */

@@ -19,6 +19,7 @@ import { toastStyles } from "./components/toast.styles";
 import { standardOptions, uiTokens, chatTokens, alertTokens } from "./tokens";
 import { journalUiTokens } from "./journal.tokens";
 import { ottrUiTokens } from "./ottr.tokens";
+import { doodleUiTokens } from "./doodle.tokens";
 import { meowUiTokens } from "./meow.tokens";
 import { utilityStyles } from "./utilities";
 import { choiceSelectStyles } from "./components/choice-select.styles";
@@ -131,6 +132,7 @@ export {
 } from "./journal.tokens";
 export { meowUiTokenValues, meowUiTokens } from "./meow.tokens";
 export { ottrUiTokenValues, ottrUiTokens } from "./ottr.tokens";
+export { doodleFonts, doodleUiTokenValues, doodleUiTokens } from "./doodle.tokens";
 export { ui, utilityStyles } from "./utilities";
 export { chartTokens } from "./shared/chart.tokens";
 
@@ -319,6 +321,22 @@ export const ottrTheme = /* @__PURE__ */ defineTheme({
   options: standardOptions,
   defaults: { scheme: "auto" },
   tokens: ottrThemeTokens,
+  styles: standardThemeStyles,
+});
+
+/** Doodle preserves the shared component structure with an editorial paper-and-ink treatment. */
+export const doodleThemeTokens = [
+  doodleUiTokens,
+  chatTokens,
+  alertTokens,
+  codeHighlightTokens,
+  chartTokens,
+] as const;
+
+export const doodleTheme = /* @__PURE__ */ defineTheme({
+  options: standardOptions,
+  defaults: { scheme: "auto" },
+  tokens: doodleThemeTokens,
   styles: standardThemeStyles,
 });
 

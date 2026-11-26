@@ -11,6 +11,7 @@ import {
   Monitor,
   Moon,
   Palette,
+  Pencil,
   PawPrint,
   Sun,
   Waves,
@@ -936,6 +937,9 @@ function Document({
                     </AppearanceChoice>
                     <AppearanceChoice group="docs-theme" value="ottr" icon={Waves}>
                       {DOCS_THEME_LABELS.ottr}
+                    </AppearanceChoice>
+                    <AppearanceChoice group="docs-theme" value="doodle" icon={Pencil}>
+                      {DOCS_THEME_LABELS.doodle}
                     </AppearanceChoice>
                   </fieldset>
                   <fieldset>

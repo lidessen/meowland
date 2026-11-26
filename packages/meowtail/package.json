@@ -1,6 +1,6 @@
 {
   "name": "meowtail",
-  "version": "0.4.0-alpha.3",
+  "version": "0.4.0-alpha.4",
   "license": "MIT",
   "type": "module",
   "sideEffects": false,
@@ -72,6 +72,7 @@
     "meowcss": "^0.3.0-alpha.2"
   },
   "devDependencies": {
+    "@fontsource-variable/geist": "5.3.0",
     "@fontsource-variable/inter": "^5.3.0",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@fontsource-variable/newsreader": "^5.3.0",

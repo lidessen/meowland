@@ -580,9 +580,24 @@ import { createMeowUITheme } from "meowtail/web";
 const theme = createMeowUITheme({ theme: ottrTheme });
 ```
 
-All four themes share one theme root name and one set of `--ui-*` variables, so mount one theme per document. `standardUiTokenValues` and the `UiTokenValues` type let a host value the same roles for its own
+### Doodle theme
+
+`doodleTheme` gives the standard components an editorial paper-and-ink finish: warm paper,
+rounded ink outlines, crisp offset shadows, and sparing blue, ochre, and coral accents. Important
+surfaces carry the outline; dividers and dense data stay quieter. Light, dark, and system appearances
+are supported. The optional `doodleFonts` manifest names Geist; the theme falls back to system
+fonts, including CJK. Illustrations, mascots, and page layouts stay with each application.
+
+```ts
+import { doodleTheme } from "meowtail/theme";
+import { createMeowUITheme } from "meowtail/web";
+
+const theme = createMeowUITheme({ theme: doodleTheme });
+```
+
+All built-in themes share one theme root name and one set of `--ui-*` variables, so mount one theme per document. `standardUiTokenValues` and the `UiTokenValues` type let a host value the same roles for its own
 theme; a value tree that misses or adds a role does not typecheck. In Meowbook, the gallery's Theme
-control paints every story with any of them, and `?theme=journal`, `?theme=meow`, or `?theme=ottr` selects one in a link.
+control paints every story with any of them, and a query such as `?theme=doodle` selects one in a link.
 
 Style files use `<responsibility>.styles.ts`; the standard theme groups them by component and conversation responsibility, and application styles are maintained with application modules.
 See the style file organization (historical reference in the original product repository) for naming, component family boundaries, and cascade organization.

@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add `doodleTheme`, an editorial paper-and-ink theme with crisp outlines and optional Geist.
+  It supports light and dark schemes and appears in the documentation and component gallery.
+
 - `createMeowUITheme({ theme, config })` from `meowtail/web` is a runtime plugin that delivers a
   theme to every Web mount: the stylesheet (shared per document through `meowcss/web`
   `mountStyles`), the theme attributes on the container and the focus-modality tracker, all

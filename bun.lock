@@ -23,6 +23,7 @@
     "apps/docs": {
       "name": "@meowland/docs",
       "devDependencies": {
+        "@fontsource-variable/geist": "5.3.0",
         "@fontsource-variable/inter": "^5.3.0",
         "@fontsource-variable/jetbrains-mono": "^5.3.0",
         "@fontsource-variable/newsreader": "^5.3.0",
@@ -68,7 +69,7 @@
       "peerDependencies": {
         "meowcss": "^0.3.0-alpha.1",
         "meowjsx": "^0.3.0-alpha.0",
-        "meowtail": "^0.4.0-alpha.1",
+        "meowtail": "^0.4.0-alpha.4",
       },
     },
     "packages/meowcss": {
@@ -141,7 +142,7 @@
     },
     "packages/meowtail": {
       "name": "meowtail",
-      "version": "0.4.0-alpha.3",
+      "version": "0.4.0-alpha.4",
       "dependencies": {
         "@floating-ui/dom": "^1.8.0",
         "@shikijs/langs": "4.3.1",
@@ -151,6 +152,7 @@
         "shiki": "4.3.1",
       },
       "devDependencies": {
+        "@fontsource-variable/geist": "5.3.0",
         "@fontsource-variable/inter": "^5.3.0",
         "@fontsource-variable/jetbrains-mono": "^5.3.0",
         "@fontsource-variable/newsreader": "^5.3.0",
@@ -182,6 +184,8 @@
     "@floating-ui/dom": ["@floating-ui/dom@1.8.0", "", { "dependencies": { "@floating-ui/core": "^1.8.0", "@floating-ui/utils": "^0.2.12" } }, "sha512-yXSrzeHZBTZadLOlfyhCkJHNeLJnHRnRInwdZ40L7ZiaAtrBwoYlsDrX3v5zB1Utk7CLfzcOVnVVWoXEky7Ceg=="],
 
     "@floating-ui/utils": ["@floating-ui/utils@0.2.12", "", {}, "sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww=="],
+
+    "@fontsource-variable/geist": ["@fontsource-variable/geist@5.3.0", "", {}, "sha512-j0m+vLQuG5XAYoHtGCVu0spvlGreR3EzpECUVzkFmI1mTVnAO38l/NEPDCFgZ177JxzYJCLSmTQibIiYPilGrA=="],
 
     "@fontsource-variable/inter": ["@fontsource-variable/inter@5.3.0", "", {}, "sha512-OupL48va4JNofb97w6NYeF9S7W/kHNKM0Er8Dem5nqi4jeOLrVJDoE8tZEpnMJmtkvNbB1EIPPwHcdkF6b1oUA=="],
 

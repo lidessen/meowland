@@ -13,6 +13,7 @@ import type {
   Table,
 } from "meowtail";
 import {
+  doodleUiTokens,
   journalUiTokens,
   meowUiTokens,
   ottrUiTokens,
@@ -52,7 +53,7 @@ export const DOCS_APPEARANCE_STORE = "meowland-docs-appearance";
 export const DOCS_THEME_STORE = "meowland-docs-theme";
 
 /** The site themes a reader can choose besides standard, as the gallery's `theme` parameter names them. */
-export const DOCS_THEMES = ["journal", "meow", "ottr"] as const;
+export const DOCS_THEMES = ["journal", "meow", "ottr", "doodle"] as const;
 export type DocsTheme = "standard" | (typeof DOCS_THEMES)[number];
 
 export const DOCS_THEME_LABELS = {
@@ -60,6 +61,7 @@ export const DOCS_THEME_LABELS = {
   journal: "Journal",
   meow: "Meow",
   ottr: "Ottr",
+  doodle: "Doodle",
 } as const satisfies Record<DocsTheme, string>;
 
 /**
@@ -86,6 +88,7 @@ function scopedThemeTokens(name: (typeof DOCS_THEMES)[number], tokens: TokenSet)
 export const docsJournalTokenStyles = scopedThemeTokens("journal", journalUiTokens);
 export const docsMeowTokenStyles = scopedThemeTokens("meow", meowUiTokens);
 export const docsOttrTokenStyles = scopedThemeTokens("ottr", ottrUiTokens);
+export const docsDoodleTokenStyles = scopedThemeTokens("doodle", doodleUiTokens);
 
 /** A reading environment built from the shared palette and component metadata. */
 export const docsStyles = css`
@@ -1543,6 +1546,7 @@ export const docsTheme = defineTheme({
     docsJournalTokenStyles,
     docsMeowTokenStyles,
     docsOttrTokenStyles,
+    docsDoodleTokenStyles,
     docsStyles,
   ],
 });

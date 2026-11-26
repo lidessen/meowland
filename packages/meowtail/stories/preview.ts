@@ -1,10 +1,10 @@
 import { previewStyles } from "./preview.styles";
 import { languageStyles } from "./language.styles";
-import { journalFontFaces } from "./journal-fonts";
+import { doodleFontFaces, journalFontFaces } from "./journal-fonts";
 import { defaultRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { installMeowUI, meowUIComponents, Select } from "meowtail";
-import { journalTheme, meowTheme, ottrTheme, standardTheme } from "meowtail/theme";
+import { doodleTheme, journalTheme, meowTheme, ottrTheme, standardTheme } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 import { installFocusModality } from "meowtail/web";
 import type { PreviewEnvironment } from "meowbook";
@@ -17,6 +17,7 @@ const themes = {
   journal: journalTheme,
   meow: meowTheme,
   ottr: ottrTheme,
+  doodle: doodleTheme,
 } as const;
 type ThemeKey = keyof typeof themes;
 const themeChoices = [
@@ -24,6 +25,7 @@ const themeChoices = [
   ["journal", "Journal"],
   ["meow", "Meow"],
   ["ottr", "Ottr"],
+  ["doodle", "Doodle"],
 ] as const;
 
 /** A `?theme=` parameter wins, so captures and links are reproducible; otherwise the last choice. */
@@ -54,7 +56,11 @@ const preview: PreviewEnvironment = ({ root, onCleanup }) => {
   onCleanup(
     mountStyles(
       root.ownerDocument,
-      (themeKey === "journal" ? journalFontFaces + "\n" : "") +
+      (themeKey === "journal"
+        ? journalFontFaces + "\n"
+        : themeKey === "doodle"
+          ? doodleFontFaces + "\n"
+          : "") +
         theme.cssText +
         previewStyles.text +
         languageStyles.text,

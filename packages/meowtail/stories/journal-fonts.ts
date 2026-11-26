@@ -1,3 +1,4 @@
+import geistLatin from "@fontsource-variable/geist/files/geist-latin-wght-normal.woff2";
 import interLatin from "@fontsource-variable/inter/files/inter-latin-wght-normal.woff2";
 import jetbrainsMonoLatin from "@fontsource-variable/jetbrains-mono/files/jetbrains-mono-latin-wght-normal.woff2";
 import newsreaderLatin from "@fontsource-variable/newsreader/files/newsreader-latin-wght-normal.woff2";
@@ -21,3 +22,6 @@ export const journalFontFaces = [
   face("Inter Variable", interLatin, "100 900"),
   face("JetBrains Mono Variable", jetbrainsMonoLatin, "100 800"),
 ].join("\n");
+
+/** The Doodle canvas uses Geist for Latin and lets system fonts handle other scripts. */
+export const doodleFontFaces = face("Geist Variable", geistLatin, "100 900");

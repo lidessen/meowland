@@ -4,7 +4,7 @@ import { buildPages, type DocsState } from "./pages";
 import { AGENT_GUIDE } from "./agent-guide";
 import { withMarkdown } from "./markdown";
 import { StoryCanvas } from "./mdx";
-import { journalFonts } from "meowtail/theme";
+import { doodleFonts, journalFonts } from "meowtail/theme";
 import { docsTheme } from "./theme";
 import { SITE_DESCRIPTION, SITE_NAME, THEME_STYLESHEET } from "./document";
 
@@ -28,8 +28,8 @@ export function createSiteConfig(state: DocsState, outputDirectory: string): Sit
     theme: docsTheme,
     site: SITE_IDENTITY,
     themeStylesheet: THEME_STYLESHEET,
-    // Journal's faces: published as files, fetched only once a reader picks Journal.
-    fonts: journalFonts,
+    // Optional theme fonts are served as local files and fetched only when used.
+    fonts: [...journalFonts, ...doodleFonts],
     // The provider paints the pages with the theme the configuration resolved,
     // so there is one theme and one way to reach it.
     pages: ({ posts, theme }) => withMarkdown(buildPages(state, posts, theme), state, posts),

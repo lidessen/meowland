@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { auditCSS } from "meowcss";
-import { ottrTheme, ottrUiTokenValues } from "meowtail/theme";
+import { doodleTheme, doodleUiTokenValues, ottrTheme, ottrUiTokenValues } from "meowtail/theme";
 import {
   journalFonts,
   journalTheme,
@@ -42,6 +42,15 @@ test("the public Ottr theme declares the standard roles and reuses its component
   ).toBe(true);
   expect(ottrTheme.name).toBe(standardTheme.name);
   expect(auditCSS(ottrTheme.cssText, standardAuditRules)).toEqual([]);
+});
+
+test("the public Doodle theme uses the same roles and standard component rules", () => {
+  expect(declaredNames(doodleTheme.cssText)).toEqual(declaredNames(standardTheme.cssText));
+  expect(
+    doodleTheme.cssText.endsWith(standardThemeStyles.map((style) => style.text).join("\n")),
+  ).toBe(true);
+  expect(doodleTheme.name).toBe(standardTheme.name);
+  expect(auditCSS(doodleTheme.cssText, standardAuditRules)).toEqual([]);
 });
 
 test("journal lists every web font its type stacks name", () => {
@@ -106,6 +115,7 @@ test("all concrete themes keep text, actions and focus readable in both schemes"
     ["journal", journalUiTokenValues],
     ["meow", meowUiTokenValues],
     ["ottr", ottrUiTokenValues],
+    ["doodle", doodleUiTokenValues],
   ] as const) {
     for (const scheme of [0, 1] as const) {
       for (const [ink, surface, minimum] of pairs) {

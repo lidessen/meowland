@@ -2,9 +2,6 @@
 
 ## Unreleased
 
-- Add `ottrTheme`: a compact workbench theme with warm light and dark surfaces and mint interaction
-  states, selectable in the gallery and docs. It reuses the standard component rules.
-
 - `createMeowUITheme({ theme, config })` from `meowtail/web` is a runtime plugin that delivers a
   theme to every Web mount: the stylesheet (shared per document through `meowcss/web`
   `mountStyles`), the theme attributes on the container and the focus-modality tracker, all
@@ -118,6 +115,11 @@
 - The Meowbook gallery's Theme control switches every story between Standard, Journal and Meow.
 - Add `journalFonts` and the `ThemeFont` type: the Fontsource packages that carry the faces Journal
   names. Meowtail ships no font files. The gallery paints Journal stories with those faces.
+
+## 0.4.0-alpha.3
+
+- Add `ottrTheme`: a compact workbench theme with warm light and dark surfaces and mint interaction
+  states, selectable in the gallery and docs. It reuses the standard component rules.
 
 ## 0.3.0-alpha.0
 

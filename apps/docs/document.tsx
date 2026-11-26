@@ -13,6 +13,7 @@ import {
   Palette,
   PawPrint,
   Sun,
+  Waves,
 } from "meowtail/icons/lucide";
 import type { Catalog, NavigationGroup } from "./catalog";
 import { groupIcon, packageIcon, PAGE_ICONS } from "./icons";
@@ -262,7 +263,7 @@ const APPEARANCE_MENU = `(() => {
   const names = { auto: "System", light: "Light", dark: "Dark" };
   const root = document.documentElement;
   const scheme = () => root.getAttribute("data-meowui-color-scheme") || "auto";
-  const themes = { standard: "Standard", journal: "Journal", meow: "Meow" };
+  const themes = { standard: "Standard", journal: "Journal", meow: "Meow", ottr: "Ottr" };
   const theme = () => {
     const choice = root.getAttribute("${DOCS_THEME_ATTRIBUTE}");
     return choice in themes ? choice : "standard";
@@ -930,6 +931,9 @@ function Document({
                     </AppearanceChoice>
                     <AppearanceChoice group="docs-theme" value="meow" icon={PawPrint}>
                       Meow
+                    </AppearanceChoice>
+                    <AppearanceChoice group="docs-theme" value="ottr" icon={Waves}>
+                      Ottr
                     </AppearanceChoice>
                   </fieldset>
                   <fieldset>

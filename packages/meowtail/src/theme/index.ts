@@ -18,6 +18,7 @@ import { menuStyles } from "./components/menu.styles";
 import { toastStyles } from "./components/toast.styles";
 import { standardOptions, uiTokens, chatTokens, alertTokens } from "./tokens";
 import { journalUiTokens } from "./journal.tokens";
+import { ottrUiTokens } from "./ottr.tokens";
 import { meowUiTokens } from "./meow.tokens";
 import { utilityStyles } from "./utilities";
 import { choiceSelectStyles } from "./components/choice-select.styles";
@@ -129,6 +130,7 @@ export {
   type ThemeFont,
 } from "./journal.tokens";
 export { meowUiTokenValues, meowUiTokens } from "./meow.tokens";
+export { ottrUiTokenValues, ottrUiTokens } from "./ottr.tokens";
 export { ui, utilityStyles } from "./utilities";
 export { chartTokens } from "./shared/chart.tokens";
 
@@ -301,6 +303,22 @@ export const meowTheme = /* @__PURE__ */ defineTheme({
   options: standardOptions,
   defaults: { scheme: "auto" },
   tokens: meowThemeTokens,
+  styles: standardThemeStyles,
+});
+
+/** Ottr is a compact workbench theme with warm surfaces and mint interaction states. */
+export const ottrThemeTokens = [
+  ottrUiTokens,
+  chatTokens,
+  alertTokens,
+  codeHighlightTokens,
+  chartTokens,
+] as const;
+
+export const ottrTheme = /* @__PURE__ */ defineTheme({
+  options: standardOptions,
+  defaults: { scheme: "auto" },
+  tokens: ottrThemeTokens,
   styles: standardThemeStyles,
 });
 

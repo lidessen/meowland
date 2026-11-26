@@ -4,7 +4,7 @@ import { journalFontFaces } from "./journal-fonts";
 import { defaultRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { installMeowUI, meowUIComponents, Select } from "meowtail";
-import { journalTheme, meowTheme, standardTheme } from "meowtail/theme";
+import { journalTheme, meowTheme, ottrTheme, standardTheme } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
 import { installFocusModality } from "meowtail/web";
 import type { PreviewEnvironment } from "meowbook";
@@ -12,12 +12,18 @@ import type { PreviewEnvironment } from "meowbook";
 installMeowUI({ components: meowUIComponents }, defaultRuntime);
 
 /** Concrete themes the gallery can paint every story with; the markup is the same for each. */
-const themes = { standard: standardTheme, journal: journalTheme, meow: meowTheme } as const;
+const themes = {
+  standard: standardTheme,
+  journal: journalTheme,
+  meow: meowTheme,
+  ottr: ottrTheme,
+} as const;
 type ThemeKey = keyof typeof themes;
 const themeChoices = [
   ["standard", "Standard"],
   ["journal", "Journal"],
   ["meow", "Meow"],
+  ["ottr", "Ottr"],
 ] as const;
 
 /** A `?theme=` parameter wins, so captures and links are reproducible; otherwise the last choice. */

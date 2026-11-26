@@ -1,7 +1,13 @@
 import { expect, test } from "bun:test";
 import { auditCSS } from "meowcss";
 import { standardAuditRules } from "meowtail/theme";
-import { docsJournalTokenStyles, docsMeowTokenStyles, docsStyles, docsTheme } from "../theme";
+import {
+  docsJournalTokenStyles,
+  docsMeowTokenStyles,
+  docsOttrTokenStyles,
+  docsStyles,
+  docsTheme,
+} from "../theme";
 
 test("the docs chrome holds to the standard scales, the type ramp included", () => {
   expect(auditCSS(docsStyles, standardAuditRules)).toEqual([]);
@@ -22,4 +28,15 @@ test("the Journal values apply only under its own theme attribute", () => {
   expect(declarations.length).toBeGreaterThan(0);
   for (const selector of declarations) expect(selector).toContain('[data-docs-theme="journal"]');
   expect(docsJournalTokenStyles.text).toContain("Newsreader");
+});
+
+test("the docs scope Ottr to the selected theme in each scheme", () => {
+  expect(docsTheme.cssText.indexOf(docsOttrTokenStyles.text)).toBeGreaterThan(
+    docsTheme.cssText.indexOf("--ui-accent-base"),
+  );
+  const declarations = docsOttrTokenStyles.text.match(/^[^{}@]+\{/gm) ?? [];
+  expect(declarations.length).toBeGreaterThan(0);
+  for (const selector of declarations) expect(selector).toContain('[data-docs-theme="ottr"]');
+  expect(docsOttrTokenStyles.text).toContain("--ui-accent-base: #2b705e;");
+  expect(docsOttrTokenStyles.text).toContain("--ui-accent-base: #5bb99f;");
 });

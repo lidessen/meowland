@@ -15,6 +15,7 @@ import type {
 import {
   journalUiTokens,
   meowUiTokens,
+  ottrUiTokens,
   standardOptions,
   standardThemeStyles,
   standardThemeTokens,
@@ -51,7 +52,7 @@ export const DOCS_APPEARANCE_STORE = "meowland-docs-appearance";
 export const DOCS_THEME_STORE = "meowland-docs-theme";
 
 /** The site themes a reader can choose besides standard, as the gallery's `theme` parameter names them. */
-export const DOCS_THEMES = ["journal", "meow"] as const;
+export const DOCS_THEMES = ["journal", "meow", "ottr"] as const;
 export type DocsTheme = "standard" | (typeof DOCS_THEMES)[number];
 
 /**
@@ -77,6 +78,7 @@ function scopedThemeTokens(name: (typeof DOCS_THEMES)[number], tokens: TokenSet)
 
 export const docsJournalTokenStyles = scopedThemeTokens("journal", journalUiTokens);
 export const docsMeowTokenStyles = scopedThemeTokens("meow", meowUiTokens);
+export const docsOttrTokenStyles = scopedThemeTokens("ottr", ottrUiTokens);
 
 /** A reading environment built from the shared palette and component metadata. */
 export const docsStyles = css`
@@ -1529,5 +1531,11 @@ export const docsTheme = defineTheme({
   options: standardOptions,
   defaults: { scheme: "auto" },
   tokens: [...standardThemeTokens, docsTokens],
-  styles: [...standardThemeStyles, docsJournalTokenStyles, docsMeowTokenStyles, docsStyles],
+  styles: [
+    ...standardThemeStyles,
+    docsJournalTokenStyles,
+    docsMeowTokenStyles,
+    docsOttrTokenStyles,
+    docsStyles,
+  ],
 });

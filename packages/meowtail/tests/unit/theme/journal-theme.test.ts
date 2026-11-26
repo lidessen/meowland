@@ -1,5 +1,6 @@
 import { expect, test } from "bun:test";
 import { auditCSS } from "meowcss";
+import { ottrTheme, ottrUiTokenValues } from "meowtail/theme";
 import {
   journalFonts,
   journalTheme,
@@ -32,6 +33,15 @@ test("meow declares exactly the standard ui roles and changes only colors", () =
   expect(auditCSS(meowTheme.cssText, standardAuditRules)).toEqual([]);
   for (const group of ["type", "space", "icon", "radius", "shadow", "motion", "layout"] as const)
     expect(meowUiTokenValues[group]).toEqual(standardUiTokenValues[group]);
+});
+
+test("the public Ottr theme declares the standard roles and reuses its component rules", () => {
+  expect(declaredNames(ottrTheme.cssText)).toEqual(declaredNames(standardTheme.cssText));
+  expect(
+    ottrTheme.cssText.endsWith(standardThemeStyles.map((style) => style.text).join("\n")),
+  ).toBe(true);
+  expect(ottrTheme.name).toBe(standardTheme.name);
+  expect(auditCSS(ottrTheme.cssText, standardAuditRules)).toEqual([]);
 });
 
 test("journal lists every web font its type stacks name", () => {
@@ -90,11 +100,12 @@ function read(values: object, path: string, scheme: 0 | 1): string {
   return (Array.isArray(leaf) ? leaf[scheme] : leaf) as string;
 }
 
-test("standard, journal and meow keep text, actions and focus readable in both schemes", () => {
+test("all concrete themes keep text, actions and focus readable in both schemes", () => {
   for (const [name, values] of [
     ["standard", standardUiTokenValues],
     ["journal", journalUiTokenValues],
     ["meow", meowUiTokenValues],
+    ["ottr", ottrUiTokenValues],
   ] as const) {
     for (const scheme of [0, 1] as const) {
       for (const [ink, surface, minimum] of pairs) {
@@ -107,6 +118,17 @@ test("standard, journal and meow keep text, actions and focus readable in both s
           pass: true,
         });
       }
+    }
+  }
+});
+
+test("Ottr can use its accent for compact text on canvas and chrome", () => {
+  for (const scheme of [0, 1] as const) {
+    const accent = read(ottrUiTokenValues, "accent.base", scheme);
+    for (const surface of ["surface.canvas", "surface.raised", "surface.fill"]) {
+      expect(contrast(accent, read(ottrUiTokenValues, surface, scheme))).toBeGreaterThanOrEqual(
+        4.5,
+      );
     }
   }
 });

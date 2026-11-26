@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+- Add `ottrTheme`: a compact workbench theme with warm light and dark surfaces and mint interaction
+  states, selectable in the gallery and docs. It reuses the standard component rules.
+
 - `createMeowUITheme({ theme, config })` from `meowtail/web` is a runtime plugin that delivers a
   theme to every Web mount: the stylesheet (shared per document through `meowcss/web`
   `mountStyles`), the theme attributes on the container and the focus-modality tracker, all

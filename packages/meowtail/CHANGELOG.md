@@ -2,11 +2,6 @@
 
 ## Unreleased
 
-- Improve Doodle with a paper wash, independent decorative marker colors, physical ink borders
-  and a press state that collapses the shadow without hiding the border.
-- Add Pine, a cool paper-and-pine theme with a fixed-dark terminal palette, available in the docs
-  and component gallery.
-
 - `createMeowUITheme({ theme, config })` from `meowtail/web` is a runtime plugin that delivers a
   theme to every Web mount: the stylesheet (shared per document through `meowcss/web`
   `mountStyles`), the theme attributes on the container and the focus-modality tracker, all
@@ -120,6 +115,13 @@
 - The Meowbook gallery's Theme control switches every story between Standard, Journal and Meow.
 - Add `journalFonts` and the `ThemeFont` type: the Fontsource packages that carry the faces Journal
   names. Meowtail ships no font files. The gallery paints Journal stories with those faces.
+
+## 0.4.0-alpha.5
+
+- Improve Doodle with a paper wash, independent decorative marker colors, physical ink borders
+  and a press state that collapses the shadow without hiding the border.
+- Add Pine, a cool paper-and-pine theme with a fixed-dark terminal palette, available in the docs
+  and component gallery.
 
 ## 0.4.0-alpha.4
 

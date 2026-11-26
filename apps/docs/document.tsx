@@ -328,12 +328,13 @@ const APPEARANCE_MENU = `(() => {
     open(false);
     button.focus();
   });
-  document.addEventListener("pointerdown", (event) => {
+  const closeOutside = (event) => {
     if (!panel.hidden && !button.parentElement.contains(event.target)) open(false);
-  });
-  panel.addEventListener("focusout", (event) => {
-    if (!panel.hidden && !button.parentElement.contains(event.relatedTarget)) open(false);
-  });
+  };
+  document.addEventListener("pointerdown", closeOutside);
+  // A tap can blur the checked radio without focusing the next one. Dismiss only when
+  // focus actually lands outside, not between blur and the radio's click.
+  document.addEventListener("focusin", closeOutside);
   // A story re-applies its theme as it mounts; keep the reader's scheme on each preview.
   const follow = (frame) => {
     let doc;

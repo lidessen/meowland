@@ -6,6 +6,11 @@ export { itemOptions } from "./item.options";
 
 export interface ItemProps extends Props, ThemedProps<typeof itemOptions> {
   as?: "div" | "button";
+  /**
+   * Makes the whole item a link to this destination, overriding `as`. A selected link item is the
+   * current destination and carries `aria-current="page"`; routing stays with the host.
+   */
+  href?: string;
   title: Child;
   description?: Child;
   leading?: Child;
@@ -15,10 +20,11 @@ export interface ItemProps extends Props, ThemedProps<typeof itemOptions> {
   className?: Props["className"];
 }
 
-/** A single readable destination. Button content must not contain nested controls. */
+/** A single readable destination. Button and link content must not contain nested controls. */
 export function Item(
   {
     as = "div",
+    href,
     title,
     description,
     leading,
@@ -31,10 +37,12 @@ export function Item(
   }: ItemProps,
   context: Context<typeof Item>,
 ) {
-  const Tag = as;
+  const Tag = href !== undefined ? "a" : as;
   return (
     <Tag
-      type={as === "button" ? "button" : undefined}
+      type={Tag === "button" ? "button" : undefined}
+      href={href}
+      aria-current={href !== undefined && selected ? "page" : undefined}
       {...props}
       className={className}
       data-selected={selected ? "true" : undefined}

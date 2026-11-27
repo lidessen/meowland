@@ -9,6 +9,8 @@ export const navListStyles = css`
   ${list("root")} {
     box-sizing: border-box;
     display: grid;
+    /* A sidebar that gives the list spare height keeps the rows at their size, packed at the top. */
+    align-content: start;
     gap: ${uiTokens.space.section};
     min-width: 0;
     color: ${uiTokens.ink.primary};

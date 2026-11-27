@@ -104,6 +104,7 @@ export const MeowUIComponent = {
   Textarea: "textarea",
   Field: "field",
   Separator: "separator",
+  Stat: "stat",
   Dialog: "dialog",
   DialogPanel: "dialog-panel",
   DialogHeader: "dialog-header",
@@ -247,6 +248,7 @@ export const meowUIComponents = [
   Components.Textarea,
   Components.Field,
   Components.Separator,
+  Components.Stat,
   Components.Dialog,
   Components.DialogPanel,
   Components.DialogHeader,
@@ -437,6 +439,7 @@ declare module "meowjsx" {
     textarea: { parts: ComponentParts<typeof import("../components/textarea").Textarea> };
     field: { parts: ComponentParts<typeof import("../components/field").Field> };
     separator: { parts: ComponentParts<typeof import("../components/separator").Separator> };
+    stat: { parts: ComponentParts<typeof import("../components/stat").Stat> };
     dialog: { parts: ComponentParts<typeof import("../components/dialog").Dialog> };
     "dialog-panel": { parts: ComponentParts<typeof import("../components/dialog").DialogPanel> };
     "dialog-header": { parts: ComponentParts<typeof import("../components/dialog").DialogHeader> };

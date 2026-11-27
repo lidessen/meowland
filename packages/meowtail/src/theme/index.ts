@@ -75,6 +75,7 @@ import { treeViewStyles } from "./components/tree-view.styles";
 import { tokenFieldStyles } from "./components/token-field.styles";
 import { autocompleteStyles } from "./components/autocomplete.styles";
 import { itemStyles } from "./components/item.styles";
+import { statStyles } from "./components/stat.styles";
 import { toggleStyles } from "./components/toggle.styles";
 import { segmentedControlStyles } from "./components/segmented-control.styles";
 import { textShimmerStyles } from "./components/text-shimmer.styles";
@@ -211,6 +212,7 @@ export const standardThemeStyles = [
   codeBlockStyles,
   mermaidDiagramStyles,
   itemStyles,
+  statStyles,
   toolbarStyles,
   tabsStyles,
   breadcrumbStyles,

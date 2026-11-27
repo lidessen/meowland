@@ -2,6 +2,13 @@
 
 ## Unreleased
 
+- `Item` accepts an `href`: the whole item becomes a link with the button item's hover and focus
+  treatment, and a selected link item carries `aria-current="page"`. The leading slot now centers on
+  the first text line (`1lh`), so a state dot and an icon sit level with the title.
+- Add `Stat`, one summary figure with a label, the figure in the page-title size, an optional
+  supporting fact and an optional `href`. It joins `meowUIComponents` and `standardThemeStyles`.
+- `NavList` packs its rows at the top when a sidebar gives it spare height.
+
 - Button accepts an `href` for navigation with native link semantics and the same theme styling as
   button actions. The documentation's home entry uses it instead of a separately styled link.
 - Doodle dark uses quieter ink edges and a darker blue and rust action palette.

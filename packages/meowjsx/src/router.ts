@@ -142,7 +142,7 @@ export function createMemoryRouterAdapter(initialPath = "/"): RouterAdapter {
     back: () => {
       if (index > 0) {
         index--;
-        for (const listener of [...listeners]) listener();
+        for (const listener of Array.from(listeners)) listener();
       }
     },
     subscribe: (listener) => {

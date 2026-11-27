@@ -57,6 +57,10 @@
     "./json": {
       "types": "./dist/src/json/index.d.ts",
       "import": "./dist/src/json/index.js"
+    },
+    "./agent": {
+      "types": "./dist/src/agent/index.d.ts",
+      "import": "./dist/src/agent/index.js"
     }
   },
   "dependencies": {

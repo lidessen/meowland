@@ -33,6 +33,7 @@ export interface PopoverProps extends Props {
 
 // Opening order, rather than DOM order, determines which nested layer dismisses.
 const layers = new WeakMap<Document, HTMLElement[]>();
+const dismissers = new WeakMap<HTMLElement, () => void>();
 const dismissedEvents = new WeakSet<Event>();
 
 /** A floating panel anchored to a trigger, in the top layer. */
@@ -76,6 +77,10 @@ export function Popover(
     if (next && !shown && anchor) {
       if (typeof panel.showPopover !== "function")
         throw new Error("Popover requires the browser Popover API");
+      // Dismiss unrelated open popovers (e.g., sibling dropdowns) while preserving ancestor popovers for nested submenus.
+      for (const existing of stack.slice()) {
+        if (existing !== panel && !existing.contains(anchor)) dismissers.get(existing)?.();
+      }
       panel.showPopover();
       stack.push(panel);
       const stopAuto = autoUpdate(
@@ -150,6 +155,7 @@ export function Popover(
             context.parts.panel,
             (element: HTMLElement) => {
               panel = element;
+              dismissers.set(element, () => request(false, false));
               const doc = element.ownerDocument;
               const win = doc.defaultView!;
               let alive = true;

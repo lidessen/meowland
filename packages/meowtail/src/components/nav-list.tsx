@@ -76,11 +76,13 @@ export function NavList(
   const itemNode = (item: NavListItem) => {
     // The active id is part of the item contract, so aria-current lives on both shapes.
     const current = currentFor(item.id);
+    const accessibleLabel = typeof item.label === "string" ? item.label : undefined;
     if (item.href !== undefined) {
       return (
         <a
           href={item.href}
           aria-current={current}
+          aria-label={accessibleLabel}
           /* A disabled anchor stays a link but leaves the tab order and activation. */ aria-disabled={
             item.disabled ? "true" : undefined
           }
@@ -96,6 +98,7 @@ export function NavList(
       <button
         type={"button"}
         disabled={item.disabled === true}
+        aria-label={accessibleLabel}
         aria-current={current}
         /* The native disabled flag already blocks activation; the guard keeps it */ /* true for programmatic activation as well. */ onClick={
           item.disabled ? undefined : () => onSelect?.(item)

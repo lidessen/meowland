@@ -10,14 +10,17 @@ export const previewStyles = css`
   body {
     margin: 0;
     min-width: 0;
-    background: ${uiTokens.surface.canvas};
     color: ${uiTokens.ink.primary};
     font-family: ${uiTokens.type.sans};
   }
-  body {
-    min-height: 100vh;
-    background-image: ${uiTokens.canvas.wash};
+  /* The document paints the canvas and its wash, so the ground fills the viewport while the body
+     keeps its content height: an embedding page measures the body to fit its preview frame. */
+  html {
+    background: ${uiTokens.canvas.wash} ${uiTokens.surface.canvas};
     background-attachment: fixed;
+  }
+  body {
+    background: transparent;
   }
   * {
     box-sizing: border-box;

@@ -132,10 +132,14 @@ for (const scheme of ["light", "dark"] as const) {
     await draft.pressSequentially("@");
     const panel = page.locator('[data-meowui-part="popover/panel"]:popover-open');
     await expect(panel).toBeVisible();
-    const surface = await page.locator('[data-meowui-part="chat-composer/surface"]').boundingBox();
-    const box = await panel.boundingBox();
-    expect(Math.abs(box!.width - surface!.width)).toBeLessThanOrEqual(2);
-    expect(box!.x + box!.width).toBeLessThanOrEqual(390);
+    const surface = page.locator('[data-meowui-part="chat-composer/surface"]');
+    // Positioning settles on the next frames; wait for the panel to take the surface's width.
+    await expect
+      .poll(async () => {
+        const [a, b] = [await panel.boundingBox(), await surface.boundingBox()];
+        return Math.abs(a!.width - b!.width) <= 2 && a!.x + a!.width <= 390;
+      })
+      .toBe(true);
     await page.screenshot({ path: info.outputPath(`composer-triggers-${scheme}.png`) });
   });
 }

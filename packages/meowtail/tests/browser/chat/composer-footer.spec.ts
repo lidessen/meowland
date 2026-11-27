@@ -22,7 +22,8 @@ async function expectAllocated(composer: Locator) {
       actions: rect(part("actions")),
       externalHint: !part("surface").contains(hint) && hint.parentElement === element,
       emptyDraft: (part("input") as HTMLTextAreaElement).value === "",
-      narrow: matchMedia("(max-width: 768px)").matches,
+      // The narrow layout follows the composer's own width (its container query), not the viewport.
+      narrow: element.getBoundingClientRect().width <= 560,
       hint: rect(hint),
       hintFits: hint.scrollWidth <= hint.clientWidth + 1,
       controls: [

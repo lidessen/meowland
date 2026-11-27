@@ -42,7 +42,7 @@ export function ChatReasoning(
     <details
       {...props}
       open={isActive}
-      data-active={derived(() => String(isActive.value))}
+      data-state={derived(() => (isActive.value ? "active" : "inactive"))}
       aria-busy={derived(() => (isActive.value ? "true" : undefined))}
       ref={[context.parts.root, ref]}
     >

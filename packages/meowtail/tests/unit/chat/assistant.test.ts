@@ -1,4 +1,5 @@
 import { describe, expect, test } from "bun:test";
+import { Window } from "happy-dom";
 import { consumeAssistantDraft, snapshotAssistantDraft } from "../../../src/chat/assistant-draft";
 import { assistantMarkdown } from "../../../src/chat/assistant-markdown";
 import { AssistantView } from "../../../src/chat/assistant";
@@ -95,6 +96,13 @@ describe("Assistant public composition", () => {
     expect(() => render({ messages: [], draft: { text: "Host draft", attachments: [] } })).toThrow(
       "requires onDraftChange or readOnly",
     );
+    expect(() =>
+      render({
+        messages: [],
+        draft: { text: "Host draft", attachments: [] },
+        readOnly: signal(false),
+      }),
+    ).toThrow("requires onDraftChange or readOnly");
     expect(
       render({ messages: [], draft: { text: "Host draft", attachments: [] }, readOnly: true }),
     ).toContain("Host draft");
@@ -233,4 +241,119 @@ describe("Assistant public composition", () => {
     expect(html).toContain('data-tool-state="unknown"');
     expect(html).toContain("Unconfirmed result");
   });
+});
+
+test("Assistant signals update mounted controls and copy", async () => {
+  const before = Object.getOwnPropertyDescriptors(globalThis);
+  const dom = new Window();
+  for (const name of [
+    "window",
+    "document",
+    "HTMLElement",
+    "HTMLInputElement",
+    "Element",
+    "Node",
+    "MutationObserver",
+    "ResizeObserver",
+  ] as const)
+    Object.defineProperty(globalThis, name, {
+      value: dom[name],
+      configurable: true,
+      writable: true,
+    });
+  Object.defineProperty(globalThis, "getComputedStyle", {
+    value: dom.getComputedStyle.bind(dom),
+    configurable: true,
+    writable: true,
+  });
+  const root = dom.document.createElement("div");
+  dom.document.body.append(root);
+  const runtime = createRuntime();
+  installMeowUI({ components: meowUIComponents }, runtime);
+  const readOnly = signal(false);
+  const labels = signal({
+    title: "First title",
+    placeholder: "First prompt",
+    send: "First send",
+    copy: "First copy",
+    good: "First good",
+    details: "First details",
+    workLoading: "First loading",
+  });
+  let submissions = 0;
+  const mounted = createWebRenderer(runtime).render(
+    h(AssistantView, {
+      messages: [
+        {
+          id: "reply",
+          role: "assistant",
+          author: "Helper",
+          parts: [{ id: "text", kind: "text", text: "Reply" }],
+        },
+      ],
+      work: [{ id: "work", title: "Work", statusText: "Pending", readState: "loading" }],
+      onMessageAction: () => undefined,
+      onSubmit: () => {
+        submissions++;
+        return { accepted: false };
+      },
+      defaultDraft: { text: "Draft", attachments: [] },
+      readOnly,
+      labels,
+    }),
+    root as unknown as Element,
+  );
+  try {
+    const textarea = root.querySelector("textarea")!;
+    const form = textarea.closest("form")!;
+    const send = form.querySelector('button[type="submit"]')! as unknown as HTMLButtonElement;
+    expect(textarea.readOnly).toBe(false);
+    expect(send.disabled).toBe(false);
+    expect(root.textContent).toContain("First title");
+    expect(root.textContent).toContain("First details");
+    const workButton = [...root.querySelectorAll("button")].find((button) =>
+      button.textContent?.includes("First details"),
+    )!;
+    workButton.click();
+    await Promise.resolve();
+    expect(root.textContent).toContain("First loading");
+    expect(root.querySelector('[aria-label="First copy"]')).not.toBeNull();
+    expect(root.querySelector('[aria-label="First good"]')).not.toBeNull();
+    readOnly.value = true;
+    await Promise.resolve();
+    expect(textarea.readOnly).toBe(true);
+    expect(textarea.disabled).toBe(true);
+    expect(send.disabled).toBe(true);
+    form.dispatchEvent(new dom.Event("submit", { bubbles: true, cancelable: true }));
+    expect(submissions).toBe(0);
+    labels.value = {
+      title: "Second title",
+      placeholder: "Second prompt",
+      send: "Second send",
+      copy: "Second copy",
+      good: "Second good",
+      details: "Second details",
+      workLoading: "Second loading",
+    };
+    await Promise.resolve();
+    expect(root.textContent).toContain("Second title");
+    expect(root.textContent).toContain("Second details");
+    expect(root.textContent).toContain("Second loading");
+    expect(textarea.placeholder).toBe("Second prompt");
+    expect(send.getAttribute("aria-label")).toBe("Second send");
+    expect(root.querySelector('[aria-label="Second copy"]')).not.toBeNull();
+    expect(root.querySelector('[aria-label="Second good"]')).not.toBeNull();
+    readOnly.value = false;
+    await Promise.resolve();
+    expect(textarea.readOnly).toBe(false);
+    expect(send.disabled).toBe(false);
+  } finally {
+    mounted.unmount();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    for (const name of Reflect.ownKeys(globalThis))
+      if (!Object.hasOwn(before, name)) Reflect.deleteProperty(globalThis, name);
+    for (const name of Reflect.ownKeys(before))
+      Object.defineProperty(globalThis, name, before[name as keyof typeof before]!);
+    await dom.happyDOM.close();
+  }
 });

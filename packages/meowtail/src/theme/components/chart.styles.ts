@@ -110,7 +110,7 @@ export const chartStyles = css`
     transition: opacity ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   /* The inspected category stays full; the others step back. */
-  ${chart.plot}:has(${chart.bar}[data-active]) ${chart.bar}:not([data-active]) {
+  ${chart.plot}:has(${chart.bar}[data-state="active"]) ${chart.bar}:not([data-state="active"]) {
     opacity: 0.45;
   }
   ${chart.line} {

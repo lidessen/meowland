@@ -26,13 +26,13 @@ export const chatReasoningStyles = css`
     font-size: ${uiTokens.type.body};
     line-height: ${uiTokens.type.line.bodyCompact};
   }
-  ${part("root")}:not([data-active="true"]) > ${part("summary")} {
+  ${part("root")}:not([data-state="active"]) > ${part("summary")} {
     color: ${uiTokens.ink.secondary};
   }
   ${part("summary")}::-webkit-details-marker {
     display: none;
   }
-  ${part("root")}:not([data-active="true"]) > ${part("summary")}:hover {
+  ${part("root")}:not([data-state="active"]) > ${part("summary")}:hover {
     color: ${uiTokens.ink.primary};
   }
   ${part("summary")}:focus-visible {
@@ -47,7 +47,7 @@ export const chatReasoningStyles = css`
     height: 20px;
   }
   /* The thinking glyph: nine 2px dots whose opacity travels across the lattice. */
-  ${part("root")}[data-active="true"] ${part("icon")} {
+  ${part("root")}[data-state="active"] ${part("icon")} {
     grid-template-columns: repeat(3, 2.5px);
     grid-auto-rows: 2.5px;
     gap: 3px;
@@ -116,7 +116,7 @@ export const chatReasoningStyles = css`
   }
   /* While the model works, only the newest lines show; older ones fade under the top edge.
      The body anchors its content to the bottom, so no script measures or scrolls it. */
-  ${part("root")}[data-active="true"] > ${part("body")} {
+  ${part("root")}[data-state="active"] > ${part("body")} {
     display: flex;
     flex-direction: column;
     justify-content: flex-end;

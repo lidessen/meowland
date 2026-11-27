@@ -1,4 +1,5 @@
 import { type Child, type Props, type Context, h } from "meowjsx";
+import { derived, isSignal, unwrap, type MaybeSignal } from "meowjsx/signal";
 
 export interface ListGroupProps extends Props {
   className?: Props["className"];
@@ -28,7 +29,7 @@ export interface ListRowProps extends Props {
   /** "accent" is the row the reader should notice first, such as the default. */
   tone?: "default" | "accent";
   /** Open content under the row, such as its editor. Children render here. */
-  expanded?: boolean;
+  expanded?: MaybeSignal<boolean>;
   className?: Props["className"];
 }
 
@@ -54,7 +55,7 @@ export function ListRow(
       {...props}
       className={className}
       data-tone={tone}
-      data-expanded={expanded ? "true" : undefined}
+      data-state={derived(() => (unwrap(expanded) ? "open" : "closed"))}
       ref={[context.parts.root, props.ref]}
     >
       <div ref={[context.parts.line]}>
@@ -70,7 +71,11 @@ export function ListRow(
         {status ? <span ref={[context.parts.status]}>{status}</span> : null}
         {actions ? <span ref={[context.parts.actions]}>{actions}</span> : null}
       </div>
-      {expanded && children ? <div ref={[context.parts.panel]}>{children}</div> : null}
+      {(isSignal(expanded) || expanded) && children ? (
+        <div hidden={derived(() => !unwrap(expanded))} ref={[context.parts.panel]}>
+          {children}
+        </div>
+      ) : null}
     </div>
   );
 }

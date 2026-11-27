@@ -1,5 +1,6 @@
 import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
 import { type Child, type Props, type Context, h } from "meowjsx";
+import { derived, unwrap, type MaybeSignal } from "meowjsx/signal";
 
 import { itemOptions } from "./item.options";
 export { itemOptions } from "./item.options";
@@ -16,7 +17,7 @@ export interface ItemProps extends Props, ThemedProps<typeof itemOptions> {
   leading?: Child;
   trailing?: Child;
   meta?: Child;
-  selected?: boolean;
+  selected?: MaybeSignal<boolean>;
   className?: Props["className"];
 }
 
@@ -42,10 +43,10 @@ export function Item(
     <Tag
       type={Tag === "button" ? "button" : undefined}
       href={href}
-      aria-current={href !== undefined && selected ? "page" : undefined}
+      aria-current={derived(() => (href !== undefined && unwrap(selected) ? "page" : undefined))}
       {...props}
       className={className}
-      data-selected={selected ? "true" : undefined}
+      {...{ ["data-selected"]: derived(() => (unwrap(selected) ? "true" : undefined)) }}
       ref={[context.parts.root, props.ref]}
     >
       {leading != null ? <span ref={[context.parts.leading]}>{leading}</span> : null}

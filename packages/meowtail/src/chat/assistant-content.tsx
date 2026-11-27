@@ -1,5 +1,5 @@
 import { h, keyed, type Child, type Context } from "meowjsx";
-import { derived, signal, unwrap, type Signal } from "meowjsx/signal";
+import { derived, signal, unwrap, type ReadableSignal, type Signal } from "meowjsx/signal";
 // Fragment is required by the classic JSX transform for process status content.
 // eslint-disable-next-line no-unused-vars
 import { Fragment } from "meowjsx";
@@ -195,7 +195,7 @@ function AssistantReplyActions(
     onMessageAction,
   }: {
     value: Signal<AssistantMessage>;
-    labels: AssistantLabels;
+    labels: ReadableSignal<AssistantLabels>;
     onMessageAction?: AssistantViewProps["onMessageAction"];
   },
   context: Context<typeof AssistantReplyActions>,
@@ -205,7 +205,11 @@ function AssistantReplyActions(
   context.onCleanup(() => clearTimeout(timer));
   const text = () =>
     value.value.parts.flatMap((part) => (part.kind === "text" ? [part.text] : [])).join("\n\n");
-  const intent = (action: AssistantMessageAction, icon: IconName, label: string) => (
+  const intent = (
+    action: AssistantMessageAction,
+    icon: IconName,
+    label: ReadableSignal<string>,
+  ) => (
     <IconButton
       size="small"
       label={label}
@@ -218,7 +222,7 @@ function AssistantReplyActions(
     <ChatMessageActions>
       <IconButton
         size="small"
-        label={derived(() => (copied.value ? labels.copied : labels.copy))}
+        label={derived(() => (copied.value ? labels.value.copied : labels.value.copy))}
         hidden={derived(() => !text())}
         onClick={async () => {
           try {
@@ -239,9 +243,21 @@ function AssistantReplyActions(
       </IconButton>
       {onMessageAction
         ? [
-            intent("good", "thumbs-up", labels.good),
-            intent("bad", "thumbs-down", labels.bad),
-            intent("regenerate", "refresh-cw", labels.regenerate),
+            intent(
+              "good",
+              "thumbs-up",
+              derived(() => labels.value.good),
+            ),
+            intent(
+              "bad",
+              "thumbs-down",
+              derived(() => labels.value.bad),
+            ),
+            intent(
+              "regenerate",
+              "refresh-cw",
+              derived(() => labels.value.regenerate),
+            ),
           ]
         : null}
     </ChatMessageActions>
@@ -261,7 +277,7 @@ export function AssistantMessageView(
     renderPart?: AssistantViewProps["renderPart"];
     onToolAction?: AssistantViewProps["onToolAction"];
     onMessageAction?: AssistantViewProps["onMessageAction"];
-    labels?: AssistantLabels;
+    labels?: ReadableSignal<AssistantLabels>;
   },
   context: Context<typeof AssistantMessageView>,
 ) {

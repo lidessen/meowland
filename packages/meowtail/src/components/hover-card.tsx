@@ -1,5 +1,5 @@
 import { h, type Child, type Props, type Context } from "meowjsx";
-import { mapSignal, signal } from "meowjsx/signal";
+import { mapSignal, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Popover, type PopoverTriggerBindings } from "./popover";
 import { copyTextToClipboard } from "../clipboard";
 import { Icon } from "../icons/icon";
@@ -11,7 +11,7 @@ export interface HoverCardProps extends Props {
   trigger: (bindings: PopoverTriggerBindings) => Child;
   content: Child;
   openDelay?: number;
-  disabled?: boolean;
+  disabled?: MaybeSignal<boolean>;
   className?: Props["className"];
   variant?: "compact" | "preview";
   widthAnchor?: () => HTMLElement | null;
@@ -69,13 +69,16 @@ export function HoverCard(
     feedback.value = "";
     copyState.value = "idle";
   };
+  context.effect(() => {
+    if (unwrap(disabled)) close();
+  });
   context.onCleanup(clear);
   context.onCleanup(() => {
     alive = false;
     clearTimeout(feedbackTimer);
   });
   const copy = async (event: Event) => {
-    if (copyText === undefined || copying) return;
+    if (unwrap(disabled) || copyText === undefined || copying) return;
     const selection = root?.ownerDocument.getSelection();
     if (selection && !selection.isCollapsed && event.currentTarget instanceof Node) {
       for (let index = 0; index < selection.rangeCount; index++)
@@ -116,10 +119,10 @@ export function HoverCard(
         if (event.pointerType === "touch") return;
         hovered = true;
         clear();
-        if (!disabled && !dismissed)
+        if (!unwrap(disabled) && !dismissed)
           timer = setTimeout(
             () => {
-              open.value = true;
+              if (!unwrap(disabled)) open.value = true;
             },
             Math.max(0, openDelay),
           );
@@ -135,7 +138,7 @@ export function HoverCard(
       onFocusIn={() => {
         focused = true;
         clear();
-        if (!disabled && !dismissed) open.value = true;
+        if (!unwrap(disabled) && !dismissed) open.value = true;
       }}
       onFocusOut={(event: FocusEvent) => {
         if ((event.currentTarget as HTMLElement).contains(event.relatedTarget as Node | null))
@@ -183,13 +186,13 @@ export function HoverCard(
             if (!next) {
               dismissed = true;
               close();
-            } else if (!disabled) open.value = true;
+            } else if (!unwrap(disabled)) open.value = true;
           }}
           trigger={(bindings) =>
             trigger({
               ...bindings,
               onClick: () => {
-                if (disabled) return;
+                if (unwrap(disabled)) return;
                 // A tap toggles; the state at touch start ignores a focus that opened it mid-tap.
                 if (touchStartedOpen) close();
                 else open.value = true;

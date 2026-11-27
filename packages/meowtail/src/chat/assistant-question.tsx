@@ -1,5 +1,5 @@
 import { h, keyed, type Context } from "meowjsx";
-import { derived, signal, type Signal } from "meowjsx/signal";
+import { derived, signal, unwrap, type MaybeSignal, type Signal } from "meowjsx/signal";
 // Fragment is required by the classic JSX transform for question actions.
 // eslint-disable-next-line no-unused-vars
 import { Fragment } from "meowjsx";
@@ -23,14 +23,14 @@ export function AssistantQuestionView(
     value: Signal<AssistantQuestion>;
     onAnswer?: AssistantViewProps["onAnswer"];
     onDismiss?: AssistantViewProps["onDismissQuestion"];
-    labels?: Partial<AssistantLabels>;
+    labels?: MaybeSignal<Partial<AssistantLabels>>;
   },
   context: Context<typeof AssistantQuestionView>,
 ) {
-  const assistantCopy = { ...defaultAssistantCopy, ...labels };
+  const assistantCopy = derived(() => ({ ...defaultAssistantCopy, ...unwrap(labels) }));
   const answer = signal("");
   const sending = signal(false);
-  const error = signal("");
+  const error = signal(false);
   const disabled = derived(() => sending.value || value.value.state !== "open" || !onAnswer);
   let disposed = false;
   context.onCleanup(() => {
@@ -40,11 +40,11 @@ export function AssistantQuestionView(
     event.preventDefault();
     if (sending.value || disabled.value || !answer.value.trim() || !onAnswer) return;
     sending.value = true;
-    error.value = "";
+    error.value = false;
     try {
       await onAnswer(value.value.id, answer.value);
     } catch {
-      if (!disposed) error.value = assistantCopy.answerError;
+      if (!disposed) error.value = true;
     } finally {
       if (!disposed) sending.value = false;
     }
@@ -54,18 +54,18 @@ export function AssistantQuestionView(
     <form onSubmit={submit} ref={parts.root}>
       <ChatQuestion
         question={derived(() => value.value.title)}
-        label={assistantCopy.questions}
+        label={derived(() => assistantCopy.value.questions)}
         description={derived(() => value.value.description)}
         feedback={derived(
           () =>
-            error.value ||
+            (error.value ? assistantCopy.value.answerError : "") ||
             value.value.feedback ||
             (value.value.state === "submitting"
-              ? assistantCopy.questionSubmitting
+              ? assistantCopy.value.questionSubmitting
               : value.value.state === "answered"
-                ? assistantCopy.questionAnswered
+                ? assistantCopy.value.questionAnswered
                 : value.value.state === "unavailable"
-                  ? assistantCopy.questionUnavailable
+                  ? assistantCopy.value.questionUnavailable
                   : ""),
         )}
         actions={
@@ -75,7 +75,7 @@ export function AssistantQuestionView(
               size="small"
               disabled={derived(() => disabled.value || !answer.value.trim())}
             >
-              {assistantCopy.answer}
+              {derived(() => assistantCopy.value.answer)}
             </Button>
             {onDismiss ? (
               <Button
@@ -85,7 +85,7 @@ export function AssistantQuestionView(
                 disabled={derived(() => sending.value || value.value.state !== "open")}
                 onClick={() => onDismiss(value.value.id)}
               >
-                {assistantCopy.dismiss}
+                {derived(() => assistantCopy.value.dismiss)}
               </Button>
             ) : null}
           </>
@@ -100,7 +100,7 @@ export function AssistantQuestionView(
               answer.value = (event.currentTarget as HTMLSelectElement).value;
             }}
           >
-            <option value="">{assistantCopy.answerPlaceholder}</option>
+            <option value="">{derived(() => assistantCopy.value.answerPlaceholder)}</option>
             {keyed(
               derived(() => value.value.options ?? []),
               (option) => option.value,
@@ -115,8 +115,8 @@ export function AssistantQuestionView(
         <textarea
           value={answer}
           rows={2}
-          aria-label={derived(() => `${assistantCopy.answer}: ${value.value.title}`)}
-          placeholder={assistantCopy.answerPlaceholder}
+          aria-label={derived(() => `${assistantCopy.value.answer}: ${value.value.title}`)}
+          placeholder={derived(() => assistantCopy.value.answerPlaceholder)}
           disabled={disabled}
           onInput={(event: Event) => {
             answer.value = (event.currentTarget as HTMLTextAreaElement).value;

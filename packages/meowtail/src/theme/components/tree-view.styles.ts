@@ -65,7 +65,7 @@ export const treeViewStyles = css`
   ${tree.toggle}[hidden] {
     visibility: hidden;
   }
-  ${tree.toggle}[data-open="true"] {
+  ${tree.toggle}[data-state="open"] {
     transform: rotate(90deg);
   }
   ${tree.toggle} svg {

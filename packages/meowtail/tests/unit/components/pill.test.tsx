@@ -8,7 +8,7 @@ installMeowUI({ components: meowUIComponents }, defaultRuntime);
 test("pill facts remain spans and actions use native buttons", () => {
   const fact = renderToHtml(<Pill active>Exit code 1</Pill>);
   expect(fact).toContain("<span");
-  expect(fact).toContain('data-active="true"');
+  expect(fact).toContain('data-state="active"');
   const action = renderToHtml(
     <Pill onClick={() => {}} disabled aria-pressed="false">
       Filter

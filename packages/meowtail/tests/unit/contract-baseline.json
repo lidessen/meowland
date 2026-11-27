@@ -1,4 +1,602 @@
 {
+  "components": [
+    {
+      "name": "accordion",
+      "source": "src/components/accordion.tsx"
+    },
+    {
+      "name": "action-rail",
+      "source": "src/components/action-rail.tsx"
+    },
+    {
+      "name": "action-row",
+      "source": "src/components/action-row.tsx"
+    },
+    {
+      "name": "add-button",
+      "source": "src/components/add-button.tsx"
+    },
+    {
+      "name": "alert",
+      "source": "src/components/alert.tsx"
+    },
+    {
+      "name": "app-bar",
+      "source": "src/components/app-bar.tsx"
+    },
+    {
+      "name": "aspect-ratio",
+      "source": "src/components/aspect-ratio.tsx"
+    },
+    {
+      "name": "assistant-composer",
+      "source": "src/chat/assistant-composer.tsx"
+    },
+    {
+      "name": "assistant-markdown",
+      "source": "src/chat/assistant-markdown.tsx"
+    },
+    {
+      "name": "assistant-question",
+      "source": "src/chat/assistant-question.tsx"
+    },
+    {
+      "name": "assistant-steps",
+      "source": "src/chat/assistant-content.tsx"
+    },
+    {
+      "name": "assistant-view",
+      "source": "src/chat/assistant.tsx"
+    },
+    {
+      "name": "autocomplete",
+      "source": "src/components/autocomplete.tsx"
+    },
+    {
+      "name": "avatar",
+      "source": "src/components/avatar.tsx"
+    },
+    {
+      "name": "badge",
+      "source": "src/components/badge.tsx"
+    },
+    {
+      "name": "breadcrumb",
+      "source": "src/components/breadcrumb.tsx"
+    },
+    {
+      "name": "button",
+      "source": "src/components/button.tsx"
+    },
+    {
+      "name": "card",
+      "source": "src/components/card.tsx"
+    },
+    {
+      "name": "card-action",
+      "source": "src/components/card-action.tsx"
+    },
+    {
+      "name": "card-content",
+      "source": "src/components/card-content.tsx"
+    },
+    {
+      "name": "card-description",
+      "source": "src/components/card-description.tsx"
+    },
+    {
+      "name": "card-footer",
+      "source": "src/components/card-footer.tsx"
+    },
+    {
+      "name": "card-header",
+      "source": "src/components/card-header.tsx"
+    },
+    {
+      "name": "card-title",
+      "source": "src/components/card-title.tsx"
+    },
+    {
+      "name": "chart",
+      "source": "src/components/chart.tsx"
+    },
+    {
+      "name": "chat-attachments",
+      "source": "src/chat/attachments.tsx"
+    },
+    {
+      "name": "chat-bubble",
+      "source": "src/chat/bubble.tsx"
+    },
+    {
+      "name": "chat-composer",
+      "source": "src/chat/composer.tsx"
+    },
+    {
+      "name": "chat-conversation",
+      "source": "src/chat/conversation.tsx"
+    },
+    {
+      "name": "chat-conversation-latest",
+      "source": "src/chat/conversation.tsx"
+    },
+    {
+      "name": "chat-frame",
+      "source": "src/chat/frame.tsx"
+    },
+    {
+      "name": "chat-header",
+      "source": "src/chat/header.tsx"
+    },
+    {
+      "name": "chat-message",
+      "source": "src/chat/message.tsx"
+    },
+    {
+      "name": "chat-message-actions",
+      "source": "src/chat/message-actions.tsx"
+    },
+    {
+      "name": "chat-message-list",
+      "source": "src/chat/message-list.tsx"
+    },
+    {
+      "name": "chat-message-list-content",
+      "source": "src/chat/message-list.tsx"
+    },
+    {
+      "name": "chat-message-list-date",
+      "source": "src/chat/message-list.tsx"
+    },
+    {
+      "name": "chat-message-list-item",
+      "source": "src/chat/message-list.tsx"
+    },
+    {
+      "name": "chat-process",
+      "source": "src/chat/process.tsx"
+    },
+    {
+      "name": "chat-question",
+      "source": "src/chat/question.tsx"
+    },
+    {
+      "name": "chat-reasoning",
+      "source": "src/chat/reasoning.tsx"
+    },
+    {
+      "name": "chat-sources",
+      "source": "src/chat/sources.tsx"
+    },
+    {
+      "name": "chat-status",
+      "source": "src/chat/status.tsx"
+    },
+    {
+      "name": "chat-task",
+      "source": "src/chat/task.tsx"
+    },
+    {
+      "name": "chat-tool-call",
+      "source": "src/chat/tool-call.tsx"
+    },
+    {
+      "name": "checkbox",
+      "source": "src/components/checkbox.tsx"
+    },
+    {
+      "name": "choice-group",
+      "source": "src/components/choice-group.tsx"
+    },
+    {
+      "name": "choice-select",
+      "source": "src/components/choice-select.tsx"
+    },
+    {
+      "name": "code-block",
+      "source": "src/components/code-block.tsx"
+    },
+    {
+      "name": "command-palette",
+      "source": "src/components/command-palette.tsx"
+    },
+    {
+      "name": "composer-panel",
+      "source": "src/chat/composer-panel.tsx"
+    },
+    {
+      "name": "container",
+      "source": "src/components/container.tsx"
+    },
+    {
+      "name": "context-menu",
+      "source": "src/components/context-menu.tsx"
+    },
+    {
+      "name": "credential-source",
+      "source": "src/components/credential-source.tsx"
+    },
+    {
+      "name": "description-item",
+      "source": "src/components/description-list.tsx"
+    },
+    {
+      "name": "description-list",
+      "source": "src/components/description-list.tsx"
+    },
+    {
+      "name": "detail-section",
+      "source": "src/components/detail-section.tsx"
+    },
+    {
+      "name": "dialog",
+      "source": "src/components/dialog.tsx"
+    },
+    {
+      "name": "dialog-actions",
+      "source": "src/components/dialog-actions.tsx"
+    },
+    {
+      "name": "dialog-header",
+      "source": "src/components/dialog-header.tsx"
+    },
+    {
+      "name": "dialog-panel",
+      "source": "src/components/dialog-panel.tsx"
+    },
+    {
+      "name": "diff-block",
+      "source": "src/components/diff-block.tsx"
+    },
+    {
+      "name": "disclosure",
+      "source": "src/components/disclosure.tsx"
+    },
+    {
+      "name": "drawer",
+      "source": "src/components/drawer.tsx"
+    },
+    {
+      "name": "empty-state",
+      "source": "src/components/empty-state.tsx"
+    },
+    {
+      "name": "entry",
+      "source": "src/components/entry.tsx"
+    },
+    {
+      "name": "entry-list",
+      "source": "src/components/entry.tsx"
+    },
+    {
+      "name": "field",
+      "source": "src/components/field.tsx"
+    },
+    {
+      "name": "field-group",
+      "source": "src/components/field-group.tsx"
+    },
+    {
+      "name": "form",
+      "source": "src/components/form.tsx"
+    },
+    {
+      "name": "grid",
+      "source": "src/components/grid.tsx"
+    },
+    {
+      "name": "hover-card",
+      "source": "src/components/hover-card.tsx"
+    },
+    {
+      "name": "icon-button",
+      "source": "src/components/icon-button.tsx"
+    },
+    {
+      "name": "icon-rail",
+      "source": "src/components/icon-rail.tsx"
+    },
+    {
+      "name": "image-lightbox",
+      "source": "src/components/image-lightbox.tsx"
+    },
+    {
+      "name": "image-preview",
+      "source": "src/components/image-preview.tsx"
+    },
+    {
+      "name": "inline",
+      "source": "src/components/inline.tsx"
+    },
+    {
+      "name": "input",
+      "source": "src/components/input.tsx"
+    },
+    {
+      "name": "item",
+      "source": "src/components/item.tsx"
+    },
+    {
+      "name": "json-block",
+      "source": "src/components/json-block.tsx"
+    },
+    {
+      "name": "json-tree",
+      "source": "src/components/json-tree.tsx"
+    },
+    {
+      "name": "layout-item",
+      "source": "src/components/layout-item.tsx"
+    },
+    {
+      "name": "link",
+      "source": "src/components/link.tsx"
+    },
+    {
+      "name": "list-group",
+      "source": "src/components/list-group.tsx"
+    },
+    {
+      "name": "list-row",
+      "source": "src/components/list-group.tsx"
+    },
+    {
+      "name": "markdown",
+      "source": "src/components/markdown.tsx"
+    },
+    {
+      "name": "menu",
+      "source": "src/components/menu.tsx"
+    },
+    {
+      "name": "menu-button",
+      "source": "src/components/menu-button.tsx"
+    },
+    {
+      "name": "mermaid-diagram",
+      "source": "src/components/mermaid-diagram.tsx"
+    },
+    {
+      "name": "meta-row",
+      "source": "src/components/meta-row.tsx"
+    },
+    {
+      "name": "modal",
+      "source": "src/components/modal.tsx"
+    },
+    {
+      "name": "nav-item",
+      "source": "src/components/nav-item.tsx"
+    },
+    {
+      "name": "nav-list",
+      "source": "src/components/nav-list.tsx"
+    },
+    {
+      "name": "number-input",
+      "source": "src/components/number-input.tsx"
+    },
+    {
+      "name": "output-block",
+      "source": "src/components/output-block.tsx"
+    },
+    {
+      "name": "page",
+      "source": "src/components/page.tsx"
+    },
+    {
+      "name": "page-frame",
+      "source": "src/components/page-frame.tsx"
+    },
+    {
+      "name": "page-header",
+      "source": "src/components/page-header.tsx"
+    },
+    {
+      "name": "pagination",
+      "source": "src/components/pagination.tsx"
+    },
+    {
+      "name": "path-label",
+      "source": "src/components/path-label.tsx"
+    },
+    {
+      "name": "path-picker",
+      "source": "src/components/path-picker.tsx"
+    },
+    {
+      "name": "pill",
+      "source": "src/components/pill.tsx"
+    },
+    {
+      "name": "popover",
+      "source": "src/components/popover.tsx"
+    },
+    {
+      "name": "process-group",
+      "source": "src/components/process-group.tsx"
+    },
+    {
+      "name": "process-step",
+      "source": "src/components/process-step.tsx"
+    },
+    {
+      "name": "progress",
+      "source": "src/components/progress.tsx"
+    },
+    {
+      "name": "prose",
+      "source": "src/components/prose.tsx"
+    },
+    {
+      "name": "rail-item",
+      "source": "src/components/rail-item.tsx"
+    },
+    {
+      "name": "rail-section",
+      "source": "src/components/rail-section.tsx"
+    },
+    {
+      "name": "read-block",
+      "source": "src/components/read-block.tsx"
+    },
+    {
+      "name": "region-layout",
+      "source": "src/components/region-layout.tsx"
+    },
+    {
+      "name": "resource-card",
+      "source": "src/components/resource-card.tsx"
+    },
+    {
+      "name": "resource-link",
+      "source": "src/components/resource-link.tsx"
+    },
+    {
+      "name": "risk-confirmation",
+      "source": "src/components/risk-confirmation.tsx"
+    },
+    {
+      "name": "search-block",
+      "source": "src/components/search-block.tsx"
+    },
+    {
+      "name": "search-input",
+      "source": "src/components/search-input.tsx"
+    },
+    {
+      "name": "section",
+      "source": "src/components/section.tsx"
+    },
+    {
+      "name": "segmented-control",
+      "source": "src/components/segmented-control.tsx"
+    },
+    {
+      "name": "select",
+      "source": "src/components/select.tsx"
+    },
+    {
+      "name": "separator",
+      "source": "src/components/separator.tsx"
+    },
+    {
+      "name": "shortcut-keys",
+      "source": "src/components/shortcut-keys.tsx"
+    },
+    {
+      "name": "skeleton",
+      "source": "src/components/skeleton.tsx"
+    },
+    {
+      "name": "skeleton-boundary",
+      "source": "src/components/skeleton-boundary.tsx"
+    },
+    {
+      "name": "slider",
+      "source": "src/components/slider.tsx"
+    },
+    {
+      "name": "spinner",
+      "source": "src/components/spinner.tsx"
+    },
+    {
+      "name": "stack",
+      "source": "src/components/stack.tsx"
+    },
+    {
+      "name": "stat",
+      "source": "src/components/stat.tsx"
+    },
+    {
+      "name": "state-dot",
+      "source": "src/components/state-dot.tsx"
+    },
+    {
+      "name": "status",
+      "source": "src/components/status.tsx"
+    },
+    {
+      "name": "status-dot",
+      "source": "src/components/status-dot.tsx"
+    },
+    {
+      "name": "switch",
+      "source": "src/components/switch.tsx"
+    },
+    {
+      "name": "table",
+      "source": "src/components/table.tsx"
+    },
+    {
+      "name": "tabs",
+      "source": "src/components/tabs.tsx"
+    },
+    {
+      "name": "tag",
+      "source": "src/components/tag.tsx"
+    },
+    {
+      "name": "task-list",
+      "source": "src/components/task-list.tsx"
+    },
+    {
+      "name": "terminal-block",
+      "source": "src/components/terminal-block.tsx"
+    },
+    {
+      "name": "text",
+      "source": "src/components/text.tsx"
+    },
+    {
+      "name": "text-shimmer",
+      "source": "src/components/text-shimmer.tsx"
+    },
+    {
+      "name": "textarea",
+      "source": "src/components/textarea.tsx"
+    },
+    {
+      "name": "timeline",
+      "source": "src/components/timeline.tsx"
+    },
+    {
+      "name": "timeline-item",
+      "source": "src/components/timeline.tsx"
+    },
+    {
+      "name": "toast",
+      "source": "src/components/toast.tsx"
+    },
+    {
+      "name": "token-field",
+      "source": "src/components/token-field.tsx"
+    },
+    {
+      "name": "toolbar",
+      "source": "src/components/toolbar.tsx"
+    },
+    {
+      "name": "tooltip",
+      "source": "src/components/tooltip.tsx"
+    },
+    {
+      "name": "tree-view",
+      "source": "src/components/tree-view.tsx"
+    },
+    {
+      "name": "web-block",
+      "source": "src/components/web-block.tsx"
+    },
+    {
+      "name": "window-title-bar",
+      "source": "src/components/window-title-bar.tsx"
+    },
+    {
+      "name": "work-card",
+      "source": "src/components/work-card.tsx"
+    }
+  ],
   "violations": [
     {
       "component": "action-rail",
@@ -32,11 +630,6 @@
     },
     {
       "component": "assistant-question",
-      "kind": "liveness",
-      "detail": "labels"
-    },
-    {
-      "component": "assistant-question",
       "kind": "story",
       "detail": "assistant-question.stories.tsx"
     },
@@ -44,21 +637,6 @@
       "component": "assistant-steps",
       "kind": "story",
       "detail": "assistant-steps.stories.tsx"
-    },
-    {
-      "component": "assistant-view",
-      "kind": "dom-state",
-      "detail": "data-open #1"
-    },
-    {
-      "component": "assistant-view",
-      "kind": "liveness",
-      "detail": "labels"
-    },
-    {
-      "component": "assistant-view",
-      "kind": "liveness",
-      "detail": "readOnly"
     },
     {
       "component": "assistant-view",
@@ -104,11 +682,6 @@
       "component": "card-title",
       "kind": "story",
       "detail": "card-title.stories.tsx"
-    },
-    {
-      "component": "chart",
-      "kind": "dom-state",
-      "detail": "data-active #1"
     },
     {
       "component": "chat-attachments",
@@ -167,18 +740,8 @@
     },
     {
       "component": "chat-process",
-      "kind": "liveness",
-      "detail": "open"
-    },
-    {
-      "component": "chat-process",
       "kind": "story",
       "detail": "chat-process.stories.tsx"
-    },
-    {
-      "component": "chat-reasoning",
-      "kind": "dom-state",
-      "detail": "data-active #1"
     },
     {
       "component": "chat-reasoning",
@@ -202,11 +765,6 @@
     },
     {
       "component": "chat-tool-call",
-      "kind": "liveness",
-      "detail": "labels"
-    },
-    {
-      "component": "chat-tool-call",
       "kind": "story",
       "detail": "chat-tool-call.stories.tsx"
     },
@@ -217,11 +775,6 @@
     },
     {
       "component": "choice-group",
-      "kind": "liveness",
-      "detail": "disabled"
-    },
-    {
-      "component": "choice-group",
       "kind": "story",
       "detail": "choice-group.stories.tsx"
     },
@@ -229,11 +782,6 @@
       "component": "container",
       "kind": "story",
       "detail": "container.stories.tsx"
-    },
-    {
-      "component": "credential-source",
-      "kind": "liveness",
-      "detail": "disabled"
     },
     {
       "component": "description-item",
@@ -287,11 +835,6 @@
     },
     {
       "component": "field-group",
-      "kind": "liveness",
-      "detail": "disabled"
-    },
-    {
-      "component": "field-group",
       "kind": "story",
       "detail": "field-group.stories.tsx"
     },
@@ -307,11 +850,6 @@
     },
     {
       "component": "hover-card",
-      "kind": "liveness",
-      "detail": "disabled"
-    },
-    {
-      "component": "hover-card",
       "kind": "story",
       "detail": "hover-card.stories.tsx"
     },
@@ -319,11 +857,6 @@
       "component": "icon-button",
       "kind": "story",
       "detail": "icon-button.stories.tsx"
-    },
-    {
-      "component": "icon-rail",
-      "kind": "dom-state",
-      "detail": "data-expanded #1"
     },
     {
       "component": "image-lightbox",
@@ -339,11 +872,6 @@
       "component": "input",
       "kind": "story",
       "detail": "input.stories.tsx"
-    },
-    {
-      "component": "item",
-      "kind": "liveness",
-      "detail": "selected"
     },
     {
       "component": "json-block",
@@ -367,16 +895,6 @@
     },
     {
       "component": "list-row",
-      "kind": "dom-state",
-      "detail": "data-expanded #1"
-    },
-    {
-      "component": "list-row",
-      "kind": "liveness",
-      "detail": "expanded"
-    },
-    {
-      "component": "list-row",
       "kind": "story",
       "detail": "list-row.stories.tsx"
     },
@@ -389,16 +907,6 @@
       "component": "nav-item",
       "kind": "story",
       "detail": "nav-item.stories.tsx"
-    },
-    {
-      "component": "number-input",
-      "kind": "liveness",
-      "detail": "disabled"
-    },
-    {
-      "component": "number-input",
-      "kind": "liveness",
-      "detail": "readOnly"
     },
     {
       "component": "output-block",
@@ -419,16 +927,6 @@
       "component": "path-label",
       "kind": "story",
       "detail": "path-label.stories.tsx"
-    },
-    {
-      "component": "pill",
-      "kind": "dom-state",
-      "detail": "data-active #1"
-    },
-    {
-      "component": "process-group",
-      "kind": "liveness",
-      "detail": "open"
     },
     {
       "component": "process-step",
@@ -477,16 +975,6 @@
     },
     {
       "component": "search-input",
-      "kind": "liveness",
-      "detail": "disabled"
-    },
-    {
-      "component": "search-input",
-      "kind": "liveness",
-      "detail": "readOnly"
-    },
-    {
-      "component": "search-input",
       "kind": "story",
       "detail": "search-input.stories.tsx"
     },
@@ -511,19 +999,9 @@
       "detail": "shortcut-keys.stories.tsx"
     },
     {
-      "component": "slider",
-      "kind": "liveness",
-      "detail": "disabled"
-    },
-    {
       "component": "stack",
       "kind": "story",
       "detail": "stack.stories.tsx"
-    },
-    {
-      "component": "stat",
-      "kind": "liveness",
-      "detail": "value"
     },
     {
       "component": "state-dot",
@@ -544,11 +1022,6 @@
       "component": "terminal-block",
       "kind": "story",
       "detail": "terminal-block.stories.tsx"
-    },
-    {
-      "component": "text-shimmer",
-      "kind": "dom-state",
-      "detail": "data-active #1"
     },
     {
       "component": "text-shimmer",
@@ -584,11 +1057,6 @@
       "component": "tooltip",
       "kind": "story",
       "detail": "tooltip.stories.tsx"
-    },
-    {
-      "component": "tree-view",
-      "kind": "dom-state",
-      "detail": "data-open #1"
     },
     {
       "component": "web-block",

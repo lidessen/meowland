@@ -1,22 +1,23 @@
 import { h, type Child, type Context, type Props } from "meowjsx";
+import { derived, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Icon } from "../icons/icon";
 
 export interface ChatProcessProps extends Props {
   label: string;
   icon?: Child;
-  open?: boolean;
+  open?: MaybeSignal<boolean>;
 }
 
 /** A collapsible row for work that happened between messages, with its details inside. */
 export function ChatProcess(
-  { label, icon, children, open = false, ref, ...props }: ChatProcessProps,
+  { label, icon, children, open, ref, ...props }: ChatProcessProps,
   context: Context<typeof ChatProcess>,
 ) {
   const parts = context.parts;
   return (
     <details
       {...props}
-      open={open}
+      open={open === undefined ? undefined : derived(() => unwrap(open))}
       data-process-icon={icon ? "custom" : undefined}
       ref={[parts.root, ref]}
     >

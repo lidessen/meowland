@@ -144,7 +144,7 @@ export interface AssistantViewProps extends Props {
   /** Supplying draft makes the host its sole owner, even for a plain value. */
   draft?: MaybeSignal<AssistantDraft>;
   defaultDraft?: AssistantDraft;
-  readOnly?: boolean;
+  readOnly?: MaybeSignal<boolean>;
   onDraftChange?: (draft: AssistantDraft) => void;
   /** Only an explicit accepted:true may clear an unchanged submitted snapshot. */
   onSubmit?: (draft: AssistantDraft) => { accepted: boolean } | Promise<{ accepted: boolean }>;
@@ -183,7 +183,7 @@ export interface AssistantViewProps extends Props {
    */
   composerTriggers?: readonly ComposerTrigger[];
   headerActions?: Child;
-  labels?: Partial<AssistantLabels>;
+  labels?: MaybeSignal<Partial<AssistantLabels>>;
 }
 
 /** Central default copy, overridable through the component's data and localized host wrappers. */

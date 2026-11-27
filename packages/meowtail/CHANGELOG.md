@@ -2,6 +2,17 @@
 
 ## Unreleased
 
+- **Breaking (Component Contract v1):** Migrated legacy DOM state attributes (`data-open`, `data-expanded`,
+  `data-active`) to `data-state` (`"open"` / `"closed"` and `"active"` / `"inactive"`) across
+  `AssistantView`, `Chart`, `ChatReasoning`, `IconRail`, `ListRow`, `Pill`, `TextShimmer`, and
+  `TreeView`, updating their theme stylesheets accordingly.
+
+- **Breaking (Component Contract v1):** Updated mutable props (`disabled`, `readOnly`, `open`, `value`,
+  `selected`, `expanded`, `labels`) to accept `MaybeSignal` and reactively observe signal changes
+  across `AssistantQuestionView`, `AssistantView`, `ChatProcess`, `ChatToolCall`, `ChoiceGroup`,
+  `CredentialSource`, `FieldGroup`, `HoverCard`, `Item`, `ListRow`, `NumberInput`, `ProcessGroup`,
+  `SearchInput`, `Slider`, and `Stat`.
+
 - `createMeowUITheme({ theme, config })` from `meowtail/web` is a runtime plugin that delivers a
   theme to every Web mount: the stylesheet (shared per document through `meowcss/web`
   `mountStyles`), the theme attributes on the container and the focus-modality tracker, all

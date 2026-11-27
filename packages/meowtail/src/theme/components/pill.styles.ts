@@ -27,12 +27,12 @@ export const pillStyles = css`
     background: ${uiTokens.state.hover};
   }
   /* An active filter is the current selection, so it takes the accent. */
-  ${pillPartRefs.root}[data-active="true"] {
+  ${pillPartRefs.root}[data-state="active"] {
     color: ${uiTokens.accent.ink};
     background: ${uiTokens.accent.selected};
     box-shadow: inset 0 0 0 1px ${uiTokens.accent.line};
   }
-  button${pillPartRefs.root}[data-active="true"]:hover:not(:disabled) {
+  button${pillPartRefs.root}[data-state="active"]:hover:not(:disabled) {
     background: color-mix(in srgb, ${uiTokens.accent.base} 14%, ${uiTokens.accent.soft});
   }
   button${pillPartRefs.root}:focus-visible {

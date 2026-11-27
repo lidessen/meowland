@@ -15,9 +15,9 @@ const item = (part: keyof typeof railItemPartRefs) => selectorForPart(railItemPa
 const section = (part: keyof typeof railSectionPartRefs) =>
   selectorForPart(railSectionPartRefs[part]);
 // Expanded while hovered, while keyboard focus is inside, or when the host pins it.
-const open = `${rail("root")}:is(:hover, :has(:focus-visible)) ${rail("drawer")}, ${rail("drawer")}[data-expanded="true"]`;
+const open = `${rail("root")}:is(:hover, :has(:focus-visible)) ${rail("drawer")}, ${rail("drawer")}[data-state="open"]`;
 const openWithin = (nestedSelector: string) =>
-  `${rail("root")}:is(:hover, :has(:focus-visible)) ${rail("drawer")} ${nestedSelector}, ${rail("drawer")}[data-expanded="true"] ${nestedSelector}`;
+  `${rail("root")}:is(:hover, :has(:focus-visible)) ${rail("drawer")} ${nestedSelector}, ${rail("drawer")}[data-state="open"] ${nestedSelector}`;
 export const iconRailStyles = css`
   ${rail("root")} {
     position: relative;

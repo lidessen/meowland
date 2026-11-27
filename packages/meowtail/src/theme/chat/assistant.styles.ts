@@ -231,7 +231,7 @@ export const assistantStyles = css`
       opacity ${uiTokens.motion.settle} ${uiTokens.motion.ease},
       visibility 0s linear ${uiTokens.motion.settle};
   }
-  ${history}[data-open="true"] {
+  ${history}[data-state="open"] {
     visibility: visible;
     opacity: 1;
     transition: opacity ${uiTokens.motion.settle} ${uiTokens.motion.ease};
@@ -259,7 +259,7 @@ export const assistantStyles = css`
     transform: translateY(${uiTokens.space.group});
     transition: transform ${uiTokens.motion.settle} ${uiTokens.motion.ease};
   }
-  ${history}[data-open="true"] > ol > li {
+  ${history}[data-state="open"] > ol > li {
     transform: none;
   }
   ${historyItem} {

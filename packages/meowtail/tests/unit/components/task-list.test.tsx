@@ -93,7 +93,7 @@ test("reasoning stays open while active and folds to its done label afterwards",
   );
   const root = view.host.querySelector("details")!;
   expect(root.open).toBe(true);
-  expect(root.getAttribute("data-active")).toBe("true");
+  expect(root.getAttribute("data-state")).toBe("active");
   expect(root.getAttribute("aria-busy")).toBe("true");
   expect(root.querySelector("summary")!.textContent).toContain("Drafting the rollout policy");
 

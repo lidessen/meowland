@@ -9,7 +9,7 @@ export interface SliderProps extends Props {
   min?: number;
   max?: number;
   step?: number;
-  disabled?: boolean;
+  disabled?: MaybeSignal<boolean>;
   name?: string;
   id?: string;
   onValueChange?: (value: number) => void;
@@ -54,6 +54,10 @@ export function Slider(
   });
   const commit = (event: Event) => {
     const input = event.currentTarget as HTMLInputElement;
+    if (unwrap(disabled)) {
+      input.value = String(readValue());
+      return;
+    }
     const next = asNumber(input.value, readValue());
     if (value === undefined) local.value = next;
     onValueChange?.(next);

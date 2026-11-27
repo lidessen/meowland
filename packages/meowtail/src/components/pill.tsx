@@ -11,7 +11,7 @@ export function Pill(
   { active = false, onClick, children, ref, ...props }: PillProps,
   context: Context<typeof Pill>,
 ) {
-  const selected = derived(() => String(unwrap(active)));
+  const selected = derived(() => (unwrap(active) ? "active" : "inactive"));
   const Element = onClick ? "button" : "span";
   return (
     <Element
@@ -19,7 +19,7 @@ export function Pill(
       ref={[context.parts.root, ref]}
       type={onClick ? "button" : undefined}
       onClick={onClick}
-      data-active={selected}
+      data-state={selected}
     >
       {children}
     </Element>

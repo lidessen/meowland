@@ -10,8 +10,8 @@ export interface NumberInputProps extends Props {
   step?: number;
   /** Decimal places of a committed value. When omitted, derived from step. */
   precision?: number;
-  disabled?: boolean;
-  readOnly?: boolean;
+  disabled?: MaybeSignal<boolean>;
+  readOnly?: MaybeSignal<boolean>;
   required?: boolean;
   name?: string;
   id?: string;
@@ -102,8 +102,9 @@ export function NumberInput(
     assign(next);
     return next;
   };
+  const unavailable = derived(() => !!unwrap(disabled) || !!unwrap(readOnly));
   const nudge = (direction: 1 | -1) => {
-    if (disabled || readOnly) return;
+    if (unwrap(disabled) || unwrap(readOnly)) return;
     editing.value = false;
     const base =
       readValue() ??
@@ -116,7 +117,7 @@ export function NumberInput(
       {
         <button
           type={"button"}
-          disabled={disabled || readOnly}
+          disabled={unavailable}
           tabIndex={-1}
           aria-label={"Decrease"}
           onClick={() => nudge(-1)}
@@ -142,16 +143,22 @@ export function NumberInput(
           aria-valuemin={Number.isFinite(lower) ? lower : undefined}
           aria-valuemax={Number.isFinite(upper) ? upper : undefined}
           onInput={(event: Event) => {
+            if (unwrap(disabled) || unwrap(readOnly)) return;
             const input = event.currentTarget as HTMLInputElement;
             editing.value = true;
             draft.value = input.value;
             onInput?.(event);
           }}
           onChange={(event: Event) => {
-            onChange?.(event);
+            if (!unwrap(disabled) && !unwrap(readOnly)) onChange?.(event);
           }}
           onBlur={(event: FocusEvent) => {
             const input = event.currentTarget as HTMLInputElement;
+            if (unwrap(disabled) || unwrap(readOnly)) {
+              editing.value = false;
+              onBlur?.(event);
+              return;
+            }
             const next = commit(input.value);
             editing.value = false;
             // A controlled owner that stays empty must clear a parsed draft immediately.
@@ -160,7 +167,7 @@ export function NumberInput(
             onBlur?.(event);
           }}
           onKeyDown={(event: KeyboardEvent) => {
-            if (event.isComposing || disabled || readOnly) return;
+            if (event.isComposing || unwrap(disabled) || unwrap(readOnly)) return;
             if (event.key === "ArrowUp") {
               event.preventDefault();
               nudge(1);
@@ -178,7 +185,7 @@ export function NumberInput(
       {
         <button
           type={"button"}
-          disabled={disabled || readOnly}
+          disabled={unavailable}
           tabIndex={-1}
           aria-label={"Increase"}
           onClick={() => nudge(1)}

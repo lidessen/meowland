@@ -19,17 +19,19 @@ export function AssistantComposer(
   { options, trailing }: { options: AssistantViewProps; trailing?: Child },
   context: Context<typeof AssistantComposer>,
 ) {
-  const assistantCopy = { ...defaultAssistantCopy, ...options.labels };
+  const assistantCopy = derived(() => ({ ...defaultAssistantCopy, ...unwrap(options.labels) }));
   const controlled = options.draft !== undefined;
-  if (controlled && !options.onDraftChange && !options.readOnly)
+  if (controlled && !options.onDraftChange && !unwrap(options.readOnly))
     throw new Error("A controlled Assistant draft requires onDraftChange or readOnly");
   const local = signal<AssistantDraft>(options.defaultDraft ?? { text: "", attachments: [] });
   const draft = derived(() => (controlled ? unwrap(options.draft!) : local.value));
   const text = derived(() => draft.value.text);
   const pending = signal(false);
   const attaching = signal(false);
-  const feedback = signal("");
-  const disabled = derived(() => options.readOnly || unwrap(options.disabled ?? false));
+  const feedback = signal<"" | "rejected" | "submitError" | "attachError">("");
+  const disabled = derived(
+    () => Boolean(unwrap(options.readOnly)) || Boolean(unwrap(options.disabled ?? false)),
+  );
   const submitDisabled = derived(
     () =>
       disabled.value ||
@@ -65,9 +67,9 @@ export function AssistantComposer(
       if (disposed) return;
       if (result?.accepted === true) {
         change(consumeAssistantDraft(draft.value, snapshot, version === textVersion), true);
-      } else feedback.value = assistantCopy.rejected;
+      } else feedback.value = "rejected";
     } catch {
-      if (!disposed) feedback.value = assistantCopy.submitError;
+      if (!disposed) feedback.value = "submitError";
     } finally {
       if (!disposed) pending.value = false;
     }
@@ -97,7 +99,7 @@ export function AssistantComposer(
       if (!disposed && result)
         change({ ...draft.value, attachments: [...draft.value.attachments, ...result] });
     } catch {
-      if (!disposed) feedback.value = assistantCopy.attachError;
+      if (!disposed) feedback.value = "attachError";
     } finally {
       if (!disposed) attaching.value = false;
     }
@@ -120,7 +122,7 @@ export function AssistantComposer(
           hidden={derived(() => unwrap(options.models ?? []).length === 0)}
           options={derived(() => unwrap(options.models ?? []))}
           value={options.model ?? localModel}
-          aria-label={assistantCopy.model}
+          aria-label={derived(() => assistantCopy.value.model)}
           onValueChange={(value: string) => {
             if (options.model === undefined) localModel.value = value;
             options.onModelChange?.(value);
@@ -134,7 +136,7 @@ export function AssistantComposer(
           hidden={derived(() => unwrap(options.reasoningOptions ?? []).length === 0)}
           options={derived(() => unwrap(options.reasoningOptions ?? []))}
           value={options.reasoning ?? localReasoning}
-          aria-label={assistantCopy.reasoning}
+          aria-label={derived(() => assistantCopy.value.reasoning)}
           onValueChange={(value: string) => {
             if (options.reasoning === undefined) localReasoning.value = value;
             options.onReasoningChange?.(value);
@@ -152,11 +154,11 @@ export function AssistantComposer(
       <ChatComposer
         layout="bar"
         value={text}
-        placeholder={assistantCopy.placeholder}
-        inputLabel={assistantCopy.composer}
-        submitLabel={assistantCopy.send}
+        placeholder={derived(() => assistantCopy.value.placeholder) as unknown as string}
+        inputLabel={derived(() => assistantCopy.value.composer) as unknown as string}
+        submitLabel={derived(() => assistantCopy.value.send) as unknown as string}
         disabled={disabled}
-        readOnly={Boolean(options.readOnly)}
+        readOnly={derived(() => Boolean(unwrap(options.readOnly)))}
         submitDisabled={submitDisabled}
         trailing={choices}
         attachments={
@@ -190,9 +192,11 @@ export function AssistantComposer(
         {options.allowAttachments === false ? null : (
           <>
             <IconButton
-              label={assistantCopy.attach}
+              label={derived(() => assistantCopy.value.attach)}
               disabled={derived(() => disabled.value || attaching.value)}
-              onClick={() => fileInput?.click()}
+              onClick={() => {
+                if (!disabled.value && !attaching.value) fileInput?.click();
+              }}
             >
               <Icon name="paperclip" />
             </IconButton>
@@ -212,7 +216,7 @@ export function AssistantComposer(
         )}
       </ChatComposer>
       <p role="status" hidden={derived(() => !feedback.value)} ref={context.parts.feedback}>
-        {feedback}
+        {derived(() => (feedback.value ? assistantCopy.value[feedback.value] : ""))}
       </p>
     </div>
   );

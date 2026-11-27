@@ -1,4 +1,5 @@
 import { h, type Child, type Props, type Context } from "meowjsx";
+import { derived, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Icon } from "../icons/icon";
 
 export interface ProcessGroupProps extends Props {
@@ -11,17 +12,22 @@ export interface ProcessGroupProps extends Props {
   status?: Child;
   /** One quiet right-aligned fact, such as the total duration or "2 / 4". Not a row of dots. */
   trailing?: Child;
-  open?: boolean;
+  open?: MaybeSignal<boolean>;
   className?: Props["className"];
 }
 
 /** Collapsible record of what the assistant did; native details owns expansion and keyboard. */
 export function ProcessGroup(
-  { title, status, trailing, open = false, children, className, ...props }: ProcessGroupProps,
+  { title, status, trailing, open, children, className, ...props }: ProcessGroupProps,
   context: Context<typeof ProcessGroup>,
 ) {
   return (
-    <details {...props} className={className} open={open} ref={[context.parts.root, props.ref]}>
+    <details
+      {...props}
+      className={className}
+      open={open === undefined ? undefined : derived(() => unwrap(open))}
+      ref={[context.parts.root, props.ref]}
+    >
       <summary ref={[context.parts.summary]}>
         <span aria-hidden="true" ref={[context.parts.chevron]}>
           <Icon name="chevron-right" />

@@ -1,4 +1,5 @@
 import { h } from "meowjsx";
+import { unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Button } from "./button";
 import { Field } from "./field";
 import { Input } from "./input";
@@ -16,7 +17,7 @@ export interface CredentialSourceProps {
   apiKey: string;
   keepStored: boolean;
   hasStored: boolean;
-  disabled?: boolean;
+  disabled?: MaybeSignal<boolean>;
   variables?: { name: string; available: boolean | null }[];
   status?: string;
   onSourceChange(source: "stored" | "environment"): void;
@@ -37,11 +38,12 @@ export function CredentialSource(props: CredentialSourceProps) {
           id={`${id}-source`}
           value={props.source}
           disabled={disabled}
-          onChange={(event: Event) =>
-            props.onSourceChange(
-              (event.target as HTMLSelectElement).value as "stored" | "environment",
-            )
-          }
+          onChange={(event: Event) => {
+            if (!unwrap(disabled))
+              props.onSourceChange(
+                (event.target as HTMLSelectElement).value as "stored" | "environment",
+              );
+          }}
         >
           <option value="stored">Enter an API key</option>
           <option value="environment">Use an environment variable</option>
@@ -61,9 +63,10 @@ export function CredentialSource(props: CredentialSourceProps) {
               autoComplete="off"
               list={`${id}-variables`}
               placeholder="For example, KIMI_API_KEY"
-              onInput={(event: Event) =>
-                props.onEnvironmentChange((event.target as HTMLInputElement).value)
-              }
+              onInput={(event: Event) => {
+                if (!unwrap(disabled))
+                  props.onEnvironmentChange((event.target as HTMLInputElement).value);
+              }}
             />
           </Field>
           <datalist id={`${id}-variables`}>
@@ -76,7 +79,9 @@ export function CredentialSource(props: CredentialSourceProps) {
             variant="outline"
             style={{ alignSelf: "start" }}
             disabled={disabled}
-            onClick={props.onCheck}
+            onClick={() => {
+              if (!unwrap(disabled)) props.onCheck();
+            }}
           >
             Check environment variable
           </Button>
@@ -116,7 +121,9 @@ export function CredentialSource(props: CredentialSourceProps) {
               variant="outline"
               size="small"
               disabled={disabled}
-              onClick={props.onReplace}
+              onClick={() => {
+                if (!unwrap(disabled)) props.onReplace();
+              }}
             >
               Replace API Key
             </Button>
@@ -134,10 +141,19 @@ export function CredentialSource(props: CredentialSourceProps) {
             value={props.apiKey}
             disabled={disabled}
             autoComplete="new-password"
-            onInput={(event: Event) => props.onKeyChange((event.target as HTMLInputElement).value)}
+            onInput={(event: Event) => {
+              if (!unwrap(disabled)) props.onKeyChange((event.target as HTMLInputElement).value);
+            }}
           />
           {props.hasStored && props.onKeep ? (
-            <Button type="button" variant="outline" disabled={disabled} onClick={props.onKeep}>
+            <Button
+              type="button"
+              variant="outline"
+              disabled={disabled}
+              onClick={() => {
+                if (!unwrap(disabled)) props.onKeep?.();
+              }}
+            >
               Keep the saved API Key
             </Button>
           ) : null}

@@ -1,11 +1,12 @@
 import { type Child, type Props, type Context, h } from "meowjsx";
+import { type MaybeSignal } from "meowjsx/signal";
 import { elementId } from "../shared/element-id";
 
 export interface FieldGroupProps extends Props {
   legend: Child;
   description?: Child;
   descriptionId?: string;
-  disabled?: boolean;
+  disabled?: MaybeSignal<boolean>;
   className?: Props["className"];
 }
 /** A titled set of related fields, as a native fieldset. */

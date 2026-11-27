@@ -328,8 +328,8 @@ export function Chart(
                         height={derived(() => rect.value.height.toFixed(1))}
                         rx="2"
                         data-series={derived(() => String(item.value.slot + 1))}
-                        data-active={derived(() =>
-                          cursor.value === item.value.index ? "true" : undefined,
+                        data-state={derived(() =>
+                          cursor.value === item.value.index ? "active" : undefined,
                         )}
                         ref={context.parts.bar}
                       />

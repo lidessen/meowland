@@ -24,9 +24,9 @@ export function TextShimmer(
         {content}
       </span>
     );
-  const activity = derived(() => String(unwrap(active)));
+  const activity = derived(() => (unwrap(active) ? "active" : "inactive"));
   return (
-    <span {...props} className={className} data-active={activity} ref={[context.parts.root, ref]}>
+    <span {...props} className={className} data-state={activity} ref={[context.parts.root, ref]}>
       <span className={contentClassName} ref={context.parts.content}>
         <ShimmerContent.Provider value={true}>{content}</ShimmerContent.Provider>
       </span>

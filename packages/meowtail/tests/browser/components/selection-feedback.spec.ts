@@ -7,7 +7,7 @@ test("nested activity text shares one decorative sweep and respects reduced moti
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const compound = page.locator(".compound-shimmer");
   await expect(compound.locator('[aria-hidden="true"][inert]')).toHaveCount(1);
-  await expect(compound).toHaveAttribute("data-active", "true");
+  await expect(compound).toHaveAttribute("data-state", "active");
   await page.getByRole("button", { name: "Toggle active state" }).click();
   await expect(compound.locator('[aria-hidden="true"]')).toBeHidden();
   await page.getByRole("button", { name: "Toggle active state" }).click();

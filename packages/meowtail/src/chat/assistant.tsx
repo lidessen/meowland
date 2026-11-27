@@ -1,4 +1,4 @@
-import { h, keyed, type Context } from "meowjsx";
+import { h, keyed, type Child, type Context } from "meowjsx";
 import { derived, signal, unwrap, type Signal } from "meowjsx/signal";
 // Fragment is required by the classic JSX transform for header actions.
 // eslint-disable-next-line no-unused-vars
@@ -29,7 +29,7 @@ function AssistantWorkRow({
   onOpen,
 }: {
   value: Signal<AssistantWork>;
-  actionLabel: string;
+  actionLabel: Child;
   onOpen: (id: string, button: HTMLElement) => void;
 }) {
   return (
@@ -51,18 +51,18 @@ function AssistantWorkDetail(
   { value, options }: { value: Signal<AssistantWork | undefined>; options: AssistantViewProps },
   context: Context<typeof AssistantWorkDetail>,
 ) {
-  const assistantCopy = { ...defaultAssistantCopy, ...options.labels };
+  const assistantCopy = derived(() => ({ ...defaultAssistantCopy, ...unwrap(options.labels) }));
   const hidden = derived(() => value.value?.readState === "unavailable");
   const feedback = derived(() => {
     const work = value.value;
     return (
       work?.feedback ||
       (work?.readState === "unavailable"
-        ? assistantCopy.workUnavailable
+        ? assistantCopy.value.workUnavailable
         : work?.readState === "loading"
-          ? assistantCopy.workLoading
+          ? assistantCopy.value.workLoading
           : work?.readState === "error"
-            ? assistantCopy.workError
+            ? assistantCopy.value.workError
             : "")
     );
   });
@@ -107,7 +107,7 @@ function AssistantWorkDetail(
             if (value.value) options.onRefreshWork!(value.value.id);
           }}
         >
-          {assistantCopy.refresh}
+          {derived(() => assistantCopy.value.refresh)}
         </Button>
       ) : null}
     </section>
@@ -120,7 +120,7 @@ AssistantWorkDetail.meta = {
 
 /** A complete default Assistant surface. Data, permissions, network and business lifetime stay with the host. */
 export function AssistantView(options: AssistantViewProps, context: Context<typeof AssistantView>) {
-  const assistantCopy = { ...defaultAssistantCopy, ...options.labels };
+  const assistantCopy = derived(() => ({ ...defaultAssistantCopy, ...unwrap(options.labels) }));
   const messages = derived(() => unwrap(options.messages));
   const work = derived(() => unwrap(options.work ?? []));
   const questions = derived(() => unwrap(options.questions ?? []));
@@ -223,7 +223,7 @@ export function AssistantView(options: AssistantViewProps, context: Context<type
     <section ref={parts.messages}>
       <div
         role="region"
-        aria-label={assistantCopy.messages}
+        aria-label={derived(() => assistantCopy.value.messages)}
         tabIndex={0}
         ref={[
           parts.viewport,
@@ -266,7 +266,7 @@ export function AssistantView(options: AssistantViewProps, context: Context<type
                 options.onLoadOlder!();
               }}
             >
-              {assistantCopy.older}
+              {derived(() => assistantCopy.value.older)}
             </Button>
           ) : null}
           <p
@@ -278,8 +278,8 @@ export function AssistantView(options: AssistantViewProps, context: Context<type
               () =>
                 unwrap(options.readFeedback ?? "") ||
                 (unwrap(options.readState ?? "ready") === "loading"
-                  ? assistantCopy.loading
-                  : assistantCopy.readError),
+                  ? assistantCopy.value.loading
+                  : assistantCopy.value.readError),
             )}
           </p>
           <div
@@ -288,28 +288,32 @@ export function AssistantView(options: AssistantViewProps, context: Context<type
             )}
             ref={parts.empty}
           >
-            <h2>{assistantCopy.empty}</h2>
-            <p>{assistantCopy.emptyDescription}</p>
+            <h2>{derived(() => assistantCopy.value.empty)}</h2>
+            <p>{derived(() => assistantCopy.value.emptyDescription)}</p>
           </div>
-          <ChatMessageList ariaLabel={assistantCopy.messages}>{transcript}</ChatMessageList>
+          <ChatMessageList
+            ariaLabel={derived(() => assistantCopy.value.messages) as unknown as string}
+          >
+            {transcript}
+          </ChatMessageList>
         </div>
       </div>
       <div hidden={latestHidden} ref={parts.latest}>
         <Button variant="outline" size="small" onClick={() => scroll?.latest()}>
-          {assistantCopy.latest}
+          {derived(() => assistantCopy.value.latest)}
         </Button>
       </div>
       {historyEnabled ? (
         <nav
           id={historyId}
-          aria-label={assistantCopy.history}
+          aria-label={derived(() => assistantCopy.value.history)}
           ref={[
             parts.history,
             (element: HTMLElement) => {
               historyList = element;
             },
           ]}
-          data-open={derived(() => String(historyOpen.value))}
+          data-state={derived(() => (historyOpen.value ? "open" : "closed"))}
           inert={derived(() => !historyOpen.value)}
           onClick={(event: MouseEvent) => {
             if (event.target === event.currentTarget) closeHistory();
@@ -345,25 +349,27 @@ export function AssistantView(options: AssistantViewProps, context: Context<type
   const activityList = (
     <div hidden={bodyHidden} ref={parts.activityBody}>
       <section ref={parts.section}>
-        <h3>{assistantCopy.current}</h3>
+        <h3>{derived(() => assistantCopy.value.current)}</h3>
         <p ref={parts.status}>
           <StatusDot state={derived(() => activity.value?.tone ?? "idle")} />
-          {derived(() => activity.value?.statusText ?? assistantCopy.noActivity)}
+          {derived(() => activity.value?.statusText ?? assistantCopy.value.noActivity)}
         </p>
         <strong>{derived(() => activity.value?.title ?? "")}</strong>
         <p>{derived(() => activity.value?.description ?? "")}</p>
         <AssistantSteps steps={derived(() => activity.value?.steps ?? [])} />
       </section>
       <section ref={parts.section}>
-        <h3>{assistantCopy.background}</h3>
-        <p hidden={derived(() => work.value.length > 0)}>{assistantCopy.noWork}</p>
+        <h3>{derived(() => assistantCopy.value.background)}</h3>
+        <p hidden={derived(() => work.value.length > 0)}>
+          {derived(() => assistantCopy.value.noWork)}
+        </p>
         {keyed(
           work,
           (item) => item.id,
           (value) => (
             <AssistantWorkRow
               value={value}
-              actionLabel={assistantCopy.details}
+              actionLabel={derived(() => assistantCopy.value.details)}
               onOpen={(id: string, button: HTMLElement) => {
                 detailOpener = button;
                 selected.value = id;
@@ -377,14 +383,14 @@ export function AssistantView(options: AssistantViewProps, context: Context<type
         )}
       </section>
       <section hidden={derived(() => questions.value.length === 0)} ref={parts.section}>
-        <h3>{assistantCopy.questions}</h3>
+        <h3>{derived(() => assistantCopy.value.questions)}</h3>
         {keyed(
           questions,
           (question) => question.id,
           (value) => (
             <AssistantQuestionView
               value={value}
-              labels={options.labels}
+              labels={unwrap(options.labels)}
               onAnswer={options.onAnswer}
               onDismiss={options.onDismissQuestion}
             />
@@ -396,7 +402,7 @@ export function AssistantView(options: AssistantViewProps, context: Context<type
   const activityPanel = (
     <Dialog
       labelledBy={undefined}
-      aria-label={assistantCopy.activity}
+      aria-label={derived(() => assistantCopy.value.activity)}
       data-assistant-panel
       ref={(element: HTMLDialogElement) => {
         dialog = element;
@@ -421,10 +427,15 @@ export function AssistantView(options: AssistantViewProps, context: Context<type
           hidden={detailHidden}
           onClick={back}
         >
-          {assistantCopy.back}
+          {derived(() => assistantCopy.value.back)}
         </Button>
-        <h2>{assistantCopy.activity}</h2>
-        <Button variant="quiet" size="small" onClick={close} aria-label={assistantCopy.close}>
+        <h2>{derived(() => assistantCopy.value.activity)}</h2>
+        <Button
+          variant="quiet"
+          size="small"
+          onClick={close}
+          aria-label={derived(() => assistantCopy.value.close)}
+        >
           ×
         </Button>
       </header>
@@ -457,7 +468,7 @@ export function AssistantView(options: AssistantViewProps, context: Context<type
         variant="workspace"
         header={
           <ChatHeader
-            title={options.title ?? assistantCopy.title}
+            title={(options.title ?? derived(() => assistantCopy.value.title)) as unknown as string}
             description={options.description}
             actions={
               <>
@@ -473,7 +484,7 @@ export function AssistantView(options: AssistantViewProps, context: Context<type
                     panelOpen.value = !panelOpen.value;
                   }}
                 >
-                  {assistantCopy.activity}
+                  {derived(() => assistantCopy.value.activity)}
                 </Button>
               </>
             }
@@ -498,7 +509,9 @@ export function AssistantView(options: AssistantViewProps, context: Context<type
                   <span hidden={derived(() => asked.value.length === 0)} ref={parts.historyTrigger}>
                     <IconButton
                       label={derived(() =>
-                        historyOpen.value ? assistantCopy.closeHistory : assistantCopy.history,
+                        historyOpen.value
+                          ? assistantCopy.value.closeHistory
+                          : assistantCopy.value.history,
                       )}
                       aria-expanded={derived(() => String(historyOpen.value))}
                       aria-controls={historyId}

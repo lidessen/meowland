@@ -267,7 +267,7 @@ export function TreeView(
               {/* Pointer only: a treeitem holds no focusable control. */}
               <span
                 aria-hidden="true"
-                data-open={derived(() => String(open.value))}
+                data-state={derived(() => (open.value ? "open" : "closed"))}
                 hidden={derived(() => !branch.value)}
                 onClick={(event: MouseEvent) => {
                   event.stopPropagation();

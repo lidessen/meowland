@@ -23,10 +23,12 @@ export function IconRail(
   return (
     <nav {...props} className={className} aria-label={label} ref={[context.parts.root, props.ref]}>
       <div
-        data-expanded={
+        data-state={
           isSignal<boolean>(expanded)
-            ? mapSignal(expanded, (value) => String(value))
-            : String(expanded)
+            ? mapSignal(expanded, (value) => (value ? "open" : "closed"))
+            : expanded
+              ? "open"
+              : "closed"
         }
         ref={[context.parts.drawer]}
       >

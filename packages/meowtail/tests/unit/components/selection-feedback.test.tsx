@@ -40,7 +40,7 @@ test("shimmer keeps its accessible text and marks the copy inert", () => {
   const html = createWebRenderer(createRuntime()).renderToHtml(
     <TextShimmer text="Processing content" active />,
   );
-  expect(html).toContain('data-active="true"');
+  expect(html).toContain('data-state="active"');
   expect(html).toContain('aria-hidden="true"');
   expect(html).toContain("inert");
   expect(html.match(/Processing content/g)?.length).toBe(2);
@@ -73,7 +73,7 @@ test("nested shimmer fragments share one inert sweep", () => {
     </TextShimmer>,
   );
   expect(html.match(/aria-hidden="true"/g)?.length).toBe(1);
-  expect(html.match(/data-active="true"/g)?.length).toBe(1);
+  expect(html.match(/data-state="active"/g)?.length).toBe(1);
   expect(html.match(/Checking/g)?.length).toBe(2);
 });
 test("confirmation only reports confirm after host acknowledgement and while enabled", () => {

@@ -38,10 +38,10 @@ export const textShimmerStyles = css`
   ${textShimmerPartRefs.decoration} [data-shimmer-decoration] {
     background: currentColor;
   }
-  ${textShimmerPartRefs.root}[data-active="true"] > ${textShimmerPartRefs.content} {
+  ${textShimmerPartRefs.root}[data-state="active"] > ${textShimmerPartRefs.content} {
     color: color-mix(in srgb, currentColor 55%, transparent);
   }
-  ${textShimmerPartRefs.root}[data-active="true"] > ${textShimmerPartRefs.decoration} {
+  ${textShimmerPartRefs.root}[data-state="active"] > ${textShimmerPartRefs.decoration} {
     display: block;
     animation: ui-text-shimmer ${uiTokens.motion.sweep} linear infinite;
   }
@@ -54,11 +54,11 @@ export const textShimmerStyles = css`
     }
   }
   @media (prefers-reduced-motion: reduce) {
-    ${textShimmerPartRefs.root}[data-active="true"] > ${textShimmerPartRefs.decoration} {
+    ${textShimmerPartRefs.root}[data-state="active"] > ${textShimmerPartRefs.decoration} {
       display: none;
       animation: none;
     }
-    ${textShimmerPartRefs.root}[data-active="true"] > ${textShimmerPartRefs.content} {
+    ${textShimmerPartRefs.root}[data-state="active"] > ${textShimmerPartRefs.content} {
       color: inherit;
     }
   }

@@ -1,5 +1,5 @@
 import { h, type Props, type Context } from "meowjsx";
-import { type MaybeSignal } from "meowjsx/signal";
+import { unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Icon } from "../icons/icon";
 
 export interface SearchInputProps extends Props {
@@ -7,8 +7,8 @@ export interface SearchInputProps extends Props {
   label: string;
   value?: MaybeSignal<string>;
   name?: string;
-  disabled?: boolean;
-  readOnly?: boolean;
+  disabled?: MaybeSignal<boolean>;
+  readOnly?: MaybeSignal<boolean>;
   onInput?: (event: Event) => void;
   className?: Props["className"];
   inputClassName?: Props["className"];
@@ -19,7 +19,17 @@ export interface SearchInputProps extends Props {
  * belongs to the consumer.
  */
 export function SearchInput(
-  { label, className, inputClassName, children: _children, ref, ...props }: SearchInputProps,
+  {
+    label,
+    className,
+    inputClassName,
+    children: _children,
+    ref,
+    disabled,
+    readOnly,
+    onInput,
+    ...props
+  }: SearchInputProps,
   context: Context<typeof SearchInput>,
 ) {
   return (
@@ -29,6 +39,11 @@ export function SearchInput(
       </span>
       <input
         {...props}
+        disabled={disabled}
+        readOnly={readOnly}
+        onInput={(event: Event) => {
+          if (!unwrap(disabled) && !unwrap(readOnly)) onInput?.(event);
+        }}
         type="search"
         aria-label={label}
         className={inputClassName}

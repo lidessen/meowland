@@ -117,7 +117,7 @@ test("controlled false, zero, and empty string stay live after mount", async () 
     (button) => button.textContent === "Continue",
   )!;
 
-  expect(pill.getAttribute("data-active")).toBe("false");
+  expect(pill.getAttribute("data-state")).toBe("inactive");
   expect(trigger.getAttribute("aria-expanded")).toBe("false");
   expect(range.value).toBe("0");
   expect(view.host.querySelector("[data-meowui-part='slider/value']")!.textContent).toBe("0");
@@ -136,7 +136,7 @@ test("controlled false, zero, and empty string stay live after mount", async () 
   acknowledged.value = true;
   await Promise.resolve();
 
-  expect(pill.getAttribute("data-active")).toBe("true");
+  expect(pill.getAttribute("data-state")).toBe("active");
   expect(range.value).toBe("25");
   expect(view.host.querySelector("[data-meowui-part='slider/value']")!.textContent).toBe("25");
   expect(number.value).toBe("");
@@ -180,8 +180,8 @@ test("segmented control, navigation, and shimmer follow later signal values", as
     view.host.querySelector("[data-meowui-part='nav-item/root']")!.getAttribute("aria-current"),
   ).toBeNull();
   expect(
-    view.host.querySelector("[data-meowui-part='text-shimmer/root']")!.getAttribute("data-active"),
-  ).toBe("false");
+    view.host.querySelector("[data-meowui-part='text-shimmer/root']")!.getAttribute("data-state"),
+  ).toBe("inactive");
 
   selected.value = "right";
   active.value = true;
@@ -192,8 +192,8 @@ test("segmented control, navigation, and shimmer follow later signal values", as
     view.host.querySelector("[data-meowui-part='nav-item/root']")!.getAttribute("aria-current"),
   ).toBe("page");
   expect(
-    view.host.querySelector("[data-meowui-part='text-shimmer/root']")!.getAttribute("data-active"),
-  ).toBe("true");
+    view.host.querySelector("[data-meowui-part='text-shimmer/root']")!.getAttribute("data-state"),
+  ).toBe("active");
   view.unmount();
 });
 

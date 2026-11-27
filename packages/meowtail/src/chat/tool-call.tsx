@@ -51,7 +51,7 @@ export interface ChatToolCallProps extends Props {
   canCancel?: MaybeSignal<boolean>;
   retryDisabled?: MaybeSignal<boolean>;
   cancelDisabled?: MaybeSignal<boolean>;
-  labels?: Partial<ChatToolCallLabels>;
+  labels?: MaybeSignal<Partial<ChatToolCallLabels>>;
 }
 
 /** One tool call in an assistant's work: what ran, on what, and how it ended. */
@@ -82,15 +82,15 @@ export function ChatToolCall(
   }: ChatToolCallProps,
   context: Context<typeof ChatToolCall>,
 ) {
-  const copy: ChatToolCallLabels = {
+  const copy = derived<ChatToolCallLabels>(() => ({
     input: "Input",
     output: "Output",
     emptyInput: "No input content",
     emptyOutput: "Empty output",
     retry: "Retry",
     cancel: "Cancel",
-    ...labels,
-  };
+    ...unwrap(labels),
+  }));
   const parts = context.parts;
   const stateWord = derived(() =>
     unwrap(statusLabel) === "" ? "" : executionStateLabel(unwrap(state)),
@@ -102,13 +102,14 @@ export function ChatToolCall(
   const payload = (kind: "input" | "output", text: MaybeSignal<string | undefined> | undefined) => (
     <div hidden={derived(() => unwrap(text) === undefined)} ref={parts[kind]}>
       <OutputBlock
-        title={copy[kind]}
+        title={derived(() => copy.value[kind])}
         rows={derived(() => {
           const value = unwrap(text);
-          return value === undefined || value === "" ? [] : value.split("\n");
+          return value === undefined || value === ""
+            ? [kind === "input" ? copy.value.emptyInput : copy.value.emptyOutput]
+            : value.split("\n");
         })}
         copyText={derived(() => unwrap(text) ?? "")}
-        emptyText={kind === "input" ? copy.emptyInput : copy.emptyOutput}
         maxLines={maxLines}
         wrap
       />
@@ -191,7 +192,7 @@ export function ChatToolCall(
                   disabled={derived(() => !unwrap(canRetry) || unwrap(retryDisabled))}
                   onClick={onRetry}
                 >
-                  {copy.retry}
+                  {derived(() => copy.value.retry)}
                 </Button>
               ) : null}
               {onCancel ? (
@@ -202,7 +203,7 @@ export function ChatToolCall(
                   disabled={derived(() => !unwrap(canCancel) || unwrap(cancelDisabled))}
                   onClick={onCancel}
                 >
-                  {copy.cancel}
+                  {derived(() => copy.value.cancel)}
                 </Button>
               ) : null}
             </div>

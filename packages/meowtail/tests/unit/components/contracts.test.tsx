@@ -2,11 +2,21 @@ import { expect, test } from "bun:test";
 import { createRuntime, createThemePlugin, h, type Child } from "meowjsx";
 import { signal } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
+import { mountComponent } from "./mount";
 import { installMeowUI, meowUIComponents } from "../../../src/registry";
 import {
   AddButton,
   Alert,
   Button,
+  ChoiceGroup,
+  CredentialSource,
+  FieldGroup,
+  HoverCard,
+  Item,
+  NumberInput,
+  SearchInput,
+  Slider,
+  Stat,
   Badge,
   Card,
   Dialog,
@@ -283,4 +293,172 @@ test("empty states keep the card stack unless the caller supplies artwork", () =
   const quiet = app.renderToHtml(<EmptyState title="Empty" illustration={false} />);
   expect(quiet).not.toContain('data-meowui-part="empty-state/illustration"');
   expect(quiet).toContain('data-meowui-part="empty-state/title"');
+});
+
+test("input and display signals update mounted components and guard changes", async () => {
+  const disabled = signal(false);
+  const readOnly = signal(false);
+  const selected = signal(false);
+  const value = signal<Child>("First");
+  const changes: string[] = [];
+  const view = mountComponent(
+    <div>
+      <ChoiceGroup
+        label="Choice"
+        options={[{ value: "one", label: "One" }]}
+        disabled={disabled}
+        onValueChange={() => changes.push("choice")}
+      />
+      <FieldGroup legend="Fields" disabled={disabled}>
+        <input />
+      </FieldGroup>
+      <CredentialSource
+        id="credentials"
+        source="environment"
+        environmentName="KEY"
+        apiKey=""
+        keepStored={false}
+        hasStored={false}
+        disabled={disabled}
+        onSourceChange={() => changes.push("source")}
+        onEnvironmentChange={() => changes.push("environment")}
+        onKeyChange={() => changes.push("key")}
+        onReplace={() => changes.push("replace")}
+        onCheck={() => changes.push("check")}
+      />
+      <NumberInput
+        disabled={disabled}
+        readOnly={readOnly}
+        onValueChange={() => changes.push("number")}
+      />
+      <SearchInput
+        label="Search"
+        disabled={disabled}
+        readOnly={readOnly}
+        onInput={() => changes.push("search")}
+      />
+      <Slider label="Volume" disabled={disabled} onValueChange={() => changes.push("slider")} />
+      <Item href="#one" title="One" selected={selected} />
+      <Stat label="Count" value={value} />
+    </div>,
+  );
+  try {
+    const dom = view.host.ownerDocument.defaultView!;
+    const fieldsets = view.host.querySelectorAll("fieldset");
+    const radio = view.host.querySelector<HTMLInputElement>('input[type="radio"]')!;
+    const select = view.host.querySelector<HTMLSelectElement>("select")!;
+    const environment = view.host.querySelector<HTMLInputElement>("#credentials-environment")!;
+    const check = Array.from(view.host.querySelectorAll("button")).find((button) =>
+      button.textContent?.includes("Check environment"),
+    )!;
+    const number = view.host.querySelector<HTMLInputElement>('[role="spinbutton"]')!;
+    const steps = view.host.querySelectorAll<HTMLButtonElement>(
+      '[aria-label="Decrease"], [aria-label="Increase"]',
+    );
+    const search = view.host.querySelector<HTMLInputElement>('input[type="search"]')!;
+    const slider = view.host.querySelector<HTMLInputElement>('input[type="range"]')!;
+    const item = view.host.querySelector<HTMLAnchorElement>('a[href="#one"]')!;
+    expect(radio.disabled).toBe(false);
+    expect(item.hasAttribute("data-selected")).toBe(false);
+    expect(view.host.textContent).toContain("First");
+    disabled.value = true;
+    selected.value = true;
+    value.value = "Second";
+    await Promise.resolve();
+    expect([...fieldsets].every((node) => node.disabled)).toBe(true);
+    expect(
+      [radio, select, environment, check, number, search, slider, ...steps].every(
+        (node) => node.disabled,
+      ),
+    ).toBe(true);
+    expect(item.getAttribute("data-selected")).toBe("true");
+    expect(item.getAttribute("aria-current")).toBe("page");
+    expect(view.host.textContent).toContain("Second");
+    radio.checked = true;
+    radio.dispatchEvent(new dom.Event("change"));
+    select.dispatchEvent(new dom.Event("change"));
+    environment.dispatchEvent(new dom.Event("input"));
+    check.dispatchEvent(new dom.Event("click"));
+    number.dispatchEvent(new dom.KeyboardEvent("keydown", { key: "ArrowUp" }));
+    search.dispatchEvent(new dom.Event("input"));
+    slider.dispatchEvent(new dom.Event("input"));
+    expect(changes).toEqual([]);
+    disabled.value = false;
+    readOnly.value = true;
+    selected.value = false;
+    await Promise.resolve();
+    expect(number.readOnly).toBe(true);
+    expect(search.readOnly).toBe(true);
+    expect([...steps].every((button) => button.disabled)).toBe(true);
+    expect(radio.disabled).toBe(false);
+    expect(item.hasAttribute("data-selected")).toBe(false);
+    expect(item.hasAttribute("aria-current")).toBe(false);
+    number.dispatchEvent(new dom.KeyboardEvent("keydown", { key: "ArrowUp" }));
+    search.dispatchEvent(new dom.Event("input"));
+    expect(changes).toEqual([]);
+    readOnly.value = false;
+    await Promise.resolve();
+    steps[1]!.click();
+    search.dispatchEvent(new dom.Event("input"));
+    expect(changes).toEqual(["number", "search"]);
+  } finally {
+    view.unmount();
+  }
+});
+
+test("hover card cancels pending opens and closes when disabled changes", async () => {
+  const disabled = signal(false);
+  const originalWindow = Object.getOwnPropertyDescriptor(globalThis, "window");
+  const originalGetComputedStyle = Object.getOwnPropertyDescriptor(globalThis, "getComputedStyle");
+  const view = mountComponent(
+    <HoverCard
+      disabled={disabled}
+      openDelay={20}
+      content="Preview"
+      trigger={(bindings) => <button {...bindings}>Open preview</button>}
+    />,
+  );
+  try {
+    const dom = view.host.ownerDocument.defaultView!;
+    Object.defineProperty(globalThis, "window", { value: dom, configurable: true });
+    Object.defineProperty(globalThis, "getComputedStyle", {
+      value: dom.getComputedStyle.bind(dom),
+      configurable: true,
+    });
+    const root = view.host.firstElementChild!;
+    const trigger = view.host.querySelector<HTMLButtonElement>("button")!;
+    const panel = view.host.querySelector<HTMLElement>("[popover]")!;
+    let shown = false;
+    const matches = panel.matches.bind(panel);
+    panel.matches = ((selector: string) =>
+      selector === ":popover-open" ? shown : matches(selector)) as typeof panel.matches;
+    panel.showPopover = () => {
+      shown = true;
+    };
+    panel.hidePopover = () => {
+      shown = false;
+    };
+    root.dispatchEvent(new dom.PointerEvent("pointerenter", { pointerType: "mouse" }));
+    disabled.value = true;
+    await new Promise((resolve) => setTimeout(resolve, 35));
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    trigger.click();
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+    disabled.value = false;
+    await Promise.resolve();
+    trigger.click();
+    await Promise.resolve();
+    expect(trigger.getAttribute("aria-expanded")).toBe("true");
+    disabled.value = true;
+    await Promise.resolve();
+    expect(trigger.getAttribute("aria-expanded")).toBe("false");
+  } finally {
+    view.unmount();
+    await new Promise((resolve) => setTimeout(resolve, 0));
+    if (originalWindow) Object.defineProperty(globalThis, "window", originalWindow);
+    else Reflect.deleteProperty(globalThis, "window");
+    if (originalGetComputedStyle)
+      Object.defineProperty(globalThis, "getComputedStyle", originalGetComputedStyle);
+    else Reflect.deleteProperty(globalThis, "getComputedStyle");
+  }
 });

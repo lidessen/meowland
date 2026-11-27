@@ -1,6 +1,8 @@
 import { expect, test } from "bun:test";
-import { h, defaultRuntime } from "meowjsx";
+import { h, defaultRuntime, createRuntime } from "meowjsx";
+import { signal } from "meowjsx/signal";
 import { renderToHtml } from "meowjsx/web";
+import { mountComponent } from "./mount";
 import { DetailSection } from "../../../src/components/detail-section";
 import { Drawer } from "../../../src/components/drawer";
 import { ListGroup, ListRow } from "../../../src/components/list-group";
@@ -104,7 +106,39 @@ test("list rows open their editor only when expanded", () => {
     </ListRow>,
   );
   expect(open).toContain("Editor");
-  expect(open).toContain('data-expanded="true"');
+  expect(open).toContain('data-state="open"');
+});
+
+test("list rows follow expanded signals and preserve their panel", async () => {
+  const expanded = signal(false);
+  const runtime = createRuntime();
+  installMeowUI({ components: meowUIComponents }, runtime);
+  const view = mountComponent(
+    <ListRow expanded={expanded} title="Codex">
+      <input value="Draft" />
+    </ListRow>,
+    runtime,
+  );
+  try {
+    const row = view.host.querySelector('[role="listitem"]')!;
+    const panel = view.host.querySelector<HTMLElement>('[data-meowui-part="list-row/panel"]')!;
+    const input = panel.querySelector("input")!;
+    expect(row.getAttribute("data-state")).toBe("closed");
+    expect(panel.hidden).toBe(true);
+    input.value = "Edited";
+    expanded.value = true;
+    await Promise.resolve();
+    expect(row.getAttribute("data-state")).toBe("open");
+    expect(panel.hidden).toBe(false);
+    expect(panel.querySelector("input")).toBe(input);
+    expect(input.value).toBe("Edited");
+    expanded.value = false;
+    await Promise.resolve();
+    expect(row.getAttribute("data-state")).toBe("closed");
+    expect(panel.hidden).toBe(true);
+  } finally {
+    view.unmount();
+  }
 });
 
 test("resource cards mark a muted capability and keep identity separate", () => {

@@ -35,7 +35,7 @@ export const listGroupStyles = css`
     padding: 12px 16px;
   }
   @media (hover: hover) {
-    ${group} > ${row("root")}:not([data-expanded]) > ${row("line")}:hover {
+    ${group} > ${row("root")}[data-state="closed"] > ${row("line")}:hover {
       background: ${uiTokens.state.hover};
     }
   }
@@ -89,7 +89,7 @@ export const listGroupStyles = css`
     border-top: ${uiTokens.line.width} solid ${uiTokens.line.divider};
     background: ${uiTokens.surface.fill};
   }
-  ${row("root")}[data-expanded="true"] {
+  ${row("root")}[data-state="open"] {
     background: ${uiTokens.surface.fill};
   }
   /* A row standing alone is a summary: it carries its own outline. */

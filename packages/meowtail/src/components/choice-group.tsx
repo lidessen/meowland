@@ -20,7 +20,7 @@ export interface ChoiceGroupProps extends Props {
   value?: MaybeSignal<string>;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
-  disabled?: boolean;
+  disabled?: MaybeSignal<boolean>;
   required?: boolean;
   className?: Props["className"];
 }
@@ -106,12 +106,12 @@ export function ChoiceGroup(
                     form={form}
                     value={option.value}
                     checked={checked}
-                    disabled={disabled || option.disabled}
+                    disabled={derived(() => !!unwrap(disabled) || !!option.disabled)}
                     required={required}
                     aria-describedby={descriptionId}
                     onChange={(event: Event) => {
                       const input = event.currentTarget as HTMLInputElement;
-                      if (disabled || option.disabled || !input.checked) return;
+                      if (unwrap(disabled) || option.disabled || !input.checked) return;
                       if (value === undefined) local.value = option.value;
                       onValueChange?.(option.value);
                       // Native selection happens before change. Controlled callers retain

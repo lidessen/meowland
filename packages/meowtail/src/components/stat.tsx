@@ -1,10 +1,11 @@
 import { h, type Child, type Context, type Props } from "meowjsx";
+import { type MaybeSignal } from "meowjsx/signal";
 
 export interface StatProps extends Props {
   /** What the figure counts, in sentence case: "Active runs". */
   label: Child;
   /** The figure itself. Pass "unknown" (or the host's word for it) when the value cannot be read. */
-  value: Child;
+  value: MaybeSignal<Child>;
   /** One supporting fact under the figure, such as its scope or when it was read. */
   detail?: Child;
   /** Makes the whole summary a link to the records it counts; routing stays with the host. */

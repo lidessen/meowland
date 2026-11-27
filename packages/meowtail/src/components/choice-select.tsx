@@ -1,6 +1,7 @@
 import { h, keyed, type Props, type Context } from "meowjsx";
 import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Popover, type PopoverTriggerBindings } from "./popover";
+import { createListbox, isTypeaheadKey } from "../behaviors";
 import { Icon } from "../icons/icon";
 import { elementByIdInRoot } from "../shared/dom-root";
 import { elementId } from "../shared/element-id";
@@ -73,8 +74,6 @@ export function ChoiceSelect(
   let nativeElement: HTMLSelectElement | null = null;
   let panelId = `${id}-panel`;
   let disposed = false;
-  let typed = "";
-  let lastTyped = 0;
   const matches = (option: ChoiceOption) =>
     `${option.label} ${option.value}`
       .toLocaleLowerCase()
@@ -89,18 +88,59 @@ export function ChoiceSelect(
       .filter((index) => index >= 0);
   const trigger = () => triggerElement;
   const panel = () => (triggerElement ? elementByIdInRoot(triggerElement, panelId) : null);
-  const focusOption = (index: number) => {
+  const highlighted = signal<string | null>(null);
+  const activeOption = derived(() => {
+    const available = readOptions().filter((option) => !option.disabled && matches(option));
+    return (
+      available.find((option) => option.value === highlighted.value)?.value ??
+      available.find((option) => option.value === readValue())?.value ??
+      available[0]?.value ??
+      null
+    );
+  });
+  const listbox = createListbox({
+    id,
+    focus: "real",
+    loop: true,
+    highlighted,
+    items: () =>
+      readOptions().flatMap((option, index) => {
+        const el = panel()?.querySelector<HTMLElement>(`[data-choice-index="${index}"]`);
+        return el
+          ? [{ key: option.value, label: option.label, disabled: option.disabled, el }]
+          : [];
+      }),
+  });
+  const reconcile = () => {
+    highlighted.value = activeOption.value;
+    return listbox.reconcile();
+  };
+  const focusOption = (key: string | null) => {
     queueMicrotask(() => {
-      if (disposed || !open.value) return;
-      panel()?.querySelector<HTMLElement>(`[data-choice-index="${index}"]`)?.focus();
+      if (!disposed && open.value && key !== null) listbox.highlight(key);
     });
   };
-  const initialIndex = (last = false) => {
-    const enabled = enabledOptions();
-    const index = readOptions().findIndex(
-      (option) => option.value === readValue() && !option.disabled,
-    );
-    return index >= 0 ? index : (enabled[last ? enabled.length - 1 : 0] ?? -1);
+  const openList = (edge?: "first" | "last", typeahead?: KeyboardEvent) => {
+    query.value = "";
+    const available = readOptions().filter((option) => !option.disabled);
+    highlighted.value =
+      edge === "first"
+        ? (available[0]?.value ?? null)
+        : edge === "last"
+          ? (available.at(-1)?.value ?? null)
+          : (available.find((option) => option.value === readValue())?.value ?? null);
+    open.value = true;
+    queueMicrotask(() => {
+      if (disposed || !open.value) return;
+      const key = reconcile();
+      if (searchable) searchElement?.focus();
+      else if (typeahead && triggerElement) {
+        const Keyboard = triggerElement.ownerDocument.defaultView!.KeyboardEvent;
+        highlighted.value = null;
+        listbox.keydown(new Keyboard("keydown", { key: typeahead.key, cancelable: true }));
+        if (highlighted.value === null && key !== null) listbox.highlight(key);
+      } else if (key !== null) listbox.highlight(key);
+    });
   };
   const close = (restore = true) => {
     open.value = false;
@@ -117,103 +157,67 @@ export function ChoiceSelect(
     if (nativeElement) nativeElement.value = readValue();
     close();
   };
-  const search = (key: string, active: number) => {
-    const enabled = enabledOptions();
-    const now = Date.now();
-    typed = now - lastTyped > 700 ? key : typed + key;
-    lastTyped = now;
-    const query = [...typed].every((letter) => letter === key) ? key : typed;
-    const start = enabled.indexOf(active);
-    for (let step = 1; step <= enabled.length; step++) {
-      const index = enabled[(start + step) % enabled.length]!;
-      if (readOptions()[index]!.label.toLocaleLowerCase().startsWith(query.toLocaleLowerCase())) {
-        focusOption(index);
-        break;
-      }
-    }
-  };
   const keydown = (event: KeyboardEvent) => {
-    if (unwrap(disabled) || event.isComposing) return;
-    const enabled = enabledOptions();
-    const inSearch = event.target === searchElement;
-    if (inSearch && !["ArrowDown", "ArrowUp", "Escape", "Tab", "Enter"].includes(event.key)) return;
-    const active = Number((event.target as HTMLElement).dataset.choiceIndex ?? -1);
-    if (event.key === "Tab") {
-      close();
+    if (event.key === "Tab" && open.value) {
+      close(false);
       return;
     }
+    if (
+      unwrap(disabled) ||
+      event.isComposing ||
+      event.shiftKey ||
+      event.ctrlKey ||
+      event.metaKey ||
+      event.altKey
+    )
+      return;
+    const inSearch = event.target === searchElement;
+    if (inSearch && !["ArrowDown", "ArrowUp", "Escape", "Tab", "Enter"].includes(event.key)) return;
     if (event.key === "Escape") {
       event.preventDefault();
       close();
       return;
     }
-    if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
-      event.preventDefault();
-      if (!open.value) {
-        query.value = "";
-        open.value = true;
-        if (searchable) {
-          queueMicrotask(() => {
-            if (!disposed && open.value) searchElement?.focus();
-          });
-          return;
-        }
-        focusOption(
+    if (!open.value) {
+      if (["ArrowDown", "ArrowUp", "Home", "End", "Enter", " "].includes(event.key)) {
+        event.preventDefault();
+        openList(
           event.key === "Home"
-            ? (enabled[0] ?? -1)
+            ? "first"
             : event.key === "End"
-              ? (enabled.at(-1) ?? -1)
-              : initialIndex(event.key === "ArrowUp"),
+              ? "last"
+              : event.key === "ArrowUp" &&
+                  !readOptions().some((option) => option.value === readValue() && !option.disabled)
+                ? "last"
+                : undefined,
         );
-        return;
+      } else if (isTypeaheadKey(event)) {
+        event.preventDefault();
+        if (searchable) {
+          openList();
+          query.value = event.key;
+        } else openList(undefined, event);
       }
-      const position = enabled.indexOf(active);
-      const next = inSearch
-        ? event.key === "ArrowUp"
-          ? enabled.at(-1)
-          : enabled[0]
-        : event.key === "Home"
-          ? enabled[0]
-          : event.key === "End"
-            ? enabled.at(-1)
-            : enabled[
-                (position + (event.key === "ArrowDown" ? 1 : -1) + enabled.length) % enabled.length
-              ];
-      focusOption(next ?? -1);
+      return;
+    }
+    if (inSearch && (event.key === "ArrowDown" || event.key === "ArrowUp")) {
+      event.preventDefault();
+      const enabled = enabledOptions();
+      const index = event.key === "ArrowUp" ? enabled.at(-1) : enabled[0];
+      if (index !== undefined) focusOption(readOptions()[index]!.value);
     } else if (event.key === "Enter" || event.key === " ") {
       event.preventDefault();
       if (inSearch) {
+        const enabled = enabledOptions();
         if (enabled.length === 1) choose(enabled[0]!);
-        else focusOption(enabled[0] ?? -1);
-        return;
+        else if (enabled[0] !== undefined) focusOption(readOptions()[enabled[0]]!.value);
+      } else {
+        const index = readOptions().findIndex((option) => option.value === highlighted.value);
+        if (index >= 0) choose(index);
       }
-      if (open.value && active >= 0) choose(active);
-      else {
-        query.value = "";
-        open.value = true;
-        if (searchable)
-          queueMicrotask(() => {
-            if (!disposed && open.value) searchElement?.focus();
-          });
-        else focusOption(initialIndex());
-      }
-    } else if (
-      event.key.length === 1 &&
-      !event.ctrlKey &&
-      !event.metaKey &&
-      !event.altKey &&
-      !event.isComposing
-    ) {
-      event.preventDefault();
-      open.value = true;
-      if (searchable) {
-        query.value = event.key;
-        queueMicrotask(() => {
-          if (!disposed && open.value) searchElement?.focus();
-        });
-        return;
-      }
-      search(event.key, active);
+    } else {
+      reconcile();
+      listbox.keydown(event);
     }
   };
 
@@ -249,6 +253,7 @@ export function ChoiceSelect(
   };
   context.onCleanup(() => {
     disposed = true;
+    listbox.dispose();
   });
 
   type ChoiceRow =
@@ -302,7 +307,15 @@ export function ChoiceSelect(
                     queueMicrotask(() => {
                       if (!disposed && open.value) searchElement?.focus();
                     });
-                  else focusOption(initialIndex());
+                  else {
+                    highlighted.value = null;
+                    queueMicrotask(() => {
+                      if (!disposed && open.value) {
+                        const key = reconcile();
+                        if (key !== null) listbox.highlight(key);
+                      }
+                    });
+                  }
                 }
               }}
               ref={[
@@ -376,7 +389,13 @@ export function ChoiceSelect(
                   <button
                     type={"button"}
                     role={"option"}
-                    tabIndex={-1}
+                    tabIndex={derived(() =>
+                      open.value &&
+                      row.value.kind === "option" &&
+                      activeOption.value === row.value.option.value
+                        ? 0
+                        : -1,
+                    )}
                     disabled={derived(
                       () => row.value.kind === "option" && Boolean(row.value.option.disabled),
                     )}
@@ -392,6 +411,9 @@ export function ChoiceSelect(
                     data-choice-index={derived(() =>
                       row.value.kind === "option" ? row.value.index : -1,
                     )}
+                    onFocus={() => {
+                      if (row.value.kind === "option") highlighted.value = row.value.option.value;
+                    }}
                     onClick={() => {
                       if (row.value.kind === "option") choose(row.value.index);
                     }}

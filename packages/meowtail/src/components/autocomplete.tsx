@@ -1,6 +1,7 @@
 import { h, keyed, type Context, type Props } from "meowjsx";
-import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
+import { derived, isSignal, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { Popover, type PopoverTriggerBindings } from "./popover";
+import { createListbox } from "../behaviors";
 import { elementByIdInRoot } from "../shared/dom-root";
 import { elementId } from "../shared/element-id";
 
@@ -71,20 +72,37 @@ export function Autocomplete(
   const listId = `${id}-list`;
   // The reader asked for the list; it shows only when there is something to show.
   const wanted = signal(false);
-  const active = signal<string | undefined>(undefined);
+  const active = signal<string | null>(null);
   let input: HTMLInputElement | undefined;
   let alive = true;
   context.onCleanup(() => {
     alive = false;
   });
 
-  const optionIds = new Map<string, string>();
-  const optionId = (key: string) => {
-    let known = optionIds.get(key);
-    if (!known) optionIds.set(key, (known = elementId(`${id}-option`)));
-    return known;
-  };
   const list = () => unwrap(suggestions);
+  const listbox = createListbox({
+    id,
+    focus: "virtual",
+    loop: true,
+    highlighted: active,
+    get controller() {
+      return input;
+    },
+    items: () =>
+      list().flatMap((item) => {
+        const el =
+          input && elementByIdInRoot(input, `${id}-option-${encodeURIComponent(item.value)}`);
+        return el ? [{ key: item.value, label: item.label ?? item.value, el }] : [];
+      }),
+  });
+  if (isSignal(suggestions)) {
+    const unsubscribe = suggestions.subscribe(() => {
+      if (active.value !== null && !list().some((item) => item.value === active.value))
+        active.value = null;
+    });
+    context.onCleanup(unsubscribe);
+  }
+  context.onCleanup(listbox.dispose);
   const showEmpty = derived(
     () =>
       emptyMessage !== undefined &&
@@ -110,7 +128,7 @@ export function Autocomplete(
   };
   const close = () => {
     wanted.value = false;
-    active.value = undefined;
+    active.value = null;
   };
   const accept = (suggestion: AutocompleteSuggestion) => {
     write(suggestion.value);
@@ -122,39 +140,33 @@ export function Autocomplete(
   const reveal = (key: string) => {
     queueMicrotask(() => {
       if (!alive || !input) return;
-      elementByIdInRoot(input, optionId(key))?.scrollIntoView?.({ block: "nearest" });
+      elementByIdInRoot(input, listbox.idForKey(key))?.scrollIntoView?.({ block: "nearest" });
     });
   };
-  const move = (step: 1 | -1 | "first" | "last") => {
-    const items = list();
-    if (items.length === 0) return;
-    const index = items.findIndex((item) => item.value === activeValue.value);
-    const next =
-      step === "first"
-        ? 0
-        : step === "last"
-          ? items.length - 1
-          : index < 0
-            ? step === 1
-              ? 0
-              : items.length - 1
-            : (index + step + items.length) % items.length;
-    active.value = items[next]!.value;
-    reveal(items[next]!.value);
-  };
-
   const keydown = (event: KeyboardEvent) => {
     if (event.isComposing || unwrap(disabled)) return;
     if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-      event.preventDefault();
       if (!open.value) {
         wanted.value = true;
-        if (event.altKey) return;
+        event.preventDefault();
+        if (!event.altKey && !event.ctrlKey && !event.metaKey) {
+          const key = event.key;
+          queueMicrotask(() => {
+            if (!alive || !open.value || !input) return;
+            const Keyboard = input.ownerDocument.defaultView!.KeyboardEvent;
+            if (
+              listbox.keydown(new Keyboard("keydown", { key, cancelable: true })) &&
+              active.value !== null
+            )
+              reveal(active.value);
+          });
+        }
+        return;
       }
-      move(event.key === "ArrowDown" ? 1 : -1);
+      active.value = activeValue.value ?? null;
+      if (listbox.keydown(event) && active.value !== null) reveal(active.value);
     } else if ((event.key === "Home" || event.key === "End") && activeValue.value !== undefined) {
-      event.preventDefault();
-      move(event.key === "Home" ? "first" : "last");
+      if (listbox.keydown(event) && active.value !== null) reveal(active.value);
     } else if (event.key === "Enter") {
       const chosen = list().find((item) => item.value === activeValue.value);
       // Without an active option Enter belongs to the form.
@@ -196,12 +208,12 @@ export function Autocomplete(
             aria-expanded={derived(() => String(open.value))}
             aria-controls={listId}
             aria-activedescendant={derived(() =>
-              activeValue.value === undefined ? undefined : optionId(activeValue.value),
+              activeValue.value === undefined ? undefined : listbox.activeId(activeValue.value),
             )}
             value={current}
             onInput={(event: Event) => {
               write((event.currentTarget as HTMLInputElement).value);
-              active.value = undefined;
+              active.value = null;
               wanted.value = true;
             }}
             onKeyDown={keydown}
@@ -241,7 +253,7 @@ export function Autocomplete(
               (item) => item.value,
               (item) => (
                 <div
-                  id={optionId(item.value.value)}
+                  id={listbox.idForKey(item.value.value)}
                   role="option"
                   aria-selected={derived(() => String(activeValue.value === item.value.value))}
                   // Keep focus in the input; a pointer choice does not blur it.

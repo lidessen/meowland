@@ -131,6 +131,13 @@
 - Add `journalFonts` and the `ThemeFont` type: the Fontsource packages that carry the faces Journal
   names. Meowtail ships no font files. The gallery paints Journal stories with those faces.
 
+## 0.4.0-alpha.9
+
+- Add compact CodeBlock sizing, optional line numbers, highlighted lines, and added or removed
+  line markers. Copy keeps the original source and whitespace.
+- Use logical inline properties for spacing and borders in selected components.
+- The docs now switch themes in live examples without discarding their state.
+
 ## 0.4.0-alpha.7
 
 - `ChatComposer`'s narrow layouts follow the composer's own width instead of the viewport: the root

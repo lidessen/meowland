@@ -37,13 +37,18 @@ export const itemStyles = css`
       background: ${uiTokens.surface.raised};
     }
   }
-  button${itemPartRefs.root} {
+  a${itemPartRefs.root} {
+    text-decoration: none;
+  }
+  button${itemPartRefs.root},
+  a${itemPartRefs.root} {
     cursor: pointer;
     transition:
       background-color ${uiTokens.motion.response} ${uiTokens.motion.ease},
       border-color ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
-  button${itemPartRefs.root}:hover:not(:disabled, [data-selected="true"]) {
+  button${itemPartRefs.root}:hover:not(:disabled, [data-selected="true"]),
+  a${itemPartRefs.root}:hover:not([data-selected="true"]) {
     background: ${uiTokens.state.hover};
   }
   /* Selected takes the one selection tint used by navigation, tables and choices; an open
@@ -54,7 +59,8 @@ export const itemStyles = css`
   button${itemPartRefs.root}[aria-expanded="true"] {
     background: ${uiTokens.state.active};
   }
-  button${itemPartRefs.root}:focus-visible {
+  button${itemPartRefs.root}:focus-visible,
+  a${itemPartRefs.root}:focus-visible {
     ${ui.focus.ring}
   }
   button${itemPartRefs.root}:disabled {
@@ -69,9 +75,10 @@ export const itemStyles = css`
     flex: 0 0 auto;
     color: ${uiTokens.ink.secondary};
   }
+  /* The leading mark centers on the title's first line, whether it is an icon or a state dot. */
   ${itemPartRefs.leading} {
     align-self: flex-start;
-    padding-top: 2px;
+    height: 1lh;
   }
   ${itemPartRefs.content} {
     display: grid;
@@ -100,7 +107,8 @@ export const itemStyles = css`
     justify-content: flex-end;
   }
   @media (prefers-reduced-motion: reduce) {
-    button${itemPartRefs.root} {
+    button${itemPartRefs.root},
+    a${itemPartRefs.root} {
       transition: none;
     }
   }

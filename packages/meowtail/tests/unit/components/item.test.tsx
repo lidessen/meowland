@@ -26,3 +26,19 @@ test("item preserves native control semantics and consumer navigation attributes
   expect(html).toContain("path/to/file");
   expect(web.renderToHtml(<Item title="Static" />)).not.toContain("<button");
 });
+
+test("an item with href is a link that marks the selected destination as current", () => {
+  const web = createWebRenderer(createRuntime());
+  const current = web.renderToHtml(
+    <Item as="button" href="/tasks/t-1" selected title="Ship" trailing="3m" />,
+  );
+  expect(current).toContain('<a href="/tasks/t-1"');
+  expect(current).toContain('aria-current="page"');
+  expect(current).not.toContain("<button");
+  expect(current).not.toContain('type="button"');
+  const other = web.renderToHtml(<Item href="/tasks/t-2" title="Review" />);
+  expect(other).not.toContain("aria-current");
+  expect(web.renderToHtml(<Item as="button" selected title="Choice" />)).not.toContain(
+    "aria-current",
+  );
+});

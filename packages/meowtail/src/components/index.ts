@@ -74,6 +74,7 @@ export {
 } from "./table";
 export { NavItem, type NavItemProps } from "./nav-item";
 export { Separator, type SeparatorProps } from "./separator";
+export { Stat, type StatProps } from "./stat";
 export { Textarea, type TextareaProps } from "./textarea";
 export { Stack, type StackProps } from "./stack";
 export { PageFrame, type PageFrameProps, pageFrameOptions } from "./page-frame";

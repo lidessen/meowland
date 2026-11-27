@@ -15,8 +15,8 @@ export interface StatusDotProps extends Props, ThemedProps<typeof statusDotOptio
 }
 
 /**
- * A dot that shows the state of a piece of work. It is decorative: the owner supplies adjacent
- * text, so it is hidden from assistive tech.
+ * A work or connection status marker, optionally with a halo. It is decorative; the owner
+ * supplies adjacent accessible status text.
  */
 export function StatusDot(
   { size = 8, halo = false, className, style, ref, ...props }: StatusDotProps,

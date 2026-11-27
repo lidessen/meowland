@@ -8,7 +8,7 @@ export interface TagProps extends Props, ThemedProps<typeof tagOptions> {
   className?: Props["className"];
 }
 
-/** A static fact beside content. Choosing or filtering belongs to Pill, which is a button. */
+/** A categorical or metadata label; use Pill for interactive filters. */
 export function Tag(
   { children, className, ref, ...props }: TagProps,
   context: Context<typeof Tag>,

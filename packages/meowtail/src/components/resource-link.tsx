@@ -13,7 +13,7 @@ export interface ResourceLinkProps extends Props {
   className?: Props["className"];
 }
 
-/** A reference to one thing that can be opened: a file, a message, a record. */
+/** An actionable reference to an openable file, record, or artifact. */
 export function ResourceLink(
   { title, detail, icon, trailing, href, className, children, ref, ...props }: ResourceLinkProps,
   context: Context<typeof ResourceLink>,

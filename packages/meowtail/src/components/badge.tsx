@@ -8,7 +8,7 @@ export interface BadgeProps extends Props, ThemedProps<typeof badgeOptions> {
   className?: Props["className"];
 }
 
-/** A small label that names a category, such as a version or a release stage. */
+/** A non-interactive indicator for a status or count. */
 export function Badge(
   { children, className, ref, ...props }: BadgeProps,
   context: Context<typeof Badge>,

@@ -21,7 +21,7 @@ export interface ItemProps extends Props, ThemedProps<typeof itemOptions> {
   className?: Props["className"];
 }
 
-/** A single readable destination. Button and link content must not contain nested controls. */
+/** A selectable or navigable list item. Button and link content must not contain nested controls. */
 export function Item(
   {
     as = "div",

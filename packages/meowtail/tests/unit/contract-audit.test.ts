@@ -189,3 +189,20 @@ test("the audit detects new static props, legacy state, and missing stories", ()
     detail: "button.stories.tsx",
   });
 });
+
+test("catalog curation documents every overlapping component", () => {
+  const curation = read("CATALOG-CURATION.md");
+  for (const name of [
+    "StatusDot",
+    "StateDot",
+    "Item",
+    "ListRow",
+    "ResourceLink",
+    "Badge",
+    "Tag",
+    "Pill",
+    "AddButton",
+  ]) {
+    expect(curation).toContain(`\`${name}\``);
+  }
+});

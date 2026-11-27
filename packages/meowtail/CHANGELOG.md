@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+- Document the distinct jobs of overlapping status markers, list entries, and labels in
+  [catalog curation](CATALOG-CURATION.md). Deprecate `AddButton` in favor of composing
+  `Button` and `Icon`; the existing export remains available.
+
 - **Breaking (Component Contract v1):** Migrated legacy DOM state attributes (`data-open`, `data-expanded`,
   `data-active`) to `data-state` (`"open"` / `"closed"` and `"active"` / `"inactive"`) across
   `AssistantView`, `Chart`, `ChatReasoning`, `IconRail`, `ListRow`, `Pill`, `TextShimmer`, and

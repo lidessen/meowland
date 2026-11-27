@@ -33,7 +33,7 @@ export interface ListRowProps extends Props {
   className?: Props["className"];
 }
 
-/** One entry in a ListGroup, or alone as a summary. Children open under the row when expanded. */
+/** A key/value or expandable detail row in a ListGroup, also usable alone as a summary. */
 export function ListRow(
   {
     title,

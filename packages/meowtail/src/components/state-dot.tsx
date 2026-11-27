@@ -9,8 +9,8 @@ export interface StateDotProps extends Props {
   className?: Props["className"];
 }
 /**
- * A small dot that marks a state beside its text. It is decorative: the owner supplies the
- * adjacent accessible status text.
+ * Marks execution-step progress, including an ongoing spinner and an optional done checkmark.
+ * It is decorative; the owner supplies adjacent accessible status text.
  */
 export function StateDot(
   {

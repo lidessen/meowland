@@ -6,7 +6,7 @@ export interface PillProps extends Props {
   className?: Props["className"];
 }
 
-/** A capsule fact, or a native button when supplied an action. Selection belongs to its caller. */
+/** A toggle or filter chip when supplied an action; the caller owns its active state. */
 export function Pill(
   { active = false, onClick, children, ref, ...props }: PillProps,
   context: Context<typeof Pill>,

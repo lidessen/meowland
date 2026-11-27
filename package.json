@@ -8,6 +8,7 @@
   ],
   "scripts": {
     "build": "bun scripts/build.ts",
+    "meowland": "bun scripts/meowland.ts",
     "pack": "bun scripts/pack.ts",
     "release": "bun scripts/release.ts",
     "typecheck": "bun scripts/build.ts --check && bun node_modules/typescript/bin/tsc -p tsconfig.scripts.json && bun node_modules/typescript/bin/tsc -p examples/browser/tsconfig.json && bun node_modules/typescript/bin/tsc -p examples/presentation/tsconfig.json && bun node_modules/typescript/bin/tsc -p examples/image-loading/tsconfig.json && bun node_modules/typescript/bin/tsc -p examples/sunshine-welcome/tsconfig.json && bun node_modules/typescript/bin/tsc -p examples/protecting-pandas/tsconfig.json && bun node_modules/typescript/bin/tsc -p apps/showcase/tsconfig.json && bun node_modules/typescript/bin/tsc -p apps/docs/tsconfig.json",

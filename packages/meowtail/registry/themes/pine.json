@@ -1,0 +1,225 @@
+{
+  "name": "pine",
+  "type": "registry:theme",
+  "fonts": [
+    {
+      "family": "Inter Variable",
+      "package": "@fontsource-variable/inter",
+      "styles": ["normal"]
+    }
+  ],
+  "tokens": {
+    "surface": {
+      "canvas": ["#f7f8f5", "#11151a"],
+      "reading": ["#f7f8f5", "#11151a"],
+      "raised": ["#ffffff", "#1a2027"],
+      "overlay": ["#ffffff", "#202832"],
+      "fill": ["#edf0eb", "#202832"],
+      "field": ["#ffffff", "#151b21"],
+      "tint": ["rgb(23 31 27 / 5%)", "rgb(241 243 238 / 7%)"],
+      "knockout": ["#ffffff", "#1a2027"],
+      "scrim": ["rgb(17 23 28 / 24%)", "rgb(6 9 13 / 55%)"]
+    },
+    "canvas": {
+      "wash": "none",
+      "selection": "revert"
+    },
+    "marker": {
+      "blue": ["#cce7fa", "#254359"],
+      "ochre": ["#f4e6b6", "#4c3d24"],
+      "coral": ["#f6cbc1", "#59322d"]
+    },
+    "button": {
+      "filledStroke": "0",
+      "outlineStroke": "var(--ui-line-width)",
+      "pressOffset": "0.5px",
+      "filledPressed": "var(--ui-shadow-filled)",
+      "outlinePressed": "var(--ui-shadow-action)"
+    },
+    "terminal": {
+      "surface": "#11171c",
+      "ink": "#edf3ef",
+      "command": "#a6e4bd",
+      "muted": "#afb9c4",
+      "prompt": "#a6e4bd",
+      "divider": "#303b42",
+      "focus": "#b7e9c5",
+      "danger": "#f6a69d",
+      "success": "#a6e4bd",
+      "warning": "#e6c479",
+      "info": "#afc6eb",
+      "reference": "#becbff"
+    },
+    "inverse": {
+      "surface": ["#11171c", "#252f39"],
+      "ink": "#edf3ef",
+      "action": "#a6e4bd"
+    },
+    "line": {
+      "width": "1px",
+      "raisedWidth": "var(--ui-line-width)",
+      "edge": ["#d8ddd6", "#343e4a"],
+      "divider": ["#e1e5df", "#303b42"],
+      "control": ["#bbc5bc", "#495766"],
+      "controlHover": ["#83988a", "#8293a3"]
+    },
+    "ink": {
+      "primary": ["#171f1b", "#f1f3ee"],
+      "secondary": ["#4c5a51", "#adb8c2"],
+      "tertiary": ["#626f66", "#9ba9b4"],
+      "chip": ["#435349", "#c8d2da"],
+      "reading": ["#303d34", "#dce4e1"]
+    },
+    "state": {
+      "hover": ["rgb(32 99 71 / 6%)", "rgb(183 233 197 / 8%)"],
+      "active": ["rgb(32 99 71 / 12%)", "rgb(183 233 197 / 14%)"],
+      "focus": ["#206347", "#b7e9c5"],
+      "focusRing": ["rgb(32 99 71 / 22%)", "rgb(183 233 197 / 28%)"]
+    },
+    "action": {
+      "primary": ["#205e44", "#b7e9c5"],
+      "primaryHover": ["#184d37", "#d2f4dc"],
+      "onPrimary": ["#f2fff6", "#14291d"],
+      "soft": ["#edf0eb", "#253d31"],
+      "danger": ["#9e342b", "#f6a69d"],
+      "onDanger": ["#ffffff", "#28120f"]
+    },
+    "control": {
+      "small": "28px",
+      "regular": "36px",
+      "large": "44px",
+      "inset": "8px",
+      "fieldInset": "12px",
+      "trackInset": "3px",
+      "thumb": ["#ffffff", "#343e4a"],
+      "knob": ["#ffffff", "#e1efe6"]
+    },
+    "accent": {
+      "base": ["#206347", "#b7e9c5"],
+      "soft": ["#e1efe6", "#253d31"],
+      "selected": ["#dbece1", "#294236"],
+      "ink": ["#205e44", "#b7e9c5"],
+      "line": ["rgb(32 99 71 / 30%)", "rgb(183 233 197 / 34%)"],
+      "halo": ["rgb(32 99 71 / 22%)", "rgb(183 233 197 / 28%)"]
+    },
+    "status": {
+      "info": ["#43559c", "#becbff"],
+      "success": ["#206347", "#a6e4bd"],
+      "warning": ["#815409", "#e6c479"],
+      "danger": ["#9e342b", "#f6a69d"],
+      "unknown": ["#8b978e", "#7f8c98"]
+    },
+    "type": {
+      "sans": "\"Inter Variable\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif",
+      "display": "\"Inter Variable\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif",
+      "reading": "\"Inter Variable\", Inter, -apple-system, BlinkMacSystemFont, \"Segoe UI\", \"PingFang SC\", \"Hiragino Sans GB\", \"Microsoft YaHei\", system-ui, sans-serif",
+      "mono": "\"IBM Plex Mono\", ui-monospace, \"SF Mono\", Consolas, Menlo, monospace",
+      "micro": "11px",
+      "caption": "12px",
+      "code": "12px",
+      "label": "13px",
+      "body": "14px",
+      "readingSize": "14px",
+      "title": "16px",
+      "heading": "20px",
+      "pageTitle": "24px",
+      "hero": "40px",
+      "line": {
+        "micro": "16px",
+        "caption": "18px",
+        "code": "18px",
+        "label": "20px",
+        "bodyCompact": "20px",
+        "body": "22px",
+        "reading": "24px",
+        "title": "24px",
+        "heading": "28px",
+        "pageTitle": "32px",
+        "hero": "48px"
+      },
+      "weight": {
+        "regular": "400",
+        "medium": "500",
+        "semibold": "600",
+        "display": "600"
+      },
+      "leading": "1.5714285714",
+      "touchField": "16px",
+      "trackingTight": "-0.025em",
+      "trackingCaps": "0.04em",
+      "quoteStyle": "normal"
+    },
+    "space": {
+      "group": "8px",
+      "section": "20px",
+      "panel": "24px",
+      "prose": "12px",
+      "insetBlock": "12px",
+      "insetInline": "16px",
+      "pageBlock": "36px",
+      "pageInline": "48px",
+      "pageBlockCompact": "20px",
+      "pageInlineCompact": "16px"
+    },
+    "icon": {
+      "small": "14px",
+      "size": "16px",
+      "large": "18px",
+      "stroke": "1.75"
+    },
+    "radius": {
+      "xs": "4px",
+      "sm": "6px",
+      "md": "8px",
+      "lg": "8px",
+      "xl": "14px",
+      "xxl": "18px",
+      "full": "999px"
+    },
+    "shadow": {
+      "raised": ["none", "inset 0 1px 0 rgb(255 255 255 / 3%)"],
+      "field": ["0 1px 1px rgb(0 0 0 / 2.5%)", "none"],
+      "action": ["none", "none"],
+      "filled": ["none", "none"],
+      "thumb": [
+        "0 0 0 1px rgb(0 0 0 / 6%), 0 1px 2px rgb(0 0 0 / 8%)",
+        "0 0 0 1px rgb(255 255 255 / 8%), 0 1px 2px rgb(0 0 0 / 32%)"
+      ],
+      "pressed": "inset 0 1px 2px rgb(0 0 0 / 12%)",
+      "sheet": ["12px 0 40px rgb(0 0 0 / 12%)", "12px 0 40px rgb(0 0 0 / 50%)"],
+      "knob": ["0 1px 2px rgb(0 0 0 / 16%)", "0 1px 2px rgb(0 0 0 / 40%)"],
+      "dock": ["0 14px 36px rgb(20 33 26 / 5%)", "0 16px 36px rgb(6 9 13 / 25%)"],
+      "float": ["0 14px 36px rgb(20 33 26 / 5%)", "0 16px 36px rgb(6 9 13 / 25%)"]
+    },
+    "motion": {
+      "instant": "40ms",
+      "response": "100ms",
+      "settle": "200ms",
+      "draw": "360ms",
+      "loop": "1.2s",
+      "sweep": "1.6s",
+      "ease": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "enter": "cubic-bezier(0.16, 1, 0.3, 1)"
+    },
+    "layout": {
+      "gridCompact": "160px",
+      "gridNormal": "240px",
+      "gridWide": "320px",
+      "containerNarrow": "480px",
+      "containerContent": "720px",
+      "containerWide": "1120px",
+      "containerPage": "1040px",
+      "measure": "70ch"
+    },
+    "glyph": {
+      "chevron": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E\")",
+      "check": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E\")",
+      "arrow": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E\")",
+      "cross": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E\")",
+      "selectChevron": [
+        "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%234c5a51' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
+        "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23adb8c2' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")"
+      ]
+    }
+  }
+}

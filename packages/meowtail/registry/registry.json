@@ -1,0 +1,77 @@
+{
+  "$schema": "https://ui.shadcn.com/schema/registry.json",
+  "name": "meowtail",
+  "homepage": "https://github.com/lidessen/meowland",
+  "items": [
+    {
+      "name": "workbench-shell",
+      "type": "registry:block",
+      "title": "Workbench Shell",
+      "description": "A workbench frame with navigation and a main content slot.",
+      "dependencies": ["meowjsx", "meowtail"],
+      "files": [
+        {
+          "path": "blocks/workbench-shell.tsx",
+          "type": "registry:block",
+          "target": "blocks/workbench-shell.tsx"
+        }
+      ]
+    },
+    {
+      "name": "list-and-detail",
+      "type": "registry:block",
+      "title": "List and Detail",
+      "description": "A searchable master list with a detail pane.",
+      "dependencies": ["meowjsx", "meowtail"],
+      "files": [
+        {
+          "path": "blocks/list-and-detail.tsx",
+          "type": "registry:block",
+          "target": "blocks/list-and-detail.tsx"
+        }
+      ]
+    },
+    {
+      "name": "docs-shell",
+      "type": "registry:block",
+      "title": "Docs Shell",
+      "description": "Documentation navigation, content and outline.",
+      "dependencies": ["meowjsx", "meowtail"],
+      "files": [
+        {
+          "path": "blocks/docs-shell.tsx",
+          "type": "registry:block",
+          "target": "blocks/docs-shell.tsx"
+        }
+      ]
+    },
+    {
+      "name": "ottr",
+      "type": "registry:theme",
+      "title": "Ottr Theme Preset",
+      "description": "Warm workbench surfaces and mint interaction states.",
+      "dependencies": ["meowcss", "meowtail"],
+      "files": [
+        {
+          "path": "themes/ottr.json",
+          "type": "registry:theme",
+          "target": "themes/ottr.json"
+        }
+      ]
+    },
+    {
+      "name": "pine",
+      "type": "registry:theme",
+      "title": "Pine Theme Preset",
+      "description": "Pine-green interface with a fixed-dark terminal palette.",
+      "dependencies": ["meowcss", "meowtail"],
+      "files": [
+        {
+          "path": "themes/pine.json",
+          "type": "registry:theme",
+          "target": "themes/pine.json"
+        }
+      ]
+    }
+  ]
+}

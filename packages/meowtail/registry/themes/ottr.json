@@ -1,0 +1,225 @@
+{
+  "name": "ottr",
+  "type": "registry:theme",
+  "fonts": [],
+  "tokens": {
+    "surface": {
+      "canvas": ["#faf9f5", "#1f1e1d"],
+      "reading": ["#faf9f5", "#1f1e1d"],
+      "raised": ["#ffffff", "#262523"],
+      "overlay": ["#ffffff", "#2d2b29"],
+      "fill": ["#f0eee6", "#34322f"],
+      "field": ["#ffffff", "#191918"],
+      "tint": ["rgb(20 20 19 / 4.5%)", "rgb(255 245 230 / 4.5%)"],
+      "knockout": ["#ffffff", "#262523"],
+      "scrim": ["rgb(20 20 19 / 24%)", "rgb(0 0 0 / 56%)"]
+    },
+    "canvas": {
+      "wash": "none",
+      "selection": "revert"
+    },
+    "marker": {
+      "blue": ["#cce7fa", "#254359"],
+      "ochre": ["#f4e6b6", "#4c3d24"],
+      "coral": ["#f6cbc1", "#59322d"]
+    },
+    "button": {
+      "filledStroke": "0",
+      "outlineStroke": "var(--ui-line-width)",
+      "pressOffset": "0.5px",
+      "filledPressed": "var(--ui-shadow-filled)",
+      "outlinePressed": "var(--ui-shadow-action)"
+    },
+    "terminal": {
+      "surface": "var(--ui-surface-fill)",
+      "ink": "var(--ui-ink-primary)",
+      "muted": "var(--ui-ink-tertiary)",
+      "command": "var(--ui-ink-primary)",
+      "prompt": "var(--ui-ink-tertiary)",
+      "divider": "var(--ui-line-divider)",
+      "focus": "var(--ui-state-focus)",
+      "danger": "var(--ui-status-danger)",
+      "success": "var(--ui-status-success)",
+      "warning": "var(--ui-status-warning)",
+      "info": "var(--ui-status-info)",
+      "reference": "var(--code-highlight-function)"
+    },
+    "inverse": {
+      "surface": ["#141413", "#34322f"],
+      "ink": "#faf9f5",
+      "action": "#8ad3bd"
+    },
+    "line": {
+      "width": "1px",
+      "raisedWidth": "var(--ui-line-width)",
+      "edge": ["#e3dfd3", "#3b3834"],
+      "divider": ["#ece9df", "#34322f"],
+      "control": ["#d4cfbf", "#514d47"],
+      "controlHover": ["#928b7b", "#8e887d"]
+    },
+    "ink": {
+      "primary": ["#141413", "#e8e6dc"],
+      "secondary": ["#6b675f", "#b4aea2"],
+      "tertiary": ["#6b675f", "#a39e93"],
+      "chip": ["#5f5b52", "#c0baaf"],
+      "reading": ["#34322c", "#d1cdc1"]
+    },
+    "state": {
+      "hover": ["rgb(20 20 19 / 4.5%)", "rgb(255 245 230 / 4.5%)"],
+      "active": ["rgb(20 20 19 / 8%)", "rgb(255 245 230 / 9%)"],
+      "focus": ["#2c7765", "#5bb99f"],
+      "focusRing": ["rgb(63 143 122 / 25%)", "rgb(91 185 159 / 30%)"]
+    },
+    "action": {
+      "primary": ["#2c7765", "#3f9c82"],
+      "primaryHover": ["#246654", "#5bb99f"],
+      "onPrimary": ["#ffffff", "#101b16"],
+      "soft": ["#f0eee6", "#34322f"],
+      "danger": ["#ad3b2b", "#e8705f"],
+      "onDanger": ["#fff8ee", "#211613"]
+    },
+    "control": {
+      "small": "28px",
+      "regular": "32px",
+      "large": "44px",
+      "inset": "8px",
+      "fieldInset": "10px",
+      "trackInset": "3px",
+      "thumb": ["#ffffff", "#4a4741"],
+      "knob": ["#ffffff", "#e8e6dc"]
+    },
+    "accent": {
+      "base": ["#2b705e", "#5bb99f"],
+      "soft": ["rgb(63 143 122 / 6%)", "rgb(91 185 159 / 7%)"],
+      "selected": ["rgb(63 143 122 / 13%)", "rgb(91 185 159 / 16%)"],
+      "ink": ["#246654", "#87d1bb"],
+      "line": ["rgb(63 143 122 / 25%)", "rgb(91 185 159 / 28%)"],
+      "halo": ["rgb(63 143 122 / 25%)", "rgb(91 185 159 / 28%)"]
+    },
+    "status": {
+      "info": ["#336592", "#81afd9"],
+      "success": ["#426b29", "#9abc7b"],
+      "warning": ["#84560f", "#e3b25f"],
+      "danger": ["#a8392a", "#f08d7e"],
+      "unknown": ["#938d82", "#928c81"]
+    },
+    "type": {
+      "sans": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", \"PingFang SC\", \"Segoe UI\", system-ui, sans-serif",
+      "display": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", \"PingFang SC\", \"Segoe UI\", system-ui, sans-serif",
+      "reading": "-apple-system, BlinkMacSystemFont, \"SF Pro Text\", \"Helvetica Neue\", \"PingFang SC\", \"Segoe UI\", system-ui, sans-serif",
+      "mono": "\"SF Mono\", ui-monospace, Menlo, Consolas, monospace",
+      "micro": "11px",
+      "caption": "12px",
+      "code": "12px",
+      "label": "12px",
+      "body": "13px",
+      "readingSize": "14px",
+      "title": "16px",
+      "heading": "19px",
+      "pageTitle": "23px",
+      "hero": "40px",
+      "line": {
+        "micro": "16px",
+        "caption": "18px",
+        "code": "18px",
+        "label": "18px",
+        "bodyCompact": "20px",
+        "body": "20px",
+        "reading": "22px",
+        "title": "24px",
+        "heading": "26px",
+        "pageTitle": "30px",
+        "hero": "48px"
+      },
+      "weight": {
+        "regular": "400",
+        "medium": "500",
+        "semibold": "600",
+        "display": "650"
+      },
+      "leading": "1.5",
+      "touchField": "16px",
+      "trackingTight": "-0.02em",
+      "trackingCaps": "0.04em",
+      "quoteStyle": "normal"
+    },
+    "space": {
+      "group": "6px",
+      "section": "18px",
+      "panel": "22px",
+      "prose": "12px",
+      "insetBlock": "10px",
+      "insetInline": "12px",
+      "pageBlock": "24px",
+      "pageInline": "26px",
+      "pageBlockCompact": "20px",
+      "pageInlineCompact": "16px"
+    },
+    "icon": {
+      "small": "14px",
+      "size": "16px",
+      "large": "18px",
+      "stroke": "1.75"
+    },
+    "radius": {
+      "xs": "5px",
+      "sm": "7px",
+      "md": "8px",
+      "lg": "9px",
+      "xl": "11px",
+      "xxl": "14px",
+      "full": "999px"
+    },
+    "shadow": {
+      "raised": ["none", "inset 0 1px 0 rgb(255 255 255 / 3%)"],
+      "field": ["0 1px 1px rgb(0 0 0 / 2.5%)", "none"],
+      "action": ["0 1px 2px rgb(20 20 19 / 4%)", "0 1px 2px rgb(0 0 0 / 24%)"],
+      "filled": ["0 1px 2px rgb(20 20 19 / 10%)", "0 1px 2px rgb(0 0 0 / 30%)"],
+      "thumb": [
+        "0 0 0 1px rgb(0 0 0 / 6%), 0 1px 2px rgb(0 0 0 / 8%)",
+        "0 0 0 1px rgb(255 255 255 / 8%), 0 1px 2px rgb(0 0 0 / 32%)"
+      ],
+      "pressed": "inset 0 1px 2px rgb(0 0 0 / 12%)",
+      "sheet": ["12px 0 40px rgb(0 0 0 / 12%)", "12px 0 40px rgb(0 0 0 / 50%)"],
+      "knob": ["0 1px 2px rgb(0 0 0 / 16%)", "0 1px 2px rgb(0 0 0 / 40%)"],
+      "dock": [
+        "0 1px 2px rgb(20 20 19 / 4%), 0 8px 24px rgb(20 20 19 / 6%)",
+        "0 1px 2px rgb(0 0 0 / 25%), 0 10px 30px rgb(0 0 0 / 35%)"
+      ],
+      "float": [
+        "0 1px 2px rgb(20 20 19 / 4%), 0 8px 24px rgb(20 20 19 / 6%)",
+        "0 1px 2px rgb(0 0 0 / 25%), 0 10px 30px rgb(0 0 0 / 35%)"
+      ]
+    },
+    "motion": {
+      "instant": "40ms",
+      "response": "120ms",
+      "settle": "200ms",
+      "draw": "360ms",
+      "loop": "1.2s",
+      "sweep": "1.6s",
+      "ease": "cubic-bezier(0.4, 0, 0.2, 1)",
+      "enter": "cubic-bezier(0.16, 1, 0.3, 1)"
+    },
+    "layout": {
+      "gridCompact": "160px",
+      "gridNormal": "240px",
+      "gridWide": "320px",
+      "containerNarrow": "480px",
+      "containerContent": "720px",
+      "containerWide": "1120px",
+      "containerPage": "1040px",
+      "measure": "70ch"
+    },
+    "glyph": {
+      "chevron": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m9 18 6-6-6-6'/%3E%3C/svg%3E\")",
+      "check": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E\")",
+      "arrow": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E\")",
+      "cross": "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E\")",
+      "selectChevron": [
+        "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b675f' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")",
+        "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23b4aea2' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E\")"
+      ]
+    }
+  }
+}

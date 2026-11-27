@@ -2,6 +2,21 @@
 
 ## Unreleased
 
+- `ChatComposer` is the one place to extend a draft ([design](../../docs/designs/2026-11-27-composer-extensions.md)):
+  - `defaultValue` and `onValueChange` give it the Autocomplete ownership shape; without `value` it
+    keeps a local draft.
+  - `submitOn` (`"none"`, `"enter"`, `"mod-enter"`) submits through the form's submit button, so a
+    blocked composer swallows the key and IME composition never submits. `AssistantComposer` uses
+    it instead of its own Enter handler.
+  - `triggers` turn characters into host suggestions (`@` mentions, `/` commands, `#` paths) with
+    one keyboard order, a surface-anchored listbox, async lookups with an `AbortSignal`, removable
+    or drill-down inserts and a live region. New parts: `suggestions`, `suggestionList`,
+    `suggestion`, `suggestionLeading`, `suggestionCopy`, `suggestionLabel`,
+    `suggestionDescription`, `suggestionMeta`, `suggestionStatus` and `announcement`.
+  - `findComposerTrigger` and `insertComposerSuggestion` are exported for hosts and tests.
+- `AssistantView` accepts `composerTriggers`.
+- `ChoiceSelect` takes a Signal for `disabled`, and `ChoiceOption` an optional `description` line
+  (new parts `optionLabel` and `description`).
 - `Item` accepts an `href`: the whole item becomes a link with the button item's hover and focus
   treatment, and a selected link item carries `aria-current="page"`. The leading slot now centers on
   the first text line (`1lh`), so a state dot and an icon sit level with the title.

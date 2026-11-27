@@ -200,13 +200,16 @@ test("unthemed composer preserves caller events, input semantics and disabled co
   const runtime = createRuntime();
   const web = createWebRenderer(runtime);
   const onSubmit = (_event: SubmitEvent) => {};
-  const onInput = (_event: Event) => {};
+  const seen: Event[] = [];
+  const onInput = (event: Event) => {
+    seen.push(event);
+  };
   let renderedSubmit: unknown;
-  let renderedInput: unknown;
+  let renderedInput: ((event: Event) => void) | undefined;
   runtime.use({
     render: ({ vnode }, next) => {
       if (vnode.type === "form") renderedSubmit = vnode.props.onSubmit;
-      if (vnode.type === "textarea") renderedInput = vnode.props.onInput;
+      if (vnode.type === "textarea") renderedInput = vnode.props.onInput as (event: Event) => void;
       return next(vnode);
     },
   });
@@ -226,7 +229,10 @@ test("unthemed composer preserves caller events, input semantics and disabled co
     </ChatComposer>,
   );
   expect(renderedSubmit).toBe(onSubmit);
-  expect(renderedInput).toBe(onInput);
+  // The composer reads the text first, then hands the caller the same native event.
+  const event = { currentTarget: { value: "Draft!" } } as unknown as Event;
+  renderedInput?.(event);
+  expect(seen).toEqual([event]);
   expect(html).toContain('class="host"');
   expect(html).toContain('name="message"');
   expect(html).toContain('aria-label="Message"');

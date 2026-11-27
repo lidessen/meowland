@@ -648,4 +648,102 @@ export const chatComposerStyles = css`
       grid-row: 3;
     }
   }
+
+  /* Suggestions add no box of their own: the panel lives in the top layer, the announcement is
+     read but not shown, and the root grid keeps its rows. */
+  ${chatComposerPartRefs.suggestions},
+  ${chatComposerPartRefs.suggestions} > ${popoverPartRefs.root} {
+    display: contents;
+  }
+  ${chatComposerPartRefs.announcement} {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+  ${popoverPartRefs.panel}:has(> ${chatComposerPartRefs.suggestionList}) {
+    padding: 6px;
+  }
+  ${chatComposerPartRefs.suggestionList} {
+    display: grid;
+    gap: 1px;
+  }
+  ${chatComposerPartRefs.suggestionList}:empty {
+    display: none;
+  }
+  ${chatComposerPartRefs.suggestion} {
+    box-sizing: border-box;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    min-height: 32px;
+    padding: 6px 10px;
+    border-radius: ${uiTokens.radius.md};
+    color: ${uiTokens.ink.primary};
+    font: ${uiTokens.type.body} / ${uiTokens.type.line.bodyCompact} ${uiTokens.type.sans};
+    cursor: pointer;
+  }
+  /* The active option is where the arrow keys are; it is painted like a focused menu item. */
+  ${chatComposerPartRefs.suggestion}[aria-selected="true"] {
+    background: ${uiTokens.state.hover};
+  }
+  @media (hover: hover) {
+    ${chatComposerPartRefs.suggestion}:hover {
+      background: ${uiTokens.state.hover};
+    }
+  }
+  ${chatComposerPartRefs.suggestion}[aria-disabled="true"] {
+    color: ${uiTokens.ink.tertiary};
+    cursor: not-allowed;
+    background: none;
+  }
+  ${chatComposerPartRefs.suggestionLeading} {
+    display: inline-flex;
+    align-items: center;
+    flex: 0 0 auto;
+    height: 1lh;
+    color: ${uiTokens.ink.secondary};
+  }
+  ${chatComposerPartRefs.suggestionCopy} {
+    display: grid;
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+  ${chatComposerPartRefs.suggestionLabel} {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  ${chatComposerPartRefs.suggestionDescription},
+  ${chatComposerPartRefs.suggestionMeta} {
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
+    line-height: ${uiTokens.type.line.bodyCompact};
+  }
+  ${chatComposerPartRefs.suggestionDescription} {
+    overflow-wrap: anywhere;
+  }
+  ${chatComposerPartRefs.suggestionMeta} {
+    flex: 0 0 auto;
+    font-family: ${uiTokens.type.mono};
+  }
+  ${chatComposerPartRefs.suggestionDescription}[hidden],
+  ${chatComposerPartRefs.suggestionMeta}[hidden],
+  ${chatComposerPartRefs.suggestionStatus}[hidden] {
+    display: none;
+  }
+  ${chatComposerPartRefs.suggestionStatus} {
+    margin: 0;
+    padding: 6px 10px;
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.label};
+  }
+  @media (pointer: coarse) {
+    ${chatComposerPartRefs.suggestion} {
+      min-height: 44px;
+      align-items: center;
+    }
+  }
 `;

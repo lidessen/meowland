@@ -464,6 +464,60 @@ the Composer inside uses its natural width within that container and is no longe
 Request state, submitted snapshots, and the latest draft are managed by the caller. `attachments` holds materials to send, and `inputLabel` provides the input name.
 The form groups a writing `surface` and its supporting `hint`. Attachments, input and actions stay inside the surface; the hint follows outside its rounded edge and focus outline, associated with the textarea by `hintId`. Page-level metadata follows the whole composer.
 `surface="none"` removes only the internal writing surface's chrome and padding for explicit bare embedding; it does not move the hint back inside a surface.
+
+#### Extending the composer: choices, triggers and keyboard submit
+
+One `ChatComposer` takes every extension, so model choice, project choice, mentions and commands
+share one keyboard order and one place for state. The design record is
+[Composer extensions](../../docs/designs/2026-11-27-composer-extensions.md).
+
+- **Text.** `value` (a Signal stays live) is controlled; without it a local draft starts at
+  `defaultValue`. `onValueChange` reports every edit and every text change the composer makes
+  itself, such as an accepted suggestion or a form reset.
+- **Keyboard submit.** `submitOn="enter"` submits on Enter (Shift+Enter for a newline);
+  `"mod-enter"` on Cmd or Ctrl+Enter; the default `"none"` leaves Enter to the textarea. The key
+  goes through the form's submit button, so a `submitDisabled` composer swallows it, and IME
+  composition never submits. State the key in `hint`.
+- **Choices** are values the whole draft is sent with: model, reasoning, project, priority. Put
+  host-controlled `ChoiceSelect`s in `trailing`, `searchable` when the list can grow; option
+  `description` carries a supporting line and `disabled` accepts a Signal for a pending send.
+  One-off actions (save as draft) are a `MenuButton` beside them.
+- **Triggers** are characters that turn into text: `@` mentions, `/` commands, `#` paths. Each
+  `ComposerTrigger` names its `char`, `label` and a `suggest(query, { signal })` that returns
+  host-filtered `ComposerSuggestion`s, synchronously or as a Promise; `position: "start"` limits
+  commands to the start of the draft. The composer detects the caret's word, shows one listbox
+  under or over the surface, owns ArrowUp/ArrowDown, Enter and Tab (only while an option is
+  active) and Escape, writes `insert` (default `char + id`, `""` to remove the trigger text) and
+  then calls `onAccept`. Focus stays in the textarea, pastes never open a list, and a live region
+  announces counts. `triggers` is fixed for the mount; turn one off with its `disabled` Signal.
+- **References stay with the host.** The draft holds plain text (`@t-105`). Record structured
+  references in `onAccept`, show them in `attachments`, and drop one when its token leaves the text.
+
+```tsx
+<ChatComposer
+  value={draft}
+  onValueChange={(text) => (draft.value = text)}
+  submitOn="enter"
+  hint="Enter to send · Shift+Enter for a new line"
+  hintId="draft-hint"
+  triggers={[
+    {
+      char: "@",
+      label: "Tasks",
+      suggest: (query) =>
+        tasks.value
+          .filter((task) => task.title.includes(query))
+          .map((task) => ({ id: task.id, label: task.title, meta: task.id })),
+      onAccept: (suggestion) => (refs.value = [...refs.value, suggestion.id]),
+    },
+  ]}
+  trailing={<ChoiceSelect aria-label="Model" options={models} value={model} searchable />}
+  onSubmit={send}
+/>
+```
+
+`AssistantView` passes `composerTriggers` to its composer and submits on Enter through the same
+`submitOn` path.
 `layout="inline"` puts short drafts and actions on the same row, and long drafts keep growing; its external hint appears on focus. The default `stacked` keeps the tool row at the bottom of the writing surface. On narrow screens, attach/input/send share the writing row and model selection sits below it; the supporting hint remains outside the surface and wraps. The `hero` hint retains its visually hidden presentation.
 `layout="hero"` uses the input height of the desktop master blank conversation. `trailing` composes selection entry points such as provider and model to the left of the send button;
 a controlled `ChoiceSelect` can be passed, expanding grouped options upward with `placement="top"`, `align="end"`, and `matchTriggerWidth={false}`.

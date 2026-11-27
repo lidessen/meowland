@@ -86,12 +86,13 @@ export const choiceSelectStyles = css`
     margin: 4px -6px 0;
     padding-inline: 16px;
   }
+  /* Label above an optional description, with the selection mark in its own column. */
   ${choiceSelectPartRefs.option} {
     box-sizing: border-box;
-    display: flex;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 12px;
     align-items: center;
-    justify-content: space-between;
-    gap: 6px;
+    column-gap: 6px;
     width: 100%;
     min-height: 32px;
     padding: 6px 10px;
@@ -106,8 +107,22 @@ export const choiceSelectStyles = css`
   }
   ${choiceSelectPartRefs.option}::after {
     content: "";
+    grid-column: 2;
+    grid-row: 1 / span 2;
     width: 12px;
-    flex: 0 0 12px;
+  }
+  ${choiceSelectPartRefs.optionLabel} {
+    grid-column: 1;
+    min-width: 0;
+  }
+  ${choiceSelectPartRefs.description} {
+    grid-column: 1;
+    color: ${uiTokens.ink.secondary};
+    font-size: ${uiTokens.type.caption};
+    line-height: ${uiTokens.type.line.caption};
+  }
+  ${choiceSelectPartRefs.description}[hidden] {
+    display: none;
   }
   ${choiceSelectPartRefs.option}[aria-selected="true"]::after {
     content: "✓";

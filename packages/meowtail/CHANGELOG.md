@@ -2,11 +2,6 @@
 
 ## Unreleased
 
-- `ChatComposer`'s narrow layouts follow the composer's own width instead of the viewport: the root
-  is a `chat-composer` inline-size container, and the one-row writing layout applies at 560px and
-  below. A composer in a side pane or an embedded preview no longer switches to the phone layout on
-  a desktop page, and a narrow composer on a wide screen now gets it.
-
 - `createMeowUITheme({ theme, config })` from `meowtail/web` is a runtime plugin that delivers a
   theme to every Web mount: the stylesheet (shared per document through `meowcss/web`
   `mountStyles`), the theme attributes on the container and the focus-modality tracker, all
@@ -120,6 +115,13 @@
 - The Meowbook gallery's Theme control switches every story between Standard, Journal and Meow.
 - Add `journalFonts` and the `ThemeFont` type: the Fontsource packages that carry the faces Journal
   names. Meowtail ships no font files. The gallery paints Journal stories with those faces.
+
+## 0.4.0-alpha.7
+
+- `ChatComposer`'s narrow layouts follow the composer's own width instead of the viewport: the root
+  is a `chat-composer` inline-size container, and the one-row writing layout applies at 560px and
+  below. A composer in a side pane or an embedded preview no longer switches to the phone layout on
+  a desktop page, and a narrow composer on a wide screen now gets it.
 
 ## 0.4.0-alpha.6
 

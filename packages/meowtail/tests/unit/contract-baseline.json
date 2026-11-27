@@ -1,0 +1,599 @@
+{
+  "violations": [
+    {
+      "component": "action-rail",
+      "kind": "story",
+      "detail": "action-rail.stories.tsx"
+    },
+    {
+      "component": "add-button",
+      "kind": "story",
+      "detail": "add-button.stories.tsx"
+    },
+    {
+      "component": "app-bar",
+      "kind": "story",
+      "detail": "app-bar.stories.tsx"
+    },
+    {
+      "component": "aspect-ratio",
+      "kind": "story",
+      "detail": "aspect-ratio.stories.tsx"
+    },
+    {
+      "component": "assistant-composer",
+      "kind": "story",
+      "detail": "assistant-composer.stories.tsx"
+    },
+    {
+      "component": "assistant-markdown",
+      "kind": "story",
+      "detail": "assistant-markdown.stories.tsx"
+    },
+    {
+      "component": "assistant-question",
+      "kind": "liveness",
+      "detail": "labels"
+    },
+    {
+      "component": "assistant-question",
+      "kind": "story",
+      "detail": "assistant-question.stories.tsx"
+    },
+    {
+      "component": "assistant-steps",
+      "kind": "story",
+      "detail": "assistant-steps.stories.tsx"
+    },
+    {
+      "component": "assistant-view",
+      "kind": "dom-state",
+      "detail": "data-open #1"
+    },
+    {
+      "component": "assistant-view",
+      "kind": "liveness",
+      "detail": "labels"
+    },
+    {
+      "component": "assistant-view",
+      "kind": "liveness",
+      "detail": "readOnly"
+    },
+    {
+      "component": "assistant-view",
+      "kind": "story",
+      "detail": "assistant-view.stories.tsx"
+    },
+    {
+      "component": "badge",
+      "kind": "story",
+      "detail": "badge.stories.tsx"
+    },
+    {
+      "component": "button",
+      "kind": "story",
+      "detail": "button.stories.tsx"
+    },
+    {
+      "component": "card-action",
+      "kind": "story",
+      "detail": "card-action.stories.tsx"
+    },
+    {
+      "component": "card-content",
+      "kind": "story",
+      "detail": "card-content.stories.tsx"
+    },
+    {
+      "component": "card-description",
+      "kind": "story",
+      "detail": "card-description.stories.tsx"
+    },
+    {
+      "component": "card-footer",
+      "kind": "story",
+      "detail": "card-footer.stories.tsx"
+    },
+    {
+      "component": "card-header",
+      "kind": "story",
+      "detail": "card-header.stories.tsx"
+    },
+    {
+      "component": "card-title",
+      "kind": "story",
+      "detail": "card-title.stories.tsx"
+    },
+    {
+      "component": "chart",
+      "kind": "dom-state",
+      "detail": "data-active #1"
+    },
+    {
+      "component": "chat-attachments",
+      "kind": "story",
+      "detail": "chat-attachments.stories.tsx"
+    },
+    {
+      "component": "chat-bubble",
+      "kind": "story",
+      "detail": "chat-bubble.stories.tsx"
+    },
+    {
+      "component": "chat-composer",
+      "kind": "story",
+      "detail": "chat-composer.stories.tsx"
+    },
+    {
+      "component": "chat-conversation-latest",
+      "kind": "story",
+      "detail": "chat-conversation-latest.stories.tsx"
+    },
+    {
+      "component": "chat-conversation",
+      "kind": "story",
+      "detail": "chat-conversation.stories.tsx"
+    },
+    {
+      "component": "chat-frame",
+      "kind": "story",
+      "detail": "chat-frame.stories.tsx"
+    },
+    {
+      "component": "chat-message-actions",
+      "kind": "story",
+      "detail": "chat-message-actions.stories.tsx"
+    },
+    {
+      "component": "chat-message-list-content",
+      "kind": "story",
+      "detail": "chat-message-list-content.stories.tsx"
+    },
+    {
+      "component": "chat-message-list-date",
+      "kind": "story",
+      "detail": "chat-message-list-date.stories.tsx"
+    },
+    {
+      "component": "chat-message-list-item",
+      "kind": "story",
+      "detail": "chat-message-list-item.stories.tsx"
+    },
+    {
+      "component": "chat-message-list",
+      "kind": "story",
+      "detail": "chat-message-list.stories.tsx"
+    },
+    {
+      "component": "chat-process",
+      "kind": "liveness",
+      "detail": "open"
+    },
+    {
+      "component": "chat-process",
+      "kind": "story",
+      "detail": "chat-process.stories.tsx"
+    },
+    {
+      "component": "chat-reasoning",
+      "kind": "dom-state",
+      "detail": "data-active #1"
+    },
+    {
+      "component": "chat-reasoning",
+      "kind": "story",
+      "detail": "chat-reasoning.stories.tsx"
+    },
+    {
+      "component": "chat-sources",
+      "kind": "story",
+      "detail": "chat-sources.stories.tsx"
+    },
+    {
+      "component": "chat-status",
+      "kind": "story",
+      "detail": "chat-status.stories.tsx"
+    },
+    {
+      "component": "chat-task",
+      "kind": "story",
+      "detail": "chat-task.stories.tsx"
+    },
+    {
+      "component": "chat-tool-call",
+      "kind": "liveness",
+      "detail": "labels"
+    },
+    {
+      "component": "chat-tool-call",
+      "kind": "story",
+      "detail": "chat-tool-call.stories.tsx"
+    },
+    {
+      "component": "checkbox",
+      "kind": "story",
+      "detail": "checkbox.stories.tsx"
+    },
+    {
+      "component": "choice-group",
+      "kind": "liveness",
+      "detail": "disabled"
+    },
+    {
+      "component": "choice-group",
+      "kind": "story",
+      "detail": "choice-group.stories.tsx"
+    },
+    {
+      "component": "container",
+      "kind": "story",
+      "detail": "container.stories.tsx"
+    },
+    {
+      "component": "credential-source",
+      "kind": "liveness",
+      "detail": "disabled"
+    },
+    {
+      "component": "description-item",
+      "kind": "story",
+      "detail": "description-item.stories.tsx"
+    },
+    {
+      "component": "detail-section",
+      "kind": "story",
+      "detail": "detail-section.stories.tsx"
+    },
+    {
+      "component": "dialog-actions",
+      "kind": "story",
+      "detail": "dialog-actions.stories.tsx"
+    },
+    {
+      "component": "dialog-header",
+      "kind": "story",
+      "detail": "dialog-header.stories.tsx"
+    },
+    {
+      "component": "dialog-panel",
+      "kind": "story",
+      "detail": "dialog-panel.stories.tsx"
+    },
+    {
+      "component": "dialog",
+      "kind": "story",
+      "detail": "dialog.stories.tsx"
+    },
+    {
+      "component": "diff-block",
+      "kind": "story",
+      "detail": "diff-block.stories.tsx"
+    },
+    {
+      "component": "empty-state",
+      "kind": "story",
+      "detail": "empty-state.stories.tsx"
+    },
+    {
+      "component": "entry-list",
+      "kind": "story",
+      "detail": "entry-list.stories.tsx"
+    },
+    {
+      "component": "entry",
+      "kind": "story",
+      "detail": "entry.stories.tsx"
+    },
+    {
+      "component": "field-group",
+      "kind": "liveness",
+      "detail": "disabled"
+    },
+    {
+      "component": "field-group",
+      "kind": "story",
+      "detail": "field-group.stories.tsx"
+    },
+    {
+      "component": "field",
+      "kind": "story",
+      "detail": "field.stories.tsx"
+    },
+    {
+      "component": "grid",
+      "kind": "story",
+      "detail": "grid.stories.tsx"
+    },
+    {
+      "component": "hover-card",
+      "kind": "liveness",
+      "detail": "disabled"
+    },
+    {
+      "component": "hover-card",
+      "kind": "story",
+      "detail": "hover-card.stories.tsx"
+    },
+    {
+      "component": "icon-button",
+      "kind": "story",
+      "detail": "icon-button.stories.tsx"
+    },
+    {
+      "component": "icon-rail",
+      "kind": "dom-state",
+      "detail": "data-expanded #1"
+    },
+    {
+      "component": "image-lightbox",
+      "kind": "story",
+      "detail": "image-lightbox.stories.tsx"
+    },
+    {
+      "component": "inline",
+      "kind": "story",
+      "detail": "inline.stories.tsx"
+    },
+    {
+      "component": "input",
+      "kind": "story",
+      "detail": "input.stories.tsx"
+    },
+    {
+      "component": "item",
+      "kind": "liveness",
+      "detail": "selected"
+    },
+    {
+      "component": "json-block",
+      "kind": "story",
+      "detail": "json-block.stories.tsx"
+    },
+    {
+      "component": "json-tree",
+      "kind": "story",
+      "detail": "json-tree.stories.tsx"
+    },
+    {
+      "component": "layout-item",
+      "kind": "story",
+      "detail": "layout-item.stories.tsx"
+    },
+    {
+      "component": "list-group",
+      "kind": "story",
+      "detail": "list-group.stories.tsx"
+    },
+    {
+      "component": "list-row",
+      "kind": "dom-state",
+      "detail": "data-expanded #1"
+    },
+    {
+      "component": "list-row",
+      "kind": "liveness",
+      "detail": "expanded"
+    },
+    {
+      "component": "list-row",
+      "kind": "story",
+      "detail": "list-row.stories.tsx"
+    },
+    {
+      "component": "meta-row",
+      "kind": "story",
+      "detail": "meta-row.stories.tsx"
+    },
+    {
+      "component": "nav-item",
+      "kind": "story",
+      "detail": "nav-item.stories.tsx"
+    },
+    {
+      "component": "number-input",
+      "kind": "liveness",
+      "detail": "disabled"
+    },
+    {
+      "component": "number-input",
+      "kind": "liveness",
+      "detail": "readOnly"
+    },
+    {
+      "component": "output-block",
+      "kind": "story",
+      "detail": "output-block.stories.tsx"
+    },
+    {
+      "component": "page-frame",
+      "kind": "story",
+      "detail": "page-frame.stories.tsx"
+    },
+    {
+      "component": "page-header",
+      "kind": "story",
+      "detail": "page-header.stories.tsx"
+    },
+    {
+      "component": "path-label",
+      "kind": "story",
+      "detail": "path-label.stories.tsx"
+    },
+    {
+      "component": "pill",
+      "kind": "dom-state",
+      "detail": "data-active #1"
+    },
+    {
+      "component": "process-group",
+      "kind": "liveness",
+      "detail": "open"
+    },
+    {
+      "component": "process-step",
+      "kind": "story",
+      "detail": "process-step.stories.tsx"
+    },
+    {
+      "component": "prose",
+      "kind": "story",
+      "detail": "prose.stories.tsx"
+    },
+    {
+      "component": "rail-item",
+      "kind": "story",
+      "detail": "rail-item.stories.tsx"
+    },
+    {
+      "component": "rail-section",
+      "kind": "story",
+      "detail": "rail-section.stories.tsx"
+    },
+    {
+      "component": "read-block",
+      "kind": "story",
+      "detail": "read-block.stories.tsx"
+    },
+    {
+      "component": "resource-card",
+      "kind": "story",
+      "detail": "resource-card.stories.tsx"
+    },
+    {
+      "component": "resource-link",
+      "kind": "story",
+      "detail": "resource-link.stories.tsx"
+    },
+    {
+      "component": "risk-confirmation",
+      "kind": "story",
+      "detail": "risk-confirmation.stories.tsx"
+    },
+    {
+      "component": "search-block",
+      "kind": "story",
+      "detail": "search-block.stories.tsx"
+    },
+    {
+      "component": "search-input",
+      "kind": "liveness",
+      "detail": "disabled"
+    },
+    {
+      "component": "search-input",
+      "kind": "liveness",
+      "detail": "readOnly"
+    },
+    {
+      "component": "search-input",
+      "kind": "story",
+      "detail": "search-input.stories.tsx"
+    },
+    {
+      "component": "segmented-control",
+      "kind": "story",
+      "detail": "segmented-control.stories.tsx"
+    },
+    {
+      "component": "select",
+      "kind": "story",
+      "detail": "select.stories.tsx"
+    },
+    {
+      "component": "separator",
+      "kind": "story",
+      "detail": "separator.stories.tsx"
+    },
+    {
+      "component": "shortcut-keys",
+      "kind": "story",
+      "detail": "shortcut-keys.stories.tsx"
+    },
+    {
+      "component": "slider",
+      "kind": "liveness",
+      "detail": "disabled"
+    },
+    {
+      "component": "stack",
+      "kind": "story",
+      "detail": "stack.stories.tsx"
+    },
+    {
+      "component": "stat",
+      "kind": "liveness",
+      "detail": "value"
+    },
+    {
+      "component": "state-dot",
+      "kind": "story",
+      "detail": "state-dot.stories.tsx"
+    },
+    {
+      "component": "switch",
+      "kind": "story",
+      "detail": "switch.stories.tsx"
+    },
+    {
+      "component": "task-list",
+      "kind": "story",
+      "detail": "task-list.stories.tsx"
+    },
+    {
+      "component": "terminal-block",
+      "kind": "story",
+      "detail": "terminal-block.stories.tsx"
+    },
+    {
+      "component": "text-shimmer",
+      "kind": "dom-state",
+      "detail": "data-active #1"
+    },
+    {
+      "component": "text-shimmer",
+      "kind": "story",
+      "detail": "text-shimmer.stories.tsx"
+    },
+    {
+      "component": "text",
+      "kind": "story",
+      "detail": "text.stories.tsx"
+    },
+    {
+      "component": "textarea",
+      "kind": "story",
+      "detail": "textarea.stories.tsx"
+    },
+    {
+      "component": "timeline-item",
+      "kind": "story",
+      "detail": "timeline-item.stories.tsx"
+    },
+    {
+      "component": "timeline",
+      "kind": "story",
+      "detail": "timeline.stories.tsx"
+    },
+    {
+      "component": "toolbar",
+      "kind": "story",
+      "detail": "toolbar.stories.tsx"
+    },
+    {
+      "component": "tooltip",
+      "kind": "story",
+      "detail": "tooltip.stories.tsx"
+    },
+    {
+      "component": "tree-view",
+      "kind": "dom-state",
+      "detail": "data-open #1"
+    },
+    {
+      "component": "web-block",
+      "kind": "story",
+      "detail": "web-block.stories.tsx"
+    }
+  ]
+}

@@ -1,5 +1,6 @@
 import { h, type Child, type Props, type Context } from "meowjsx";
-import { signal, unwrap, type MaybeSignal } from "meowjsx/signal";
+import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
+import { createRovingFocus, createTypeahead, isTypeaheadKey } from "../behaviors";
 import { Popover, type PopoverTriggerBindings } from "./popover";
 import { Icon } from "../icons/icon";
 import { activeElementInRoot, elementByIdInRoot } from "../shared/dom-root";
@@ -63,23 +64,39 @@ export function Menu(
   const local = signal(false);
   const state = open !== undefined ? open : local;
   let root: HTMLElement | undefined;
-  let search = "";
-  let searchTime = 0;
+  const actions = items.flatMap((item) =>
+    !("type" in item) ? [item] : item.type === "group" ? item.items : [],
+  );
+  const first = actions.find((item) => !item.disabled)?.id ?? null;
+  const stop = signal<string | null>(first);
+  const search = createTypeahead(500);
   const children: Array<() => void> = [];
   const buttons = () =>
     Array.from(
       root?.querySelectorAll<HTMLButtonElement>('button[role="menuitem"]:not(:disabled)') ?? [],
     ).filter((button) => button.closest('[role="menu"]') === root);
+  const roving = createRovingFocus({
+    stop,
+    orientation: "vertical",
+    loop: true,
+    items: () => buttons().map((el) => ({ key: el.dataset.menuId!, el })),
+  });
+  context.onCleanup(() => roving.dispose());
   const request = (next: boolean) => {
     if (open === undefined) local.value = next;
     onOpenChange?.(next);
     if (!next) {
-      search = "";
+      search.reset();
+      stop.value = first;
       children.forEach((close) => close());
     }
   };
   context.effect(() => {
-    if (!unwrap(state)) children.forEach((close) => close());
+    if (!unwrap(state)) {
+      children.forEach((close) => close());
+      search.reset();
+      stop.value = first;
+    }
   });
   const focusEdge = (last = false) =>
     queueMicrotask(() => {
@@ -160,7 +177,10 @@ export function Menu(
                   {...bindings}
                   role={"menuitem"}
                   type={"button"}
-                  tabIndex={-1}
+                  tabIndex={derived(() => (unwrap(state) && stop.value === item.id ? 0 : -1))}
+                  onFocus={() => {
+                    stop.value = item.id;
+                  }}
                   disabled={item.disabled}
                   data-menu-id={item.id}
                   data-menu-label={item.label}
@@ -191,7 +211,10 @@ export function Menu(
       <button
         type={"button"}
         role={"menuitem"}
-        tabIndex={-1}
+        tabIndex={derived(() => (unwrap(state) && stop.value === item.id ? 0 : -1))}
+        onFocus={() => {
+          stop.value = item.id;
+        }}
         disabled={item.disabled}
         data-menu-id={item.id}
         data-menu-label={item.label}
@@ -221,37 +244,24 @@ export function Menu(
     }
     const rows = buttons();
     const current = rows.findIndex((row) => root && row === activeElementInRoot(root));
-    let next: number | undefined;
-    if (event.key === "ArrowDown") next = (current + 1) % rows.length;
-    if (event.key === "ArrowUp")
-      next = current < 0 ? rows.length - 1 : (current - 1 + rows.length) % rows.length;
-    if (event.key === "Home") next = 0;
-    if (event.key === "End") next = rows.length - 1;
     if (event.key === "Tab") {
-      // Dismiss the whole action surface, then let native Tab continue from
-      // its restored trigger. Moving focus must never activate an action.
+      // Dismiss the whole action surface and let native Tab continue.
       request(false);
       closeAncestors?.();
       event.stopPropagation();
       return;
     }
-    if (event.key.length === 1 && event.key !== " ") {
-      const now = Date.now();
-      search = now - searchTime > 500 ? event.key : search + event.key;
-      searchTime = now;
-      const needle = search.toLocaleLowerCase();
-      for (let step = 1; step <= rows.length; step++) {
-        const index = (current + step) % rows.length;
-        const label = rows[index]?.dataset.menuLabel ?? "";
-        if (label.trim().toLocaleLowerCase().startsWith(needle)) {
-          next = index;
-          break;
-        }
+    if (roving.keydown(event)) return;
+    if (isTypeaheadKey(event) && (event.key !== " " || search.active())) {
+      const next = search(
+        event.key,
+        rows.map((row) => row.dataset.menuLabel ?? ""),
+        current,
+      );
+      if (next >= 0) {
+        event.preventDefault();
+        roving.focus(rows[next]!.dataset.menuId!);
       }
-    }
-    if (next !== undefined) {
-      event.preventDefault();
-      rows[next]?.focus();
     }
   };
   return (

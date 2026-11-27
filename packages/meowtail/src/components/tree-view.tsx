@@ -1,5 +1,6 @@
 import { h, keyed, type Child, type Context, type Props } from "meowjsx";
 import { derived, signal, unwrap, type MaybeSignal, type ReadableSignal } from "meowjsx/signal";
+import { createRovingFocus, createTypeahead, isTypeaheadKey } from "../behaviors";
 import { Icon, type IconName } from "../icons/icon";
 import { activeElementInRoot } from "../shared/dom-root";
 import { elementId } from "../shared/element-id";
@@ -94,6 +95,17 @@ export function TreeView(
     return wanted ?? ids[0];
   });
   const elements = new Map<string, HTMLElement>();
+  const roving = createRovingFocus({
+    orientation: "vertical",
+    loop: false,
+    items: () =>
+      visible.value.flatMap((id) => {
+        const el = elements.get(id);
+        return el ? [{ key: id, el, focusable: true }] : [];
+      }),
+  });
+  const search = createTypeahead();
+  context.onCleanup(() => roving.dispose());
   let root: HTMLElement | undefined;
   // The item that holds focus and its ancestors, kept to repair focus if it disappears.
   let holder: { id: string; ancestors: readonly string[] } | undefined;
@@ -149,23 +161,23 @@ export function TreeView(
     const branch = item?.children !== undefined;
     const open = openSet.value.has(id);
     const handled = () => event.preventDefault();
+    if (roving.keydown(event)) {
+      elements.get(roving.stop.value ?? "")?.scrollIntoView?.({ block: "nearest" });
+      return;
+    }
+    if (isTypeaheadKey(event) && (event.key !== " " || search.active()) && event.key !== "*") {
+      const match = search(
+        event.key,
+        ids.map((candidate) => find(unwrap(items), candidate)?.label ?? ""),
+        index,
+      );
+      if (match >= 0) {
+        handled();
+        focusItem(ids[match]);
+      }
+      return;
+    }
     switch (event.key) {
-      case "ArrowDown":
-        handled();
-        focusItem(ids[index + 1]);
-        break;
-      case "ArrowUp":
-        handled();
-        focusItem(ids[index - 1]);
-        break;
-      case "Home":
-        handled();
-        focusItem(ids[0]);
-        break;
-      case "End":
-        handled();
-        focusItem(ids.at(-1));
-        break;
       case "ArrowRight":
         handled();
         if (branch && !open) setOpen(id, true);
@@ -194,18 +206,6 @@ export function TreeView(
         onExpandedChange?.(next);
         break;
       }
-      default:
-        if (event.key.length === 1 && event.key !== " ") {
-          const letter = event.key.toLocaleLowerCase();
-          const order = [...ids.slice(index + 1), ...ids.slice(0, index + 1)];
-          const match = order.find((candidate) =>
-            find(unwrap(items), candidate)?.label.toLocaleLowerCase().startsWith(letter),
-          );
-          if (match !== undefined) {
-            handled();
-            focusItem(match);
-          }
-        }
     }
   };
 

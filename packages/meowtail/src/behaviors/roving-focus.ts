@@ -19,7 +19,8 @@ export interface RovingFocusOptions<T extends string = string> {
 export function isFocusItemEligible(item: FocusItem): boolean {
   const { el } = item;
   if (!el.isConnected || item.disabled || item.focusable === false) return false;
-  if (el.matches(':disabled, [aria-disabled="true"]')) return false;
+  if (el.matches(":disabled")) return false;
+  if (item.focusable !== true && el.matches('[aria-disabled="true"]')) return false;
   for (let node: Element | null = el; node;) {
     if (node.matches("[hidden], [inert]")) return false;
     const style = el.ownerDocument.defaultView?.getComputedStyle(node);

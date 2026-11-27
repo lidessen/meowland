@@ -1,6 +1,8 @@
 import { expect, test } from "bun:test";
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
+import { checkPattern, checkSsrPurity } from "../pattern-kit";
+import { mountComponent } from "./mount";
 import { TreeView, installMeowUI, meowUIComponents } from "../../../src/index";
 
 function html(view: unknown) {
@@ -45,4 +47,49 @@ test("tree items carry level, position, expansion and selection; closed groups s
   expect(item("locked")).toContain('aria-disabled="true"');
   expect(item("locked")).not.toContain("aria-selected");
   expect(item("index")).not.toContain("aria-expanded");
+});
+
+test("tree satisfies the composite pattern and disabled items remain focusable but not selectable", async () => {
+  const selected: string[] = [];
+  const view = mountComponent(
+    <TreeView
+      label="Files"
+      onSelectedChange={(id) => selected.push(id)}
+      items={[
+        { id: "one", label: "One" },
+        { id: "locked", label: "Locked", disabled: true },
+        { id: "three", label: "Three" },
+      ]}
+    />,
+  );
+  try {
+    await checkPattern(view.host, "tree");
+    const rows = view.host.querySelectorAll<HTMLElement>('[role="treeitem"]');
+    const key = (value: string) =>
+      view.host.ownerDocument.activeElement!.dispatchEvent(
+        new view.host.ownerDocument.defaultView!.KeyboardEvent("keydown", {
+          key: value,
+          bubbles: true,
+          cancelable: true,
+        }),
+      );
+    rows[0]!.focus();
+    key("ArrowDown");
+    expect(view.host.ownerDocument.activeElement).toBe(rows[1]);
+    key("Enter");
+    key(" ");
+    expect(selected).toEqual([]);
+    key("ArrowDown");
+    expect(view.host.ownerDocument.activeElement).toBe(rows[2]);
+    key("ArrowUp");
+    expect(view.host.ownerDocument.activeElement).toBe(rows[1]);
+  } finally {
+    view.unmount();
+  }
+});
+
+test("tree renders on the server without impure global calls", () => {
+  expect(
+    checkSsrPurity(() => html(<TreeView label="Files" items={[{ id: "one", label: "One" }]} />)),
+  ).toContain('role="tree"');
 });

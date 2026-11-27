@@ -2,6 +2,7 @@ import { expect, test } from "bun:test";
 import { createRuntime, h, type Props } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { Menu, type MenuTriggerBindings } from "../../../src/components/menu";
+import { checkPattern, checkSsrPurity } from "../pattern-kit";
 import { mountComponent } from "./mount";
 
 test("menu names groups and actions, blocks disabled callbacks and reports closure before action", () => {
@@ -158,4 +159,58 @@ test("menu keyboard walks enabled rows and typeahead excludes shortcut text", ()
   } finally {
     view.unmount();
   }
+});
+
+test("open menu satisfies the composite pattern and closed items leave the tab order", async () => {
+  const view = mountComponent(
+    <Menu
+      id="pattern-menu"
+      open={true}
+      trigger={(bindings) => <button {...bindings}>Actions</button>}
+      items={[
+        { id: "one", label: "One" },
+        { id: "two", label: "Two" },
+      ]}
+    />,
+  );
+  const panel = view.host.querySelector<HTMLElement>("[data-popover-panel]")!;
+  let shown = false;
+  const matches = panel.matches.bind(panel);
+  panel.matches = ((selector: string) =>
+    selector === ":popover-open" ? shown : matches(selector)) as typeof panel.matches;
+  panel.showPopover = () => {};
+  panel.hidePopover = () => {
+    shown = false;
+  };
+  try {
+    await checkPattern(view.host, "menu");
+  } finally {
+    view.unmount();
+  }
+  const closed = mountComponent(
+    <Menu
+      id="closed-menu"
+      trigger={(bindings) => <button {...bindings}>Actions</button>}
+      items={[{ id: "one", label: "One" }]}
+    />,
+  );
+  try {
+    expect(closed.host.querySelector<HTMLElement>('[role="menuitem"]')!.tabIndex).toBe(-1);
+  } finally {
+    closed.unmount();
+  }
+});
+
+test("menu renders on the server without impure global calls", () => {
+  expect(
+    checkSsrPurity(() =>
+      createWebRenderer(createRuntime()).renderToHtml(
+        <Menu
+          id="server-menu"
+          trigger={(bindings) => <button {...bindings}>Actions</button>}
+          items={[{ id: "one", label: "One" }]}
+        />,
+      ),
+    ),
+  ).toContain('role="menu"');
 });

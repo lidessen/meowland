@@ -23,6 +23,7 @@
   "include": [
     "src/index.ts",
     "src/runtime.ts",
+    "src/router.ts",
     "src/renderer.ts",
     "src/jsx-runtime.ts",
     "src/jsx-dev-runtime.ts",

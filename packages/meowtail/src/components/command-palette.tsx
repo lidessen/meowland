@@ -1,5 +1,6 @@
 import { h, keyed, type Context, type Props } from "meowjsx";
 import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
+import { createListbox } from "../behaviors";
 import { Icon, type IconName } from "../icons/icon";
 import { activeElementInRoot, elementByIdInRoot } from "../shared/dom-root";
 import { elementId } from "../shared/element-id";
@@ -89,7 +90,8 @@ export function CommandPalette(
   const base = elementId("command-palette");
   const listId = `${base}-list`;
   const query = signal("");
-  const chosen = signal<string | undefined>(undefined);
+  const chosen = signal<string | null>(null);
+  const domVersion = signal(0);
   let dialog: HTMLDialogElement | undefined;
   let input: HTMLInputElement | undefined;
   let opener: HTMLElement | null = null;
@@ -110,9 +112,32 @@ export function CommandPalette(
   // The chosen command while it still matches, else the first enabled match.
   const active = derived(() => {
     const ids = enabled.value.map((command) => command.id);
-    return chosen.value !== undefined && ids.includes(chosen.value) ? chosen.value : ids[0];
+    return chosen.value !== null && ids.includes(chosen.value) ? chosen.value : ids[0];
   });
-  const optionId = (id: string) => `${base}-option-${id}`;
+  const listbox: ReturnType<typeof createListbox<string>> = createListbox({
+    id: base,
+    focus: "virtual",
+    loop: true,
+    highlighted: chosen,
+    get controller() {
+      return input;
+    },
+    items: () =>
+      matching.value.flatMap((command) => {
+        const el = input && elementByIdInRoot(input, listbox.idForKey(command.id));
+        return el
+          ? [{ key: command.id, label: command.label, disabled: command.disabled, el }]
+          : [];
+      }),
+  });
+  context.onCleanup(listbox.dispose);
+  context.effect(() => {
+    void matching.value;
+    unwrap(open);
+    queueMicrotask(() => {
+      if (alive) domVersion.value++;
+    });
+  });
 
   const restoreOpener = () => {
     const target = opener;
@@ -126,7 +151,7 @@ export function CommandPalette(
       const focused = activeElementInRoot(dialog);
       opener = focused instanceof HTMLElement && !dialog.contains(focused) ? focused : null;
       query.value = "";
-      chosen.value = undefined;
+      chosen.value = null;
       if (input) input.value = "";
       dialog.showModal();
       input?.focus();
@@ -146,16 +171,21 @@ export function CommandPalette(
     pending = id;
     dialog.close();
   };
-  const move = (step: 1 | -1) => {
-    const ids = enabled.value.map((command) => command.id);
-    if (ids.length === 0) return;
-    const index = ids.indexOf(active.value ?? "");
-    const next = ids[(index + step + ids.length) % ids.length]!;
-    chosen.value = next;
-    queueMicrotask(() => {
-      if (alive && dialog)
-        elementByIdInRoot(dialog, optionId(next))?.scrollIntoView?.({ block: "nearest" });
-    });
+  const navigate = (event: KeyboardEvent) => {
+    chosen.value = active.value ?? null;
+    const arrow = event.key === "ArrowDown" || event.key === "ArrowUp";
+    const Keyboard = input!.ownerDocument.defaultView!.KeyboardEvent;
+    const navigation = arrow
+      ? new Keyboard("keydown", { key: event.key, cancelable: true })
+      : event;
+    if (arrow) event.preventDefault();
+    if (listbox.keydown(navigation) && chosen.value !== null) {
+      const id = chosen.value;
+      queueMicrotask(() => {
+        if (alive && dialog)
+          elementByIdInRoot(dialog, listbox.idForKey(id))?.scrollIntoView?.({ block: "nearest" });
+      });
+    }
   };
 
   return (
@@ -202,21 +232,23 @@ export function CommandPalette(
             aria-expanded="true"
             aria-controls={listId}
             aria-autocomplete="list"
-            aria-activedescendant={derived(() =>
-              active.value === undefined ? undefined : optionId(active.value),
+            aria-activedescendant={derived(
+              () => (
+                domVersion.value,
+                active.value === undefined ? undefined : listbox.activeId(active.value)
+              ),
             )}
             placeholder={placeholder}
             autoComplete="off"
             spellcheck="false"
             onInput={(event: Event) => {
               query.value = (event.currentTarget as HTMLInputElement).value;
-              chosen.value = undefined;
+              chosen.value = null;
             }}
             onKeyDown={(event: KeyboardEvent) => {
               if (event.isComposing) return;
-              if (event.key === "ArrowDown" || event.key === "ArrowUp") {
-                event.preventDefault();
-                move(event.key === "ArrowDown" ? 1 : -1);
+              if (["ArrowDown", "ArrowUp", "Home", "End"].includes(event.key)) {
+                navigate(event);
               } else if (event.key === "Enter") {
                 event.preventDefault();
                 if (active.value !== undefined) run(active.value);
@@ -258,7 +290,7 @@ export function CommandPalette(
                       const id = command.value.id;
                       return (
                         <div
-                          id={optionId(id)}
+                          id={listbox.idForKey(id)}
                           role="option"
                           aria-selected={derived(() => String(active.value === id))}
                           aria-disabled={derived(() =>

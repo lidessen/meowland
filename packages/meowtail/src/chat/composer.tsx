@@ -1,8 +1,9 @@
 import { defineStyleProps } from "meowcss/meowjsx";
 import { h, keyed, type Child, type Context, type Props } from "meowjsx";
 import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
+import { createListbox } from "../behaviors";
 import { Popover } from "../components/popover";
-import { elementByIdInRoot } from "../shared/dom-root";
+import { activeElementInRoot, elementByIdInRoot } from "../shared/dom-root";
 import { elementId } from "../shared/element-id";
 import {
   findComposerTrigger,
@@ -130,14 +131,15 @@ export function ChatComposer(
   const items = signal<readonly ComposerSuggestion[]>([]);
   const loading = signal(false);
   const settled = signal(false);
-  const picked = signal<string | undefined>(undefined);
+  const picked = signal<string | null>(null);
+  const domVersion = hasTriggers ? signal(0) : undefined;
   const evaluate = (fromPaste = false) => {
     if (!triggers.length) return;
     const element = field;
     const usable =
       element &&
       element.isConnected &&
-      element.ownerDocument.activeElement === element &&
+      activeElementInRoot(element) === element &&
       !unwrap(disabled) &&
       !unwrap(readOnly);
     const found =
@@ -153,7 +155,7 @@ export function ChatComposer(
     if (next && dismissed) next = null;
     if (!sameMatch(match.value, next)) {
       if (match.value?.index !== next?.index || match.value?.char !== next?.char)
-        picked.value = undefined;
+        picked.value = null;
       match.value = next;
     }
   };
@@ -217,12 +219,32 @@ export function ChatComposer(
       !unwrap(match.value.trigger.disabled ?? false) &&
       (items.value.length > 0 || loading.value || showEmpty.value),
   );
-  const optionIds = new Map<string, string>();
-  const optionId = (key: string) => {
-    let known = optionIds.get(key);
-    if (!known) optionIds.set(key, (known = elementId(`${baseId}-option`)));
-    return known;
-  };
+  const listbox: ReturnType<typeof createListbox<string>> | undefined = hasTriggers
+    ? createListbox({
+        id: baseId,
+        focus: "virtual",
+        loop: true,
+        highlighted: picked,
+        get controller() {
+          return field;
+        },
+        items: () =>
+          items.value.flatMap((item) => {
+            const el = field && elementByIdInRoot(field, listbox!.idForKey(item.id));
+            return el ? [{ key: item.id, label: item.label, disabled: item.disabled, el }] : [];
+          }),
+      })
+    : undefined;
+  if (listbox) {
+    context.onCleanup(listbox.dispose);
+    context.effect(() => {
+      void items.value;
+      void open.value;
+      queueMicrotask(() => {
+        if (alive) domVersion!.value++;
+      });
+    });
+  }
   const announcement = derived(() => {
     if (!open.value) return "";
     if (loading.value) return loadingMessage;
@@ -253,23 +275,18 @@ export function ChatComposer(
   const reveal = (key: string) => {
     queueMicrotask(() => {
       if (!alive || !field) return;
-      elementByIdInRoot(field, optionId(key))?.scrollIntoView?.({ block: "nearest" });
+      elementByIdInRoot(field, listbox!.idForKey(key))?.scrollIntoView?.({ block: "nearest" });
     });
-  };
-  const move = (step: 1 | -1) => {
-    const list = enabledItems();
-    if (!list.length) return;
-    const index = list.findIndex((item) => item.id === activeId.value);
-    const next = list[(index + step + list.length) % list.length]!;
-    picked.value = next.id;
-    reveal(next.id);
   };
   const keydown = (event: KeyboardEvent) => {
     if (event.isComposing || event.keyCode === 229) return;
     if (open.value) {
       if (event.key === "ArrowDown" || event.key === "ArrowUp") {
+        picked.value = activeId.value ?? null;
+        const Keyboard = field!.ownerDocument.defaultView!.KeyboardEvent;
+        const navigation = new Keyboard("keydown", { key: event.key, cancelable: true });
         event.preventDefault();
-        move(event.key === "ArrowDown" ? 1 : -1);
+        if (listbox?.keydown(navigation) && picked.value !== null) reveal(picked.value);
         return;
       }
       if ((event.key === "Enter" || event.key === "Tab") && !event.altKey) {
@@ -361,10 +378,13 @@ export function ChatComposer(
             }
             aria-activedescendant={
               hasTriggers
-                ? derived(() =>
-                    open.value && activeId.value !== undefined
-                      ? optionId(activeId.value)
-                      : undefined,
+                ? derived(
+                    () => (
+                      domVersion!.value,
+                      open.value && activeId.value !== undefined
+                        ? listbox!.activeId(activeId.value)
+                        : undefined
+                    ),
                   )
                 : undefined
             }
@@ -436,7 +456,7 @@ export function ChatComposer(
                   (item) => item.id,
                   (item) => (
                     <div
-                      id={optionId(item.value.id)}
+                      id={listbox!.idForKey(item.value.id)}
                       role="option"
                       aria-selected={derived(() => String(activeId.value === item.value.id))}
                       aria-disabled={derived(() => (item.value.disabled ? "true" : undefined))}

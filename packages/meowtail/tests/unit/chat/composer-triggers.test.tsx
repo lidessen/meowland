@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { Window } from "happy-dom";
 import { createRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import {
@@ -8,6 +9,7 @@ import {
   insertComposerSuggestion,
   type ComposerTrigger,
 } from "../../../src/chat";
+import { checkSsrPurity } from "../pattern-kit";
 
 const triggers = [{ char: "@" }, { char: "/", position: "start" as const }];
 
@@ -92,3 +94,151 @@ test("a composer with triggers wires list semantics only while the list is open"
   expect(plain).not.toContain('role="listbox"');
   expect(plain).not.toContain("-surface");
 });
+
+function mount(view: unknown, shadow = false) {
+  const before = Object.getOwnPropertyDescriptors(globalThis);
+  const dom = new Window();
+  const opened = new WeakSet<Element>();
+  const prototype = dom.HTMLElement.prototype;
+  const originals = Object.getOwnPropertyDescriptors(prototype);
+  const originalMatches = prototype.matches;
+  Object.defineProperties(dom.HTMLElement.prototype, {
+    showPopover: {
+      configurable: true,
+      value(this: Element) {
+        opened.add(this);
+      },
+    },
+    hidePopover: {
+      configurable: true,
+      value(this: Element) {
+        opened.delete(this);
+      },
+    },
+    matches: {
+      configurable: true,
+      value(this: Element, selector: string) {
+        return selector === ":popover-open"
+          ? opened.has(this)
+          : originalMatches.call(this, selector);
+      },
+    },
+  });
+  for (const name of [
+    "window",
+    "document",
+    "HTMLElement",
+    "HTMLInputElement",
+    "Element",
+    "Node",
+    "MutationObserver",
+  ] as const)
+    Object.defineProperty(globalThis, name, {
+      value: dom[name],
+      configurable: true,
+      writable: true,
+    });
+  Object.defineProperty(globalThis, "getComputedStyle", {
+    value: dom.getComputedStyle.bind(dom),
+    configurable: true,
+    writable: true,
+  });
+  const host = dom.document.createElement("div");
+  dom.document.body.append(host);
+  const root = dom.document.createElement("div");
+  (shadow ? host.attachShadow({ mode: "open" }) : host).append(root);
+  const mounted = createWebRenderer(createRuntime()).render(
+    view as never,
+    root as unknown as Element,
+  );
+  return {
+    root: root as unknown as HTMLElement,
+    active: () =>
+      (shadow
+        ? host.shadowRoot!.activeElement
+        : dom.document.activeElement) as unknown as Element | null,
+    key(target: Element, key: string, extra: KeyboardEventInit = {}) {
+      const Keyboard = dom.KeyboardEvent as unknown as typeof KeyboardEvent;
+      const event = new Keyboard("keydown", {
+        key,
+        bubbles: true,
+        cancelable: true,
+        composed: true,
+        ...extra,
+      });
+      target.dispatchEvent(event as unknown as Event);
+      return event;
+    },
+    async unmount() {
+      mounted.unmount();
+      await new Promise((resolve) => setTimeout(resolve, 0));
+      for (const name of ["showPopover", "hidePopover", "matches"] as const) {
+        const descriptor = originals[name];
+        if (descriptor) Object.defineProperty(prototype, name, descriptor);
+        else Reflect.deleteProperty(prototype, name);
+      }
+      host.remove();
+      for (const name of Reflect.ownKeys(globalThis))
+        if (!Object.hasOwn(before, name)) Reflect.deleteProperty(globalThis, name);
+      for (const name of Reflect.ownKeys(before))
+        Object.defineProperty(globalThis, name, before[name as keyof typeof before]!);
+    },
+  };
+}
+
+test("renders trigger and plain composers without browser globals or nondeterminism", () => {
+  const web = createWebRenderer(createRuntime());
+  const trigger: ComposerTrigger = { char: "@", label: "Tasks", suggest: () => [] };
+  expect(checkSsrPurity(() => web.renderToHtml(<ChatComposer triggers={[trigger]} />))).toContain(
+    'aria-autocomplete="list"',
+  );
+  expect(checkSsrPurity(() => web.renderToHtml(<ChatComposer />))).not.toContain("-surface");
+});
+
+for (const shadow of [false, true]) {
+  test(`navigates suggestions and resolves references in ${shadow ? "shadow root" : "document"}`, async () => {
+    const trigger: ComposerTrigger = {
+      char: "@",
+      label: "Tasks",
+      suggest: () => [
+        { id: "first / item", label: "First" },
+        { id: "disabled", label: "Disabled", disabled: true },
+        { id: "last", label: "Last" },
+      ],
+    };
+    const view = mount(<ChatComposer triggers={[trigger]} />, shadow);
+    try {
+      await Promise.resolve();
+      const input = view.root.querySelector<HTMLTextAreaElement>("textarea")!;
+      input.focus();
+      input.value = "@";
+      input.setSelectionRange(1, 1);
+      input.dispatchEvent(
+        new input.ownerDocument.defaultView!.Event("input", { bubbles: true, composed: true }),
+      );
+      await Promise.resolve();
+      await Promise.resolve();
+      const list = view.root.querySelector('[role="listbox"]')!;
+      const options = list.querySelectorAll('[role="option"]');
+      expect(input.getAttribute("aria-controls")).toBe(list.id);
+      expect(input.getAttribute("aria-activedescendant")).toBe(options[0]!.id);
+      expect(options[0]!.id).toContain("first%20%2F%20item");
+      expect(options[1]!.getAttribute("aria-disabled")).toBe("true");
+      view.key(input, "ArrowDown");
+      await Promise.resolve();
+      expect(input.getAttribute("aria-activedescendant")).toBe(options[2]!.id);
+      expect(view.active()).toBe(input);
+      view.key(input, "ArrowDown");
+      await Promise.resolve();
+      expect(input.getAttribute("aria-activedescendant")).toBe(options[0]!.id);
+      expect(view.key(input, "Home").defaultPrevented).toBe(false);
+      expect(view.key(input, "End").defaultPrevented).toBe(false);
+      view.key(input, "Escape");
+      await Promise.resolve();
+      expect(input.hasAttribute("aria-activedescendant")).toBe(false);
+      expect(view.key(input, "Home").defaultPrevented).toBe(false);
+    } finally {
+      await view.unmount();
+    }
+  });
+}

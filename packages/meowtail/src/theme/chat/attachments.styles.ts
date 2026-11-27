@@ -135,7 +135,7 @@ export const chatAttachmentsStyles = css`
     opacity: 1;
   }
   ${chatAttachmentsPartRefs.entry}:has(${chatAttachmentsPartRefs.remove}):is(:hover, :focus-within) ${chatAttachmentsPartRefs.name} {
-    padding-right: 18px;
+    padding-inline-end: 18px;
   }
   ${chatAttachmentsPartRefs.remove} svg {
     width: ${uiTokens.icon.size};

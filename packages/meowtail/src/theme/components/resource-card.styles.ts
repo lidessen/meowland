@@ -81,7 +81,7 @@ export const resourceCardStyles = css`
     flex: 0 1 auto;
     min-width: 0;
     gap: 6px;
-    margin-left: auto;
+    margin-inline-start: auto;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};
     overflow-wrap: anywhere;
@@ -100,7 +100,7 @@ export const resourceCardStyles = css`
     gap: ${uiTokens.space.group};
   }
   ${card("identity")} {
-    margin-left: auto;
+    margin-inline-start: auto;
     color: ${uiTokens.ink.secondary};
     font-family: ${uiTokens.type.mono};
     font-size: ${uiTokens.type.caption};

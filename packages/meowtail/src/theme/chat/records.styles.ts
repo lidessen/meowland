@@ -103,7 +103,7 @@ export const chatRecordsStyles = css`
 
   /* The state badge comes from shared/state-badge.styles.ts; the row only places it. */
   ${chatToolCallPartRefs.status} {
-    margin-left: 6px;
+    margin-inline-start: 6px;
   }
 
   /* The host's account of the state: a second header line, aligned with the label. */
@@ -258,7 +258,7 @@ export const chatRecordsStyles = css`
     margin: 0 0 ${uiTokens.space.group};
     padding-block: ${uiTokens.space.group} 0;
     padding-inline: var(${rowIndent}) 0;
-    border-left: 0;
+    border-inline-start: 0;
     color: ${uiTokens.ink.secondary};
     font-size: calc(${chatTokens.fontBody} - 1px);
     line-height: calc(${uiTokens.type.line.label} + var(${rowDelta}, 0px));

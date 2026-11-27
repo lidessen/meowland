@@ -4,12 +4,18 @@ import { doodleFontFaces, journalFontFaces, pineFontFaces } from "./journal-font
 import { defaultRuntime, h } from "meowjsx";
 import { createWebRenderer } from "meowjsx/web";
 import { installMeowUI, meowUIComponents, Select } from "meowtail";
+import { compileTokens, type TokenSet } from "meowcss";
 import {
   doodleTheme,
+  doodleUiTokens,
   journalTheme,
+  journalUiTokens,
   meowTheme,
+  meowUiTokens,
   ottrTheme,
+  ottrUiTokens,
   pineTheme,
+  pineUiTokens,
   standardTheme,
 } from "meowtail/theme";
 import { applyTheme, mountStyles } from "meowcss/web";
@@ -62,18 +68,71 @@ function chosenTheme(): ThemeKey {
 function isEmbedded(): boolean {
   return new URLSearchParams(location.search).has("embedded");
 }
+const embeddedThemeTokens: ReadonlyArray<readonly [Exclude<ThemeKey, "standard">, TokenSet]> = [
+  ["journal", journalUiTokens],
+  ["meow", meowUiTokens],
+  ["ottr", ottrUiTokens],
+  ["doodle", doodleUiTokens],
+  ["pine", pineUiTokens],
+];
+
+function embeddedScopedThemeCss(): string {
+  return embeddedThemeTokens
+    .map(([name, tokens]) => {
+      const selector = `[data-docs-theme="${name}"]`;
+      return compileTokens(tokens, {
+        constants: `:where(${selector}[data-meowui-theme-root], ${selector} [data-meowui-theme-root])`,
+        sources: [
+          {
+            options: "scheme",
+            selector: `:where(${selector}[data-meowui-scope], ${selector} [data-meowui-scope])`,
+          },
+        ],
+      });
+    })
+    .join("\n");
+}
+
 const preview: PreviewEnvironment = ({ root, onCleanup }) => {
   root.classList.add("meowui-story");
   const scope = document.documentElement;
-  const themeKey = chosenTheme();
-  const theme = themes[themeKey];
+  const embedded = isEmbedded();
+  const liveTheme =
+    embedded &&
+    scope.dataset.meowbookCapture !== "true" &&
+    new URLSearchParams(location.search).get("liveTheme") === "1";
+  let themeKey = chosenTheme();
+  if (liveTheme && window.parent !== window) {
+    try {
+      const selection = window.parent.document.documentElement.getAttribute("data-docs-theme");
+      themeKey = themeChoices.find(([name]) => name === selection)?.[0] ?? "standard";
+    } catch {
+      // A cross-origin embedding cannot supply its current selection; use the requested URL.
+    }
+  }
+  const theme = liveTheme ? standardTheme : themes[themeKey];
+  const embeddedCss = liveTheme
+    ? [
+        journalFontFaces,
+        doodleFontFaces,
+        pineFontFaces,
+        theme.cssText,
+        embeddedScopedThemeCss(),
+      ].join("\n")
+    : (fontFaces[themeKey] ?? "") + "\n" + theme.cssText;
   onCleanup(
-    mountStyles(
-      root.ownerDocument,
-      (fontFaces[themeKey] ?? "") + "\n" + theme.cssText + previewStyles.text + languageStyles.text,
-    ),
+    mountStyles(root.ownerDocument, embeddedCss + previewStyles.text + languageStyles.text),
   );
   onCleanup(applyTheme(scope, theme));
+  if (liveTheme) {
+    scope.dataset.docsLiveTheme = "";
+    if (themeKey === "standard") scope.removeAttribute("data-docs-theme");
+    else scope.setAttribute("data-docs-theme", themeKey);
+    onCleanup(() => {
+      scope.removeAttribute("data-docs-theme");
+      delete scope.dataset.docsLiveTheme;
+    });
+  }
   onCleanup(installFocusModality(root.ownerDocument));
   if (scope.dataset.meowbookCapture === "true") {
     const scheme = matchMedia("(prefers-color-scheme: dark)");
@@ -89,7 +148,7 @@ const preview: PreviewEnvironment = ({ root, onCleanup }) => {
     });
     return defaultRuntime;
   }
-  if (isEmbedded()) {
+  if (embedded) {
     scope.dataset.workshopEmbedded = "";
     onCleanup(() => {
       root.classList.remove("meowui-story");

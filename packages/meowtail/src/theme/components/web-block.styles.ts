@@ -22,7 +22,7 @@ export const webBlockStyles = css`
     flex-direction: column;
     gap: 10px;
     margin: 0;
-    padding-left: 2.5em;
+    padding-inline-start: 2.5em;
     max-height: 320px;
     overflow: auto;
   }

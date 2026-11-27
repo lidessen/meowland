@@ -20,7 +20,7 @@ export const chatComposerStyles = css`
   ${chatComposerPartRefs.trailing} {
     display: flex;
     align-items: center;
-    margin-left: auto;
+    margin-inline-start: auto;
     min-width: 0;
     max-width: min(280px, 60%);
   }
@@ -250,7 +250,7 @@ export const chatComposerStyles = css`
   ${chatComposerPartRefs.submit} {
     display: grid;
     place-items: center;
-    margin-left: auto;
+    margin-inline-start: auto;
     flex: none;
     font-family: ${uiTokens.type.sans};
     transition:
@@ -280,7 +280,7 @@ export const chatComposerStyles = css`
   }
 
   ${chatComposerPartRefs.trailing} + ${chatComposerPartRefs.submit} {
-    margin-left: 0;
+    margin-inline-start: 0;
   }
 
   ${chatComposerPartRefs.actions} > ${iconButtonPartRefs.root} {
@@ -409,17 +409,17 @@ export const chatComposerStyles = css`
 
   /* The model and its supporting choices stay beside send, not stranded after attach. */
   ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} > ${chatComposerPartRefs.trailing} {
-    margin-left: auto;
+    margin-inline-start: auto;
     min-width: 0;
     max-width: min(360px, 70%);
   }
 
   ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} > ${chatComposerPartRefs.submit} {
-    margin-left: 0;
+    margin-inline-start: 0;
   }
 
   ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions}:not(:has(> ${chatComposerPartRefs.trailing})) > ${chatComposerPartRefs.submit} {
-    margin-left: auto;
+    margin-inline-start: auto;
   }
 
   ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.submit} {
@@ -511,7 +511,7 @@ export const chatComposerStyles = css`
     ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] ${chatComposerPartRefs.actions} > ${chatComposerPartRefs.trailing} {
       grid-column: 2 / -1;
       grid-row: 3;
-      margin-left: 0;
+      margin-inline-start: 0;
       max-width: none;
       padding-top: 2px;
       justify-content: flex-start;
@@ -541,7 +541,7 @@ export const chatComposerStyles = css`
       height: 36px;
       min-width: 36px;
       min-height: 36px;
-      margin-left: 0;
+      margin-inline-start: 0;
       border-radius: 50%;
     }
 

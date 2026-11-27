@@ -142,7 +142,13 @@ export { Skeleton, type SkeletonProps, skeletonOptions } from "./skeleton";
 export { Spinner, type SpinnerProps } from "./spinner";
 export { Item, type ItemProps, itemOptions } from "./item";
 export { ChoiceGroup, type ChoiceGroupProps, type ChoiceGroupOption } from "./choice-group";
-export { CodeBlock, codeLanguageName, type CodeBlockProps } from "./code-block";
+export {
+  CodeBlock,
+  codeBlockOptions,
+  codeLanguageName,
+  type CodeBlockDiffLines,
+  type CodeBlockProps,
+} from "./code-block";
 export {
   MermaidDiagram,
   type MermaidDiagramLimits,

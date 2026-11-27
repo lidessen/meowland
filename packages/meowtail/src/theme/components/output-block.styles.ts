@@ -82,7 +82,7 @@ export const outputBlockStyles = css`
   ${readBlockPartRefs.number} {
     display: inline-block;
     min-width: 4ch;
-    margin-right: 12px;
+    margin-inline-end: 12px;
     text-align: right;
     color: ${uiTokens.ink.tertiary};
     user-select: none;
@@ -141,7 +141,7 @@ export const outputBlockStyles = css`
     font: ${uiTokens.type.code} / ${uiTokens.type.line.code} ${uiTokens.type.mono};
   }
   ${searchBlockPartRefs.root} ${outputBlockPartRefs.line} {
-    padding-left: 14px;
+    padding-inline-start: 14px;
   }
   ${searchBlockPartRefs.path}:is(summary) {
     cursor: pointer;
@@ -182,7 +182,7 @@ export const outputBlockStyles = css`
     font: ${uiTokens.type.code} / ${uiTokens.type.line.body} ${uiTokens.type.mono};
   }
   ${terminalBlockPartRefs.root} ${outputBlockPartRefs.header} {
-    padding-left: 30px;
+    padding-inline-start: 30px;
     max-height: 150px;
     overflow-y: auto;
     background: ${uiTokens.terminal.surface};
@@ -197,7 +197,7 @@ export const outputBlockStyles = css`
     border-bottom: 1px solid ${uiTokens.terminal.divider};
   }
   ${terminalBlockPartRefs.root} ${outputBlockPartRefs.body} {
-    padding-left: 30px;
+    padding-inline-start: 30px;
     max-height: var(--ui-terminal-output-max-height, none);
   }
   ${terminalBlockPartRefs.root}[data-terminal-body="false"] ${outputBlockPartRefs.body} {

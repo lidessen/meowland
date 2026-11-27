@@ -255,9 +255,8 @@ const APPEARANCE_EARLY = `(() => {
 
 /**
  * The appearance menu: one button opens the theme and scheme choices. Both persist for the reader.
- * The scheme reaches the live previews directly, since they share the site's origin; each preview
- * is a gallery canvas that mounts its theme once, so a preview showing another theme reloads with
- * the reader's choice in its `theme` parameter.
+ * Docs previews read the current selection when they mount. Once mounted, they switch token
+ * scopes in place without reloading the story.
  */
 const APPEARANCE_MENU = `(() => {
   const button = document.getElementById("docs-appearance");
@@ -283,6 +282,16 @@ const APPEARANCE_MENU = `(() => {
   const paintTheme = (choice) => {
     for (const frame of frames()) {
       const url = new URL(frame.getAttribute("src"), location.href);
+      if (url.searchParams.get("liveTheme") === "1") {
+        try {
+          const root = frame.contentDocument?.documentElement;
+          if (root?.hasAttribute("data-docs-live-theme")) {
+            if (choice === "standard") root.removeAttribute("${DOCS_THEME_ATTRIBUTE}");
+            else root.setAttribute("${DOCS_THEME_ATTRIBUTE}", choice);
+          }
+        } catch {}
+        continue;
+      }
       if (url.searchParams.get("theme") === choice) continue;
       url.searchParams.set("theme", choice);
       frame.setAttribute("src", url.pathname + url.search);
@@ -382,7 +391,9 @@ const CODE_ACTIONS = `(() => {
     const label = copy.getAttribute("aria-label");
     copy.addEventListener("click", async () => {
       try {
-        await navigator.clipboard.writeText(code.textContent || "");
+        const lines = [...code.querySelectorAll("[data-line-text]")];
+        const source = lines.length ? lines.map((line) => line.textContent || "").join("") : code.textContent || "";
+        await navigator.clipboard.writeText(source);
         copy.setAttribute("data-copied", "true");
         copy.setAttribute("aria-label", "Copied");
       } catch {

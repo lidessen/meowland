@@ -28,7 +28,7 @@ export const chatMessageStyles = css`
   ${chatMessagePartRefs.root}[data-chat-role="user"] {
     width: fit-content;
     max-width: ${chatTokens.userMaxWidth};
-    margin-left: auto;
+    margin-inline-start: auto;
   }
 
   ${chatMessagePartRefs.root}[data-chat-role="assistant"] {
@@ -109,7 +109,7 @@ export const chatMessageStyles = css`
     justify-content: flex-end;
     grid-column: 2;
     grid-row: 2;
-    padding-right: 4px;
+    padding-inline-end: 4px;
   }
 
   /* Speaker and time are the message's own identity, not hover-only chrome, so a
@@ -221,7 +221,7 @@ export const chatMessageStyles = css`
   }
 
   ${chatMessagePartRefs.root}[data-chat-role="assistant"] ${chatMessagePartRefs.actions} {
-    margin-left: -6px;
+    margin-inline-start: -6px;
   }
 
   ${chatMessagePartRefs.root}:hover ${chatMessagePartRefs.actions},

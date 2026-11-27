@@ -193,6 +193,7 @@ describe("the docs pages", () => {
     expect(html).toContain(">API</");
     expect(html).toMatch(/<div(?=[^>]*class="docs-preview")(?=[^>]*data-meowui-part="card\/root")/);
     expect(html).toContain("docs-preview-frame");
+    expect(html).toContain("liveTheme=1");
     expect(html).toContain("Component reference");
   });
 

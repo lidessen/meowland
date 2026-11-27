@@ -152,26 +152,60 @@ Meowland already writes for agents (agent guide, skills, `llms.txt`). The next s
 
 ## Phases
 
-| Phase                  | Scope                                                                                                                                                                                                                                          | Exit criteria                                                                                                       |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
-| 0. Contract and audit  | Write the contract; build the contract test and the host-CSS audit; publish the violation list and component statuses. No behavior change.                                                                                                     | The test runs in CI; every component has a status; the list is in the docs.                                         |
-| 1. Behaviors           | Extract listbox/active descendant (Autocomplete, ChoiceSelect, CommandPalette, ChatComposer), roving focus (Menu, Toolbar, Tabs, TreeView, SegmentedControl), typeahead and focus recovery; add the test kit with pattern, SSR and RTL checks. | No component keeps its own arrow-key loop; each migrated family passes its pattern check; browser suites unchanged. |
-| 2. Contract migration  | Migrate families to the contract (values, liveness, `data-state`, polymorphism, `labels`), one family per change, breaking within alpha with a changelog entry each.                                                                           | The violation list is empty for Stable candidates.                                                                  |
-| 3. Docs and coverage   | Fixed docs anatomy; stories for the ~29 uncovered components; status and coverage on the docs site.                                                                                                                                            | Every component page has every section; the story matrix covers every exported component.                           |
-| 4. Catalog curation    | Decide each overlapping pair (StatusDot/StateDot, Item/ListRow/ResourceLink, Badge/Tag/Pill, AddButton): merge, keep with a stated difference, or retire.                                                                                      | No two components share a job without a written difference.                                                         |
-| 5. Blocks and registry | Registry format, validator, `meowland add`, first blocks taken from real products (the Workcells workbench shell and list-and-detail, the docs shell).                                                                                         | A fresh app installs a block and passes its checks with only public imports.                                        |
-| 6. Agent bridge        | Manifest, MCP endpoint, runtime bridge experiment in Workcells.                                                                                                                                                                                | An agent completes a scripted Workcells task through the bridge with permission hooks enforced.                     |
+| Phase                  | Scope                                                                                                                                                                                                                                                                                                          | Exit criteria                                                                                                       |
+| ---------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| 0. Contract and audit  | Write the contract; build the contract test and the host-CSS audit; publish the violation list and component statuses. No behavior change.                                                                                                                                                                     | The test runs in CI; every component has a status; the list is in the docs.                                         |
+| 1. Behaviors           | Run the `@ui-sdk/core` validation and record the decision; then extract listbox/active descendant (Autocomplete, ChoiceSelect, CommandPalette, ChatComposer), roving focus (Menu, Toolbar, Tabs, TreeView, SegmentedControl), typeahead and focus recovery; add the test kit with pattern, SSR and RTL checks. | No component keeps its own arrow-key loop; each migrated family passes its pattern check; browser suites unchanged. |
+| 2. Contract migration  | Migrate families to the contract (values, liveness, `data-state`, polymorphism, `labels`), one family per change, breaking within alpha with a changelog entry each.                                                                                                                                           | The violation list is empty for Stable candidates.                                                                  |
+| 3. Docs and coverage   | Fixed docs anatomy; stories for the ~29 uncovered components; status and coverage on the docs site.                                                                                                                                                                                                            | Every component page has every section; the story matrix covers every exported component.                           |
+| 4. Catalog curation    | Decide each overlapping pair (StatusDot/StateDot, Item/ListRow/ResourceLink, Badge/Tag/Pill, AddButton): merge, keep with a stated difference, or retire.                                                                                                                                                      | No two components share a job without a written difference.                                                         |
+| 5. Blocks and registry | Registry format, validator, `meowland add`, first blocks taken from real products (the Workcells workbench shell and list-and-detail, the docs shell).                                                                                                                                                         | A fresh app installs a block and passes its checks with only public imports.                                        |
+| 6. Agent bridge        | Manifest, MCP endpoint, runtime bridge experiment in Workcells.                                                                                                                                                                                                                                                | An agent completes a scripted Workcells task through the bridge with permission hooks enforced.                     |
 
 Phases 0 and 1 come first because every later phase depends on them: migration needs the contract
 to aim at, and docs and blocks are only as consistent as the components under them.
 
+## Validating `@ui-sdk/core`
+
+Before Phase 1 extracts any behavior, a time-boxed validation (about three days) answers one
+question: can Meowtail build its behavior layer on `@ui-sdk/core` instead of writing its own?
+
+**Setup.** A throwaway branch adds `@ui-sdk/core` at an exact beta version and rebuilds two
+existing components on it, without changing their public API, parts or theme rules:
+
+- **ChoiceSelect** on `createListbox`, `createTypeahead` and `createPopup` (listbox with active
+  option, typeahead, popup and dismiss), the densest keyboard model in the package.
+- **Toolbar** on `createRovingFocus` (roving tab stop, orientation, Home and End).
+
+**Criteria.** Every one must hold for adoption:
+
+| Criterion            | How it is checked                                                                                                                                                                                |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| One state model      | Behaviors read and write MeowJSX Signals through a thin adapter; no second store mirrors component state, and setup still runs once per mount.                                                   |
+| No framework runtime | `@ui-sdk/core` adds no React, Vue, Svelte or Solid code to the bundle; the added size for the two components is measured and stays under 6 KB gzip.                                              |
+| Behavior parity      | The existing unit and browser suites for both components pass unchanged, including the popover-select and toolbar specs, IME and pointer cases.                                                  |
+| Pattern checks       | `checkPattern` from `@ui-sdk/core/testing` passes for `listbox` and `toolbar` on the rebuilt components, and the same check runs against today's implementation as a baseline.                   |
+| Rendering targets    | Server rendering (`renderToHtml`) stays pure and RTL keyboard direction works (`checkServer`, `checkDirection`).                                                                                 |
+| Shadow roots         | Active-descendant wiring keeps working where Meowtail resolves ids inside a shadow root today.                                                                                                   |
+| Dependency risk      | License (Apache-2.0) and notices fit `THIRD_PARTY_NOTICES.md`; the beta's breaking changes since its first release are counted from its changelog; versions are pinned exactly while it is beta. |
+
+**Outcomes.**
+
+- **Adopt**: every criterion holds. Meowtail depends on `@ui-sdk/core` for behaviors through one
+  internal adapter module, pins the version, and Phase 1 migrates the remaining families on it.
+- **Adopt the test kit only**: behaviors fail a criterion but `@ui-sdk/core/testing` pattern,
+  server and direction checks run cleanly against Meowtail. Use it as a dev dependency for tests
+  and write the behaviors in Meowtail.
+- **Write our own**: neither fits. Meowtail writes `meowtail/behaviors`, keeping the UI SDK's
+  behavior names and option shapes so the two stay recognizable and a later switch stays cheap.
+
+The validation result (decision, measurements, failing criteria) is recorded as a design record
+next to this plan before Phase 1 continues, and the spike branch is discarded.
+
 ## Open decisions
 
-- **Use `@ui-sdk/core` or write behaviors in Meowtail?** Phase 1 starts with a short spike that
-  binds two UI SDK behaviors (roving focus, listbox) to MeowJSX parts. Adopt it only if it binds
-  without a second state model next to Signals, its beta churn is acceptable, and it adds no
-  framework runtime to the bundle. Otherwise write a Meowtail behavior layer that keeps the UI SDK's
-  vocabulary so the two stay recognizable.
+- **Use `@ui-sdk/core` or write behaviors in Meowtail?** Decided by the validation below, which
+  opens Phase 1; no behavior is extracted before its result is recorded.
 - **How breaking can Phase 2 be?** All packages are alpha; the plan assumes breaking changes with
   changelog entries and no compatibility shims, matching the repository's practice.
 - **Where blocks live**: in `meowtail` as a registry folder, or a separate `meowland-blocks`

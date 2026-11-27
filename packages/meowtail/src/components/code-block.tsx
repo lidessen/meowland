@@ -1,8 +1,11 @@
+import { defineStyleProps, type ThemedProps } from "meowcss/meowjsx";
 import { h, type Child, type Props, type Context } from "meowjsx";
 import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
 import { IconButton } from "./icon-button";
 import { Icon } from "../icons/icon";
 import { copyTextToClipboard } from "../clipboard";
+import { codeBlockOptions } from "./code-block.options";
+export { codeBlockOptions } from "./code-block.options";
 
 // The highlighter stays in this module. Themes use type-only component imports,
 // so unused code surfaces drop out of the bundle.
@@ -47,7 +50,83 @@ export function codeLanguageName(language: string | undefined): string {
   return languageNames[id.toLowerCase()] ?? id;
 }
 
-export interface CodeBlockProps extends Props {
+/** 1-based line numbers marked as added or removed inside a code block. */
+export interface CodeBlockDiffLines {
+  added?: readonly number[];
+  removed?: readonly number[];
+}
+
+interface HighlightSpan {
+  text: string;
+  color?: string;
+  fontStyle?: number;
+}
+
+function renderSpan(span: HighlightSpan): Child {
+  return (
+    <span
+      style={{
+        color: span.color,
+        fontStyle: (span.fontStyle ?? 0) & 1 ? "italic" : undefined,
+        fontWeight: (span.fontStyle ?? 0) & 2 ? "bold" : undefined,
+        textDecoration: (span.fontStyle ?? 0) & 4 ? "underline" : undefined,
+      }}
+    >
+      {span.text}
+    </span>
+  );
+}
+
+function splitSpansByLine(spans: readonly HighlightSpan[]): Child[][] {
+  const lines: Child[][] = [[]];
+  for (const span of spans) {
+    const pieces = span.text.split("\n");
+    for (let i = 0; i < pieces.length; i++) {
+      if (i > 0) lines.push([]);
+      const piece = pieces[i]!;
+      if (piece.length > 0) {
+        lines[lines.length - 1]!.push(renderSpan({ ...span, text: piece }));
+      }
+    }
+  }
+  return lines;
+}
+
+function renderDecoratedLines(
+  lines: readonly Child[],
+  options: {
+    showLineNumbers: boolean;
+    highlightSet: ReadonlySet<number>;
+    addedSet: ReadonlySet<number>;
+    removedSet: ReadonlySet<number>;
+  },
+): Child[] {
+  const { showLineNumbers, highlightSet, addedSet, removedSet } = options;
+  return lines.map((lineContent, index) => {
+    const lineNumber = index + 1;
+    const diff = addedSet.has(lineNumber)
+      ? "added"
+      : removedSet.has(lineNumber)
+        ? "removed"
+        : undefined;
+    const highlighted = highlightSet.has(lineNumber) ? "true" : undefined;
+    return (
+      <span data-line={String(lineNumber)} data-highlighted={highlighted} data-diff={diff}>
+        {showLineNumbers ? (
+          <span aria-hidden="true" data-line-number={String(lineNumber)}>
+            {String(lineNumber)}
+          </span>
+        ) : null}
+        <span data-line-text="">
+          {lineContent}
+          {index < lines.length - 1 ? "\n" : ""}
+        </span>
+      </span>
+    );
+  });
+}
+
+export interface CodeBlockProps extends Props, ThemedProps<typeof codeBlockOptions> {
   code: MaybeSignal<string>;
   language?: MaybeSignal<string | undefined>;
   /**
@@ -69,11 +148,17 @@ export interface CodeBlockProps extends Props {
    */
   actions?: MaybeSignal<Child>;
   defaultWrap?: boolean;
+  /** Displays a non-selectable 1-based line number gutter alongside each line. */
+  showLineNumbers?: MaybeSignal<boolean>;
+  /** 1-based line numbers emphasized with an accent tint and start-edge marker. */
+  highlightLines?: MaybeSignal<readonly number[] | undefined>;
+  /** 1-based line numbers tinted as added or removed diff lines. */
+  diffLines?: MaybeSignal<CodeBlockDiffLines | undefined>;
   /** Hosts may supply a clipboard implementation; the default uses the browser clipboard. */
   onCopy?: (code: string) => Promise<void>;
 }
 
-/** A block of code with its language, an optional title, soft wrap and copy. */
+/** A block of code with its language, an optional title, line annotations, soft wrap and copy. */
 export function CodeBlock(
   {
     code,
@@ -82,6 +167,9 @@ export function CodeBlock(
     caption,
     actions,
     defaultWrap = false,
+    showLineNumbers = false,
+    highlightLines,
+    diffLines,
     onCopy,
     ref,
     ...props
@@ -93,12 +181,25 @@ export function CodeBlock(
   const copying = signal(false);
   const copied = signal(false);
   const failure = signal("");
-  const highlighted = signal<Child>(unwrap(code));
+  const spansState = signal<{
+    source: string;
+    language: string | undefined;
+    spans: HighlightSpan[];
+  } | null>(null);
   const languageLabel = derived(() => codeLanguageName(unwrap(language)));
+  const hasLineDecoration = derived(() => {
+    const numbers = Boolean(unwrap(showLineNumbers));
+    const highlights = unwrap(highlightLines);
+    const diff = unwrap(diffLines);
+    return (
+      numbers ||
+      Boolean(highlights && highlights.length > 0) ||
+      Boolean(diff?.added && diff.added.length > 0) ||
+      Boolean(diff?.removed && diff.removed.length > 0)
+    );
+  });
   let disposed = false;
   let copiedTimer: ReturnType<typeof setTimeout> | undefined;
-  // The last highlight, kept so streamed code extends it instead of flashing back to plain text.
-  let shown: { source: string; language: string | undefined; spans: Child[] } | undefined;
   context.onCleanup(() => {
     disposed = true;
     clearTimeout(copiedTimer);
@@ -106,31 +207,43 @@ export function CodeBlock(
   context.effect(() => {
     const currentCode = unwrap(code);
     const currentLanguage = unwrap(language);
-    highlighted.value =
-      shown && shown.language === currentLanguage && currentCode.startsWith(shown.source)
-        ? [...shown.spans, currentCode.slice(shown.source.length)]
-        : currentCode;
     let active = true;
     void highlightCode(currentCode, currentLanguage).then((spans) => {
       if (!active || disposed || !spans) return;
-      const rendered = spans.map((span) => (
-        <span
-          style={{
-            color: span.color,
-            fontStyle: (span.fontStyle ?? 0) & 1 ? "italic" : undefined,
-            fontWeight: (span.fontStyle ?? 0) & 2 ? "bold" : undefined,
-            textDecoration: (span.fontStyle ?? 0) & 4 ? "underline" : undefined,
-          }}
-        >
-          {span.text}
-        </span>
-      ));
-      shown = { source: currentCode, language: currentLanguage, spans: rendered };
-      highlighted.value = rendered;
+      spansState.value = { source: currentCode, language: currentLanguage, spans };
     });
     return () => {
       active = false;
     };
+  });
+  const renderedCode = derived<Child>(() => {
+    const currentCode = unwrap(code);
+    const currentLanguage = unwrap(language);
+    const cached = spansState.value;
+    const reusableSpans =
+      cached && cached.language === currentLanguage && currentCode.startsWith(cached.source)
+        ? currentCode.length > cached.source.length
+          ? [...cached.spans, { text: currentCode.slice(cached.source.length) }]
+          : cached.spans
+        : null;
+
+    if (!hasLineDecoration.value) {
+      return reusableSpans ? reusableSpans.map(renderSpan) : currentCode;
+    }
+
+    const lines: Child[] = reusableSpans
+      ? splitSpansByLine(reusableSpans)
+      : currentCode.split("\n");
+    const highlightSet = new Set(unwrap(highlightLines) ?? []);
+    const diff = unwrap(diffLines);
+    const addedSet = new Set(diff?.added ?? []);
+    const removedSet = new Set(diff?.removed ?? []);
+    return renderDecoratedLines(lines, {
+      showLineNumbers: Boolean(unwrap(showLineNumbers)),
+      highlightSet,
+      addedSet,
+      removedSet,
+    });
   });
   const copy = async () => {
     if (copying.value) return;
@@ -188,8 +301,15 @@ export function CodeBlock(
           </IconButton>
         </div>
       </figcaption>
-      <pre tabIndex={0} aria-label="Code content" data-wrap={wrap} ref={context.parts.content}>
-        <code ref={context.parts.code}>{highlighted}</code>
+      <pre
+        tabIndex={0}
+        aria-label="Code content"
+        data-wrap={wrap}
+        data-line-numbers={derived(() => (unwrap(showLineNumbers) ? "true" : undefined))}
+        data-decorated={derived(() => (hasLineDecoration.value ? "true" : undefined))}
+        ref={context.parts.content}
+      >
+        <code ref={context.parts.code}>{renderedCode}</code>
       </pre>
       {/* Success is announced and shown on the button; a failure stays visible until the next try. */}
       <span
@@ -219,4 +339,5 @@ CodeBlock.meta = {
     "code",
     "feedback",
   ],
+  style: defineStyleProps(codeBlockOptions, { defaults: { size: "regular" } }),
 } as const;

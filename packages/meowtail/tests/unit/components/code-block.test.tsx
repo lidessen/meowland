@@ -156,3 +156,69 @@ test("language ids read as names, and unknown ids stay as given", () => {
   expect(codeLanguageName(undefined)).toBe("Code");
   expect(codeLanguageName("  ")).toBe("Code");
 });
+
+test("code block supports compact size, line numbers, highlighted lines and diff lines", () => {
+  const runtime = createRuntime();
+  installMeowUI({ components: meowUIComponents }, runtime);
+  const renderer = createWebRenderer(runtime);
+  const html = renderer.renderToHtml(
+    <CodeBlock
+      size="compact"
+      language="typescript"
+      code={"const a = 1;\nconst b = 2;\nconst c = 3;"}
+      showLineNumbers
+      highlightLines={[2]}
+      diffLines={{ added: [3], removed: [1] }}
+    />,
+  );
+  expect(html).toContain('data-option-code-block-size="compact"');
+  expect(html).toContain('data-line-numbers="true"');
+  expect(html).toContain('data-decorated="true"');
+  expect(html).toContain('data-line="1"');
+  expect(html).toContain('data-diff="removed"');
+  expect(html).toContain('data-line="2"');
+  expect(html).toContain('data-highlighted="true"');
+  expect(html).toContain('data-line="3"');
+  expect(html).toContain('data-diff="added"');
+  expect(html).toContain('data-line-number="1"');
+  expect(html).toContain('data-line-number="3"');
+});
+
+test("annotated code keeps its raw copy payload when signals change", async () => {
+  const code = signal("first\n\n  last  \n");
+  const lineNumbers = signal(false);
+  const highlighted = signal<readonly number[]>([]);
+  const copied: string[] = [];
+  const view = mountComponent(
+    <CodeBlock
+      code={code}
+      showLineNumbers={lineNumbers}
+      highlightLines={highlighted}
+      onCopy={async (value) => {
+        copied.push(value);
+      }}
+    />,
+  );
+  try {
+    const pre = view.host.querySelector("pre")!;
+    expect(pre.querySelector("[data-line]")).toBeNull();
+    lineNumbers.value = true;
+    highlighted.value = [3];
+    await Promise.resolve();
+    expect(pre.querySelectorAll("[data-line-number]")).toHaveLength(4);
+    expect(pre.querySelector('[data-line="3"]')?.getAttribute("data-highlighted")).toBe("true");
+    expect(
+      Array.from(pre.querySelectorAll("[data-line-text]"), (line) => line.textContent).join(""),
+    ).toBe(code.value);
+    code.value += "appended";
+    const copy = view.host.querySelector('button[aria-label="Copy code"]')! as HTMLButtonElement;
+    await (copy.onclick as () => Promise<void>)();
+    expect(copied).toEqual([code.value]);
+    lineNumbers.value = false;
+    highlighted.value = [];
+    await Promise.resolve();
+    expect(pre.querySelector("[data-line]")).toBeNull();
+  } finally {
+    view.unmount();
+  }
+});

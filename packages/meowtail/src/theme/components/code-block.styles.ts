@@ -1,6 +1,7 @@
 import { css, parts } from "meowcss/meowjsx";
 import { uiTokens } from "../tokens";
 import type { CodeBlock } from "../../components/code-block";
+import { codeBlockOptions } from "../../components/code-block.options";
 import { ui } from "../utilities";
 const codeBlock = parts<typeof CodeBlock>("code-block");
 /*
@@ -19,14 +20,22 @@ export const codeBlockStyles = css`
     font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     overflow: hidden;
   }
+  ${codeBlock.root}${codeBlockOptions.when({ size: "compact" })} {
+    border-radius: ${uiTokens.radius.lg};
+  }
   /* Actions sit in the corner, a 6px inset matching the panel item radius; the name wraps beside them. */
   ${codeBlock.header} {
     display: flex;
     flex-wrap: wrap;
     align-items: flex-start;
     gap: ${uiTokens.space.group};
-    padding: 6px 6px 0 16px;
+    padding-block: 6px 0;
+    padding-inline: 16px 6px;
     background: transparent;
+  }
+  ${codeBlock.root}${codeBlockOptions.when({ size: "compact" })} ${codeBlock.header} {
+    padding-block: 4px 0;
+    padding-inline: 12px 4px;
   }
   ${codeBlock.heading} {
     display: flex;
@@ -101,15 +110,57 @@ export const codeBlockStyles = css`
     overflow-wrap: normal;
     scrollbar-width: thin;
   }
+  ${codeBlock.root}${codeBlockOptions.when({ size: "compact" })} ${codeBlock.content} {
+    padding: 4px 12px 10px;
+  }
+  ${codeBlock.root} ${codeBlock.content}[data-decorated="true"] {
+    padding-inline: 0;
+  }
   ${codeBlock.content}[data-wrap="true"] {
     white-space: pre-wrap;
     overflow-wrap: anywhere;
   }
   ${codeBlock.root} ${codeBlock.code} {
+    display: block;
     padding: 0;
     background: transparent;
     font: inherit;
     white-space: inherit;
+  }
+  ${codeBlock.root} ${codeBlock.code} [data-line] {
+    display: flex;
+    align-items: baseline;
+    min-width: 100%;
+    padding-inline: 16px;
+    border-inline-start: 2px solid transparent;
+  }
+  ${codeBlock.root}${codeBlockOptions.when({ size: "compact" })} ${codeBlock.code} [data-line] {
+    padding-inline: 12px;
+  }
+  ${codeBlock.root} ${codeBlock.code} [data-line][data-highlighted="true"] {
+    background: ${uiTokens.accent.soft};
+    border-inline-start-color: ${uiTokens.accent.base};
+  }
+  ${codeBlock.root} ${codeBlock.code} [data-line][data-diff="added"] {
+    background: color-mix(in srgb, ${uiTokens.status.success} 12%, transparent);
+    border-inline-start-color: ${uiTokens.status.success};
+  }
+  ${codeBlock.root} ${codeBlock.code} [data-line][data-diff="removed"] {
+    background: color-mix(in srgb, ${uiTokens.status.danger} 12%, transparent);
+    border-inline-start-color: ${uiTokens.status.danger};
+  }
+  ${codeBlock.root} ${codeBlock.code} [data-line-number] {
+    flex: 0 0 auto;
+    min-width: 2.25em;
+    padding-inline-end: 12px;
+    color: ${uiTokens.ink.tertiary};
+    text-align: end;
+    user-select: none;
+    font-variant-numeric: tabular-nums;
+  }
+  ${codeBlock.root} ${codeBlock.code} [data-line-text] {
+    flex: 1 1 auto;
+    min-width: 0;
   }
   /* Announced always; shown only for a failure, aligned with the code. */
   ${codeBlock.feedback} {

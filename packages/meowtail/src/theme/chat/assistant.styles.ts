@@ -348,7 +348,7 @@ export const assistantStyles = css`
     padding: 0;
     box-sizing: border-box;
     border: 0;
-    border-left: ${uiTokens.line.width} solid ${uiTokens.line.edge};
+    border-inline-start: ${uiTokens.line.width} solid ${uiTokens.line.edge};
     border-radius: 0;
     color: inherit;
     background: ${uiTokens.surface.canvas};

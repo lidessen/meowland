@@ -51,7 +51,7 @@ export const navItemStyles = css`
     height: ${uiTokens.icon.size};
   }
   ${navItemPartRefs.badge} {
-    margin-left: auto;
+    margin-inline-start: auto;
     flex-shrink: 0;
     color: ${uiTokens.ink.secondary};
     font-size: ${uiTokens.type.caption};

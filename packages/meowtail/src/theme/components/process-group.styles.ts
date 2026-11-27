@@ -90,7 +90,7 @@ export const processGroupStyles = css`
     flex: 0 0 auto;
     align-items: center;
     gap: 4px;
-    margin-left: auto;
+    margin-inline-start: auto;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.caption};
     font-variant-numeric: tabular-nums;

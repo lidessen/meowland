@@ -94,3 +94,30 @@ test("JSON keyboard expansion and copy keep branch identity and failure visible"
   await page.keyboard.press("Enter");
   await expect(page.getByRole("status").filter({ hasText: "Copy failed" })).toBeVisible();
 });
+
+test("annotated code wraps at phone width and copies source rather than the gutter", async ({
+  page,
+  context,
+}) => {
+  await context.grantPermissions(["clipboard-read", "clipboard-write"]);
+  await page.setViewportSize({ width: 390, height: 760 });
+  await page.goto("/canvas.html?story=code-block-annotated");
+  await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
+  const block = page.locator('[data-meowui-part="code-block/root"]');
+  const content = block.getByLabel("Code content");
+  await expect(block).toHaveAttribute("data-option-code-block-size", "compact");
+  await expect(content.locator("[data-line-number]")).toHaveCount(4);
+  await expect(content.locator('[data-line="1"]')).toHaveAttribute("data-diff", "removed");
+  await expect(content.locator('[data-line="2"]')).toHaveAttribute("data-diff", "added");
+  await expect(content.locator('[data-line="4"]')).toHaveAttribute("data-highlighted", "true");
+  const source = await content
+    .locator("[data-line-text]")
+    .evaluateAll((lines) => lines.map((line) => line.textContent).join(""));
+  expect(source).toContain("\n  const current = true;\n\n");
+  const width = () => content.evaluate((node) => node.scrollWidth - node.clientWidth);
+  expect(await width()).toBeGreaterThan(0);
+  await block.getByRole("button", { name: "Soft wrap" }).click();
+  await expect.poll(width).toBe(0);
+  await block.getByRole("button", { name: "Copy code" }).click();
+  await expect.poll(() => page.evaluate(() => navigator.clipboard.readText())).toBe(source);
+});

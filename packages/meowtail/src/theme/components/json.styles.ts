@@ -51,7 +51,7 @@ export const jsonStyles = css`
     transform: rotate(90deg);
   }
   ${jsonTreePartRefs.children} {
-    padding-left: 14px;
+    padding-inline-start: 14px;
   }
   ${jsonTreePartRefs.children} > ${jsonTreePartRefs.root} {
     padding: 0;

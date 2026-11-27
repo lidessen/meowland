@@ -37,7 +37,7 @@ export const iconRailStyles = css`
     width: 56px;
     padding: 10px 8px 12px;
     overflow: hidden;
-    border-right: ${uiTokens.line.width} solid ${uiTokens.line.divider};
+    border-inline-end: ${uiTokens.line.width} solid ${uiTokens.line.divider};
     background: ${uiTokens.surface.canvas};
     font: ${uiTokens.type.body} / ${uiTokens.type.leading} ${uiTokens.type.sans};
     transition:
@@ -181,7 +181,7 @@ export const iconRailStyles = css`
     transition: opacity ${uiTokens.motion.response} ${uiTokens.motion.ease};
   }
   ${item("meta")} {
-    margin-left: auto;
+    margin-inline-start: auto;
     color: ${uiTokens.ink.tertiary};
     font-size: ${uiTokens.type.caption};
     font-variant-numeric: tabular-nums;

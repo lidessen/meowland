@@ -2347,7 +2347,7 @@
   {
     "name": "code-block",
     "symbol": "CodeBlock",
-    "description": "A block of code with its language, an optional title, soft wrap and copy.",
+    "description": "A block of code with its language, an optional title, line annotations, soft wrap and copy.",
     "status": "Beta",
     "parts": [
       "root",
@@ -2363,7 +2363,12 @@
       "code",
       "feedback"
     ],
-    "options": {},
+    "options": {
+      "size": {
+        "values": ["regular", "compact"],
+        "default": "regular"
+      }
+    },
     "props": [
       {
         "name": "code",
@@ -2406,6 +2411,28 @@
         "liveness": "unknown"
       },
       {
+        "name": "showLineNumbers",
+        "type": "MaybeSignal<boolean>",
+        "optional": true,
+        "description": "Displays a non-selectable 1-based line number gutter alongside each line.",
+        "default": "false",
+        "liveness": "signal"
+      },
+      {
+        "name": "highlightLines",
+        "type": "MaybeSignal<readonly number[] | undefined>",
+        "optional": true,
+        "description": "1-based line numbers emphasized with an accent tint and start-edge marker.",
+        "liveness": "signal"
+      },
+      {
+        "name": "diffLines",
+        "type": "MaybeSignal<CodeBlockDiffLines | undefined>",
+        "optional": true,
+        "description": "1-based line numbers tinted as added or removed diff lines.",
+        "liveness": "signal"
+      },
+      {
         "name": "onCopy",
         "type": "(code: string) => Promise<void>",
         "optional": true,
@@ -2413,9 +2440,9 @@
         "liveness": "unknown"
       }
     ],
-    "extends": ["Props"],
+    "extends": ["Props", "ThemedProps<typeof codeBlockOptions>"],
     "behaviors": [],
-    "examples": ["code-block", "code-block-header"]
+    "examples": ["code-block", "code-block-header", "code-block-annotated"]
   },
   {
     "name": "command-palette",

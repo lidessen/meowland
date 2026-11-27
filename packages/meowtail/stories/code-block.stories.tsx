@@ -78,3 +78,25 @@ export async function connect(endpoint: string) {
     </Stack>
   ),
 });
+
+export const CodeBlockAnnotatedStory = defineStory({
+  id: "code-block-annotated",
+  title: "Code Block · Line annotations",
+  group: "Content and inspection",
+  groupOrder: 70,
+  component: "CodeBlock",
+  covers: ["line numbers", "highlighted lines", "diff lines", "compact size"],
+  render: () => (
+    <CodeBlock
+      size="compact"
+      title="review.ts"
+      language="typescript"
+      code={
+        'const previous = false;\n  const current = true;\n\nconst description = "A deliberately long line for trying soft wrap without changing the copied source.";'
+      }
+      showLineNumbers
+      highlightLines={[4]}
+      diffLines={{ added: [2], removed: [1] }}
+    />
+  ),
+});

@@ -67,7 +67,7 @@ export const alertStyles = css`
   ${alertPartRefs.root}[${alertOptions.attribute("layout")}="bar"] ${alertPartRefs.actions} {
     flex: none;
     margin-top: 0;
-    margin-left: auto;
+    margin-inline-start: auto;
     flex-wrap: nowrap;
   }
 

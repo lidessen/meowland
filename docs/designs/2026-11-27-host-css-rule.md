@@ -15,9 +15,18 @@ ordering and `!important` can also change the cascade, so a layer is not permiss
 parts deliberately.
 
 ```css
-.docs-layout { display: grid; grid-template-columns: 16rem 1fr; }
-@layer host-reset { button { font: inherit; } }
-.host-css-only a { text-decoration: underline; }
+.docs-layout {
+  display: grid;
+  grid-template-columns: 16rem 1fr;
+}
+@layer host-reset {
+  button {
+    font: inherit;
+  }
+}
+.host-css-only a {
+  text-decoration: underline;
+}
 ```
 
 The last example requires its wrapper to contain only host-owned markup. Prefer a host-owned

@@ -48,7 +48,10 @@ function selectorList(value: string): string[] {
 function violations(css: string): string[] {
   const found: string[] = [];
   // Remove comments and strings before tokenizing, retaining separation between tokens.
-  const source = css.replace(/\/\*[\s\S]*?\*\/|"(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'/g, " ");
+  const source = css.replace(
+    /\/\*[\s\S]*?\*\/|"(?:\\[\s\S]|[^"\\])*"|'(?:\\[\s\S]|[^'\\])*'/g,
+    " ",
+  );
   const stack: { layer: boolean; keyframes: boolean }[] = [];
   let start = 0;
   let parens = 0;
@@ -134,9 +137,11 @@ test("the audit checks selector lists, nested rules, escapes and layers", () => 
 });
 
 test("a host wrapper must be an ancestor and every selector is checked", () => {
-  expect(violations(`.host-css-only, a { color: red; } .host-css-only.button { color: red; }
+  expect(
+    violations(`.host-css-only, a { color: red; } .host-css-only.button { color: red; }
     .host-css-only [data-meowui-part] { color: red; }
-    .host-css-only + button, :is(.host-css-only a, button) { color: red; }`)).toEqual([
+    .host-css-only + button, :is(.host-css-only a, button) { color: red; }`),
+  ).toEqual([
     "element: a",
     "part: .host-css-only [data-meowui-part]",
     "element: .host-css-only + button",

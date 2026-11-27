@@ -8,6 +8,8 @@ import { elementId } from "../shared/element-id";
 export interface ChoiceOption {
   value: string;
   label: string;
+  /** One supporting line under the label in the list, such as a model's context size. */
+  description?: string;
   disabled?: boolean;
   group?: string;
 }
@@ -21,7 +23,8 @@ export interface ChoiceSelectProps extends Props {
   onValueChange?: (value: string) => void;
   name?: string;
   id?: string;
-  disabled?: boolean;
+  /** A Signal stays live, so a choice can follow a pending submit. */
+  disabled?: MaybeSignal<boolean>;
   required?: boolean;
   placeholder?: string;
   searchable?: boolean;
@@ -106,7 +109,7 @@ export function ChoiceSelect(
   };
   const choose = (index: number) => {
     const option = readOptions()[index];
-    if (disabled || !option || option.disabled) return;
+    if (unwrap(disabled) || !option || option.disabled) return;
     if (value === undefined) local.value = option.value;
     invalid.value = undefined;
     validation.value = "";
@@ -130,7 +133,7 @@ export function ChoiceSelect(
     }
   };
   const keydown = (event: KeyboardEvent) => {
-    if (disabled || event.isComposing) return;
+    if (unwrap(disabled) || event.isComposing) return;
     const enabled = enabledOptions();
     const inSearch = event.target === searchElement;
     if (inSearch && !["ArrowDown", "ArrowUp", "Escape", "Tab", "Enter"].includes(event.key)) return;
@@ -394,7 +397,19 @@ export function ChoiceSelect(
                     }}
                     ref={[context.parts.option]}
                   >
-                    {derived(() => (row.value.kind === "option" ? row.value.option.label : ""))}
+                    <span ref={[context.parts.optionLabel]}>
+                      {derived(() => (row.value.kind === "option" ? row.value.option.label : ""))}
+                    </span>
+                    <span
+                      hidden={derived(
+                        () => row.value.kind !== "option" || !row.value.option.description,
+                      )}
+                      ref={[context.parts.description]}
+                    >
+                      {derived(() =>
+                        row.value.kind === "option" ? (row.value.option.description ?? "") : "",
+                      )}
+                    </span>
                   </button>
                 );
               },
@@ -465,6 +480,8 @@ ChoiceSelect.meta = {
     "list",
     "group",
     "option",
+    "optionLabel",
+    "description",
     "native",
     "validation",
     "search",

@@ -5,6 +5,15 @@ export {
   type ChatComposerInput,
   type ChatComposerSubmit,
 } from "./composer";
+export {
+  findComposerTrigger,
+  insertComposerSuggestion,
+  composerQueryLimit,
+  type ComposerSuggestion,
+  type ComposerSuggestContext,
+  type ComposerTrigger,
+  type ComposerTriggerMatch,
+} from "./composer-triggers";
 export { chatComposerOptions } from "./composer.options";
 export { ComposerPanel, type ComposerPanelProps } from "./composer-panel";
 export { ChatFrame, type ChatFrameProps } from "./frame";

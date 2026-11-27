@@ -220,7 +220,9 @@ test("short choices retain exact trigger matching without splitting short option
     await option.evaluate((node) => {
       const range = document.createRange();
       // Reactive labels include comment anchors; measure the rendered label contents.
-      range.selectNodeContents(node);
+      range.selectNodeContents(
+        node.querySelector('[data-meowui-part="choice-select/optionLabel"]')!,
+      );
       return range.getClientRects().length;
     }),
   ).toBe(1);

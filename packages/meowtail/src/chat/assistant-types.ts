@@ -1,3 +1,4 @@
+import type { ComposerTrigger } from "./composer-triggers";
 import type { IconName } from "../icons/icon";
 import type { Child, Props } from "meowjsx";
 import type { MaybeSignal } from "meowjsx/signal";
@@ -176,6 +177,11 @@ export interface AssistantViewProps extends Props {
   renderPart?: (part: AssistantMessagePart, message: AssistantMessage) => Child | undefined;
   renderWorkDetail?: (work: AssistantWork) => Child | undefined;
   composerTrailing?: Child;
+  /**
+   * Characters that open host suggestions in the composer (`@` mentions, `/` commands). Fixed for
+   * the mount. Accepted suggestions become draft text; structured references stay with the host.
+   */
+  composerTriggers?: readonly ComposerTrigger[];
   headerActions?: Child;
   labels?: Partial<AssistantLabels>;
 }

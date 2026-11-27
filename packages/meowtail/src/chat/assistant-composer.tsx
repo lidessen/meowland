@@ -184,18 +184,8 @@ export function AssistantComposer(
           textVersion++;
           change({ ...draft.value, text: (event.target as HTMLTextAreaElement).value });
         }}
-        onKeyDown={(event: KeyboardEvent) => {
-          const target = event.target;
-          if (
-            target instanceof HTMLTextAreaElement &&
-            target.dataset.chatInput !== undefined &&
-            event.key === "Enter" &&
-            !event.shiftKey &&
-            !event.isComposing &&
-            event.keyCode !== 229
-          )
-            void send(event);
-        }}
+        submitOn="enter"
+        triggers={options.composerTriggers}
       >
         {options.allowAttachments === false ? null : (
           <>

@@ -190,7 +190,7 @@ describe("the docs pages", () => {
     expect(html).toContain("Button");
     expect(html).toContain('data-meowui-part="section/root"');
     expect(html).toContain('data-meowui-part="section/title"');
-    expect(html).toContain("API reference");
+    expect(html).toContain(">API</");
     expect(html).toMatch(/<div(?=[^>]*class="docs-preview")(?=[^>]*data-meowui-part="card\/root")/);
     expect(html).toContain("docs-preview-frame");
     expect(html).toContain("Component reference");
@@ -225,20 +225,42 @@ describe("the docs pages", () => {
     expect(html).not.toContain("Six published packages");
   });
 
-  test("a component table of contents only links to sections that exist", () => {
-    const html = page("components/button");
-    const toc = html.match(/<nav aria-label="On this page">([\s\S]*?)<\/nav>/)?.[1] ?? "";
-    expect(toc).toMatch(/<a(?=[^>]*href="#preview")(?=[^>]*data-meowui-part="link\/root")/);
-    expect(toc).toContain('href="#installation"');
-    expect(toc).toContain('href="#usage"');
-    expect(toc).toContain('href="#api-reference"');
-    expect(toc).not.toContain('href="#examples"');
-    for (const [, id] of toc.matchAll(/href="#([^"]+)"/g)) {
-      expect(html).toMatch(new RegExp(`<section[^>]*id="${id}"`));
+  test("every component page and its table of contents follow the contract order", () => {
+    const ids = [
+      "overview",
+      "anatomy",
+      "usage",
+      "examples",
+      "keyboard",
+      "accessibility",
+      "theming",
+      "api",
+      "agent-notes",
+    ];
+    for (const component of catalog.components) {
+      const html = page(component.path);
+      const sectionIds = [...html.matchAll(/<section[^>]*id="([^"]+)"/g)].map((match) => match[1]);
+      const toc = html.match(/<nav aria-label="On this page">([\s\S]*?)<\/nav>/)?.[1] ?? "";
+      const links = [...toc.matchAll(/href="#([^"]+)"/g)].map((match) => match[1]);
+      expect(sectionIds).toEqual(ids);
+      expect(links).toEqual(ids);
+      expect(html).toMatch(/data-meowui-part="badge\/root"[^>]*>Beta<\/span>/);
     }
-    expect(html).toMatch(
-      /<details class="docs-toc-disclosure"><summary>On this page<svg[^>]*data-icon="chevron-down"/,
-    );
+  });
+
+  test("home and component index report status and displayed story coverage", () => {
+    for (const path of ["", "components"]) {
+      const html = page(path);
+      expect(html).toContain(`${catalog.components.length} Beta`);
+      expect(html).toContain("0 Stable");
+      expect(html).toContain("0 Experimental");
+      expect(html).toContain("1 own story appearances");
+      expect(html).toContain("0 borrowed story appearances");
+      expect(html).toContain("1 total story appearances");
+    }
+    const index = page("components");
+    expect(index).toContain("1 own · 0 borrowed · 1 total");
+    expect(index).toContain("0 own · 0 borrowed · 0 total");
   });
 
   test("examples ship a preview and code tab pair, and usage shows a real first use", () => {

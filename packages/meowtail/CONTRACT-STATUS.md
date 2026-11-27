@@ -1,19 +1,19 @@
 # Component contract status
 
-This status table reflects the Phase 2 contract migration over the Phase 0A source audit baseline. All 18 static prop liveness mismatches and 8 legacy DOM state attributes have been migrated to `MaybeSignal` and `data-state`; only the 93 missing dedicated story files (Phase 3) remain.
+This status table reflects Phase 2 (0 liveness / 0 DOM state violations) and Phase 3 (dedicated stories added for 19 standalone components).
 
-The inventory has 149 entries: 142 registered components plus seven public wrappers or parts not separately registered. There are 93 tracked findings: 0 prop liveness mismatches, 0 legacy DOM state attributes, and 93 missing dedicated story files. A dedicated story means an exact `<component-name>.stories.tsx` file in `stories/`; a component can still appear in a shared story.
+The inventory has 149 entries: 142 registered components plus seven public wrappers or parts not separately registered. There are 74 tracked findings: 0 prop liveness mismatches, 0 legacy DOM state attributes, and 74 missing dedicated story files (mostly sub-parts or components covered in shared stories).
 
 See [the baseline](tests/unit/contract-baseline.json) for machine-readable findings and [the contract](CONTRACT.md) for the target.
 
 | Component                   | Tier | Tracked findings                                       |
 | --------------------------- | ---- | ------------------------------------------------------ |
 | `accordion`                 | Beta | None detected                                          |
-| `action-rail`               | Beta | Missing story: `action-rail.stories.tsx`               |
+| `action-rail`               | Beta | None detected                                          |
 | `action-row`                | Beta | None detected                                          |
 | `add-button`                | Beta | Missing story: `add-button.stories.tsx`                |
 | `alert`                     | Beta | None detected                                          |
-| `app-bar`                   | Beta | Missing story: `app-bar.stories.tsx`                   |
+| `app-bar`                   | Beta | None detected                                          |
 | `aspect-ratio`              | Beta | Missing story: `aspect-ratio.stories.tsx`              |
 | `assistant-composer`        | Beta | Missing story: `assistant-composer.stories.tsx`        |
 | `assistant-markdown`        | Beta | Missing story: `assistant-markdown.stories.tsx`        |
@@ -69,35 +69,35 @@ See [the baseline](tests/unit/contract-baseline.json) for machine-readable findi
 | `dialog-actions`            | Beta | Missing story: `dialog-actions.stories.tsx`            |
 | `dialog-header`             | Beta | Missing story: `dialog-header.stories.tsx`             |
 | `dialog-panel`              | Beta | Missing story: `dialog-panel.stories.tsx`              |
-| `diff-block`                | Beta | Missing story: `diff-block.stories.tsx`                |
+| `diff-block`                | Beta | None detected                                          |
 | `disclosure`                | Beta | None detected                                          |
 | `drawer`                    | Beta | None detected                                          |
 | `empty-state`               | Beta | Missing story: `empty-state.stories.tsx`               |
 | `entry`                     | Beta | Missing story: `entry.stories.tsx`                     |
-| `entry-list`                | Beta | Missing story: `entry-list.stories.tsx`                |
-| `field`                     | Beta | Missing story: `field.stories.tsx`                     |
+| `entry-list`                | Beta | None detected                                          |
+| `field`                     | Beta | None detected                                          |
 | `field-group`               | Beta | Missing story: `field-group.stories.tsx`               |
 | `form`                      | Beta | None detected                                          |
 | `grid`                      | Beta | Missing story: `grid.stories.tsx`                      |
-| `hover-card`                | Beta | Missing story: `hover-card.stories.tsx`                |
+| `hover-card`                | Beta | None detected                                          |
 | `icon-button`               | Beta | Missing story: `icon-button.stories.tsx`               |
 | `icon-rail`                 | Beta | None detected                                          |
-| `image-lightbox`            | Beta | Missing story: `image-lightbox.stories.tsx`            |
+| `image-lightbox`            | Beta | None detected                                          |
 | `image-preview`             | Beta | None detected                                          |
 | `inline`                    | Beta | Missing story: `inline.stories.tsx`                    |
 | `input`                     | Beta | Missing story: `input.stories.tsx`                     |
 | `item`                      | Beta | None detected                                          |
-| `json-block`                | Beta | Missing story: `json-block.stories.tsx`                |
-| `json-tree`                 | Beta | Missing story: `json-tree.stories.tsx`                 |
+| `json-block`                | Beta | None detected                                          |
+| `json-tree`                 | Beta | None detected                                          |
 | `layout-item`               | Beta | Missing story: `layout-item.stories.tsx`               |
 | `link`                      | Beta | None detected                                          |
-| `list-group`                | Beta | Missing story: `list-group.stories.tsx`                |
+| `list-group`                | Beta | None detected                                          |
 | `list-row`                  | Beta | Missing story: `list-row.stories.tsx`                  |
 | `markdown`                  | Beta | None detected                                          |
 | `menu`                      | Beta | None detected                                          |
 | `menu-button`               | Beta | None detected                                          |
 | `mermaid-diagram`           | Beta | None detected                                          |
-| `meta-row`                  | Beta | Missing story: `meta-row.stories.tsx`                  |
+| `meta-row`                  | Beta | None detected                                          |
 | `modal`                     | Beta | None detected                                          |
 | `nav-item`                  | Beta | Missing story: `nav-item.stories.tsx`                  |
 | `nav-list`                  | Beta | None detected                                          |
@@ -120,9 +120,9 @@ See [the baseline](tests/unit/contract-baseline.json) for machine-readable findi
 | `read-block`                | Beta | Missing story: `read-block.stories.tsx`                |
 | `region-layout`             | Beta | None detected                                          |
 | `resource-card`             | Beta | Missing story: `resource-card.stories.tsx`             |
-| `resource-link`             | Beta | Missing story: `resource-link.stories.tsx`             |
-| `risk-confirmation`         | Beta | Missing story: `risk-confirmation.stories.tsx`         |
-| `search-block`              | Beta | Missing story: `search-block.stories.tsx`              |
+| `resource-link`             | Beta | None detected                                          |
+| `risk-confirmation`         | Beta | None detected                                          |
+| `search-block`              | Beta | None detected                                          |
 | `search-input`              | Beta | Missing story: `search-input.stories.tsx`              |
 | `section`                   | Beta | None detected                                          |
 | `segmented-control`         | Beta | Missing story: `segmented-control.stories.tsx`         |
@@ -138,22 +138,22 @@ See [the baseline](tests/unit/contract-baseline.json) for machine-readable findi
 | `state-dot`                 | Beta | Missing story: `state-dot.stories.tsx`                 |
 | `status`                    | Beta | None detected                                          |
 | `status-dot`                | Beta | None detected                                          |
-| `switch`                    | Beta | Missing story: `switch.stories.tsx`                    |
+| `switch`                    | Beta | None detected                                          |
 | `table`                     | Beta | None detected                                          |
 | `tabs`                      | Beta | None detected                                          |
 | `tag`                       | Beta | None detected                                          |
 | `task-list`                 | Beta | Missing story: `task-list.stories.tsx`                 |
 | `terminal-block`            | Beta | Missing story: `terminal-block.stories.tsx`            |
 | `text`                      | Beta | Missing story: `text.stories.tsx`                      |
-| `text-shimmer`              | Beta | Missing story: `text-shimmer.stories.tsx`              |
-| `textarea`                  | Beta | Missing story: `textarea.stories.tsx`                  |
-| `timeline`                  | Beta | Missing story: `timeline.stories.tsx`                  |
+| `text-shimmer`              | Beta | None detected                                          |
+| `textarea`                  | Beta | None detected                                          |
+| `timeline`                  | Beta | None detected                                          |
 | `timeline-item`             | Beta | Missing story: `timeline-item.stories.tsx`             |
 | `toast`                     | Beta | None detected                                          |
 | `token-field`               | Beta | None detected                                          |
 | `toolbar`                   | Beta | Missing story: `toolbar.stories.tsx`                   |
 | `tooltip`                   | Beta | Missing story: `tooltip.stories.tsx`                   |
 | `tree-view`                 | Beta | None detected                                          |
-| `web-block`                 | Beta | Missing story: `web-block.stories.tsx`                 |
+| `web-block`                 | Beta | None detected                                          |
 | `window-title-bar`          | Beta | None detected                                          |
 | `work-card`                 | Beta | None detected                                          |

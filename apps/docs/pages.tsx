@@ -5,7 +5,15 @@ import * as meowtail from "meowtail";
 import { Icon, IconSource } from "meowtail/icons";
 import type { ContentItem, SitePage } from "meowpress/build";
 import type { StoryEntry } from "meowbook";
-import { kebabCase, type Catalog, type CatalogComponent, type CatalogExample } from "./catalog";
+import {
+  kebabCase,
+  storyCoverage,
+  styleAxes,
+  type Catalog,
+  type CatalogComponent,
+  type CatalogExample,
+  type ComponentStatus,
+} from "./catalog";
 import { displayName } from "./families";
 import { firstElementOf, renderSourceOf, type StorySource } from "./code";
 import { groupIcon, packageIcon, PAGE_ICONS } from "./icons";
@@ -157,6 +165,24 @@ function ReadingSections({ sections }: { sections: ReadingSection[] }): Child {
   );
 }
 
+function CoverageSummary({ catalog }: { catalog: Catalog }): Child {
+  const statuses: ComponentStatus[] = ["Beta", "Stable", "Experimental"];
+  const coverage = catalog.components.map(storyCoverage);
+  const own = coverage.reduce((sum, entry) => sum + entry.ownStoryCount, 0);
+  const borrowed = coverage.reduce((sum, entry) => sum + entry.borrowedCount, 0);
+  return (
+    <p>
+      {statuses
+        .map(
+          (status) =>
+            `${catalog.components.filter((entry) => entry.status === status).length} ${status}`,
+        )
+        .join(" · ")}
+      {` · ${own} own story appearances · ${borrowed} borrowed story appearances · ${own + borrowed} total story appearances`}
+    </p>
+  );
+}
+
 function HomePage({ state }: { state: DocsState }): Child {
   const componentCount = state.catalog.components.length;
   return (
@@ -242,6 +268,7 @@ function HomePage({ state }: { state: DocsState }): Child {
         title="Components"
         description={`${componentCount} components. Each one lists its style axes and DOM parts; the ones the stories cover also show a live example and the code behind it.`}
       >
+        <CoverageSummary catalog={state.catalog} />
         {/* The two ways into the components, laid out like the packages above them. */}
         <div className="docs-package-grid">
           <a className="docs-package-link" href="/components/">
@@ -305,6 +332,7 @@ function summaryFor(state: DocsState, path: string): string | undefined {
 function ComponentList({ state }: { state: DocsState }): Child {
   return (
     <Stack gap="relaxed">
+      <CoverageSummary catalog={state.catalog} />
       {state.catalog.navigation.map((group) => (
         <div className="docs-index" id={kebabCase(group.label)}>
           <h3 className="docs-example-title docs-index-title">
@@ -316,6 +344,16 @@ function ComponentList({ state }: { state: DocsState }): Child {
               <li>
                 <a href={entry.href}>{entry.label}</a>
                 <span>{summaryFor(state, entry.path) ?? ""}</span>
+                {(() => {
+                  const component = state.catalog.components.find(
+                    (item) => item.path === entry.path,
+                  );
+                  if (!component) return null;
+                  const coverage = storyCoverage(component);
+                  return (
+                    <div>{`${component.status} · ${coverage.ownStoryCount} own · ${coverage.borrowedCount} borrowed · ${coverage.totalCount} total`}</div>
+                  );
+                })()}
               </li>
             ))}
           </ul>
@@ -450,99 +488,139 @@ function ComponentPage({
   state: DocsState;
 }): Child {
   const borrowed = component.stories.length === 0;
-  const [primary, ...rest] = borrowed ? component.usedIn : component.stories;
-  const sections: ReadingSection[] = [];
-  if (primary) {
-    sections.push({
-      id: "preview",
-      title: "Preview",
-      description: borrowed
-        ? `${displayName(component.title)} has no story of its own; this one draws it as part of ${primary.component ? displayName(primary.component) : "a composed scene"}.`
-        : undefined,
-      children: (
-        <StoryExample
-          storyId={primary.id}
-          title={storyLabel(primary)}
-          description={component.summary === primary.description ? undefined : primary.description}
-          tall={isTallStory(primary)}
-          {...sourceFor(state, primary)}
-        />
-      ),
-    });
-  }
-  sections.push({
-    id: "installation",
-    title: "Installation",
-    children: <InstallLine command={componentInstall(state)} />,
-  });
+  const stories = borrowed ? component.usedIn : component.stories;
+  const primary = stories[0];
   const usage = usageFor(component, state);
-  if (usage) {
-    sections.push({
+  const axes = styleAxes(component.meta?.style);
+  const sections: ReadingSection[] = [
+    {
+      id: "overview",
+      title: "Overview",
+      children: (
+        <Stack gap="relaxed">
+          <Badge tone="outline" size="small">
+            {component.status}
+          </Badge>
+          <p>{component.summary ?? "Component reference, examples and available metadata."}</p>
+          <div>
+            <h3 className="docs-example-title">Installation</h3>
+            <InstallLine command={componentInstall(state)} />
+          </div>
+        </Stack>
+      ),
+    },
+    { id: "anatomy", title: "Anatomy", children: <PartList meta={component.meta} /> },
+    {
       id: "usage",
       title: "Usage",
-      description: usage.snippet ? "Taken from the examples on this page." : undefined,
-      children: (
+      children: usage ? (
         <CodeSample
           source={usage.snippet ? `${usage.importLine}\n\n${usage.snippet}` : usage.importLine}
           file={usage.snippet ? "usage.tsx" : "usage.ts"}
         />
+      ) : (
+        <Note>No public root import is available for this entry.</Note>
       ),
-    });
-  }
-  if (rest.length > 0) {
-    sections.push({
+    },
+    {
       id: "examples",
       title: "Examples",
-      description: borrowed
-        ? `Other stories that draw ${displayName(component.title)}.`
-        : "The other stories that show this component.",
-      children: (
+      description:
+        borrowed && primary
+          ? `These borrowed stories show ${displayName(component.title)} within another component or scene.`
+          : undefined,
+      children: stories.length ? (
         <Stack gap="relaxed">
-          {rest.map((story) => (
+          {stories.map((story) => (
             <StoryExample
               storyId={story.id}
               title={storyLabel(story)}
-              description={story.description}
+              description={component.summary === story.description ? undefined : story.description}
               tall={isTallStory(story)}
               {...sourceFor(state, story)}
             />
           ))}
         </Stack>
+      ) : (
+        <Note>No story covers this component yet.</Note>
       ),
-    });
-  }
-  sections.push({
-    id: "api-reference",
-    title: "API reference",
-    children: (
-      <Stack gap="relaxed">
-        {notesFor(state.props?.get(component.title))}
-        <div>
-          <h3 className="docs-example-title">Props</h3>
-          <PropsTable style={component.meta?.style} props={state.props?.get(component.title)} />
-        </div>
-        <div>
-          <h3 className="docs-example-title">DOM parts</h3>
-          <PartList meta={component.meta} />
-        </div>
-        <div>
-          <h3 className="docs-example-title">Registry</h3>
-          {component.meta ? (
-            <Note>
-              The component's static <code>meta</code> declares the name{" "}
-              <code>{component.meta.name}</code>. Register its function with{" "}
-              <code>createMeowUI({"{ components: [...] }"})</code> on the runtime that renders it.
-            </Note>
-          ) : (
-            <Note>
-              This component has no registry metadata. It is a story that shows several components
-              together.
-            </Note>
-          )}
-        </div>
-      </Stack>
-    ),
-  });
+    },
+    {
+      id: "keyboard",
+      title: "Keyboard",
+      children: (
+        <Note>
+          For interactive elements, use Tab to move focus and the native activation keys where
+          applicable. Consult the examples and component props for any additional keyboard behavior.
+        </Note>
+      ),
+    },
+    {
+      id: "accessibility",
+      title: "Accessibility",
+      children: (
+        <Note>
+          Provide accessible labels for interactive elements and check the rendered role and state
+          for the chosen usage. See the props and examples for component-specific options.
+        </Note>
+      ),
+    },
+    {
+      id: "theming",
+      title: "Theming",
+      children: axes.length ? (
+        <ul>
+          {axes.map((axis) => (
+            <li>
+              <code>{axis.axis}</code>
+              {`: ${axis.choices.join(", ")} (default: ${axis.default})`}
+            </li>
+          ))}
+        </ul>
+      ) : (
+        <Note>
+          Theme tokens and the DOM parts above control this component's presentation; no style axes
+          are listed in its registry metadata.
+        </Note>
+      ),
+    },
+    {
+      id: "api",
+      title: "API",
+      children: (
+        <Stack gap="relaxed">
+          {notesFor(state.props?.get(component.title))}
+          <div>
+            <h3 className="docs-example-title">Props</h3>
+            <PropsTable style={component.meta?.style} props={state.props?.get(component.title)} />
+          </div>
+          <div>
+            <h3 className="docs-example-title">Registry</h3>
+            {component.meta ? (
+              <Note>
+                The component's static <code>meta</code> declares the name{" "}
+                <code>{component.meta.name}</code>. Register its function with{" "}
+                <code>createMeowUI({"{ components: [...] }"})</code> on the runtime that renders it.
+              </Note>
+            ) : (
+              <Note>This entry has no registry metadata.</Note>
+            )}
+          </div>
+        </Stack>
+      ),
+    },
+    {
+      id: "agent-notes",
+      title: "Agent notes",
+      children: (
+        <Note>
+          Use <code>data-meowui-part</code> to identify documented DOM parts. The JSON entry
+          supports a finite catalog; check its documented schema before describing a component for
+          an agent.
+        </Note>
+      ),
+    },
+  ];
   return (
     <Page
       className="docs-reference-page"

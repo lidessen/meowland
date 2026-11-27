@@ -21,6 +21,9 @@ export interface CatalogRegistryEntry {
   readonly meta: CatalogMeta;
 }
 
+/** Contract maturity; the current audit lists every component as Beta. */
+export type ComponentStatus = "Beta" | "Stable" | "Experimental";
+
 /** One component the site documents. */
 export interface CatalogComponent {
   /** URL segment in kebab case. */
@@ -35,6 +38,8 @@ export interface CatalogComponent {
   stories: StoryEntry[];
   /** Stories of other components whose example draws this one, for a component without stories of its own. */
   usedIn: StoryEntry[];
+  /** Current contract maturity, pending all Stable criteria. */
+  status: ComponentStatus;
   /** Component metadata, when the component is registered. */
   meta?: CatalogMeta;
   /** One line describing the component, taken from the first story that has one. */
@@ -243,6 +248,7 @@ export function buildCatalog(
       group: story.group ?? UNCATEGORIZED_GROUP,
       stories: [],
       usedIn: [],
+      status: "Beta",
       meta: registered?.meta,
     });
   }
@@ -276,6 +282,7 @@ export function buildCatalog(
       group: usedIn[0]?.group ?? UNCATEGORIZED_GROUP,
       stories: [],
       usedIn,
+      status: "Beta",
       meta: byName.get(name)?.meta,
     });
   }
@@ -384,4 +391,15 @@ export function styleAxes(style?: CatalogStyleProps): {
     choices,
     default: String(style.defaults[axis]),
   }));
+}
+
+/** Stories displayed on a page; borrowed stories are limited by the catalog. */
+export function storyCoverage(component: CatalogComponent): {
+  ownStoryCount: number;
+  borrowedCount: number;
+  totalCount: number;
+} {
+  const ownStoryCount = component.stories.length;
+  const borrowedCount = component.usedIn.length;
+  return { ownStoryCount, borrowedCount, totalCount: ownStoryCount + borrowedCount };
 }

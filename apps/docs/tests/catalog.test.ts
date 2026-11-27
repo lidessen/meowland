@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
 import type { StoryEntry } from "meowbook";
-import { buildCatalog, kebabCase, styleAxes } from "../catalog";
+import { buildCatalog, kebabCase, storyCoverage, styleAxes } from "../catalog";
 
 function story(overrides: Partial<StoryEntry> & { id: string }): StoryEntry {
   return {
@@ -104,6 +104,26 @@ describe("the component catalog", () => {
     expect(component?.stories).toEqual([]);
     expect(component?.usedIn.map((entry) => entry.id)).toEqual(["form", "settings", "scene"]);
     expect(component?.group).toBe("Forms");
+  });
+
+  test("coverage counts own, borrowed and uncovered stories and keeps the audited Beta status", () => {
+    const registry = [
+      { name: "Own", meta: { name: "own", parts: ["root"] } },
+      { name: "Borrowed", meta: { name: "borrowed", parts: ["root"] } },
+      { name: "Uncovered", meta: { name: "uncovered", parts: ["root"] } },
+    ];
+    const catalog = buildCatalog(
+      [story({ id: "own", component: "Own" }), story({ id: "scene" })],
+      (entry) => (entry.id === "scene" ? "<Borrowed />" : undefined),
+      registry,
+    );
+    const own = catalog.components.find((entry) => entry.title === "Own")!;
+    const borrowed = catalog.components.find((entry) => entry.title === "Borrowed")!;
+    const uncovered = catalog.components.find((entry) => entry.title === "Uncovered")!;
+    expect(storyCoverage(own)).toEqual({ ownStoryCount: 1, borrowedCount: 0, totalCount: 1 });
+    expect(storyCoverage(borrowed)).toEqual({ ownStoryCount: 0, borrowedCount: 1, totalCount: 1 });
+    expect(storyCoverage(uncovered)).toEqual({ ownStoryCount: 0, borrowedCount: 0, totalCount: 0 });
+    expect(catalog.components.map((entry) => entry.status)).toEqual(["Beta", "Beta", "Beta"]);
   });
 
   test("a registered part without a component borrows the stories that cover it", () => {

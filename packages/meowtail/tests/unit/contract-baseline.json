@@ -599,19 +599,9 @@
   ],
   "violations": [
     {
-      "component": "action-rail",
-      "kind": "story",
-      "detail": "action-rail.stories.tsx"
-    },
-    {
       "component": "add-button",
       "kind": "story",
       "detail": "add-button.stories.tsx"
-    },
-    {
-      "component": "app-bar",
-      "kind": "story",
-      "detail": "app-bar.stories.tsx"
     },
     {
       "component": "aspect-ratio",
@@ -814,19 +804,9 @@
       "detail": "dialog.stories.tsx"
     },
     {
-      "component": "diff-block",
-      "kind": "story",
-      "detail": "diff-block.stories.tsx"
-    },
-    {
       "component": "empty-state",
       "kind": "story",
       "detail": "empty-state.stories.tsx"
-    },
-    {
-      "component": "entry-list",
-      "kind": "story",
-      "detail": "entry-list.stories.tsx"
     },
     {
       "component": "entry",
@@ -839,29 +819,14 @@
       "detail": "field-group.stories.tsx"
     },
     {
-      "component": "field",
-      "kind": "story",
-      "detail": "field.stories.tsx"
-    },
-    {
       "component": "grid",
       "kind": "story",
       "detail": "grid.stories.tsx"
     },
     {
-      "component": "hover-card",
-      "kind": "story",
-      "detail": "hover-card.stories.tsx"
-    },
-    {
       "component": "icon-button",
       "kind": "story",
       "detail": "icon-button.stories.tsx"
-    },
-    {
-      "component": "image-lightbox",
-      "kind": "story",
-      "detail": "image-lightbox.stories.tsx"
     },
     {
       "component": "inline",
@@ -874,34 +839,14 @@
       "detail": "input.stories.tsx"
     },
     {
-      "component": "json-block",
-      "kind": "story",
-      "detail": "json-block.stories.tsx"
-    },
-    {
-      "component": "json-tree",
-      "kind": "story",
-      "detail": "json-tree.stories.tsx"
-    },
-    {
       "component": "layout-item",
       "kind": "story",
       "detail": "layout-item.stories.tsx"
     },
     {
-      "component": "list-group",
-      "kind": "story",
-      "detail": "list-group.stories.tsx"
-    },
-    {
       "component": "list-row",
       "kind": "story",
       "detail": "list-row.stories.tsx"
-    },
-    {
-      "component": "meta-row",
-      "kind": "story",
-      "detail": "meta-row.stories.tsx"
     },
     {
       "component": "nav-item",
@@ -959,21 +904,6 @@
       "detail": "resource-card.stories.tsx"
     },
     {
-      "component": "resource-link",
-      "kind": "story",
-      "detail": "resource-link.stories.tsx"
-    },
-    {
-      "component": "risk-confirmation",
-      "kind": "story",
-      "detail": "risk-confirmation.stories.tsx"
-    },
-    {
-      "component": "search-block",
-      "kind": "story",
-      "detail": "search-block.stories.tsx"
-    },
-    {
       "component": "search-input",
       "kind": "story",
       "detail": "search-input.stories.tsx"
@@ -1009,11 +939,6 @@
       "detail": "state-dot.stories.tsx"
     },
     {
-      "component": "switch",
-      "kind": "story",
-      "detail": "switch.stories.tsx"
-    },
-    {
       "component": "task-list",
       "kind": "story",
       "detail": "task-list.stories.tsx"
@@ -1024,29 +949,14 @@
       "detail": "terminal-block.stories.tsx"
     },
     {
-      "component": "text-shimmer",
-      "kind": "story",
-      "detail": "text-shimmer.stories.tsx"
-    },
-    {
       "component": "text",
       "kind": "story",
       "detail": "text.stories.tsx"
     },
     {
-      "component": "textarea",
-      "kind": "story",
-      "detail": "textarea.stories.tsx"
-    },
-    {
       "component": "timeline-item",
       "kind": "story",
       "detail": "timeline-item.stories.tsx"
-    },
-    {
-      "component": "timeline",
-      "kind": "story",
-      "detail": "timeline.stories.tsx"
     },
     {
       "component": "toolbar",
@@ -1057,11 +967,6 @@
       "component": "tooltip",
       "kind": "story",
       "detail": "tooltip.stories.tsx"
-    },
-    {
-      "component": "web-block",
-      "kind": "story",
-      "detail": "web-block.stories.tsx"
     }
   ]
 }

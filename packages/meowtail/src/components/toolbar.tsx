@@ -1,4 +1,5 @@
 import { h, type Context, type Props } from "meowjsx";
+import { createRovingFocus } from "../behaviors";
 import { activeElementInRoot } from "../shared/dom-root";
 
 export interface ToolbarProps extends Props {
@@ -14,12 +15,26 @@ const compositeSelector =
   '[role="toolbar"], [role="menu"], [role="menubar"], [role="tablist"], [role="listbox"], [role="tree"], [role="grid"], [role="radiogroup"], [role="combobox"], [contenteditable]:not([contenteditable="false"])';
 
 /** Rove native actions only; editing and composite controls keep their own keyboard contract. */
-function mountToolbar(root: HTMLElement) {
+function mountToolbar(root: HTMLElement, orientation: "horizontal" | "vertical") {
   const attributes = new Map<HTMLElement, { original: string | null; applied: string | null }>();
+  const keys = new WeakMap<HTMLElement, string>();
+  const optedIn = new WeakSet<HTMLElement>();
+  let nextKey = 0;
   let actions: HTMLElement[] = [];
-  let current: HTMLElement | undefined;
   let disposed = false;
   const view = root.ownerDocument.defaultView!;
+  const keyFor = (element: HTMLElement) => {
+    let key = keys.get(element);
+    if (key === undefined) {
+      key = String(nextKey++);
+      keys.set(element, key);
+    }
+    return key;
+  };
+  const roving = createRovingFocus({
+    orientation,
+    items: () => actions.map((el) => ({ key: keyFor(el), el })),
+  });
   const absorb = (records: MutationRecord[]) => {
     for (const record of records) {
       if (record.type !== "attributes" || record.attributeName !== "tabindex") continue;
@@ -30,6 +45,7 @@ function mountToolbar(root: HTMLElement) {
         owned.original = element.getAttribute("tabindex");
         owned.applied = null;
       }
+      optedIn.delete(element);
     }
   };
   const restore = (element: HTMLElement) => {
@@ -47,9 +63,9 @@ function mountToolbar(root: HTMLElement) {
     const style = view.getComputedStyle(element);
     return (
       boundary === root &&
-      !(original !== null && Number(original) < 0) &&
+      (!(original !== null && Number(original) < 0) || optedIn.has(element)) &&
       !element.matches(':disabled, [aria-disabled="true"]') &&
-      !element.closest("[hidden], [inert]") &&
+      !element.closest('[hidden], [inert], [aria-hidden="true"]') &&
       style.visibility !== "hidden" &&
       style.visibility !== "collapse" &&
       element.getClientRects().length > 0
@@ -64,6 +80,7 @@ function mountToolbar(root: HTMLElement) {
         "tabindex",
         "disabled",
         "aria-disabled",
+        "aria-hidden",
         "hidden",
         "inert",
         "class",
@@ -80,46 +97,41 @@ function mountToolbar(root: HTMLElement) {
     observer.disconnect();
     actions = [...root.querySelectorAll<HTMLElement>(actionSelector)].filter(eligible);
     for (const element of attributes.keys()) if (!actions.includes(element)) restore(element);
-    const focused = activeElementInRoot(root);
-    current =
-      actions.find((element) => element === focused) ??
-      (current && actions.includes(current) ? current : actions[0]);
+    roving.reconcile();
     for (const element of actions) {
       let owned = attributes.get(element);
       if (!owned) {
         owned = { original: element.getAttribute("tabindex"), applied: null };
         attributes.set(element, owned);
       }
-      const value = element === current ? "0" : "-1";
+      const value = String(roving.tabIndex(keyFor(element)));
       if (element.getAttribute("tabindex") !== value) element.setAttribute("tabindex", value);
       owned.applied = value;
     }
     observe();
   };
   const observer = new view.MutationObserver(reconcile);
-  const onFocus = () => reconcile();
-  const onResize = () => reconcile();
-  const onKeyDown = (event: KeyboardEvent) => {
-    if (event.defaultPrevented || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey)
-      return;
+  const onFocus = () => {
+    reconcile();
+    const focused = activeElementInRoot(root);
+    if (focused instanceof view.HTMLElement && focused.matches(actionSelector))
+      optedIn.add(focused);
+    reconcile();
+  };
+  const onClick = (event: MouseEvent) => {
     reconcile();
     const target = (event.target as Element).closest<HTMLElement>(actionSelector);
-    const index = target ? actions.indexOf(target) : -1;
-    if (index < 0) return;
-    const vertical = root.getAttribute("aria-orientation") === "vertical";
-    const rtl = view.getComputedStyle(root).direction === "rtl";
-    let next: number;
-    if (event.key === "Home") next = 0;
-    else if (event.key === "End") next = actions.length - 1;
-    else if (event.key === (vertical ? "ArrowDown" : "ArrowRight"))
-      next = index + (vertical || !rtl ? 1 : -1);
-    else if (event.key === (vertical ? "ArrowUp" : "ArrowLeft"))
-      next = index + (vertical || !rtl ? -1 : 1);
-    else return;
-    event.preventDefault();
-    actions[(next + actions.length) % actions.length]!.focus();
+    if (target && target.closest(compositeSelector) === root) optedIn.add(target);
+    reconcile();
+  };
+  const onResize = () => reconcile();
+  const onKeyDown = (event: KeyboardEvent) => {
+    reconcile();
+    const target = (event.target as Element).closest<HTMLElement>(actionSelector);
+    if (target && actions.includes(target)) roving.keydown(event);
   };
   root.addEventListener("focusin", onFocus);
+  root.addEventListener("click", onClick);
   root.addEventListener("keydown", onKeyDown);
   view.addEventListener("resize", onResize);
   observe();
@@ -129,9 +141,11 @@ function mountToolbar(root: HTMLElement) {
     disposed = true;
     observer.disconnect();
     root.removeEventListener("focusin", onFocus);
+    root.removeEventListener("click", onClick);
     root.removeEventListener("keydown", onKeyDown);
     view.removeEventListener("resize", onResize);
     for (const element of attributes.keys()) restore(element);
+    roving.dispose();
   };
 }
 
@@ -148,7 +162,7 @@ export function Toolbar(
       aria-label={label}
       aria-orientation={orientation}
       data-orientation={orientation}
-      ref={[context.parts.root, ref, (root: HTMLElement) => mountToolbar(root)]}
+      ref={[context.parts.root, ref, (root: HTMLElement) => mountToolbar(root, orientation)]}
     >
       {children}
     </div>

@@ -1,5 +1,6 @@
 import { h, type Child, type Context, type Props } from "meowjsx";
 import { derived, signal, unwrap, type MaybeSignal } from "meowjsx/signal";
+import { createRovingFocus } from "../behaviors";
 import { tabsCount, tabsIndex } from "./tabs.options";
 import { elementId } from "../shared/element-id";
 export { tabsCount, tabsIndex } from "./tabs.options";
@@ -18,10 +19,12 @@ export interface TabsProps extends Props {
   value?: MaybeSignal<string>;
   defaultValue?: string;
   onValueChange?: (value: string) => void;
+  orientation?: "horizontal" | "vertical";
+  activation?: "automatic" | "manual";
   className?: Props["className"];
 }
 
-/** Horizontal tabs with automatic keyboard activation. Items are fixed for the mount, and panels stay mounted to preserve drafts. */
+/** Items are fixed for the mount, and panels stay mounted to preserve drafts. */
 export function Tabs(
   {
     id = elementId("tabs"),
@@ -30,6 +33,8 @@ export function Tabs(
     value,
     defaultValue,
     onValueChange,
+    orientation = "horizontal",
+    activation = "automatic",
     className,
     children,
     ref,
@@ -40,7 +45,20 @@ export function Tabs(
   void children;
   const enabled = items.flatMap((item, index) => (item.disabled ? [] : [index]));
   const local = signal(defaultValue ?? items[enabled[0] ?? -1]?.value ?? "");
-  const focus = signal(enabled[0] ?? -1);
+  const stop = signal<string | null>(enabled.length ? String(enabled[0]) : null);
+  const elements = new Map<number, HTMLElement>();
+  const roving = createRovingFocus({
+    stop,
+    orientation,
+    items: () =>
+      [...elements]
+        .sort(([a], [b]) => a - b)
+        .map(([index, el]) => ({
+          key: String(index),
+          el,
+          disabled: items[index]?.disabled,
+        })),
+  });
   const current = value !== undefined ? value : local;
   const activeIndex = derived(() =>
     items.findIndex((item) => item.value === unwrap(current) && !item.disabled),
@@ -49,44 +67,31 @@ export function Tabs(
   const indicatorHidden = derived(() => activeIndex.value < 0);
   const selected = items.map((_, index) => derived(() => String(index === activeIndex.value)));
   const hidden = items.map((_, index) => derived(() => index !== activeIndex.value));
-  const tabIndex = items.map((_, index) => derived(() => (index === focus.value ? 0 : -1)));
+  const tabIndex = items.map((_, index) => derived(() => (String(index) === stop.value ? 0 : -1)));
   // Arrow keys set focus themselves. A host-driven value still moves the roving tabindex.
   context.effect(() => {
     const active = activeIndex.value;
-    focus.value = active >= 0 ? active : (enabled[0] ?? -1);
+    const index = active >= 0 ? active : (enabled[0] ?? -1);
+    stop.value = index >= 0 ? String(index) : null;
   });
   const choose = (index: number) => {
     const item = items[index];
     if (!item || item.disabled) return;
-    focus.value = index;
+    stop.value = String(index);
     if (value === undefined) local.value = item.value;
     onValueChange?.(item.value);
   };
-  const keydown = (event: KeyboardEvent, index: number) => {
-    const position = enabled.indexOf(index);
-    if (position < 0 || !enabled.length) return;
-    const rtl = getComputedStyle(event.currentTarget as Element).direction === "rtl";
-    let target: number | undefined;
-    if (event.key === "Home") target = enabled[0];
-    else if (event.key === "End") target = enabled.at(-1);
-    else if (event.key === "ArrowRight" || event.key === "ArrowLeft") {
-      const delta = (event.key === "ArrowRight" ? 1 : -1) * (rtl ? -1 : 1);
-      target = enabled[(position + delta + enabled.length) % enabled.length];
-    }
-    if (target === undefined) return;
-    event.preventDefault();
-    const button = (event.currentTarget as HTMLElement).parentElement?.querySelectorAll(
-      '[role="tab"]',
-    )[target] as HTMLElement | undefined;
-    button?.focus();
-    choose(target);
+  const keydown = (event: KeyboardEvent) => {
+    if (roving.keydown(event) && activation === "automatic" && stop.value !== null)
+      choose(Number(stop.value));
   };
+  context.onCleanup(() => roving.dispose());
   return (
     <div {...props} id={id} className={className} ref={[context.parts.root, ref]}>
       <div
         role="tablist"
         aria-label={label}
-        aria-orientation="horizontal"
+        aria-orientation={orientation}
         style={{ [tabsCount.name]: Math.max(1, items.length), [tabsIndex.name]: indicatorIndex }}
         ref={context.parts.list}
       >
@@ -101,11 +106,19 @@ export function Tabs(
             aria-selected={selected[index]}
             tabIndex={tabIndex[index]}
             onFocus={() => {
-              focus.value = index;
+              stop.value = String(index);
             }}
             onClick={() => choose(index)}
-            onKeyDown={(event: KeyboardEvent) => keydown(event, index)}
-            ref={context.parts.tab}
+            onKeyDown={keydown}
+            ref={[
+              context.parts.tab,
+              (element: HTMLElement) => {
+                elements.set(index, element);
+                return () => {
+                  elements.delete(index);
+                };
+              },
+            ]}
           >
             {item.label}
           </button>

@@ -1,8 +1,100 @@
 import { expect, test } from "bun:test";
+import { Window } from "happy-dom";
 import { createRuntime, h, type Props } from "meowjsx";
 import { unwrap, signal } from "meowjsx/signal";
 import { createWebRenderer } from "meowjsx/web";
 import { Tabs } from "../../../src/components/tabs";
+import { checkDirection, checkPattern, checkSsrPurity } from "../pattern-kit";
+
+const patternItems = ["One", "Two", "Three"].map((label) => ({
+  value: label,
+  label,
+  content: label,
+}));
+
+function mountTabs(
+  orientation: "horizontal" | "vertical" = "horizontal",
+  activation: "automatic" | "manual" = "automatic",
+) {
+  const before = Object.getOwnPropertyDescriptors(globalThis);
+  const dom = new Window();
+  for (const name of ["document", "HTMLElement", "Element", "Node", "MutationObserver"] as const)
+    Object.defineProperty(globalThis, name, {
+      value: dom[name],
+      configurable: true,
+      writable: true,
+    });
+  const computedStyle = dom.getComputedStyle.bind(dom);
+  dom.getComputedStyle = (element) =>
+    new Proxy(computedStyle(element), {
+      get(target, property, receiver) {
+        if (property === "direction") return element.closest("[dir]")?.getAttribute("dir") || "ltr";
+        return Reflect.get(target, property, receiver);
+      },
+    });
+  const root = dom.document.createElement("div");
+  dom.document.body.append(root);
+  const rendered = createWebRenderer(createRuntime()).render(
+    <Tabs
+      id="pattern-tabs"
+      label="Views"
+      items={patternItems}
+      orientation={orientation}
+      activation={activation}
+    />,
+    root as unknown as Element,
+  );
+  return {
+    root: root as unknown as Element,
+    unmount() {
+      rendered.unmount();
+      root.remove();
+      for (const name of Reflect.ownKeys(globalThis))
+        if (!Object.hasOwn(before, name)) Reflect.deleteProperty(globalThis, name);
+      for (const name of Reflect.ownKeys(before))
+        Object.defineProperty(globalThis, name, before[name as keyof typeof before]!);
+    },
+  };
+}
+
+test("tabs satisfy the composite pattern and mirror horizontal direction", async () => {
+  const instance = mountTabs();
+  try {
+    await checkPattern(instance.root, "tabs");
+  } finally {
+    instance.unmount();
+  }
+  await checkDirection(() => mountTabs());
+});
+
+test("vertical manual tabs move focus without selecting until activated", async () => {
+  const instance = mountTabs("vertical", "manual");
+  try {
+    const tabs = [...instance.root.querySelectorAll<HTMLButtonElement>('[role="tab"]')];
+    tabs[0]!.focus();
+    const view = instance.root.ownerDocument.defaultView!;
+    tabs[0]!.dispatchEvent(
+      new view.KeyboardEvent("keydown", { key: "ArrowDown", bubbles: true, cancelable: true }),
+    );
+    expect(instance.root.ownerDocument.activeElement).toBe(tabs[1]!);
+    expect(tabs[0]!.getAttribute("aria-selected")).toBe("true");
+    tabs[1]!.click();
+    await Promise.resolve();
+    expect(tabs[1]!.getAttribute("aria-selected")).toBe("true");
+  } finally {
+    instance.unmount();
+  }
+});
+
+test("tabs render on the server without impure global calls", () => {
+  expect(
+    checkSsrPurity(() =>
+      createWebRenderer(createRuntime()).renderToHtml(
+        <Tabs id="server-tabs" label="Views" items={patternItems} />,
+      ),
+    ),
+  ).toContain('role="tablist"');
+});
 
 test("tabs keep panels mounted while controlled selection remains caller-owned", () => {
   const runtime = createRuntime();

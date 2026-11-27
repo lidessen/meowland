@@ -17,7 +17,7 @@ test("Doodle keeps the ink stroke while the pressed action loses its lift", asyn
   ];
   const card = page.locator('[data-meowui-part="card/root"]').first();
   await expect(card).toHaveCSS("border-top-width", "2px");
-  await expect(page.locator("body")).toHaveCSS("background-image", /radial-gradient/);
+  await expect(page.locator("html")).toHaveCSS("background-image", /radial-gradient/);
   for (const action of actions) {
     await expect(action).toHaveCSS("min-height", "44px");
     await expect(action).toHaveCSS("border-top-width", "2px");

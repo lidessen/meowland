@@ -90,8 +90,10 @@ export const chatComposerStyles = css`
   }
 
   /* The form groups the writing surface and its external supporting instructions. */
+  /* The composer is the container its narrow layouts query. */
   ${chatComposerPartRefs.root} {
     position: relative;
+    container: chat-composer / inline-size;
     display: grid;
     grid-template-columns: minmax(0, 1fr);
     gap: 6px;
@@ -303,7 +305,7 @@ export const chatComposerStyles = css`
     box-shadow: none;
   }
 
-  @media (max-width: 680px) {
+  @container chat-composer (max-width: 560px) {
     ${chatComposerPartRefs.surface} {
       grid-template-columns: minmax(0, 1fr);
       padding: 8px 0 0;
@@ -462,8 +464,10 @@ export const chatComposerStyles = css`
     padding-inline: calc(${uiTokens.space.section} + 14px);
   }
 
-  /* A phone writes on one row: attach, text, send. The model choice keeps a quiet row beneath. */
-  @media (max-width: 768px) {
+  /* A narrow composer writes on one row: attach, text, send. The model choice keeps a quiet row
+     beneath. The composer's own width decides, not the viewport, so a composer in a side pane or an
+     embedded preview keeps the layout its room allows. */
+  @container chat-composer (max-width: 560px) {
     ${chatComposerPartRefs.root}[${chatComposerOptions.attribute("layout")}="stacked"] > ${chatComposerPartRefs.surface} {
       display: grid;
       grid-template-columns: auto minmax(0, 1fr) auto;

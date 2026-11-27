@@ -58,7 +58,7 @@ test("a direct frame composer keeps its reading inset while nested composers use
 test("a labeled action in a narrow stacked composer takes its own row instead of the text's column", async ({
   page,
 }) => {
-  await page.setViewportSize({ width: 640, height: 900 });
+  await page.setViewportSize({ width: 480, height: 900 });
   await page.goto("/canvas.html?story=composer-attachments");
   await expect(page.locator("#story-state")).toHaveAttribute("data-status", "ready");
   const geometry = await page

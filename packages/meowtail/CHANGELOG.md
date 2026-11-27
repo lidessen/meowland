@@ -2,32 +2,6 @@
 
 ## Unreleased
 
-- `ChatComposer` is the one place to extend a draft ([design](../../docs/designs/2026-11-27-composer-extensions.md)):
-  - `defaultValue` and `onValueChange` give it the Autocomplete ownership shape; without `value` it
-    keeps a local draft.
-  - `submitOn` (`"none"`, `"enter"`, `"mod-enter"`) submits through the form's submit button, so a
-    blocked composer swallows the key and IME composition never submits. `AssistantComposer` uses
-    it instead of its own Enter handler.
-  - `triggers` turn characters into host suggestions (`@` mentions, `/` commands, `#` paths) with
-    one keyboard order, a surface-anchored listbox, async lookups with an `AbortSignal`, removable
-    or drill-down inserts and a live region. New parts: `suggestions`, `suggestionList`,
-    `suggestion`, `suggestionLeading`, `suggestionCopy`, `suggestionLabel`,
-    `suggestionDescription`, `suggestionMeta`, `suggestionStatus` and `announcement`.
-  - `findComposerTrigger` and `insertComposerSuggestion` are exported for hosts and tests.
-- `AssistantView` accepts `composerTriggers`.
-- `ChoiceSelect` takes a Signal for `disabled`, and `ChoiceOption` an optional `description` line
-  (new parts `optionLabel` and `description`).
-- `Item` accepts an `href`: the whole item becomes a link with the button item's hover and focus
-  treatment, and a selected link item carries `aria-current="page"`. The leading slot now centers on
-  the first text line (`1lh`), so a state dot and an icon sit level with the title.
-- Add `Stat`, one summary figure with a label, the figure in the page-title size, an optional
-  supporting fact and an optional `href`. It joins `meowUIComponents` and `standardThemeStyles`.
-- `NavList` packs its rows at the top when a sidebar gives it spare height.
-
-- Button accepts an `href` for navigation with native link semantics and the same theme styling as
-  button actions. The documentation's home entry uses it instead of a separately styled link.
-- Doodle dark uses quieter ink edges and a darker blue and rust action palette.
-
 - `createMeowUITheme({ theme, config })` from `meowtail/web` is a runtime plugin that delivers a
   theme to every Web mount: the stylesheet (shared per document through `meowcss/web`
   `mountStyles`), the theme attributes on the container and the focus-modality tracker, all
@@ -141,6 +115,43 @@
 - The Meowbook gallery's Theme control switches every story between Standard, Journal and Meow.
 - Add `journalFonts` and the `ThemeFont` type: the Fontsource packages that carry the faces Journal
   names. Meowtail ships no font files. The gallery paints Journal stories with those faces.
+
+## 0.4.0-alpha.7
+
+- `ChatComposer`'s narrow layouts follow the composer's own width instead of the viewport: the root
+  is a `chat-composer` inline-size container, and the one-row writing layout applies at 560px and
+  below. A composer in a side pane or an embedded preview no longer switches to the phone layout on
+  a desktop page, and a narrow composer on a wide screen now gets it.
+
+## 0.4.0-alpha.6
+
+Requires `meowjsx@^0.3.0-alpha.1` and `meowcss@^0.3.0-alpha.2`. Released together with
+`meowjsx@0.3.0-alpha.3`, which adds the `meowjsx/router` entry.
+
+- `ChatComposer` is the one place to extend a draft ([design](../../docs/designs/2026-11-27-composer-extensions.md)):
+  - `defaultValue` and `onValueChange` give it the Autocomplete ownership shape; without `value` it
+    keeps a local draft.
+  - `submitOn` (`"none"`, `"enter"`, `"mod-enter"`) submits through the form's submit button, so a
+    blocked composer swallows the key and IME composition never submits. `AssistantComposer` uses
+    it instead of its own Enter handler.
+  - `triggers` turn characters into host suggestions (`@` mentions, `/` commands, `#` paths) with
+    one keyboard order, a surface-anchored listbox, async lookups with an `AbortSignal`, removable
+    or drill-down inserts and a live region. New parts: `suggestions`, `suggestionList`,
+    `suggestion`, `suggestionLeading`, `suggestionCopy`, `suggestionLabel`,
+    `suggestionDescription`, `suggestionMeta`, `suggestionStatus` and `announcement`.
+  - `findComposerTrigger` and `insertComposerSuggestion` are exported for hosts and tests.
+- `AssistantView` accepts `composerTriggers`.
+- `ChoiceSelect` takes a Signal for `disabled`, and `ChoiceOption` an optional `description` line
+  (new parts `optionLabel` and `description`).
+- `Item` accepts an `href`: the whole item becomes a link with the button item's hover and focus
+  treatment, and a selected link item carries `aria-current="page"`. The leading slot now centers on
+  the first text line (`1lh`), so a state dot and an icon sit level with the title.
+- Add `Stat`, one summary figure with a label, the figure in the page-title size, an optional
+  supporting fact and an optional `href`. It joins `meowUIComponents` and `standardThemeStyles`.
+- `NavList` packs its rows at the top when a sidebar gives it spare height.
+- Button accepts an `href` for navigation with native link semantics and the same theme styling as
+  button actions. The documentation's home entry uses it instead of a separately styled link.
+- Doodle dark uses quieter ink edges and a darker blue and rust action palette.
 
 ## 0.4.0-alpha.5
 

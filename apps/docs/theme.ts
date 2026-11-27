@@ -114,7 +114,10 @@ export const docsStyles = css`
   * {
     box-sizing: border-box;
   }
-  .docs-shell a:not(:where([data-meowui-part="link/root"], ${prose.root} a)) {
+  /* Plain site links take the surrounding ink. Library parts (Link, a Button or Item rendered as a
+     link) and Prose links keep the look the theme gives them; the theme's rules carry no
+     specificity, so this reset must not reach them. */
+  .docs-shell a:not(:where([data-meowui-part], ${prose.root} a)) {
     color: inherit;
     text-decoration: none;
   }
